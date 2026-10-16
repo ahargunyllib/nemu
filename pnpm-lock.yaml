@@ -210,12 +210,18 @@ importers:
 
   apps/server:
     dependencies:
+      '@nemu/ai':
+        specifier: workspace:*
+        version: link:../../packages/ai
       '@nemu/api':
         specifier: workspace:*
         version: link:../../packages/api
       '@nemu/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@nemu/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@nemu/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -354,11 +360,33 @@ importers:
         specifier: npm:@voidzero-dev/vite-plus-core@1.1.0
         version: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@26.6.5)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1)'
 
+  packages/ai:
+    dependencies:
+      '@nemu/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      zod:
+        specifier: 'catalog:'
+        version: 4.6.7
+    devDependencies:
+      '@nemu/config':
+        specifier: workspace:*
+        version: link:../config
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
   packages/api:
     dependencies:
+      '@nemu/ai':
+        specifier: workspace:*
+        version: link:../ai
       '@nemu/auth':
         specifier: workspace:*
         version: link:../auth
+      '@nemu/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@nemu/db':
         specifier: workspace:*
         version: link:../db
@@ -414,6 +442,19 @@ importers:
         version: 6.0.3
 
   packages/config: {}
+
+  packages/contracts:
+    dependencies:
+      zod:
+        specifier: 'catalog:'
+        version: 4.6.7
+    devDependencies:
+      '@nemu/config':
+        specifier: workspace:*
+        version: link:../config
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
   packages/db:
     dependencies:

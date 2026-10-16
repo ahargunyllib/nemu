@@ -9,8 +9,10 @@
     "env:generate": "varlock codegen"
   },
   "dependencies": {
+    "@nemu/ai": "workspace:*",
     "@nemu/api": "workspace:*",
     "@nemu/auth": "workspace:*",
+    "@nemu/contracts": "workspace:*",
     "@nemu/db": "workspace:*",
     "@orpc/openapi": "catalog:",
     "@orpc/server": "catalog:",

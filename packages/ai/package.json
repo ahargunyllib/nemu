@@ -1,0 +1,27 @@
+{
+  "name": "@nemu/ai",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./demo": {
+      "types": "./src/demo.ts",
+      "default": "./dist/demo.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "check-types": "tsc -b",
+    "test": "tsc -b && node --test dist/index.test.js"
+  },
+  "dependencies": {
+    "@nemu/contracts": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@nemu/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

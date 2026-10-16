@@ -10,7 +10,9 @@
     "check-types": "tsc -b"
   },
   "dependencies": {
+    "@nemu/ai": "workspace:*",
     "@nemu/auth": "workspace:*",
+    "@nemu/contracts": "workspace:*",
     "@nemu/db": "workspace:*",
     "@orpc/client": "catalog:",
     "@orpc/openapi": "catalog:",
