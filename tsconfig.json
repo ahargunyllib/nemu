@@ -1,0 +1,3 @@
+{
+  "extends": "@nemu/config/tsconfig.base.json"
+}
