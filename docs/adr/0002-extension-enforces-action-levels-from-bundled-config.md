@@ -1,0 +1,3 @@
+# The extension decides what it may click, from a bundled config
+
+The Nemu Extension must refuse to click Konfirmasi or Dilarang elements even when the Nemu Service asks it to. Action Levels per nemu_id live in a static config file that the extension bundles at build time. The extension clicks only elements the config marks Jalan sendiri; any other click request becomes a highlight. We did not let the Demo App mark levels on its own elements (a page could grant itself click rights) and did not fetch rules from the Service (a misbehaving Service could loosen them). An admin UI for Action Levels is deferred.
