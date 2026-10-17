@@ -50,7 +50,13 @@ export function AreaSelectLayer({ onSelect, onCancel }: AreaSelectLayerProps) {
       }}
     >
       {!start && (
-        <Card size="sm" className="absolute top-4 left-1/2 -translate-x-1/2 shadow-lg">
+        // Sized explicitly: CardHeader is a size container, so a shrink-to-fit Card collapses.
+        // Centered with margins, not translate: Tailwind's translate variables stay unset in the
+        // shadow root, where @property registrations don't apply.
+        <Card
+          size="sm"
+          className="absolute inset-x-0 top-4 mx-auto w-md max-w-[calc(100vw-2rem)] shadow-lg"
+        >
           <CardHeader>
             <CardTitle>Pilih area</CardTitle>
             <CardDescription>
