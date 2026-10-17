@@ -1,5 +1,5 @@
 import type { NemuAction, PageElement } from "@nemu/contracts";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { useAnswerActions } from "../../features/action-level/hooks/use-answer-actions";
 import { AreaCropChip } from "../../features/area-crop/components/area-crop-chip";
@@ -52,6 +52,7 @@ export function NemuOverlay() {
   useClickFollowUp(clicked, chat.followUp);
   const confirmed = useConfirmedStatus(actions);
   const [panelRef, panelHeight] = useElementHeight<HTMLDivElement>();
+  const nemuRef = useRef<HTMLDivElement>(null);
 
   function openComposer(position: CursorPosition) {
     setAnchor(position);
@@ -80,6 +81,7 @@ export function NemuOverlay() {
   // All of it is hidden while the viewport is captured, so an Area Crop shows only the page.
   return (
     <div
+      ref={nemuRef}
       className={
         area.state.kind === "capturing"
           ? "invisible font-sans text-foreground"
@@ -141,6 +143,7 @@ export function NemuOverlay() {
                   if (state.kind === "idle") setAnchor(null);
                 }}
                 onPickArea={area.start}
+                boundary={nemuRef}
               >
                 {(area.state.kind === "attached" || area.state.kind === "failed") && (
                   <AreaCropChip state={area.state} onRemove={area.clear} />
