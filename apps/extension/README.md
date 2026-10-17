@@ -51,6 +51,22 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
 After code changes in dev mode, the dev build reloads itself; if the overlay doesn't update,
 click the reload icon on the extension card and refresh the Demo App tab.
 
+## Check it in a real browser
+
+With `NEMU_RESPONDER=fixture pnpm dev` running, `pnpm --filter extension verify` loads the dev
+build into Playwright's Chromium and checks:
+
+- a page outside the allowlist gets no overlay;
+- signed out, the card asks Rina to log in;
+- signed in as Rina, the Momen 1 prompt comes back as an Answer Card with its citation.
+
+It prints one line per check, exits non-zero on a failure, and saves screenshots to
+`.output/verify/`. Add `-- --headed` to watch it. Automation can't press the toolbar icon or the
+browser-level shortcut, so the script opens the Composer by sending the background's open message
+from the service worker. Check Ctrl+Shift+Space by hand when you change the shortcut or the
+manifest. If Playwright's Chromium isn't installed yet, run
+`pnpm --filter extension exec playwright-core install chromium` once.
+
 The extension calls `http://localhost:3000` by default. Set `WXT_SERVER_URL` (in
 `apps/extension/.env` or the shell) before building to point it at another Nemu Service; the
 manifest's host permission follows it.
