@@ -11,10 +11,22 @@ function renderComposer(attachment?: React.ReactNode) {
   const onSubmit = vi.fn();
   const onCancel = vi.fn();
   const onPickArea = vi.fn();
+  const boundary = { current: null as HTMLElement | null };
   render(
-    <Composer onSubmit={onSubmit} onCancel={onCancel} onPickArea={onPickArea}>
-      {attachment}
-    </Composer>,
+    <>
+      <button type="button">Halaman</button>
+      <div ref={(element) => void (boundary.current = element)}>
+        <Composer
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+          onPickArea={onPickArea}
+          boundary={boundary}
+        >
+          {attachment}
+        </Composer>
+        <button type="button">Answer Card</button>
+      </div>
+    </>,
   );
   const input = screen.getByRole("textbox", { name: "Pertanyaan untuk Nemu" });
   return { input, onSubmit, onCancel, onPickArea };
@@ -84,5 +96,46 @@ describe("Composer", () => {
     fireEvent.click(screen.getByRole("button", { name: "Hapus Area Crop" }));
 
     expect(onRemove).toHaveBeenCalledOnce();
+  });
+
+  test("closes when the page is clicked while it is empty", () => {
+    const { input, onCancel } = renderComposer();
+
+    fireEvent.change(input, { target: { value: "   " } });
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Halaman" }));
+
+    expect(onCancel).toHaveBeenCalledOnce();
+  });
+
+  test("keeps a draft and marks itself when the page is clicked", () => {
+    const { input, onCancel } = renderComposer();
+
+    fireEvent.change(input, { target: { value: "Mulai dari mana?" } });
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Halaman" }));
+
+    expect(onCancel).not.toHaveBeenCalled();
+    expect(input).toHaveProperty("value", "Mulai dari mana?");
+    expect(input.closest("[data-nudged]")).not.toBeNull();
+  });
+
+  test("keeps an attached Area Crop when the page is clicked", () => {
+    const { onCancel } = renderComposer(
+      <AreaCropChip
+        state={{ kind: "attached", crop: "data:image/png;base64,AREA" }}
+        onRemove={vi.fn()}
+      />,
+    );
+
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Halaman" }));
+
+    expect(onCancel).not.toHaveBeenCalled();
+  });
+
+  test("stays open when the rest of Nemu, such as the Answer Card, is clicked", () => {
+    const { onCancel } = renderComposer();
+
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Answer Card" }));
+
+    expect(onCancel).not.toHaveBeenCalled();
   });
 });
