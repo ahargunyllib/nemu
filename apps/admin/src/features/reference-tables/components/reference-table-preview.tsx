@@ -22,32 +22,35 @@ export default function ReferenceTablePreview({
 }) {
   const previewRows = rows.slice(0, PREVIEW_ROW_COUNT);
 
+  // One scroll box for both axes, capped so a long table stays inside the dialog.
   return (
-    <Table>
-      <TableCaption>
-        Showing {previewRows.length} of {rows.length} rows
-      </TableCaption>
-      <TableHeader>
-        <TableRow>
-          {columns.map((column) => (
-            <TableHead key={column}>{column}</TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {previewRows.map((row) => (
-          <TableRow key={columns.map((column) => row[column]).join("|")}>
-            {columns.map((column) => {
-              const value = row[column];
-              return (
-                <TableCell key={column}>
-                  {typeof value === "number" ? numberFormat.format(value) : value}
-                </TableCell>
-              );
-            })}
+    <div className="max-h-[60vh] min-w-0 overflow-auto [&_[data-slot=table-container]]:overflow-visible">
+      <Table>
+        <TableCaption>
+          Showing {previewRows.length} of {rows.length} rows
+        </TableCaption>
+        <TableHeader className="sticky top-0 z-10 bg-popover">
+          <TableRow>
+            {columns.map((column) => (
+              <TableHead key={column}>{column}</TableHead>
+            ))}
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {previewRows.map((row) => (
+            <TableRow key={columns.map((column) => row[column]).join("|")}>
+              {columns.map((column) => {
+                const value = row[column];
+                return (
+                  <TableCell key={column}>
+                    {typeof value === "number" ? numberFormat.format(value) : value}
+                  </TableCell>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }
