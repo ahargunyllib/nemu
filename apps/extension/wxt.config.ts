@@ -6,6 +6,9 @@ import { DEFAULT_SERVER_URL } from "./shared/lib/config";
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   modules: ["@wxt-dev/module-react"],
+  // Don't auto-launch a browser in dev: it needs Chrome installed, and `pnpm dev` dies without it.
+  // Load .output/chrome-mv3-dev unpacked in any Chromium browser instead.
+  webExt: { disabled: true },
   vite: () => ({
     plugins: [tailwindcss()],
   }),
