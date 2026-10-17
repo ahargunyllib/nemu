@@ -2,14 +2,8 @@
   "name": "@nemu/contracts",
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "default": "./dist/index.js"
-    },
-    "./fixtures": {
-      "types": "./src/fixtures.ts",
-      "default": "./dist/fixtures.js"
-    }
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
   },
   "scripts": {
     "build": "tsc -b",
