@@ -57,3 +57,7 @@ schema, that none repeats, and that every fixture targets a registered id.
 To add an element, register its id in `NEMU_IDS` first and render it with
 `data-nemu-id={NEMU_IDS.<page>.<element>}`. Never rename or reuse an id: the
 fixtures, the AI, and the extension's Action Level config (ADR-0002) target them.
+
+Put the id on the whole control Rina sees. A field with a prefix or suffix, such
+as `RupiahInput`'s "Rp", carries it on its input group, named by the field label
+through `aria-labelledby`, so a highlight rings the prefix too.

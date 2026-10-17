@@ -49,11 +49,14 @@ export default function BiayaSection({ form }: { form: AjukanPerdinForm }) {
         <form.Field name="biayaTransport">
           {(field) => (
             <Field data-invalid={!field.state.meta.isValid}>
-              <FieldLabel htmlFor={field.name}>Biaya transportasi pergi-pulang</FieldLabel>
+              <FieldLabel id={`${field.name}-label`} htmlFor={field.name}>
+                Biaya transportasi pergi-pulang
+              </FieldLabel>
               <RupiahInput
                 id={field.name}
                 name={field.name}
-                data-nemu-id={NEMU_IDS.perdinForm.biayaTransport}
+                nemuId={NEMU_IDS.perdinForm.biayaTransport}
+                labelId={`${field.name}-label`}
                 value={field.state.value}
                 aria-invalid={!field.state.meta.isValid}
                 onBlur={field.handleBlur}
@@ -96,11 +99,14 @@ export default function BiayaSection({ form }: { form: AjukanPerdinForm }) {
       <form.Field name="nominalPenginapan">
         {(field) => (
           <Field data-invalid={!field.state.meta.isValid}>
-            <FieldLabel htmlFor={field.name}>Nominal penginapan</FieldLabel>
+            <FieldLabel id={`${field.name}-label`} htmlFor={field.name}>
+              Nominal penginapan
+            </FieldLabel>
             <RupiahInput
               id={field.name}
               name={field.name}
-              data-nemu-id={NEMU_IDS.perdinForm.lodgingAmount}
+              nemuId={NEMU_IDS.perdinForm.lodgingAmount}
+              labelId={`${field.name}-label`}
               value={field.state.value}
               aria-invalid={!field.state.meta.isValid}
               onBlur={field.handleBlur}
@@ -115,11 +121,14 @@ export default function BiayaSection({ form }: { form: AjukanPerdinForm }) {
       <form.Field name="uangHarian">
         {(field) => (
           <Field data-invalid={!field.state.meta.isValid}>
-            <FieldLabel htmlFor={field.name}>Uang harian</FieldLabel>
+            <FieldLabel id={`${field.name}-label`} htmlFor={field.name}>
+              Uang harian
+            </FieldLabel>
             <RupiahInput
               id={field.name}
               name={field.name}
-              data-nemu-id={NEMU_IDS.perdinForm.uangHarian}
+              nemuId={NEMU_IDS.perdinForm.uangHarian}
+              labelId={`${field.name}-label`}
               value={field.state.value}
               aria-invalid={!field.state.meta.isValid}
               onBlur={field.handleBlur}
