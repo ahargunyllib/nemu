@@ -33,9 +33,5 @@ jobs:
       - uses: ./.github/actions/setup
       - name: Check provider credentials
         run: pnpm --filter @nemu/infra exec alchemy provider check-env --provider Cloudflare
-      # @nemu/ai and @nemu/contracts export ./dist, which is gitignored; the
-      # Worker bundle can't resolve them unless they are built first.
-      - name: Build workspace packages
-        run: pnpm --filter @nemu/ai build
       - name: Deploy
         run: pnpm --filter @nemu/infra exec alchemy deploy --yes
