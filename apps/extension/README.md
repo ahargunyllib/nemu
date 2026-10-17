@@ -10,6 +10,14 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   takes the user from that session; the extension never sends `user_id`. Signed out, the card asks
   Rina to log in to the Demo App.
 - **Contract.** Request and response schemas come from `@nemu/contracts`.
+- **Element List.** Every prompt carries the page's rendered elements that have a
+  `data-nemu-id` (at most 150, under 50 KB, never an input's value). Off-screen ones are sent
+  with `visible: false` so Nemu can still point at them.
+- **Highlight (Arahkan).** A `highlight` action scrolls to its target and draws a pulsing amber
+  outline with the action label on a click-through page layer; the Answer Card moves aside so it
+  never covers a highlight. A target missing from the page becomes a warning on the card. The
+  Momen 2 prompt with `NEMU_RESPONDER=fixture` exercises it once the lodging form (#3) is on
+  `/perdin/baru`.
 - **Shortcut.** Ctrl+Shift+Space is bound to the extension's action (`_execute_action`, shown
   as "Activate the extension"), the same as clicking the Nemu toolbar icon. It's not a page key
   listener because macOS, the browser, or another app can take the keys before the page sees

@@ -61,6 +61,14 @@ _Avoid_: business trip, perdin
 **SBM**:
 Standar Biaya Masukan, the yearly cost-ceiling table (TA 2026 = PMK 32/2025) that sets daily allowance, lodging and transport rates per province and golongan.
 
+**Kalender Libur**:
+The year's national holidays and cuti bersama; days in it are not working days when counting deadlines such as the Pertanggungjawaban.
+_Avoid_: holiday list
+
+**Reference Table**:
+A structured table the admin uploads as CSV in the Admin Workspace: one of the SBM tables or the Kalender Libur. A new upload replaces the stored table of the same type.
+_Avoid_: table (alone), spreadsheet
+
 **Golongan**:
 A civil servant's rank (e.g. III/a); it selects the SBM row.
 

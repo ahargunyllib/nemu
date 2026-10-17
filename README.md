@@ -30,7 +30,9 @@ This project uses Cloudflare D1 (SQLite) with Drizzle ORM.
 
 Runtime database access uses the Cloudflare `DB` binding from `packages/infra/alchemy.run.ts`. If a local `DATABASE_URL` is present, it is only for database tooling.
 
-Alchemy provisions the D1 database and applies migrations during `deploy`.
+Alchemy provisions the D1 database and applies migrations during `deploy`. `pnpm run dev` does the same for the local D1 database, which includes the seeded demo accounts.
+
+`alchemy dev` keeps its state in `packages/infra/.alchemy/` alongside the local database, while `deploy` keeps state in Cloudflare. Each checkout or git worktree therefore gets its own migrated local database on its first `pnpm run dev`, with no manual step. Copy `apps/server/.env` into a new worktree before starting it. To reset the local database, stop dev and delete `packages/infra/.alchemy/`.
 
 1. Generate migration files:
 
