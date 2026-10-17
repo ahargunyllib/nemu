@@ -44,6 +44,17 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   prefers-reduced-motion it jumps instead of gliding and doesn't animate. The art in
   `features/mascot/assets/` is placeholder SVG: replace each file under the same name with the
   final art.
+- **Follow-up on the new page.** A click that opens a Task (only the Pertanggungjawaban task link,
+  listed in `features/chat/lib/follow-up.ts`) asks the same question once more after it lands:
+  once the new page has no `Skeleton` and its nemu_ids hold still for 300 ms (3 s at most), the
+  extension sends the prompt with that page's Element List. At most one follow-up per question.
+  Momen 1's menu click doesn't follow up: its answer is complete. The fixture Responder tells the
+  two Momen 3 requests apart by their Element Lists.
+- **Konfirmasi.** A `confirm` action rings its target with its label (Momen 3: Kirim, "Kamu yang
+  mengirim"), and the extension never clicks it. On a task page (`/perdin/task/$instanceId`), once
+  Rina presses it, the background reads `getProcessInstance` until the State moves and the Answer
+  Card shows the task ID and the new State (Verifikasi). A `batas_pertanggungjawaban` calc entry
+  shows as a deadline chip on the card.
 - **Shortcut.** Ctrl+Shift+Space is bound to the extension's action (`_execute_action`, shown
   as "Activate the extension"), the same as clicking the Nemu toolbar icon. It's not a page key
   listener because macOS, the browser, or another app can take the keys before the page sees
@@ -92,6 +103,10 @@ build into Playwright's Chromium and checks:
   The card shows the answer, warning and the PMK 119/2023 Pasal 8 ayat (5) citation, rings each
   lodging field with its action label, and keeps off both fields. Nemu fills in neither field,
   and the Chat Log records that an Area Crop was attached;
+- Momen 3, five times in a row after a demo data reset: Nemu opens the Pertanggungjawaban task,
+  the follow-up rings both missing uploads and Kirim and shows the 12 November 2026 deadline chip,
+  and after the script uploads the sample PDFs and presses Kirim, the card shows
+  PJ-PD-2026-0042 and Verifikasi;
 - the mascot sits 12 px below and to the right of the cursor, and clicking it opens the Composer.
 
 It prints one line per check, exits non-zero on a failure, and saves screenshots to

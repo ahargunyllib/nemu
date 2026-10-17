@@ -13,8 +13,12 @@ import { AnswerCard } from "./answer-card";
 
 afterEach(cleanup);
 
-function renderCard(response: NemuResponse, onReply = vi.fn()) {
-  render(<AnswerCard response={response} header={null} onReply={onReply} />);
+function renderCard(response: NemuResponse, onReply = vi.fn(), children?: React.ReactNode) {
+  render(
+    <AnswerCard response={response} header={null} onReply={onReply}>
+      {children}
+    </AnswerCard>,
+  );
   return { onReply };
 }
 
@@ -40,6 +44,24 @@ describe("AnswerCard", () => {
 
     expect(screen.getByText(/30% × Rp745\.000 × 2 malam =/)).toBeTruthy();
     expect(screen.getByText("Rp447.000")).toBeTruthy();
+  });
+
+  test("shows the Momen 3 Pertanggungjawaban deadline as a chip", () => {
+    renderCard(momentThreeFollowUpResponse);
+
+    expect(screen.getByText("Batas 12 November 2026")).toBeTruthy();
+  });
+
+  test("shows no deadline chip without a batas_pertanggungjawaban entry", () => {
+    renderCard(momentTwoResponse);
+
+    expect(screen.queryByText(/^Batas /)).toBeNull();
+  });
+
+  test("shows what happened after the answer, such as the sent task's status", () => {
+    renderCard(momentThreeFollowUpResponse, vi.fn(), <p>ID tugas PJ-PD-2026-0042</p>);
+
+    expect(screen.getByText("ID tugas PJ-PD-2026-0042")).toBeTruthy();
   });
 
   test("keeps the detail collapsed until asked", () => {

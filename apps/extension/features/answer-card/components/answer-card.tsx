@@ -1,9 +1,11 @@
 import type { NemuResponse } from "@nemu/contracts";
+import { Badge } from "@nemu/ui/components/badge";
 import { Button } from "@nemu/ui/components/button";
 import { Card, CardContent, CardFooter } from "@nemu/ui/components/card";
-import { TriangleAlertIcon } from "lucide-react";
+import { CalendarClockIcon, TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 
+import { pertanggungjawabanDeadline } from "../lib/calculation";
 import { CalculationBreakdown } from "./calculation-breakdown";
 import { CitationList } from "./citation-list";
 
@@ -18,12 +20,15 @@ type AnswerCardProps = {
   response: NemuResponse;
   header: React.ReactNode;
   onReply: () => void;
+  /** What happened after the answer, such as the task's new status once the user pressed Kirim. */
+  children?: React.ReactNode;
 };
 
-export function AnswerCard({ response, header, onReply }: AnswerCardProps) {
+export function AnswerCard({ response, header, onReply, children }: AnswerCardProps) {
   const [detailOpen, setDetailOpen] = useState(false);
   const statusLabel = STATUS_LABELS[response.status];
   const { detail } = response.answer;
+  const deadline = pertanggungjawabanDeadline(response.calc);
 
   return (
     <Card size="sm" className="shadow-lg">
@@ -41,6 +46,12 @@ export function AnswerCard({ response, header, onReply }: AnswerCardProps) {
           </p>
         )}
         <p className="text-sm">{response.answer.ringkas}</p>
+        {deadline && (
+          <Badge>
+            <CalendarClockIcon data-icon="inline-start" />
+            Batas {deadline}
+          </Badge>
+        )}
         {detail && (
           <div className="flex flex-col items-start gap-1">
             <Button
@@ -56,6 +67,7 @@ export function AnswerCard({ response, header, onReply }: AnswerCardProps) {
           </div>
         )}
         <CalculationBreakdown calculations={response.calc} />
+        {children}
         {response.warnings.length > 0 && (
           <ul aria-label="Peringatan" className="flex flex-col gap-1">
             {response.warnings.map((warning) => (

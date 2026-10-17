@@ -8,6 +8,8 @@ import { createNemuClient } from "../features/chat/api/nemu-client";
 import { isChatRequestMessage } from "../features/chat/lib/chat-message";
 import { requestNemuChat } from "../features/chat/api/request-nemu-chat";
 import { OPEN_COMPOSER_MESSAGE } from "../features/composer/lib/open-composer-message";
+import { requestProcessInstance } from "../features/process-status/api/request-process-instance";
+import { isProcessInstanceRequestMessage } from "../features/process-status/lib/process-instance-message";
 import { isAllowedPage } from "../shared/lib/config";
 
 /**
@@ -50,9 +52,14 @@ export default defineBackground(() => {
       void captureViewportOf(sender.tab).then(sendResponse);
       return true;
     }
-    if (!isChatRequestMessage(message)) return;
-    void requestNemuChat(client, message.request, sender.tab?.url).then(sendResponse);
-    return true;
+    if (isChatRequestMessage(message)) {
+      void requestNemuChat(client, message.request, sender.tab?.url).then(sendResponse);
+      return true;
+    }
+    if (isProcessInstanceRequestMessage(message)) {
+      void requestProcessInstance(client, message.instanceId, sender.tab?.url).then(sendResponse);
+      return true;
+    }
   });
 
   // Fired by the toolbar icon and by the `_execute_action` shortcut (Ctrl+Shift+Space).

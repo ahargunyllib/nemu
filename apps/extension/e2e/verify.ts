@@ -13,6 +13,9 @@
 import {
   momentOneRequest,
   momentOneResponse,
+  momentThreeFollowUpResponse,
+  momentThreeRequest,
+  momentThreeResponse,
   momentTwoRequest,
   momentTwoResponse,
 } from "@nemu/contracts/fixtures";
@@ -35,6 +38,13 @@ const OUTSIDE_URL = DEFAULT_SERVER_URL;
 const TIMEOUT_MS = 15_000;
 // Issue #8: Momen 1 must succeed five times out of five.
 const MOMEN_1_RUNS = 5;
+// Issue #10: so must Momen 3, from Beranda to Kirim.
+const MOMEN_3_RUNS = 5;
+const SAMPLE_DOCUMENTS = path.resolve(import.meta.dirname, "../../mock-alurkerja/sample-documents");
+const MISSING_UPLOADS = {
+  "upload-laporan-perjalanan": "laporan-perjalanan-makassar.pdf",
+  "upload-boarding-pass-pulang": "boarding-pass-pulang-upg-cgk.pdf",
+} as const;
 
 // The service worker's own extension API, which `worker.evaluate` callbacks run against.
 declare const chrome: typeof browser;
@@ -148,6 +158,15 @@ async function waitForScrollToSettle(page: Page) {
     last = scrollY;
     await page.waitForTimeout(300);
   }
+}
+
+/** The demo panel's reset puts PD-2026-0042 back in Pertanggungjawaban with two documents. */
+async function resetDemoData(page: Page) {
+  await page.goto(DEMO_APP_URL);
+  await page.getByRole("button", { name: "Panel demo" }).click();
+  await page.getByRole("button", { name: "Reset data demo" }).click();
+  await page.getByText("Data demo dikembalikan", { exact: false }).waitFor();
+  await page.keyboard.press("Escape");
 }
 
 /** Retries `assertion` until it passes, for overlay layout that follows the page a frame late. */
@@ -359,6 +378,61 @@ async function main() {
       await page.screenshot({ path: path.join(SCREENSHOT_DIR, "mascot-listening.png") });
       await page.keyboard.press("Escape");
     });
+
+    await check(
+      `Momen 3 opens the task, rings the uploads and Kirim, then shows Verifikasi, ${MOMEN_3_RUNS} out of ${MOMEN_3_RUNS}`,
+      async () => {
+        const overlay = page.locator("nemu-overlay");
+        for (let run = 1; run <= MOMEN_3_RUNS; run++) {
+          await resetDemoData(page);
+          await page.goto(DEMO_APP_URL);
+          await page.getByRole("heading", { name: "Beranda" }).waitFor();
+          await ask(context, page, momentThreeRequest.prompt);
+          await page.getByText(momentThreeResponse.answer.ringkas).waitFor();
+          await page.waitForURL(`${DEMO_APP_URL}/perdin/task/PD-2026-0042`);
+
+          // The follow-up from the task page: its own answer, the deadline chip, three rings.
+          const card = overlay
+            .locator('[data-slot="card"]')
+            .filter({ hasText: momentThreeFollowUpResponse.answer.ringkas });
+          await card.waitFor();
+          await card.getByText("Batas 12 November 2026").waitFor();
+          await waitForScrollToSettle(page);
+          await eventually(async () => {
+            for (const { target, label } of momentThreeFollowUpResponse.actions) {
+              const targetBox = await boxOf(page.locator(`[data-nemu-id="${target}"]`));
+              const rings = overlay.getByText(label, { exact: true });
+              let ringed = false;
+              for (const badge of await rings.all()) {
+                if (sameBox(await boxOf(badge.locator("..")), ringAround(targetBox))) ringed = true;
+              }
+              if (!ringed) throw new Error(`no "${label}" ring around ${target}`);
+            }
+          });
+          if (run === 1) {
+            await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-3-task.png") });
+          }
+          // Nemu never presses Kirim: the task is still open until Rina does.
+          await page.getByText("Dokumen pertanggungjawaban").waitFor();
+
+          for (const [nemuId, file] of Object.entries(MISSING_UPLOADS)) {
+            await page
+              .locator(`[data-nemu-id="${nemuId}"]`)
+              .setInputFiles(path.join(SAMPLE_DOCUMENTS, file));
+            await page.getByText(`${file} terunggah`).first().waitFor();
+          }
+          await page.locator('[data-nemu-id="button-kirim"]').click();
+
+          const status = card.getByRole("region", { name: "Status tugas" });
+          await status.getByText("PJ-PD-2026-0042").waitFor();
+          await status.getByText("Verifikasi", { exact: true }).waitFor();
+          if (run === 1) {
+            await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-3-sent.png") });
+          }
+          await closeAnswerCard(page);
+        }
+      },
+    );
   } finally {
     await context.close();
   }

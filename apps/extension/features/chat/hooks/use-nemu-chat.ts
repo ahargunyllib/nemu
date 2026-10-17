@@ -15,12 +15,15 @@ export type ChatState =
       | ChatResult
     ));
 
+type Question = { prompt: string; followedUp: boolean };
+
 export function useNemuChat() {
   const [sessionId] = useState(() => crypto.randomUUID());
   const [state, setState] = useState<ChatState>({ kind: "idle" });
   const latestRequest = useRef(0);
+  const question = useRef<Question | null>(null);
 
-  const send = useCallback(
+  const request = useCallback(
     async (prompt: string, elements: PageElement[], screenshotCrop?: string) => {
       const requestId = ++latestRequest.current;
       setState({ kind: "loading", prompt, elements, screenshotCrop });
@@ -38,10 +41,33 @@ export function useNemuChat() {
     [sessionId],
   );
 
+  const send = useCallback(
+    (prompt: string, elements: PageElement[], screenshotCrop?: string) => {
+      question.current = { prompt, followedUp: false };
+      return request(prompt, elements, screenshotCrop);
+    },
+    [request],
+  );
+
+  /**
+   * Asks the current question again from the page a click opened, at most once per question.
+   * The Area Crop shows the page before the click, so it stays behind.
+   */
+  const followUp = useCallback(
+    (elements: PageElement[]) => {
+      const current = question.current;
+      if (!current || current.followedUp) return;
+      current.followedUp = true;
+      return request(current.prompt, elements);
+    },
+    [request],
+  );
+
   const reset = useCallback(() => {
     latestRequest.current++;
+    question.current = null;
     setState({ kind: "idle" });
   }, []);
 
-  return { state, send, reset };
+  return { state, send, followUp, reset };
 }

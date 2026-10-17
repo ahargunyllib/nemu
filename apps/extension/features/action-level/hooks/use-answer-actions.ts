@@ -33,7 +33,15 @@ export function useAnswerActions(
   const warnings =
     click && navigation.outcome === "no-change" ? [clickHadNoEffectWarning(click)] : [];
 
-  return { highlights, missing, warnings, cursor: navigation.cursor, outcome: navigation.outcome };
+  return {
+    highlights,
+    missing,
+    warnings,
+    cursor: navigation.cursor,
+    outcome: navigation.outcome,
+    /** The click once it has changed the page. */
+    clicked: navigation.outcome === "succeeded" ? click : undefined,
+  };
 }
 
 function clickHadNoEffectWarning(action: NemuAction): string {

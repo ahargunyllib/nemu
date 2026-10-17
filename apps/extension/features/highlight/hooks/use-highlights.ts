@@ -11,7 +11,7 @@ type HighlightState = { highlights: TrackedHighlight[]; missing: NemuAction[] };
 const EMPTY: HighlightState = { highlights: [], missing: [] };
 
 /**
- * Runs the `highlight` actions of an answer: scrolls the first target into view, then follows
+ * Runs the `highlight` and `confirm` actions of an answer: scrolls the first target into view, then follows
  * every target's box each frame, so the highlights stay attached through scrolling, resizing, and
  * layout shifts. Targets missing from the page come back in `missing`.
  */

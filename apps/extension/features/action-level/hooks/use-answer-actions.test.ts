@@ -4,6 +4,9 @@ import {
   momentOneRequest,
   momentOneResponse,
   momentThreeFollowUpRequest,
+  momentThreeFollowUpResponse,
+  momentThreeRequest,
+  momentThreeResponse,
 } from "@nemu/contracts/fixtures";
 import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
 import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
@@ -55,6 +58,38 @@ describe("useAnswerActions", () => {
     expect(result.current.outcome).toBe("succeeded");
     expect(result.current.cursor?.mascot).toBe("success");
     expect(result.current.highlights).toEqual([]);
+  });
+
+  test("Momen 3 reports the task click once it opens the task page", async () => {
+    vi.useFakeTimers();
+    renderTarget(NEMU_IDS.task.pertanggungjawaban, () =>
+      window.history.pushState(null, "", "/perdin/task/PD-2026-0042"),
+    );
+
+    const result = renderActions(momentThreeResponse.actions, momentThreeRequest.elements);
+    expect(result.current.clicked).toBeUndefined();
+    await act(() => vi.advanceTimersByTimeAsync(MORPH_MS + MAX_MOVE_MS + 100));
+
+    expect(result.current.clicked?.target).toBe(NEMU_IDS.task.pertanggungjawaban);
+  });
+
+  test("the Momen 3 follow-up rings both uploads, then Kirim as the user's to press", async () => {
+    const targets = momentThreeFollowUpResponse.actions.map(({ target }) => renderTarget(target));
+
+    const result = renderActions(
+      momentThreeFollowUpResponse.actions,
+      momentThreeFollowUpRequest.elements,
+    );
+
+    await waitFor(() =>
+      expect(result.current.highlights.map(({ action }) => [action.target, action.label])).toEqual([
+        [NEMU_IDS.pertanggungjawaban.uploadLaporanPerjalanan, "Unggah dokumen ini"],
+        [NEMU_IDS.pertanggungjawaban.uploadBoardingPassPulang, "Unggah dokumen ini"],
+        [NEMU_IDS.pertanggungjawaban.kirim, "Kamu yang mengirim"],
+      ]),
+    );
+    expect(result.current.cursor).toBeNull();
+    for (const { clicked } of targets) expect(clicked).not.toHaveBeenCalled();
   });
 
   test("a fake answer that clicks Kirim highlights it and never clicks", async () => {

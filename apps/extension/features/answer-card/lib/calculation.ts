@@ -88,3 +88,13 @@ export function describeCalculation(calculation: Calculation): CalculationLine {
     source: calculation.sumber,
   };
 }
+
+/** The date in the answer's `batas_pertanggungjawaban` entry, formatted for the deadline chip. */
+export function pertanggungjawabanDeadline(
+  calculations: readonly Calculation[],
+): string | undefined {
+  const entry = calculations.find(({ fungsi }) => fungsi === "batas_pertanggungjawaban");
+  return typeof entry?.hasil === "string" && ISO_DATE.test(entry.hasil)
+    ? formatDate(entry.hasil)
+    : undefined;
+}
