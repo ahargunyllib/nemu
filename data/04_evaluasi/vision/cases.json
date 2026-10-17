@@ -1,0 +1,52 @@
+[
+  {
+    "id": "V01",
+    "name": "kolom_penginapan",
+    "filename": "01_kolom_penginapan.png",
+    "pertanyaan": "Apakah opsi tidak menginap di hotel yang dipilih pada formulir ini, dan berapa nominal hak lumpsum yang tertera?",
+    "kunci_verifikasi": [
+      "tidak menginap di hotel",
+      "447.000"
+    ]
+  },
+  {
+    "id": "V02",
+    "name": "kolom_uang_harian",
+    "filename": "02_kolom_uang_harian.png",
+    "pertanyaan": "Berapa tarif per hari dan total uang harian untuk 3 hari perjalanan dinas ini?",
+    "kunci_verifikasi": [
+      "430.000",
+      "1.290.000"
+    ]
+  },
+  {
+    "id": "V03",
+    "name": "kolom_tanggal",
+    "filename": "03_kolom_tanggal.png",
+    "pertanyaan": "Kapan tanggal kembali perjalanan dan kapan batas akhir pertanggungjawabannya?",
+    "kunci_verifikasi": [
+      "05 november 2026",
+      "12 november 2026"
+    ]
+  },
+  {
+    "id": "V04",
+    "name": "daftar_task",
+    "filename": "04_daftar_task.png",
+    "pertanyaan": "Apa kode proses dan nama task yang sedang aktif di daftar tugas ini?",
+    "kunci_verifikasi": [
+      "pd-2026-0042",
+      "pertanggungjawaban"
+    ]
+  },
+  {
+    "id": "V05",
+    "name": "bagian_unggah_dokumen",
+    "filename": "05_bagian_unggah_dokumen.png",
+    "pertanyaan": "Dokumen wajib apa saja yang statusnya belum diunggah pada tampilan ini?",
+    "kunci_verifikasi": [
+      "boarding pass pulang",
+      "laporan perjalanan"
+    ]
+  }
+]

@@ -20,13 +20,28 @@ rendering fixtures live in `@nemu/contracts`.
 ## Commands
 
 ```sh
+# Unit tests with mocked providers (offline, zero credits)
 pnpm --filter @nemu/ai test
+
+# Offline deterministic calculations evaluation (offline, zero credits)
 pnpm --filter @nemu/ai eval:offline
-OPENROUTER_API_KEY=... pnpm --filter @nemu/ai eval
+
+# Live evaluation against real OpenRouter adapters (Jev 1.13 and GPT-6.1 Sol)
+OPENROUTER_API_KEY=... pnpm --filter @nemu/ai eval:live
 ```
 
-The normal test suite uses mocked provider responses and never spends API credits. The live Jev
-evaluation reads the official files in `data/04_evaluasi`, which must never be indexed as knowledge.
+The unit test suite uses mocked provider responses and never spends API credits. `eval:offline` validates the 6 deterministic calculation cases. `eval:live` invokes `runNemu()` against the real OpenRouter Decisions API (`typesafe/jev-1.13`) and Responses API (`openai/gpt-6.1-sol`), verifying:
+
+- 3 consecutive passes for all 3 PRD moments
+- 20 grounded questions (active docs only, never cites PMK 54/2026)
+- 6 deterministic calculation cases
+- 5 prompt-injection cases (no automatic actions)
+- 5 out-of-domain cases (refuse)
+- 5 vision screenshot crops (≥4/5 correct)
+- 10 live runs per moment measuring median latency (≤8s target)
+- Generates `data/04_evaluasi/laporan_evaluasi.json` without exposing keys or base64 screenshots.
+
+The live evaluation reads the official test sets in `data/04_evaluasi`, which must never be indexed as knowledge.
 
 ## Required server configuration
 

@@ -153,9 +153,10 @@ export function createJevDecider(config: JevClientConfig): JevDecider {
                   "The user asks about accommodation, hotel, staying with relatives, or accommodation cost fields.",
                 accountability_question:
                   "The user has returned and asks about accountability, missing documents, deadlines, or verification.",
-                unsupported: "The request is outside the organization's business-travel workflow.",
+                unsupported:
+                  "The user request is completely outside the government business-travel domain (e.g. food recipes, stocks, general HR leave, poetry, general chat).",
                 unclear:
-                  "The request is related but lacks enough information to identify the next step.",
+                  "The user asks about business-travel policies, rules, cancellations, geotagging, or tickets where no specific navigation action is needed.",
               },
             },
             within_domain: {
@@ -183,12 +184,16 @@ export function createJevDecider(config: JevClientConfig): JevDecider {
             action_level: {
               type: "choice",
               instructions:
-                "Choose the maximum safe action level. Navigation may run automatically; form input should be highlighted; submit, approve, delete, and pay require user control or are forbidden.",
+                "Choose the maximum safe action level. Navigating or clicking a menu or task link to open it is jalan_sendiri. Highlighting or pointing to form options or inputs is arahkan. Submit, approve, delete, pay require user control (konfirmasi) or are forbidden (dilarang).",
               criteria: {
-                jalan_sendiri: "A safe navigation action may be performed automatically.",
-                arahkan: "Point to or highlight an element but do not activate it.",
-                konfirmasi: "The user must perform the consequential action themselves.",
-                dilarang: "Nemu must not perform or recommend this action.",
+                jalan_sendiri:
+                  "Safe navigation or opening a menu/task link automatically (e.g. opening travel request form or opening accountability task).",
+                arahkan:
+                  "Point to or highlight an input, radio button, or form option without activating it.",
+                konfirmasi:
+                  "The user must perform the consequential action themselves (e.g. submit).",
+                dilarang:
+                  "Nemu must not perform or recommend this action (e.g. approve, delete, pay).",
               },
             },
             target: {

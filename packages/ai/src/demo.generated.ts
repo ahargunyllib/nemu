@@ -1240,6 +1240,4668 @@ export const GENERATED_SBM_ROWS = [
     "grade": "*",
     "value": 580000,
     "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+  },
+  {
+    "province": "JAKARTA - AMBON",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 13285000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - AMBON",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 7081000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7412000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3797000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7519000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4807000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - BANDAR LAMPUNG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 2407000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - BANDAR LAMPUNG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 1583000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - BANJARMASIN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5252000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - BANJARMASIN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3205000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4867000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3091000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - BENGKULU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4364000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - BENGKULU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2770000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - BIAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 14065000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - BIAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8046000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5305000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3262000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - GORONTALO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7231000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - GORONTALO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5162000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - JAMBI",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4065000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - JAMBI",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2584000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 14568000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8767000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4107000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2268000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - KENDARI",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7658000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - KENDARI",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4265000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - KUPANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9413000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - KUPANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5081000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7444000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3829000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - MALANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4599000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - MALANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2695000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - MAMUJU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7295000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - MAMUJU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5208000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10824000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5460000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - MANOKWARI",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 16226000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - MANOKWARI",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 10824000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - MATARAM",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5316000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - MATARAM",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3230000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7252000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4054000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5530000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3159000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - PALANGKARAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4984000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - PALANGKARAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2984000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 3861000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2268000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - PALU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9348000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - PALU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5113000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - PANGKAL PINANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 3412000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - PANGKAL PINANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2139000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5583000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3016000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4353000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2781000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 3861000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2182000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 3861000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2342000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5466000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2674000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - TERNATE",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10001000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - TERNATE",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6664000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 13830000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 7902000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - TANJUNG SELOR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7424000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAKARTA - TANJUNG SELOR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4341000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8054000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4784000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7434000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4453000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - KENDARI",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4824000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - KENDARI",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3056000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6022000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3697000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - MANOKWARI",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5177000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - MANOKWARI",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3239000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - PALU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6140000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - PALU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3754000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - SORONG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 3637000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - SORONG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2415000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8803000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5185000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - TERNATE",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4022000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "AMBON - TERNATE",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2621000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 12739000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 7222000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10354000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5677000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10739000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6044000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 19071000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 10793000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9669000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5082000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 12664000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6581000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 15702000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 7806000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 12493000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6570000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10942000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5745000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9445000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5082000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10996000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5803000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9445000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5002000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9445000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5150000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10889000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5471000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 18408000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BALIKPAPAN - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 10107000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10835000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6719000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 19167000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 11468000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9765000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5757000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 12760000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 7256000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 15798000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8481000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9990000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6249000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9530000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5677000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9530000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5826000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10985000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6147000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 18504000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDA ACEH - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 10782000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8129000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4419000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8225000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5094000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - BANJARMASIN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6193000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - BANJARMASIN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3651000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5840000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3549000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - BIAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 14119000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - BIAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8012000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6236000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3903000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 14568000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8664000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5155000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2954000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - KENDARI",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8354000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - KENDARI",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4796000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8161000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4453000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - MALANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5594000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - MALANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3354000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 11199000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5677000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - MATARAM",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6246000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - MATARAM",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3880000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7979000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4441000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6439000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3617000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - PALANGKARAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5947000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - PALANGKARAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3640000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4931000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2954000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6482000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3674000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5380000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3446000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4931000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2873000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4931000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3022000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6386000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3342000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 13905000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDAR LAMPUNG - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 7977000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6289000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3583000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5626000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3252000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - JAMBI",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5006000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - JAMBI",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2941000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 3369000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2279000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6129000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3508000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4385000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2631000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - PANGKAL PINANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4599000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - PANGKAL PINANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2738000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6525000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3701000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 3027000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 1957000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 3647000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2268000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4824000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3056000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - TANJUNG PANDAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4439000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANDUNG - TANJUNG PANDAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2850000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10792000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6022000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8407000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4578000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - BIAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 16686000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - BIAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8749000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8792000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4920000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 17135000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 9359000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7723000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4304000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10546000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5412000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9006000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4642000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7498000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4022000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9049000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4696000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7498000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3958000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7498000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4097000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8942000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4592000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 16472000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BANJARMASIN - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8897000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10439000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5936000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8450000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4824000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 16782000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 9263000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7370000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3936000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10375000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5711000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 13413000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6482000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10193000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5316000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8653000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4546000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7145000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3936000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8707000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4599000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7594000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4396000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7145000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3861000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7145000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4000000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8600000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4300000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 16119000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BATAM - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8621000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BENGKULU - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 2899000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BENGKULU - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2026000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 18622000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 9477000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 18718000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 10108000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 16333000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8664000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 16729000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8995000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 3615000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2321000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 15648000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8108000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 11734000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6353000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 18472000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 9498000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 16932000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8728000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 15424000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8108000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 16985000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8781000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 15873000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8568000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 12782000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 7081000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5808000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "BIAK - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3444000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 11680000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 7325000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - KUPANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5091000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - KUPANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3159000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4182000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2816000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7851000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4578000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - MATARAM",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 1840000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - MATARAM",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 1488000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10589000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5658000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9049000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4888000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - PALANGKARAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8557000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - PALANGKARAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4909000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7541000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4278000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9092000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4942000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7990000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4738000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10140000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "DENPASAR - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6559000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7733000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4407000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - BANJARMASIN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7690000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - BANJARMASIN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4193000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7733000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4439000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6653000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3551000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - KUPANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 11434000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - KUPANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6075000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9659000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4952000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - MALANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7091000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - MALANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3925000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 12707000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6097000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - PALANGKARAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7444000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - PALANGKARAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4193000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6878000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4011000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6428000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3476000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6428000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3615000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7883000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAMBI - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3915000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 13274000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 7690000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 22109000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 11263000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 18932000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 10097000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 17381000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 9327000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 15873000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8717000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 17435000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 9380000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 16322000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 9177000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 3615000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "JAYAPURA - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2289000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 3861000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2655000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6525000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3893000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10536000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5722000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9519000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4770000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7969000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4280000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6460000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3617000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8022000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4054000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6910000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3840000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 11894000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "YOGYAKARTA - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 7114000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 12953000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 7102000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10568000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5658000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5455000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3503000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8129000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4706000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 11167000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5722000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9659000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5102000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 11220000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5776000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9659000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5027000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9659000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5166000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 11103000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5466000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 18633000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KENDARI - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 9798000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KUPANG - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 14386000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KUPANG - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8676000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KUPANG - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7348000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KUPANG - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4182000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KUPANG - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7637000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KUPANG - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4311000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KUPANG - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 11648000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KUPANG - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6140000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KUPANG - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6749000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "KUPANG - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3983000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MAKASSAR - BIAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8493000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MAKASSAR - BIAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4931000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MAKASSAR - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10193000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MAKASSAR - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6193000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MAKASSAR - KENDARI",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 2663000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MAKASSAR - KENDARI",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 1912000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MAKASSAR - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5327000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MAKASSAR - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2909000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MAKASSAR - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 11723000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MAKASSAR - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 7027000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10108000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5134000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10204000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5765000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - BANJARMASIN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8161000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - BANJARMASIN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4407000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7819000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4311000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - BIAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 16087000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - BIAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8482000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 16536000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 9092000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - KENDARI",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10322000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - KENDARI",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5487000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10129000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5166000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 13167000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6311000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9958000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5145000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8418000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4385000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - PALANGKARAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7915000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - PALANGKARAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4407000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6899000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3765000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8461000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4439000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 15873000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MALANG - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8461000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 15552000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 7316000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 14012000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6546000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 12504000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5926000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 14055000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6599000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 12953000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6396000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 12504000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5851000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 12504000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5990000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9937000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5262000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 16183000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MANADO - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8995000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10750000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5615000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10846000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6246000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - BANJARMASIN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8803000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - BANJARMASIN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4888000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8461000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4803000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - BIAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 11552000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - BIAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6546000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 13092000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 7575000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4417000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2968000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4717000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3113000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8717000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5070000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10600000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5637000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9060000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4867000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7551000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4246000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9102000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4909000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8001000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4706000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 3829000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MATARAM - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2484000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MEDAN - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 3466000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MEDAN - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2347000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MEDAN - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 12514000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MEDAN - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6172000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MEDAN - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9733000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MEDAN - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5230000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MEDAN - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9284000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MEDAN - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4696000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MEDAN - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9284000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MEDAN - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4835000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MEDAN - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10739000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MEDAN - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5134000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MEDAN - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 18258000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "MEDAN - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 9455000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PADANG - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10974000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PADANG - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5402000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PADANG - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8193000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PADANG - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4460000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PADANG - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7744000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PADANG - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3925000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PADANG - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7744000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PADANG - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4065000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PADANG - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9199000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PADANG - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4364000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PADANG - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 16718000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PADANG - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8685000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10546000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - BANDA ACEH",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6022000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8161000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4578000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7477000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4304000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - MATARAM",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8557000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - MATARAM",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4888000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 10300000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5412000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8760000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4642000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7252000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4022000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8803000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4696000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7252000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3947000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7252000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4086000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8696000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALANGKARAYA - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4385000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALEMBANG - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9894000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALEMBANG - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5220000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALEMBANG - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9466000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALEMBANG - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4781000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALEMBANG - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6685000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALEMBANG - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3840000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALEMBANG - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6236000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALEMBANG - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3305000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALEMBANG - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6236000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALEMBANG - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3444000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALEMBANG - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7690000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALEMBANG - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3744000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALEMBANG - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 15210000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALEMBANG - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8076000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALU - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 4268000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALU - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2578000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALU - POSO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 1957000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALU - POSO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 1423000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALU - SORONG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6878000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALU - SORONG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4155000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALU - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6878000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALU - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3883000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALU - TOLI-TOLI",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 2941000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PALU - TOLI-TOLI",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 1915000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9038000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - BALIKPAPAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4631000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - BANJARMASIN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7091000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - BANJARMASIN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3915000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6739000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - BATAM",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3818000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6065000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - YOGYAKARTA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3262000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9060000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4663000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 12097000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - MANADO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5808000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8888000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - MEDAN",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4653000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7337000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - PADANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3883000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5829000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - PALEMBANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3262000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7391000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - PEKANBARU",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3936000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6279000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3733000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5829000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3187000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5829000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3326000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7284000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PANGKAL PINANG - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3626000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PEKANBARU - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8247000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PEKANBARU - PONTIANAK",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4514000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PEKANBARU - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7797000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PEKANBARU - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3979000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PEKANBARU - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 7797000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PEKANBARU - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4118000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PEKANBARU - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9241000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PEKANBARU - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4407000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PEKANBARU - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 16771000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PEKANBARU - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8739000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PONTIANAK - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9915000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PONTIANAK - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 5241000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PONTIANAK - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6685000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PONTIANAK - SEMARANG",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3765000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PONTIANAK - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 6685000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PONTIANAK - SOLO",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3904000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PONTIANAK - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 8140000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PONTIANAK - SURABAYA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4204000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PONTIANAK - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 15659000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "PONTIANAK - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 8535000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "SEMARANG - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9466000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "SEMARANG - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4706000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "SOLO - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 9466000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "SOLO - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 4845000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "SURABAYA - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 3198000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "SURABAYA - DENPASAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 2118000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "SURABAYA - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 12675000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "SURABAYA - JAYAPURA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 7250000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "SURABAYA - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 5936000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "SURABAYA - MAKASSAR",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 3674000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "SURABAYA - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "bisnis",
+    "value": 11295000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "SURABAYA - TIMIKA",
+    "component": "tiket_pesawat",
+    "grade": "ekonomi",
+    "value": 6589000,
+    "source": "PMK 32/2025 Lampiran II angka 17"
+  },
+  {
+    "province": "ACEH",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 123000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "SUMATERA UTARA",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 278000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "RIAU",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 99000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "KEPULAUAN RIAU",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 159000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "JAMBI",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 133000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "SUMATERA BARAT",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 171000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "SUMATERA SELATAN",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 162000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "LAMPUNG",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 162000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "BENGKULU",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 106000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "KEPULAUAN BANGKA BELITUNG",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 94000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "BANTEN",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 300000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "JAWA BARAT",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 180000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "DKI JAKARTA",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 250000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "JAWA TENGAH",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 105000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "DI YOGYAKARTA",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 258000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "JAWA TIMUR",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 225000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "BALI",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 219000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "NUSA TENGGARA BARAT",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 224000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "NUSA TENGGARA TIMUR",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 105000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "KALIMANTAN BARAT",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 165000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "KALIMANTAN TENGAH",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 130000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "KALIMANTAN SELATAN",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 174000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "KALIMANTAN TIMUR",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 300000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "KALIMANTAN UTARA",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 211000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "SULAWESI UTARA",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 134000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "GORONTALO",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 256000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "SULAWESI BARAT",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 283000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "SULAWESI SELATAN",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 181000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "SULAWESI TENGAH",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 149000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "SULAWESI TENGGARA",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 154000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "MALUKU",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 279000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "MALUKU UTARA",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 208000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "PAPUA",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 462000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+  },
+  {
+    "province": "PAPUA BARAT",
+    "component": "transport_bandara",
+    "grade": "*",
+    "value": 228000,
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
   }
 ] satisfies readonly SbmRow[];
 
