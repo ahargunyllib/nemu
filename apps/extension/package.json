@@ -2,7 +2,7 @@
   "name": "extension",
   "version": "0.0.0",
   "private": true,
-  "description": "manifest.json description",
+  "description": "Nemu Extension: the Composer and Answer Card on the Demo App",
   "type": "module",
   "scripts": {
     "dev": "wxt --port 5555",
@@ -11,17 +11,27 @@
     "build:firefox": "wxt build -b firefox",
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
-    "compile": "tsc --noEmit",
-    "postinstall": "wxt prepare"
+    "postinstall": "wxt prepare",
+    "check-types": "tsc --noEmit",
+    "test": "vp test run"
   },
   "dependencies": {
+    "@nemu/contracts": "workspace:*",
+    "@nemu/ui": "workspace:*",
+    "@orpc/client": "catalog:",
+    "lucide-react": "^1.57.0",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "zod": "catalog:"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@testing-library/react": "^16.3.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@wxt-dev/module-react": "^1.1.5",
+    "happy-dom": "^21.0.3",
+    "tailwindcss": "catalog:",
     "typescript": "^5.9.3",
     "web-ext": "^10.5.0",
     "wxt": "^0.21.3"
