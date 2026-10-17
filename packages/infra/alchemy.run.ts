@@ -2,6 +2,7 @@ import * as Alchemy from "alchemy";
 import * as Cloudflare from "alchemy/Cloudflare";
 import * as Config from "effect/Config";
 import * as Effect from "effect/Effect";
+import * as Layer from "effect/Layer";
 import * as Redacted from "effect/Redacted";
 import "varlock/auto-load";
 
@@ -48,7 +49,15 @@ export default Alchemy.Stack(
   "nemu",
   {
     providers: Cloudflare.providers(),
-    state: Cloudflare.state(),
+    // `alchemy dev` keeps state in this checkout's .alchemy/ next to the local D1 data,
+    // so a fresh worktree creates its database and applies migrations instead of
+    // trusting a shared remote row that says another checkout already migrated.
+    state: Layer.unwrap(
+      Effect.gen(function* () {
+        const { dev } = yield* Alchemy.AlchemyContext;
+        return dev ? Alchemy.localState() : Cloudflare.state();
+      }),
+    ),
   },
   Effect.gen(function* () {
     const serverWorker = yield* server;
