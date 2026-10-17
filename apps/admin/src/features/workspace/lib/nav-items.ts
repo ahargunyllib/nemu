@@ -3,6 +3,7 @@ import {
   GlobeIcon,
   LayoutDashboardIcon,
   type LucideIcon,
+  MessagesSquareIcon,
   ShieldCheckIcon,
   TableIcon,
   UsersIcon,
@@ -12,7 +13,7 @@ export type NavItem = {
   label: string;
   icon: LucideIcon;
 } & (
-  | { to: "/dashboard" | "/documents" | "/tables"; comingSoon?: never }
+  | { to: "/dashboard" | "/chat-log" | "/documents" | "/tables"; comingSoon?: never }
   | { to?: never; comingSoon: true }
 );
 
@@ -25,7 +26,10 @@ export type NavGroup = {
 export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Overview",
-    items: [{ to: "/dashboard", label: "Dashboard", icon: LayoutDashboardIcon }],
+    items: [
+      { to: "/dashboard", label: "Dashboard", icon: LayoutDashboardIcon },
+      { to: "/chat-log", label: "Chat Log", icon: MessagesSquareIcon },
+    ],
   },
   {
     label: "Knowledge",
