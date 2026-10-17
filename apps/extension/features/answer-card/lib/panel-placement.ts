@@ -12,9 +12,14 @@ export type PanelPlacement = { left: number; maxHeight: number } & (
   | { bottom: number }
 );
 
+/** Shrinking the panel to scroll in less room than this hides too much of it to be worth it. */
+const MIN_HEIGHT = 160;
+
 /**
  * Places the panel beside the cursor, unless it would cover a highlighted area; then it moves to
- * the first viewport corner that covers none, or failing that the one that covers the least.
+ * the first viewport corner that covers none. When the panel is too tall for every spot, it takes
+ * the spot with the most clear room and shrinks to it, scrolling, rather than covering a highlight.
+ * Only when no spot has usable room does it cover, and then as little as possible.
  */
 export function placePanel(
   cursor: Point,
@@ -24,19 +29,43 @@ export function placePanel(
 ): PanelPlacement {
   const preferred = besideCursor(cursor, viewport);
   const candidates = [preferred, ...corners(viewport)];
-  let best = preferred;
-  let bestOverlap = Number.POSITIVE_INFINITY;
+  let roomiest = preferred;
+  let roomiestHeight = 0;
+  let leastCovering = preferred;
+  let leastOverlap = Number.POSITIVE_INFINITY;
 
   for (const candidate of candidates) {
+    const room = clearHeight(candidate, viewport, avoid);
+    if (room >= Math.min(panelHeight, candidate.maxHeight)) return candidate;
+    if (room > roomiestHeight) {
+      roomiest = candidate;
+      roomiestHeight = room;
+    }
     const box = panelBox(candidate, panelHeight, viewport);
     const overlap = avoid.reduce((sum, area) => sum + overlapArea(box, area), 0);
-    if (overlap === 0) return candidate;
-    if (overlap < bestOverlap) {
-      best = candidate;
-      bestOverlap = overlap;
+    if (overlap < leastOverlap) {
+      leastCovering = candidate;
+      leastOverlap = overlap;
     }
   }
-  return best;
+  return roomiestHeight >= MIN_HEIGHT ? { ...roomiest, maxHeight: roomiestHeight } : leastCovering;
+}
+
+/** How tall the panel can grow from its anchored edge before it reaches a highlighted area. */
+function clearHeight(placement: PanelPlacement, viewport: Viewport, avoid: readonly Box[]): number {
+  const growsDown = "top" in placement;
+  const edge = growsDown ? placement.top : viewport.height - placement.bottom;
+  let room = placement.maxHeight;
+
+  for (const area of avoid) {
+    const beside =
+      area.left >= placement.left + PANEL_WIDTH || area.left + area.width <= placement.left;
+    const behind = growsDown ? area.top + area.height <= edge : area.top >= edge;
+    if (beside || behind) continue;
+    const distance = growsDown ? area.top - edge : edge - (area.top + area.height);
+    room = Math.min(room, Math.max(0, distance - GAP));
+  }
+  return room;
 }
 
 /** Below the cursor in the top half of the screen and above it in the bottom half. */
