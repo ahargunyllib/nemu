@@ -9,6 +9,7 @@ export type DocumentRepository = {
   list(): Promise<DocumentRecord[]>;
   findById(id: string): Promise<DocumentRecord | undefined>;
   setActive(id: string, isActive: boolean): Promise<DocumentRecord | undefined>;
+  delete(id: string): Promise<DocumentRecord | undefined>;
 };
 
 export function createDocumentRepository(db: Database): DocumentRepository {
@@ -38,6 +39,13 @@ export function createDocumentRepository(db: Database): DocumentRepository {
         .where(eq(knowledgeDocument.id, id))
         .returning();
       return updated;
+    },
+    async delete(id) {
+      const [deleted] = await db
+        .delete(knowledgeDocument)
+        .where(eq(knowledgeDocument.id, id))
+        .returning();
+      return deleted;
     },
   };
 }

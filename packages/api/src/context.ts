@@ -10,6 +10,7 @@ export type NemuService = {
 export type DocumentFileStore = {
   put(key: string, body: ArrayBuffer, contentType: string): Promise<void>;
   get(key: string): Promise<ArrayBuffer | null>;
+  delete(key: string): Promise<void>;
 };
 
 export type Context = {

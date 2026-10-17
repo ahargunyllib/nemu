@@ -7,6 +7,7 @@ import type { DocumentFileStore } from "../../context";
 import type { DocumentRecord, DocumentRepository } from "./repository";
 import {
   type UploadDocumentInput,
+  deleteDocument,
   listDocuments,
   readDocumentFile,
   setDocumentActive,
@@ -41,6 +42,10 @@ function createFakes() {
       if (row) row.isActive = isActive;
       return row;
     },
+    async delete(id) {
+      const index = rows.findIndex((row) => row.id === id);
+      return index === -1 ? undefined : rows.splice(index, 1)[0];
+    },
   };
   const files: DocumentFileStore = {
     async put(key, body) {
@@ -48,6 +53,9 @@ function createFakes() {
     },
     async get(key) {
       return objects.get(key) ?? null;
+    },
+    async delete(key) {
+      objects.delete(key);
     },
   };
   return { deps: { documents, files }, objects };
@@ -155,5 +163,40 @@ describe("setDocumentActive", () => {
 
     expect(deactivated?.isActive).toBe(false);
     expect((await listDocuments(deps))[0]?.isActive).toBe(false);
+  });
+});
+
+describe("deleteDocument", () => {
+  it("removes the document and its stored file", async () => {
+    const { deps, objects } = createFakes();
+    const document = await uploadDocument(deps, upload(new File(["# SOP"], "sop.md")));
+
+    const deleted = await deleteDocument(deps, document.id);
+
+    expect(deleted?.id).toBe(document.id);
+    expect(await listDocuments(deps)).toHaveLength(0);
+    expect(objects.size).toBe(0);
+    expect(await readDocumentFile(deps, document.id)).toBeUndefined();
+  });
+
+  it("removes the document even when deleting its file fails", async () => {
+    const { deps } = createFakes();
+    const document = await uploadDocument(deps, upload(new File(["# SOP"], "sop.md")));
+    const failingFiles: DocumentFileStore = {
+      ...deps.files,
+      async delete() {
+        throw new Error("R2 unavailable");
+      },
+    };
+
+    await deleteDocument({ ...deps, files: failingFiles }, document.id);
+
+    expect(await listDocuments(deps)).toHaveLength(0);
+  });
+
+  it("returns nothing for an unknown document", async () => {
+    const { deps } = createFakes();
+
+    expect(await deleteDocument(deps, "missing")).toBeUndefined();
   });
 });

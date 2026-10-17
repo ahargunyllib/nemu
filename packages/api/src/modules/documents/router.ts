@@ -5,6 +5,7 @@ import type { Context } from "../../context";
 import { protectedProcedure } from "../../index";
 import { createDocumentRepository } from "./repository";
 import {
+  deleteDocument,
   documentFormatOf,
   listDocuments,
   readDocumentFile,
@@ -44,6 +45,12 @@ export const documentsRouter = {
       if (!document) throw new ORPCError("NOT_FOUND", { message: "Document not found" });
       return document;
     }),
+
+  deleteDocument: protectedProcedure.input(documentIdSchema).handler(async ({ context, input }) => {
+    const document = await deleteDocument(documentDeps(context), input.id);
+    if (!document) throw new ORPCError("NOT_FOUND", { message: "Document not found" });
+    return document;
+  }),
 
   getDocumentFile: protectedProcedure
     .input(documentIdSchema)

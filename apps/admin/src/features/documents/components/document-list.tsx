@@ -1,3 +1,14 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@nemu/ui/components/alert-dialog";
 import { Button } from "@nemu/ui/components/button";
 import {
   Card,
@@ -16,6 +27,7 @@ import {
 } from "@nemu/ui/components/empty";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@nemu/ui/components/input-group";
 import { Skeleton } from "@nemu/ui/components/skeleton";
+import { Spinner } from "@nemu/ui/components/spinner";
 import { Switch } from "@nemu/ui/components/switch";
 import {
   Table,
@@ -26,7 +38,7 @@ import {
   TableRow,
 } from "@nemu/ui/components/table";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ExternalLinkIcon, FileTextIcon, SearchIcon } from "lucide-react";
+import { ExternalLinkIcon, FileTextIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -118,16 +130,19 @@ export default function DocumentList() {
                         {formatDate(document.createdAt)}
                       </TableCell>
                       <TableCell>
-                        {document.status === "ready" && (
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label={`Open ${document.title}`}
-                            onClick={() => openFile(document.id)}
-                          >
-                            <ExternalLinkIcon />
-                          </Button>
-                        )}
+                        <div className="flex justify-end gap-1">
+                          {document.status === "ready" && (
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={`Open ${document.title}`}
+                              onClick={() => openFile(document.id)}
+                            >
+                              <ExternalLinkIcon />
+                            </Button>
+                          )}
+                          <DocumentDeleteButton id={document.id} title={document.title} />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -162,6 +177,51 @@ function DocumentActiveSwitch({ id, isActive }: { id: string; isActive: boolean 
       disabled={setActive.isPending}
       onCheckedChange={(checked) => setActive.mutate({ id, isActive: checked })}
     />
+  );
+}
+
+function DocumentDeleteButton({ id, title }: { id: string; title: string }) {
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const remove = useMutation(
+    orpc.deleteDocument.mutationOptions({
+      onSuccess: () => {
+        setOpen(false);
+        toast.success(`Deleted ${title}`);
+      },
+      onError: (error) => toast.error(error.message),
+      onSettled: () => queryClient.invalidateQueries({ queryKey: orpc.listDocuments.key() }),
+    }),
+  );
+
+  return (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger
+        render={<Button variant="ghost" size="icon-sm" aria-label={`Delete ${title}`} />}
+      >
+        <Trash2Icon />
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete {title}?</AlertDialogTitle>
+          <AlertDialogDescription>
+            The document and its file are removed for good, and Nemu stops answering from it. This
+            cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={remove.isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            variant="destructive"
+            disabled={remove.isPending}
+            onClick={() => remove.mutate({ id })}
+          >
+            {remove.isPending && <Spinner />}
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 
