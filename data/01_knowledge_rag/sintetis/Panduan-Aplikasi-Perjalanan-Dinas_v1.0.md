@@ -19,7 +19,7 @@ Panduan ini menjelaskan menu dan isian di aplikasi Perjalanan Dinas milik Balai 
 2. Bagian A, Jenis dan tujuan: pilih jenis perjalanan `[fld-jenis-perjalanan]`, pilih surat tugas `[fld-surat-tugas]`, pilih kota tujuan `[fld-kota-tujuan]`. Provinsi terisi otomatis.
 3. Bagian B, Jadwal: isi tanggal berangkat `[fld-tanggal-berangkat]` dan tanggal kembali `[fld-tanggal-kembali]`. Jumlah hari dihitung otomatis.
 4. Bagian C, Biaya: pilih moda `[fld-moda]`, isi tiket pergi-pulang `[fld-tiket-pp]`, transport ke bandara asal `[fld-transport-asal]` dan tujuan `[fld-transport-tujuan]`.
-5. Penginapan: pilih `[opt-penginapan-hotel]` bila menginap di hotel, lalu isi tarif per malam `[fld-tarif-hotel]`. Pilih `[opt-penginapan-tidak-hotel]` bila tidak menginap di hotel; nominal lumpsum `[fld-lumpsum-penginapan]` terisi otomatis.
+5. Penginapan: pilih `[opt-penginapan-hotel]` bila menginap di hotel, lalu isi tarif per malam `[fld-tarif-hotel]`. Pilih `[opt-penginapan-tidak-hotel]` bila tidak menginap di hotel; isi nominal lumpsum `[fld-lumpsum-penginapan]` secara manual sesuai hasil perhitungan Nemu.
 6. Uang harian `[fld-uang-harian]` terisi otomatis dari tabel SBM.
 7. Uang muka: pilih `[opt-uang-muka-ya]` atau `[opt-uang-muka-tidak]`.
 8. Bagian D, Dokumen: unggah undangan `[upl-undangan]`. Surat tugas dan rincian biaya terlampir otomatis.

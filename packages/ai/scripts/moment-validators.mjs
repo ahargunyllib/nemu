@@ -12,6 +12,15 @@ export function validateMoment2Response(res) {
   const isAnswer = res.status === "answer";
   const text = `${res.answer.ringkas} ${res.answer.detail}`;
   const mentionsAmount = text.includes("447.000") || text.includes("447000");
+  const describesManualEntry =
+    /\b(?:isi|masukkan|ketik)\s+(?:nilai\s+)?(?:nominal(?:\s+(?:penginapan|lumpsum))?|Rp\s*447[.,]000)[^.!?]{0,80}\b(?:secara\s+manual|sendiri)\b/iu.test(
+      text,
+    );
+  const deniesManualEntry =
+    /\b(?:jangan|tidak perlu|tak perlu)\s+(?:meng)?(?:isi|masukkan|ketik)\b/iu.test(text);
+  const claimsAutomaticFill = /(?:terisi|diisi)\s+otomatis|otomatis\s+(?:terisi|diisi)/iu.test(
+    text,
+  );
   const hasCalc = res.calc.some(
     (c) => c.fungsi === "hitung_lumpsum_penginapan" && (c.hasil === 447_000 || c.hasil === 447000),
   );
@@ -32,10 +41,19 @@ export function validateMoment2Response(res) {
   ]);
 
   return {
-    passed: isAnswer && (mentionsAmount || hasCalc) && hasCitation && exactActionPlan,
+    passed:
+      isAnswer &&
+      (mentionsAmount || hasCalc) &&
+      describesManualEntry &&
+      !deniesManualEntry &&
+      !claimsAutomaticFill &&
+      hasCitation &&
+      exactActionPlan,
     reasons: [
       !isAnswer && `status expected 'answer', got '${res.status}'`,
       !(mentionsAmount || hasCalc) && `missing 447.000 calculation or text`,
+      (!describesManualEntry || deniesManualEntry || claimsAutomaticFill) &&
+        `expected manual entry wording and no automatic-fill claim`,
       !hasCitation && `missing citation to PMK 119/2023 or SBM`,
       !exactActionPlan && `expected exactly the two ordered accommodation highlights`,
     ].filter(Boolean),

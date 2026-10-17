@@ -32,6 +32,38 @@ test("Moment 2 validation requires exactly the two guidance highlights", () => {
   );
 });
 
+test("Moment 2 validation rejects false automatic-fill wording", () => {
+  const result = validateMoment2Response({
+    ...momentTwoResponse,
+    answer: {
+      ...momentTwoResponse.answer,
+      ringkas: "Pilih Tidak menginap di hotel. Nominal penginapan terisi otomatis Rp447.000.",
+    },
+  });
+
+  assert.equal(result.passed, false);
+  assert.equal(
+    result.reasons.some((reason) => reason.includes("manual entry")),
+    true,
+  );
+});
+
+test("Moment 2 validation rejects negated manual-entry wording", () => {
+  const result = validateMoment2Response({
+    ...momentTwoResponse,
+    answer: {
+      ringkas: "Jangan isi nominal penginapan Rp447.000 secara manual.",
+      detail: "Perhitungannya tetap 30 persen dari tarif hotel untuk dua malam.",
+    },
+  });
+
+  assert.equal(result.passed, false);
+  assert.equal(
+    result.reasons.some((reason) => reason.includes("manual entry")),
+    true,
+  );
+});
+
 test("Moment 3 initial validation requires only the task navigation click", () => {
   assert.equal(validateMoment3InitialResponse(momentThreeResponse).passed, true);
   assert.equal(

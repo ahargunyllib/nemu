@@ -26,6 +26,7 @@ export type AnswerGenerationInput = {
   request: NemuRequest;
   userProfile: NemuUserProfile;
   processContext?: ProcessContext;
+  workflowGuidance?: readonly string[];
   evidence: readonly RankedKnowledgeChunk[];
   calculations: readonly Calculation[];
   decision: JevDecision;
@@ -125,6 +126,7 @@ export function createOpenRouterAnswerGenerator(config: OpenRouterClientConfig):
           current_url: input.request.url,
           user_profile: input.userProfile,
           process_context: input.processContext ?? null,
+          workflow_guidance: input.workflowGuidance ?? [],
           visible_elements: input.request.elements.map(({ nemu_id, label, role, visible }) => ({
             nemu_id,
             label,

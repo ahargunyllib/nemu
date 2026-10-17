@@ -189,8 +189,21 @@ for (let r = 1; r <= ROUNDS; r++) {
     );
     await card.waitFor();
     await page.waitForTimeout(1500);
+    const detailButton = card.getByRole("button", { name: "Lihat detail" });
+    if (await detailButton.isVisible().catch(() => false)) await detailButton.click();
     const text = (await card.innerText()).replace(/\s+/g, " ");
     check(r, "M2", "Rp447.000 on the card", /447[.,]000/.test(text), text.slice(0, 160));
+    check(
+      r,
+      "M2",
+      "manual nominal entry",
+      /\b(?:isi|masukkan|ketik)\s+(?:nilai\s+)?(?:nominal(?:\s+(?:penginapan|lumpsum))?|Rp\s*447[.,]000)[^.!?]{0,80}\b(?:secara\s+manual|sendiri)\b/i.test(
+        text,
+      ) &&
+        !/\b(?:jangan|tidak perlu|tak perlu)\s+(?:meng)?(?:isi|masukkan|ketik)\b/i.test(text) &&
+        !/(?:terisi|diisi)\s+otomatis|otomatis\s+(?:terisi|diisi)/i.test(text),
+      text.slice(0, 160),
+    );
     check(
       r,
       "M2",

@@ -90,6 +90,15 @@ test("retrieval never returns inactive knowledge", () => {
   );
 });
 
+test("application guidance says the accommodation amount is entered manually", () => {
+  const applicationGuidance = DEMO_KNOWLEDGE_CHUNKS.filter((chunk) => chunk.docId === "panduan-app")
+    .map((chunk) => chunk.text)
+    .join("\n");
+
+  assert.match(applicationGuidance, /isi nominal lumpsum/iu);
+  assert.doesNotMatch(applicationGuidance, /nominal lumpsum.+terisi otomatis/iu);
+});
+
 test("contract rejects clicks that are not jalan_sendiri", () => {
   const result = nemuActionSchema.safeParse({
     type: "click",
@@ -98,6 +107,113 @@ test("contract rejects clicks that are not jalan_sendiri", () => {
     label: "Kirim",
   });
   assert.equal(result.success, false);
+});
+
+test("Moment 1 ignores an unrelated active process and opens a new request", async () => {
+  const response = await runNemu(momentOneRequest, {
+    userProfile: DEMO_USER_PROFILE,
+    processContext: momentThreeRequest.process_context,
+    knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    sbmRows: DEMO_SBM_ROWS,
+    holidays: DEMO_HOLIDAYS_2026,
+    requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+    currentDate: "2026-11-06",
+    jevDecider: async () => ({
+      intent: "start_travel_request",
+      intentConfidence: 0.98,
+      withinDomainProbability: 0.99,
+      injectionProbability: 0,
+      requiredTool: "process_status",
+      actionLevel: "arahkan",
+      actionConfidence: 0.62,
+      target: null,
+      targetConfidence: 0.51,
+    }),
+    answerGenerator: async (input) => {
+      const guidedInput = input as typeof input & { workflowGuidance?: readonly string[] };
+      assert.equal(input.processContext, undefined);
+      assert.equal(
+        guidedInput.workflowGuidance?.some((guidance) => guidance.includes("new travel request")),
+        true,
+      );
+      return {
+        status: "answer",
+        ringkas: "Saya bukakan formulir pengajuan perjalanan dinas baru.",
+        detail: "Siapkan surat tugas dan dokumen pendukung sebelum mengirim.",
+        citationIds: ["sop-pd-01-section-4"],
+        warnings: [],
+      };
+    },
+  });
+
+  assert.deepEqual(response.actions, [
+    {
+      type: "click",
+      target: "menu-ajukan-perjalanan-dinas",
+      level: "jalan_sendiri",
+      label: "Buka formulir",
+    },
+  ]);
+});
+
+test("Moment 1 takes precedence when other workflow controls are also visible", async () => {
+  const menuElement = momentOneRequest.elements[0];
+  assert.ok(menuElement);
+  const requests = [
+    {
+      ...momentTwoRequest,
+      prompt: momentOneRequest.prompt,
+      elements: [menuElement, ...momentTwoRequest.elements],
+    },
+    {
+      ...momentThreeFollowUpRequest,
+      prompt: momentOneRequest.prompt,
+      elements: [menuElement, ...momentThreeFollowUpRequest.elements],
+    },
+  ];
+
+  for (const request of requests) {
+    const response = await runNemu(request, {
+      userProfile: DEMO_USER_PROFILE,
+      knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      sbmRows: DEMO_SBM_ROWS,
+      holidays: DEMO_HOLIDAYS_2026,
+      requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+      currentDate: "2026-11-06",
+      jevDecider: async () => ({
+        intent: "start_travel_request",
+        intentConfidence: 0.98,
+        withinDomainProbability: 0.99,
+        injectionProbability: 0,
+        requiredTool: "process_status",
+        actionLevel: "arahkan",
+        actionConfidence: 0.62,
+        target: null,
+        targetConfidence: 0.51,
+      }),
+      answerGenerator: async (input) => {
+        assert.equal(input.processContext, undefined);
+        const citationId = input.evidence[0]?.id;
+        assert.ok(citationId);
+        return {
+          status: "answer",
+          ringkas: "Saya bukakan formulir pengajuan perjalanan dinas baru.",
+          detail: "Siapkan surat tugas dan dokumen pendukung sebelum mengirim.",
+          citationIds: [citationId],
+          warnings: [],
+        };
+      },
+    });
+
+    assert.deepEqual(response.actions, [
+      {
+        type: "click",
+        target: "menu-ajukan-perjalanan-dinas",
+        level: "jalan_sendiri",
+        label: "Buka formulir",
+      },
+    ]);
+  }
 });
 
 test("Moment 2 uses trusted workflow context when Jev returns a non-ideal decision", async () => {
@@ -113,7 +229,12 @@ test("Moment 2 uses trusted workflow context when Jev returns a non-ideal decisi
     targetConfidence: 0.61,
   });
   const answerGenerator: AnswerGenerator = async (input) => {
+    const guidedInput = input as typeof input & { workflowGuidance?: readonly string[] };
     assert.equal(input.calculations.at(-1)?.hasil, 447_000);
+    assert.equal(
+      guidedInput.workflowGuidance?.some((guidance) => guidance.includes("entered manually")),
+      true,
+    );
     return {
       status: "answer",
       ringkas: "Pilih Tidak menginap di hotel. Hak penginapanmu adalah Rp447.000.",
@@ -162,9 +283,9 @@ test("low confidence prevents automatic clicks", async () => {
     injectionProbability: 0,
     requiredTool: "none",
     actionLevel: "jalan_sendiri",
-    actionConfidence: 0.7,
+    actionConfidence: 0.99,
     target: "menu-ajukan-perjalanan-dinas",
-    targetConfidence: 0.7,
+    targetConfidence: 0.99,
   });
   const answerGenerator: AnswerGenerator = async () => ({
     status: "answer",
@@ -808,7 +929,7 @@ test("a screenshot-only question receives active evidence for vision interpretat
   );
 });
 
-test("the OpenRouter Responses adapter sends the crop and strict structured-output schema", async () => {
+test("the OpenRouter Responses adapter sends workflow guidance, crop, and strict output", async () => {
   let requestUrl: string | undefined;
   let requestBody: Record<string, unknown> | undefined;
   const generator = createOpenRouterAnswerGenerator({
@@ -834,7 +955,9 @@ test("the OpenRouter Responses adapter sends the crop and strict structured-outp
   });
 
   const evidence = retrieveKnowledge(DEMO_KNOWLEDGE_CHUNKS, "menginap di rumah saudara", 5);
-  await generator({
+  const generationInput: Parameters<typeof generator>[0] & {
+    workflowGuidance: readonly string[];
+  } = {
     request: momentTwoRequest,
     userProfile: DEMO_USER_PROFILE,
     processContext: momentTwoRequest.process_context,
@@ -852,15 +975,26 @@ test("the OpenRouter Responses adapter sends the crop and strict structured-outp
       targetConfidence: 0.99,
     },
     missingDocuments: [],
-  });
+    workflowGuidance: [
+      "The accommodation amount is entered manually by the user. Never say it is filled automatically.",
+    ],
+  };
+  await generator(generationInput);
 
   assert.equal(requestUrl, "https://openrouter.ai/api/v1/responses");
   assert.equal(requestBody?.model, "openai/gpt-6.1-sol");
   assert.equal(requestBody?.max_output_tokens, 2_000);
-  const input = requestBody?.input as Array<{ content: Array<{ type: string }> }>;
+  const input = requestBody?.input as Array<{
+    content: Array<{ type: string; text?: string }>;
+  }>;
   assert.equal(
     input[0]?.content.some((item) => item.type === "input_image"),
     true,
+  );
+  const inputText = input[0]?.content.find((item) => item.type === "input_text")?.text;
+  assert.deepEqual(
+    JSON.parse(inputText ?? "{}").workflow_guidance,
+    generationInput.workflowGuidance,
   );
   const text = requestBody?.text as { format?: { type?: string; strict?: boolean } };
   assert.deepEqual(

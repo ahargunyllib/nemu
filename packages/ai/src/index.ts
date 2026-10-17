@@ -68,7 +68,11 @@ type ToolResults = {
   clarification?: string;
 };
 
-type WorkflowScenario = "accommodation_guidance" | "accountability_follow_up" | null;
+type WorkflowScenario =
+  | "start_travel_request"
+  | "accommodation_guidance"
+  | "accountability_follow_up"
+  | null;
 
 const CONFIRM_ACTION_PATTERN = /(?:^|\b)(kirim|submit)(?:\b|$)/iu;
 const PROHIBITED_ACTION_PATTERN = /(?:^|\b)(setuju|approve|hapus|delete|bayar|pay)(?:\b|$)/iu;
@@ -92,10 +96,12 @@ const ACCOUNTABILITY_UPLOAD_TARGETS = [
   },
 ] as const;
 const ACCOUNTABILITY_SUBMIT_TARGET = NEMU_IDS.pertanggungjawaban.kirim;
+const START_TRAVEL_REQUEST_TARGET = NEMU_IDS.shell.menuAjukanPerjalananDinas;
 
 function resolveWorkflowScenario(
   request: NemuRequest,
   processContext: ProcessContext | undefined,
+  decision: JevDecision,
 ): WorkflowScenario {
   const activeTask = processContext?.active_task
     ? normalizeDocumentName(processContext.active_task)
@@ -104,6 +110,13 @@ function resolveWorkflowScenario(
   const visibleElementIds = new Set(
     request.elements.filter((element) => element.visible).map((element) => element.nemu_id),
   );
+
+  if (
+    decision.intent === "start_travel_request" &&
+    visibleElementIds.has(START_TRAVEL_REQUEST_TARGET)
+  ) {
+    return "start_travel_request";
+  }
 
   if (
     activeTask === "isi rencana" &&
@@ -122,6 +135,20 @@ function resolveWorkflowScenario(
   }
 
   return null;
+}
+
+function workflowGuidanceFor(scenario: WorkflowScenario): readonly string[] {
+  if (scenario === "start_travel_request") {
+    return [
+      "Treat this as a new travel request. Do not ask whether it refers to an existing process.",
+    ];
+  }
+  if (scenario === "accommodation_guidance") {
+    return [
+      "The accommodation amount is entered manually by the user. Never say it is filled automatically.",
+    ];
+  }
+  return [];
 }
 
 function durationSince(startedAt: number): number {
@@ -167,11 +194,13 @@ function runDeterministicTools(
 ): ToolResults {
   const results: ToolResults = { calculations: [], missingDocuments: [] };
   const requiredTool =
-    workflowScenario === "accommodation_guidance"
-      ? "lookup_sbm_and_accommodation"
-      : workflowScenario === "accountability_follow_up"
-        ? "accountability_deadline"
-        : decision.requiredTool;
+    workflowScenario === "start_travel_request"
+      ? "none"
+      : workflowScenario === "accommodation_guidance"
+        ? "lookup_sbm_and_accommodation"
+        : workflowScenario === "accountability_follow_up"
+          ? "accountability_deadline"
+          : decision.requiredTool;
 
   if (requiredTool === "lookup_sbm_and_accommodation") {
     const province = processContext?.destination_province;
@@ -291,6 +320,31 @@ function buildActions(
       .filter((element) => element.visible)
       .map((element) => [element.nemu_id, element] as const),
   );
+  if (workflowScenario === "start_travel_request") {
+    const element = visibleElementsById.get(START_TRAVEL_REQUEST_TARGET);
+    if (!element || PROHIBITED_ACTION_PATTERN.test(`${element.nemu_id} ${element.label}`)) {
+      return [];
+    }
+
+    return decision.intentConfidence >= clickThreshold
+      ? [
+          {
+            type: "click",
+            target: element.nemu_id,
+            level: "jalan_sendiri",
+            label: "Buka formulir",
+          },
+        ]
+      : [
+          {
+            type: "highlight",
+            target: element.nemu_id,
+            level: "arahkan",
+            label: "Periksa ini",
+          },
+        ];
+  }
+
   if (workflowScenario === "accommodation_guidance") {
     const guidanceActions = ACCOMMODATION_GUIDANCE_TARGETS.flatMap((targetId) => {
       const element = visibleElementsById.get(targetId);
@@ -487,7 +541,6 @@ export async function runNemu(
   const startedAt = performance.now();
   const request = nemuRequestSchema.parse(untrustedRequest);
   const processContext = context.processContext ?? request.process_context;
-  const workflowScenario = resolveWorkflowScenario(request, processContext);
   const thresholds = {
     domain: context.thresholds?.domain ?? 0.5,
     injection: context.thresholds?.injection ?? 0.7,
@@ -515,6 +568,10 @@ export async function runNemu(
   ]);
   const jevDuration = durationSince(jevStartedAt);
   const retrievalDuration = durationSince(retrievalStartedAt);
+  const workflowScenario = resolveWorkflowScenario(request, processContext, jevResult.decision);
+  const answerProcessContext =
+    workflowScenario === "start_travel_request" ? undefined : processContext;
+  const workflowGuidance = workflowGuidanceFor(workflowScenario);
   let evidence = initialEvidence;
 
   if (request.screenshot_crop && (!evidence.length || (evidence[0]?.score ?? 0) < 4)) {
@@ -588,7 +645,8 @@ export async function runNemu(
     const generatedAnswer = await context.answerGenerator({
       request,
       userProfile: context.userProfile,
-      processContext,
+      processContext: answerProcessContext,
+      workflowGuidance,
       evidence,
       calculations: toolResults.calculations,
       decision: jevResult.decision,
