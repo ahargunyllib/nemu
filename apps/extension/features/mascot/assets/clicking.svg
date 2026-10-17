@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Placeholder: replace with the designer's clicking art. -->
+  <circle cx="16" cy="17" r="13" fill="currentColor"/>
+  <path d="M10 13h4M18 13h4" stroke-width="2" stroke-linecap="round" style="stroke: var(--primary-foreground)"/>
+  <path d="M14 18v7l2-2 1.5 3 1.5-.8-1.5-2.9h3z" style="fill: var(--primary-foreground)"/>
+</svg>

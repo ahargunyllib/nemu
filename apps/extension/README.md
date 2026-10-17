@@ -26,6 +26,17 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   lands stops it. A stopped click, a missing target, or a click that changed nothing falls back to
   a highlight, and the cursor shows a warning. Ids missing from the config count as Arahkan, so
   list a new id there to let Nemu click it.
+- **Mascot.** A 32 px mascot follows the cursor 12 px below and to the right of its tip (flipping
+  sides at the viewport's edge), so it never sits on what Rina is about to click. It waits when
+  the cursor closes in on it, so it can be clicked to open the Composer, and its hover × hides it
+  until the Composer next opens. It waits beside the Composer while that is open and rides along
+  with Nemu's cursor during a navigation click. Its seven states follow what Nemu is doing: idle,
+  listening (Composer open), thinking (after Kirim), guiding (highlights) or clicking, then
+  success (the click opened the page) or warning (a failed request, missing target, or click that
+  changed nothing). Results rest after 3 s, and Esc returns it to idle. Under
+  prefers-reduced-motion it jumps instead of gliding and doesn't animate. The art in
+  `features/mascot/assets/` is placeholder SVG: replace each file under the same name with the
+  final art.
 - **Shortcut.** Ctrl+Shift+Space is bound to the extension's action (`_execute_action`, shown
   as "Activate the extension"), the same as clicking the Nemu toolbar icon. It's not a page key
   listener because macOS, the browser, or another app can take the keys before the page sees
@@ -70,7 +81,8 @@ build into Playwright's Chromium and checks:
 - Momen 1, five times in a row from Beranda: Nemu clicks Ajukan Perjalanan Dinas, the form opens,
   and the card's detail lists the documents to prepare;
 - on the Perjalanan Dinas form, the Momen 2 prompt shows its answer and warning, rings each lodging
-  field with its action label, and keeps the Answer Card off both fields.
+  field with its action label, and keeps the Answer Card off both fields;
+- the mascot sits 12 px below and to the right of the cursor, and clicking it opens the Composer.
 
 It prints one line per check, exits non-zero on a failure, and saves screenshots to
 `.output/verify/`. Add `-- --headed` to watch it. Automation can't press the toolbar icon or the

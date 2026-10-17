@@ -24,6 +24,7 @@ import type { browser } from "wxt/browser";
 
 import { OPEN_COMPOSER_MESSAGE } from "../features/composer/lib/open-composer-message.ts";
 import { RING_PADDING } from "../features/highlight/lib/highlight-targets.ts";
+import { CURSOR_OFFSET } from "../features/mascot/lib/mascot-position.ts";
 import { ALLOWED_ORIGINS, DEFAULT_SERVER_URL } from "../shared/lib/config.ts";
 
 const EXTENSION_DIR = path.resolve(import.meta.dirname, "../.output/chrome-mv3-dev");
@@ -246,6 +247,27 @@ async function main() {
         await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-2-highlight.png") });
       },
     );
+
+    await check("the mascot follows the cursor and opens the Composer when clicked", async () => {
+      await page.goto(DEMO_APP_URL);
+      await page.getByRole("heading", { name: "Beranda" }).waitFor();
+      const mascot = page.getByRole("button", { name: "Tanya Nemu" });
+      await page.mouse.move(600, 400);
+      await eventually(async () => {
+        const box = await boxOf(mascot);
+        if (
+          Math.abs(box.x - 600 - CURSOR_OFFSET) > 1 ||
+          Math.abs(box.y - 400 - CURSOR_OFFSET) > 1
+        ) {
+          throw new Error(`the mascot is at ${box.x},${box.y}, not beside the cursor`);
+        }
+      });
+      await page.screenshot({ path: path.join(SCREENSHOT_DIR, "mascot-idle.png") });
+      await mascot.click();
+      await page.getByRole("textbox", { name: "Pertanyaan untuk Nemu" }).waitFor();
+      await page.screenshot({ path: path.join(SCREENSHOT_DIR, "mascot-listening.png") });
+      await page.keyboard.press("Escape");
+    });
   } finally {
     await context.close();
   }

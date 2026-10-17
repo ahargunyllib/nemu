@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Placeholder: replace with the designer's thinking art. -->
+  <circle cx="16" cy="17" r="13" fill="currentColor"/>
+  <circle cx="13" cy="12" r="2" style="fill: var(--primary-foreground)"/>
+  <circle cx="21" cy="12" r="2" style="fill: var(--primary-foreground)"/>
+  <circle cx="11" cy="21" r="1.25" style="fill: var(--primary-foreground)"/>
+  <circle cx="16" cy="21" r="1.25" style="fill: var(--primary-foreground)"/>
+  <circle cx="21" cy="21" r="1.25" style="fill: var(--primary-foreground)"/>
+</svg>

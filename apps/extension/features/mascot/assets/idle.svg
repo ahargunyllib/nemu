@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Placeholder: replace with the designer's idle art. -->
+  <circle cx="16" cy="17" r="13" fill="currentColor"/>
+  <circle cx="12" cy="15" r="2" style="fill: var(--primary-foreground)"/>
+  <circle cx="20" cy="15" r="2" style="fill: var(--primary-foreground)"/>
+  <path d="M12 21q4 3 8 0" fill="none" stroke-width="1.5" stroke-linecap="round" style="stroke: var(--primary-foreground)"/>
+</svg>

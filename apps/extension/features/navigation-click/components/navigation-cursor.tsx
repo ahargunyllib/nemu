@@ -4,9 +4,9 @@ import { CheckIcon, MousePointer2Icon, TriangleAlertIcon } from "lucide-react";
 import type { ClickStep, CursorFrame } from "../lib/navigation-click";
 
 /**
- * The mascot's stand-in during a navigation click, drawn on the page layer: a dot that morphs
- * into a cursor, glides to the target, pings on the click, then shows success or a warning.
- * The mascot (#6) replaces it and reads the same frames.
+ * Nemu's cursor during a navigation click, drawn on the page layer: a dot that morphs into a
+ * cursor, glides to the target, pings on the click, then shows success or a warning. The mascot
+ * rides along just below and to the right of it, so the result badge sits past the mascot.
  */
 export function NavigationCursor({ frame }: { frame: CursorFrame }) {
   return (
@@ -59,7 +59,7 @@ function ResultBadge({
   children: React.ReactNode;
 }) {
   return (
-    <span className="absolute top-3 left-3 animate-in rounded-4xl bg-background font-sans shadow-md fade-in">
+    <span className="absolute top-5 left-12 animate-in rounded-4xl bg-background font-sans shadow-md fade-in">
       <Badge variant={variant}>{children}</Badge>
     </span>
   );
