@@ -106,6 +106,23 @@ describe("useHighlights", () => {
     await waitFor(() => expect(result.current.highlight?.action).toEqual(kirim));
   });
 
+  test("pressing the only highlighted target ends the guide and removes its ring", async () => {
+    const menu = renderTarget("menu-ajukan-perjalanan-dinas");
+    const result = renderHighlights([
+      {
+        type: "highlight",
+        target: "menu-ajukan-perjalanan-dinas",
+        level: "arahkan",
+        label: "Periksa ini",
+      },
+    ]);
+    await waitFor(() => expect(result.current.highlight).toBeDefined());
+
+    act(() => menu.element.click());
+
+    await waitFor(() => expect(result.current.highlight).toBeUndefined());
+  });
+
   test("steps back and forth by hand, and stays on the last step", async () => {
     renderTarget(notHotel.target);
     renderTarget(amount.target, "input");
