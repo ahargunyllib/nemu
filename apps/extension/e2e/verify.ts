@@ -16,7 +16,7 @@ import {
   momentTwoRequest,
   momentTwoResponse,
 } from "@nemu/contracts/fixtures";
-import { mkdir } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { type BrowserContext, chromium, type Locator, type Page } from "playwright-core";
@@ -68,6 +68,43 @@ async function ask(context: BrowserContext, page: Page, prompt: string) {
   const composer = page.getByRole("textbox", { name: "Pertanyaan untuk Nemu" });
   await composer.fill(prompt);
   await composer.press("Enter");
+}
+
+/** Drags a box over `targets` in area select mode, the way Rina selects the lodging field. */
+async function selectArea(page: Page, targets: Locator[]): Promise<Box> {
+  await targets[0]?.scrollIntoViewIfNeeded();
+  const boxes = await Promise.all(targets.map(boxOf));
+  const margin = 12;
+  const left = Math.min(...boxes.map(({ x }) => x)) - margin;
+  const top = Math.min(...boxes.map(({ y }) => y)) - margin;
+  const right = Math.max(...boxes.map(({ x, width }) => x + width)) + margin;
+  const bottom = Math.max(...boxes.map(({ y, height }) => y + height)) + margin;
+
+  await page.getByRole("button", { name: "Pilih area" }).click();
+  await page.getByRole("application", { name: "Pilih area" }).waitFor();
+  await page.mouse.move(left, top);
+  await page.mouse.down();
+  await page.mouse.move((left + right) / 2, (top + bottom) / 2, { steps: 5 });
+  await page.mouse.move(right, bottom, { steps: 5 });
+  await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-2-area-select.png") });
+  await page.mouse.up();
+  return { x: left, y: top, width: right - left, height: bottom - top };
+}
+
+/** The newest Chat Log entry, read with Rina's Demo App session like the Admin Workspace does. */
+async function newestChatLogEntry(page: Page): Promise<{ prompt: string; hasAreaCrop: boolean }> {
+  const body = await page.evaluate(async (serverUrl) => {
+    const response = await fetch(`${serverUrl}/rpc/listChatLog`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    return response.json();
+  }, DEFAULT_SERVER_URL);
+  const [entry] = body.json ?? [];
+  if (!entry) throw new Error(`no Chat Log entry: ${JSON.stringify(body).slice(0, 200)}`);
+  return entry;
 }
 
 async function closeAnswerCard(page: Page) {
@@ -213,11 +250,44 @@ async function main() {
     );
 
     await check(
-      "on the form, Momen 2 rings its targets and the Answer Card avoids them",
+      "on the form, Momen 2 sends only the selected area, rings its targets and the Answer Card avoids them",
       async () => {
         await page.goto(`${DEMO_APP_URL}/perdin/baru`);
         await page.getByRole("heading", { name: "Ajukan Perjalanan Dinas" }).waitFor();
-        await ask(context, page, momentTwoRequest.prompt);
+        const highlights = momentTwoResponse.actions.filter(({ type }) => type === "highlight");
+        if (highlights.length === 0) throw new Error("momentTwoResponse has no highlight actions");
+
+        await openComposer(context, page);
+        const composer = page.getByRole("textbox", { name: "Pertanyaan untuk Nemu" });
+        await composer.fill(momentTwoRequest.prompt);
+        const selection = await selectArea(
+          page,
+          highlights.map(({ target }) => page.locator(`[data-nemu-id="${target}"]`).first()),
+        );
+
+        // The chip holds a crop of the selection alone, not of the whole viewport.
+        const chip = page.getByRole("img", { name: "Area Crop" });
+        await chip.waitFor();
+        const [cropWidth, cropHeight, cropUrl] = await chip.evaluate((image: HTMLImageElement) => [
+          image.naturalWidth,
+          image.naturalHeight,
+          image.src,
+        ]);
+        await writeFile(
+          path.join(SCREENSHOT_DIR, "momen-2-area-crop-sent.png"),
+          Buffer.from(String(cropUrl).replace(/^data:image\/png;base64,/, ""), "base64"),
+        );
+        const scale = await page.evaluate(() => window.devicePixelRatio);
+        if (
+          Math.abs((cropWidth ?? 0) - selection.width * scale) > 2 ||
+          Math.abs((cropHeight ?? 0) - selection.height * scale) > 2
+        ) {
+          throw new Error(
+            `the crop is ${cropWidth}×${cropHeight}, not the ${selection.width}×${selection.height} selection`,
+          );
+        }
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-2-area-crop-chip.png") });
+        await composer.press("Enter");
 
         const overlay = page.locator("nemu-overlay");
         const card = overlay
@@ -228,8 +298,6 @@ async function main() {
           await card.getByRole("list", { name: "Peringatan" }).getByText(warning).waitFor();
         }
 
-        const highlights = momentTwoResponse.actions.filter(({ type }) => type === "highlight");
-        if (highlights.length === 0) throw new Error("momentTwoResponse has no highlight actions");
         await waitForScrollToSettle(page);
         await eventually(async () => {
           const cardBox = await boxOf(card);
@@ -244,7 +312,30 @@ async function main() {
             if (overlaps(cardBox, targetBox)) throw new Error(`the Answer Card covers ${target}`);
           }
         });
+        for (const { judul, pasal } of momentTwoResponse.citations) {
+          await card.getByRole("button", { name: judul }).click();
+          if (pasal) await card.getByText(`Pasal ${pasal}`, { exact: false }).waitFor();
+        }
         await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-2-highlight.png") });
+
+        // Arahkan only: Rina fills the lodging fields herself.
+        const [notHotel, amount] = highlights.map(({ target }) =>
+          page.locator(`[data-nemu-id="${target}"]`).first(),
+        );
+        if ((await notHotel?.getAttribute("aria-checked")) === "true") {
+          throw new Error("Nemu picked the lodging option");
+        }
+        const amountValue = await amount?.evaluate((element) =>
+          element instanceof HTMLInputElement
+            ? element.value
+            : element.querySelector("input")?.value,
+        );
+        if (amountValue) throw new Error(`Nemu filled the lodging amount: ${amountValue}`);
+
+        const entry = await newestChatLogEntry(page);
+        if (entry.prompt !== momentTwoRequest.prompt || !entry.hasAreaCrop) {
+          throw new Error(`the Chat Log doesn't record the Area Crop: ${JSON.stringify(entry)}`);
+        }
       },
     );
 

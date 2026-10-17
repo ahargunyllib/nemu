@@ -2,6 +2,9 @@ import type { NemuAction, PageElement } from "@nemu/contracts";
 import { useState } from "react";
 
 import { useAnswerActions } from "../../features/action-level/hooks/use-answer-actions";
+import { AreaCropChip } from "../../features/area-crop/components/area-crop-chip";
+import { AreaSelectLayer } from "../../features/area-crop/components/area-select-layer";
+import { useAreaCrop } from "../../features/area-crop/hooks/use-area-crop";
 import { AnswerCard } from "../../features/answer-card/components/answer-card";
 import { AnswerCardHeader } from "../../features/answer-card/components/answer-card-header";
 import { AnswerCardSkeleton } from "../../features/answer-card/components/answer-card-skeleton";
@@ -34,6 +37,7 @@ export function NemuOverlay() {
   const [anchor, setAnchor] = useState<CursorPosition | null>(null);
   const [composerOpen, setComposerOpen] = useState(false);
   const chat = useNemuChat();
+  const area = useAreaCrop();
   const { state } = chat;
   const { highlights, missing, warnings, cursor, outcome } = useAnswerActions(
     state.kind === "response" ? state.response.actions : NO_ACTIONS,
@@ -49,12 +53,13 @@ export function NemuOverlay() {
 
   useComposerShortcut(openComposer);
 
-  function ask(prompt: string) {
-    void chat.send(prompt, collectElementList(document));
+  function ask(prompt: string, screenshotCrop?: string) {
+    void chat.send(prompt, collectElementList(document), screenshotCrop);
   }
 
   function close() {
     chat.reset();
+    area.clear();
     setComposerOpen(false);
     setAnchor(null);
   }
@@ -62,9 +67,18 @@ export function NemuOverlay() {
   const header =
     state.kind === "idle" ? null : <AnswerCardHeader prompt={state.prompt} onClose={close} />;
 
+  const pickingArea = area.state.kind === "selecting" || area.state.kind === "capturing";
+
   // One font and text color for everything Nemu draws: highlights, the mascot (#6), and the panel.
+  // All of it is hidden while the viewport is captured, so an Area Crop shows only the page.
   return (
-    <div className="font-sans text-foreground">
+    <div
+      className={
+        area.state.kind === "capturing"
+          ? "invisible font-sans text-foreground"
+          : "font-sans text-foreground"
+      }
+    >
       <PageLayer>
         {highlights.map(({ action, box }, index) => (
           <HighlightRing key={`${index}-${action.target}`} box={box} label={action.label} />
@@ -72,6 +86,7 @@ export function NemuOverlay() {
         {cursor && <NavigationCursor frame={cursor} />}
         <Mascot
           activity={{
+            // Area select mode keeps the Composer open, so dragging a box counts as listening too.
             listening: composerOpen,
             thinking: state.kind === "loading",
             clicking: cursor?.mascot === "clicking",
@@ -92,7 +107,10 @@ export function NemuOverlay() {
       {anchor && (
         <div
           ref={panelRef}
-          className="fixed z-2147483647 flex flex-col gap-2 overflow-y-auto"
+          // Hidden, not unmounted, during area select mode so the Composer keeps its text.
+          className={
+            pickingArea ? "hidden" : "fixed z-2147483647 flex flex-col gap-2 overflow-y-auto"
+          }
           style={{
             width: PANEL_WIDTH,
             ...placePanel(
@@ -107,13 +125,20 @@ export function NemuOverlay() {
             <Composer
               onSubmit={(prompt) => {
                 setComposerOpen(false);
-                ask(prompt);
+                ask(prompt, area.crop);
+                area.clear();
               }}
               onCancel={() => {
                 setComposerOpen(false);
+                area.clear();
                 if (state.kind === "idle") setAnchor(null);
               }}
-            />
+              onPickArea={area.start}
+            >
+              {(area.state.kind === "attached" || area.state.kind === "failed") && (
+                <AreaCropChip state={area.state} onRemove={area.clear} />
+              )}
+            </Composer>
           )}
           {state.kind === "loading" && <AnswerCardSkeleton header={header} />}
           {state.kind === "response" && (
@@ -141,10 +166,13 @@ export function NemuOverlay() {
             <ChatErrorCard
               header={header}
               message={state.message}
-              onRetry={() => ask(state.prompt)}
+              onRetry={() => ask(state.prompt, state.screenshotCrop)}
             />
           )}
         </div>
+      )}
+      {area.state.kind === "selecting" && (
+        <AreaSelectLayer onSelect={area.select} onCancel={area.clear} />
       )}
     </div>
   );
