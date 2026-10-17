@@ -12,7 +12,7 @@ The Nemu Service is a modular monolith: `apps/server` composes it, and feature m
 
 ### Frontend architecture
 
-The web app and the Nemu Extension use route-owned (or entrypoint-owned) page composition and responsibility-based feature slices. Follow `docs/agents/frontend-architecture.md` for placement, composition, search validation, and audit rules.
+The Demo App (`apps/mock-alurkerja`) and the Nemu Extension use route-owned (or entrypoint-owned) page composition and responsibility-based feature slices. Follow `docs/agents/frontend-architecture.md` for placement, composition, search validation, and audit rules.
 
 ### Third-party providers
 

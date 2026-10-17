@@ -20,9 +20,9 @@ These rules apply to the Nemu Service: `apps/server`, `packages/api`,
 - `packages/db` owns the Drizzle schema, one file per feature under
   `src/schema/`, and the generated migrations. `packages/auth` owns the Better
   Auth configuration.
-- Wire schemas shared with the Nemu Extension and the web app live in
+- Wire schemas shared with the Nemu Extension and the Demo App live in
   `@nemu/contracts`. A procedure's input and output schemas come from there
-  whenever a client other than the web app calls it.
+  whenever a client other than the Demo App calls it.
 - Keep provider-specific adapters close to their owner. OpenRouter adapters
   belong to `packages/ai`; anything else a single feature calls belongs to that
   feature's module.
@@ -71,7 +71,7 @@ oRPC procedure -> service -> repository -> Drizzle / D1
 - `packages/infra/alchemy.run.ts` declares every Worker binding and value.
   `Config.Redacted` is for secrets, `Config.String` for plain values.
 - Each app reads its environment only through its generated `ENV` module
-  (`apps/server/src/env.server.ts`, `apps/web/src/env.public.ts`). When adding a
+  (`apps/server/src/env.server.ts`, `apps/mock-alurkerja/src/env.public.ts`). When adding a
   value, declare it in that app's `.env.schema` and in `alchemy.run.ts`, then
   run `pnpm env:generate`.
 - Schema changes go through `pnpm db:generate`; commit the generated migration
