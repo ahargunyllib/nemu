@@ -44,13 +44,12 @@ export function Mascot({ activity, composerAnchor, nemuCursor, onOpenComposer }:
         aria-label="Tanya Nemu"
         size="icon-sm"
         variant="ghost"
-        className="text-primary"
         onClick={(event) => onOpenComposer({ x: event.clientX, y: event.clientY })}
       >
         {/* The art is bundled SVG from assets/, never page or server content. */}
         <span
           key={state}
-          className={`size-full motion-reduce:animate-none ${MASCOT_MOTION[state]}`}
+          className={`size-full drop-shadow-sm motion-reduce:animate-none ${MASCOT_MOTION[state]}`}
           dangerouslySetInnerHTML={{ __html: MASCOT_ART[state] }}
         />
       </Button>

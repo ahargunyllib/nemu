@@ -8,8 +8,9 @@ import warning from "../assets/warning.svg?raw";
 import type { MascotState } from "./mascot-state";
 
 /**
- * One SVG per state, drawn inline so it can use the theme tokens (`currentColor` is `primary`).
- * The files in `assets/` are placeholders: swap in the designer's art under the same names.
+ * One SVG per state, drawn inline. The files in `assets/` are placeholders with their own color
+ * and shape per state, so each state reads at a glance: swap in the designer's art under the same
+ * names.
  */
 export const MASCOT_ART: Record<MascotState, string> = {
   idle: fillBox(idle),

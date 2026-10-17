@@ -1,6 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- Placeholder: replace with the designer's success art. -->
-  <circle cx="16" cy="17" r="13" fill="currentColor"/>
-  <path d="M10 15q2-2 4 0M18 15q2-2 4 0" fill="none" stroke-width="1.5" stroke-linecap="round" style="stroke: var(--primary-foreground)"/>
-  <path d="M11 20q5 5 10 0" fill="none" stroke-width="1.5" stroke-linecap="round" style="stroke: var(--primary-foreground)"/>
+  <!-- Placeholder: replace with the designer's success art. Green, happy, with a sparkle. -->
+  <circle cx="15" cy="18" r="12" fill="#22c55e"/>
+  <path d="M8.5 16q2.5-3 5 0M16.5 16q2.5-3 5 0" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M9 20.5h12q-6 7-12 0z" fill="#fff"/>
+  <path d="M27 1l1.2 2.8L31 5l-2.8 1.2L27 9l-1.2-2.8L23 5l2.8-1.2z" fill="#facc15"/>
 </svg>
