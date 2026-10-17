@@ -18,11 +18,19 @@ export const momentOneRequest = {
 export const momentOneResponse = {
   status: "answer",
   answer: {
-    ringkas: "Ini perjalanan dinas luar kota. Saya bukakan formulir pengajuannya.",
-    detail:
-      "Siapkan surat tugas, rincian jadwal, rencana biaya, dan dokumen pendukung sebelum mengirim pengajuan.",
+    ringkas:
+      "Ini perjalanan dinas luar kota. Saya bukakan formulir Ajukan Perjalanan Dinas; siapkan empat dokumen sebelum mengirim.",
+    detail: [
+      "Dokumen yang disiapkan:",
+      "1. Nomor surat tugas dari Kepala Balai",
+      "2. Undangan atau kerangka acuan rapat",
+      "3. Jadwal berangkat dan kembali",
+      "4. Rincian perkiraan biaya (dibuat otomatis dari isian form)",
+    ].join("\n"),
   },
-  citations: [{ doc_id: "sop-pd-01", judul: "SOP-PD-01 Perjalanan Dinas", pasal: "Bagian 2" }],
+  citations: [
+    { doc_id: "sop-pd-01", judul: "SOP-PD-01 Perjalanan Dinas", pasal: "Butir 4.1, 4.2, 4.4" },
+  ],
   calc: [],
   actions: [
     {

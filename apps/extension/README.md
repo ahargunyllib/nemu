@@ -18,6 +18,14 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   never covers a highlight. A target missing from the page becomes a warning on the card. The
   Momen 2 prompt with `NEMU_RESPONDER=fixture` exercises it once the lodging form (#3) is on
   `/perdin/baru`.
+- **Navigation click (Jalan sendiri).** A `click` action runs only when its target is Jalan sendiri
+  in the bundled Action Level config (`features/action-level/lib/action-level-config.ts`,
+  ADR-0002) and was in the Element List sent with the prompt; any other click becomes a highlight.
+  The cursor morphs from where Rina opened the Composer (200 ms), moves to the target (400–800 ms),
+  clicks, and waits up to 2 s for a new URL or a new nemu_id on the page. Esc before the click
+  lands stops it. A stopped click, a missing target, or a click that changed nothing falls back to
+  a highlight, and the cursor shows a warning. Ids missing from the config count as Arahkan, so
+  list a new id there to let Nemu click it.
 - **Shortcut.** Ctrl+Shift+Space is bound to the extension's action (`_execute_action`, shown
   as "Activate the extension"), the same as clicking the Nemu toolbar icon. It's not a page key
   listener because macOS, the browser, or another app can take the keys before the page sees
@@ -59,6 +67,8 @@ build into Playwright's Chromium and checks:
 - a page outside the allowlist gets no overlay;
 - signed out, the card asks Rina to log in;
 - signed in as Rina, the Momen 1 prompt comes back as an Answer Card with its citation;
+- Momen 1, five times in a row from Beranda: Nemu clicks Ajukan Perjalanan Dinas, the form opens,
+  and the card's detail lists the documents to prepare;
 - on the Perjalanan Dinas form, the Momen 2 prompt shows its answer and warning, rings each lodging
   field with its action label, and keeps the Answer Card off both fields.
 
