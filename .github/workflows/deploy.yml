@@ -35,3 +35,34 @@ jobs:
         run: pnpm --filter @nemu/infra exec alchemy provider check-env --provider Cloudflare
       - name: Deploy
         run: pnpm --filter @nemu/infra exec alchemy deploy --yes
+
+  # Rebuilds the extension against the server that was just deployed and replaces the zip on the
+  # rolling `extension-latest` release, so the download link never changes.
+  release-extension:
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      # Same domain as the prod server in packages/infra/alchemy.run.ts.
+      WXT_SERVER_URL: https://nemu-api.ahargunyllib.dev
+      WXT_EXTENSION_VERSION: 0.1.${{ github.run_number }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - name: Build extension zip
+        run: |
+          pnpm --filter extension zip
+          cp apps/extension/.output/*-chrome.zip nemu-extension-chrome.zip
+      - name: Upload to extension-latest release
+        run: |
+          notes="Version ${WXT_EXTENSION_VERSION}, built from ${GITHUB_SHA} against ${WXT_SERVER_URL}.
+
+          Install: unzip, open chrome://extensions (arc://extensions in Arc), turn on Developer mode, click Load unpacked, and pick the unzipped folder. To update, replace the folder's contents and click the reload icon on the extension card."
+          if gh release view extension-latest > /dev/null 2>&1; then
+            gh release edit extension-latest --notes "$notes"
+          else
+            gh release create extension-latest --title "Nemu Extension (latest)" --notes "$notes" --target "$GITHUB_SHA"
+          fi
+          gh release upload extension-latest nemu-extension-chrome.zip --clobber
