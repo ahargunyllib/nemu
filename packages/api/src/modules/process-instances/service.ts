@@ -105,13 +105,25 @@ export async function listMyTasks(
   return toViews(processInstances, withTask);
 }
 
+const AJUKAN_PERJALANAN_DINAS_PATH = "/perdin/baru";
+
+function isAjukanPerjalananDinas(pageUrl: string | undefined): boolean {
+  if (!pageUrl) return false;
+  return new URL(pageUrl).pathname.replace(/\/$/, "") === AJUKAN_PERJALANAN_DINAS_PATH;
+}
+
 /**
  * The Process Instance Nemu answers about: the most recently changed one that has
  * a Task for the user, else their most recently changed one.
+ *
+ * On Ajukan Perjalanan Dinas (Momen 2) Rina is still planning the trip, so the
+ * same trip goes out as a plan in progress (`isi_rencana`), without its later
+ * State, return date, or documents.
  */
 export async function loadProcessContext(
   { processInstances }: ProcessInstanceDeps,
   ownerId: string,
+  pageUrl?: string,
 ): Promise<ProcessContext | undefined> {
   const records = (await processInstances.listByOwner(ownerId)).sort(
     (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime(),
@@ -120,6 +132,16 @@ export async function loadProcessContext(
   if (!active) return undefined;
   const [view] = await toViews(processInstances, [active]);
   if (!view) return undefined;
+
+  if (isAjukanPerjalananDinas(pageUrl)) {
+    return {
+      instance_id: view.id,
+      active_task: "isi_rencana",
+      destination_province: view.provinsi,
+      nights: nightsBetween(view.tanggalBerangkat, view.tanggalKembali),
+      uploaded_documents: [],
+    };
+  }
 
   return {
     instance_id: view.id,

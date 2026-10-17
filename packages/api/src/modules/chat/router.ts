@@ -14,7 +14,11 @@ export const chatRouter = {
   nemuChat: protectedProcedure.input(nemuRequestSchema).handler(async ({ context, input }) => {
     const userId = context.session.user.id;
     // The process context comes from the Demo App's data, never from the extension.
-    const processContext = await loadProcessContext(createProcessInstanceDeps(context.db), userId);
+    const processContext = await loadProcessContext(
+      createProcessInstanceDeps(context.db),
+      userId,
+      input.url,
+    );
     return answerChat(chatDeps(context), { ...input, process_context: processContext }, userId);
   }),
 

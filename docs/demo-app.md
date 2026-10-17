@@ -57,6 +57,14 @@ it as `process_context`, with document names as the AI reads them
 (`surat_tugas`, `boarding_pass_pergi`, `boarding_pass_pulang`,
 `laporan_perjalanan`). The extension never sends `process_context`.
 
+The page URL the extension sends picks the stage. On Ajukan Perjalanan Dinas
+(`/perdin/baru`, Momen 2) Rina is still planning that trip, so `nemuChat` sends
+it as a plan in progress: `active_task` `isi_rencana`, the destination
+province and nights (for the lodging calculation), and no State, return date,
+or documents. On every other page (Beranda in Momen 1 and 3, the task page) it
+sends the instance as it is, so Momen 3 gets Pertanggungjawaban, return date
+5 November, and the 12 November deadline.
+
 ## Demo panel and demo clock
 
 **Panel demo** in the header plays the atasan, PPK, and bendahara: pick a

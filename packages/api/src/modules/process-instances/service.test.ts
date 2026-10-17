@@ -1,4 +1,8 @@
-import { momentThreeRequest } from "@nemu/contracts/fixtures";
+import {
+  momentThreeFollowUpRequest,
+  momentThreeRequest,
+  momentTwoRequest,
+} from "@nemu/contracts/fixtures";
 import type { AjukanPerjalananDinasInput } from "@nemu/contracts/process-instance";
 import { describe, expect, it } from "vite-plus/test";
 
@@ -235,6 +239,26 @@ describe("loadProcessContext", () => {
     await ajukanPerjalananDinas(deps, "rina", rinaToMakassar);
 
     expect(await loadProcessContext(deps, "rina")).toEqual(momentThreeRequest.process_context);
+  });
+
+  it("gives Momen 2 on Ajukan Perjalanan Dinas the trip as a plan in progress, not its Pertanggungjawaban", async () => {
+    const deps = await createSeededFakes();
+
+    const context = await loadProcessContext(deps, "rina", momentTwoRequest.url);
+
+    expect(context).toEqual(momentTwoRequest.process_context);
+    expect(context).not.toHaveProperty("return_date");
+  });
+
+  it("keeps the Pertanggungjawaban context for Momen 3 on Beranda and on the task page", async () => {
+    const deps = await createSeededFakes();
+
+    expect(await loadProcessContext(deps, "rina", momentThreeRequest.url)).toEqual(
+      momentThreeRequest.process_context,
+    );
+    expect(await loadProcessContext(deps, "rina", momentThreeFollowUpRequest.url)).toEqual(
+      momentThreeFollowUpRequest.process_context,
+    );
   });
 
   it("falls back to the newest instance when none has a Task, and to nothing without instances", async () => {
