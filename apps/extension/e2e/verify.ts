@@ -362,7 +362,13 @@ async function main() {
       await page.goto(DEMO_APP_URL);
       await page.getByRole("heading", { name: "Beranda" }).waitFor();
       const mascot = page.getByRole("button", { name: "Tanya Nemu" });
-      await page.mouse.move(600, 400);
+      // The overlay starts listening for the cursor a moment after the page renders, and the mascot
+      // has no place until it sees the cursor move, so keep moving until it shows up.
+      await eventually(async () => {
+        await page.mouse.move(0, 0);
+        await page.mouse.move(600, 400);
+        await mascot.waitFor({ timeout: 200 });
+      });
       await eventually(async () => {
         const box = await boxOf(mascot);
         if (
