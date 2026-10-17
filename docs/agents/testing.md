@@ -31,3 +31,12 @@ configuration constants, or assert trivial wiring.
 
 Run the narrowest useful suite while iterating, then `pnpm check` and
 `pnpm test` before opening or updating a pull request.
+
+## Nemu Extension in a real browser
+
+Unit tests can't load the extension, so after changing `apps/extension`, run
+`pnpm --filter extension verify` with `NEMU_RESPONDER=fixture pnpm dev` running.
+It drives the dev build in Playwright's Chromium and saves screenshots to
+`apps/extension/.output/verify/`; look at them before reporting the change as
+verified. It isn't part of `pnpm test` because it needs the dev stack running.
+See `apps/extension/README.md`.
