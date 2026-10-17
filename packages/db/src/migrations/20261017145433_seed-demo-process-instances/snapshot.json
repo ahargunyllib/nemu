@@ -1,6 +1,6 @@
 {
-  "id": "dae17706-a6fc-45e6-b8c9-32361f755f8d",
-  "prevIds": ["c9c64bdc-0cd9-4b0e-8483-61b9482fab6f"],
+  "id": "ff650b53-d752-40b6-a221-5dbd47ce2dfb",
+  "prevIds": ["6931ecdd-794b-4d2e-b226-df887d860d0b"],
   "version": "7",
   "dialect": "sqlite",
   "ddl": [
@@ -34,6 +34,10 @@
     },
     {
       "name": "process_instance",
+      "entityType": "tables"
+    },
+    {
+      "name": "chat_log",
       "entityType": "tables"
     },
     {
@@ -807,6 +811,126 @@
       "table": "process_instance"
     },
     {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "chat_log"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "table": "chat_log"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "session_id",
+      "entityType": "columns",
+      "table": "chat_log"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "url",
+      "entityType": "columns",
+      "table": "chat_log"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "prompt",
+      "entityType": "columns",
+      "table": "chat_log"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "has_area_crop",
+      "entityType": "columns",
+      "table": "chat_log"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "status",
+      "entityType": "columns",
+      "table": "chat_log"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "result",
+      "entityType": "columns",
+      "table": "chat_log"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "citations",
+      "entityType": "columns",
+      "table": "chat_log"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "actions",
+      "entityType": "columns",
+      "table": "chat_log"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "duration_ms",
+      "entityType": "columns",
+      "table": "chat_log"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "(cast(unixepoch('subsecond') * 1000 as integer))",
+      "generated": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "table": "chat_log"
+    },
+    {
       "columns": ["user_id"],
       "tableTo": "user",
       "columnsTo": ["id"],
@@ -849,6 +973,17 @@
       "name": "fk_process_instance_owner_id_user_id_fk",
       "entityType": "fks",
       "table": "process_instance"
+    },
+    {
+      "columns": ["user_id"],
+      "tableTo": "user",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "name": "fk_chat_log_user_id_user_id_fk",
+      "entityType": "fks",
+      "table": "chat_log"
     },
     {
       "columns": ["instance_id", "jenis"],
@@ -904,6 +1039,13 @@
       "nameExplicit": false,
       "name": "process_instance_pk",
       "table": "process_instance",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "chat_log_pk",
+      "table": "chat_log",
       "entityType": "pks"
     },
     {
@@ -975,6 +1117,20 @@
       "name": "process_instance_ownerId_idx",
       "entityType": "indexes",
       "table": "process_instance"
+    },
+    {
+      "columns": [
+        {
+          "value": "created_at",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "chat_log_createdAt_idx",
+      "entityType": "indexes",
+      "table": "chat_log"
     },
     {
       "columns": ["token"],
