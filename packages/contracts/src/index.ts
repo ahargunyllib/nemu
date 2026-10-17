@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const nemuIdSchema = z
+export const nemuIdSchema = z
   .string()
   .min(1)
   .max(160)

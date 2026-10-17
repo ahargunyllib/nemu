@@ -1,7 +1,7 @@
 import type { Context as ApiContext } from "@nemu/api/context";
 import type { Context as HonoContext } from "hono";
 
-import { createAuth, createNemuService, getDb } from "./services";
+import { createAuth, createDocumentFileStore, createNemuService, getDb } from "./services";
 
 export type CreateContextOptions = {
   context: HonoContext;
@@ -18,6 +18,7 @@ export async function createContext({ context }: CreateContextOptions): Promise<
     db,
     session,
     nemu: createNemuService(),
+    documentFiles: createDocumentFileStore(),
   };
 }
 

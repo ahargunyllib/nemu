@@ -1,27 +1,10 @@
-import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
 export default function Header({ children }: { children: ReactNode }) {
-  const links = [
-    { to: "/", label: "Home" },
-    { to: "/dashboard", label: "Dashboard" },
-  ] as const;
-
   return (
-    <div>
-      <div className="flex flex-row items-center justify-between px-2 py-1">
-        <nav className="flex gap-4 text-lg">
-          {links.map(({ to, label }) => {
-            return (
-              <Link key={to} to={to}>
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="flex items-center gap-2">{children}</div>
-      </div>
-      <hr />
-    </div>
+    <header className="flex h-12 items-center justify-between border-b px-4">
+      <span className="text-sm font-semibold">Alur Kerja Demo</span>
+      <div className="flex items-center gap-2">{children}</div>
+    </header>
   );
 }

@@ -15,6 +15,7 @@ const requireAuth = o.middleware(async ({ context, next }) => {
       session: context.session,
       db: context.db,
       nemu: context.nemu,
+      documentFiles: context.documentFiles,
     },
   });
 });

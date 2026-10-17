@@ -5,6 +5,7 @@ export default function Header({ children }: { children: ReactNode }) {
   const links = [
     { to: "/", label: "Home" },
     { to: "/dashboard", label: "Dashboard" },
+    { to: "/documents", label: "Documents" },
   ] as const;
 
   return (

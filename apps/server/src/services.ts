@@ -6,7 +6,7 @@ import {
   DEMO_SBM_ROWS,
   DEMO_USER_PROFILE,
 } from "@nemu/ai/demo";
-import type { NemuService } from "@nemu/api/context";
+import type { DocumentFileStore, NemuService } from "@nemu/api/context";
 import { createFixtureNemuService } from "@nemu/api/modules/chat/fixture-responder";
 import { createAuth as createConfiguredAuth } from "@nemu/auth";
 import { type Database, createDb } from "@nemu/db";
@@ -34,6 +34,18 @@ export function getDb(): Database {
 }
 export async function createAuth(database?: Database) {
   return createConfiguredAuth(ENV, database ?? (await getDb()));
+}
+
+export function createDocumentFileStore(): DocumentFileStore {
+  return {
+    async put(key, body, contentType) {
+      await ENV.DOCUMENTS.put(key, body, { httpMetadata: { contentType } });
+    },
+    async get(key) {
+      const object = await ENV.DOCUMENTS.get(key);
+      return object ? object.arrayBuffer() : null;
+    },
+  };
 }
 
 export function createNemuService(): NemuService {

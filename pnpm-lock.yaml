@@ -331,6 +331,9 @@ importers:
       '@nemu/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@nemu/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@nemu/ui':
         specifier: workspace:*
         version: link:../../packages/ui

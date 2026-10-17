@@ -8,9 +8,6 @@ import { HeadContent, Outlet, createRootRouteWithContext } from "@tanstack/react
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useState } from "react";
 
-import UserMenu from "@/features/auth/components/user-menu";
-import Header from "@/shared/components/header";
-import { ModeToggle } from "@/shared/components/mode-toggle";
 import { ThemeProvider } from "@/shared/components/theme-provider";
 import { link, orpc } from "@/shared/api/orpc";
 
@@ -26,11 +23,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   head: () => ({
     meta: [
       {
-        title: "nemu",
+        title: "Alur Kerja Demo",
       },
       {
         name: "description",
-        content: "nemu is a web application",
+        content: "Demo workflow app for the Nemu guide",
       },
     ],
     links: [
@@ -55,13 +52,7 @@ function RootComponent() {
         disableTransitionOnChange
         storageKey="vite-ui-theme"
       >
-        <div className="grid grid-rows-[auto_1fr] h-svh">
-          <Header>
-            <ModeToggle />
-            <UserMenu />
-          </Header>
-          <Outlet />
-        </div>
+        <Outlet />
         <Toaster richColors />
       </ThemeProvider>
       <TanStackRouterDevtools position="bottom-left" />
