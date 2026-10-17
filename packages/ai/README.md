@@ -4,9 +4,9 @@
 
 ## Responsibilities
 
-- Jev through OpenRouter: text-only intent, routing, action level, target selection, and confidence
+- Jev through OpenRouter: text-only intent, routing, primary target selection, and confidence
 - GPT-6.1 Sol through OpenRouter: optional screenshot understanding and grounded Indonesian answers
-- TypeScript: retrieval, calculations, citation checks, and final action enforcement
+- TypeScript: retrieval, calculations, citation checks, multi-action planning, and final action enforcement
 
 The public entry point is:
 
@@ -16,6 +16,14 @@ runNemu(request, context): Promise<NemuResponse>
 
 The package contains no Hono, oRPC, D1, or Chrome dependency. Shared wire schemas and the three
 rendering fixtures live in `@nemu/contracts`.
+
+## Cross-page follow-up
+
+The Momen 3 follow-up does not add a marker to `NemuRequest`. After the task-link click succeeds,
+the extension sends the same `session_id` and prompt once more with the new task-page URL and
+Element List. Those current-page fields are sufficient for `runNemu` to return the two missing
+upload highlights, the Kirim confirmation, and the deadline calculation. The extension owns the
+one-follow-up-per-question limit.
 
 ## Commands
 
