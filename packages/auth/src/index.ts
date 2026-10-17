@@ -9,6 +9,13 @@ export type AuthConfig = {
   CORS_ORIGIN: string;
 };
 
+export function parseOrigins(value: string): string[] {
+  return value
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+}
+
 export function createAuth(
   env: AuthConfig,
   database: Database,
@@ -19,7 +26,7 @@ export function createAuth(
       provider: "sqlite",
       schema,
     }),
-    trustedOrigins: [env.CORS_ORIGIN, ...desktopOrigins],
+    trustedOrigins: [...parseOrigins(env.CORS_ORIGIN), ...desktopOrigins],
     emailAndPassword: { enabled: true },
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,

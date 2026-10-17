@@ -1,4 +1,5 @@
 import { appRouter } from "@nemu/api/routers/index";
+import { parseOrigins } from "@nemu/auth";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
@@ -34,7 +35,7 @@ app.use("*", async (c, next) => {
 app.use(
   "/*",
   cors({
-    origin: ENV.CORS_ORIGIN,
+    origin: parseOrigins(ENV.CORS_ORIGIN),
     allowMethods: ["GET", "POST", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,

@@ -58,8 +58,24 @@ export default Alchemy.Stack(
       },
     });
 
+    const adminWorker = yield* Cloudflare.Website.Vite("admin", {
+      rootDir: "../../apps/admin",
+      domain: isProd ? "nemu-admin.ahargunyllib.dev" : undefined,
+      assets: {
+        htmlHandling: "auto-trailing-slash",
+        notFoundHandling: "single-page-application",
+      },
+      env: {
+        VITE_SERVER_URL: serverWorker.url.as<string>(),
+      },
+      dev: {
+        port: 3002,
+      },
+    });
+
     return {
       web: webWorker.url,
+      admin: adminWorker.url,
       server: serverWorker.url,
     };
   }),
