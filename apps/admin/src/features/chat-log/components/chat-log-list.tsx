@@ -127,7 +127,7 @@ export default function ChatLogList() {
                         {entry.actions.length === 0 ? (
                           <span className="text-muted-foreground">None</span>
                         ) : (
-                          <div className="grid gap-1">
+                          <div className="flex flex-col items-start gap-1">
                             {entry.actions.map((action) => (
                               <Badge
                                 key={`${action.type}-${action.target}`}
