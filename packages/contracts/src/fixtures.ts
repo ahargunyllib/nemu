@@ -119,7 +119,7 @@ export const momentThreeRequest = {
   ],
   process_context: {
     instance_id: "PD-2026-0042",
-    active_task: "Pertanggungjawaban",
+    active_task: "pertanggungjawaban",
     status: "Pertanggungjawaban",
     return_date: "2026-11-05",
     destination_province: "Sulawesi Selatan",
@@ -181,7 +181,7 @@ export const momentThreeFollowUpRequest = {
   ],
   process_context: {
     instance_id: "PD-2026-0042",
-    active_task: "Pertanggungjawaban",
+    active_task: "pertanggungjawaban",
     status: "Pertanggungjawaban",
     return_date: "2026-11-05",
     destination_province: "Sulawesi Selatan",

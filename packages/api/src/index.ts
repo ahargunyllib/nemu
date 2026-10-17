@@ -1,6 +1,6 @@
 import { ORPCError, os } from "@orpc/server";
 
-import type { Context } from "./context";
+import type { AuthenticatedContext, Context } from "./context";
 
 export const o = os.$context<Context>();
 
@@ -10,14 +10,9 @@ const requireAuth = o.middleware(async ({ context, next }) => {
   if (!context.session?.user) {
     throw new ORPCError("UNAUTHORIZED");
   }
-  return next({
-    context: {
-      session: context.session,
-      db: context.db,
-      nemu: context.nemu,
-      documentFiles: context.documentFiles,
-    },
-  });
+  // Named so each procedure's declared type refers to it instead of inlining it.
+  const authenticated: AuthenticatedContext = { ...context, session: context.session };
+  return next({ context: authenticated });
 });
 
 export const protectedProcedure = publicProcedure.use(requireAuth);

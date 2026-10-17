@@ -5,13 +5,12 @@ import { cn } from "@nemu/ui/lib/utils";
 import { Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 
-import {
-  type ProcessInstance,
-  formatTanggal,
-} from "@/features/perjalanan-dinas/lib/demo-process-instances";
+import { formatTanggal } from "@/shared/lib/format-tanggal";
+import { TASK_NEMU_IDS } from "@/features/perjalanan-dinas/lib/tasks";
+import type { ProcessInstanceView } from "@/features/perjalanan-dinas/types/process-instance-view";
 
-export default function TaskList({ instances }: { instances: readonly ProcessInstance[] }) {
-  if (instances.length === 0) {
+export default function TaskList({ tasks }: { tasks: readonly ProcessInstanceView[] }) {
+  if (tasks.length === 0) {
     return (
       <Empty className="border">
         <EmptyHeader>
@@ -24,31 +23,35 @@ export default function TaskList({ instances }: { instances: readonly ProcessIns
 
   return (
     <ul className="divide-y border">
-      {instances.map((instance) => (
-        <li key={instance.id}>
-          <Link
-            to="/perdin/task/$instanceId"
-            params={{ instanceId: instance.id }}
-            data-nemu-id={instance.task.nemuId}
-            aria-label={`${instance.task.label} ${instance.id}`}
-            className={cn(
-              buttonVariants({ variant: "ghost" }),
-              "h-auto w-full justify-between gap-4 px-4 py-3",
-            )}
-          >
-            <span className="flex flex-col items-start gap-1 text-left">
-              <span className="text-sm font-medium">{instance.task.label}</span>
-              <span className="text-muted-foreground">
-                {instance.id} · {instance.tujuan} · kembali {formatTanggal(instance.tanggalKembali)}
-              </span>
-            </span>
-            <span className="flex items-center gap-2">
-              <Badge variant="secondary">{instance.state}</Badge>
-              <ChevronRight />
-            </span>
-          </Link>
-        </li>
-      ))}
+      {tasks.map(
+        (instance) =>
+          instance.activeTask && (
+            <li key={instance.id}>
+              <Link
+                to="/perdin/task/$instanceId"
+                params={{ instanceId: instance.id }}
+                data-nemu-id={TASK_NEMU_IDS[instance.activeTask.key]}
+                aria-label={`${instance.activeTask.label} ${instance.id}`}
+                className={cn(
+                  buttonVariants({ variant: "ghost" }),
+                  "h-auto w-full justify-between gap-4 px-4 py-3",
+                )}
+              >
+                <span className="flex flex-col items-start gap-1 text-left">
+                  <span className="text-sm font-medium">{instance.activeTask.label}</span>
+                  <span className="text-muted-foreground">
+                    {instance.activeTask.id} · {instance.kotaTujuan} · kembali{" "}
+                    {formatTanggal(instance.tanggalKembali)}
+                  </span>
+                </span>
+                <span className="flex items-center gap-2">
+                  <Badge variant="secondary">{instance.state}</Badge>
+                  <ChevronRight />
+                </span>
+              </Link>
+            </li>
+          ),
+      )}
     </ul>
   );
 }

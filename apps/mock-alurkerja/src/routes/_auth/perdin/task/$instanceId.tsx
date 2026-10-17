@@ -1,21 +1,25 @@
 import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
 import { buttonVariants } from "@nemu/ui/components/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@nemu/ui/components/empty";
+import { Skeleton } from "@nemu/ui/components/skeleton";
 import { cn } from "@nemu/ui/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ChevronLeft } from "lucide-react";
 
+import PertanggungjawabanTask from "@/features/perjalanan-dinas/components/pertanggungjawaban-task";
 import TaskSummary from "@/features/perjalanan-dinas/components/task-summary";
-import { processInstancesOf } from "@/features/perjalanan-dinas/lib/demo-process-instances";
+import { orpc } from "@/shared/api/orpc";
 
 export const Route = createFileRoute("/_auth/perdin/task/$instanceId")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { user } = Route.useRouteContext();
   const { instanceId } = Route.useParams();
-  const instance = processInstancesOf(user.id).find((candidate) => candidate.id === instanceId);
+  const { data: instance, isPending } = useQuery(
+    orpc.getProcessInstance.queryOptions({ input: { instanceId }, retry: false }),
+  );
 
   return (
     <>
@@ -27,8 +31,15 @@ function RouteComponent() {
         <ChevronLeft />
         Kembali ke My Task
       </Link>
-      {instance ? (
-        <TaskSummary instance={instance} />
+      {isPending ? (
+        <Skeleton className="h-48 w-full" />
+      ) : instance ? (
+        <>
+          <TaskSummary instance={instance} />
+          {(instance.state === "Pertanggungjawaban" || instance.state === "Verifikasi") && (
+            <PertanggungjawabanTask instance={instance} />
+          )}
+        </>
       ) : (
         <Empty className="border">
           <EmptyHeader>

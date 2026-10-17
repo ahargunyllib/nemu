@@ -1,7 +1,11 @@
 import { sql } from "drizzle-orm";
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-import { PENGINAPAN, PROCESS_STATES } from "@nemu/contracts/process-instance";
+import {
+  DOKUMEN_PERTANGGUNGJAWABAN,
+  PENGINAPAN,
+  PROCESS_STATES,
+} from "@nemu/contracts/process-instance";
 
 import { user } from "./auth";
 
@@ -37,4 +41,21 @@ export const processInstance = sqliteTable(
       .notNull(),
   },
   (table) => [index("process_instance_ownerId_idx").on(table.ownerId)],
+);
+
+// A document uploaded to a Process Instance's Pertanggungjawaban task, at most
+// one per kind; only the file name is kept in the MVP.
+export const processDocument = sqliteTable(
+  "process_document",
+  {
+    instanceId: text("instance_id")
+      .notNull()
+      .references(() => processInstance.id, { onDelete: "cascade" }),
+    jenis: text("jenis", { enum: DOKUMEN_PERTANGGUNGJAWABAN }).notNull(),
+    namaFile: text("nama_file").notNull(),
+    uploadedAt: integer("uploaded_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.instanceId, table.jenis] })],
 );

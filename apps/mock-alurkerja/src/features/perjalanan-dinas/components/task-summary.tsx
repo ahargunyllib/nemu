@@ -8,15 +8,14 @@ import {
   CardTitle,
 } from "@nemu/ui/components/card";
 
-import {
-  type ProcessInstance,
-  formatTanggal,
-} from "@/features/perjalanan-dinas/lib/demo-process-instances";
+import { formatTanggal } from "@/shared/lib/format-tanggal";
+import type { ProcessInstanceView } from "@/features/perjalanan-dinas/types/process-instance-view";
 
-export default function TaskSummary({ instance }: { instance: ProcessInstance }) {
+export default function TaskSummary({ instance }: { instance: ProcessInstanceView }) {
   const rows = [
+    ["ID tugas", instance.activeTask?.id ?? "–"],
     ["Nomor pengajuan", instance.id],
-    ["Tujuan", `${instance.tujuan}, ${instance.provinsi}`],
+    ["Tujuan", `${instance.kotaTujuan}, ${instance.provinsi}`],
     ["Tanggal berangkat", formatTanggal(instance.tanggalBerangkat)],
     ["Tanggal kembali", formatTanggal(instance.tanggalKembali)],
   ] as const;
@@ -24,8 +23,8 @@ export default function TaskSummary({ instance }: { instance: ProcessInstance })
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{instance.task.label}</CardTitle>
-        <CardDescription>Perjalanan Dinas ke {instance.tujuan}</CardDescription>
+        <CardTitle>{instance.activeTask?.label ?? "Tidak ada tugas aktif"}</CardTitle>
+        <CardDescription>Perjalanan Dinas ke {instance.kotaTujuan}</CardDescription>
         <CardAction>
           <Badge variant="secondary">{instance.state}</Badge>
         </CardAction>

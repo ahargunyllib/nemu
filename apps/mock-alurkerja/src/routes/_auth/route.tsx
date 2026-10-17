@@ -2,6 +2,8 @@ import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 
 import { authClient } from "@/features/auth/api/auth-client";
 import UserMenu from "@/features/auth/components/user-menu";
+import DemoPanel from "@/features/demo/components/demo-panel";
+import DemoToday from "@/features/demo/components/demo-today";
 import SideMenu from "@/features/menu/components/side-menu";
 import Header from "@/shared/components/header";
 
@@ -22,6 +24,8 @@ function AuthLayout() {
   return (
     <div className="grid h-svh grid-rows-[auto_1fr]">
       <Header>
+        <DemoToday />
+        <DemoPanel />
         <UserMenu />
       </Header>
       <div className="grid min-h-0 grid-cols-[14rem_1fr]">

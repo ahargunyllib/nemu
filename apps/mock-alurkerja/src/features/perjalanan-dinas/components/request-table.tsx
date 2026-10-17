@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@nemu/ui/components/table";
 
-import { formatTanggal } from "@/features/perjalanan-dinas/lib/demo-process-instances";
+import { formatTanggal } from "@/shared/lib/format-tanggal";
 import type { MyProcessInstance } from "@/features/perjalanan-dinas/types/my-process-instance";
 
 export default function RequestTable({ instances }: { instances: readonly MyProcessInstance[] }) {

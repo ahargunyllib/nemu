@@ -68,3 +68,30 @@ export const ajukanPerjalananDinasInputSchema = z
   });
 
 export type AjukanPerjalananDinasInput = z.infer<typeof ajukanPerjalananDinasInputSchema>;
+
+/**
+ * Documents the Pertanggungjawaban task asks for, named as the AI reads them in
+ * `process_context.uploaded_documents`.
+ */
+export const DOKUMEN_PERTANGGUNGJAWABAN = [
+  "surat_tugas",
+  "boarding_pass_pergi",
+  "boarding_pass_pulang",
+  "laporan_perjalanan",
+] as const;
+
+export const dokumenPertanggungjawabanSchema = z.enum(DOKUMEN_PERTANGGUNGJAWABAN);
+
+export type DokumenPertanggungjawaban = z.infer<typeof dokumenPertanggungjawabanSchema>;
+
+export const processInstanceIdInputSchema = z.object({
+  instanceId: z.string().trim().min(1).max(40),
+});
+
+/** Uploading one Pertanggungjawaban document; only the file name is stored in the MVP. */
+export const unggahDokumenInputSchema = processInstanceIdInputSchema.extend({
+  jenis: dokumenPertanggungjawabanSchema,
+  namaFile: z.string().trim().min(1).max(200),
+});
+
+export type UnggahDokumenInput = z.infer<typeof unggahDokumenInputSchema>;
