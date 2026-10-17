@@ -425,7 +425,8 @@ async function main() {
             await page
               .locator(`[data-nemu-id="${nemuId}"]`)
               .setInputFiles(path.join(SAMPLE_DOCUMENTS, file));
-            await page.getByText(`${file} terunggah`).first().waitFor();
+            // The file name under the field appears once the refetch shows the upload.
+            await page.getByText(file, { exact: true }).waitFor();
           }
           await page.locator('[data-nemu-id="button-kirim"]').click();
 
