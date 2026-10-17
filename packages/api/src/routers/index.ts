@@ -1,26 +1,11 @@
 import type { RouterClient } from "@orpc/server";
-import { nemuRequestSchema, nemuResponseSchema } from "@nemu/contracts";
 
-import { protectedProcedure, publicProcedure } from "../index";
+import { chatRouter } from "../modules/chat/router";
+import { healthRouter } from "../modules/health/router";
 
 export const appRouter = {
-  healthCheck: publicProcedure.handler(() => {
-    return "OK";
-  }),
-  privateData: protectedProcedure.handler(({ context }) => {
-    return {
-      message: "This is private",
-      user: context.session?.user,
-    };
-  }),
-  nemuChat: protectedProcedure.input(nemuRequestSchema).handler(async ({ context, input }) => {
-    const authenticatedUserId = context.session.user.id;
-    const response = await context.nemu.respond(
-      { ...input, user_id: authenticatedUserId },
-      authenticatedUserId,
-    );
-    return nemuResponseSchema.parse(response);
-  }),
+  ...healthRouter,
+  ...chatRouter,
 };
 export type AppRouter = typeof appRouter;
 export type AppRouterClient = RouterClient<typeof appRouter>;

@@ -11,7 +11,7 @@ import {
 import { Skeleton } from "@nemu/ui/components/skeleton";
 import { Link, useNavigate } from "@tanstack/react-router";
 
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/features/auth/api/auth-client";
 
 export default function UserMenu() {
   const navigate = useNavigate();

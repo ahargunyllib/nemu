@@ -8,9 +8,11 @@ import { HeadContent, Outlet, createRootRouteWithContext } from "@tanstack/react
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useState } from "react";
 
-import Header from "@/components/header";
-import { ThemeProvider } from "@/components/theme-provider";
-import { link, orpc } from "@/utils/orpc";
+import UserMenu from "@/features/auth/components/user-menu";
+import Header from "@/shared/components/header";
+import { ModeToggle } from "@/shared/components/mode-toggle";
+import { ThemeProvider } from "@/shared/components/theme-provider";
+import { link, orpc } from "@/shared/api/orpc";
 
 import "../index.css";
 
@@ -54,7 +56,10 @@ function RootComponent() {
         storageKey="vite-ui-theme"
       >
         <div className="grid grid-rows-[auto_1fr] h-svh">
-          <Header />
+          <Header>
+            <ModeToggle />
+            <UserMenu />
+          </Header>
           <Outlet />
         </div>
         <Toaster richColors />
