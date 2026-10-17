@@ -11,7 +11,10 @@ import {
 export type NavItem = {
   label: string;
   icon: LucideIcon;
-} & ({ to: "/dashboard" | "/documents"; comingSoon?: never } | { to?: never; comingSoon: true });
+} & (
+  | { to: "/dashboard" | "/documents" | "/tables"; comingSoon?: never }
+  | { to?: never; comingSoon: true }
+);
 
 export type NavGroup = {
   label: string;
@@ -28,7 +31,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "Knowledge",
     items: [
       { to: "/documents", label: "Documents", icon: FileTextIcon },
-      { label: "Tables", icon: TableIcon, comingSoon: true },
+      { to: "/tables", label: "Tables", icon: TableIcon },
     ],
   },
   {
