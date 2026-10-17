@@ -11,6 +11,9 @@ export const db = Cloudflare.D1.Database("database", {
   migrations: "../../packages/db/src/migrations",
 });
 
+// Knowledge document files uploaded in the Admin Workspace; metadata lives in D1.
+export const documents = Cloudflare.R2.Bucket("documents");
+
 export const server = Cloudflare.Worker("server", {
   main: "../../apps/server/src/index.ts",
   domain: isProd ? "nemu-api.ahargunyllib.dev" : undefined,
@@ -19,6 +22,7 @@ export const server = Cloudflare.Worker("server", {
   },
   env: {
     DB: db,
+    DOCUMENTS: documents,
     CORS_ORIGIN: Config.String("CORS_ORIGIN"),
     BETTER_AUTH_SECRET: Config.Redacted("BETTER_AUTH_SECRET"),
     BETTER_AUTH_URL: Cloudflare.Worker.URL,
