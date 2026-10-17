@@ -1,13 +1,20 @@
-import { Badge } from "@nemu/ui/components/badge";
 import { Button } from "@nemu/ui/components/button";
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@nemu/ui/components/card";
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@nemu/ui/components/empty";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@nemu/ui/components/empty";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@nemu/ui/components/input-group";
 import { Skeleton } from "@nemu/ui/components/skeleton";
 import { Switch } from "@nemu/ui/components/switch";
 import {
@@ -19,27 +26,61 @@ import {
   TableRow,
 } from "@nemu/ui/components/table";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ExternalLinkIcon, FileTextIcon, SearchIcon } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
+import { listDocumentsQueryOptions } from "@/features/documents/api/list-documents";
+import DocumentStatusBadge from "@/features/documents/components/document-status-badge";
+import { formatDate, formatSize } from "@/features/documents/lib/format";
 import { client, orpc } from "@/shared/api/orpc";
 
 const SKELETON_ROWS = ["a", "b", "c"];
 
 export default function DocumentList() {
-  const documents = useQuery(orpc.listDocuments.queryOptions());
+  const documents = useQuery(listDocumentsQueryOptions());
+  const [query, setQuery] = useState("");
+
+  const filtered = documents.data?.filter((document) =>
+    `${document.title} ${document.fileName}`.toLowerCase().includes(query.trim().toLowerCase()),
+  );
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Documents</CardTitle>
-        <CardDescription>Uploaded knowledge documents and their status.</CardDescription>
+        <CardTitle>All documents</CardTitle>
+        <CardDescription>
+          {documents.data
+            ? `${documents.data.length} documents · ${documents.data.filter((d) => d.isActive).length} active`
+            : "Uploaded knowledge documents and their status."}
+        </CardDescription>
+        <CardAction>
+          <InputGroup className="w-48 sm:w-64">
+            <InputGroupAddon>
+              <SearchIcon />
+            </InputGroupAddon>
+            <InputGroupInput
+              aria-label="Search documents"
+              placeholder="Search documents…"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </InputGroup>
+        </CardAction>
       </CardHeader>
       <CardContent>
-        {documents.data?.length === 0 ? (
+        {filtered?.length === 0 ? (
           <Empty>
             <EmptyHeader>
-              <EmptyTitle>No documents yet</EmptyTitle>
-              <EmptyDescription>Upload a PDF or Markdown file to get started.</EmptyDescription>
+              <EmptyMedia variant="icon">
+                <FileTextIcon />
+              </EmptyMedia>
+              <EmptyTitle>{query ? "No matching documents" : "No documents yet"}</EmptyTitle>
+              <EmptyDescription>
+                {query
+                  ? "Try a different title or file name."
+                  : "Upload a PDF or Markdown file to get started."}
+              </EmptyDescription>
             </EmptyHeader>
           </Empty>
         ) : (
@@ -52,12 +93,12 @@ export default function DocumentList() {
                 <TableHead>Status</TableHead>
                 <TableHead>Active</TableHead>
                 <TableHead>Uploaded</TableHead>
-                <TableHead />
+                <TableHead className="w-0" />
               </TableRow>
             </TableHeader>
             <TableBody>
-              {documents.data
-                ? documents.data.map((document) => (
+              {filtered
+                ? filtered.map((document) => (
                     <TableRow key={document.id}>
                       <TableCell className="font-medium">{document.title}</TableCell>
                       <TableCell>{document.version}</TableCell>
@@ -65,24 +106,26 @@ export default function DocumentList() {
                         {document.fileName} · {formatSize(document.sizeBytes)}
                       </TableCell>
                       <TableCell>
-                        {document.status === "ready" ? (
-                          <Badge variant="secondary">Ready</Badge>
-                        ) : (
-                          <Badge variant="destructive" title={document.failureReason ?? undefined}>
-                            Failed
-                          </Badge>
-                        )}
+                        <DocumentStatusBadge
+                          status={document.status}
+                          failureReason={document.failureReason}
+                        />
                       </TableCell>
                       <TableCell>
                         <DocumentActiveSwitch id={document.id} isActive={document.isActive} />
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {document.createdAt.toLocaleString()}
+                        {formatDate(document.createdAt)}
                       </TableCell>
                       <TableCell>
                         {document.status === "ready" && (
-                          <Button variant="ghost" size="sm" onClick={() => openFile(document.id)}>
-                            Open
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={`Open ${document.title}`}
+                            onClick={() => openFile(document.id)}
+                          >
+                            <ExternalLinkIcon />
                           </Button>
                         )}
                       </TableCell>
@@ -129,10 +172,4 @@ async function openFile(id: string) {
   } catch (error) {
     toast.error(error instanceof Error ? error.message : "Could not open the file");
   }
-}
-
-function formatSize(bytes: number) {
-  return bytes < 1024 * 1024
-    ? `${(bytes / 1024).toFixed(1)} KB`
-    : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }

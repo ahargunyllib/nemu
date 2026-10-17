@@ -1,5 +1,6 @@
 import type { AppRouterClient } from "@nemu/api/routers/index";
 import { Toaster } from "@nemu/ui/components/sonner";
+import { TooltipProvider } from "@nemu/ui/components/tooltip";
 import { createORPCClient } from "@orpc/client";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import type { QueryClient } from "@tanstack/react-query";
@@ -8,8 +9,6 @@ import { HeadContent, Outlet, createRootRouteWithContext } from "@tanstack/react
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useState } from "react";
 
-import UserMenu from "@/features/auth/components/user-menu";
-import Header from "@/shared/components/header";
 import { ThemeProvider } from "@/shared/components/theme-provider";
 import { link, orpc } from "@/shared/api/orpc";
 
@@ -49,12 +48,9 @@ function RootComponent() {
     <>
       <HeadContent />
       <ThemeProvider attribute="class" forcedTheme="light" disableTransitionOnChange>
-        <div className="grid grid-rows-[auto_1fr] h-svh">
-          <Header>
-            <UserMenu />
-          </Header>
+        <TooltipProvider>
           <Outlet />
-        </div>
+        </TooltipProvider>
         <Toaster richColors />
       </ThemeProvider>
       <TanStackRouterDevtools position="bottom-left" />

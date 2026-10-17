@@ -1,18 +1,11 @@
 import { Button } from "@nemu/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@nemu/ui/components/card";
 import { Input } from "@nemu/ui/components/input";
 import { Label } from "@nemu/ui/components/label";
 import { Spinner } from "@nemu/ui/components/spinner";
 import { Switch } from "@nemu/ui/components/switch";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRef } from "react";
+import { type ReactNode, useRef } from "react";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -38,7 +31,13 @@ function titleFromFileName(fileName: string) {
   return fileName.replace(/\.(pdf|md|markdown)$/i, "").replace(/[_-]+/g, " ");
 }
 
-export default function DocumentUploadForm() {
+export default function DocumentUploadForm({
+  onUploaded,
+  children,
+}: {
+  onUploaded?: () => void;
+  children?: ReactNode;
+}) {
   const queryClient = useQueryClient();
   const fileInput = useRef<HTMLInputElement>(null);
   const upload = useMutation(orpc.uploadDocument.mutationOptions());
@@ -67,6 +66,7 @@ export default function DocumentUploadForm() {
         }
         formApi.reset();
         if (fileInput.current) fileInput.current.value = "";
+        onUploaded?.();
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Upload failed");
       } finally {
@@ -76,101 +76,96 @@ export default function DocumentUploadForm() {
   });
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Upload document</CardTitle>
-        <CardDescription>A knowledge document as PDF or Markdown.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form
-          className="grid gap-4"
-          onSubmit={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            form.handleSubmit();
-          }}
-        >
-          <form.Field name="file">
-            {(field) => (
-              <div className="grid gap-2">
-                <Label htmlFor={field.name}>File</Label>
-                <Input
-                  ref={fileInput}
-                  id={field.name}
-                  name={field.name}
-                  type="file"
-                  accept={ACCEPTED_FILES}
-                  onBlur={field.handleBlur}
-                  onChange={(event) => {
-                    const file = event.target.files?.[0] ?? null;
-                    field.handleChange(file);
-                    if (file && !form.getFieldValue("title")) {
-                      form.setFieldValue("title", titleFromFileName(file.name));
-                    }
-                  }}
-                />
-                <FieldErrors errors={field.state.meta.errors} />
-              </div>
-            )}
-          </form.Field>
-
-          <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
-            <form.Field name="title">
-              {(field) => (
-                <div className="grid gap-2">
-                  <Label htmlFor={field.name}>Title</Label>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                  />
-                  <FieldErrors errors={field.state.meta.errors} />
-                </div>
-              )}
-            </form.Field>
-            <form.Field name="version">
-              {(field) => (
-                <div className="grid gap-2">
-                  <Label htmlFor={field.name}>Version</Label>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                  />
-                  <FieldErrors errors={field.state.meta.errors} />
-                </div>
-              )}
-            </form.Field>
+    <form
+      className="grid gap-4"
+      onSubmit={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        form.handleSubmit();
+      }}
+    >
+      <form.Field name="file">
+        {(field) => (
+          <div className="grid gap-2">
+            <Label htmlFor={field.name}>File</Label>
+            <Input
+              ref={fileInput}
+              id={field.name}
+              name={field.name}
+              type="file"
+              accept={ACCEPTED_FILES}
+              onBlur={field.handleBlur}
+              onChange={(event) => {
+                const file = event.target.files?.[0] ?? null;
+                field.handleChange(file);
+                if (file && !form.getFieldValue("title")) {
+                  form.setFieldValue("title", titleFromFileName(file.name));
+                }
+              }}
+            />
+            <FieldErrors errors={field.state.meta.errors} />
           </div>
+        )}
+      </form.Field>
 
-          <form.Field name="isActive">
-            {(field) => (
-              <div className="flex items-center gap-2">
-                <Switch
-                  id={field.name}
-                  checked={field.state.value}
-                  onCheckedChange={(checked) => field.handleChange(checked)}
-                />
-                <Label htmlFor={field.name}>Active</Label>
-              </div>
-            )}
-          </form.Field>
+      <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
+        <form.Field name="title">
+          {(field) => (
+            <div className="grid gap-2">
+              <Label htmlFor={field.name}>Title</Label>
+              <Input
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+              />
+              <FieldErrors errors={field.state.meta.errors} />
+            </div>
+          )}
+        </form.Field>
+        <form.Field name="version">
+          {(field) => (
+            <div className="grid gap-2">
+              <Label htmlFor={field.name}>Version</Label>
+              <Input
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+              />
+              <FieldErrors errors={field.state.meta.errors} />
+            </div>
+          )}
+        </form.Field>
+      </div>
 
-          <form.Subscribe selector={(state) => state.isSubmitting}>
-            {(isSubmitting) => (
-              <Button type="submit" className="justify-self-start" disabled={isSubmitting}>
-                {isSubmitting && <Spinner />}
-                Upload
-              </Button>
-            )}
-          </form.Subscribe>
-        </form>
-      </CardContent>
-    </Card>
+      <form.Field name="isActive">
+        {(field) => (
+          <div className="flex items-center gap-2">
+            <Switch
+              id={field.name}
+              checked={field.state.value}
+              onCheckedChange={(checked) => field.handleChange(checked)}
+            />
+            <Label htmlFor={field.name}>Active</Label>
+          </div>
+        )}
+      </form.Field>
+
+      <form.Subscribe selector={(state) => state.isSubmitting}>
+        {(isSubmitting) => (
+          <div className="flex justify-end gap-2">
+            {children}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Spinner />}
+              Upload
+            </Button>
+          </div>
+        )}
+      </form.Subscribe>
+    </form>
   );
 }
 
