@@ -1,22 +1,99 @@
-import { ajukanPerjalananDinasInputSchema } from "@nemu/contracts/process-instance";
+import {
+  ajukanPerjalananDinasInputSchema,
+  processInstanceIdInputSchema,
+  unggahDokumenInputSchema,
+} from "@nemu/contracts/process-instance";
+import { ORPCError } from "@orpc/server";
 
-import type { Context } from "../../context";
 import { protectedProcedure } from "../../index";
-import { createProcessInstanceRepository } from "./repository";
-import { ajukanPerjalananDinas, listMyProcessInstances } from "./service";
+import {
+  type ProcessResult,
+  ajukanPerjalananDinas,
+  createProcessInstanceDeps,
+  getProcessInstance,
+  kirimPertanggungjawaban,
+  listMyProcessInstances,
+  listMyTasks,
+  majukanState,
+  resetDemo,
+  unggahDokumenPertanggungjawaban,
+} from "./service";
 
-function processInstanceDeps(context: Pick<Context, "db">) {
-  return { processInstances: createProcessInstanceRepository(context.db) };
+function unwrap<T>(result: ProcessResult<T>): T {
+  if (!result.ok) throw new ORPCError(result.code, { message: result.message });
+  return result.value;
 }
 
 export const processInstancesRouter = {
   ajukanPerjalananDinas: protectedProcedure
     .input(ajukanPerjalananDinasInputSchema)
     .handler(({ context, input }) =>
-      ajukanPerjalananDinas(processInstanceDeps(context), context.session.user.id, input),
+      ajukanPerjalananDinas(createProcessInstanceDeps(context.db), context.session.user.id, input),
     ),
 
   listMyProcessInstances: protectedProcedure.handler(({ context }) =>
-    listMyProcessInstances(processInstanceDeps(context), context.session.user.id),
+    listMyProcessInstances(createProcessInstanceDeps(context.db), context.session.user.id),
   ),
+
+  listMyTasks: protectedProcedure.handler(({ context }) =>
+    listMyTasks(createProcessInstanceDeps(context.db), context.session.user.id),
+  ),
+
+  getProcessInstance: protectedProcedure
+    .input(processInstanceIdInputSchema)
+    .handler(async ({ context, input }) => {
+      const instance = await getProcessInstance(
+        createProcessInstanceDeps(context.db),
+        context.session.user.id,
+        input.instanceId,
+      );
+      if (!instance) {
+        throw new ORPCError("NOT_FOUND", {
+          message: `Pengajuan ${input.instanceId} tidak ditemukan`,
+        });
+      }
+      return instance;
+    }),
+
+  unggahDokumenPertanggungjawaban: protectedProcedure
+    .input(unggahDokumenInputSchema)
+    .handler(async ({ context, input }) =>
+      unwrap(
+        await unggahDokumenPertanggungjawaban(
+          createProcessInstanceDeps(context.db),
+          context.session.user.id,
+          input,
+        ),
+      ),
+    ),
+
+  kirimPertanggungjawaban: protectedProcedure
+    .input(processInstanceIdInputSchema)
+    .handler(async ({ context, input }) =>
+      unwrap(
+        await kirimPertanggungjawaban(
+          createProcessInstanceDeps(context.db),
+          context.session.user.id,
+          input.instanceId,
+        ),
+      ),
+    ),
+
+  majukanState: protectedProcedure
+    .input(processInstanceIdInputSchema)
+    .handler(async ({ context, input }) =>
+      unwrap(
+        await majukanState(
+          createProcessInstanceDeps(context.db),
+          context.session.user.id,
+          input.instanceId,
+        ),
+      ),
+    ),
+
+  resetDemo: protectedProcedure.handler(({ context }) =>
+    resetDemo(createProcessInstanceDeps(context.db), context.session.user.id),
+  ),
+
+  getDemoClock: protectedProcedure.handler(({ context }) => ({ today: context.demoDate })),
 };

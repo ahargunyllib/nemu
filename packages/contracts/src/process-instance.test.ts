@@ -4,6 +4,7 @@ import { test } from "node:test";
 import {
   type AjukanPerjalananDinasInput,
   ajukanPerjalananDinasInputSchema,
+  unggahDokumenInputSchema,
 } from "./process-instance.js";
 
 const rinaToMakassar: AjukanPerjalananDinasInput = {
@@ -47,4 +48,11 @@ test("tanggal kembali before tanggal berangkat is rejected on tanggalKembali", (
   });
   assert.equal(result.success, false);
   assert.deepEqual(result.error?.issues[0]?.path, ["tanggalKembali"]);
+});
+
+test("a Pertanggungjawaban upload names one of the documents the AI knows", () => {
+  const upload = { instanceId: "PD-2026-0042", namaFile: "laporan.pdf" };
+
+  assert.ok(unggahDokumenInputSchema.safeParse({ ...upload, jenis: "laporan_perjalanan" }).success);
+  assert.ok(!unggahDokumenInputSchema.safeParse({ ...upload, jenis: "kuitansi" }).success);
 });

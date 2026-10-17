@@ -1,19 +1,21 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
 import TaskList from "@/features/perjalanan-dinas/components/task-list";
-import { processInstancesOf } from "@/features/perjalanan-dinas/lib/demo-process-instances";
+import TaskListSkeleton from "@/features/perjalanan-dinas/components/task-list-skeleton";
+import { orpc } from "@/shared/api/orpc";
 
 export const Route = createFileRoute("/_auth/my-task")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { user } = Route.useRouteContext();
+  const { data: tasks } = useQuery(orpc.listMyTasks.queryOptions());
 
   return (
     <>
       <h1 className="text-lg font-semibold">My Task</h1>
-      <TaskList instances={processInstancesOf(user.id)} />
+      {tasks ? <TaskList tasks={tasks} /> : <TaskListSkeleton />}
     </>
   );
 }

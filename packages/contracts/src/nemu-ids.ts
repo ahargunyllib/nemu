@@ -26,6 +26,8 @@ export const NEMU_IDS = {
   /** Task links, one per Task, on Beranda (`/`) and My Task (`/my-task`). */
   task: {
     pertanggungjawaban: "task-pertanggungjawaban",
+    isiRencana: "task-isi-rencana",
+    revisi: "task-revisi",
   },
   /** Task detail (`/perdin/task/$instanceId`). */
   taskDetail: {
@@ -48,11 +50,21 @@ export const NEMU_IDS = {
     uploadUndangan: "upload-undangan",
     kirim: "button-kirim-pengajuan",
   },
-  /** Pertanggungjawaban task (`/perdin/task/$instanceId`), rendered from #4. */
+  /** Pertanggungjawaban task (`/perdin/task/$instanceId`). */
   pertanggungjawaban: {
+    uploadSuratTugas: "upload-surat-tugas",
+    uploadBoardingPassPergi: "upload-boarding-pass-pergi",
     uploadLaporanPerjalanan: "upload-laporan-perjalanan",
     uploadBoardingPassPulang: "upload-boarding-pass-pulang",
     kirim: "button-kirim",
+  },
+  /** Demo panel in the header of every signed-in page; moves a State without the approvers. */
+  demoPanel: {
+    open: "button-panel-demo",
+    close: "button-tutup-panel-demo",
+    instance: "select-demo-process-instance",
+    advance: "button-majukan-state",
+    reset: "button-reset-demo",
   },
 } as const;
 

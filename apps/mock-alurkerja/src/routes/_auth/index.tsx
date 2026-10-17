@@ -1,8 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
 import ProfileCard from "@/features/auth/components/profile-card";
 import TaskList from "@/features/perjalanan-dinas/components/task-list";
-import { processInstancesOf } from "@/features/perjalanan-dinas/lib/demo-process-instances";
+import TaskListSkeleton from "@/features/perjalanan-dinas/components/task-list-skeleton";
+import { orpc } from "@/shared/api/orpc";
 
 export const Route = createFileRoute("/_auth/")({
   component: RouteComponent,
@@ -10,6 +12,7 @@ export const Route = createFileRoute("/_auth/")({
 
 function RouteComponent() {
   const { user } = Route.useRouteContext();
+  const { data: tasks } = useQuery(orpc.listMyTasks.queryOptions());
 
   return (
     <>
@@ -17,7 +20,7 @@ function RouteComponent() {
       <ProfileCard user={user} />
       <section className="space-y-2">
         <h2 className="text-sm font-medium">Tugas saya</h2>
-        <TaskList instances={processInstancesOf(user.id)} />
+        {tasks ? <TaskList tasks={tasks} /> : <TaskListSkeleton />}
       </section>
     </>
   );

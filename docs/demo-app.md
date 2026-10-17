@@ -24,6 +24,8 @@ rounded, as in AlurKerja.
 | My Task                 | `/my-task`                 |
 | Task detail             | `/perdin/task/$instanceId` |
 
+The Task detail page of a Pertanggungjawaban is the Pertanggungjawaban task page.
+
 ## Process Instances
 
 Kirim on Ajukan Perjalanan Dinas stores a Process Instance in the
@@ -31,6 +33,48 @@ Kirim on Ajukan Perjalanan Dinas stores a Process Instance in the
 departure year. My Request lists the signed-in user's instances from the
 `listMyProcessInstances` procedure. The States and the form's wire schema live
 in `@nemu/contracts/process-instance`.
+
+A Process Instance's active Task comes from its State: Draf asks to fill in the
+plan (`isi_rencana`), Revisi to fix the request (`revisi`), and
+Pertanggungjawaban to submit the Pertanggungjawaban (`pertanggungjawaban`).
+Every other State waits on the atasan, PPK, or bendahara, so it has no Task.
+A Task's ID is its code plus the nomor pengajuan, e.g. `PJ-PD-2026-0042`.
+Beranda and My Task list the Tasks from `listMyTasks`.
+
+The Pertanggungjawaban task page asks for four documents (surat tugas, boarding
+pass pergi and pulang, laporan perjalanan). Only the file name is stored, in
+`process_document`. Kirim needs all four and moves the State to Verifikasi,
+then shows the task ID. Sample PDFs to upload are in
+`apps/mock-alurkerja/sample-documents/`.
+
+## Process endpoints
+
+`listMyTasks` and `getProcessInstance` return the active Task, tanggal kembali,
+and uploaded documents of the signed-in user's instances. Before calling the
+Responder, `nemuChat` loads the user's active Process Instance (the most
+recently changed one with a Task, else the most recently changed one) and sends
+it as `process_context`, with document names as the AI reads them
+(`surat_tugas`, `boarding_pass_pergi`, `boarding_pass_pulang`,
+`laporan_perjalanan`). The extension never sends `process_context`.
+
+## Demo panel and demo clock
+
+**Panel demo** in the header plays the atasan, PPK, and bendahara: pick a
+Process Instance and press **Majukan State** to move it to the next State
+(Draf → … → Selesai; Revisi goes back to Diajukan). **Reset data demo** puts
+back the signed-in user's 3-Momen fixtures and deletes their other requests.
+
+"Today" is the demo clock, `NEMU_DEMO_DATE` (2026-11-06), the same setting the
+AI counts from; the header shows it through `getDemoClock`.
+
+## 3-Momen fixtures
+
+A migration (`packages/db/src/migrations/*_seed-demo-process-instances`) seeds
+Rina's `PD-2026-0042` to Makassar, 3–5 November 2026, in State
+Pertanggungjawaban with the surat tugas and boarding pass pergi uploaded, so
+the boarding pass pulang and laporan perjalanan are missing (Momen 3). The
+migration is generated from `packages/api/src/modules/process-instances/demo-seed.ts`;
+after changing it, run `UPDATE_DEMO_SEED=1 pnpm test`.
 
 ## Demo accounts
 
