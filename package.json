@@ -17,12 +17,13 @@
     "staged": "vp staged",
     "hooks:setup": "vp config",
     "dev:mock-alurkerja": "vp run --filter mock-alurkerja dev:bare",
+    "dev:admin": "vp run --filter admin dev:bare",
     "dev:server": "vp run --filter hono dev:bare",
     "db:generate": "vp run --filter @nemu/db db:generate",
     "deploy": "vp run --filter @nemu/infra deploy",
     "destroy": "vp run --filter @nemu/infra destroy",
-    "env:generate": "varlock codegen --path ./apps/mock-alurkerja/ && varlock codegen --path ./apps/server/ && varlock codegen --path ./packages/db/",
-    "postinstall": "varlock codegen --path ./apps/mock-alurkerja/ && varlock codegen --path ./apps/server/ && varlock codegen --path ./packages/db/"
+    "env:generate": "varlock codegen --path ./apps/mock-alurkerja/ && varlock codegen --path ./apps/admin/ && varlock codegen --path ./apps/server/ && varlock codegen --path ./packages/db/",
+    "postinstall": "varlock codegen --path ./apps/mock-alurkerja/ && varlock codegen --path ./apps/admin/ && varlock codegen --path ./apps/server/ && varlock codegen --path ./packages/db/"
   },
   "dependencies": {
     "zod": "catalog:"
