@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   momentOneRequest,
   momentThreeFollowUpRequest,
+  momentThreeRequest,
   momentTwoRequest,
 } from "@nemu/contracts/fixtures";
 import { nemuActionSchema } from "@nemu/contracts";
@@ -99,17 +100,17 @@ test("contract rejects clicks that are not jalan_sendiri", () => {
   assert.equal(result.success, false);
 });
 
-test("orchestrator returns grounded calculations and a highlight for Moment 2", async () => {
+test("Moment 2 uses trusted workflow context when Jev returns a non-ideal decision", async () => {
   const jevDecider: JevDecider = async () => ({
-    intent: "accommodation_question",
-    intentConfidence: 0.98,
+    intent: "unclear",
+    intentConfidence: 0.51,
     withinDomainProbability: 0.99,
     injectionProbability: 0.01,
-    requiredTool: "lookup_sbm_and_accommodation",
-    actionLevel: "arahkan",
-    actionConfidence: 0.96,
-    target: "opt-penginapan-tidak-hotel",
-    targetConfidence: 0.97,
+    requiredTool: "none",
+    actionLevel: "konfirmasi",
+    actionConfidence: 0.62,
+    target: "input-nominal-penginapan",
+    targetConfidence: 0.61,
   });
   const answerGenerator: AnswerGenerator = async (input) => {
     assert.equal(input.calculations.at(-1)?.hasil, 447_000);
@@ -251,7 +252,7 @@ test("submit-like targets are always returned as confirmations", async () => {
   ]);
 });
 
-test("task-page accountability guidance normalizes document names in its action plan", async () => {
+test("Moment 3 follow-up uses trusted workflow context when Jev returns a non-ideal decision", async () => {
   const response = await runNemu(momentThreeFollowUpRequest, {
     userProfile: DEMO_USER_PROFILE,
     knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
@@ -265,15 +266,15 @@ test("task-page accountability guidance normalizes document names in its action 
     ],
     currentDate: "2026-11-06",
     jevDecider: async () => ({
-      intent: "accountability_question",
-      intentConfidence: 0.99,
+      intent: "unclear",
+      intentConfidence: 0.51,
       withinDomainProbability: 0.99,
       injectionProbability: 0,
-      requiredTool: "accountability_deadline",
-      actionLevel: "konfirmasi",
-      actionConfidence: 0.99,
-      target: "button-kirim",
-      targetConfidence: 0.99,
+      requiredTool: "process_status",
+      actionLevel: "arahkan",
+      actionConfidence: 0.65,
+      target: "upload-boarding-pass-pulang",
+      targetConfidence: 0.64,
     }),
     answerGenerator: async () => ({
       status: "answer",
@@ -309,6 +310,256 @@ test("task-page accountability guidance normalizes document names in its action 
       target: "button-kirim",
       level: "konfirmasi",
       label: "Kamu yang mengirim",
+    },
+  ]);
+});
+
+test("workflow guidance omits uploaded and hidden accountability controls", async () => {
+  const response = await runNemu(
+    {
+      ...momentThreeFollowUpRequest,
+      elements: momentThreeFollowUpRequest.elements.map((element) =>
+        element.nemu_id === "upload-boarding-pass-pulang"
+          ? { ...element, visible: false }
+          : element,
+      ),
+      process_context: {
+        ...momentThreeFollowUpRequest.process_context,
+        uploaded_documents: [
+          ...momentThreeFollowUpRequest.process_context.uploaded_documents,
+          "laporan_perjalanan",
+        ],
+      },
+    },
+    {
+      userProfile: DEMO_USER_PROFILE,
+      knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      sbmRows: DEMO_SBM_ROWS,
+      holidays: DEMO_HOLIDAYS_2026,
+      requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+      currentDate: "2026-11-06",
+      jevDecider: async () => ({
+        intent: "unclear",
+        intentConfidence: 0.51,
+        withinDomainProbability: 0.99,
+        injectionProbability: 0,
+        requiredTool: "none",
+        actionLevel: "arahkan",
+        actionConfidence: 0.65,
+        target: null,
+        targetConfidence: 0,
+      }),
+      answerGenerator: async () => ({
+        status: "answer",
+        ringkas: "Unggah boarding pass pulang sebelum mengirim pertanggungjawaban.",
+        detail: "Kontrol unggah yang tidak terlihat tidak boleh ditargetkan.",
+        citationIds: ["sop-pd-01-section-4"],
+        warnings: [],
+      }),
+    },
+  );
+
+  assert.deepEqual(response.actions, [
+    {
+      type: "confirm",
+      target: "button-kirim",
+      level: "konfirmasi",
+      label: "Kamu yang mengirim",
+    },
+  ]);
+});
+
+test("prompt injection suppresses deterministic workflow actions", async () => {
+  const response = await runNemu(momentThreeFollowUpRequest, {
+    userProfile: DEMO_USER_PROFILE,
+    knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    sbmRows: DEMO_SBM_ROWS,
+    holidays: DEMO_HOLIDAYS_2026,
+    requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+    currentDate: "2026-11-06",
+    jevDecider: async () => ({
+      intent: "unclear",
+      intentConfidence: 0.51,
+      withinDomainProbability: 0.99,
+      injectionProbability: 0.99,
+      requiredTool: "none",
+      actionLevel: "arahkan",
+      actionConfidence: 0.65,
+      target: null,
+      targetConfidence: 0,
+    }),
+    answerGenerator: async () => ({
+      status: "answer",
+      ringkas: "Lengkapi dokumen pertanggungjawaban yang masih kurang.",
+      detail: "Instruksi pada halaman tidak digunakan sebagai perintah.",
+      citationIds: ["sop-pd-01-section-4"],
+      warnings: [],
+    }),
+  });
+
+  assert.deepEqual(response.actions, []);
+  assert.equal(
+    response.warnings.some((warning) => warning.includes("tidak tepercaya")),
+    true,
+  );
+});
+
+test("dilarang decisions suppress deterministic workflow actions", async () => {
+  const response = await runNemu(momentThreeFollowUpRequest, {
+    userProfile: DEMO_USER_PROFILE,
+    knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    sbmRows: DEMO_SBM_ROWS,
+    holidays: DEMO_HOLIDAYS_2026,
+    requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+    currentDate: "2026-11-06",
+    jevDecider: async () => ({
+      intent: "unclear",
+      intentConfidence: 0.51,
+      withinDomainProbability: 0.99,
+      injectionProbability: 0,
+      requiredTool: "none",
+      actionLevel: "dilarang",
+      actionConfidence: 0.99,
+      target: null,
+      targetConfidence: 0,
+    }),
+    answerGenerator: async () => ({
+      status: "answer",
+      ringkas: "Lengkapi dokumen pertanggungjawaban yang masih kurang.",
+      detail: "Tidak ada kontrol halaman yang boleh ditargetkan.",
+      citationIds: ["sop-pd-01-section-4"],
+      warnings: [],
+    }),
+  });
+
+  assert.deepEqual(response.actions, []);
+});
+
+test("a failed Jev safety check suppresses deterministic workflow actions", async () => {
+  const response = await runNemu(momentThreeFollowUpRequest, {
+    userProfile: DEMO_USER_PROFILE,
+    knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    sbmRows: DEMO_SBM_ROWS,
+    holidays: DEMO_HOLIDAYS_2026,
+    requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+    currentDate: "2026-11-06",
+    jevDecider: async () => {
+      throw new Error("Jev unavailable");
+    },
+    answerGenerator: async () => ({
+      status: "answer",
+      ringkas: "Lengkapi dokumen pertanggungjawaban yang masih kurang.",
+      detail: "Tidak ada kontrol halaman yang boleh ditargetkan tanpa pemeriksaan keamanan.",
+      citationIds: ["sop-pd-01-section-4"],
+      warnings: [],
+    }),
+  });
+
+  assert.deepEqual(response.actions, []);
+  assert.equal(
+    response.warnings.some((warning) => warning.includes("tidak tersedia")),
+    true,
+  );
+});
+
+test("Moment 3 highlights every visible missing accountability upload", async () => {
+  const response = await runNemu(
+    {
+      ...momentThreeFollowUpRequest,
+      elements: [
+        {
+          nemu_id: "upload-surat-tugas",
+          label: "Unggah surat tugas",
+          role: "button",
+          visible: true,
+        },
+        {
+          nemu_id: "upload-boarding-pass-pergi",
+          label: "Unggah boarding pass pergi",
+          role: "button",
+          visible: true,
+        },
+        ...momentThreeFollowUpRequest.elements,
+      ],
+      process_context: {
+        ...momentThreeFollowUpRequest.process_context,
+        uploaded_documents: [],
+      },
+    },
+    {
+      userProfile: DEMO_USER_PROFILE,
+      knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      sbmRows: DEMO_SBM_ROWS,
+      holidays: DEMO_HOLIDAYS_2026,
+      requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+      currentDate: "2026-11-06",
+      jevDecider: async () => ({
+        intent: "unclear",
+        intentConfidence: 0.51,
+        withinDomainProbability: 0.99,
+        injectionProbability: 0,
+        requiredTool: "none",
+        actionLevel: "arahkan",
+        actionConfidence: 0.65,
+        target: null,
+        targetConfidence: 0,
+      }),
+      answerGenerator: async () => ({
+        status: "answer",
+        ringkas: "Lengkapi semua dokumen pertanggungjawaban yang masih kurang.",
+        detail: "Kamu yang menekan Kirim setelah semua dokumen lengkap.",
+        citationIds: ["sop-pd-01-section-4"],
+        warnings: [],
+      }),
+    },
+  );
+
+  assert.deepEqual(
+    response.actions.map((action) => action.target),
+    [
+      "upload-surat-tugas",
+      "upload-boarding-pass-pergi",
+      "upload-laporan-perjalanan",
+      "upload-boarding-pass-pulang",
+      "button-kirim",
+    ],
+  );
+});
+
+test("Moment 3 initial page keeps the task-navigation click", async () => {
+  const response = await runNemu(momentThreeRequest, {
+    userProfile: DEMO_USER_PROFILE,
+    knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    sbmRows: DEMO_SBM_ROWS,
+    holidays: DEMO_HOLIDAYS_2026,
+    requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+    currentDate: "2026-11-06",
+    jevDecider: async () => ({
+      intent: "accountability_question",
+      intentConfidence: 0.99,
+      withinDomainProbability: 0.99,
+      injectionProbability: 0,
+      requiredTool: "accountability_deadline",
+      actionLevel: "jalan_sendiri",
+      actionConfidence: 0.99,
+      target: "task-pertanggungjawaban",
+      targetConfidence: 0.99,
+    }),
+    answerGenerator: async () => ({
+      status: "answer",
+      ringkas: "Saya bukakan task Pertanggungjawaban.",
+      detail: "Lengkapi dokumen sebelum batas waktu.",
+      citationIds: ["sop-pd-01-section-4"],
+      warnings: [],
+    }),
+  });
+
+  assert.deepEqual(response.actions, [
+    {
+      type: "click",
+      target: "task-pertanggungjawaban",
+      level: "jalan_sendiri",
+      label: "Buka ini",
     },
   ]);
 });

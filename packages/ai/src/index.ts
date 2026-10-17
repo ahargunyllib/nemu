@@ -8,6 +8,7 @@ import {
   nemuRequestSchema,
   nemuResponseSchema,
 } from "@nemu/contracts";
+import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
 
 import type { AnswerGenerator, NemuUserProfile } from "./openai.js";
 import type { JevDecider, JevDecision } from "./jev.js";
@@ -67,17 +68,61 @@ type ToolResults = {
   clarification?: string;
 };
 
+type WorkflowScenario = "accommodation_guidance" | "accountability_follow_up" | null;
+
 const CONFIRM_ACTION_PATTERN = /(?:^|\b)(kirim|submit)(?:\b|$)/iu;
 const PROHIBITED_ACTION_PATTERN = /(?:^|\b)(setuju|approve|hapus|delete|bayar|pay)(?:\b|$)/iu;
 const ACCOMMODATION_GUIDANCE_TARGETS = [
-  "opt-penginapan-tidak-hotel",
-  "input-nominal-penginapan",
+  NEMU_IDS.perdinForm.lodgingNotHotel,
+  NEMU_IDS.perdinForm.lodgingAmount,
 ] as const;
 const ACCOUNTABILITY_UPLOAD_TARGETS = [
-  { document: "laporan_perjalanan", target: "upload-laporan-perjalanan" },
-  { document: "boarding_pass_pulang", target: "upload-boarding-pass-pulang" },
+  { document: "surat_tugas", target: NEMU_IDS.pertanggungjawaban.uploadSuratTugas },
+  {
+    document: "boarding_pass_pergi",
+    target: NEMU_IDS.pertanggungjawaban.uploadBoardingPassPergi,
+  },
+  {
+    document: "laporan_perjalanan",
+    target: NEMU_IDS.pertanggungjawaban.uploadLaporanPerjalanan,
+  },
+  {
+    document: "boarding_pass_pulang",
+    target: NEMU_IDS.pertanggungjawaban.uploadBoardingPassPulang,
+  },
 ] as const;
-const ACCOUNTABILITY_SUBMIT_TARGET = "button-kirim";
+const ACCOUNTABILITY_SUBMIT_TARGET = NEMU_IDS.pertanggungjawaban.kirim;
+
+function resolveWorkflowScenario(
+  request: NemuRequest,
+  processContext: ProcessContext | undefined,
+): WorkflowScenario {
+  const activeTask = processContext?.active_task
+    ? normalizeDocumentName(processContext.active_task)
+    : "";
+  const status = processContext?.status ? normalizeDocumentName(processContext.status) : "";
+  const visibleElementIds = new Set(
+    request.elements.filter((element) => element.visible).map((element) => element.nemu_id),
+  );
+
+  if (
+    activeTask === "isi rencana" &&
+    ACCOMMODATION_GUIDANCE_TARGETS.some((target) => visibleElementIds.has(target))
+  ) {
+    return "accommodation_guidance";
+  }
+
+  const hasAccountabilityTask =
+    activeTask === "pertanggungjawaban" || status === "pertanggungjawaban";
+  const hasAccountabilityControl =
+    ACCOUNTABILITY_UPLOAD_TARGETS.some(({ target }) => visibleElementIds.has(target)) ||
+    visibleElementIds.has(ACCOUNTABILITY_SUBMIT_TARGET);
+  if (hasAccountabilityTask && hasAccountabilityControl) {
+    return "accountability_follow_up";
+  }
+
+  return null;
+}
 
 function durationSince(startedAt: number): number {
   return Math.max(0, Math.round(performance.now() - startedAt));
@@ -118,10 +163,17 @@ function runDeterministicTools(
   decision: JevDecision,
   context: NemuContext,
   processContext: ProcessContext | undefined,
+  workflowScenario: WorkflowScenario,
 ): ToolResults {
   const results: ToolResults = { calculations: [], missingDocuments: [] };
+  const requiredTool =
+    workflowScenario === "accommodation_guidance"
+      ? "lookup_sbm_and_accommodation"
+      : workflowScenario === "accountability_follow_up"
+        ? "accountability_deadline"
+        : decision.requiredTool;
 
-  if (decision.requiredTool === "lookup_sbm_and_accommodation") {
+  if (requiredTool === "lookup_sbm_and_accommodation") {
     const province = processContext?.destination_province;
     const nights = processContext?.nights;
 
@@ -168,7 +220,7 @@ function runDeterministicTools(
     });
   }
 
-  if (decision.requiredTool === "accountability_deadline") {
+  if (requiredTool === "accountability_deadline") {
     const returnDate = processContext?.return_date;
     if (!returnDate) {
       results.clarification = "Tanggal kembali perjalanan dinasnya kapan?";
@@ -227,8 +279,10 @@ function buildActions(
   missingDocuments: readonly string[],
   clickThreshold: number,
   injectionDetected: boolean,
+  safetyCheckFailed: boolean,
+  workflowScenario: WorkflowScenario,
 ): NemuAction[] {
-  if (injectionDetected || !decision.target || decision.actionLevel === "dilarang") {
+  if (safetyCheckFailed || injectionDetected || decision.actionLevel === "dilarang") {
     return [];
   }
 
@@ -237,17 +291,7 @@ function buildActions(
       .filter((element) => element.visible)
       .map((element) => [element.nemu_id, element] as const),
   );
-  const target = visibleElementsById.get(decision.target);
-  if (!target) {
-    return [];
-  }
-
-  const targetDescription = `${target.nemu_id} ${target.label}`;
-  if (PROHIBITED_ACTION_PATTERN.test(targetDescription)) {
-    return [];
-  }
-
-  if (decision.intent === "accommodation_question" && decision.actionLevel === "arahkan") {
+  if (workflowScenario === "accommodation_guidance") {
     const guidanceActions = ACCOMMODATION_GUIDANCE_TARGETS.flatMap((targetId) => {
       const element = visibleElementsById.get(targetId);
       if (!element || PROHIBITED_ACTION_PATTERN.test(`${element.nemu_id} ${element.label}`)) {
@@ -267,10 +311,7 @@ function buildActions(
     }
   }
 
-  if (
-    decision.intent === "accountability_question" &&
-    decision.requiredTool === "accountability_deadline"
-  ) {
+  if (workflowScenario === "accountability_follow_up") {
     const missingDocumentSet = new Set(missingDocuments.map(normalizeDocumentName));
     const accountabilityActions: NemuAction[] = ACCOUNTABILITY_UPLOAD_TARGETS.flatMap(
       ({ document, target: targetId }) => {
@@ -311,6 +352,19 @@ function buildActions(
     if (accountabilityActions.length) {
       return accountabilityActions;
     }
+  }
+
+  if (!decision.target) {
+    return [];
+  }
+  const target = visibleElementsById.get(decision.target);
+  if (!target) {
+    return [];
+  }
+
+  const targetDescription = `${target.nemu_id} ${target.label}`;
+  if (PROHIBITED_ACTION_PATTERN.test(targetDescription)) {
+    return [];
   }
 
   if (CONFIRM_ACTION_PATTERN.test(targetDescription) || decision.actionLevel === "konfirmasi") {
@@ -433,6 +487,7 @@ export async function runNemu(
   const startedAt = performance.now();
   const request = nemuRequestSchema.parse(untrustedRequest);
   const processContext = context.processContext ?? request.process_context;
+  const workflowScenario = resolveWorkflowScenario(request, processContext);
   const thresholds = {
     domain: context.thresholds?.domain ?? 0.5,
     injection: context.thresholds?.injection ?? 0.7,
@@ -503,7 +558,12 @@ export async function runNemu(
   const toolsStartedAt = performance.now();
   let toolResults: ToolResults;
   try {
-    toolResults = runDeterministicTools(jevResult.decision, context, processContext);
+    toolResults = runDeterministicTools(
+      jevResult.decision,
+      context,
+      processContext,
+      workflowScenario,
+    );
   } catch {
     return fixedResponse(
       "error",
@@ -565,6 +625,8 @@ export async function runNemu(
             toolResults.missingDocuments,
             thresholds.click,
             injectionDetected,
+            jevResult.failed,
+            workflowScenario,
           )
         : [];
 
