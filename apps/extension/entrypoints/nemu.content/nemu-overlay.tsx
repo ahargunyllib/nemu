@@ -35,6 +35,8 @@ import { useElementHeight } from "../../shared/hooks/use-element-height";
 
 const NO_ACTIONS: NemuAction[] = [];
 const NO_ELEMENTS: PageElement[] = [];
+/** Room around the panel inside its scroll box, so the scroll box doesn't clip the cards' shadow. */
+const SHADOW_ROOM = 16;
 
 export function NemuOverlay() {
   const [anchor, setAnchor] = useState<CursorPosition | null>(null);
@@ -75,6 +77,14 @@ export function NemuOverlay() {
     state.kind === "idle" ? null : <AnswerCardHeader prompt={state.prompt} onClose={close} />;
 
   const pickingArea = area.state.kind === "selecting" || area.state.kind === "capturing";
+  const placement =
+    anchor &&
+    placePanel(
+      anchor,
+      { width: window.innerWidth, height: window.innerHeight },
+      panelHeight,
+      highlights.map(({ box }) => highlightFootprint(box)),
+    );
 
   // One font and text color for everything Nemu draws: highlights, the mascot (#6), and the panel.
   // All of it is hidden while the viewport is captured, so an Area Crop shows only the page.
@@ -111,23 +121,23 @@ export function NemuOverlay() {
           onOpenComposer={openComposer}
         />
       </PageLayer>
-      {anchor && (
+      {placement && (
         <div
           // Hidden, not unmounted, during area select mode so the Composer keeps its text.
-          className={pickingArea ? "hidden" : "fixed z-2147483647 overflow-y-auto"}
+          className={
+            pickingArea ? "hidden" : "pointer-events-none fixed z-2147483647 overflow-y-auto"
+          }
           style={{
-            width: PANEL_WIDTH,
-            ...placePanel(
-              anchor,
-              { width: window.innerWidth, height: window.innerHeight },
-              panelHeight,
-              highlights.map(({ box }) => highlightFootprint(box)),
-            ),
+            ...placement,
+            width: PANEL_WIDTH + 2 * SHADOW_ROOM,
+            maxHeight: placement.maxHeight + 2 * SHADOW_ROOM,
+            margin: -SHADOW_ROOM,
+            padding: SHADOW_ROOM,
           }}
         >
           {/* Measured inside the scroll box, so a panel shrunk to keep off a highlight still
               reports its full height. */}
-          <div ref={panelRef} className="flex flex-col gap-2">
+          <div ref={panelRef} className="pointer-events-auto flex flex-col gap-2">
             {composerOpen && (
               <Composer
                 onSubmit={(prompt) => {
