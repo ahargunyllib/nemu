@@ -1,6 +1,7 @@
-import type { NemuAction } from "@nemu/contracts";
+import type { NemuAction, PageElement } from "@nemu/contracts";
 import { useState } from "react";
 
+import { useAnswerActions } from "../../features/action-level/hooks/use-answer-actions";
 import { AnswerCard } from "../../features/answer-card/components/answer-card";
 import { AnswerCardHeader } from "../../features/answer-card/components/answer-card-header";
 import { AnswerCardSkeleton } from "../../features/answer-card/components/answer-card-skeleton";
@@ -17,23 +18,26 @@ import {
 } from "../../features/composer/hooks/use-composer-shortcut";
 import { collectElementList } from "../../features/element-list/lib/element-list";
 import { HighlightRing } from "../../features/highlight/components/highlight-ring";
-import { useHighlights } from "../../features/highlight/hooks/use-highlights";
 import {
   highlightFootprint,
   missingTargetWarning,
 } from "../../features/highlight/lib/highlight-targets";
+import { NavigationCursor } from "../../features/navigation-click/components/navigation-cursor";
 import { PageLayer } from "../../shared/components/page-layer";
 import { useElementHeight } from "../../shared/hooks/use-element-height";
 
 const NO_ACTIONS: NemuAction[] = [];
+const NO_ELEMENTS: PageElement[] = [];
 
 export function NemuOverlay() {
   const [anchor, setAnchor] = useState<CursorPosition | null>(null);
   const [composerOpen, setComposerOpen] = useState(false);
   const chat = useNemuChat();
   const { state } = chat;
-  const { highlights, missing } = useHighlights(
+  const { highlights, missing, warnings, cursor } = useAnswerActions(
     state.kind === "response" ? state.response.actions : NO_ACTIONS,
+    state.kind === "response" ? state.elements : NO_ELEMENTS,
+    anchor,
   );
   const [panelRef, panelHeight] = useElementHeight<HTMLDivElement>();
 
@@ -61,6 +65,7 @@ export function NemuOverlay() {
         {highlights.map(({ action, box }, index) => (
           <HighlightRing key={`${index}-${action.target}`} box={box} label={action.label} />
         ))}
+        {cursor && <NavigationCursor frame={cursor} />}
       </PageLayer>
       {anchor && (
         <div
@@ -94,7 +99,11 @@ export function NemuOverlay() {
               key={state.prompt}
               response={{
                 ...state.response,
-                warnings: [...state.response.warnings, ...missing.map(missingTargetWarning)],
+                warnings: [
+                  ...state.response.warnings,
+                  ...missing.map(missingTargetWarning),
+                  ...warnings,
+                ],
               }}
               header={header}
               onReply={() => setComposerOpen(true)}

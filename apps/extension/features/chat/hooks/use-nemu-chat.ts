@@ -4,9 +4,10 @@ import { useCallback, useRef, useState } from "react";
 import { sendChatRequest } from "../api/chat-messaging";
 import type { ChatResult } from "../lib/chat-message";
 
+/** A sent prompt keeps the Element List it carried: only those targets can be clicked. */
 export type ChatState =
   | { kind: "idle" }
-  | ({ prompt: string } & ({ kind: "loading" } | ChatResult));
+  | ({ prompt: string; elements: PageElement[] } & ({ kind: "loading" } | ChatResult));
 
 export function useNemuChat() {
   const [sessionId] = useState(() => crypto.randomUUID());
@@ -16,14 +17,14 @@ export function useNemuChat() {
   const send = useCallback(
     async (prompt: string, elements: PageElement[]) => {
       const requestId = ++latestRequest.current;
-      setState({ kind: "loading", prompt });
+      setState({ kind: "loading", prompt, elements });
       const result = await sendChatRequest({
         session_id: sessionId,
         url: window.location.href,
         prompt,
         elements,
       });
-      if (requestId === latestRequest.current) setState({ ...result, prompt });
+      if (requestId === latestRequest.current) setState({ ...result, prompt, elements });
     },
     [sessionId],
   );

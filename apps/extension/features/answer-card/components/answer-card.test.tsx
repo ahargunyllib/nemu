@@ -6,7 +6,7 @@ import {
   momentThreeResponse,
   momentTwoResponse,
 } from "@nemu/contracts/fixtures";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, getDefaultNormalizer, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 
 import { AnswerCard } from "./answer-card";
@@ -45,10 +45,12 @@ describe("AnswerCard", () => {
   test("keeps the detail collapsed until asked", () => {
     renderCard(momentOneResponse);
     const detail = momentOneResponse.answer.detail;
+    // The Momen 1 checklist keeps one document per line.
+    const keepLines = { normalizer: getDefaultNormalizer({ collapseWhitespace: false }) };
 
-    expect(screen.queryByText(detail)).toBeNull();
+    expect(screen.queryByText(detail, keepLines)).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Lihat detail" }));
-    expect(screen.getByText(detail)).toBeTruthy();
+    expect(screen.getByText(detail, keepLines)).toBeTruthy();
   });
 
   test("opens a citation's full reference when clicked", () => {

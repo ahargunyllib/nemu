@@ -26,6 +26,8 @@ const [DEMO_APP_URL = ""] = ALLOWED_ORIGINS;
 // The Nemu Service's own origin is not on the allowlist, so it must get no overlay.
 const OUTSIDE_URL = DEFAULT_SERVER_URL;
 const TIMEOUT_MS = 15_000;
+// Issue #8: Momen 1 must succeed five times out of five.
+const MOMEN_1_RUNS = 5;
 
 // The service worker's own extension API, which `worker.evaluate` callbacks run against.
 declare const chrome: typeof browser;
@@ -126,6 +128,30 @@ async function main() {
       }
       await page.screenshot({ path: path.join(SCREENSHOT_DIR, "answer-card.png") });
     });
+
+    await check(
+      `Momen 1 clicks the menu and opens the form, ${MOMEN_1_RUNS} out of ${MOMEN_1_RUNS}`,
+      async () => {
+        for (let run = 1; run <= MOMEN_1_RUNS; run++) {
+          await page.goto(DEMO_APP_URL);
+          await page.getByRole("heading", { name: "Beranda" }).waitFor();
+          await ask(context, page, momentOneRequest.prompt);
+          await page.getByText(momentOneResponse.answer.ringkas).waitFor();
+          // Morph (200 ms) and part of the move: the cursor is on its way to the menu.
+          await page.waitForTimeout(400);
+          if (run === 1) {
+            await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-1-clicking.png") });
+          }
+          await page.waitForURL(`${DEMO_APP_URL}/perdin/baru`);
+          await page.getByRole("button", { name: "Lihat detail" }).click();
+          await page.getByText("Rincian perkiraan biaya", { exact: false }).waitFor();
+          if (run === 1) {
+            await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-1-form.png") });
+          }
+          await closeAnswerCard(page);
+        }
+      },
+    );
   } finally {
     await context.close();
   }
