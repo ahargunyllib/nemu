@@ -116,6 +116,11 @@ from the service worker. Check Ctrl+Shift+Space by hand when you change the shor
 manifest. If Playwright's Chromium isn't installed yet, run
 `pnpm --filter extension exec playwright-core install chromium` once.
 
-The extension calls `http://localhost:3000` by default. Set `WXT_SERVER_URL` (in
-`apps/extension/.env` or the shell) before building to point it at another Nemu Service; the
-manifest's host permission follows it.
+In dev, the extension calls `http://localhost:3000` by default. Set `WXT_SERVER_URL` (in
+`apps/extension/.env` or the shell) to point it at another Nemu Service; the manifest's host
+permission follows it. `wxt build` and `wxt zip` fail without it, so a production build never
+ships pointing at localhost:
+
+```bash
+WXT_SERVER_URL=https://nemu-api.ahargunyllib.dev pnpm --filter extension build
+```
