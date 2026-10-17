@@ -44,7 +44,7 @@ export default Alchemy.Stack(
   Effect.gen(function* () {
     const serverWorker = yield* server;
     const webWorker = yield* Cloudflare.Website.Vite("web", {
-      rootDir: "../../apps/web",
+      rootDir: "../../apps/mock-alurkerja",
       domain: isProd ? "nemu-mock-alurkerja.ahargunyllib.dev" : undefined,
       assets: {
         htmlHandling: "auto-trailing-slash",
