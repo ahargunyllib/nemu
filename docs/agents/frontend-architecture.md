@@ -1,6 +1,6 @@
 # Frontend Architecture
 
-These rules apply to `apps/mock-alurkerja/src` and
+These rules apply to `apps/mock-alurkerja/src`, `apps/admin/src`, and
 `apps/extension` (the Nemu Extension). Shared UI primitives live in
 `packages/ui`.
 
@@ -98,20 +98,20 @@ Run these checks after frontend architecture changes:
 
 ```bash
 # Responsibility placement.
-find apps/mock-alurkerja/src apps/extension -path '*/node_modules' -prune -o -type f -path '*/components/*.ts' -print
-find apps/mock-alurkerja/src apps/extension -path '*/node_modules' -prune -o -type d \( -name model -o -name ui -o -name utils \) -print
-rg -l '^export (function|const) use[A-Z]' apps/mock-alurkerja/src apps/extension -g '*.ts' -g '*.tsx' | rg -v '/hooks/'
-rg -l '\bcreateContext\b' apps/mock-alurkerja/src apps/extension -g '*.ts' -g '*.tsx' | rg -v '/contexts/'
+find apps/mock-alurkerja/src apps/admin/src apps/extension -path '*/node_modules' -prune -o -type f -path '*/components/*.ts' -print
+find apps/mock-alurkerja/src apps/admin/src apps/extension -path '*/node_modules' -prune -o -type d \( -name model -o -name ui -o -name utils \) -print
+rg -l '^export (function|const) use[A-Z]' apps/mock-alurkerja/src apps/admin/src apps/extension -g '*.ts' -g '*.tsx' | rg -v '/hooks/'
+rg -l '\bcreateContext\b' apps/mock-alurkerja/src apps/admin/src apps/extension -g '*.ts' -g '*.tsx' | rg -v '/contexts/'
 
 # No page facades or app-local barrels.
-find apps/mock-alurkerja/src apps/extension -path '*/node_modules' -prune -o -type f \( -name '*-page.tsx' -o -name index.ts \) -print
+find apps/mock-alurkerja/src apps/admin/src apps/extension -path '*/node_modules' -prune -o -type f \( -name '*-page.tsx' -o -name index.ts \) -print
 
 # Route concerns stay out of features; shared remains a dependency leaf.
-rg -n '\b(createFileRoute|validateSearch|loaderDeps|beforeLoad|getRouteApi)\b' apps/mock-alurkerja/src/features
-rg -n '@/features/|@/routes/' apps/mock-alurkerja/src/shared
+rg -n '\b(createFileRoute|validateSearch|loaderDeps|beforeLoad|getRouteApi)\b' apps/mock-alurkerja/src/features apps/admin/src/features
+rg -n '@/features/|@/routes/' apps/mock-alurkerja/src/shared apps/admin/src/shared
 
 # Review search usage against Zod validators in routes.
-rg -n '\b(useSearch|validateSearch|loaderDeps)\b' apps/mock-alurkerja/src -g '!routeTree.gen.ts'
+rg -n '\b(useSearch|validateSearch|loaderDeps)\b' apps/mock-alurkerja/src apps/admin/src -g '!routeTree.gen.ts'
 
 pnpm check
 pnpm build

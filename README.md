@@ -118,6 +118,7 @@ cd packages/infra && pnpm exec alchemy deploy --stage production
 ```
 nemu/
 ├── apps/
+│   ├── admin/          # Admin Workspace: admin console (React + TanStack Router)
 │   ├── mock-alurkerja/ # Demo App: fake AlurKerja frontend (React + TanStack Router)
 │   └── server/         # Backend API (Hono, ORPC)
 ├── packages/
@@ -132,6 +133,7 @@ nemu/
 - `pnpm run dev`: Start all applications in development mode
 - `pnpm run build`: Build all applications
 - `pnpm run dev:mock-alurkerja`: Start only the Demo App
+- `pnpm run dev:admin`: Start only the Admin Workspace
 - `pnpm run dev:server`: Start only the server
 - `pnpm run check-types`: Check TypeScript types across all apps
 - `pnpm run db:generate`: Generate database client/types
