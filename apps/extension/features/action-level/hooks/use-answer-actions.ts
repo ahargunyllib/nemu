@@ -8,7 +8,7 @@ import { asHighlight, enforceActionLevels } from "../lib/enforce-action-levels";
 
 /**
  * Runs an answer's actions on the page: applies the bundled Action Levels, makes the first
- * allowed click, and highlights the rest. A click that is stopped, can't find its target, or
+ * allowed click, and highlights the rest one step at a time. A click that is stopped, can't find its target, or
  * changes nothing falls back to a highlight on its target.
  *
  * `elementList` is the Element List sent with the prompt; only its targets can be clicked.
@@ -28,14 +28,13 @@ export function useAnswerActions(
     () => (click && clickFailed ? [...enforced, asHighlight(click)] : enforced),
     [enforced, click, clickFailed],
   );
-  const { highlights, missing } = useHighlights(highlightActions);
+  const highlights = useHighlights(highlightActions);
 
   const warnings =
     click && navigation.outcome === "no-change" ? [clickHadNoEffectWarning(click)] : [];
 
   return {
-    highlights,
-    missing,
+    ...highlights,
     warnings,
     cursor: navigation.cursor,
     outcome: navigation.outcome,

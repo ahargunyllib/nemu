@@ -149,6 +149,17 @@ function sameBox(a: Box, b: Box): boolean {
   );
 }
 
+/** Checks that the overlay draws one ring, labelled `label`, around the target's box. */
+async function assertOnlyRing(overlay: Locator, target: string, label: string, targetBox: Box) {
+  // A ring's label is the only badge outside the Answer Card.
+  const rings = overlay.locator('[data-slot="badge"]:not([data-slot="card"] *)');
+  if ((await rings.count()) !== 1) throw new Error(`${await rings.count()} rings, not one`);
+  if ((await rings.textContent()) !== label) throw new Error(`no "${label}" label on ${target}`);
+  if (!sameBox(await boxOf(rings.locator("..")), ringAround(targetBox))) {
+    throw new Error(`the "${label}" ring isn't around ${target}`);
+  }
+}
+
 /** Waits out the smooth scroll that brings the first highlight target into view. */
 async function waitForScrollToSettle(page: Page) {
   let last: number | undefined;
@@ -269,7 +280,7 @@ async function main() {
     );
 
     await check(
-      "on the form, Momen 2 sends only the selected area, rings its targets and the Answer Card avoids them",
+      "on the form, Momen 2 sends only the selected area, rings its targets one step at a time and the Answer Card avoids them",
       async () => {
         await page.goto(`${DEMO_APP_URL}/perdin/baru`);
         await page.getByRole("heading", { name: "Ajukan Perjalanan Dinas" }).waitFor();
@@ -317,25 +328,28 @@ async function main() {
           await card.getByRole("list", { name: "Peringatan" }).getByText(warning).waitFor();
         }
 
-        await waitForScrollToSettle(page);
-        await eventually(async () => {
-          const cardBox = await boxOf(card);
-          for (const { target, label } of highlights) {
+        // One ring at a time: check each step, then move on with the Answer Card's arrow.
+        for (const [index, { target, label }] of highlights.entries()) {
+          await card.getByText(`Langkah ${index + 1} dari ${highlights.length}`).waitFor();
+          await waitForScrollToSettle(page);
+          await eventually(async () => {
+            // The panel around the card, which scrolls when it's shrunk to keep off the ring.
+            const cardBox = await boxOf(card.locator("xpath=../.."));
             const targetBox = await boxOf(page.locator(`[data-nemu-id="${target}"]`).first());
-            const badge = overlay.getByText(label, { exact: true });
-            if (!(await badge.isVisible())) throw new Error(`no "${label}" label on ${target}`);
-            const ringBox = await boxOf(badge.locator(".."));
-            if (!sameBox(ringBox, ringAround(targetBox))) {
-              throw new Error(`the "${label}" ring isn't around ${target}`);
-            }
+            await assertOnlyRing(overlay, target, label, targetBox);
             if (overlaps(cardBox, targetBox)) throw new Error(`the Answer Card covers ${target}`);
+          });
+          await page.screenshot({
+            path: path.join(SCREENSHOT_DIR, `momen-2-highlight-step-${index + 1}.png`),
+          });
+          if (index < highlights.length - 1) {
+            await card.getByRole("button", { name: "Langkah berikutnya" }).click();
           }
-        });
+        }
         for (const { judul, pasal } of momentTwoResponse.citations) {
           await card.getByRole("button", { name: judul }).click();
           if (pasal) await card.getByText(`Pasal ${pasal}`, { exact: false }).waitFor();
         }
-        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-2-highlight.png") });
 
         // Arahkan only: Rina fills the lodging fields herself.
         const [notHotel, amount] = highlights.map(({ target }) =>
@@ -386,7 +400,7 @@ async function main() {
     });
 
     await check(
-      `Momen 3 opens the task, rings the uploads and Kirim, then shows Verifikasi, ${MOMEN_3_RUNS} out of ${MOMEN_3_RUNS}`,
+      `Momen 3 opens the task, rings the uploads then Kirim, then shows Verifikasi, ${MOMEN_3_RUNS} out of ${MOMEN_3_RUNS}`,
       async () => {
         const overlay = page.locator("nemu-overlay");
         for (let run = 1; run <= MOMEN_3_RUNS; run++) {
@@ -397,36 +411,38 @@ async function main() {
           await page.getByText(momentThreeResponse.answer.ringkas).waitFor();
           await page.waitForURL(`${DEMO_APP_URL}/perdin/task/PD-2026-0042`);
 
-          // The follow-up from the task page: its own answer, the deadline chip, three rings.
+          // The follow-up from the task page: its own answer, the deadline chip, three steps.
           const card = overlay
             .locator('[data-slot="card"]')
             .filter({ hasText: momentThreeFollowUpResponse.answer.ringkas });
           await card.waitFor();
           await card.getByText("Batas 12 November 2026").waitFor();
-          await waitForScrollToSettle(page);
-          await eventually(async () => {
-            for (const { target, label } of momentThreeFollowUpResponse.actions) {
-              const targetBox = await boxOf(page.locator(`[data-nemu-id="${target}"]`));
-              const rings = overlay.getByText(label, { exact: true });
-              let ringed = false;
-              for (const badge of await rings.all()) {
-                if (sameBox(await boxOf(badge.locator("..")), ringAround(targetBox))) ringed = true;
-              }
-              if (!ringed) throw new Error(`no "${label}" ring around ${target}`);
-            }
-          });
+          const steps = momentThreeFollowUpResponse.actions;
+          const ringStep = async (index: number) => {
+            const step = steps[index];
+            if (!step) throw new Error(`momentThreeFollowUpResponse has no step ${index + 1}`);
+            await card.getByText(`Langkah ${index + 1} dari ${steps.length}`).waitFor();
+            await waitForScrollToSettle(page);
+            await eventually(async () => {
+              const targetBox = await boxOf(page.locator(`[data-nemu-id="${step.target}"]`));
+              await assertOnlyRing(overlay, step.target, step.label, targetBox);
+            });
+          };
+          await ringStep(0);
           if (run === 1) {
             await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-3-task.png") });
           }
           // Nemu never presses Kirim: the task is still open until Rina does.
           await page.getByText("Dokumen pertanggungjawaban").waitFor();
 
-          for (const [nemuId, file] of Object.entries(MISSING_UPLOADS)) {
+          // Each upload moves the ring on by itself, ending on Kirim.
+          for (const [index, [nemuId, file]] of Object.entries(MISSING_UPLOADS).entries()) {
             await page
               .locator(`[data-nemu-id="${nemuId}"]`)
               .setInputFiles(path.join(SAMPLE_DOCUMENTS, file));
             // The file name under the field appears once the refetch shows the upload.
             await page.getByText(file, { exact: true }).waitFor();
+            await ringStep(index + 1);
           }
           await page.locator('[data-nemu-id="button-kirim"]').click();
 
