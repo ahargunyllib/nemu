@@ -64,9 +64,10 @@ export default function PertanggungjawabanTask({ instance }: { instance: Process
         </FieldGroup>
       </CardContent>
       <CardFooter className="justify-end">
+        {/* An upload stays pending until the refetch shows it, so Kirim never checks stale data. */}
         <Button
           data-nemu-id={NEMU_IDS.pertanggungjawaban.kirim}
-          disabled={isKirimPending}
+          disabled={isKirimPending || isUnggahPending}
           onClick={kirim}
         >
           {isKirimPending && <Spinner />}

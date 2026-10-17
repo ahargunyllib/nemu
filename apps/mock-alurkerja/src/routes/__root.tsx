@@ -48,7 +48,7 @@ function RootComponent() {
       <HeadContent />
       <ThemeProvider attribute="class" forcedTheme="light" disableTransitionOnChange>
         <Outlet />
-        <Toaster richColors />
+        <Toaster richColors position="top-center" />
       </ThemeProvider>
       <TanStackRouterDevtools position="bottom-left" />
       <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
