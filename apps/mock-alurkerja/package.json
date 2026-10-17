@@ -9,6 +9,7 @@
     "start": "vp dev",
     "check-types": "tsc -b ../../packages/api && vp build && tsc --noEmit",
     "dev:bare": "vp dev",
+    "test": "vp test run",
     "env:generate": "varlock codegen"
   },
   "dependencies": {

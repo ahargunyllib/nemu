@@ -24,6 +24,14 @@ rounded, as in AlurKerja.
 | My Task                 | `/my-task`                 |
 | Task detail             | `/perdin/task/$instanceId` |
 
+## Process Instances
+
+Kirim on Ajukan Perjalanan Dinas stores a Process Instance in the
+`process_instance` table in State Diajukan, numbered `PD-<year>-<NNNN>` by
+departure year. My Request lists the signed-in user's instances from the
+`listMyProcessInstances` procedure. The States and the form's wire schema live
+in `@nemu/contracts/process-instance`.
+
 ## Demo accounts
 
 A migration (`packages/db/src/migrations/*_seed-demo-accounts`) seeds both
