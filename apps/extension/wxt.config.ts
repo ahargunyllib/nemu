@@ -12,6 +12,16 @@ export default defineConfig({
   vite: () => ({
     plugins: [tailwindcss()],
   }),
+  hooks: {
+    // A production build without it would call localhost, so every chat fails with "Failed to
+    // fetch". The check lives here because `wxt prepare` (postinstall) resolves the manifest too.
+    "build:before": (wxt) => {
+      if (wxt.config.mode === "production" && !process.env.WXT_SERVER_URL)
+        throw new Error(
+          "WXT_SERVER_URL is not set. Set it to the Nemu Service URL before `wxt build` or `wxt zip`.",
+        );
+    },
+  },
   // WXT loads .env files before calling this, so WXT_SERVER_URL is set here too.
   manifest: () => ({
     name: "Nemu",
