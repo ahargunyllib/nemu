@@ -33,7 +33,7 @@ export function LoginRequiredCard({
     <ChatNoticeCard
       header={header}
       title="Kamu belum masuk ke Demo App"
-      description="Nemu memakai akun Demo App-mu. Masuk dulu, lalu tekan Ctrl+Shift+Space lagi."
+      description="Nemu memakai akun Demo App-mu. Masuk dulu, lalu buka Nemu lagi."
     >
       <Button size="sm" render={<a href={loginUrl} />} nativeButton={false}>
         Masuk ke Demo App
