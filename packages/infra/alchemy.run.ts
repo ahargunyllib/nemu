@@ -2,6 +2,7 @@ import * as Alchemy from "alchemy";
 import * as Cloudflare from "alchemy/Cloudflare";
 import * as Config from "effect/Config";
 import * as Effect from "effect/Effect";
+import * as Redacted from "effect/Redacted";
 import "varlock/auto-load";
 
 // Custom domains belong to prod only; personal dev_* stages stay on workers.dev.
@@ -26,7 +27,11 @@ export const server = Cloudflare.Worker("server", {
     CORS_ORIGIN: Config.String("CORS_ORIGIN"),
     BETTER_AUTH_SECRET: Config.Redacted("BETTER_AUTH_SECRET"),
     BETTER_AUTH_URL: Cloudflare.Worker.URL,
-    OPENROUTER_API_KEY: Config.Redacted("OPENROUTER_API_KEY"),
+    NEMU_RESPONDER: Config.String("NEMU_RESPONDER").pipe(Config.withDefault("ai")),
+    // Optional so fixture mode deploys without a key; the AI responder rejects an empty one.
+    OPENROUTER_API_KEY: Config.Redacted("OPENROUTER_API_KEY").pipe(
+      Config.withDefault(Redacted.make("")),
+    ),
     OPENROUTER_GENERATOR_MODEL: Config.String("OPENROUTER_GENERATOR_MODEL"),
     OPENROUTER_REASONING_EFFORT: Config.String("OPENROUTER_REASONING_EFFORT"),
     OPENROUTER_JEV_MODEL: Config.String("OPENROUTER_JEV_MODEL"),

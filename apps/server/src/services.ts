@@ -7,6 +7,7 @@ import {
   DEMO_USER_PROFILE,
 } from "@nemu/ai/demo";
 import type { DocumentFileStore, NemuService } from "@nemu/api/context";
+import { createFixtureNemuService } from "@nemu/api/modules/chat/fixture-responder";
 import { createAuth as createConfiguredAuth } from "@nemu/auth";
 import { type Database, createDb } from "@nemu/db";
 
@@ -48,6 +49,18 @@ export function createDocumentFileStore(): DocumentFileStore {
 }
 
 export function createNemuService(): NemuService {
+  return ENV.NEMU_RESPONDER === "fixture" ? createFixtureNemuService() : createAiNemuService();
+}
+
+function createAiNemuService(): NemuService {
+  if (!ENV.OPENROUTER_API_KEY) {
+    return {
+      async respond() {
+        throw new Error("OPENROUTER_API_KEY is not set; set it or use NEMU_RESPONDER=fixture");
+      },
+    };
+  }
+
   const jevDecider = createJevDecider({
     apiKey: ENV.OPENROUTER_API_KEY,
     model: ENV.OPENROUTER_JEV_MODEL,
