@@ -34,10 +34,13 @@ export default function DemoPanel() {
 
   return (
     <Sheet>
-      <SheetTrigger data-nemu-id={NEMU_IDS.demoPanel.open} render={<Button variant="outline" />}>
+      <SheetTrigger
+        data-nemu-id={NEMU_IDS.demoPanel.open}
+        render={<Button variant="outline" size="sm" className="shadow-lg" />}
+      >
         Panel demo
       </SheetTrigger>
-      <SheetContent showCloseButton={false}>
+      <SheetContent side="left" showCloseButton={false}>
         <SheetHeader>
           <SheetTitle>Panel demo</SheetTitle>
           <SheetDescription>

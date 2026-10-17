@@ -22,6 +22,25 @@ export const PERDIN_FORM_DEFAULTS = {
 
 export type PerdinFormValues = typeof PERDIN_FORM_DEFAULTS;
 
+/** File name of the sample undangan in `sample-documents/`; only the name is sent. */
+export const DEMO_UNDANGAN_FILE_NAME = "undangan-rapat-koordinasi.pdf";
+
+/**
+ * What "Isi formulir demo" types in: Rina's trip to Makassar on 3–5 November 2026. Penginapan and
+ * nominal penginapan stay empty, because in Momen 2 Rina asks Nemu how to fill them in.
+ */
+export const PERDIN_FORM_DEMO_VALUES = {
+  jenisPerjalanan: "Perjalanan dinas luar kota",
+  nomorSuratTugas: "ST-123/BLD/2026",
+  kotaTujuan: "Makassar",
+  maksud: "Rapat koordinasi layanan digital",
+  tanggalBerangkat: "2026-11-03",
+  tanggalKembali: "2026-11-05",
+  modaTransport: "Pesawat",
+  biayaTransport: "3500000",
+  uangHarian: "1290000",
+} satisfies Partial<PerdinFormValues>;
+
 const wajib = (message: string) => z.string().trim().min(1, { message, abort: true });
 const rupiah = (message: string) =>
   wajib(message).regex(/^\d+$/, "Isi dengan angka tanpa titik atau koma");

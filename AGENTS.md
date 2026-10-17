@@ -22,6 +22,10 @@ Wire in a paid third-party provider only once the user has chosen it. Until then
 
 Build UI by composing the vendored shadcn components in `packages/ui` with their stock variants. Add a missing component with the shadcn CLI from `packages/ui` instead of hand-building it, and use theme tokens such as `primary`, `muted`, and `destructive` rather than custom color variants or palettes. Show content that is loading or still being produced as a `Skeleton` shaped like that content; keep `Spinner` for a button whose action is pending. For example, `UserMenu` renders a button-shaped `Skeleton` while the session loads.
 
+### Demo-only controls
+
+Keep controls that exist only to run the demo out of the Demo App's AlurKerja chrome (header, side menu, page content), so the demo still looks like AlurKerja. Put them on the floating demo dock at the bottom left as separate buttons, not a joined bar that reads as tabs. For example, Panel demo moved from the header to the dock, and Ajukan Perjalanan Dinas adds **Isi formulir demo** there through `useDemoPageAction` (`docs/demo-app.md`).
+
 ### Tests
 
 Co-locate tests with the source they protect and prioritize observable behavior. See `docs/agents/testing.md`.

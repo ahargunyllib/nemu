@@ -3,11 +3,13 @@ import { Button } from "@nemu/ui/components/button";
 import { Spinner } from "@nemu/ui/components/spinner";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { useDemoPageAction } from "@/features/demo/hooks/use-demo-page-action";
 import BiayaSection from "@/features/perjalanan-dinas/components/biaya-section";
 import DokumenSection from "@/features/perjalanan-dinas/components/dokumen-section";
 import JadwalSection from "@/features/perjalanan-dinas/components/jadwal-section";
 import JenisTujuanSection from "@/features/perjalanan-dinas/components/jenis-tujuan-section";
 import { useAjukanPerdinForm } from "@/features/perjalanan-dinas/hooks/use-ajukan-perdin-form";
+import { useIsiFormulirDemo } from "@/features/perjalanan-dinas/hooks/use-isi-formulir-demo";
 
 export const Route = createFileRoute("/_auth/perdin/baru")({
   component: RouteComponent,
@@ -15,6 +17,11 @@ export const Route = createFileRoute("/_auth/perdin/baru")({
 
 function RouteComponent() {
   const form = useAjukanPerdinForm();
+  useDemoPageAction({
+    label: "Isi formulir demo",
+    nemuId: NEMU_IDS.demoPanel.fillForm,
+    run: useIsiFormulirDemo(form),
+  });
 
   return (
     <>

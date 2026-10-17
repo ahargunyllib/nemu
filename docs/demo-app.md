@@ -67,10 +67,20 @@ sends the instance as it is, so Momen 3 gets Pertanggungjawaban, return date
 
 ## Demo panel and demo clock
 
-**Panel demo** in the header plays the atasan, PPK, and bendahara: pick a
+The demo controls stay out of the AlurKerja header. They float as separate
+buttons at the bottom left of every signed-in page, over the end of the side
+menu, so the extension's panel and highlights keep the content area.
+
+**Panel demo** plays the atasan, PPK, and bendahara: pick a
 Process Instance and press **Majukan State** to move it to the next State
 (Draf → … → Selesai; Revisi goes back to Diajukan). **Reset data demo** puts
 back the signed-in user's 3-Momen fixtures and deletes their other requests.
+
+A page can add a one-click shortcut above Panel demo with
+`useDemoPageAction`. On Ajukan Perjalanan Dinas, **Isi formulir demo** fills
+Rina's Makassar trip (3–5 November 2026) and attaches a stand-in
+`undangan-rapat-koordinasi.pdf`. It leaves Penginapan and Nominal penginapan
+empty, because in Momen 2 Rina asks Nemu how to fill them in.
 
 "Today" is the demo clock, `NEMU_DEMO_DATE` (2026-11-06), the same setting the
 AI counts from; the header shows it through `getDemoClock`.

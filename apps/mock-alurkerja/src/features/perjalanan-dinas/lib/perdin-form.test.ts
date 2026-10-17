@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vite-plus/test";
 
 import {
+  DEMO_UNDANGAN_FILE_NAME,
   PERDIN_FORM_DEFAULTS,
+  PERDIN_FORM_DEMO_VALUES,
   type PerdinFormValues,
   lamaPerjalanan,
   perdinFormSchema,
@@ -51,6 +53,21 @@ describe("perdinFormSchema", () => {
     const result = perdinFormSchema.safeParse({ ...filled, tanggalKembali: "2026-11-01" });
 
     expect(result.error?.issues.map((issue) => issue.path[0])).toEqual(["tanggalKembali"]);
+  });
+});
+
+describe("PERDIN_FORM_DEMO_VALUES", () => {
+  it("leaves only the Momen 2 lodging fields for Rina to fill in", () => {
+    const result = perdinFormSchema.safeParse({
+      ...PERDIN_FORM_DEFAULTS,
+      ...PERDIN_FORM_DEMO_VALUES,
+      dokumenUndangan: new File(["%PDF-1.7"], DEMO_UNDANGAN_FILE_NAME),
+    });
+
+    expect(result.error?.issues.map((issue) => issue.path[0])).toEqual([
+      "penginapan",
+      "nominalPenginapan",
+    ]);
   });
 });
 
