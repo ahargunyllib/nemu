@@ -136,6 +136,22 @@ function runDeterministicTools(
       hasil: sbmRow.value,
       sumber: sbmRow.source,
     });
+    const dailyAllowanceRow = lookupSbm(
+      context.sbmRows,
+      province,
+      "uang_harian",
+      context.userProfile.grade,
+    );
+    if (dailyAllowanceRow) {
+      const days = nights !== undefined ? nights + 1 : 3;
+      results.calculations.push({
+        fungsi: "uang_harian",
+        input: { provinsi: province, tarif: dailyAllowanceRow.value, hari: days },
+        hasil: dailyAllowanceRow.value * days,
+        sumber: dailyAllowanceRow.source,
+      });
+    }
+
     results.calculations.push({
       ...calculateAccommodationLumpSum(sbmRow.value, nights),
       sumber: sbmRow.source,
@@ -264,7 +280,12 @@ function parseRupiahAmount(rawAmount: string): number | undefined {
   return Number.isSafeInteger(amount) ? amount : undefined;
 }
 
-function collectTrustedNumbers(calculations: readonly Calculation[]): Set<number> {
+function collectTrustedNumbers(
+  calculations: readonly Calculation[],
+  sbmRows?: readonly SbmRow[],
+  prompt?: string,
+  evidence?: readonly RankedKnowledgeChunk[],
+): Set<number> {
   const trustedNumbers = new Set<number>();
   for (const calculation of calculations) {
     if (typeof calculation.hasil === "number") {
@@ -276,15 +297,39 @@ function collectTrustedNumbers(calculations: readonly Calculation[]): Set<number
       }
     }
   }
+  for (const row of sbmRows ?? []) {
+    trustedNumbers.add(row.value);
+  }
+  if (prompt) {
+    for (const match of prompt.matchAll(/Rp\s*([\d.]+(?:,\d{1,2})?)/giu)) {
+      const amount = parseRupiahAmount(match[1] ?? "");
+      if (amount !== undefined) {
+        trustedNumbers.add(amount);
+      }
+    }
+  }
+  if (evidence) {
+    for (const chunk of evidence) {
+      for (const match of chunk.text.matchAll(/Rp\s*([\d.]+(?:,\d{1,2})?)/giu)) {
+        const amount = parseRupiahAmount(match[1] ?? "");
+        if (amount !== undefined) {
+          trustedNumbers.add(amount);
+        }
+      }
+    }
+  }
   return trustedNumbers;
 }
 
 function validateGeneratedAnswer(
   generatedAnswer: Awaited<ReturnType<AnswerGenerator>>,
   calculations: readonly Calculation[],
+  sbmRows?: readonly SbmRow[],
+  prompt?: string,
+  evidence?: readonly RankedKnowledgeChunk[],
 ): void {
   const answerText = `${generatedAnswer.ringkas} ${generatedAnswer.detail}`;
-  const trustedNumbers = collectTrustedNumbers(calculations);
+  const trustedNumbers = collectTrustedNumbers(calculations, sbmRows, prompt, evidence);
 
   for (const match of answerText.matchAll(/Rp\s*([\d.]+(?:,\d{1,2})?)/giu)) {
     const amount = parseRupiahAmount(match[1] ?? "");
@@ -309,7 +354,7 @@ export async function runNemu(
   const thresholds = {
     domain: context.thresholds?.domain ?? 0.5,
     injection: context.thresholds?.injection ?? 0.7,
-    click: context.thresholds?.click ?? 0.85,
+    click: context.thresholds?.click ?? 0.8,
   };
 
   const jevStartedAt = performance.now();
@@ -335,7 +380,7 @@ export async function runNemu(
   const retrievalDuration = durationSince(retrievalStartedAt);
   let evidence = initialEvidence;
 
-  if (request.screenshot_crop && (!evidence.length || (evidence[0]?.score ?? 0) < 2)) {
+  if (request.screenshot_crop && (!evidence.length || (evidence[0]?.score ?? 0) < 4)) {
     const intentSearchTerms = {
       start_travel_request: "mulai pengajuan surat tugas menu perjalanan dinas",
       accommodation_question: "penginapan hotel tidak menginap rumah saudara biaya",
@@ -352,8 +397,9 @@ export async function runNemu(
 
   if (
     !jevResult.failed &&
-    (jevResult.decision.intent === "unsupported" ||
-      jevResult.decision.withinDomainProbability < thresholds.domain)
+    (jevResult.decision.withinDomainProbability < thresholds.domain ||
+      (jevResult.decision.intent === "unsupported" &&
+        jevResult.decision.withinDomainProbability < 0.8))
   ) {
     return fixedResponse(
       "refuse",
@@ -406,7 +452,13 @@ export async function runNemu(
       decision: jevResult.decision,
       missingDocuments: toolResults.missingDocuments,
     });
-    validateGeneratedAnswer(generatedAnswer, toolResults.calculations);
+    validateGeneratedAnswer(
+      generatedAnswer,
+      toolResults.calculations,
+      context.sbmRows,
+      request.prompt,
+      evidence,
+    );
     const gptDuration = durationSince(gptStartedAt);
     const citations = citationsFromEvidence(generatedAnswer.citationIds, evidence);
 

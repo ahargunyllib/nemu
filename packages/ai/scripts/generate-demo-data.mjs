@@ -117,6 +117,10 @@ const accommodationRows = parseCsv(await readText("02_tabel/sbm2026_penginapan_d
 const dailyAllowanceRows = parseCsv(
   await readText("02_tabel/sbm2026_uang_harian_dalam_negeri.csv"),
 );
+const ticketRows = parseCsv(await readText("02_tabel/sbm2026_tiket_pesawat_pp_dalam_negeri.csv"));
+const airportTransportRows = parseCsv(
+  await readText("02_tabel/sbm2026_transport_terminal_bandara.csv"),
+);
 const sbmRows = [
   ...accommodationRows.flatMap((row) => [
     {
@@ -139,6 +143,29 @@ const sbmRows = [
     component: "uang_harian",
     grade: "*",
     value: Number(row.luar_kota),
+    source: row.sumber,
+  })),
+  ...ticketRows.flatMap((row) => [
+    {
+      province: `${row.kota_asal} - ${row.kota_tujuan}`,
+      component: "tiket_pesawat",
+      grade: "bisnis",
+      value: Number(row.bisnis_pp),
+      source: "PMK 32/2025 Lampiran II angka 17",
+    },
+    {
+      province: `${row.kota_asal} - ${row.kota_tujuan}`,
+      component: "tiket_pesawat",
+      grade: "ekonomi",
+      value: Number(row.ekonomi_pp),
+      source: "PMK 32/2025 Lampiran II angka 17",
+    },
+  ]),
+  ...airportTransportRows.map((row) => ({
+    province: row.provinsi,
+    component: "transport_bandara",
+    grade: "*",
+    value: Number(row.besaran_per_orang_per_kali),
     source: row.sumber,
   })),
 ];
