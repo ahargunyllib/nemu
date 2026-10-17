@@ -28,6 +28,13 @@ export function createAuth(
     }),
     trustedOrigins: [...parseOrigins(env.CORS_ORIGIN), ...desktopOrigins],
     emailAndPassword: { enabled: true },
+    user: {
+      // Demo accounts are seeded by a migration; these fields are never set from sign-up.
+      additionalFields: {
+        golongan: { type: "string", required: false, input: false },
+        role: { type: "string", required: false, defaultValue: "pegawai", input: false },
+      },
+    },
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,
     advanced: {

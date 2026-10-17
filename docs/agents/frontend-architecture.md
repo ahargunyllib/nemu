@@ -69,6 +69,13 @@ These rules apply to `apps/mock-alurkerja/src`, `apps/admin/src`, and
 - Preserve route-level lazy boundaries. Do not import a multi-page feature
   barrel.
 
+## Demo App elements
+
+- Every interactive element in the Demo App has a `data-nemu-id` taken from
+  `NEMU_IDS` in `@nemu/contracts/nemu-ids` and a clear accessible label
+  (visible text or `aria-label`). Register a new id there before rendering it,
+  and never rename one. See `docs/demo-app.md`.
+
 ## React composition and state
 
 - Split feature UI into cohesive sections and controls. Move deterministic

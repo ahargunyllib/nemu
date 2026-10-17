@@ -1,3 +1,4 @@
+import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
 import { Button } from "@nemu/ui/components/button";
 import {
   DropdownMenu,
@@ -9,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@nemu/ui/components/dropdown-menu";
 import { Skeleton } from "@nemu/ui/components/skeleton";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 import { authClient } from "@/features/auth/api/auth-client";
 
@@ -17,43 +18,37 @@ export default function UserMenu() {
   const navigate = useNavigate();
   const { data: session, isPending } = authClient.useSession();
 
-  if (isPending) {
-    return <Skeleton className="h-9 w-24" />;
-  }
-
-  if (!session) {
-    return (
-      <Link to="/login">
-        <Button variant="outline">Sign In</Button>
-      </Link>
-    );
+  if (isPending || !session) {
+    return <Skeleton className="h-8 w-28" />;
   }
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="outline" />}>
+      <DropdownMenuTrigger
+        data-nemu-id={NEMU_IDS.shell.accountMenu}
+        aria-label={`Menu akun ${session.user.name}`}
+        render={<Button variant="outline" />}
+      >
         {session.user.name}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-card">
+      <DropdownMenuContent className="bg-card" align="end">
         <DropdownMenuGroup>
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel>{session.user.email}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>{session.user.email}</DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"
+            data-nemu-id={NEMU_IDS.shell.signOut}
             onClick={() => {
               authClient.signOut({
                 fetchOptions: {
                   onSuccess: () => {
-                    navigate({
-                      to: "/",
-                    });
+                    navigate({ to: "/login" });
                   },
                 },
               });
             }}
           >
-            Sign Out
+            Keluar
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
