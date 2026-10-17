@@ -1,8 +1,36 @@
 # AGENTS.md
 
-## Commits and pull requests
+## Agent guidance
 
-Don't add agent attribution: no `Co-Authored-By` trailers in commit messages and no "Generated with" lines in PR descriptions.
+### Corrections and conventions
+
+When the user corrects an implementation, design choice, or workflow, apply the correction and capture the reusable rule in this file in the same task. State a rule that applies across features, then give the corrected feature as an example. Put domain terms in `GLOSSARY.md` and feature-specific business decisions in an ADR under `docs/adr/`, and link them here when relevant. Refine existing guidance instead of duplicating it. Do not edit skill files unless the user explicitly asks.
+
+### Backend architecture
+
+The Nemu Service is a modular monolith: `apps/server` composes it, and feature modules in `packages/api` run procedure → service → repository. Follow `docs/agents/backend-architecture.md` for placement, request flow, authentication, Cloudflare lifecycle, configuration, and audit rules.
+
+### Frontend architecture
+
+The web app and the Nemu Extension use route-owned (or entrypoint-owned) page composition and responsibility-based feature slices. Follow `docs/agents/frontend-architecture.md` for placement, composition, search validation, and audit rules.
+
+### Third-party providers
+
+Wire in a paid third-party provider only once the user has chosen it. Until then, ship the adapter interface, inject it so tests use a fake, and fail clearly as missing configuration. For example, `nemuChat` reaches OpenRouter only through the `NemuService` seam, so a fixture responder can stand in for it (ADR-0001).
+
+### UI composition
+
+Build UI by composing the vendored shadcn components in `packages/ui` with their stock variants. Add a missing component with the shadcn CLI from `packages/ui` instead of hand-building it, and use theme tokens such as `primary`, `muted`, and `destructive` rather than custom color variants or palettes. Show content that is loading or still being produced as a `Skeleton` shaped like that content; keep `Spinner` for a button whose action is pending. For example, `UserMenu` renders a button-shaped `Skeleton` while the session loads.
+
+### Tests
+
+Co-locate tests with the source they protect and prioritize observable behavior. See `docs/agents/testing.md`.
+
+### Commits and pull requests
+
+`main` accepts changes only through pull requests. Keep each pull request small and single-purpose, with a conventional-commit title.
+
+Don't add agent attribution: no `Co-Authored-By` trailers in commit messages and no "Generated with" lines in PR descriptions. Include this rule in briefs for any session or subagent you start.
 
 ## Agent skills
 
