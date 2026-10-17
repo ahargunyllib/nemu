@@ -63,6 +63,14 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   (`arc://extensions/shortcuts` in Arc), or click the toolbar icon. A changed default only
   applies to a fresh install, so remove and re-load the extension to pick it up.
 
+## Install the latest build
+
+Every deploy from `main` rebuilds the extension against the production Nemu Service and replaces
+the zip on the `extension-latest` release:
+<https://github.com/ahargunyllib/nemu/releases/download/extension-latest/nemu-extension-chrome.zip>.
+Unzip it, then load the folder unpacked as in step 2 below. To update, replace the folder's
+contents with the new zip and click the reload icon on the extension card.
+
 ## Run it
 
 1. Start everything with `pnpm dev`: the server on :3000, the Demo App on :3001, and the
