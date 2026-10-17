@@ -25,6 +25,7 @@ import {
   highlightFootprint,
   missingTargetWarning,
 } from "../../features/highlight/lib/highlight-targets";
+import { Mascot } from "../../features/mascot/components/mascot";
 import { NavigationCursor } from "../../features/navigation-click/components/navigation-cursor";
 import { PageLayer } from "../../shared/components/page-layer";
 import { useElementHeight } from "../../shared/hooks/use-element-height";
@@ -38,17 +39,19 @@ export function NemuOverlay() {
   const chat = useNemuChat();
   const area = useAreaCrop();
   const { state } = chat;
-  const { highlights, missing, warnings, cursor } = useAnswerActions(
+  const { highlights, missing, warnings, cursor, outcome } = useAnswerActions(
     state.kind === "response" ? state.response.actions : NO_ACTIONS,
     state.kind === "response" ? state.elements : NO_ELEMENTS,
     anchor,
   );
   const [panelRef, panelHeight] = useElementHeight<HTMLDivElement>();
 
-  useComposerShortcut((position) => {
+  function openComposer(position: CursorPosition) {
     setAnchor(position);
     setComposerOpen(true);
-  });
+  }
+
+  useComposerShortcut(openComposer);
 
   function ask(prompt: string, screenshotCrop?: string) {
     void chat.send(prompt, collectElementList(document), screenshotCrop);
@@ -81,6 +84,25 @@ export function NemuOverlay() {
           <HighlightRing key={`${index}-${action.target}`} box={box} label={action.label} />
         ))}
         {cursor && <NavigationCursor frame={cursor} />}
+        <Mascot
+          activity={{
+            // Area select mode keeps the Composer open, so dragging a box counts as listening too.
+            listening: composerOpen,
+            thinking: state.kind === "loading",
+            clicking: cursor?.mascot === "clicking",
+            guiding: highlights.length > 0,
+            succeeded: outcome === "succeeded",
+            failed:
+              state.kind === "error" ||
+              state.kind === "unauthorized" ||
+              missing.length > 0 ||
+              outcome === "missing" ||
+              outcome === "no-change",
+          }}
+          composerAnchor={composerOpen ? anchor : null}
+          nemuCursor={cursor}
+          onOpenComposer={openComposer}
+        />
       </PageLayer>
       {anchor && (
         <div
