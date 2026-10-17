@@ -13,6 +13,13 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
 - **Element List.** Every prompt carries the page's rendered elements that have a
   `data-nemu-id` (at most 150, under 50 KB, never an input's value). Off-screen ones are sent
   with `visible: false` so Nemu can still point at them.
+- **Area Crop.** The crop button in the Composer starts area select mode: Rina drags a box over
+  the page, Nemu hides its own overlay, and the background screenshots the viewport
+  (`captureVisibleTab`, which is why the manifest asks for `<all_urls>`; the background still
+  captures allowlisted tabs only). The content script cuts out just the box (longest side at most
+  1280 px) and shows it as a removable chip in the Composer. It goes with the next prompt as
+  `screenshot_crop`, and the full screenshot never leaves the tab. The Nemu Service never stores
+  the image: the Chat Log only notes that one was attached.
 - **Highlight (Arahkan).** A `highlight` action scrolls to its target and draws a pulsing amber
   outline with the action label on a click-through page layer; the Answer Card moves aside so it
   never covers a highlight. A target missing from the page becomes a warning on the card. The
@@ -69,8 +76,11 @@ build into Playwright's Chromium and checks:
 - signed in as Rina, the Momen 1 prompt comes back as an Answer Card with its citation;
 - Momen 1, five times in a row from Beranda: Nemu clicks Ajukan Perjalanan Dinas, the form opens,
   and the card's detail lists the documents to prepare;
-- on the Perjalanan Dinas form, the Momen 2 prompt shows its answer and warning, rings each lodging
-  field with its action label, and keeps the Answer Card off both fields.
+- on the Perjalanan Dinas form, Momen 2: Rina drags a box over the lodging fields, the chip holds a
+  crop of just that box (saved as `momen-2-area-crop-sent.png`), and the prompt goes out with it.
+  The card shows the answer, warning and the PMK 119/2023 Pasal 8 ayat (5) citation, rings each
+  lodging field with its action label, and keeps off both fields. Nemu fills in neither field,
+  and the Chat Log records that an Area Crop was attached.
 
 It prints one line per check, exits non-zero on a failure, and saves screenshots to
 `.output/verify/`. Add `-- --headed` to watch it. Automation can't press the toolbar icon or the
