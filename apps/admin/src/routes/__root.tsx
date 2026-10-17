@@ -10,7 +10,6 @@ import { useState } from "react";
 
 import UserMenu from "@/features/auth/components/user-menu";
 import Header from "@/shared/components/header";
-import { ModeToggle } from "@/shared/components/mode-toggle";
 import { ThemeProvider } from "@/shared/components/theme-provider";
 import { link, orpc } from "@/shared/api/orpc";
 
@@ -49,15 +48,9 @@ function RootComponent() {
   return (
     <>
       <HeadContent />
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="dark"
-        disableTransitionOnChange
-        storageKey="nemu-admin-theme"
-      >
+      <ThemeProvider attribute="class" forcedTheme="light" disableTransitionOnChange>
         <div className="grid grid-rows-[auto_1fr] h-svh">
           <Header>
-            <ModeToggle />
             <UserMenu />
           </Header>
           <Outlet />
