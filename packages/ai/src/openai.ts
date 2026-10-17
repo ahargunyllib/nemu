@@ -34,7 +34,7 @@ export type AnswerGenerationInput = {
 
 export type AnswerGenerator = (input: AnswerGenerationInput) => Promise<GeneratedAnswer>;
 
-export type OpenAIClientConfig = {
+export type OpenRouterClientConfig = {
   apiKey: string;
   model: string;
   reasoningEffort?: "low" | "medium" | "high" | "xhigh" | "max";
@@ -111,10 +111,10 @@ function extractOutputText(response: unknown): string {
     }
   }
 
-  throw new Error("OpenAI response did not contain output text");
+  throw new Error("OpenRouter Responses API did not contain output text");
 }
 
-export function createOpenAIAnswerGenerator(config: OpenAIClientConfig): AnswerGenerator {
+export function createOpenRouterAnswerGenerator(config: OpenRouterClientConfig): AnswerGenerator {
   return async (input) => {
     const content: Array<Record<string, unknown>> = [
       {
@@ -156,7 +156,7 @@ export function createOpenAIAnswerGenerator(config: OpenAIClientConfig): AnswerG
     }
 
     const response = await fetchJson(
-      "https://api.openai.com/v1/responses",
+      "https://openrouter.ai/api/v1/responses",
       {
         method: "POST",
         headers: {

@@ -10,6 +10,13 @@ export type SbmRow = {
   source: string;
 };
 
+export type HotelRateCheck = {
+  limit: number;
+  rate: number;
+  exceeds: boolean;
+  difference: number;
+};
+
 function normalizeText(value: string): string {
   return value
     .normalize("NFKD")
@@ -38,7 +45,7 @@ export function lookupSbm(
     (row) =>
       normalizeText(row.province) === normalizedProvince &&
       row.component === component &&
-      normalizeGrade(row.grade) === normalizedGrade,
+      (row.grade === "*" || normalizeGrade(row.grade) === normalizedGrade),
   );
 }
 
@@ -69,6 +76,19 @@ export function calculateDailyAllowance(rate: number, days: number): Calculation
     fungsi: "uang_harian",
     input: { tarif: rate, hari: days },
     hasil: rate * days,
+  };
+}
+
+export function checkHotelRate(limit: number, rate: number): HotelRateCheck {
+  if (!Number.isInteger(limit) || limit < 0 || !Number.isInteger(rate) || rate < 0) {
+    throw new Error("Hotel limit and rate must be non-negative integers");
+  }
+
+  return {
+    limit,
+    rate,
+    exceeds: rate > limit,
+    difference: Math.max(0, rate - limit),
   };
 }
 

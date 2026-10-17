@@ -1,0 +1,56 @@
+[
+  {
+    "doc_id": "pmk-113-2012",
+    "judul": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "jenis": "asli",
+    "status": "aktif",
+    "berkas": "01_knowledge_rag/asli/PMK-113-PMK.05-2012_teks.md",
+    "pdf_asli": "_pdf-asli/PMK-113-PMK.05-2012.pdf",
+    "sumber": "https://peraturan.bpk.go.id/Details/126950/pmk-no-113pmk052012"
+  },
+  {
+    "doc_id": "pmk-119-2023",
+    "judul": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "jenis": "asli",
+    "status": "aktif",
+    "berlaku_mulai": "2023-11-15",
+    "berkas": "01_knowledge_rag/asli/PMK-119-2023_teks.md",
+    "pdf_asli": "_pdf-asli/PMK-119-2023.pdf",
+    "sumber": "https://peraturan.bpk.go.id/Details/272360/pmk-no-119-tahun-2023"
+  },
+  {
+    "doc_id": "pmk-32-2025",
+    "judul": "PMK 32 Tahun 2025 SBM TA 2026 (kutipan perjalanan dinas)",
+    "jenis": "asli",
+    "status": "aktif",
+    "berlaku_untuk": "TA 2026",
+    "berkas": "01_knowledge_rag/asli/PMK-32-2025_SBM-2026_kutipan-perjalanan-dinas.md",
+    "pdf_asli": "_pdf-asli/PMK-32-2025_SBM-TA-2026.pdf",
+    "sumber": "https://peraturan.bpk.go.id/Details/319323/pmk-no-32-tahun-2025"
+  },
+  {
+    "doc_id": "pmk-54-2026",
+    "judul": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "jenis": "asli",
+    "status": "nonaktif",
+    "alasan": "Pasal 5: dipakai mulai TA 2027",
+    "berkas": "01_knowledge_rag/tidak-aktif/PMK-54-2026_SBM-TA-2027_teks.md",
+    "pdf_asli": "_pdf-asli/PMK-54-2026_SBM-TA-2027.pdf",
+    "sumber": "https://peraturan.bpk.go.id/Details/353532/pmk-no-54-tahun-2026"
+  },
+  {
+    "doc_id": "sop-pd-01",
+    "judul": "SOP-PD-01 Perjalanan Dinas Jabatan Dalam Negeri v1.0",
+    "jenis": "sintetis",
+    "status": "aktif",
+    "berlaku_mulai": "2026-01-02",
+    "berkas": "01_knowledge_rag/sintetis/SOP-PD-01_Perjalanan-Dinas_v1.0.md"
+  },
+  {
+    "doc_id": "panduan-app",
+    "judul": "Panduan aplikasi Perjalanan Dinas v1.0",
+    "jenis": "sintetis",
+    "status": "aktif",
+    "berkas": "01_knowledge_rag/sintetis/Panduan-Aplikasi-Perjalanan-Dinas_v1.0.md"
+  }
+]

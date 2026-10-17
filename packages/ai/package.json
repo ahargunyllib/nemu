@@ -12,9 +12,12 @@
     }
   },
   "scripts": {
-    "build": "tsc -b",
+    "data:generate": "node scripts/generate-demo-data.mjs",
+    "build": "node scripts/generate-demo-data.mjs && tsc -b",
     "check-types": "tsc -b",
-    "test": "tsc -b && node --test dist/index.test.js"
+    "test": "node scripts/generate-demo-data.mjs && tsc -b && node --test dist/index.test.js",
+    "eval": "node scripts/generate-demo-data.mjs && tsc -b && node scripts/evaluate.mjs",
+    "eval:offline": "node scripts/generate-demo-data.mjs && tsc -b && node scripts/evaluate.mjs --offline"
   },
   "dependencies": {
     "@nemu/contracts": "workspace:*",

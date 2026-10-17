@@ -123,7 +123,7 @@ export function createJevDecider(config: JevClientConfig): JevDecider {
     );
 
     const response = await fetchJson(
-      "https://api.typesafe.ai/v1/systemone",
+      "https://openrouter.ai/api/alpha/decisions",
       {
         method: "POST",
         headers: {

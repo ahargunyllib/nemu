@@ -1,4 +1,4 @@
-import { createJevDecider, createOpenAIAnswerGenerator, runNemu } from "@nemu/ai";
+import { createJevDecider, createOpenRouterAnswerGenerator, runNemu } from "@nemu/ai";
 import {
   DEMO_HOLIDAYS_2026,
   DEMO_KNOWLEDGE_CHUNKS,
@@ -10,14 +10,20 @@ import type { NemuService } from "@nemu/api/context";
 import { createAuth as createConfiguredAuth } from "@nemu/auth";
 import { type Database, createDb } from "@nemu/db";
 
-const OPENAI_REASONING_EFFORTS = ["low", "medium", "high", "xhigh", "max"] as const;
+const REASONING_EFFORTS = ["low", "medium", "high", "xhigh", "max"] as const;
 
-function getReasoningEffort(): (typeof OPENAI_REASONING_EFFORTS)[number] {
-  const configuredEffort = ENV.OPENAI_REASONING_EFFORT;
-  if (!OPENAI_REASONING_EFFORTS.some((effort) => effort === configuredEffort)) {
-    throw new Error(`Unsupported OpenAI reasoning effort: ${configuredEffort}`);
+function getReasoningEffort(): (typeof REASONING_EFFORTS)[number] {
+  const configuredEffort = ENV.OPENROUTER_REASONING_EFFORT;
+  switch (configuredEffort) {
+    case "low":
+    case "medium":
+    case "high":
+    case "xhigh":
+    case "max":
+      return configuredEffort;
+    default:
+      throw new Error(`Unsupported OpenRouter reasoning effort: ${configuredEffort}`);
   }
-  return configuredEffort;
 }
 
 import { ENV } from "./env.server";
@@ -31,12 +37,12 @@ export async function createAuth(database?: Database) {
 
 export function createNemuService(): NemuService {
   const jevDecider = createJevDecider({
-    apiKey: ENV.TYPESAFE_API_KEY,
-    model: ENV.TYPESAFE_MODEL,
+    apiKey: ENV.OPENROUTER_API_KEY,
+    model: ENV.OPENROUTER_JEV_MODEL,
   });
-  const answerGenerator = createOpenAIAnswerGenerator({
-    apiKey: ENV.OPENAI_API_KEY,
-    model: ENV.OPENAI_MODEL,
+  const answerGenerator = createOpenRouterAnswerGenerator({
+    apiKey: ENV.OPENROUTER_API_KEY,
+    model: ENV.OPENROUTER_GENERATOR_MODEL,
     reasoningEffort: getReasoningEffort(),
   });
 

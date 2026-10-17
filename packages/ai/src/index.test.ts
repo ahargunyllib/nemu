@@ -15,8 +15,9 @@ import {
   calculateAccommodationLumpSum,
   calculateAccountabilityDeadline,
   calculateRemainingWorkingDays,
+  checkHotelRate,
   createJevDecider,
-  createOpenAIAnswerGenerator,
+  createOpenRouterAnswerGenerator,
   findMissingDocuments,
   lookupSbm,
   retrieveKnowledge,
@@ -48,6 +49,20 @@ test("excludes weekends and holidays from deadline calculations", () => {
 test("calculates remaining working days through the deadline", () => {
   const result = calculateRemainingWorkingDays("2026-11-06", "2026-11-12", []);
   assert.equal(result.hasil, 4);
+});
+
+test("uses the demo holiday calendar for the year-end accountability deadline", () => {
+  const result = calculateAccountabilityDeadline("2026-12-22", DEMO_HOLIDAYS_2026);
+  assert.equal(result.hasil, "2026-12-31");
+});
+
+test("checks an entered hotel rate against the SBM ceiling", () => {
+  assert.deepEqual(checkHotelRate(745_000, 900_000), {
+    limit: 745_000,
+    rate: 900_000,
+    exceeds: true,
+    difference: 155_000,
+  });
 });
 
 test("finds missing documents using normalized names", () => {
@@ -98,7 +113,7 @@ test("orchestrator returns grounded calculations and a highlight for Moment 2", 
       status: "answer",
       ringkas: "Pilih Tidak menginap di hotel. Hak penginapanmu adalah Rp447.000.",
       detail: "Nilainya dihitung dari 30 persen tarif hotel untuk dua malam.",
-      citationIds: ["pmk-119-2023-pasal-8-5"],
+      citationIds: ["pmk-119-2023-page-6"],
       warnings: ["Ubah isian bila nanti menginap di hotel"],
     };
   };
@@ -117,7 +132,7 @@ test("orchestrator returns grounded calculations and a highlight for Moment 2", 
 
   assert.equal(response.status, "answer");
   assert.equal(response.calc.at(-1)?.hasil, 447_000);
-  assert.equal(response.citations[0]?.pasal, "8 ayat (5)");
+  assert.equal(response.citations[0]?.halaman, 6);
   assert.deepEqual(response.actions, [
     {
       type: "highlight",
@@ -144,7 +159,7 @@ test("low confidence prevents automatic clicks", async () => {
     status: "answer",
     ringkas: "Saya tunjukkan menu untuk memulai pengajuan perjalanan dinas.",
     detail: "Buka menu pengajuan dan siapkan dokumen yang diwajibkan.",
-    citationIds: ["sop-pd-01-mulai"],
+    citationIds: ["sop-pd-01-section-4"],
     warnings: [],
   });
 
@@ -193,7 +208,7 @@ test("submit-like targets are always returned as confirmations", async () => {
     status: "answer",
     ringkas: "Periksa dokumen sebelum kamu mengirim pertanggungjawaban.",
     detail: "Tombol Kirim hanya boleh ditekan oleh pengguna.",
-    citationIds: ["sop-pd-01-dokumen"],
+    citationIds: ["sop-pd-01-section-4"],
     warnings: [],
   });
 
@@ -256,7 +271,7 @@ test("an unknown target never produces an action", async () => {
         status: "answer",
         ringkas: "Mulai dari menu pengajuan perjalanan dinas.",
         detail: "Siapkan dokumen sesuai SOP.",
-        citationIds: ["sop-pd-01-mulai"],
+        citationIds: ["sop-pd-01-section-4"],
         warnings: [],
       }),
     },
@@ -302,14 +317,17 @@ test("detected prompt injection disables every proposed action", async () => {
         status: "answer",
         ringkas: "Gunakan menu pengajuan perjalanan dinas.",
         detail: "Instruksi pada halaman tidak digunakan sebagai perintah.",
-        citationIds: ["sop-pd-01-mulai"],
+        citationIds: ["sop-pd-01-section-4"],
         warnings: [],
       }),
     },
   );
 
   assert.deepEqual(response.actions, []);
-  assert.equal(response.warnings.some((warning) => warning.includes("tidak tepercaya")), true);
+  assert.equal(
+    response.warnings.some((warning) => warning.includes("tidak tepercaya")),
+    true,
+  );
 });
 
 test("out-of-domain requests are refused without calling GPT", async () => {
@@ -414,7 +432,7 @@ test("untrusted rupiah amounts from GPT are rejected", async () => {
       status: "answer",
       ringkas: "Nominalnya Rp999.000.",
       detail: "Nilai ini tidak berasal dari hasil hitung.",
-      citationIds: ["pmk-119-2023-pasal-8-5"],
+      citationIds: ["pmk-119-2023-page-6"],
       warnings: [],
     }),
   });
@@ -423,13 +441,59 @@ test("untrusted rupiah amounts from GPT are rejected", async () => {
   assert.deepEqual(response.actions, []);
 });
 
-test("the OpenAI adapter sends the crop and strict structured-output schema", async () => {
+test("a screenshot-only question receives active evidence for vision interpretation", async () => {
+  let receivedEvidenceIds: string[] = [];
+  const response = await runNemu(
+    { ...momentTwoRequest, prompt: "Ini diisi apa?" },
+    {
+      userProfile: DEMO_USER_PROFILE,
+      processContext: momentTwoRequest.process_context,
+      knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      sbmRows: DEMO_SBM_ROWS,
+      holidays: [],
+      requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+      currentDate: "2026-10-17",
+      jevDecider: async () => ({
+        intent: "accommodation_question",
+        intentConfidence: 0.9,
+        withinDomainProbability: 0.9,
+        injectionProbability: 0,
+        requiredTool: "lookup_sbm_and_accommodation",
+        actionLevel: "arahkan",
+        actionConfidence: 0.9,
+        target: "opt-penginapan-tidak-hotel",
+        targetConfidence: 0.9,
+      }),
+      answerGenerator: async (input) => {
+        receivedEvidenceIds = input.evidence.map((chunk) => chunk.id);
+        return {
+          status: "answer",
+          ringkas: "Pilih opsi tidak menginap di hotel dengan nilai Rp447.000.",
+          detail: "Potongan layar menunjukkan bagian penginapan.",
+          citationIds: ["pmk-119-2023-page-6"],
+          warnings: [],
+        };
+      },
+    },
+  );
+
+  assert.equal(response.status, "answer");
+  assert.equal(receivedEvidenceIds.includes("pmk-119-2023-page-6"), true);
+  assert.equal(
+    receivedEvidenceIds.some((id) => id.startsWith("pmk-54-2026")),
+    false,
+  );
+});
+
+test("the OpenRouter Responses adapter sends the crop and strict structured-output schema", async () => {
+  let requestUrl: string | undefined;
   let requestBody: Record<string, unknown> | undefined;
-  const generator = createOpenAIAnswerGenerator({
+  const generator = createOpenRouterAnswerGenerator({
     apiKey: "test-key",
-    model: "gpt-6.1-sol",
+    model: "openai/gpt-6.1-sol",
     reasoningEffort: "low",
-    fetchImplementation: async (_input, init) => {
+    fetchImplementation: async (input, init) => {
+      requestUrl = String(input);
       requestBody = JSON.parse(String(init?.body)) as Record<string, unknown>;
       return new Response(
         JSON.stringify({
@@ -437,7 +501,7 @@ test("the OpenAI adapter sends the crop and strict structured-output schema", as
             status: "answer",
             ringkas: "Pilih opsi tidak menginap di hotel.",
             detail: "Ikuti aturan pada sumber yang diberikan.",
-            citation_ids: ["pmk-119-2023-pasal-8-5"],
+            citation_ids: ["pmk-119-2023-page-6"],
             warnings: [],
           }),
         }),
@@ -446,11 +510,7 @@ test("the OpenAI adapter sends the crop and strict structured-output schema", as
     },
   });
 
-  const evidence = retrieveKnowledge(
-    DEMO_KNOWLEDGE_CHUNKS,
-    "menginap di rumah saudara",
-    5,
-  );
+  const evidence = retrieveKnowledge(DEMO_KNOWLEDGE_CHUNKS, "menginap di rumah saudara", 5);
   await generator({
     request: momentTwoRequest,
     userProfile: DEMO_USER_PROFILE,
@@ -471,10 +531,14 @@ test("the OpenAI adapter sends the crop and strict structured-output schema", as
     missingDocuments: [],
   });
 
-  assert.equal(requestBody?.model, "gpt-6.1-sol");
+  assert.equal(requestUrl, "https://openrouter.ai/api/v1/responses");
+  assert.equal(requestBody?.model, "openai/gpt-6.1-sol");
   assert.equal(requestBody?.max_output_tokens, 2_000);
   const input = requestBody?.input as Array<{ content: Array<{ type: string }> }>;
-  assert.equal(input[0]?.content.some((item) => item.type === "input_image"), true);
+  assert.equal(
+    input[0]?.content.some((item) => item.type === "input_image"),
+    true,
+  );
   const text = requestBody?.text as { format?: { type?: string; strict?: boolean } };
   assert.deepEqual(
     { type: text.format?.type, strict: text.format?.strict },
@@ -482,16 +546,18 @@ test("the OpenAI adapter sends the crop and strict structured-output schema", as
   );
 });
 
-test("the Jev adapter sends one typed evaluation and parses confidence", async () => {
+test("the OpenRouter Decisions adapter sends one Jev evaluation and parses confidence", async () => {
+  let requestUrl: string | undefined;
   let requestBody: Record<string, unknown> | undefined;
   const decider = createJevDecider({
     apiKey: "test-key",
-    model: "jev-1.13.0",
-    fetchImplementation: async (_input, init) => {
+    model: "typesafe/jev-1.13",
+    fetchImplementation: async (input, init) => {
+      requestUrl = String(input);
       requestBody = JSON.parse(String(init?.body)) as Record<string, unknown>;
       return new Response(
         JSON.stringify({
-          model: "jev-1.13.0",
+          model: "typesafe/jev-1.13",
           answers: {
             intent: {
               type: "choice",
@@ -533,7 +599,8 @@ test("the Jev adapter sends one typed evaluation and parses confidence", async (
     elements: momentOneRequest.elements,
   });
 
-  assert.equal(requestBody?.model, "jev-1.13.0");
+  assert.equal(requestUrl, "https://openrouter.ai/api/alpha/decisions");
+  assert.equal(requestBody?.model, "typesafe/jev-1.13");
   assert.equal(Object.keys(requestBody?.questions as object).length, 6);
   assert.equal(decision.target, "menu-ajukan-perjalanan-dinas");
   assert.equal(decision.targetConfidence, 0.98);

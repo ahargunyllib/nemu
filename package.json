@@ -11,6 +11,7 @@
     "build": "vp run -r build",
     "check-types": "vp run -r check-types",
     "check": "vp check && vp run -r check-types",
+    "test": "vp run -r test",
     "lint": "vp lint",
     "format": "vp fmt",
     "staged": "vp staged",

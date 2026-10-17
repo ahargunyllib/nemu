@@ -25,7 +25,7 @@ export { createJevDecider } from "./jev.js";
 export type { JevDecider, JevDecision, JevDecisionInput } from "./jev.js";
 export { retrieveKnowledge } from "./knowledge.js";
 export type { KnowledgeChunk, RankedKnowledgeChunk } from "./knowledge.js";
-export { createOpenAIAnswerGenerator } from "./openai.js";
+export { createOpenRouterAnswerGenerator } from "./openai.js";
 export type {
   AnswerGenerationInput,
   AnswerGenerator,
@@ -37,10 +37,11 @@ export {
   calculateAccountabilityDeadline,
   calculateDailyAllowance,
   calculateRemainingWorkingDays,
+  checkHotelRate,
   findMissingDocuments,
   lookupSbm,
 } from "./tools.js";
-export type { SbmComponent, SbmRow } from "./tools.js";
+export type { HotelRateCheck, SbmComponent, SbmRow } from "./tools.js";
 
 export type NemuContext = {
   userProfile: NemuUserProfile;
@@ -324,7 +325,7 @@ export async function runNemu(
     retrieveKnowledge(context.knowledgeChunks, request.prompt, 5),
   );
 
-  const [jevResult, evidence] = await Promise.all([
+  const [jevResult, initialEvidence] = await Promise.all([
     jevPromise
       .then((decision) => ({ decision, failed: false as const }))
       .catch(() => ({ decision: fallbackDecision(), failed: true as const })),
@@ -332,6 +333,22 @@ export async function runNemu(
   ]);
   const jevDuration = durationSince(jevStartedAt);
   const retrievalDuration = durationSince(retrievalStartedAt);
+  let evidence = initialEvidence;
+
+  if (request.screenshot_crop && (!evidence.length || (evidence[0]?.score ?? 0) < 2)) {
+    const intentSearchTerms = {
+      start_travel_request: "mulai pengajuan surat tugas menu perjalanan dinas",
+      accommodation_question: "penginapan hotel tidak menginap rumah saudara biaya",
+      accountability_question: "pertanggungjawaban dokumen tenggat boarding pass",
+      unsupported: "",
+      unclear: "perjalanan dinas panduan aplikasi",
+    }[jevResult.decision.intent];
+    evidence = retrieveKnowledge(
+      context.knowledgeChunks,
+      `${request.prompt} ${intentSearchTerms}`,
+      5,
+    );
+  }
 
   if (
     !jevResult.failed &&
