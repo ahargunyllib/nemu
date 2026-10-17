@@ -3,6 +3,16 @@
 The Demo App (`apps/mock-alurkerja`) is our fake AlurKerja. It carries no Javan or
 AlurKerja logos.
 
+## Look
+
+The real AlurKerja App (`app.alurkerja.com`) is built on shadcn with the
+`base-maia` style and the `neutral` base color, Figtree for body text, and
+Outfit for headings. The shared theme in `packages/ui/src/styles/globals.css`
+copies those tokens, so the Demo App, Admin Workspace, and Nemu Extension use
+the same palette and fonts. Our vendored components still use the `base-lyra`
+style, so they have square corners where AlurKerja uses pill-shaped buttons and
+inputs.
+
 ## Pages
 
 | Page                    | Path                       |
