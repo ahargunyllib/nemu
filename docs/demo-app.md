@@ -9,9 +9,9 @@ The real AlurKerja App (`app.alurkerja.com`) is built on shadcn with the
 `base-maia` style and the `neutral` base color, Figtree for body text, and
 Outfit for headings. The shared theme in `packages/ui/src/styles/globals.css`
 copies those tokens, so the Demo App, Admin Workspace, and Nemu Extension use
-the same palette and fonts. Our vendored components still use the `base-lyra`
-style, so they have square corners where AlurKerja uses pill-shaped buttons and
-inputs.
+the same palette and fonts. The vendored components in `packages/ui` use the
+same `base-maia` style, so buttons and inputs are pill-shaped and cards are
+rounded, as in AlurKerja.
 
 ## Pages
 
