@@ -25,6 +25,9 @@ export default defineConfig({
   // WXT loads .env files before calling this, so WXT_SERVER_URL is set here too.
   manifest: () => ({
     name: "Nemu",
+    // The extension-latest release job sets this per run, so a tester can read which build they
+    // have in chrome://extensions. Local builds keep package.json's 0.0.0.
+    version: process.env.WXT_EXTENSION_VERSION,
     description: "Pemandu Perjalanan Dinas di Demo App.",
     // `captureVisibleTab` for the Area Crop needs `<all_urls>` (a Demo App host permission isn't
     // enough). `activeTab` would only cover a tab whose action was just pressed, and Arc fires the
