@@ -69,7 +69,9 @@ Every deploy from `main` rebuilds the extension against the production Nemu Serv
 the zip on the `extension-latest` release:
 <https://github.com/ahargunyllib/nemu/releases/download/extension-latest/nemu-extension-chrome.zip>.
 Unzip it, then load the folder unpacked as in step 2 below. To update, replace the folder's
-contents with the new zip and click the reload icon on the extension card.
+contents with the new zip and click the reload icon on the extension card. The build's version is
+`0.1.<run number>`: the extension card shows it, and the release notes name the matching commit.
+A local build stays `0.0.0`.
 
 ## Run it
 
