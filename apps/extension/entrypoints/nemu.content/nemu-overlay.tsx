@@ -13,6 +13,7 @@ import {
   LoginRequiredCard,
 } from "../../features/answer-card/components/chat-notice-card";
 import { PANEL_WIDTH, placePanel } from "../../features/answer-card/lib/panel-placement";
+import { useClickFollowUp } from "../../features/chat/hooks/use-click-follow-up";
 import { useNemuChat } from "../../features/chat/hooks/use-nemu-chat";
 import { Composer } from "../../features/composer/components/composer";
 import {
@@ -27,6 +28,8 @@ import {
 } from "../../features/highlight/lib/highlight-targets";
 import { Mascot } from "../../features/mascot/components/mascot";
 import { NavigationCursor } from "../../features/navigation-click/components/navigation-cursor";
+import { ConfirmedStatus } from "../../features/process-status/components/confirmed-status";
+import { useConfirmedStatus } from "../../features/process-status/hooks/use-confirmed-status";
 import { PageLayer } from "../../shared/components/page-layer";
 import { useElementHeight } from "../../shared/hooks/use-element-height";
 
@@ -39,11 +42,15 @@ export function NemuOverlay() {
   const chat = useNemuChat();
   const area = useAreaCrop();
   const { state } = chat;
-  const { highlights, missing, warnings, cursor, outcome } = useAnswerActions(
-    state.kind === "response" ? state.response.actions : NO_ACTIONS,
+  const actions = state.kind === "response" ? state.response.actions : NO_ACTIONS;
+  const { highlights, missing, warnings, cursor, outcome, clicked } = useAnswerActions(
+    actions,
     state.kind === "response" ? state.elements : NO_ELEMENTS,
     anchor,
   );
+  // Momen 3: opening the task asks again from the task page, where the uploads and Kirim are.
+  useClickFollowUp(clicked, chat.followUp);
+  const confirmed = useConfirmedStatus(actions);
   const [panelRef, panelHeight] = useElementHeight<HTMLDivElement>();
 
   function openComposer(position: CursorPosition) {
@@ -154,7 +161,9 @@ export function NemuOverlay() {
               }}
               header={header}
               onReply={() => setComposerOpen(true)}
-            />
+            >
+              {confirmed && <ConfirmedStatus status={confirmed} />}
+            </AnswerCard>
           )}
           {state.kind === "unauthorized" && (
             <LoginRequiredCard

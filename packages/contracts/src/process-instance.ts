@@ -95,3 +95,15 @@ export const unggahDokumenInputSchema = processInstanceIdInputSchema.extend({
 });
 
 export type UnggahDokumenInput = z.infer<typeof unggahDokumenInputSchema>;
+
+/**
+ * What the Nemu Extension reads from `get_process_instance`: the State and the active Task,
+ * whose `id` is the task ID. Other fields of the reply are dropped.
+ */
+export const processInstanceStatusSchema = z.object({
+  id: z.string().min(1),
+  state: processStateSchema,
+  activeTask: z.object({ id: z.string().min(1), label: z.string() }).nullable(),
+});
+
+export type ProcessInstanceStatus = z.infer<typeof processInstanceStatusSchema>;
