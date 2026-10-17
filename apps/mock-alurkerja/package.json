@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@nemu/api": "workspace:*",
+    "@nemu/contracts": "workspace:*",
     "@nemu/ui": "workspace:*",
     "@orpc/client": "catalog:",
     "@orpc/server": "catalog:",

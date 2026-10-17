@@ -47,6 +47,8 @@ pnpm run dev
 Open [http://localhost:3001](http://localhost:3001) in your browser to see the Demo App.
 The API is running at [http://localhost:3000](http://localhost:3000).
 
+Sign in with a seeded demo account (Rina or the verifikator); see [docs/demo-app.md](docs/demo-app.md).
+
 ## UI Customization
 
 React web apps in this stack share shadcn/ui primitives through `packages/ui`.
