@@ -1,3 +1,4 @@
+import type { PageElement } from "@nemu/contracts";
 import { useCallback, useRef, useState } from "react";
 
 import { sendChatRequest } from "../api/chat-messaging";
@@ -13,15 +14,14 @@ export function useNemuChat() {
   const latestRequest = useRef(0);
 
   const send = useCallback(
-    async (prompt: string) => {
+    async (prompt: string, elements: PageElement[]) => {
       const requestId = ++latestRequest.current;
       setState({ kind: "loading", prompt });
-      // The Element List arrives in #7; until then the page sends none.
       const result = await sendChatRequest({
         session_id: sessionId,
         url: window.location.href,
         prompt,
-        elements: [],
+        elements,
       });
       if (requestId === latestRequest.current) setState({ ...result, prompt });
     },
