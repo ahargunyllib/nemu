@@ -113,11 +113,8 @@ export function NemuOverlay() {
       </PageLayer>
       {anchor && (
         <div
-          ref={panelRef}
           // Hidden, not unmounted, during area select mode so the Composer keeps its text.
-          className={
-            pickingArea ? "hidden" : "fixed z-2147483647 flex flex-col gap-2 overflow-y-auto"
-          }
+          className={pickingArea ? "hidden" : "fixed z-2147483647 overflow-y-auto"}
           style={{
             width: PANEL_WIDTH,
             ...placePanel(
@@ -128,56 +125,60 @@ export function NemuOverlay() {
             ),
           }}
         >
-          {composerOpen && (
-            <Composer
-              onSubmit={(prompt) => {
-                setComposerOpen(false);
-                ask(prompt, area.crop);
-                area.clear();
-              }}
-              onCancel={() => {
-                setComposerOpen(false);
-                area.clear();
-                if (state.kind === "idle") setAnchor(null);
-              }}
-              onPickArea={area.start}
-            >
-              {(area.state.kind === "attached" || area.state.kind === "failed") && (
-                <AreaCropChip state={area.state} onRemove={area.clear} />
-              )}
-            </Composer>
-          )}
-          {state.kind === "loading" && <AnswerCardSkeleton header={header} />}
-          {state.kind === "response" && (
-            <AnswerCard
-              key={state.prompt}
-              response={{
-                ...state.response,
-                warnings: [
-                  ...state.response.warnings,
-                  ...missing.map(missingTargetWarning),
-                  ...warnings,
-                ],
-              }}
-              header={header}
-              onReply={() => setComposerOpen(true)}
-            >
-              {confirmed && <ConfirmedStatus status={confirmed} />}
-            </AnswerCard>
-          )}
-          {state.kind === "unauthorized" && (
-            <LoginRequiredCard
-              header={header}
-              loginUrl={new URL("/login", window.location.href).href}
-            />
-          )}
-          {state.kind === "error" && (
-            <ChatErrorCard
-              header={header}
-              message={state.message}
-              onRetry={() => ask(state.prompt, state.screenshotCrop)}
-            />
-          )}
+          {/* Measured inside the scroll box, so a panel shrunk to keep off a highlight still
+              reports its full height. */}
+          <div ref={panelRef} className="flex flex-col gap-2">
+            {composerOpen && (
+              <Composer
+                onSubmit={(prompt) => {
+                  setComposerOpen(false);
+                  ask(prompt, area.crop);
+                  area.clear();
+                }}
+                onCancel={() => {
+                  setComposerOpen(false);
+                  area.clear();
+                  if (state.kind === "idle") setAnchor(null);
+                }}
+                onPickArea={area.start}
+              >
+                {(area.state.kind === "attached" || area.state.kind === "failed") && (
+                  <AreaCropChip state={area.state} onRemove={area.clear} />
+                )}
+              </Composer>
+            )}
+            {state.kind === "loading" && <AnswerCardSkeleton header={header} />}
+            {state.kind === "response" && (
+              <AnswerCard
+                key={state.prompt}
+                response={{
+                  ...state.response,
+                  warnings: [
+                    ...state.response.warnings,
+                    ...missing.map(missingTargetWarning),
+                    ...warnings,
+                  ],
+                }}
+                header={header}
+                onReply={() => setComposerOpen(true)}
+              >
+                {confirmed && <ConfirmedStatus status={confirmed} />}
+              </AnswerCard>
+            )}
+            {state.kind === "unauthorized" && (
+              <LoginRequiredCard
+                header={header}
+                loginUrl={new URL("/login", window.location.href).href}
+              />
+            )}
+            {state.kind === "error" && (
+              <ChatErrorCard
+                header={header}
+                message={state.message}
+                onRetry={() => ask(state.prompt, state.screenshotCrop)}
+              />
+            )}
+          </div>
         </div>
       )}
       {area.state.kind === "selecting" && (
