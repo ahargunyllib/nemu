@@ -45,6 +45,9 @@ export function createDocumentFileStore(): DocumentFileStore {
       const object = await ENV.DOCUMENTS.get(key);
       return object ? object.arrayBuffer() : null;
     },
+    async delete(key) {
+      await ENV.DOCUMENTS.delete(key);
+    },
   };
 }
 

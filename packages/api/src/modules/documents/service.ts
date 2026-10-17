@@ -96,6 +96,25 @@ export function setDocumentActive(
   return documents.setActive(id, isActive);
 }
 
+// Removes the row first so Nemu stops answering from the document even if the
+// file cleanup fails; a leftover object in storage is unreachable without its row.
+export async function deleteDocument(
+  { documents, files }: DocumentDeps,
+  id: string,
+): Promise<DocumentRecord | undefined> {
+  const document = await documents.delete(id);
+  if (!document) return undefined;
+
+  if (document.status === "ready") {
+    try {
+      await files.delete(document.storageKey);
+    } catch (error) {
+      console.error("Deleting knowledge document file failed", error);
+    }
+  }
+  return document;
+}
+
 // How the server reads an uploaded file back, e.g. for a future AI workspace loader.
 export async function readDocumentFile(
   { documents, files }: DocumentDeps,
