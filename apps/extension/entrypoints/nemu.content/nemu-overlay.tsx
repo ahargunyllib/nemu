@@ -65,6 +65,13 @@ export function NemuOverlay() {
     void chat.send(prompt, collectElementList(document), screenshotCrop);
   }
 
+  /** Closes only the Composer; an answer still on screen keeps its place. */
+  function closeComposer() {
+    setComposerOpen(false);
+    area.clear();
+    if (state.kind === "idle") setAnchor(null);
+  }
+
   function close() {
     chat.reset();
     area.clear();
@@ -117,6 +124,7 @@ export function NemuOverlay() {
           composerAnchor={composerOpen ? anchor : null}
           nemuCursor={cursor}
           onOpenComposer={openComposer}
+          onCloseComposer={closeComposer}
         />
       </PageLayer>
       {placement && (
@@ -143,11 +151,7 @@ export function NemuOverlay() {
                   ask(prompt, area.crop);
                   area.clear();
                 }}
-                onCancel={() => {
-                  setComposerOpen(false);
-                  area.clear();
-                  if (state.kind === "idle") setAnchor(null);
-                }}
+                onCancel={closeComposer}
                 onPickArea={area.start}
                 boundary={nemuRef}
               >

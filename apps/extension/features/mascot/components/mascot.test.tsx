@@ -23,12 +23,14 @@ const NOTHING: MascotActivity = {
 
 function renderMascot() {
   const onOpenComposer = vi.fn();
+  const onCloseComposer = vi.fn();
   const view = render(
     <Mascot
       activity={NOTHING}
       composerAnchor={null}
       nemuCursor={null}
       onOpenComposer={onOpenComposer}
+      onCloseComposer={onCloseComposer}
     />,
   );
   function rerender(activity: Partial<MascotActivity>, composerAnchor: Point | null = null) {
@@ -38,10 +40,11 @@ function renderMascot() {
         composerAnchor={composerAnchor}
         nemuCursor={null}
         onOpenComposer={onOpenComposer}
+        onCloseComposer={onCloseComposer}
       />,
     );
   }
-  return { onOpenComposer, rerender };
+  return { onOpenComposer, onCloseComposer, rerender };
 }
 
 function moveCursor(x: number, y: number) {
@@ -94,6 +97,23 @@ describe("Mascot", () => {
     moveCursor(400, 300);
 
     fireEvent.click(screen.getByRole("button", { name: "Sembunyikan maskot" }));
+    moveCursor(500, 400);
+    expect(mascot()).toBeNull();
+
+    rerender({ listening: true }, { x: 500, y: 400 });
+    expect(mascot()).not.toBeNull();
+  });
+
+  test("hiding it while the Composer is open closes the Composer and stays hidden", () => {
+    const { onCloseComposer, rerender } = renderMascot();
+    moveCursor(400, 300);
+    rerender({ listening: true }, { x: 400, y: 300 });
+
+    fireEvent.click(screen.getByRole("button", { name: "Sembunyikan maskot" }));
+    expect(onCloseComposer).toHaveBeenCalledOnce();
+    expect(mascot()).toBeNull();
+
+    rerender({});
     moveCursor(500, 400);
     expect(mascot()).toBeNull();
 

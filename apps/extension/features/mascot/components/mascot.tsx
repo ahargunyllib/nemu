@@ -16,18 +16,31 @@ type MascotProps = {
   /** Nemu's cursor during a navigation click: the mascot rides along with it. */
   nemuCursor: CursorFrame | null;
   onOpenComposer: (position: Point) => void;
+  /** Hiding the mascot also closes the Composer it waits beside. */
+  onCloseComposer: () => void;
 };
 
 /**
  * The Nemu mascot on the page layer. It follows the cursor and shows what Nemu is doing; clicking
- * it opens the Composer. Hidden, it stays away until Rina opens the Composer again.
+ * it opens the Composer. Hidden, it closes the Composer and stays away until Rina opens it again.
  */
-export function Mascot({ activity, composerAnchor, nemuCursor, onOpenComposer }: MascotProps) {
+export function Mascot({
+  activity,
+  composerAnchor,
+  nemuCursor,
+  onOpenComposer,
+  onCloseComposer,
+}: MascotProps) {
   const state = useMascotState(activity);
   const placement = useMascotPosition(composerAnchor, nemuCursor);
   const [hidden, setHidden] = useState(false);
+  const [wasListening, setWasListening] = useState(activity.listening);
 
-  if (hidden && activity.listening) setHidden(false);
+  // Only opening the Composer brings it back, so hiding sticks while the Composer is still open.
+  if (wasListening !== activity.listening) {
+    setWasListening(activity.listening);
+    if (activity.listening) setHidden(false);
+  }
   if (hidden || !placement) return null;
 
   return (
@@ -58,7 +71,10 @@ export function Mascot({ activity, composerAnchor, nemuCursor, onOpenComposer }:
         size="icon-xs"
         variant="secondary"
         className="invisible absolute -top-3 -right-3 shadow-sm group-hover:visible"
-        onClick={() => setHidden(true)}
+        onClick={() => {
+          setHidden(true);
+          onCloseComposer();
+        }}
       >
         <XIcon />
       </Button>
