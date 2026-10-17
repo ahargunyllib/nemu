@@ -45,7 +45,9 @@ The Pertanggungjawaban task page asks for four documents (surat tugas, boarding
 pass pergi and pulang, laporan perjalanan). Only the file name is stored, in
 `process_document`. Kirim needs all four and moves the State to Verifikasi,
 then shows the task ID. Sample PDFs to upload are in
-`apps/mock-alurkerja/sample-documents/`.
+`apps/mock-alurkerja/sample-documents/`: the four above (boarding passes
+Yogyakarta YIA ↔ Makassar UPG), the undangan for the plan form, and a kuitansi
+tiket pesawat for the Rp3.893.000 fare.
 
 ## Process endpoints
 
@@ -69,12 +71,18 @@ AI counts from; the header shows it through `getDemoClock`.
 
 ## 3-Momen fixtures
 
-A migration (`packages/db/src/migrations/*_seed-demo-process-instances`) seeds
-Rina's `PD-2026-0042` to Makassar, 3–5 November 2026, in State
-Pertanggungjawaban with the surat tugas and boarding pass pergi uploaded, so
-the boarding pass pulang and laporan perjalanan are missing (Momen 3). The
-migration is generated from `packages/api/src/modules/process-instances/demo-seed.ts`;
-after changing it, run `UPDATE_DEMO_SEED=1 pnpm test`.
+A migration (the newest `packages/db/src/migrations/*_reseed-demo-process-instances`)
+seeds Rina's `PD-2026-0042`, Yogyakarta → Makassar PP on 3–5 November 2026, in
+State Pertanggungjawaban with the surat tugas and boarding pass pergi uploaded,
+so the boarding pass pulang and laporan perjalanan are missing (Momen 3). Its
+amounts are SBM 2026 rows: tiket Yogyakarta–Makassar ekonomi PP Rp3.893.000,
+lumpsum penginapan Rp447.000 (30% x Rp745.000 x 2 malam), and uang harian
+Rp1.290.000 (Sulawesi Selatan Rp430.000 x 3 hari).
+
+The migration is generated from `packages/api/src/modules/process-instances/demo-seed.ts`.
+Applied migrations stay untouched, so after changing the seed add a new one with
+`pnpm --filter @nemu/db db:generate --custom --name=reseed-demo-process-instances`
+and fill it with `UPDATE_DEMO_SEED=1 pnpm test` in `packages/api`.
 
 ## Demo accounts
 

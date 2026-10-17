@@ -1,4 +1,4 @@
-# Panduan aplikasi Perjalanan Dinas (AlurKerja App)
+# Panduan aplikasi Perjalanan Dinas
 
 SINTETIS · dokumen contoh untuk demo Nemu · bukan dokumen resmi instansi mana pun
 
@@ -15,22 +15,23 @@ Panduan ini menjelaskan menu dan isian di aplikasi Perjalanan Dinas milik Balai 
 
 ## Membuat pengajuan
 
-1. Klik `[menu-ajukan-perjalanan-dinas]`.
-2. Bagian A, Jenis dan tujuan: pilih jenis perjalanan `[fld-jenis-perjalanan]`, pilih surat tugas `[fld-surat-tugas]`, pilih kota tujuan `[fld-kota-tujuan]`. Provinsi terisi otomatis.
-3. Bagian B, Jadwal: isi tanggal berangkat `[fld-tanggal-berangkat]` dan tanggal kembali `[fld-tanggal-kembali]`. Jumlah hari dihitung otomatis.
-4. Bagian C, Biaya: pilih moda `[fld-moda]`, isi tiket pergi-pulang `[fld-tiket-pp]`, transport ke bandara asal `[fld-transport-asal]` dan tujuan `[fld-transport-tujuan]`.
-5. Penginapan: pilih `[opt-penginapan-hotel]` bila menginap di hotel, lalu isi tarif per malam `[fld-tarif-hotel]`. Pilih `[opt-penginapan-tidak-hotel]` bila tidak menginap di hotel; nominal lumpsum `[fld-lumpsum-penginapan]` terisi otomatis.
-6. Uang harian `[fld-uang-harian]` terisi otomatis dari tabel SBM.
-7. Uang muka: pilih `[opt-uang-muka-ya]` atau `[opt-uang-muka-tidak]`.
-8. Bagian D, Dokumen: unggah undangan `[upl-undangan]`. Surat tugas dan rincian biaya terlampir otomatis.
-9. Klik `[btn-kirim-pengajuan]`. Status berubah menjadi Diajukan. `[btn-simpan-draf]` menyimpan tanpa mengirim.
+1. Klik `[menu-ajukan-perjalanan-dinas]`. Formulir terdiri atas empat bagian dan semua isian wajib diisi.
+2. Bagian A, Jenis dan tujuan: pilih jenis perjalanan `[select-jenis-perjalanan]` (Perjalanan dinas luar kota atau Perjalanan dinas dalam kota), isi nomor surat tugas `[input-nomor-surat-tugas]`, pilih kota tujuan `[select-kota-tujuan]`, dan isi maksud perjalanan `[input-maksud-perjalanan]`. Provinsi terisi otomatis dari kota tujuan.
+3. Bagian B, Jadwal: isi tanggal berangkat `[input-tanggal-berangkat]` dan tanggal kembali `[input-tanggal-kembali]`. Lama perjalanan dalam hari dan malam dihitung otomatis. Tanggal kembali tidak boleh sebelum tanggal berangkat.
+4. Bagian C, Biaya: pilih moda transportasi `[select-moda-transport]` (Pesawat, Kereta api, Bus, atau Kendaraan dinas), lalu isi biaya transportasi pergi-pulang `[input-biaya-transport]` dalam rupiah.
+5. Penginapan: pilih `[opt-penginapan-hotel]` (Menginap di hotel) atau `[opt-penginapan-tidak-hotel]` (Tidak menginap di hotel). Lalu isi nominal penginapan `[input-nominal-penginapan]`, yaitu total biaya penginapan selama perjalanan. Bila tidak menginap di hotel, isi dengan lumpsum penginapan sesuai ketentuan yang berlaku.
+6. Uang harian: isi `[input-uang-harian]` dengan total uang harian untuk seluruh hari perjalanan. Nominal ini tidak terisi otomatis.
+7. Bagian D, Dokumen: unggah undangan kegiatan `[upload-undangan]` dalam bentuk PDF atau gambar. Surat tugas dan rincian biaya terlampir otomatis.
+8. Klik Kirim `[button-kirim-pengajuan]`. Pengajuan tersimpan dengan status Diajukan. Formulir tidak bisa disimpan sebagai draf, jadi lengkapi semua isian sebelum mengirim.
 
 ## Setelah pulang
 
-1. Buka `[menu-my-task]`, lalu klik task Pertanggungjawaban `[task-pertanggungjawaban]`.
-2. Unggah laporan perjalanan `[upl-laporan]`, tiket `[upl-tiket]`, boarding pass pergi `[upl-boarding-pergi]`, boarding pass pulang `[upl-boarding-pulang]`, bukti hotel `[upl-bukti-hotel]` (tidak muncul bila memilih tidak menginap di hotel), dan Daftar Pengeluaran Riil `[upl-dpr]` bila diperlukan.
-3. Klik `[btn-kirim-pertanggungjawaban]`. Chip tenggat `[chip-tenggat]` menunjukkan sisa hari kerja.
+1. Buka Beranda `[menu-beranda]` atau My Task `[menu-my-task]`, lalu klik task Pertanggungjawaban `[task-pertanggungjawaban]`.
+2. Unggah empat dokumen: surat tugas `[upload-surat-tugas]`, boarding pass pergi `[upload-boarding-pass-pergi]`, boarding pass pulang `[upload-boarding-pass-pulang]`, dan laporan perjalanan `[upload-laporan-perjalanan]`. Dokumen yang sudah terunggah menampilkan nama berkasnya.
+3. Klik Kirim `[button-kirim]`. Kirim hanya berhasil bila keempat dokumen sudah terunggah. Status berubah menjadi Verifikasi dan halaman menampilkan ID tugas, misalnya `PJ-PD-2026-0042`.
 
 ## Status pengajuan
 
-Draf, Diajukan, Disetujui Atasan, Disetujui PPK, Berangkat, Kembali, Pertanggungjawaban, Verifikasi, Selesai. Bila dokumen kurang, status berubah menjadi Revisi.
+Draf, Diajukan, Disetujui, Berangkat, Kembali, Pertanggungjawaban, Verifikasi, Selesai. Bila pengajuan perlu diperbaiki, statusnya menjadi Revisi lalu kembali ke Diajukan setelah diperbaiki. Status pengajuan terlihat di My Request `[menu-my-request]`.
+
+Hanya tiga status yang memberi task kepada pegawai: Draf memberi task Isi rencana perjalanan `[task-isi-rencana]`, Revisi memberi task Perbaiki pengajuan `[task-revisi]`, dan Pertanggungjawaban memberi task Pertanggungjawaban `[task-pertanggungjawaban]`. Status lain menunggu atasan, PPK, atau bendahara.

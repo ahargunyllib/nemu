@@ -16,7 +16,7 @@ const filled: PerdinFormValues = {
   tanggalBerangkat: "2026-11-03",
   tanggalKembali: "2026-11-05",
   modaTransport: "Pesawat",
-  biayaTransport: "3500000",
+  biayaTransport: "3893000",
   penginapan: "tidak_hotel",
   nominalPenginapan: "447000",
   uangHarian: "1290000",
@@ -59,7 +59,7 @@ describe("toAjukanPerjalananDinasInput", () => {
     expect(toAjukanPerjalananDinasInput(filled)).toMatchObject({
       kotaTujuan: "Makassar",
       penginapan: "tidak_hotel",
-      biayaTransport: 3_500_000,
+      biayaTransport: 3_893_000,
       nominalPenginapan: 447_000,
       uangHarian: 1_290_000,
       dokumenUndangan: "undangan-rapat.pdf",

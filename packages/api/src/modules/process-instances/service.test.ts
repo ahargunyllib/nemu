@@ -103,7 +103,7 @@ const rinaToMakassar: AjukanPerjalananDinasInput = {
   tanggalBerangkat: "2026-11-03",
   tanggalKembali: "2026-11-05",
   modaTransport: "Pesawat",
-  biayaTransport: 3_500_000,
+  biayaTransport: 3_893_000,
   penginapan: "tidak_hotel",
   nominalPenginapan: 447_000,
   uangHarian: 1_290_000,
