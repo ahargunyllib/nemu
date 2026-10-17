@@ -31,10 +31,22 @@ export const NEMU_IDS = {
   taskDetail: {
     back: "link-kembali-my-task",
   },
-  /** Ajukan Perjalanan Dinas form (`/perdin/baru`), rendered from #3. */
+  /** Ajukan Perjalanan Dinas form (`/perdin/baru`). */
   perdinForm: {
+    jenisPerjalanan: "select-jenis-perjalanan",
+    nomorSuratTugas: "input-nomor-surat-tugas",
+    kotaTujuan: "select-kota-tujuan",
+    maksud: "input-maksud-perjalanan",
+    tanggalBerangkat: "input-tanggal-berangkat",
+    tanggalKembali: "input-tanggal-kembali",
+    modaTransport: "select-moda-transport",
+    biayaTransport: "input-biaya-transport",
+    lodgingHotel: "opt-penginapan-hotel",
     lodgingNotHotel: "opt-penginapan-tidak-hotel",
     lodgingAmount: "input-nominal-penginapan",
+    uangHarian: "input-uang-harian",
+    uploadUndangan: "upload-undangan",
+    kirim: "button-kirim-pengajuan",
   },
   /** Pertanggungjawaban task (`/perdin/task/$instanceId`), rendered from #4. */
   pertanggungjawaban: {

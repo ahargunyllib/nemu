@@ -9,12 +9,10 @@ import {
   TableRow,
 } from "@nemu/ui/components/table";
 
-import {
-  type ProcessInstance,
-  formatTanggal,
-} from "@/features/perjalanan-dinas/lib/demo-process-instances";
+import { formatTanggal } from "@/features/perjalanan-dinas/lib/demo-process-instances";
+import type { MyProcessInstance } from "@/features/perjalanan-dinas/types/my-process-instance";
 
-export default function RequestTable({ instances }: { instances: readonly ProcessInstance[] }) {
+export default function RequestTable({ instances }: { instances: readonly MyProcessInstance[] }) {
   if (instances.length === 0) {
     return (
       <Empty className="border">
@@ -41,7 +39,7 @@ export default function RequestTable({ instances }: { instances: readonly Proces
           <TableRow key={instance.id}>
             <TableCell className="font-medium">{instance.id}</TableCell>
             <TableCell>
-              {instance.tujuan}, {instance.provinsi}
+              {instance.kotaTujuan}, {instance.provinsi}
             </TableCell>
             <TableCell>
               {formatTanggal(instance.tanggalBerangkat)} – {formatTanggal(instance.tanggalKembali)}
