@@ -68,7 +68,9 @@ build into Playwright's Chromium and checks:
 - signed out, the card asks Rina to log in;
 - signed in as Rina, the Momen 1 prompt comes back as an Answer Card with its citation;
 - Momen 1, five times in a row from Beranda: Nemu clicks Ajukan Perjalanan Dinas, the form opens,
-  and the card's detail lists the documents to prepare.
+  and the card's detail lists the documents to prepare;
+- on the Perjalanan Dinas form, the Momen 2 prompt shows its answer and warning, rings each lodging
+  field with its action label, and keeps the Answer Card off both fields.
 
 It prints one line per check, exits non-zero on a failure, and saves screenshots to
 `.output/verify/`. Add `-- --headed` to watch it. Automation can't press the toolbar icon or the

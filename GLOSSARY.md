@@ -52,6 +52,10 @@ The card that shows Nemu's reply: summary, expandable detail, clickable citation
 The prompt input that opens beside the cursor.
 _Avoid_: chat box
 
+**Chat Log**:
+The audit record of every chat request (time, user, prompt, sources, actions, result), shown to the admin in the Admin Workspace. It notes whether an Area Crop was attached but never stores the image.
+_Avoid_: chat history, transcript
+
 ## Perjalanan Dinas domain
 
 **Perjalanan Dinas**:

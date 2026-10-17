@@ -10,14 +10,20 @@
  * Needs the dev stack in fixture mode (`NEMU_RESPONDER=fixture pnpm dev`), which also keeps
  * .output/chrome-mv3-dev built. Run `pnpm --filter extension verify`; add `-- --headed` to watch.
  */
-import { momentOneRequest, momentOneResponse } from "@nemu/contracts/fixtures";
+import {
+  momentOneRequest,
+  momentOneResponse,
+  momentTwoRequest,
+  momentTwoResponse,
+} from "@nemu/contracts/fixtures";
 import { mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { type BrowserContext, chromium, type Page } from "playwright-core";
+import { type BrowserContext, chromium, type Locator, type Page } from "playwright-core";
 import type { browser } from "wxt/browser";
 
 import { OPEN_COMPOSER_MESSAGE } from "../features/composer/lib/open-composer-message.ts";
+import { RING_PADDING } from "../features/highlight/lib/highlight-targets.ts";
 import { ALLOWED_ORIGINS, DEFAULT_SERVER_URL } from "../shared/lib/config.ts";
 
 const EXTENSION_DIR = path.resolve(import.meta.dirname, "../.output/chrome-mv3-dev");
@@ -65,6 +71,58 @@ async function ask(context: BrowserContext, page: Page, prompt: string) {
 
 async function closeAnswerCard(page: Page) {
   await page.getByRole("button", { name: "Tutup" }).click();
+}
+
+type Box = { x: number; y: number; width: number; height: number };
+
+async function boxOf(locator: Locator): Promise<Box> {
+  const box = await locator.boundingBox();
+  if (!box) throw new Error(`${String(locator)} is not rendered`);
+  return box;
+}
+
+function overlaps(a: Box, b: Box): boolean {
+  return a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+}
+
+/** The target's box grown by the ring's padding, which is where the ring must sit. */
+function ringAround(target: Box): Box {
+  return {
+    x: target.x - RING_PADDING,
+    y: target.y - RING_PADDING,
+    width: target.width + 2 * RING_PADDING,
+    height: target.height + 2 * RING_PADDING,
+  };
+}
+
+function sameBox(a: Box, b: Box): boolean {
+  return [a.x - b.x, a.y - b.y, a.width - b.width, a.height - b.height].every(
+    (difference) => Math.abs(difference) <= 1,
+  );
+}
+
+/** Waits out the smooth scroll that brings the first highlight target into view. */
+async function waitForScrollToSettle(page: Page) {
+  let last: number | undefined;
+  for (;;) {
+    const scrollY = await page.evaluate(() => window.scrollY);
+    if (scrollY === last) return;
+    last = scrollY;
+    await page.waitForTimeout(300);
+  }
+}
+
+/** Retries `assertion` until it passes, for overlay layout that follows the page a frame late. */
+async function eventually(assertion: () => Promise<void>) {
+  const deadline = Date.now() + TIMEOUT_MS;
+  for (;;) {
+    try {
+      return await assertion();
+    } catch (error) {
+      if (Date.now() > deadline) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+  }
 }
 
 async function main() {
@@ -150,6 +208,42 @@ async function main() {
           }
           await closeAnswerCard(page);
         }
+      },
+    );
+
+    await check(
+      "on the form, Momen 2 rings its targets and the Answer Card avoids them",
+      async () => {
+        await page.goto(`${DEMO_APP_URL}/perdin/baru`);
+        await page.getByRole("heading", { name: "Ajukan Perjalanan Dinas" }).waitFor();
+        await ask(context, page, momentTwoRequest.prompt);
+
+        const overlay = page.locator("nemu-overlay");
+        const card = overlay
+          .locator('[data-slot="card"]')
+          .filter({ hasText: momentTwoResponse.answer.ringkas });
+        await card.waitFor();
+        for (const warning of momentTwoResponse.warnings) {
+          await card.getByRole("list", { name: "Peringatan" }).getByText(warning).waitFor();
+        }
+
+        const highlights = momentTwoResponse.actions.filter(({ type }) => type === "highlight");
+        if (highlights.length === 0) throw new Error("momentTwoResponse has no highlight actions");
+        await waitForScrollToSettle(page);
+        await eventually(async () => {
+          const cardBox = await boxOf(card);
+          for (const { target, label } of highlights) {
+            const targetBox = await boxOf(page.locator(`[data-nemu-id="${target}"]`).first());
+            const badge = overlay.getByText(label, { exact: true });
+            if (!(await badge.isVisible())) throw new Error(`no "${label}" label on ${target}`);
+            const ringBox = await boxOf(badge.locator(".."));
+            if (!sameBox(ringBox, ringAround(targetBox))) {
+              throw new Error(`the "${label}" ring isn't around ${target}`);
+            }
+            if (overlaps(cardBox, targetBox)) throw new Error(`the Answer Card covers ${target}`);
+          }
+        });
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-2-highlight.png") });
       },
     );
   } finally {

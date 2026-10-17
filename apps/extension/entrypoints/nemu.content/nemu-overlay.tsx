@@ -59,8 +59,9 @@ export function NemuOverlay() {
   const header =
     state.kind === "idle" ? null : <AnswerCardHeader prompt={state.prompt} onClose={close} />;
 
+  // One font and text color for everything Nemu draws: highlights, the mascot (#6), and the panel.
   return (
-    <>
+    <div className="font-sans text-foreground">
       <PageLayer>
         {highlights.map(({ action, box }, index) => (
           <HighlightRing key={`${index}-${action.target}`} box={box} label={action.label} />
@@ -70,7 +71,7 @@ export function NemuOverlay() {
       {anchor && (
         <div
           ref={panelRef}
-          className="fixed z-2147483647 flex flex-col gap-2 overflow-y-auto font-sans text-foreground"
+          className="fixed z-2147483647 flex flex-col gap-2 overflow-y-auto"
           style={{
             width: PANEL_WIDTH,
             ...placePanel(
@@ -124,6 +125,6 @@ export function NemuOverlay() {
           )}
         </div>
       )}
-    </>
+    </div>
   );
 }
