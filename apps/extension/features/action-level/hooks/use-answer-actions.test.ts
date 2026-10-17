@@ -57,7 +57,7 @@ describe("useAnswerActions", () => {
     expect(window.location.pathname).toBe("/perdin/baru");
     expect(result.current.outcome).toBe("succeeded");
     expect(result.current.cursor?.mascot).toBe("success");
-    expect(result.current.highlights).toEqual([]);
+    expect(result.current.highlight).toBeUndefined();
   });
 
   test("Momen 3 reports the task click once it opens the task page", async () => {
@@ -73,7 +73,7 @@ describe("useAnswerActions", () => {
     expect(result.current.clicked?.target).toBe(NEMU_IDS.task.pertanggungjawaban);
   });
 
-  test("the Momen 3 follow-up rings both uploads, then Kirim as the user's to press", async () => {
+  test("the Momen 3 follow-up steps through both uploads, then Kirim as the user's to press", async () => {
     const targets = momentThreeFollowUpResponse.actions.map(({ target }) => renderTarget(target));
 
     const result = renderActions(
@@ -82,12 +82,15 @@ describe("useAnswerActions", () => {
     );
 
     await waitFor(() =>
-      expect(result.current.highlights.map(({ action }) => [action.target, action.label])).toEqual([
-        [NEMU_IDS.pertanggungjawaban.uploadLaporanPerjalanan, "Unggah dokumen ini"],
-        [NEMU_IDS.pertanggungjawaban.uploadBoardingPassPulang, "Unggah dokumen ini"],
-        [NEMU_IDS.pertanggungjawaban.kirim, "Kamu yang mengirim"],
-      ]),
+      expect(result.current.highlight?.action.target).toBe(
+        NEMU_IDS.pertanggungjawaban.uploadLaporanPerjalanan,
+      ),
     );
+    expect(result.current.steps.map(({ target, label }) => [target, label])).toEqual([
+      [NEMU_IDS.pertanggungjawaban.uploadLaporanPerjalanan, "Unggah dokumen ini"],
+      [NEMU_IDS.pertanggungjawaban.uploadBoardingPassPulang, "Unggah dokumen ini"],
+      [NEMU_IDS.pertanggungjawaban.kirim, "Kamu yang mengirim"],
+    ]);
     expect(result.current.cursor).toBeNull();
     for (const { clicked } of targets) expect(clicked).not.toHaveBeenCalled();
   });
@@ -104,9 +107,11 @@ describe("useAnswerActions", () => {
     const result = renderActions([clickKirim], momentThreeFollowUpRequest.elements);
 
     await waitFor(() =>
-      expect(result.current.highlights.map(({ action }) => action)).toEqual([
-        { ...clickKirim, type: "highlight", level: "arahkan" },
-      ]),
+      expect(result.current.highlight?.action).toEqual({
+        ...clickKirim,
+        type: "highlight",
+        level: "arahkan",
+      }),
     );
     expect(result.current.cursor).toBeNull();
     expect(kirim.clicked).not.toHaveBeenCalled();
@@ -117,7 +122,7 @@ describe("useAnswerActions", () => {
 
     const result = renderActions(momentOneResponse.actions, []);
 
-    await waitFor(() => expect(result.current.highlights).toHaveLength(1));
+    await waitFor(() => expect(result.current.highlight).toBeDefined());
     expect(menu.clicked).not.toHaveBeenCalled();
   });
 
@@ -134,7 +139,7 @@ describe("useAnswerActions", () => {
     expect(menu.clicked).not.toHaveBeenCalled();
     expect(result.current.outcome).toBe("stopped");
     expect(result.current.cursor).toBeNull();
-    expect(result.current.highlights).toHaveLength(1);
+    expect(result.current.highlight).toBeDefined();
   });
 
   test("a missing click target warns and falls back to a highlight", async () => {

@@ -32,6 +32,23 @@ export function findHighlightTargets(
   return { found, missing };
 }
 
+const FORM_FIELD = "input:not([type=hidden]), textarea, select";
+
+/**
+ * Whether the user just did the current step on its target: changed a field inside it, or pressed
+ * a target that is a plain button or option. A click into a field, or on a control that opens a
+ * popup such as a select, only starts the step.
+ */
+export function completesStep(event: Event, target: HTMLElement): boolean {
+  if (event.type === "change") return true;
+  if (event.type !== "click") return false;
+  return (
+    !target.matches(FORM_FIELD) &&
+    !target.querySelector(FORM_FIELD) &&
+    !target.closest("[aria-haspopup]")
+  );
+}
+
 export function missingTargetWarning(action: NemuAction): string {
   return `Nemu tidak menemukan "${action.label}" (${action.target}) di halaman ini.`;
 }

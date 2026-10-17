@@ -22,6 +22,7 @@ import {
 } from "../../features/composer/hooks/use-composer-shortcut";
 import { collectElementList } from "../../features/element-list/lib/element-list";
 import { HighlightRing } from "../../features/highlight/components/highlight-ring";
+import { HighlightSteps } from "../../features/highlight/components/highlight-steps";
 import {
   highlightFootprint,
   missingTargetWarning,
@@ -45,11 +46,8 @@ export function NemuOverlay() {
   const area = useAreaCrop();
   const { state } = chat;
   const actions = state.kind === "response" ? state.response.actions : NO_ACTIONS;
-  const { highlights, missing, warnings, cursor, outcome, clicked } = useAnswerActions(
-    actions,
-    state.kind === "response" ? state.elements : NO_ELEMENTS,
-    anchor,
-  );
+  const { highlight, steps, stepIndex, goTo, missing, warnings, cursor, outcome, clicked } =
+    useAnswerActions(actions, state.kind === "response" ? state.elements : NO_ELEMENTS, anchor);
   // Momen 3: opening the task asks again from the task page, where the uploads and Kirim are.
   useClickFollowUp(clicked, chat.followUp);
   const confirmed = useConfirmedStatus(actions);
@@ -83,7 +81,7 @@ export function NemuOverlay() {
       anchor,
       { width: window.innerWidth, height: window.innerHeight },
       panelHeight,
-      highlights.map(({ box }) => highlightFootprint(box)),
+      highlight ? [highlightFootprint(highlight.box)] : [],
     );
 
   // One font and text color for everything Nemu draws: highlights, the mascot (#6), and the panel.
@@ -97,9 +95,7 @@ export function NemuOverlay() {
       }
     >
       <PageLayer>
-        {highlights.map(({ action, box }, index) => (
-          <HighlightRing key={`${index}-${action.target}`} box={box} label={action.label} />
-        ))}
+        {highlight && <HighlightRing box={highlight.box} label={highlight.action.label} />}
         {cursor && <NavigationCursor frame={cursor} />}
         <Mascot
           activity={{
@@ -107,7 +103,7 @@ export function NemuOverlay() {
             listening: composerOpen,
             thinking: state.kind === "loading",
             clicking: cursor?.mascot === "clicking",
-            guiding: highlights.length > 0,
+            guiding: Boolean(highlight),
             succeeded: outcome === "succeeded",
             failed:
               state.kind === "error" ||
@@ -172,6 +168,7 @@ export function NemuOverlay() {
                 header={header}
                 onReply={() => setComposerOpen(true)}
               >
+                <HighlightSteps steps={steps} index={stepIndex} onGoTo={goTo} />
                 {confirmed && <ConfirmedStatus status={confirmed} />}
               </AnswerCard>
             )}
