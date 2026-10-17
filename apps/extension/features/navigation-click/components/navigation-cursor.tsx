@@ -59,7 +59,7 @@ function ResultBadge({
   children: React.ReactNode;
 }) {
   return (
-    <span className="absolute top-3 left-3 rounded-4xl bg-background shadow-md animate-in fade-in">
+    <span className="absolute top-3 left-3 animate-in rounded-4xl bg-background font-sans shadow-md fade-in">
       <Badge variant={variant}>{children}</Badge>
     </span>
   );
