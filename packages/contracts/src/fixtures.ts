@@ -94,6 +94,12 @@ export const momentTwoResponse = {
       level: "arahkan",
       label: "Pilih ini",
     },
+    {
+      type: "highlight",
+      target: "input-nominal-penginapan",
+      level: "arahkan",
+      label: "Isi nominal ini",
+    },
   ],
   warnings: ["Ubah isian bila nanti menginap di hotel"],
 } satisfies NemuResponse;
@@ -143,6 +149,80 @@ export const momentThreeResponse = {
       target: "task-pertanggungjawaban",
       level: "jalan_sendiri",
       label: "Buka task",
+    },
+  ],
+  warnings: ["Kamu yang menekan Kirim setelah semua dokumen lengkap"],
+} satisfies NemuResponse;
+
+export const momentThreeFollowUpRequest = {
+  session_id: "s-001",
+  user_id: "rina",
+  url: "https://app.demo/perdin/task/PD-2026-0042",
+  prompt: "Saya sudah pulang kemarin, sekarang apa?",
+  elements: [
+    {
+      nemu_id: "upload-laporan-perjalanan",
+      label: "Unggah laporan perjalanan",
+      role: "button",
+      visible: true,
+    },
+    {
+      nemu_id: "upload-boarding-pass-pulang",
+      label: "Unggah boarding pass pulang",
+      role: "button",
+      visible: true,
+    },
+    {
+      nemu_id: "button-kirim",
+      label: "Kirim",
+      role: "button",
+      visible: true,
+    },
+  ],
+  process_context: {
+    instance_id: "PD-2026-0042",
+    active_task: "Pertanggungjawaban",
+    status: "Pertanggungjawaban",
+    return_date: "2026-11-05",
+    destination_province: "Sulawesi Selatan",
+    nights: 2,
+    uploaded_documents: ["surat_tugas", "boarding_pass_pergi"],
+  },
+} satisfies NemuRequest;
+
+export const momentThreeFollowUpResponse = {
+  status: "answer",
+  answer: {
+    ringkas:
+      "Lengkapi laporan perjalanan dan boarding pass pulang sebelum 12 November 2026, lalu kamu yang mengirim.",
+    detail: "Batas pertanggungjawaban adalah lima hari kerja setelah tanggal kembali.",
+  },
+  citations: [{ doc_id: "pmk-113-2012", judul: "PMK 113/2012", pasal: "34" }],
+  calc: [
+    {
+      fungsi: "batas_pertanggungjawaban",
+      input: { tanggal_kembali: "2026-11-05", hari_kerja: 5 },
+      hasil: "2026-11-12",
+    },
+  ],
+  actions: [
+    {
+      type: "highlight",
+      target: "upload-laporan-perjalanan",
+      level: "arahkan",
+      label: "Unggah dokumen ini",
+    },
+    {
+      type: "highlight",
+      target: "upload-boarding-pass-pulang",
+      level: "arahkan",
+      label: "Unggah dokumen ini",
+    },
+    {
+      type: "confirm",
+      target: "button-kirim",
+      level: "konfirmasi",
+      label: "Kamu yang mengirim",
     },
   ],
   warnings: ["Kamu yang menekan Kirim setelah semua dokumen lengkap"],

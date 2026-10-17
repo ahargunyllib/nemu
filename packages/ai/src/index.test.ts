@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { momentOneRequest, momentTwoRequest } from "@nemu/contracts/fixtures";
+import {
+  momentOneRequest,
+  momentThreeFollowUpRequest,
+  momentTwoRequest,
+} from "@nemu/contracts/fixtures";
 import { nemuActionSchema } from "@nemu/contracts";
 
 import {
@@ -140,6 +144,12 @@ test("orchestrator returns grounded calculations and a highlight for Moment 2", 
       level: "arahkan",
       label: "Periksa ini",
     },
+    {
+      type: "highlight",
+      target: "input-nominal-penginapan",
+      level: "arahkan",
+      label: "Periksa ini",
+    },
   ]);
 });
 
@@ -236,7 +246,69 @@ test("submit-like targets are always returned as confirmations", async () => {
       type: "confirm",
       target: "button-kirim",
       level: "konfirmasi",
-      label: "Kamu yang melakukan",
+      label: "Kamu yang mengirim",
+    },
+  ]);
+});
+
+test("task-page accountability guidance normalizes document names in its action plan", async () => {
+  const response = await runNemu(momentThreeFollowUpRequest, {
+    userProfile: DEMO_USER_PROFILE,
+    knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    sbmRows: DEMO_SBM_ROWS,
+    holidays: DEMO_HOLIDAYS_2026,
+    requiredDocuments: [
+      "Surat Tugas",
+      "Boarding Pass Pergi",
+      "Boarding Pass Pulang",
+      "Laporan Perjalanan",
+    ],
+    currentDate: "2026-11-06",
+    jevDecider: async () => ({
+      intent: "accountability_question",
+      intentConfidence: 0.99,
+      withinDomainProbability: 0.99,
+      injectionProbability: 0,
+      requiredTool: "accountability_deadline",
+      actionLevel: "konfirmasi",
+      actionConfidence: 0.99,
+      target: "button-kirim",
+      targetConfidence: 0.99,
+    }),
+    answerGenerator: async () => ({
+      status: "answer",
+      ringkas: "Lengkapi laporan perjalanan dan boarding pass pulang sebelum 12 November 2026.",
+      detail: "Kamu yang menekan Kirim setelah semua dokumen lengkap.",
+      citationIds: ["sop-pd-01-section-4"],
+      warnings: [],
+    }),
+  });
+
+  assert.equal(
+    response.calc.some(
+      (calculation) =>
+        calculation.fungsi === "batas_pertanggungjawaban" && calculation.hasil === "2026-11-12",
+    ),
+    true,
+  );
+  assert.deepEqual(response.actions, [
+    {
+      type: "highlight",
+      target: "upload-laporan-perjalanan",
+      level: "arahkan",
+      label: "Unggah dokumen ini",
+    },
+    {
+      type: "highlight",
+      target: "upload-boarding-pass-pulang",
+      level: "arahkan",
+      label: "Unggah dokumen ini",
+    },
+    {
+      type: "confirm",
+      target: "button-kirim",
+      level: "konfirmasi",
+      label: "Kamu yang mengirim",
     },
   ]);
 });

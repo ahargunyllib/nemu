@@ -19,7 +19,17 @@ import {
   DEMO_SBM_ROWS,
   DEMO_USER_PROFILE,
 } from "../dist/demo.js";
-import { momentOneRequest, momentTwoRequest, momentThreeRequest } from "@nemu/contracts/fixtures";
+import {
+  momentOneRequest,
+  momentThreeFollowUpRequest,
+  momentThreeRequest,
+  momentTwoRequest,
+} from "@nemu/contracts/fixtures";
+import {
+  validateMoment2Response,
+  validateMoment3FollowUpResponse,
+  validateMoment3InitialResponse,
+} from "./moment-validators.mjs";
 
 const isLive = process.argv.includes("--live");
 
@@ -172,65 +182,6 @@ function validateMoment1Response(res) {
   };
 }
 
-function validateMoment2Response(res) {
-  const isAnswer = res.status === "answer";
-  const text = `${res.answer.ringkas} ${res.answer.detail}`;
-  const mentionsAmount = text.includes("447.000") || text.includes("447000");
-  const hasCalc = res.calc.some(
-    (c) => c.fungsi === "hitung_lumpsum_penginapan" && (c.hasil === 447_000 || c.hasil === 447000),
-  );
-  const hasCitation = res.citations.some(
-    (c) => c.doc_id.includes("pmk-119-2023") || c.doc_id.includes("pmk-32-2025"),
-  );
-  const onlyHighlight =
-    res.actions.some(
-      (a) =>
-        a.type === "highlight" &&
-        a.target === "opt-penginapan-tidak-hotel" &&
-        a.level === "arahkan",
-    ) && res.actions.every((a) => a.type !== "click");
-
-  return {
-    passed: isAnswer && (mentionsAmount || hasCalc) && hasCitation && onlyHighlight,
-    reasons: [
-      !isAnswer && `status expected 'answer', got '${res.status}'`,
-      !(mentionsAmount || hasCalc) && `missing 447.000 calculation or text`,
-      !hasCitation && `missing citation to PMK 119/2023 or SBM`,
-      !onlyHighlight && `expected only highlight on 'opt-penginapan-tidak-hotel'`,
-    ].filter(Boolean),
-  };
-}
-
-function validateMoment3Response(res) {
-  const isAnswer = res.status === "answer";
-  const text = `${res.answer.ringkas} ${res.answer.detail}`.toLowerCase();
-  const mentionsDeadline =
-    text.includes("12 november 2026") ||
-    text.includes("12-11-2026") ||
-    res.calc.some((c) => c.hasil === "2026-11-12");
-  const mentionsMissing =
-    text.includes("boarding pass") && (text.includes("laporan") || text.includes("pulang"));
-  const opensTask = res.actions.some(
-    (a) =>
-      a.type === "click" && a.target === "task-pertanggungjawaban" && a.level === "jalan_sendiri",
-  );
-  const noSubmitClick = res.actions.every(
-    (a) => !/(?:^|\b)(kirim|submit|setuju|approve)(?:\b|$)/i.test(`${a.target} ${a.label}`),
-  );
-
-  return {
-    passed: isAnswer && mentionsDeadline && mentionsMissing && opensTask && noSubmitClick,
-    reasons: [
-      !isAnswer && `status expected 'answer', got '${res.status}'`,
-      !mentionsDeadline && `missing deadline 12 November 2026`,
-      !mentionsMissing &&
-        `missing identification of missing documents (boarding pass, laporan kegiatan)`,
-      !opensTask && `missing click action on 'task-pertanggungjawaban'`,
-      !noSubmitClick && `submit action was clicked or recommended automatically`,
-    ].filter(Boolean),
-  };
-}
-
 async function runLiveEvaluation() {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
@@ -281,7 +232,16 @@ async function runLiveEvaluation() {
 
     const v1 = validateMoment1Response(r1);
     const v2 = validateMoment2Response(r2);
-    const v3 = validateMoment3Response(r3);
+    const r3FollowUp = await runNemu(momentThreeFollowUpRequest, sharedContext);
+    const v3Initial = validateMoment3InitialResponse(r3);
+    const v3FollowUp = validateMoment3FollowUpResponse(r3FollowUp);
+    const v3 = {
+      passed: v3Initial.passed && v3FollowUp.passed,
+      reasons: [
+        ...v3Initial.reasons.map((reason) => `initial: ${reason}`),
+        ...v3FollowUp.reasons.map((reason) => `follow-up: ${reason}`),
+      ],
+    };
 
     momentResults.moment1.push({
       iteration: i + 1,
@@ -297,7 +257,7 @@ async function runLiveEvaluation() {
     });
     momentResults.moment3.push({
       iteration: i + 1,
-      total_ms: r3.timing?.total_ms ?? 0,
+      total_ms: (r3.timing?.total_ms ?? 0) + (r3FollowUp.timing?.total_ms ?? 0),
       passed: v3.passed,
       reasons: v3.reasons,
     });
@@ -305,7 +265,7 @@ async function runLiveEvaluation() {
     console.log(
       `M1: ${v1.passed ? "OK" : "FAIL"} (${r1.timing?.total_ms}ms) | ` +
         `M2: ${v2.passed ? "OK" : "FAIL"} (${r2.timing?.total_ms}ms) | ` +
-        `M3: ${v3.passed ? "OK" : "FAIL"} (${r3.timing?.total_ms}ms)`,
+        `M3: ${v3.passed ? "OK" : "FAIL"} (${(r3.timing?.total_ms ?? 0) + (r3FollowUp.timing?.total_ms ?? 0)}ms)`,
     );
   }
 
