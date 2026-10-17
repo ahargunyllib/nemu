@@ -10,6 +10,13 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   takes the user from that session; the extension never sends `user_id`. Signed out, the card asks
   Rina to log in to the Demo App.
 - **Contract.** Request and response schemas come from `@nemu/contracts`.
+- **Shortcut.** Ctrl+Shift+Space is bound to the extension's action (`_execute_action`, shown
+  as "Activate the extension"), the same as clicking the Nemu toolbar icon. It's not a page key
+  listener because macOS, the browser, or another app can take the keys before the page sees
+  them, and not a custom command because Arc never fires those. If the shortcut does nothing,
+  something else owns the combo: rebind it at `chrome://extensions/shortcuts`
+  (`arc://extensions/shortcuts` in Arc), or click the toolbar icon. A changed default only
+  applies to a fresh install, so remove and re-load the extension to pick it up.
 
 ## Run it
 
@@ -27,7 +34,8 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
    `pnpm --filter extension build` and load `apps/extension/.output/chrome-mv3`.
 
 3. Log in to the Demo App at <http://localhost:3001> (the login page has demo-account buttons),
-   press Ctrl+Shift+Space (Ctrl on macOS too, not Cmd), and ask one of the Momen prompts:
+   press Ctrl+Shift+Space (Ctrl on macOS too, not Cmd) or click the Nemu toolbar icon, and ask
+   one of the Momen prompts:
    - "Saya dapat tugas rapat ke Makassar 3 hari, mulai dari mana?"
    - "Saya menginap di rumah saudara, ini diisi apa?"
    - "Saya sudah pulang kemarin, sekarang apa?"
