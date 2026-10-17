@@ -58,13 +58,17 @@ export const NEMU_IDS = {
     uploadBoardingPassPulang: "upload-boarding-pass-pulang",
     kirim: "button-kirim",
   },
-  /** Demo panel in the header of every signed-in page; moves a State without the approvers. */
+  /**
+   * Demo dock floating at the bottom left of every signed-in page: the demo panel moves a State
+   * without the approvers, and a page can add a one-click demo action such as filling its form.
+   */
   demoPanel: {
     open: "button-panel-demo",
     close: "button-tutup-panel-demo",
     instance: "select-demo-process-instance",
     advance: "button-majukan-state",
     reset: "button-reset-demo",
+    fillForm: "button-isi-formulir-demo",
   },
 } as const;
 
