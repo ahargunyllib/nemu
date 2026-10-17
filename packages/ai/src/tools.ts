@@ -26,6 +26,10 @@ function normalizeText(value: string): string {
     .trim();
 }
 
+export function normalizeDocumentName(value: string): string {
+  return normalizeText(value);
+}
+
 function normalizeGrade(value: string): string {
   const upperValue = value.toUpperCase();
   const match = upperValue.match(/(?:^|\s)(IV|III|II|I)(?:\s|\/|$)/u);
@@ -168,6 +172,6 @@ export function findMissingDocuments(
   requiredDocuments: readonly string[],
   uploadedDocuments: readonly string[],
 ): string[] {
-  const uploaded = new Set(uploadedDocuments.map(normalizeText));
-  return requiredDocuments.filter((document) => !uploaded.has(normalizeText(document)));
+  const uploaded = new Set(uploadedDocuments.map(normalizeDocumentName));
+  return requiredDocuments.filter((document) => !uploaded.has(normalizeDocumentName(document)));
 }

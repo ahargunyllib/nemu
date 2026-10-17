@@ -18,6 +18,7 @@ import {
   calculateRemainingWorkingDays,
   findMissingDocuments,
   lookupSbm,
+  normalizeDocumentName,
   type SbmRow,
 } from "./tools.js";
 
@@ -68,6 +69,15 @@ type ToolResults = {
 
 const CONFIRM_ACTION_PATTERN = /(?:^|\b)(kirim|submit)(?:\b|$)/iu;
 const PROHIBITED_ACTION_PATTERN = /(?:^|\b)(setuju|approve|hapus|delete|bayar|pay)(?:\b|$)/iu;
+const ACCOMMODATION_GUIDANCE_TARGETS = [
+  "opt-penginapan-tidak-hotel",
+  "input-nominal-penginapan",
+] as const;
+const ACCOUNTABILITY_UPLOAD_TARGETS = [
+  { document: "laporan_perjalanan", target: "upload-laporan-perjalanan" },
+  { document: "boarding_pass_pulang", target: "upload-boarding-pass-pulang" },
+] as const;
+const ACCOUNTABILITY_SUBMIT_TARGET = "button-kirim";
 
 function durationSince(startedAt: number): number {
   return Math.max(0, Math.round(performance.now() - startedAt));
@@ -136,6 +146,22 @@ function runDeterministicTools(
       hasil: sbmRow.value,
       sumber: sbmRow.source,
     });
+    const dailyAllowanceRow = lookupSbm(
+      context.sbmRows,
+      province,
+      "uang_harian",
+      context.userProfile.grade,
+    );
+    if (dailyAllowanceRow) {
+      const days = nights !== undefined ? nights + 1 : 3;
+      results.calculations.push({
+        fungsi: "uang_harian",
+        input: { provinsi: province, tarif: dailyAllowanceRow.value, hari: days },
+        hasil: dailyAllowanceRow.value * days,
+        sumber: dailyAllowanceRow.source,
+      });
+    }
+
     results.calculations.push({
       ...calculateAccommodationLumpSum(sbmRow.value, nights),
       sumber: sbmRow.source,
@@ -198,6 +224,7 @@ function citationsFromEvidence(
 function buildActions(
   decision: JevDecision,
   request: NemuRequest,
+  missingDocuments: readonly string[],
   clickThreshold: number,
   injectionDetected: boolean,
 ): NemuAction[] {
@@ -205,9 +232,12 @@ function buildActions(
     return [];
   }
 
-  const target = request.elements.find(
-    (element) => element.visible && element.nemu_id === decision.target,
+  const visibleElementsById = new Map(
+    request.elements
+      .filter((element) => element.visible)
+      .map((element) => [element.nemu_id, element] as const),
   );
+  const target = visibleElementsById.get(decision.target);
   if (!target) {
     return [];
   }
@@ -217,13 +247,81 @@ function buildActions(
     return [];
   }
 
+  if (decision.intent === "accommodation_question" && decision.actionLevel === "arahkan") {
+    const guidanceActions = ACCOMMODATION_GUIDANCE_TARGETS.flatMap((targetId) => {
+      const element = visibleElementsById.get(targetId);
+      if (!element || PROHIBITED_ACTION_PATTERN.test(`${element.nemu_id} ${element.label}`)) {
+        return [];
+      }
+      return [
+        {
+          type: "highlight" as const,
+          target: element.nemu_id,
+          level: "arahkan" as const,
+          label: "Periksa ini",
+        },
+      ];
+    });
+    if (guidanceActions.length) {
+      return guidanceActions;
+    }
+  }
+
+  if (
+    decision.intent === "accountability_question" &&
+    decision.requiredTool === "accountability_deadline"
+  ) {
+    const missingDocumentSet = new Set(missingDocuments.map(normalizeDocumentName));
+    const accountabilityActions: NemuAction[] = ACCOUNTABILITY_UPLOAD_TARGETS.flatMap(
+      ({ document, target: targetId }) => {
+        const element = visibleElementsById.get(targetId);
+        if (
+          !missingDocumentSet.has(normalizeDocumentName(document)) ||
+          !element ||
+          PROHIBITED_ACTION_PATTERN.test(`${element.nemu_id} ${element.label}`)
+        ) {
+          return [];
+        }
+        return [
+          {
+            type: "highlight" as const,
+            target: element.nemu_id,
+            level: "arahkan" as const,
+            label: "Unggah dokumen ini",
+          },
+        ];
+      },
+    );
+    const submitElement = visibleElementsById.get(ACCOUNTABILITY_SUBMIT_TARGET);
+    const submitDescription = submitElement
+      ? `${submitElement.nemu_id} ${submitElement.label}`
+      : "";
+    if (
+      submitElement &&
+      CONFIRM_ACTION_PATTERN.test(submitDescription) &&
+      !PROHIBITED_ACTION_PATTERN.test(submitDescription)
+    ) {
+      accountabilityActions.push({
+        type: "confirm",
+        target: submitElement.nemu_id,
+        level: "konfirmasi",
+        label: "Kamu yang mengirim",
+      });
+    }
+    if (accountabilityActions.length) {
+      return accountabilityActions;
+    }
+  }
+
   if (CONFIRM_ACTION_PATTERN.test(targetDescription) || decision.actionLevel === "konfirmasi") {
     return [
       {
         type: "confirm",
         target: target.nemu_id,
         level: "konfirmasi",
-        label: "Kamu yang melakukan",
+        label: CONFIRM_ACTION_PATTERN.test(targetDescription)
+          ? "Kamu yang mengirim"
+          : "Kamu yang melakukan",
       },
     ];
   }
@@ -264,7 +362,12 @@ function parseRupiahAmount(rawAmount: string): number | undefined {
   return Number.isSafeInteger(amount) ? amount : undefined;
 }
 
-function collectTrustedNumbers(calculations: readonly Calculation[]): Set<number> {
+function collectTrustedNumbers(
+  calculations: readonly Calculation[],
+  sbmRows?: readonly SbmRow[],
+  prompt?: string,
+  evidence?: readonly RankedKnowledgeChunk[],
+): Set<number> {
   const trustedNumbers = new Set<number>();
   for (const calculation of calculations) {
     if (typeof calculation.hasil === "number") {
@@ -276,15 +379,39 @@ function collectTrustedNumbers(calculations: readonly Calculation[]): Set<number
       }
     }
   }
+  for (const row of sbmRows ?? []) {
+    trustedNumbers.add(row.value);
+  }
+  if (prompt) {
+    for (const match of prompt.matchAll(/Rp\s*([\d.]+(?:,\d{1,2})?)/giu)) {
+      const amount = parseRupiahAmount(match[1] ?? "");
+      if (amount !== undefined) {
+        trustedNumbers.add(amount);
+      }
+    }
+  }
+  if (evidence) {
+    for (const chunk of evidence) {
+      for (const match of chunk.text.matchAll(/Rp\s*([\d.]+(?:,\d{1,2})?)/giu)) {
+        const amount = parseRupiahAmount(match[1] ?? "");
+        if (amount !== undefined) {
+          trustedNumbers.add(amount);
+        }
+      }
+    }
+  }
   return trustedNumbers;
 }
 
 function validateGeneratedAnswer(
   generatedAnswer: Awaited<ReturnType<AnswerGenerator>>,
   calculations: readonly Calculation[],
+  sbmRows?: readonly SbmRow[],
+  prompt?: string,
+  evidence?: readonly RankedKnowledgeChunk[],
 ): void {
   const answerText = `${generatedAnswer.ringkas} ${generatedAnswer.detail}`;
-  const trustedNumbers = collectTrustedNumbers(calculations);
+  const trustedNumbers = collectTrustedNumbers(calculations, sbmRows, prompt, evidence);
 
   for (const match of answerText.matchAll(/Rp\s*([\d.]+(?:,\d{1,2})?)/giu)) {
     const amount = parseRupiahAmount(match[1] ?? "");
@@ -309,7 +436,7 @@ export async function runNemu(
   const thresholds = {
     domain: context.thresholds?.domain ?? 0.5,
     injection: context.thresholds?.injection ?? 0.7,
-    click: context.thresholds?.click ?? 0.85,
+    click: context.thresholds?.click ?? 0.8,
   };
 
   const jevStartedAt = performance.now();
@@ -335,7 +462,7 @@ export async function runNemu(
   const retrievalDuration = durationSince(retrievalStartedAt);
   let evidence = initialEvidence;
 
-  if (request.screenshot_crop && (!evidence.length || (evidence[0]?.score ?? 0) < 2)) {
+  if (request.screenshot_crop && (!evidence.length || (evidence[0]?.score ?? 0) < 4)) {
     const intentSearchTerms = {
       start_travel_request: "mulai pengajuan surat tugas menu perjalanan dinas",
       accommodation_question: "penginapan hotel tidak menginap rumah saudara biaya",
@@ -352,8 +479,9 @@ export async function runNemu(
 
   if (
     !jevResult.failed &&
-    (jevResult.decision.intent === "unsupported" ||
-      jevResult.decision.withinDomainProbability < thresholds.domain)
+    (jevResult.decision.withinDomainProbability < thresholds.domain ||
+      (jevResult.decision.intent === "unsupported" &&
+        jevResult.decision.withinDomainProbability < 0.8))
   ) {
     return fixedResponse(
       "refuse",
@@ -406,7 +534,13 @@ export async function runNemu(
       decision: jevResult.decision,
       missingDocuments: toolResults.missingDocuments,
     });
-    validateGeneratedAnswer(generatedAnswer, toolResults.calculations);
+    validateGeneratedAnswer(
+      generatedAnswer,
+      toolResults.calculations,
+      context.sbmRows,
+      request.prompt,
+      evidence,
+    );
     const gptDuration = durationSince(gptStartedAt);
     const citations = citationsFromEvidence(generatedAnswer.citationIds, evidence);
 
@@ -425,7 +559,13 @@ export async function runNemu(
     ];
     const actions =
       generatedAnswer.status === "answer"
-        ? buildActions(jevResult.decision, request, thresholds.click, injectionDetected)
+        ? buildActions(
+            jevResult.decision,
+            request,
+            toolResults.missingDocuments,
+            thresholds.click,
+            injectionDetected,
+          )
         : [];
 
     return nemuResponseSchema.parse({
