@@ -16,7 +16,13 @@ export default defineConfig({
   manifest: () => ({
     name: "Nemu",
     description: "Pemandu Perjalanan Dinas di Demo App.",
-    host_permissions: [`${new URL(process.env.WXT_SERVER_URL || DEFAULT_SERVER_URL).origin}/*`],
+    // `captureVisibleTab` for the Area Crop needs `<all_urls>` (a Demo App host permission isn't
+    // enough). `activeTab` would only cover a tab whose action was just pressed, and Arc fires the
+    // action without a tab. The background still captures allowlisted tabs only.
+    host_permissions: [
+      `${new URL(process.env.WXT_SERVER_URL || DEFAULT_SERVER_URL).origin}/*`,
+      "<all_urls>",
+    ],
     // The shortcut and the toolbar icon both trigger the action, which opens the Composer.
     // It's bound to the built-in `_execute_action` command because Arc never fires custom
     // commands. The browser handles the keys before the page sees them, and users can rebind

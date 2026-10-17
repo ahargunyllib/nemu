@@ -2,16 +2,22 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 
+import { AreaCropChip } from "../../area-crop/components/area-crop-chip";
 import { Composer } from "./composer";
 
 afterEach(cleanup);
 
-function renderComposer() {
+function renderComposer(attachment?: React.ReactNode) {
   const onSubmit = vi.fn();
   const onCancel = vi.fn();
-  render(<Composer onSubmit={onSubmit} onCancel={onCancel} />);
+  const onPickArea = vi.fn();
+  render(
+    <Composer onSubmit={onSubmit} onCancel={onCancel} onPickArea={onPickArea}>
+      {attachment}
+    </Composer>,
+  );
   const input = screen.getByRole("textbox", { name: "Pertanyaan untuk Nemu" });
-  return { input, onSubmit, onCancel };
+  return { input, onSubmit, onCancel, onPickArea };
 }
 
 describe("Composer", () => {
@@ -51,5 +57,32 @@ describe("Composer", () => {
     fireEvent.click(screen.getByRole("button", { name: "Kirim" }));
 
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  test("starts area select mode from its button without sending", () => {
+    const { onPickArea, onSubmit } = renderComposer();
+
+    fireEvent.click(screen.getByRole("button", { name: "Pilih area" }));
+
+    expect(onPickArea).toHaveBeenCalledOnce();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  test("shows the attached Area Crop as a chip that can be removed", () => {
+    const onRemove = vi.fn();
+    renderComposer(
+      <AreaCropChip
+        state={{ kind: "attached", crop: "data:image/png;base64,AREA" }}
+        onRemove={onRemove}
+      />,
+    );
+
+    expect(screen.getByRole("img", { name: "Area Crop" })).toHaveProperty(
+      "src",
+      "data:image/png;base64,AREA",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Hapus Area Crop" }));
+
+    expect(onRemove).toHaveBeenCalledOnce();
   });
 });
