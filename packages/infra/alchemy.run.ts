@@ -18,6 +18,11 @@ export const server = Cloudflare.Worker("server", {
     CORS_ORIGIN: Config.String("CORS_ORIGIN"),
     BETTER_AUTH_SECRET: Config.Redacted("BETTER_AUTH_SECRET"),
     BETTER_AUTH_URL: Cloudflare.Worker.URL,
+    OPENROUTER_API_KEY: Config.Redacted("OPENROUTER_API_KEY"),
+    OPENROUTER_GENERATOR_MODEL: Config.String("OPENROUTER_GENERATOR_MODEL"),
+    OPENROUTER_REASONING_EFFORT: Config.String("OPENROUTER_REASONING_EFFORT"),
+    OPENROUTER_JEV_MODEL: Config.String("OPENROUTER_JEV_MODEL"),
+    NEMU_DEMO_DATE: Config.String("NEMU_DEMO_DATE"),
   },
   dev: {
     port: 3000,

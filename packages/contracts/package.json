@@ -1,0 +1,25 @@
+{
+  "name": "@nemu/contracts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./fixtures": {
+      "types": "./src/fixtures.ts",
+      "default": "./dist/fixtures.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "check-types": "tsc -b"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@nemu/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
