@@ -8,7 +8,14 @@ export type ClickStep = "morph" | "move" | "click" | "check";
  * `clicking` while it acts as a cursor, then `success` or `warning`.
  */
 export type CursorFrame =
-  | { mascot: "clicking"; step: ClickStep; at: Point; moveMs: number }
+  | {
+      mascot: "clicking";
+      step: ClickStep;
+      at: Point;
+      moveMs: number;
+      /** The click action's label, shown under the target while the cursor works on it. */
+      label?: string;
+    }
   | { mascot: "success" | "warning"; at: Point };
 
 /**

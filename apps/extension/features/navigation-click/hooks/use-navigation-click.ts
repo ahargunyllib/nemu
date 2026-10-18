@@ -50,8 +50,10 @@ export function useNavigationClick(
       from: startRef.current ?? { x: window.innerWidth / 2, y: window.innerHeight / 3 },
       signal: controller.signal,
       reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-      onFrame: (cursor) => {
-        if (!disposed) setState({ cursor, outcome: null });
+      onFrame: (frame) => {
+        if (disposed) return;
+        const cursor = frame.mascot === "clicking" ? { ...frame, label: action.label } : frame;
+        setState({ cursor, outcome: null });
       },
     }).then((outcome) => {
       window.removeEventListener("keydown", stopOnEscape, { capture: true });
