@@ -7,7 +7,7 @@ import { Composer } from "./composer";
 
 afterEach(cleanup);
 
-function renderComposer(attachment?: React.ReactNode) {
+function renderComposer(attachment?: React.ReactNode, picking = false) {
   const onSubmit = vi.fn();
   const onCancel = vi.fn();
   const onPickArea = vi.fn();
@@ -20,6 +20,7 @@ function renderComposer(attachment?: React.ReactNode) {
           onSubmit={onSubmit}
           onCancel={onCancel}
           onPickArea={onPickArea}
+          picking={picking}
           boundary={boundary}
         >
           {attachment}
@@ -71,6 +72,17 @@ describe("Composer", () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
+  test("sends from its button once there is a prompt", () => {
+    const { input, onSubmit } = renderComposer();
+    const send = screen.getByRole("button", { name: "Kirim" });
+
+    expect(send).toHaveProperty("disabled", true);
+    fireEvent.change(input, { target: { value: "Mulai dari mana?" } });
+    fireEvent.click(send);
+
+    expect(onSubmit).toHaveBeenCalledExactlyOnceWith("Mulai dari mana?");
+  });
+
   test("starts area select mode from its button without sending", () => {
     const { onPickArea, onSubmit } = renderComposer();
 
@@ -78,6 +90,32 @@ describe("Composer", () => {
 
     expect(onPickArea).toHaveBeenCalledOnce();
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  test("asks Nemu by default", () => {
+    const { input } = renderComposer();
+
+    expect(input).toHaveProperty("placeholder", "Tanya Nemu…");
+  });
+
+  test("says how to drag a box while area select mode is on", () => {
+    const { input } = renderComposer(undefined, true);
+
+    expect(input).toHaveProperty("placeholder", "Seret area di layar · Esc batal");
+    expect(screen.getByRole("button", { name: "Pilih area" }).getAttribute("aria-pressed")).toBe(
+      "true",
+    );
+  });
+
+  test("asks about the attached part of the page", () => {
+    const { input } = renderComposer(
+      <AreaCropChip
+        state={{ kind: "attached", crop: "data:image/png;base64,AREA" }}
+        onRemove={vi.fn()}
+      />,
+    );
+
+    expect(input).toHaveProperty("placeholder", "Tanya tentang bagian ini…");
   });
 
   test("shows the attached Area Crop as a chip that can be removed", () => {
