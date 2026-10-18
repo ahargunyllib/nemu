@@ -12,16 +12,6 @@ import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
 import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 
-import {
-  dasarPenugasanStep as dasar,
-  jenisPerjalananStep as jenis,
-  kotaTujuanStep as kota,
-  lodgingAmountStep as amount,
-  momentOneGuidedActions,
-  momentTwoGuidedActions,
-  notHotelStep as notHotel,
-} from "../../guided-steps/lib/guided-fixtures";
-import { DONE_MS } from "../../guided-steps/lib/guided-steps";
 import { MAX_MOVE_MS, MORPH_MS } from "../../navigation-click/lib/navigation-click";
 import { useAnswerActions } from "./use-answer-actions";
 
@@ -47,20 +37,6 @@ function renderTarget(nemuId: string, onClick: () => void = () => {}) {
   element.addEventListener("click", clicked);
   document.body.append(element);
   return { clicked };
-}
-
-/** A form field on the page, which the user fills by changing it. */
-function renderField(nemuId: string) {
-  const element = document.createElement("input");
-  element.dataset.nemuId = nemuId;
-  element.getBoundingClientRect = () => new DOMRect(40, 300, 200, 32);
-  element.scrollIntoView = vi.fn();
-  document.body.append(element);
-  return {
-    fill() {
-      element.dispatchEvent(new Event("change", { bubbles: true }));
-    },
-  };
 }
 
 function renderActions(actions: NemuAction[], elementList: PageElement[]) {
@@ -177,67 +153,5 @@ describe("useAnswerActions", () => {
     expect(result.current.missing.map(({ target }) => target)).toEqual([
       NEMU_IDS.shell.menuAjukanPerjalananDinas,
     ]);
-  });
-
-  test("Momen 1 guided: clicks Perjalanan Dinas, waits for the form, then guides its fields", async () => {
-    vi.useFakeTimers();
-    renderTarget(NEMU_IDS.favoriteProcess.perjalananDinas, () => {
-      window.history.pushState(null, "", "/perdin/baru");
-      // The form renders a moment after the route changes.
-      setTimeout(() => {
-        for (const { target } of [jenis, kota, dasar]) renderField(target);
-      }, 400);
-    });
-
-    const result = renderActions(momentOneGuidedActions, [
-      {
-        nemu_id: NEMU_IDS.favoriteProcess.perjalananDinas,
-        label: "Perjalanan Dinas",
-        role: "link",
-        visible: true,
-      },
-    ]);
-    expect(result.current.guided).toBe(true);
-    expect(result.current.searching).toBe(true);
-
-    await act(() => vi.advanceTimersByTimeAsync(MORPH_MS + MAX_MOVE_MS + 100));
-    expect(result.current.outcome).toBe("succeeded");
-    expect(result.current.highlight).toBeUndefined();
-
-    await act(() => vi.advanceTimersByTimeAsync(1_000));
-    expect(result.current.searching).toBe(false);
-    expect(result.current.missing).toEqual([]);
-    expect(result.current.steps.map(({ target }) => target)).toEqual([
-      jenis.target,
-      kota.target,
-      dasar.target,
-    ]);
-    expect(result.current.highlight?.action).toEqual(jenis);
-  });
-
-  test("Momen 2 guided: each filled step shows success for a moment, then the next starts", async () => {
-    vi.useFakeTimers();
-    const notHotelField = renderField(notHotel.target);
-    const amountField = renderField(amount.target);
-
-    const result = renderActions(momentTwoGuidedActions, []);
-    await act(() => vi.advanceTimersByTimeAsync(20));
-    expect(result.current.highlight?.action).toEqual(notHotel);
-    expect(result.current.stepIndex).toBe(0);
-
-    act(() => notHotelField.fill());
-    expect(result.current.done).toBe(true);
-    expect(result.current.highlight?.action).toEqual(notHotel);
-
-    await act(() => vi.advanceTimersByTimeAsync(DONE_MS + 20));
-    expect(result.current.done).toBe(false);
-    expect(result.current.stepIndex).toBe(1);
-    expect(result.current.highlight?.action).toEqual(amount);
-
-    act(() => amountField.fill());
-    expect(result.current.done).toBe(true);
-    await act(() => vi.advanceTimersByTimeAsync(DONE_MS + 20));
-    // Past the last step the guide ends: no outline, label, or card.
-    expect(result.current.highlight).toBeUndefined();
   });
 });

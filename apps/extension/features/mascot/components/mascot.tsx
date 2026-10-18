@@ -16,8 +16,6 @@ type MascotProps = {
   composerAnchor: Point | null;
   /** Nemu's cursor during a navigation click: the mascot rides along with it. */
   nemuCursor: CursorFrame | null;
-  /** Where the mascot waits otherwise, such as a guided step card's top-left corner. */
-  perch?: Point | null;
   onOpenComposer: (position: Point) => void;
   /** Hiding the mascot also closes the Composer it waits beside. */
   onCloseComposer: () => void;
@@ -32,12 +30,11 @@ export function Mascot({
   activity,
   composerAnchor,
   nemuCursor,
-  perch = null,
   onOpenComposer,
   onCloseComposer,
 }: MascotProps) {
   const state = useMascotState(activity);
-  const placement = useMascotPosition(composerAnchor, nemuCursor, perch);
+  const placement = useMascotPosition(composerAnchor, nemuCursor);
   const [hidden, setHidden] = useState(false);
   const [wasListening, setWasListening] = useState(activity.listening);
 

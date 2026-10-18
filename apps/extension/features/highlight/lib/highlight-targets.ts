@@ -49,24 +49,6 @@ export function completesStep(event: Event, target: HTMLElement): boolean {
   );
 }
 
-/**
- * Calls `onPick` once the user picks a value in a popup control on the target, such as the Demo
- * App's Select: it fires no change event on its trigger, so the step is done when the value the
- * trigger shows changes. Targets without a popup control are left to `completesStep`. Returns
- * the cleanup.
- */
-export function watchPick(target: HTMLElement, onPick: () => void): () => void {
-  if (!target.matches("[aria-haspopup]") && !target.querySelector("[aria-haspopup]")) {
-    return () => {};
-  }
-  const shown = target.textContent;
-  const observer = new MutationObserver(() => {
-    if (target.textContent !== shown) onPick();
-  });
-  observer.observe(target, { subtree: true, childList: true, characterData: true });
-  return () => observer.disconnect();
-}
-
 export function missingTargetWarning(action: NemuAction): string {
   return `Nemu tidak menemukan "${action.label}" (${action.target}) di halaman ini.`;
 }

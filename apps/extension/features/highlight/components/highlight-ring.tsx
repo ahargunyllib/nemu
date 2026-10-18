@@ -8,25 +8,18 @@ import { LABEL_SPACE, labelGrowsLeft, RING_PADDING } from "../lib/highlight-targ
 
 const LABEL_OVERLAP = 8;
 
-type HighlightRingProps = {
-  box: Box;
-  action: NemuAction;
-  /** In guided steps, the step's place in the guide, shown after the label: "langkah 1/3". */
-  step?: { index: number; total: number };
-};
+type HighlightRingProps = { box: Box; action: NemuAction };
 
 /**
  * Tingkat 0 of the design system: the target outlined, with its label pinned to the outline's
  * top-right edge (bottom edge near the top of the viewport). A `highlight` gets Sorot arahkan, a
  * glowing amber outline; a `confirm` gets Sorot konfirmasi, a dashed blue outline that fades in,
- * and a green label, because the user, not Nemu, sends it. In guided steps the label adds the
- * step count after a ·, in the lighter part.
+ * and a green label, because the user, not Nemu, sends it.
  */
-export function HighlightRing({ box, action, step }: HighlightRingProps) {
+export function HighlightRing({ box, action }: HighlightRingProps) {
   const confirm = action.type === "confirm";
   const labelBelow = box.top - RING_PADDING < LABEL_SPACE;
   const [head, ...rest] = action.label.split(" · ");
-  if (step) rest.push(`langkah ${step.index + 1}/${step.total}`);
   // The label sits on the outline's edge, overlapping it by LABEL_OVERLAP, so it covers as little
   // of the target and what is beside it as it can.
   const labelShift = labelBelow

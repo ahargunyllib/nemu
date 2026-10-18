@@ -123,24 +123,6 @@ describe("useHighlights", () => {
     await waitFor(() => expect(result.current.highlight).toBeUndefined());
   });
 
-  test("picking a value in a Select, which fires no change on its trigger, finishes the step", async () => {
-    const select = renderTarget(notHotel.target);
-    select.element.setAttribute("aria-haspopup", "listbox");
-    select.element.textContent = "Pilih jenis perjalanan";
-    renderTarget(amount.target, "input");
-    const result = renderHighlights([notHotel, amount]);
-    await waitFor(() => expect(result.current.highlight?.action).toEqual(notHotel));
-
-    // Opening the popup only starts the step.
-    act(() => select.element.click());
-    expect(result.current.stepIndex).toBe(0);
-
-    act(() => {
-      select.element.textContent = "Perjalanan dinas luar kota";
-    });
-    await waitFor(() => expect(result.current.highlight?.action).toEqual(amount));
-  });
-
   test("steps back and forth by hand, and stays on the last step", async () => {
     renderTarget(notHotel.target);
     renderTarget(amount.target, "input");
