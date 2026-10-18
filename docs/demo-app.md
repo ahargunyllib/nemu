@@ -90,8 +90,9 @@ My Task is a narrow column: the "My Tasks" heading, a **Search tasks…** box,
 a "Due date" label, and a compact row per Task (its label over "Perjalanan
 Dinas · <task ID>") that lifts to white on hover. Each row keeps its `task-*` id
 and opens the Task detail page. The search filters the rows by Task label, Task
-ID, or nomor pengajuan in the browser. Beside the column, a dashed panel fills
-the rest of the page: "Pilih tugas", or "Tidak ada tugas" when there are none.
+ID, or nomor pengajuan in the browser. When there are no Tasks at all, a
+"Tidak ada tugas" panel fills the rest of the page beside the column; otherwise
+nothing sits beside it.
 The Task detail page shows the same column behind its sheet.
 
 ### Task detail
