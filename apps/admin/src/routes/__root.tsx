@@ -51,7 +51,7 @@ function RootComponent() {
         <TooltipProvider>
           <Outlet />
         </TooltipProvider>
-        <Toaster richColors />
+        <Toaster richColors theme="light" />
       </ThemeProvider>
       <TanStackRouterDevtools position="bottom-left" />
       <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
