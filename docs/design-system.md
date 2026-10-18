@@ -19,7 +19,7 @@ The tokens live in `packages/ui/src/styles/nemu.css` and are Tailwind colours:
 | `nemu-soft`                                 | white / 18%                                 | Icon buttons and chips sitting on a `nemu` fill.                                                    |
 | `nemu-text`                                 | amber 700 `#8F460A`                         | Nemu links ("Rincian", "Tutup", "Lihat detail") and outline button text (6.9:1).                    |
 | `nemu-subtle` / `nemu-subtle-foreground`    | amber 50 / amber 800                        | Citation chips ("PMK 119/2023 · Ps. 8 ayat (5)").                                                   |
-| `nemu-ring`                                 | amber 500 `#E07A16`                         | Highlight outline (Sorot arahkan), mascot orbit ring, click ripple. Lines only.                     |
+| `nemu-ring`                                 | amber 500 `#E07A16`                         | Mascot orbit ring, click ripple. Lines only (Sorot arahkan is `nemu-amber-600`).                    |
 | `nemu-glow`                                 | amber 400 `#F59331`                         | Mascot glow, loading shimmer.                                                                       |
 | `nemu-success*`                             | `#10B981`, subtle `#ECFDF5`, text `#047857` | "Kamu yang mengirim" label, success card.                                                           |
 | `nemu-warning-subtle` / `nemu-warning-text` | `#FFFBEB` / `#B45309`                       | Soft warnings.                                                                                      |
@@ -77,11 +77,18 @@ close ×, with the Composer pill inside it below ("Tanya tentang bagian ini…")
 ## Answers: three levels (Tingkat)
 
 - **Tingkat 0 · Label target**: a clear step only needs the target outlined and labelled with
-  2–4 words, no card. The outline is a rounded `nemu-ring` border around the element (Sorot
-  arahkan). The label is a `nemu` pill at the element's top-right edge, overlapping the outline,
-  with a small white circle holding the mascot at its left: "Pilih ini", or
-  "Isi Rp447.000 · 30% × 2 malam" (the part after · lighter). The success variant is green:
-  "Kamu yang mengirim".
+  2–4 words, no card. The outline is Sorot arahkan (see Motion). The label is a fully rounded
+  `nemu` pill 26px tall (padding 3px top and bottom, 10px right, 3px left, gap 6px) with a 1px
+  white border and the `shadow-nemu-float` shadow; its text is SemiBold 12/16 white, with a small
+  white circle holding the mascot at its left: "Pilih ini", or "Isi Rp447.000 · 30% × 2 malam"
+  (the part after · Regular at 80%). It sits to the right of the element, level with the
+  outline's top, so it covers none of the target; with no room on the right it falls back to the
+  outline's top-right edge (bottom-right near the top of the viewport), overlapping it. The
+  success variant, for Sorot konfirmasi, is `nemu-success`: "Kamu yang mengirim".
+- **Steps**: an answer with several highlights rings one target at a time and waits for the user.
+  Pressing the ringed target, or changing the field it holds, removes its ring and rings the next
+  step's target; after the last step nothing stays ringed. A click into a field or on a control
+  that opens a popup only starts the step.
 - **Tingkat 1 · Jawaban ringkas** (default): a white card beside the highlighted element, the
   element stays outlined. Header: mascot icon + title in Card title style ("Pilih \"Tidak menginap
   di hotel\""), close ×. Body: a muted bordered calc box ("30% × Rp745.000 × 2 malam" over a bold
@@ -107,7 +114,8 @@ Other pieces: a result strip "Rp447.000 [copy icon] Salin" on `nemu-subtle`; num
 
 ## Motion (Motion Kursor)
 
-- **Sorot arahkan**: rounded `nemu-ring` outline around the target.
+- **Sorot arahkan**: a thin, strong outline around the target: 2px solid `nemu-amber-600`,
+  radius 10px, 4px off the element, no glow, halo, or pulse. Fades in over 250 ms.
 - **Sorot konfirmasi**: dashed `nemu-confirm` outline around a submit button the user presses;
   appears in 250 ms. On a coloured header use a white dashed line instead.
 - **Click ripple**: an amber ring that expands at the click point.
