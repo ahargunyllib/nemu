@@ -6,9 +6,10 @@ import type { ComponentProps } from "react";
 export function AppSidebar({ className, ...props }: ComponentProps<typeof Sidebar>) {
   return (
     // `dark` switches the sidebar tokens to their dark values, so the menu stays on theme tokens.
+    // Items rest at a dimmed foreground and turn full white when hovered or active.
     <Sidebar
       collapsible="none"
-      className={cn("dark sticky top-0 h-svh shrink-0", className)}
+      className={cn("dark sticky top-0 h-svh w-58 shrink-0 text-sidebar-foreground/80", className)}
       {...props}
     />
   );

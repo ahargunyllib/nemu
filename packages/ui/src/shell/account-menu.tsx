@@ -22,13 +22,22 @@ export function AccountMenu({ name, detail, children, ...triggerProps }: Account
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger render={<SidebarMenuButton size="lg" />} {...triggerProps}>
-            <Avatar className="size-8">
-              <AvatarFallback>{initials(name)}</AvatarFallback>
+          <DropdownMenuTrigger
+            render={<SidebarMenuButton className="h-auto gap-2.5 px-2 py-1.5" />}
+            {...triggerProps}
+          >
+            <Avatar className="size-7.5">
+              <AvatarFallback className="bg-orange-100 text-[13px] font-medium text-sidebar">
+                {initials(name)}
+              </AvatarFallback>
             </Avatar>
-            <div className="grid flex-1 text-left leading-tight">
-              <span className="truncate font-medium">{name}</span>
-              <span className="truncate text-xs text-sidebar-foreground/70">{detail}</span>
+            <div className="grid flex-1 text-left">
+              <span className="truncate text-[13px] leading-4.5 text-sidebar-foreground">
+                {name}
+              </span>
+              <span className="truncate text-[11.5px] leading-3.75 text-sidebar-foreground/45">
+                {detail}
+              </span>
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="min-w-56 bg-card" side="right" align="end">
@@ -43,8 +52,8 @@ export function AccountMenu({ name, detail, children, ...triggerProps }: Account
 /** Stands in for `AccountMenu` while the session loads. */
 export function AccountMenuSkeleton() {
   return (
-    <div className="flex items-center gap-2 p-2">
-      <Skeleton className="size-8 rounded-full" />
+    <div className="flex items-center gap-2.5 px-2 py-1.5">
+      <Skeleton className="size-7.5 rounded-full" />
       <div className="grid flex-1 gap-1">
         <Skeleton className="h-3.5 w-20" />
         <Skeleton className="h-3 w-32" />
