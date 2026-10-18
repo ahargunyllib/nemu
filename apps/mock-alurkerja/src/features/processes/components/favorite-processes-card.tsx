@@ -10,34 +10,34 @@ import ProcessBadge from "@/features/processes/components/process-badge";
 import { ALL_PROCESSES_COUNT, FAVORITE_PROCESSES } from "@/features/processes/lib/processes";
 
 const ENTRY_CLASS = cn(
-  buttonVariants({ variant: "outline" }),
-  "h-auto justify-start gap-3 rounded-2xl p-3 text-left whitespace-normal",
+  buttonVariants({ variant: "ghost" }),
+  "-mx-2 justify-start gap-2.5 px-2 font-normal",
 );
 
+/** The user's favourite processes in one row, each a shortcut to start it. */
 export default function FavoriteProcessesCard() {
   return (
-    <Card>
+    <Card size="sm">
       <CardHeader>
         <CardTitle className="flex items-center gap-1.5">
           Favorite Processes
-          <Star aria-hidden className="size-4 fill-current text-muted-foreground" />
+          <Star aria-hidden className="size-3.5 fill-current" />
         </CardTitle>
-        <CardAction className="flex items-center text-sm text-muted-foreground">
+        <CardAction className="flex items-center text-xs text-muted-foreground">
           All processes · {ALL_PROCESSES_COUNT}
-          <ChevronRight aria-hidden className="size-4" />
+          <ChevronRight aria-hidden className="size-3.5" />
         </CardAction>
       </CardHeader>
-      <CardContent className="grid gap-3 sm:grid-cols-3">
+      <CardContent className="grid gap-x-6 gap-y-1 sm:grid-cols-3">
         {FAVORITE_PROCESSES.map((process) => {
           const body: ReactNode = (
             <>
-              <ProcessBadge code={process.code} tone={process.tone} />
-              <span className="grid gap-0.5">
-                <span className="font-medium">{process.name}</span>
-                <span className="text-xs font-normal text-muted-foreground">
-                  {process.description}
-                </span>
-              </span>
+              <ProcessBadge
+                code={process.code}
+                tone={process.tone}
+                className="size-6 rounded-md text-[0.625rem]"
+              />
+              {process.name}
             </>
           );
           return "to" in process ? (
