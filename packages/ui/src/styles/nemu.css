@@ -49,6 +49,9 @@
 
   /* shadow/float: every Nemu surface floating over the page (Composer, Answer Card). */
   --nemu-shadow-float: 0 2px 4px rgb(24 24 27 / 0.06), 0 16px 40px rgb(24 24 27 / 0.14);
+  /* Blok area: the dashed line and the light fill of the box Rina drags. */
+  --nemu-select: #297fe4;
+  --nemu-select-fill: rgb(77 148 232 / 8%);
 }
 
 @theme inline {
@@ -78,4 +81,6 @@
   --color-nemu-danger-subtle: var(--nemu-danger-subtle);
   --color-nemu-confirm: var(--nemu-confirm);
   --shadow-nemu-float: var(--nemu-shadow-float);
+  --color-nemu-select: var(--nemu-select);
+  --color-nemu-select-fill: var(--nemu-select-fill);
 }

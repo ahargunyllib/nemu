@@ -9,9 +9,10 @@ afterEach(cleanup);
 function renderLayer() {
   const onSelect = vi.fn();
   const onCancel = vi.fn();
-  render(<AreaSelectLayer onSelect={onSelect} onCancel={onCancel} />);
+  const onDrag = vi.fn();
+  render(<AreaSelectLayer onSelect={onSelect} onCancel={onCancel} onDrag={onDrag} />);
   const layer = screen.getByRole("application", { name: "Pilih area" });
-  return { layer, onSelect, onCancel };
+  return { layer, onSelect, onCancel, onDrag };
 }
 
 function drag(layer: HTMLElement, from: [number, number], to: [number, number]) {
@@ -32,6 +33,27 @@ describe("AreaSelectLayer", () => {
       width: 520,
       height: 140,
     });
+  });
+
+  test("outlines the box while it is dragged and reports it, for the mascot to sit at its corner", () => {
+    const { layer, onDrag } = renderLayer();
+
+    fireEvent.pointerDown(layer, { pointerId: 1, clientX: 40, clientY: 300 });
+    fireEvent.pointerMove(layer, { pointerId: 1, clientX: 560, clientY: 440 });
+
+    const box = { left: 40, top: 300, width: 520, height: 140 };
+    expect(onDrag).toHaveBeenLastCalledWith(box);
+    expect(layer.querySelector<HTMLElement>("[data-nemu-area=selected]")?.style).toMatchObject({
+      left: "40px",
+      top: "300px",
+      width: "520px",
+      height: "140px",
+    });
+
+    fireEvent.pointerUp(layer, { pointerId: 1, clientX: 560, clientY: 440 });
+
+    expect(onDrag).toHaveBeenLastCalledWith(null);
+    expect(layer.querySelector("[data-nemu-area]")).toBeNull();
   });
 
   test("ignores a plain click", () => {

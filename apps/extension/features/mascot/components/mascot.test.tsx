@@ -2,6 +2,7 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 
+import type { Box } from "../../../shared/types/box";
 import { RESTING_MS } from "../../navigation-click/hooks/use-navigation-click";
 import type { Point } from "../lib/mascot-position";
 import type { MascotActivity } from "../lib/mascot-state";
@@ -33,12 +34,17 @@ function renderMascot() {
       onCloseComposer={onCloseComposer}
     />,
   );
-  function rerender(activity: Partial<MascotActivity>, composerAnchor: Point | null = null) {
+  function rerender(
+    activity: Partial<MascotActivity>,
+    composerAnchor: Point | null = null,
+    draggedArea: Box | null = null,
+  ) {
     view.rerender(
       <Mascot
         activity={{ ...NOTHING, ...activity }}
         composerAnchor={composerAnchor}
         nemuCursor={null}
+        draggedArea={draggedArea}
         onOpenComposer={onOpenComposer}
         onCloseComposer={onCloseComposer}
       />,
@@ -90,6 +96,22 @@ describe("Mascot", () => {
 
     rerender({});
     expect(mascot()?.style.transform).toBe("translate(912px, 612px)");
+  });
+
+  test("sits as the cursor at the bottom-right corner of a Blok area while it is dragged", () => {
+    const { rerender } = renderMascot();
+    moveCursor(400, 300);
+    const anchor = { x: 400, y: 300 };
+    rerender({ listening: true }, anchor);
+    const waiting = mascot()?.style.transform;
+    expect(screen.getByText("Space")).toBeTruthy();
+
+    rerender({ listening: true }, anchor, { left: 40, top: 300, width: 520, height: 140 });
+    expect(mascot()?.style.transform).toBe("translate(572px, 452px)");
+    expect(screen.queryByText("Space")).toBeNull();
+
+    rerender({ listening: true }, anchor);
+    expect(mascot()?.style.transform).toBe(waiting);
   });
 
   test("stays hidden until the Composer opens again", () => {

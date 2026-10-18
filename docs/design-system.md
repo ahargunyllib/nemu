@@ -25,6 +25,7 @@ The tokens live in `packages/ui/src/styles/nemu.css` and are Tailwind colours:
 | `nemu-warning-subtle` / `nemu-warning-text` | `#FFFBEB` / `#B45309`                       | Soft warnings.                                                                                      |
 | `nemu-danger-subtle`                        | `#FEF2F2`                                   | Inline warning box inside an Answer Card; text is `destructive`.                                    |
 | `nemu-confirm`                              | `#3B82F6`                                   | Sorot konfirmasi: dashed outline on a button the user must press.                                   |
+| `nemu-select` / `nemu-select-fill`          | `#297FE4` / `#4D94E8` at 8%                 | Blok area: the dashed line and light fill of the box Rina drags.                                    |
 
 The full amber scale is also available as `nemu-amber-50` … `nemu-amber-800`. Mascot art
 colours: body gradient amber 300 → 500, wings amber 100, white outline, white eyes; success body
@@ -91,8 +92,12 @@ buttons, crop (Area Crop) then send (`ArrowRight`). States:
 The pill stays `nemu` (amber 600) rather than the design's amber 500: white text on amber 500 is
 about 3:1, under the 4.5:1 body text needs. Awaiting designer confirmation.
 
-**Kartu area** (after a box is dragged): a white card with the cropped thumbnail top-left and a
-close ×, with the Composer pill inside it below ("Tanya tentang bagian ini…").
+**Kartu area** (after a box is dragged): a white card, 288 px wide, radius 14 px, 1 px `border`,
+padding 10 px top and 12 px on the other sides, 8 px gap, `shadow-nemu-float`. A small cropped
+thumbnail (about 48 × 28, rounded and bordered) sits top-left and a close × top-right; the Composer
+pill fills the card's inner width below them ("Tanya tentang bagian ini…"). The design also puts a
+title (the detected section) and a subtitle (page and step) beside the thumbnail; Nemu has no data
+for them yet, so they are left out.
 
 ## Answers: three levels (Tingkat)
 
@@ -135,8 +140,9 @@ Other pieces: a result strip "Rp447.000 [copy icon] Salin" on `nemu-subtle`; num
 - **Klik navigasi**: the mascot-cursor travels to the target, a ripple ring plays on it, and an
   amber (`nemu`) pill tooltip under it says "Membuka Perjalanan Dinas… [Esc]".
 - **Sorot guiding**: the target outlined with the "Pilih ini" label, the mascot waiting beside it.
-- **Blok area**: a dashed amber (`nemu-ring`) selection box with round amber corner handles, the
-  mascot as a cursor at its bottom-right corner. While Nemu reads, the box stays as a grey dashed
-  outline.
+- **Blok area**: the selection box Rina drags: a 1.5 px dashed `nemu-select` line (dash 5, gap 4),
+  radius 4 px, a `nemu-select-fill` fill, and round amber (`nemu-ring`) corner handles. The rest of
+  the page is never darkened, and the box is never filled black. The mascot sits as the cursor at
+  the box's bottom-right corner. While Nemu reads, the box stays as a grey dashed outline.
 - **Hotkey hint**: while the Composer is open beside the mascot, an amber chip on the mascot's
   other side reads "Hotkey Ctrl + Shift + [Space]".
