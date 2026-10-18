@@ -82,16 +82,6 @@ close ×, with the Composer pill inside it below ("Tanya tentang bagian ini…")
   with a small white circle holding the mascot at its left: "Pilih ini", or
   "Isi Rp447.000 · 30% × 2 malam" (the part after · lighter). The success variant is green:
   "Kamu yang mengirim".
-- **Guided steps** (Momen 1 and 2): when an answer walks the user through several fields, there
-  is no Answer Card. Each step shows the Tingkat 0 outline and label, with the step count after
-  the label: "Pilih Dinas luar kota · langkah 1/3". Beside the target sits a small header-less
-  **step card** (white, rounded, about 280 px wide, close × top-right) holding the action's
-  `note`, with `**bold**` for the option to pick ("…jadi pilih **"Tidak menginap di hotel"**.").
-  When the action has a `value`, the card adds it bold under the note and a `nemu-subtle` strip
-  "Rp447.000 [copy] Salin". The mascot sits on the card's top-left corner. The card goes above or
-  below the target, wherever it does not cover the field. Nemu never fills the field: when the
-  user fills or picks it, the mascot turns green for a moment and the next step starts. After the
-  last step everything goes away.
 - **Tingkat 1 · Jawaban ringkas** (default): a white card beside the highlighted element, the
   element stays outlined. Header: mascot icon + title in Card title style ("Pilih \"Tidak menginap
   di hotel\""), close ×. Body: a muted bordered calc box ("30% × Rp745.000 × 2 malam" over a bold
