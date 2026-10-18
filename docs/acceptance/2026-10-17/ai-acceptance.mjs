@@ -4,22 +4,38 @@ import { createRequire } from "node:module";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-const [repo, outDir, roundsArg = "3"] = process.argv.slice(2);
+import { hasUnnegatedAutomaticFillClaim } from "../../../packages/ai/scripts/moment-validators.mjs";
+
+const [repoArg, outDirArg, roundsArg = "3"] = process.argv.slice(2);
+if (!repoArg || !outDirArg) {
+  throw new Error("Usage: node ai-acceptance.mjs <repo-root> <out-dir> [rounds]");
+}
+const repo = path.resolve(repoArg);
+const outDir = path.resolve(outDirArg);
 const require = createRequire(path.join(repo, "apps/extension/package.json"));
 const { chromium } = require("playwright-core");
 
 const EXT = path.join(repo, "apps/extension/.output/chrome-mv3-dev");
 const DOCS = path.join(repo, "apps/mock-alurkerja/sample-documents");
-const APP = "http://localhost:3001";
-const SERVER = "http://localhost:3000";
+const APP = process.env.NEMU_APP_URL ?? "http://localhost:3001";
+const SERVER = process.env.NEMU_SERVER_URL ?? "http://localhost:3000";
 const ROUNDS = Number(roundsArg);
 const AI_TIMEOUT = 120_000;
 
 const PROMPTS = {
   m1: "Saya dapat tugas rapat ke Makassar 3 hari, mulai dari mana?",
+  issue75: "Cara ajukan dinas gimana?",
   m2: "Saya menginap di rumah saudara, ini diisi apa?",
   m3: "Saya sudah pulang kemarin, sekarang apa?",
 };
+const ISSUE_75_TARGETS = [
+  "select-jenis-perjalanan",
+  "input-nomor-surat-tugas",
+  "select-kota-tujuan",
+  "input-maksud-perjalanan",
+  "input-tanggal-berangkat",
+  "input-tanggal-kembali",
+];
 
 await mkdir(outDir, { recursive: true });
 const ctx = await chromium.launchPersistentContext("", {
@@ -140,6 +156,44 @@ for (let r = 1; r <= ROUNDS; r++) {
     await shot(`r${r}-m1-failed`).catch(() => {});
   }
 
+  // Issue 75: on the open form, the same start intent guides the fields instead of the menu.
+  try {
+    await page.goto(`${APP}/perdin/baru`);
+    await page.getByRole("heading", { name: "Ajukan Perjalanan Dinas" }).waitFor();
+    const before = await newestId();
+    const box = await openComposer();
+    await box.fill(PROMPTS.issue75);
+    await box.press("Enter");
+    const [e] = await newEntries(before);
+    round.issue75 = { ...summarize(e) };
+    check(r, "I75", "answered", e.status === "answer", `${e.status}, ${e.durationMs} ms`);
+    check(
+      r,
+      "I75",
+      "six ordered form highlights",
+      e.actions.length === ISSUE_75_TARGETS.length &&
+        ISSUE_75_TARGETS.every(
+          (target, index) =>
+            e.actions[index]?.type === "highlight" && e.actions[index]?.target === target,
+        ),
+      round.issue75.actions.join(", ") || "no actions",
+    );
+    check(
+      r,
+      "I75",
+      "no action on the current menu",
+      !e.actions.some((action) => action.target === "menu-ajukan-perjalanan-dinas"),
+      round.issue75.actions.join(", ") || "no actions",
+    );
+    await card.waitFor();
+    await page.waitForTimeout(800);
+    await shot(`r${r}-issue75`);
+    await close();
+  } catch (error) {
+    check(r, "I75", "ran", false, String(error).split("\n")[0]);
+    await shot(`r${r}-issue75-failed`).catch(() => {});
+  }
+
   // Momen 2: on the form, Area Crop of the lodging fields → highlight both, Rp447.000.
   try {
     await page.goto(`${APP}/perdin/baru`);
@@ -189,13 +243,31 @@ for (let r = 1; r <= ROUNDS; r++) {
     );
     await card.waitFor();
     await page.waitForTimeout(1500);
+    const detailButton = card.getByRole("button", { name: "Lihat detail" });
+    if (await detailButton.isVisible().catch(() => false)) await detailButton.click();
     const text = (await card.innerText()).replace(/\s+/g, " ");
     check(r, "M2", "Rp447.000 on the card", /447[.,]000/.test(text), text.slice(0, 160));
     check(
       r,
       "M2",
+      "manual nominal entry",
+      (/\b(?:isi|masukkan|ketik)\s+(?:nilai\s+)?(?:nominal(?:\s+(?:penginapan|lumpsum))?|Rp\s*447[.,]000)[^.!?]{0,80}\b(?:secara\s+manual|sendiri)\b/i.test(
+        text,
+      ) ||
+        /\b(?:isi|masukkan|ketik)\s+(?:secara\s+)?manual\b[^.!?]{0,40}\b(?:nilai\s+)?(?:nominal(?:\s+(?:penginapan|lumpsum))?|Rp\s*447[.,]000)\b/i.test(
+          text,
+        )) &&
+        !/\b(?:jangan|tidak perlu|tak perlu)\s+(?:meng)?(?:isi|masukkan|ketik)\b/i.test(text) &&
+        !hasUnnegatedAutomaticFillClaim(text),
+      text.slice(0, 160),
+    );
+    check(
+      r,
+      "M2",
       "cites PMK 119/2023",
-      e.citations.some((c) => c.judul.includes("119/2023")),
+      e.citations.some(
+        (c) => c.doc_id?.includes("pmk-119-2023") || /119(?:\/|\s+Tahun\s+)2023/i.test(c.judul),
+      ),
       round.m2.citations.join("; "),
     );
     await shot(`r${r}-m2`);

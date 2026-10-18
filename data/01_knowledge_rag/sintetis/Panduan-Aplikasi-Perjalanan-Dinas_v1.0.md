@@ -16,20 +16,19 @@ Panduan ini menjelaskan menu dan isian di aplikasi Perjalanan Dinas milik Balai 
 ## Membuat pengajuan
 
 1. Klik `[menu-ajukan-perjalanan-dinas]`.
-2. Bagian A, Jenis dan tujuan: pilih jenis perjalanan `[fld-jenis-perjalanan]`, pilih surat tugas `[fld-surat-tugas]`, pilih kota tujuan `[fld-kota-tujuan]`. Provinsi terisi otomatis.
-3. Bagian B, Jadwal: isi tanggal berangkat `[fld-tanggal-berangkat]` dan tanggal kembali `[fld-tanggal-kembali]`. Jumlah hari dihitung otomatis.
-4. Bagian C, Biaya: pilih moda `[fld-moda]`, isi tiket pergi-pulang `[fld-tiket-pp]`, transport ke bandara asal `[fld-transport-asal]` dan tujuan `[fld-transport-tujuan]`.
-5. Penginapan: pilih `[opt-penginapan-hotel]` bila menginap di hotel, lalu isi tarif per malam `[fld-tarif-hotel]`. Pilih `[opt-penginapan-tidak-hotel]` bila tidak menginap di hotel; nominal lumpsum `[fld-lumpsum-penginapan]` terisi otomatis.
-6. Uang harian `[fld-uang-harian]` terisi otomatis dari tabel SBM.
-7. Uang muka: pilih `[opt-uang-muka-ya]` atau `[opt-uang-muka-tidak]`.
-8. Bagian D, Dokumen: unggah undangan `[upl-undangan]`. Surat tugas dan rincian biaya terlampir otomatis.
-9. Klik `[btn-kirim-pengajuan]`. Status berubah menjadi Diajukan. `[btn-simpan-draf]` menyimpan tanpa mengirim.
+2. Bagian A, Jenis dan tujuan: pilih jenis perjalanan `[select-jenis-perjalanan]`, isi nomor surat tugas `[input-nomor-surat-tugas]`, pilih kota tujuan `[select-kota-tujuan]`, lalu isi maksud perjalanan `[input-maksud-perjalanan]`. Provinsi terisi otomatis setelah kota dipilih.
+3. Bagian B, Jadwal: isi tanggal berangkat `[input-tanggal-berangkat]` dan tanggal kembali `[input-tanggal-kembali]`. Jumlah hari dihitung otomatis.
+4. Bagian C, Biaya: pilih moda `[select-moda-transport]`, lalu isi total perkiraan biaya transport pada `[input-biaya-transport]`.
+5. Penginapan: pilih `[opt-penginapan-hotel]` bila menginap di hotel atau `[opt-penginapan-tidak-hotel]` bila tidak menginap di hotel. Isi nominal penginapan `[input-nominal-penginapan]` secara manual sesuai hasil perhitungan Nemu.
+6. Isi uang harian `[input-uang-harian]` sesuai hasil perhitungan dan ketentuan SBM.
+7. Bagian D, Dokumen: unggah undangan `[upload-undangan]`.
+8. Klik `[button-kirim-pengajuan]` setelah semua isian dan dokumen diperiksa. Status berubah menjadi Diajukan.
 
 ## Setelah pulang
 
 1. Buka `[menu-my-task]`, lalu klik task Pertanggungjawaban `[task-pertanggungjawaban]`.
-2. Unggah laporan perjalanan `[upl-laporan]`, tiket `[upl-tiket]`, boarding pass pergi `[upl-boarding-pergi]`, boarding pass pulang `[upl-boarding-pulang]`, bukti hotel `[upl-bukti-hotel]` (tidak muncul bila memilih tidak menginap di hotel), dan Daftar Pengeluaran Riil `[upl-dpr]` bila diperlukan.
-3. Klik `[btn-kirim-pertanggungjawaban]`. Chip tenggat `[chip-tenggat]` menunjukkan sisa hari kerja.
+2. Unggah surat tugas `[upload-surat-tugas]`, boarding pass pergi `[upload-boarding-pass-pergi]`, laporan perjalanan `[upload-laporan-perjalanan]`, dan boarding pass pulang `[upload-boarding-pass-pulang]` pada kontrol yang tersedia.
+3. Klik `[button-kirim]` setelah seluruh dokumen wajib lengkap. Pengguna tetap harus menekan tombol Kirim sendiri.
 
 ## Status pengajuan
 

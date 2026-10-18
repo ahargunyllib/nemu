@@ -76,8 +76,10 @@ export const momentTwoRequest = {
 export const momentTwoResponse = {
   status: "answer",
   answer: {
-    ringkas: "Pilih Tidak menginap di hotel. Hak penginapanmu adalah Rp447.000 untuk dua malam.",
-    detail: "Perhitungannya 30% x Rp745.000 x 2 malam. Ubah pilihan jika nanti menginap di hotel.",
+    ringkas:
+      "Pilih Tidak menginap di hotel, lalu isi nominal penginapan Rp447.000 untuk dua malam.",
+    detail:
+      "Masukkan nominal secara manual. Perhitungannya 30% x Rp745.000 x 2 malam. Ubah pilihan jika nanti menginap di hotel.",
   },
   citations: [
     {
