@@ -1,4 +1,4 @@
-import { momentThreeFollowUpResponse, momentTwoResponse } from "@nemu/contracts/fixtures";
+import { momentThreeFollowUpResponse, momentThreeResponse } from "@nemu/contracts/fixtures";
 import { describe, expect, test } from "vite-plus/test";
 
 import { momentOneGuidedActions, momentTwoGuidedActions } from "./guided-fixtures";
@@ -13,7 +13,8 @@ describe("isGuided", () => {
   });
 
   test("answers without notes keep the Answer Card", () => {
-    expect(isGuided(momentTwoResponse.actions)).toBe(false);
+    // Momen 3 has no step notes; Momen 1 and 2 gain them in the shared fixtures (#85).
+    expect(isGuided(momentThreeResponse.actions)).toBe(false);
     expect(isGuided(momentThreeFollowUpResponse.actions)).toBe(false);
   });
 });
