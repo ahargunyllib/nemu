@@ -112,8 +112,11 @@ Other pieces: a result strip "Rp447.000 [copy icon] Salin" on `nemu-subtle`; num
   appears in 250 ms. On a coloured header use a white dashed line instead.
 - **Click ripple**: an amber ring that expands at the click point.
 - **Loading**: a thin white bar with an amber shimmer moving across.
-- **Klik navigasi**: the mascot-cursor travels to the target, a ripple ring plays on it, and a
-  black pill tooltip under it says "Membuka Perjalanan Dinas… Esc".
+- **Klik navigasi**: the mascot-cursor travels to the target, a ripple ring plays on it, and an
+  amber (`nemu`) pill tooltip under it says "Membuka Perjalanan Dinas… [Esc]".
 - **Sorot guiding**: the target outlined with the "Pilih ini" label, the mascot waiting beside it.
-- **Blok area**: a dashed blue selection box with amber round corner handles, mascot at the
-  bottom-right corner, the rest of the page dimmed.
+- **Blok area**: a dashed amber (`nemu-ring`) selection box with round amber corner handles, the
+  mascot as a cursor at its bottom-right corner. While Nemu reads, the box stays as a grey dashed
+  outline.
+- **Hotkey hint**: while the Composer is open beside the mascot, an amber chip on the mascot's
+  other side reads "Hotkey Ctrl + Shift + [Space]".
