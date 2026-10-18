@@ -61,7 +61,8 @@ and "Good morning, Rina." it shows three cards:
 ### Ajukan Perjalanan Dinas
 
 The page is titled "Start Perjalanan Dinas". The form is one card with four
-tabs, and only the open tab's fields render:
+pill tabs, each stacking its fields in one column, and only the open tab's
+fields render:
 
 | Tab              | Fields                                                                           |
 | ---------------- | -------------------------------------------------------------------------------- |
@@ -70,7 +71,8 @@ tabs, and only the open tab's fields render:
 | 3 Biaya          | Tiket PP, Penginapan (two cards), Nominal penginapan, Uang harian                |
 | 4 Dokumen        | Undangan upload                                                                  |
 
-Lama perjalanan fills itself from the two dates ("3 hari · 2 malam"). Kota
+A picked date reads with its weekday ("Selasa, 3 Nov 2026"), and Lama
+perjalanan fills itself from the two dates ("3 hari · 2 malam"). Kota
 tujuan must name one of the Demo App's cities (`KOTA_TUJUAN`). Dasar penugasan
 picks one of the user's surat tugas, and its nomor is sent as `nomorSuratTugas`.
 Uang harian shows the SBM daily rate times the days for a luar kota trip.

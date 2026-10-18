@@ -9,7 +9,7 @@ export default function DokumenSection({ form }: { form: AjukanPerdinForm }) {
   const errors = usePerdinErrors(form);
 
   return (
-    <FieldGroup>
+    <FieldGroup className="gap-3">
       <form.Field name="dokumenUndangan">
         {(field) => (
           <div className="space-y-2">

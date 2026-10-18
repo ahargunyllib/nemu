@@ -14,8 +14,8 @@ export default function PerdinFormTabs({ form }: { form: AjukanPerdinForm }) {
   const invalidTabs = tabsWithErrors(usePerdinErrors(form));
 
   return (
-    <Tabs defaultValue={PERDIN_TABS[0].value} className="gap-6">
-      <TabsList variant="line" className="w-full justify-start border-b">
+    <Tabs defaultValue={PERDIN_TABS[0].value} className="gap-3">
+      <TabsList>
         {PERDIN_TABS.map((tab, index) => {
           const invalid = invalidTabs.includes(tab.value);
           return (
@@ -26,13 +26,7 @@ export default function PerdinFormTabs({ form }: { form: AjukanPerdinForm }) {
               aria-label={invalid ? `${tab.label}, ada isian yang perlu diperbaiki` : tab.label}
               className="flex-none px-3"
             >
-              <span
-                aria-hidden
-                className="inline-flex size-5 items-center justify-center rounded-full bg-muted text-xs"
-              >
-                {index + 1}
-              </span>
-              {tab.label}
+              {index + 1} {tab.label}
               <span
                 aria-hidden
                 className={cn("size-1.5 rounded-full bg-destructive", !invalid && "invisible")}

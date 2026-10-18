@@ -1,11 +1,13 @@
 import { Button } from "@nemu/ui/components/button";
 import { Calendar } from "@nemu/ui/components/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@nemu/ui/components/popover";
-import { CalendarDays } from "lucide-react";
 import { useState } from "react";
 
-import { fromIsoDate, toIsoDate } from "@/features/perjalanan-dinas/lib/perdin-form";
-import { formatTanggal } from "@/shared/lib/format-tanggal";
+import {
+  formatHariTanggal,
+  fromIsoDate,
+  toIsoDate,
+} from "@/features/perjalanan-dinas/lib/perdin-form";
 
 /** A YYYY-MM-DD date picked from a calendar; `notBefore` greys out the days before it. */
 export default function DatePicker({
@@ -35,9 +37,8 @@ export default function DatePicker({
         aria-invalid={invalid}
         render={<Button variant="outline" className="w-full justify-start font-normal" />}
       >
-        <CalendarDays />
         {value ? (
-          formatTanggal(value)
+          formatHariTanggal(value)
         ) : (
           <span className="text-muted-foreground">Pilih tanggal</span>
         )}
