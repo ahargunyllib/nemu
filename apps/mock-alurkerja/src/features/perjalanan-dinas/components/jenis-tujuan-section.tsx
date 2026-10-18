@@ -23,56 +23,54 @@ export default function JenisTujuanSection({ form }: { form: AjukanPerdinForm })
   const errors = usePerdinErrors(form);
 
   return (
-    <FieldGroup>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <form.Field name="jenisPerjalanan">
-          {(field) => {
-            return (
-              <Field data-invalid={Boolean(errors[field.name])}>
-                <FieldLabel htmlFor={field.name}>Jenis perjalanan</FieldLabel>
-                <OptionSelect
-                  id={field.name}
-                  nemuId={NEMU_IDS.perdinForm.jenisPerjalanan}
-                  options={JENIS_PERJALANAN_OPTIONS}
-                  placeholder="Pilih jenis perjalanan"
-                  value={field.state.value}
-                  invalid={Boolean(errors[field.name])}
-                  onChange={field.handleChange}
-                />
-                <FieldError>{errors[field.name]}</FieldError>
-              </Field>
-            );
-          }}
-        </form.Field>
+    <FieldGroup className="gap-3">
+      <form.Field name="jenisPerjalanan">
+        {(field) => {
+          return (
+            <Field data-invalid={Boolean(errors[field.name])} className="gap-1.5">
+              <FieldLabel htmlFor={field.name}>Jenis perjalanan</FieldLabel>
+              <OptionSelect
+                id={field.name}
+                nemuId={NEMU_IDS.perdinForm.jenisPerjalanan}
+                options={JENIS_PERJALANAN_OPTIONS}
+                placeholder="Pilih jenis perjalanan"
+                value={field.state.value}
+                invalid={Boolean(errors[field.name])}
+                onChange={field.handleChange}
+              />
+              <FieldError>{errors[field.name]}</FieldError>
+            </Field>
+          );
+        }}
+      </form.Field>
 
-        <form.Field name="kotaTujuan">
-          {(field) => {
-            const kota = kotaTujuanOf(field.state.value);
-            return (
-              <Field data-invalid={Boolean(errors[field.name])}>
-                <FieldLabel htmlFor={field.name}>Kota tujuan</FieldLabel>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  data-nemu-id={NEMU_IDS.perdinForm.kotaTujuan}
-                  placeholder="Contoh: Makassar"
-                  value={field.state.value}
-                  aria-invalid={Boolean(errors[field.name])}
-                  onBlur={field.handleBlur}
-                  onChange={(event) => field.handleChange(event.target.value)}
-                />
-                {kota && <FieldDescription>Provinsi: {KOTA_TUJUAN[kota]}</FieldDescription>}
-                <FieldError>{errors[field.name]}</FieldError>
-              </Field>
-            );
-          }}
-        </form.Field>
-      </div>
+      <form.Field name="kotaTujuan">
+        {(field) => {
+          const kota = kotaTujuanOf(field.state.value);
+          return (
+            <Field data-invalid={Boolean(errors[field.name])} className="gap-1.5">
+              <FieldLabel htmlFor={field.name}>Kota tujuan</FieldLabel>
+              <Input
+                id={field.name}
+                name={field.name}
+                data-nemu-id={NEMU_IDS.perdinForm.kotaTujuan}
+                placeholder="Contoh: Makassar"
+                value={field.state.value}
+                aria-invalid={Boolean(errors[field.name])}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+              />
+              {kota && <FieldDescription>Provinsi: {KOTA_TUJUAN[kota]}</FieldDescription>}
+              <FieldError>{errors[field.name]}</FieldError>
+            </Field>
+          );
+        }}
+      </form.Field>
 
       <form.Field name="dasarPenugasan">
         {(field) => {
           return (
-            <Field data-invalid={Boolean(errors[field.name])}>
+            <Field data-invalid={Boolean(errors[field.name])} className="gap-1.5">
               <FieldLabel htmlFor={field.name}>Dasar penugasan (surat tugas)</FieldLabel>
               <OptionSelect
                 id={field.name}
@@ -92,7 +90,7 @@ export default function JenisTujuanSection({ form }: { form: AjukanPerdinForm })
       <form.Field name="maksud">
         {(field) => {
           return (
-            <Field data-invalid={Boolean(errors[field.name])}>
+            <Field data-invalid={Boolean(errors[field.name])} className="gap-1.5">
               <FieldLabel htmlFor={field.name}>Maksud perjalanan</FieldLabel>
               <Textarea
                 id={field.name}

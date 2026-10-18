@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@nemu/ui/components/card";
+import { PageHeading } from "@nemu/ui/shell/page-heading";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { useDemoPageAction } from "@/features/demo/hooks/use-demo-page-action";
@@ -32,15 +33,21 @@ function RouteComponent() {
 
   return (
     <>
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <ProcessBadge code={PERJALANAN_DINAS.code} tone={PERJALANAN_DINAS.tone} />
-          <h1 className="font-heading text-2xl font-semibold">Start {PERJALANAN_DINAS.name}</h1>
-        </div>
-        <StartProcessButton form={form} formId={FORM_ID} />
-      </div>
-      <Card>
-        <CardHeader>
+      <PageHeading
+        title={
+          <span className="flex items-center gap-3">
+            <ProcessBadge
+              code={PERJALANAN_DINAS.code}
+              tone={PERJALANAN_DINAS.tone}
+              className="size-7 rounded-lg text-xs"
+            />
+            Start {PERJALANAN_DINAS.name}
+          </span>
+        }
+        actions={<StartProcessButton form={form} formId={FORM_ID} />}
+      />
+      <Card className="gap-3 py-5 shadow-sm [--card-spacing:--spacing(7.5)]">
+        <CardHeader className="gap-3">
           <CardTitle>Formulir Perjalanan Dinas</CardTitle>
           <CardDescription>Isi sesuai surat tugas. Ikuti SOP-PD-01.</CardDescription>
         </CardHeader>

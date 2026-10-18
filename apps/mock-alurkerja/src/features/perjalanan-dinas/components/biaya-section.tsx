@@ -41,7 +41,7 @@ export default function BiayaSection({ form }: { form: AjukanPerdinForm }) {
   const errors = usePerdinErrors(form);
 
   return (
-    <FieldGroup>
+    <FieldGroup className="gap-3">
       <form.Subscribe
         selector={(state) =>
           biayaTransportLabel(state.values.modaTransport, state.values.kotaTujuan)
@@ -51,7 +51,7 @@ export default function BiayaSection({ form }: { form: AjukanPerdinForm }) {
           <form.Field name="biayaTransport">
             {(field) => {
               return (
-                <Field data-invalid={Boolean(errors[field.name])}>
+                <Field data-invalid={Boolean(errors[field.name])} className="gap-1.5">
                   <FieldLabel id={`${field.name}-label`} htmlFor={field.name}>
                     {label}
                   </FieldLabel>
@@ -76,11 +76,11 @@ export default function BiayaSection({ form }: { form: AjukanPerdinForm }) {
       <form.Field name="penginapan">
         {(field) => {
           return (
-            <FieldSet data-invalid={Boolean(errors[field.name])}>
+            <FieldSet data-invalid={Boolean(errors[field.name])} className="gap-1.5">
               <FieldLegend variant="label">Penginapan</FieldLegend>
               <RadioGroup
                 name={field.name}
-                className="grid gap-3 sm:grid-cols-2"
+                className="gap-1.5"
                 value={field.state.value || null}
                 onValueChange={(value) => field.handleChange(String(value))}
               >
@@ -90,17 +90,18 @@ export default function BiayaSection({ form }: { form: AjukanPerdinForm }) {
                     key={option.value}
                     htmlFor={`penginapan-${option.value}`}
                     data-nemu-id={option.nemuId}
+                    className="*:data-[slot=field]:px-3 *:data-[slot=field]:py-2.5"
                   >
                     <Field orientation="horizontal">
-                      <FieldContent>
-                        <FieldTitle>{option.label}</FieldTitle>
-                        <FieldDescription>{option.description}</FieldDescription>
-                      </FieldContent>
                       <RadioGroupItem
                         id={`penginapan-${option.value}`}
                         value={option.value}
                         aria-invalid={Boolean(errors[field.name])}
                       />
+                      <FieldContent>
+                        <FieldTitle>{option.label}</FieldTitle>
+                        <FieldDescription>{option.description}</FieldDescription>
+                      </FieldContent>
                     </Field>
                   </FieldLabel>
                 ))}
@@ -114,7 +115,7 @@ export default function BiayaSection({ form }: { form: AjukanPerdinForm }) {
       <form.Field name="nominalPenginapan">
         {(field) => {
           return (
-            <Field data-invalid={Boolean(errors[field.name])}>
+            <Field data-invalid={Boolean(errors[field.name])} className="gap-1.5">
               <FieldLabel id={`${field.name}-label`} htmlFor={field.name}>
                 Nominal penginapan
               </FieldLabel>
@@ -145,7 +146,7 @@ export default function BiayaSection({ form }: { form: AjukanPerdinForm }) {
           <form.Field name="uangHarian">
             {(field) => {
               return (
-                <Field data-invalid={Boolean(errors[field.name])}>
+                <Field data-invalid={Boolean(errors[field.name])} className="gap-1.5">
                   <FieldLabel id={`${field.name}-label`} htmlFor={field.name}>
                     {hari ? `Uang harian · ${hari} hari` : "Uang harian"}
                   </FieldLabel>
