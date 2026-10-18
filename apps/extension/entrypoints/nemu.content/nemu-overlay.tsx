@@ -8,7 +8,6 @@ import { AreaSelectLayer } from "../../features/area-crop/components/area-select
 import { useAreaCrop } from "../../features/area-crop/hooks/use-area-crop";
 import { AnswerCard } from "../../features/answer-card/components/answer-card";
 import { AnswerCardHeader } from "../../features/answer-card/components/answer-card-header";
-import { AnswerCardSkeleton } from "../../features/answer-card/components/answer-card-skeleton";
 import {
   ChatErrorCard,
   LoginRequiredCard,
@@ -16,7 +15,8 @@ import {
 import { PANEL_WIDTH, placePanel } from "../../features/answer-card/lib/panel-placement";
 import { useClickFollowUp } from "../../features/chat/hooks/use-click-follow-up";
 import { useNemuChat } from "../../features/chat/hooks/use-nemu-chat";
-import { Composer } from "../../features/composer/components/composer";
+import { COMPOSER_WIDTH, Composer } from "../../features/composer/components/composer";
+import { ReadingPill } from "../../features/composer/components/reading-pill";
 import {
   type CursorPosition,
   useComposerShortcut,
@@ -40,6 +40,8 @@ const NO_ACTIONS: NemuAction[] = [];
 const NO_ELEMENTS: PageElement[] = [];
 /** Room around the panel inside its scroll box, so the scroll box doesn't clip the cards' shadow. */
 const SHADOW_ROOM = 16;
+/** The Composer keeps its own width, so the panel makes room for it even when it is wider. */
+const PANEL_ROOM = Math.max(PANEL_WIDTH, COMPOSER_WIDTH);
 
 export function NemuOverlay() {
   const [anchor, setAnchor] = useState<CursorPosition | null>(null);
@@ -93,6 +95,7 @@ export function NemuOverlay() {
       { width: window.innerWidth, height: window.innerHeight },
       panelHeight,
       highlight ? [highlightFootprint(highlight.box)] : [],
+      PANEL_ROOM,
     );
 
   // One font and text color for everything Nemu draws: highlights, the mascot (#6), and the panel.
@@ -138,7 +141,7 @@ export function NemuOverlay() {
           className="pointer-events-none fixed z-2147483647 overflow-y-auto"
           style={{
             ...placement,
-            width: PANEL_WIDTH + 2 * SHADOW_ROOM,
+            width: PANEL_ROOM + 2 * SHADOW_ROOM,
             maxHeight: placement.maxHeight + 2 * SHADOW_ROOM,
             margin: -SHADOW_ROOM,
             padding: SHADOW_ROOM,
@@ -146,7 +149,11 @@ export function NemuOverlay() {
         >
           {/* Measured inside the scroll box, so a panel shrunk to keep off a highlight still
               reports its full height. */}
-          <div ref={panelRef} className="pointer-events-auto flex flex-col gap-2">
+          <div
+            ref={panelRef}
+            className="pointer-events-auto flex flex-col gap-2"
+            style={{ width: PANEL_WIDTH }}
+          >
             {composerOpen && (
               <Composer
                 onSubmit={(prompt) => {
@@ -165,7 +172,8 @@ export function NemuOverlay() {
                 )}
               </Composer>
             )}
-            {state.kind === "loading" && <AnswerCardSkeleton header={header} />}
+            {/* Membaca: in the Composer's place until the answer arrives. */}
+            {state.kind === "loading" && <ReadingPill />}
             {state.kind === "response" && (
               <AnswerCard
                 key={state.prompt}

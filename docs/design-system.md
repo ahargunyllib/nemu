@@ -75,14 +75,21 @@ amber wings (amber 100 ellipses tilted up behind the body), soft amber glow. Sev
 
 ## Composer (Komposer · Tanya Nemu)
 
-One-line pill, full `nemu` fill, rounded-2xl, soft drop shadow, white text, placeholder
-"Tanya Nemu…" (white / 92%). Right side: two round `nemu-soft` icon buttons, crop (Area Crop) then
-send (arrow). States:
+A 300px pill (its own width, not the Answer Card panel's), full `nemu` fill, rounded-2xl,
+`shadow-nemu-float`, white text. It is 40px tall for one line and grows to three as the text
+wraps, then scrolls. Padding 5px top, right, and bottom and 14px left, 4px gaps. Text is Body/Small
+(Regular 13/18); the placeholder "Tanya Nemu…" is white / 92%. Right side: two 30×30 round icon
+buttons, crop (Area Crop) then send (`ArrowRight`). States:
 
-1. Empty: both buttons soft.
-2. Typed (wraps to more lines): the send button turns white with an amber arrow.
+1. Empty: both buttons `nemu-soft`.
+2. Typed: the send button turns white with an amber arrow.
 3. Area select ("Seret area di layar · Esc batal" as the placeholder): the crop button is white.
-4. Reading: a narrower pill "••• Membaca halaman dan SOP…" with no buttons.
+4. Membaca (after Kirim): a narrower pill in the Composer's place, same fill, 40px tall, padding
+   5px 14px, hugging its content, no buttons: three white dots, then "Membaca halaman dan SOP…".
+   The answer replaces it in the same spot.
+
+The pill stays `nemu` (amber 600) rather than the design's amber 500: white text on amber 500 is
+about 3:1, under the 4.5:1 body text needs. Awaiting designer confirmation.
 
 **Kartu area** (after a box is dragged): a white card with the cropped thumbnail top-left and a
 close ×, with the Composer pill inside it below ("Tanya tentang bagian ini…").
@@ -109,8 +116,8 @@ close ×, with the Composer pill inside it below ("Tanya tentang bagian ini…")
   amber outline pill "Buka My Requests" (`NemuButton tone="outline"`) and "Tutup" link.
 
 Panel variants carry a kicker row above the title: tiny mascot + Label/Caps text ("TANYA NEMU",
-"MEMBACA…", "JAWABAN", "BERHASIL" in green, "TIDAK DITEMUKAN" in red), close × on the right.
-"Membaca…" shows skeleton lines under "Membaca halaman dan sumber instansi…". The Tanya Nemu panel
+"JAWABAN", "BERHASIL" in green, "TIDAK DITEMUKAN" in red), close × on the right. While Nemu
+reads there is no card: the Composer's Membaca pill stands in for it. The Tanya Nemu panel
 shows an "Area: Penginapan" muted chip, a bordered textarea, "Enter kirim · Esc batal" hint and a
 round black send button.
 
