@@ -82,7 +82,6 @@ export function NemuOverlay() {
   const header =
     state.kind === "idle" ? null : <AnswerCardHeader prompt={state.prompt} onClose={close} />;
 
-  const pickingArea = area.state.kind === "selecting" || area.state.kind === "capturing";
   const placement =
     anchor &&
     placePanel(
@@ -129,10 +128,8 @@ export function NemuOverlay() {
       </PageLayer>
       {placement && (
         <div
-          // Hidden, not unmounted, during area select mode so the Composer keeps its text.
-          className={
-            pickingArea ? "hidden" : "pointer-events-none fixed z-2147483647 overflow-y-auto"
-          }
+          // Stays up under the area select layer, where the Composer says how to drag a box.
+          className="pointer-events-none fixed z-2147483647 overflow-y-auto"
           style={{
             ...placement,
             width: PANEL_WIDTH + 2 * SHADOW_ROOM,
@@ -153,6 +150,7 @@ export function NemuOverlay() {
                 }}
                 onCancel={closeComposer}
                 onPickArea={area.start}
+                picking={area.state.kind === "selecting"}
                 boundary={nemuRef}
               >
                 {(area.state.kind === "attached" || area.state.kind === "failed") && (
