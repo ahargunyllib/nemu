@@ -21,7 +21,7 @@ export function useAnswerActions(
   const enforced = useMemo(() => enforceActionLevels(actions, elementList), [actions, elementList]);
   // One click per answer: a navigation click usually changes the page under the next one.
   const click = enforced.find((action) => action.type === "click");
-  const navigation = useNavigationClick(click, start);
+  const navigation = useNavigationClick(click, start, elementList);
   const clickFailed = Boolean(navigation.outcome && navigation.outcome !== "succeeded");
 
   const highlightActions = useMemo(

@@ -140,8 +140,14 @@ export function NemuOverlay() {
       </PageLayer>
       {placement && (
         <div
-          // Stays up under the area select layer, where the Composer says how to drag a box.
-          className="pointer-events-none fixed z-2147483647 overflow-y-auto"
+          // Stays up under the area select layer, where the Composer says how to drag a box. While
+          // Nemu's cursor is out it drops under the page layer, so it never covers the cursor, its
+          // tooltip, or the mascot riding along.
+          className={
+            cursor
+              ? "pointer-events-none fixed z-2147483645 overflow-y-auto"
+              : "pointer-events-none fixed z-2147483647 overflow-y-auto"
+          }
           style={{
             ...placement,
             width: PANEL_ROOM + 2 * SHADOW_ROOM,
