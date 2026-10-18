@@ -16,7 +16,8 @@ export const DEMO_ACCOUNTS = [
   },
 ] as const;
 
-export const ROLE_LABELS: Record<string, string> = {
-  pegawai: "Pegawai",
-  verifikator: "Verifikator",
+/** The jabatan the side menu shows under each demo role's name. */
+export const JABATAN_LABELS: Record<string, string> = {
+  pegawai: "Pranata Komputer",
+  verifikator: "Verifikator Keuangan",
 };

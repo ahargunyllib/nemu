@@ -1,35 +1,34 @@
 import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
-import { Field, FieldDescription, FieldError, FieldLabel } from "@nemu/ui/components/field";
-import { Input } from "@nemu/ui/components/input";
+import { FieldError, FieldGroup } from "@nemu/ui/components/field";
 
-import PerdinFormSection from "@/features/perjalanan-dinas/components/perdin-form-section";
+import DokumenUploadField from "@/features/perjalanan-dinas/components/dokumen-upload-field";
 import type { AjukanPerdinForm } from "@/features/perjalanan-dinas/hooks/use-ajukan-perdin-form";
+import { usePerdinErrors } from "@/features/perjalanan-dinas/hooks/use-perdin-errors";
 
 export default function DokumenSection({ form }: { form: AjukanPerdinForm }) {
+  const errors = usePerdinErrors(form);
+
   return (
-    <PerdinFormSection
-      title="D. Dokumen"
-      description="Surat tugas dan rincian biaya terlampir otomatis."
-    >
+    <FieldGroup>
       <form.Field name="dokumenUndangan">
         {(field) => (
-          <Field data-invalid={!field.state.meta.isValid}>
-            <FieldLabel htmlFor={field.name}>Undangan</FieldLabel>
-            <Input
+          <div className="space-y-2">
+            {/* The picked file's name comes from the form, so it survives switching tabs. */}
+            <DokumenUploadField
               id={field.name}
-              name={field.name}
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png"
-              data-nemu-id={NEMU_IDS.perdinForm.uploadUndangan}
-              aria-invalid={!field.state.meta.isValid}
-              onBlur={field.handleBlur}
-              onChange={(event) => field.handleChange(event.target.files?.[0] ?? null)}
+              label="Undangan"
+              nemuId={NEMU_IDS.perdinForm.uploadUndangan}
+              namaFile={field.state.value?.name}
+              disabled={false}
+              onFile={field.handleChange}
             />
-            <FieldDescription>PDF atau gambar undangan kegiatan.</FieldDescription>
-            <FieldError errors={field.state.meta.errors} />
-          </Field>
+            <FieldError>{errors.dokumenUndangan}</FieldError>
+          </div>
         )}
       </form.Field>
-    </PerdinFormSection>
+      <p className="text-sm text-muted-foreground">
+        Surat tugas dan rincian biaya terlampir otomatis.
+      </p>
+    </FieldGroup>
   );
 }
