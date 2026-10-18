@@ -100,15 +100,19 @@ click the reload icon on the extension card and refresh the Demo App tab.
 
 ## Check it in a real browser
 
-With `NEMU_RESPONDER=fixture pnpm dev` running, `pnpm --filter extension verify` loads the dev
-build into Playwright's Chromium and checks:
+With `NEMU_RESPONDER=fixture pnpm dev` running, `pnpm --filter extension verify` runs a
+production build into `.output/chrome-mv3` that calls `http://localhost:3000`, loads it into
+Playwright's Chromium, and checks it. It doesn't use the dev build: that one registers its content
+script from the WXT dev server instead of the manifest, so under Playwright no overlay appears.
+It stops early if the Nemu Service answers with the AI Responder instead of the fixtures. The
+checks:
 
 - a page outside the allowlist gets no overlay;
 - signed out, the card asks Rina to log in;
 - signed in as Rina, the Momen 1 prompt comes back as an Answer Card with its citation;
 - Momen 1, five times in a row from Beranda: Nemu clicks Ajukan Perjalanan Dinas, the form opens,
   and the card's detail lists the documents to prepare;
-- on the Perjalanan Dinas form, Momen 2: Rina drags a box over the lodging fields, the chip holds a
+- on the Perjalanan Dinas form's Biaya tab, Momen 2: Rina drags a box over the lodging fields, the chip holds a
   crop of just that box (saved as `momen-2-area-crop-sent.png`), and the prompt goes out with it.
   The card shows the answer, warning and the PMK 119/2023 Pasal 8 ayat (5) citation, rings each
   lodging field with its action label, and keeps off both fields. Nemu fills in neither field,
