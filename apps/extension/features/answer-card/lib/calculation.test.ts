@@ -1,7 +1,7 @@
 import { momentThreeResponse, momentTwoResponse } from "@nemu/contracts/fixtures";
 import { describe, expect, test } from "vite-plus/test";
 
-import { describeCalculation } from "./calculation";
+import { copyableValue, describeCalculation } from "./calculation";
 
 describe("describeCalculation", () => {
   test("shows the Momen 2 lodging lumpsum as percentage × rate × nights", () => {
@@ -39,5 +39,15 @@ describe("describeCalculation", () => {
       result: "745.000",
       source: undefined,
     });
+  });
+});
+
+describe("copyableValue", () => {
+  test("offers the Momen 2 lodging lumpsum as Rupiah, copied as digits", () => {
+    expect(copyableValue(momentTwoResponse.calc)).toEqual({ label: "Rp447.000", text: "447000" });
+  });
+
+  test("offers nothing for a date, such as the Momen 3 deadline", () => {
+    expect(copyableValue(momentThreeResponse.calc)).toBeUndefined();
   });
 });

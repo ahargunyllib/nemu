@@ -80,6 +80,14 @@ export function NemuOverlay() {
     if (state.kind === "idle") setAnchor(null);
   }
 
+  /** Sends a prompt from the Composer, on top of the panel or as Balas in the Answer Card. */
+  function submitComposer(prompt: string) {
+    setComposerOpen(false);
+    setReadArea(area.crop ? (area.selection ?? null) : null);
+    ask(prompt, area.crop);
+    area.clear();
+  }
+
   function close() {
     chat.reset();
     area.clear();
@@ -87,8 +95,10 @@ export function NemuOverlay() {
     setAnchor(null);
   }
 
-  const header =
-    state.kind === "idle" ? null : <AnswerCardHeader prompt={state.prompt} onClose={close} />;
+  const header = state.kind === "idle" ? null : <AnswerCardHeader onClose={close} />;
+  const areaChip = (area.state.kind === "attached" || area.state.kind === "failed") && (
+    <AreaCropChip state={area.state} onRemove={area.clear} />
+  );
 
   const placement =
     anchor &&
@@ -112,7 +122,9 @@ export function NemuOverlay() {
       }
     >
       <PageLayer>
-        {composerOpen && area.selection && <AreaOutline box={area.selection} />}
+        {(composerOpen || state.kind === "response") && area.selection && (
+          <AreaOutline box={area.selection} />
+        )}
         {state.kind === "loading" && readArea && <AreaOutline box={readArea} reading />}
         {highlight && <HighlightRing box={highlight.box} action={highlight.action} />}
         {cursor && <NavigationCursor frame={cursor} />}
@@ -165,20 +177,13 @@ export function NemuOverlay() {
           >
             {composerOpen && (
               <Composer
-                onSubmit={(prompt) => {
-                  setComposerOpen(false);
-                  setReadArea(area.crop ? (area.selection ?? null) : null);
-                  ask(prompt, area.crop);
-                  area.clear();
-                }}
+                onSubmit={submitComposer}
                 onCancel={closeComposer}
                 onPickArea={area.start}
                 picking={area.state.kind === "selecting"}
                 boundary={nemuRef}
               >
-                {(area.state.kind === "attached" || area.state.kind === "failed") && (
-                  <AreaCropChip state={area.state} onRemove={area.clear} />
-                )}
+                {areaChip}
               </Composer>
             )}
             {/* Membaca: in the Composer's place until the answer arrives. */}
@@ -195,7 +200,21 @@ export function NemuOverlay() {
                   ],
                 }}
                 header={header}
-                onReply={() => setComposerOpen(true)}
+                reply={
+                  // Balas: the same Composer inside the card, while none is open above it. A click
+                  // on the page only drops its Area Crop, so the answer stays while Rina acts.
+                  !composerOpen && (
+                    <Composer
+                      onSubmit={submitComposer}
+                      onCancel={area.clear}
+                      onPickArea={area.start}
+                      picking={area.state.kind === "selecting"}
+                      boundary={nemuRef}
+                    >
+                      {areaChip}
+                    </Composer>
+                  )
+                }
               >
                 <HighlightSteps steps={steps} index={stepIndex} onGoTo={goTo} />
                 {confirmed && <ConfirmedStatus status={confirmed} />}
@@ -205,7 +224,6 @@ export function NemuOverlay() {
               <LoginRequiredCard
                 header={header}
                 loginUrl={new URL("/login", window.location.href).href}
-                onClose={close}
               />
             )}
             {state.kind === "error" && (
@@ -213,7 +231,6 @@ export function NemuOverlay() {
                 header={header}
                 message={state.message}
                 onRetry={() => ask(state.prompt, state.screenshotCrop)}
-                onClose={close}
               />
             )}
           </div>

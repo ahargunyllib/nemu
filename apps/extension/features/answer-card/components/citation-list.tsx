@@ -1,11 +1,11 @@
 import type { Citation } from "@nemu/contracts";
-import { NemuBadge } from "@nemu/ui/nemu/nemu-badge";
-import { BookOpenIcon } from "lucide-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 import { describeCitation } from "../lib/citation";
 import { CAPTION } from "../lib/typography";
+import { TextLink } from "./text-link";
 
+/** "Sumber: PMK 119/2023" as quiet text; a click on a source shows its pasal under the line. */
 export function CitationList({ citations }: { citations: readonly Citation[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const open = openIndex === null ? undefined : citations[openIndex];
@@ -13,27 +13,25 @@ export function CitationList({ citations }: { citations: readonly Citation[] }) 
   if (!citations.length) return null;
 
   return (
-    <section aria-label="Sumber" className="flex flex-col gap-1.5">
-      <div className="flex flex-wrap gap-1">
+    <section aria-label="Sumber" className="flex flex-col gap-1 text-muted-foreground">
+      <p>
+        Sumber:{" "}
         {citations.map((citation, index) => (
-          <NemuBadge
-            key={`${citation.doc_id}-${index}`}
-            tone="subtle"
-            render={<button type="button" />}
-            aria-expanded={openIndex === index}
-            className="h-auto cursor-pointer py-1 text-[11.5px]/[15px] hover:bg-nemu-amber-100"
-            onClick={() => setOpenIndex(openIndex === index ? null : index)}
-          >
-            <BookOpenIcon data-icon="inline-start" />
-            {citation.judul}
-          </NemuBadge>
+          <Fragment key={`${citation.doc_id}-${index}`}>
+            {index > 0 && ", "}
+            <TextLink
+              aria-expanded={openIndex === index}
+              className="text-muted-foreground no-underline hover:text-foreground hover:underline aria-expanded:text-foreground"
+              onClick={() => setOpenIndex(openIndex === index ? null : index)}
+            >
+              {citation.judul}
+            </TextLink>
+          </Fragment>
         ))}
-      </div>
+      </p>
       {open && (
-        <p className={`rounded-xl bg-muted px-3 py-2 text-muted-foreground ${CAPTION}`}>
-          {describeCitation(open)}
-          <br />
-          Dokumen: {open.doc_id}
+        <p className={CAPTION}>
+          {describeCitation(open)} · Dokumen {open.doc_id}
         </p>
       )}
     </section>
