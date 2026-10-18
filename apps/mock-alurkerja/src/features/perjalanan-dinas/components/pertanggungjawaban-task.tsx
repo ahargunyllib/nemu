@@ -18,14 +18,20 @@ const OTHER_TABS = ["Details", "Diagram", "History", "Discussion"] as const;
  * The Pertanggungjawaban task sheet: upload the trip documents, then the employee presses
  * Complete Task. Once sent (State Verifikasi) the documents stay listed, read-only.
  */
-export default function PertanggungjawabanTask({ instance }: { instance: ProcessInstanceView }) {
+export default function PertanggungjawabanTask({
+  instance,
+  assignee,
+}: {
+  instance: ProcessInstanceView;
+  assignee: string;
+}) {
   const { unggah, isUnggahPending, kirim, isKirimPending, terkirim } =
     usePertanggungjawaban(instance);
   const terbuka = instance.state === "Pertanggungjawaban";
 
   return (
     <>
-      <TaskSummary instance={instance}>
+      <TaskSummary instance={instance} assignee={assignee}>
         <Button
           variant="outline"
           disabled

@@ -88,7 +88,9 @@ function TaskPage() {
   );
   return (
     <Sheet open>
-      <SheetContent>{data && <PertanggungjawabanTask instance={data} />}</SheetContent>
+      <SheetContent>
+        {data && <PertanggungjawabanTask instance={data} assignee="Rina" />}
+      </SheetContent>
     </Sheet>
   );
 }
@@ -97,10 +99,29 @@ afterEach(() => {
   server.sent = false;
   server.refetchGate = Promise.resolve();
   cleanup();
+  vi.useRealTimers();
   vi.restoreAllMocks();
 });
 
 describe("PertanggungjawabanTask", () => {
+  test("the header shows the Task's age, dates, and assignee", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-07T12:00:00Z"));
+    server.dokumen = [];
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <TaskPage />
+      </QueryClientProvider>,
+    );
+
+    const field = async (label: string) =>
+      (await screen.findByText(label, { selector: "dt" })).nextElementSibling?.textContent;
+    expect(await field("Task Age")).toBe("1 day");
+    expect(await field("Created")).toBe("Nov 6, 2026");
+    expect(await field("Due Date")).toBe("Nov 13, 2026");
+    expect(await field("Assignee")).toBe("Rina");
+  });
+
   test("Complete Task waits for the refetch after the last upload instead of refusing it", async () => {
     const uploadedAt = new Date("2026-11-06");
     server.dokumen = [
