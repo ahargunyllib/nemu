@@ -7,7 +7,6 @@ import type { CursorFrame } from "../../navigation-click/lib/navigation-click";
 import { useMascotPosition } from "../hooks/use-mascot-position";
 import { useMascotState } from "../hooks/use-mascot-state";
 import { MASCOT_ART, MASCOT_MOTION } from "../lib/mascot-art";
-import { HotkeyHint } from "./hotkey-hint";
 import type { Point } from "../lib/mascot-position";
 import type { MascotActivity } from "../lib/mascot-state";
 
@@ -26,8 +25,8 @@ type MascotProps = {
 
 /**
  * The Nemu mascot on the page layer. It follows the cursor and shows what Nemu is doing; clicking
- * it opens the Composer, beside which it shows the shortcut that opens it too. Hidden, it closes the
- * Composer and stays away until Rina opens it again.
+ * it opens the Composer, beside which it waits. Hidden, it closes the Composer and stays away until
+ * Rina opens it again.
  */
 export function Mascot({
   activity,
@@ -72,7 +71,6 @@ export function Mascot({
           dangerouslySetInnerHTML={{ __html: MASCOT_ART[state] }}
         />
       </Button>
-      {composerAnchor && !draggedArea && <HotkeyHint mascotAt={placement.at} />}
       <Button
         aria-label="Sembunyikan maskot"
         size="icon-xs"
