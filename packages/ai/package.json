@@ -9,10 +9,11 @@
     "data:generate": "node scripts/generate-demo-data.mjs",
     "build": "node scripts/generate-demo-data.mjs && tsc -b",
     "check-types": "tsc -b",
-    "test": "node scripts/generate-demo-data.mjs && tsc -b && node --test dist/index.test.js scripts/moment-validators.test.mjs",
+    "test": "node scripts/generate-demo-data.mjs && tsc -b && node --test dist/index.test.js scripts/moment-validators.test.mjs scripts/evaluation-utils.test.mjs",
     "eval": "node scripts/generate-demo-data.mjs && tsc -b && node scripts/evaluate.mjs",
     "eval:offline": "node scripts/generate-demo-data.mjs && tsc -b && node scripts/evaluate.mjs --offline",
-    "eval:live": "node scripts/generate-demo-data.mjs && tsc -b && node scripts/evaluate.mjs --live"
+    "eval:live": "node scripts/generate-demo-data.mjs && tsc -b && node scripts/evaluate.mjs --live",
+    "eval:live:failed": "node scripts/generate-demo-data.mjs && tsc -b && node scripts/evaluate.mjs --live --moments=2,3"
   },
   "dependencies": {
     "@nemu/contracts": "workspace:*",

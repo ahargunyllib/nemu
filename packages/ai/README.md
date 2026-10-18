@@ -36,6 +36,9 @@ pnpm --filter @nemu/ai eval:offline
 
 # Live evaluation against real OpenRouter adapters (Jev 1.13 and GPT-6.1 Sol)
 OPENROUTER_API_KEY=... pnpm --filter @nemu/ai eval:live
+
+# Targeted live follow-up for previously failed Momen 2 and Momen 3 only
+OPENROUTER_API_KEY=... pnpm --filter @nemu/ai eval:live:failed
 ```
 
 The unit test suite uses mocked provider responses and never spends API credits. `eval:offline` validates the 6 deterministic calculation cases. `eval:live` invokes `runNemu()` against the real OpenRouter Decisions API (`typesafe/jev-1.13`) and Responses API (`openai/gpt-6.1-sol`), verifying:
@@ -48,6 +51,8 @@ The unit test suite uses mocked provider responses and never spends API credits.
 - 5 vision screenshot crops (≥4/5 correct)
 - 10 live runs per moment measuring median latency (≤8s target)
 - Generates `data/04_evaluasi/laporan_evaluasi.json` without exposing keys or base64 screenshots.
+
+The targeted follow-up skips the grounded-question, injection, out-of-domain, and vision suites that already passed. It writes `data/04_evaluasi/laporan_evaluasi_moments-2-3.json`, preserving the original full-run evidence. For Momen 3, the ≤8-second target is applied separately to the initial and follow-up responses; end-to-end latency is still reported but is not used as the per-response pass gate.
 
 The live evaluation reads the official test sets in `data/04_evaluasi`, which must never be indexed as knowledge.
 
