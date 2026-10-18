@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { PageHeading } from "@nemu/ui/shell/page-heading";
 import { createFileRoute } from "@tanstack/react-router";
 
 import TaskList from "@/features/perjalanan-dinas/components/task-list";
@@ -14,7 +15,7 @@ function RouteComponent() {
 
   return (
     <>
-      <h1 className="text-lg font-semibold">My Task</h1>
+      <PageHeading title="My Task" />
       {tasks ? <TaskList tasks={tasks} /> : <TaskListSkeleton />}
     </>
   );

@@ -1,7 +1,7 @@
+import { PageHeading } from "@nemu/ui/shell/page-heading";
 import { createFileRoute } from "@tanstack/react-router";
 
 import ChatLogList from "@/features/chat-log/components/chat-log-list";
-import PageHeader from "@/shared/components/page-header";
 
 export const Route = createFileRoute("/_auth/chat-log")({
   component: RouteComponent,
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_auth/chat-log")({
 function RouteComponent() {
   return (
     <>
-      <PageHeader
+      <PageHeading
         title="Chat Log"
         description="Every chat request Nemu received: who asked, the prompt, the sources and actions it answered with, and the result. Area Crop images are never stored."
       />
