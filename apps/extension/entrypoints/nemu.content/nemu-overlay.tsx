@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 
 import { useAnswerActions } from "../../features/action-level/hooks/use-answer-actions";
 import { AreaCropChip } from "../../features/area-crop/components/area-crop-chip";
+import { AreaOutline } from "../../features/area-crop/components/area-outline";
 import { AreaSelectLayer } from "../../features/area-crop/components/area-select-layer";
 import { useAreaCrop } from "../../features/area-crop/hooks/use-area-crop";
 import { AnswerCard } from "../../features/answer-card/components/answer-card";
@@ -33,6 +34,7 @@ import { ConfirmedStatus } from "../../features/process-status/components/confir
 import { useConfirmedStatus } from "../../features/process-status/hooks/use-confirmed-status";
 import { PageLayer } from "../../shared/components/page-layer";
 import { useElementHeight } from "../../shared/hooks/use-element-height";
+import type { Box } from "../../shared/types/box";
 
 const NO_ACTIONS: NemuAction[] = [];
 const NO_ELEMENTS: PageElement[] = [];
@@ -42,6 +44,8 @@ const SHADOW_ROOM = 16;
 export function NemuOverlay() {
   const [anchor, setAnchor] = useState<CursorPosition | null>(null);
   const [composerOpen, setComposerOpen] = useState(false);
+  /** The Blok area sent with the prompt Nemu is reading. */
+  const [readArea, setReadArea] = useState<Box | null>(null);
   const chat = useNemuChat();
   const area = useAreaCrop();
   const { state } = chat;
@@ -103,6 +107,8 @@ export function NemuOverlay() {
       }
     >
       <PageLayer>
+        {composerOpen && area.selection && <AreaOutline box={area.selection} />}
+        {state.kind === "loading" && readArea && <AreaOutline box={readArea} reading />}
         {highlight && <HighlightRing box={highlight.box} action={highlight.action} />}
         {cursor && <NavigationCursor frame={cursor} />}
         <Mascot
@@ -145,6 +151,7 @@ export function NemuOverlay() {
               <Composer
                 onSubmit={(prompt) => {
                   setComposerOpen(false);
+                  setReadArea(area.crop ? (area.selection ?? null) : null);
                   ask(prompt, area.crop);
                   area.clear();
                 }}

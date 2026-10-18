@@ -2,14 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import type { Box } from "../../../shared/types/box";
 import { isUsableSelection, type Point, selectionBox } from "../lib/area-crop";
-
-/** Round amber handles on the corners of the box, centered on its dashed border. */
-const CORNERS = [
-  "-top-1.5 -left-1.5",
-  "-top-1.5 -right-1.5",
-  "-bottom-1.5 -left-1.5",
-  "-right-1.5 -bottom-1.5",
-];
+import { AreaOutline } from "./area-outline";
 
 type AreaSelectLayerProps = {
   onSelect: (selection: Box) => void;
@@ -18,7 +11,7 @@ type AreaSelectLayerProps = {
 
 /**
  * Blok area from the design system: covers the viewport so Rina can drag a box around the part of
- * the page she is asking about. The rest of the page dims, and the box is dashed blue with round
+ * the page she is asking about. The rest of the page dims, and the box is dashed amber with round
  * amber corner handles.
  */
 export function AreaSelectLayer({ onSelect, onCancel }: AreaSelectLayerProps) {
@@ -71,17 +64,7 @@ export function AreaSelectLayer({ onSelect, onCancel }: AreaSelectLayerProps) {
         </div>
       )}
       {selection && (
-        <div
-          className="absolute rounded-sm border-2 border-dashed border-nemu-confirm shadow-[0_0_0_100vmax_rgb(0_0_0/40%)]"
-          style={selection}
-        >
-          {CORNERS.map((corner) => (
-            <span
-              key={corner}
-              className={`absolute size-3 rounded-full bg-nemu-ring ring-2 ring-white ${corner}`}
-            />
-          ))}
-        </div>
+        <AreaOutline box={selection} className="shadow-[0_0_0_100vmax_rgb(0_0_0/40%)]" />
       )}
     </div>
   );
