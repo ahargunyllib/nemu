@@ -2,7 +2,7 @@ import { createContext } from "react";
 
 import type { MascotState } from "../../mascot/lib/mascot-state";
 
-/** The state an Answer Card shows in its header's kicker row: "JAWABAN", "MEMBACA…", "GAGAL". */
+/** The state an Answer Card shows in its header's kicker row: "JAWABAN", "BERHASIL", "GAGAL". */
 export type AnswerCardKicker = {
   label: string;
   tone: "nemu" | "success" | "danger";
