@@ -71,6 +71,24 @@ Uang harian shows the SBM daily rate times the days for a luar kota trip.
 every field is valid. A field shows its error once touched, and a tab holding an
 error shows a red dot, so Rina can find it from any tab.
 
+### Task detail
+
+A Task opens as a sheet on the right of My Task, under the top bar: the Task
+list stays in view and clickable beside it, so another Task opens in the same
+sheet. Closing it (the × with the `link-kembali-my-task` id, or Esc) goes back
+to My Task. The URL stays `/perdin/task/$instanceId`, which the extension reads.
+
+The sheet's orange header names the process (Perjalanan Dinas and the Task ID),
+the Task (or the State while no Task is open, e.g. Verifikasi) with the nomor
+pengajuan, and the trip (Tujuan, Berangkat, Kembali). Its colours are App
+tokens in the Demo App's `index.css`, not Nemu amber. On a Pertanggungjawaban
+it holds **Delegate** (disabled; not in the demo) and **Complete Task**
+(`button-kirim`), which becomes a "Completed" mark once sent. Of the tabs, only
+Form has content. Under "Unggah dokumen pertanggungjawaban" each document is a
+row: a dashed drop zone ("Drag file or click to upload") until it is uploaded,
+then a green check with its file name. The whole row is the file input and
+carries its `upload-*` id. After Complete Task the rows stay, read-only.
+
 ## Process Instances
 
 Start Process on Ajukan Perjalanan Dinas stores a Process Instance in the
@@ -88,8 +106,8 @@ Beranda and My Task list the Tasks from `listMyTasks`.
 
 The Pertanggungjawaban task page asks for four documents (surat tugas, boarding
 pass pergi and pulang, laporan perjalanan). Only the file name is stored, in
-`process_document`. Kirim needs all four and moves the State to Verifikasi,
-then shows the task ID. Sample PDFs to upload are in
+`process_document`. Complete Task needs all four and moves the State to
+Verifikasi, then shows the task ID. Sample PDFs to upload are in
 `apps/mock-alurkerja/sample-documents/`.
 
 ## Process endpoints

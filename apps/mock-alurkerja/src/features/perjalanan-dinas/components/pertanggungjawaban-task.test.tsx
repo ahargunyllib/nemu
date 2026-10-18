@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import type { DokumenPertanggungjawaban } from "@nemu/contracts/process-instance";
+import { Sheet, SheetContent } from "@nemu/ui/components/sheet";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { toast } from "sonner";
@@ -15,6 +16,7 @@ import PertanggungjawabanTask from "./pertanggungjawaban-task";
 const server = vi.hoisted(() => ({
   dokumen: [] as { jenis: DokumenPertanggungjawaban; namaFile: string; uploadedAt: Date }[],
   refetchGate: Promise.resolve(),
+  sent: false,
   kirim: vi.fn(),
 }));
 
@@ -25,7 +27,7 @@ vi.mock("@/shared/api/orpc", async () => {
       async getProcessInstance(): Promise<ProcessInstanceView> {
         const dokumen = [...server.dokumen];
         await server.refetchGate;
-        return instanceWith(dokumen);
+        return server.sent ? sentInstanceWith(dokumen) : instanceWith(dokumen);
       },
       async unggahDokumenPertanggungjawaban({
         jenis,
@@ -40,8 +42,8 @@ vi.mock("@/shared/api/orpc", async () => {
       },
       async kirimPertanggungjawaban() {
         server.kirim();
-        const instance = { ...instanceWith(server.dokumen), state: "Verifikasi" as const };
-        return { taskId: "PJ-PD-2026-0042", instance };
+        server.sent = true;
+        return { taskId: "PJ-PD-2026-0042", instance: sentInstanceWith(server.dokumen) };
       },
     }),
   };
@@ -76,20 +78,30 @@ function instanceWith(dokumen: ProcessInstanceView["dokumen"]): ProcessInstanceV
   };
 }
 
+function sentInstanceWith(dokumen: ProcessInstanceView["dokumen"]): ProcessInstanceView {
+  return { ...instanceWith(dokumen), state: "Verifikasi", activeTask: null };
+}
+
 function TaskPage() {
   const { data } = useQuery(
     orpc.getProcessInstance.queryOptions({ input: { instanceId: "PD-2026-0042" } }),
   );
-  return data ? <PertanggungjawabanTask instance={data} /> : null;
+  return (
+    <Sheet open>
+      <SheetContent>{data && <PertanggungjawabanTask instance={data} />}</SheetContent>
+    </Sheet>
+  );
 }
 
 afterEach(() => {
+  server.sent = false;
+  server.refetchGate = Promise.resolve();
   cleanup();
   vi.restoreAllMocks();
 });
 
 describe("PertanggungjawabanTask", () => {
-  test("Kirim waits for the refetch after the last upload instead of refusing it", async () => {
+  test("Complete Task waits for the refetch after the last upload instead of refusing it", async () => {
     const uploadedAt = new Date("2026-11-06");
     server.dokumen = [
       { jenis: "surat_tugas", namaFile: "surat-tugas.pdf", uploadedAt },
@@ -103,7 +115,7 @@ describe("PertanggungjawabanTask", () => {
         <TaskPage />
       </QueryClientProvider>,
     );
-    const kirim = await screen.findByRole("button", { name: "Kirim" });
+    const kirim = await screen.findByRole("button", { name: "Complete Task" });
 
     let releaseRefetch = () => {};
     server.refetchGate = new Promise((resolve) => {
@@ -128,5 +140,29 @@ describe("PertanggungjawabanTask", () => {
 
     await waitFor(() => expect(server.kirim).toHaveBeenCalledOnce());
     expect(toastError).not.toHaveBeenCalled();
+  });
+
+  test("once sent, the documents stay listed but can no longer be uploaded", async () => {
+    const uploadedAt = new Date("2026-11-06");
+    server.dokumen = [
+      { jenis: "surat_tugas", namaFile: "surat-tugas.pdf", uploadedAt },
+      { jenis: "boarding_pass_pergi", namaFile: "boarding-pass-pergi-cgk-upg.pdf", uploadedAt },
+      { jenis: "boarding_pass_pulang", namaFile: "boarding-pass-pulang-upg-cgk.pdf", uploadedAt },
+      { jenis: "laporan_perjalanan", namaFile: "laporan-perjalanan-makassar.pdf", uploadedAt },
+    ];
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <TaskPage />
+      </QueryClientProvider>,
+    );
+    expect(await screen.findByLabelText("Unggah laporan perjalanan")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Complete Task" }));
+
+    await screen.findByText("Completed");
+    expect(screen.getByRole("heading", { name: /^Verifikasi/ })).toBeTruthy();
+    expect(screen.queryByLabelText("Unggah laporan perjalanan")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Complete Task" })).toBeNull();
+    expect(screen.getByText("laporan-perjalanan-makassar.pdf")).toBeTruthy();
   });
 });

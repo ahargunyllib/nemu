@@ -1,1 +1,32 @@
 @import "@nemu/ui/globals.css";
+
+/*
+ * AlurKerja's task sheet: an orange gradient header with white text, and a green check on each
+ * uploaded document. They are App colours the shadcn theme lacks, so they live here as App tokens,
+ * not as the Nemu amber in nemu.css, which only Nemu's own overlays use.
+ */
+:root {
+  --task-header-from: #ea580c;
+  --task-header-via: #f97316;
+  --task-header-to: #fb923c;
+  --task-header-foreground: #ffffff;
+  --task-done: #16a34a;
+}
+
+@theme inline {
+  --color-task-header-from: var(--task-header-from);
+  --color-task-header-via: var(--task-header-via);
+  --color-task-header-to: var(--task-header-to);
+  --color-task-header-foreground: var(--task-header-foreground);
+  --color-task-done: var(--task-done);
+}
+
+/*
+ * The task sheet opens beside My Task, as in AlurKerja: the side menu, top bar, and Task list stay
+ * in view and clickable, so the stock Sheet overlay under it is see-through and lets clicks pass.
+ */
+[data-slot="sheet-overlay"]:has(~ [data-task-sheet]) {
+  background: transparent;
+  backdrop-filter: none;
+  pointer-events: none;
+}

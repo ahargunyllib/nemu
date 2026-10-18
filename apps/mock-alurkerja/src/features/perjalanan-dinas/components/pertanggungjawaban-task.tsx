@@ -1,79 +1,97 @@
 import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
-import { Button } from "@nemu/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@nemu/ui/components/card";
-import { FieldGroup } from "@nemu/ui/components/field";
+import { Button, buttonVariants } from "@nemu/ui/components/button";
 import { Spinner } from "@nemu/ui/components/spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@nemu/ui/components/tabs";
+import { cn } from "@nemu/ui/lib/utils";
+import { CheckIcon } from "lucide-react";
 
-import DokumenUploadField from "@/features/perjalanan-dinas/components/dokumen-upload-field";
+import DokumenUploadRow from "@/features/perjalanan-dinas/components/dokumen-upload-row";
+import TaskSummary from "@/features/perjalanan-dinas/components/task-summary";
 import { usePertanggungjawaban } from "@/features/perjalanan-dinas/hooks/use-pertanggungjawaban";
 import { DOKUMEN_UPLOADS } from "@/features/perjalanan-dinas/lib/tasks";
 import type { ProcessInstanceView } from "@/features/perjalanan-dinas/types/process-instance-view";
 
+/** Tabs AlurKerja shows on a task that the demo has no content for. */
+const OTHER_TABS = ["Details", "Diagram", "History", "Discussion"] as const;
+
 /**
- * The Pertanggungjawaban task: upload the trip documents, then the employee presses Kirim.
- * Once sent (State Verifikasi) it shows the task ID instead.
+ * The Pertanggungjawaban task sheet: upload the trip documents, then the employee presses
+ * Complete Task. Once sent (State Verifikasi) the documents stay listed, read-only.
  */
 export default function PertanggungjawabanTask({ instance }: { instance: ProcessInstanceView }) {
   const { unggah, isUnggahPending, kirim, isKirimPending, terkirim } =
     usePertanggungjawaban(instance);
-
-  if (instance.state !== "Pertanggungjawaban") {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Pertanggungjawaban terkirim</CardTitle>
-          <CardDescription>
-            {terkirim ? `ID tugas ${terkirim.taskId}, ` : ""}status {instance.state}. Tunggu hasil
-            verifikasi.
-          </CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  }
+  const terbuka = instance.state === "Pertanggungjawaban";
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Dokumen pertanggungjawaban</CardTitle>
-        <CardDescription>
-          Unggah semua dokumen, lalu tekan Kirim untuk diverifikasi.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <FieldGroup>
-          {DOKUMEN_UPLOADS.map((upload) => (
-            <DokumenUploadField
-              key={upload.jenis}
-              id={`dokumen-${upload.jenis}`}
-              label={upload.label}
-              nemuId={upload.nemuId}
-              namaFile={
-                instance.dokumen.find((dokumen) => dokumen.jenis === upload.jenis)?.namaFile
-              }
-              disabled={isUnggahPending}
-              onFile={(file) => unggah(upload.jenis, file)}
-            />
-          ))}
-        </FieldGroup>
-      </CardContent>
-      <CardFooter className="justify-end">
-        {/* An upload stays pending until the refetch shows it, so Kirim never checks stale data. */}
+    <>
+      <TaskSummary instance={instance}>
         <Button
-          data-nemu-id={NEMU_IDS.pertanggungjawaban.kirim}
-          disabled={isKirimPending || isUnggahPending}
-          onClick={kirim}
+          variant="outline"
+          disabled
+          className="border-task-header-foreground/80 bg-transparent text-task-header-foreground"
         >
-          {isKirimPending && <Spinner />}
-          Kirim
+          Delegate
         </Button>
-      </CardFooter>
-    </Card>
+        {terbuka ? (
+          // An upload stays pending until the refetch shows it, so this never checks stale data.
+          <Button
+            variant="outline"
+            data-nemu-id={NEMU_IDS.pertanggungjawaban.kirim}
+            disabled={isKirimPending || isUnggahPending}
+            onClick={kirim}
+            className="bg-background text-foreground hover:bg-muted"
+          >
+            {isKirimPending && <Spinner />}
+            Complete Task
+          </Button>
+        ) : (
+          <span
+            className={cn(buttonVariants({ variant: "outline" }), "bg-background text-foreground")}
+          >
+            Completed
+            <CheckIcon data-icon="inline-end" />
+          </span>
+        )}
+      </TaskSummary>
+      <Tabs defaultValue="form" className="min-h-0 flex-1 gap-4 overflow-y-auto px-6 py-4">
+        <TabsList className="self-center">
+          <TabsTrigger value="form" className="px-4">
+            Form
+          </TabsTrigger>
+          {OTHER_TABS.map((tab) => (
+            <TabsTrigger key={tab} value={tab} disabled className="px-4">
+              {tab}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <TabsContent value="form" className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
+            <h3 className="font-heading text-base font-medium">
+              Unggah dokumen pertanggungjawaban
+            </h3>
+            <p className="text-muted-foreground">
+              {terbuka
+                ? "Semua dokumen wajib diunggah sebelum dikirim ke verifikator."
+                : `${terkirim ? `Tugas ${terkirim.taskId} terkirim` : "Terkirim"} ke verifikator. Tunggu hasil verifikasi.`}
+            </p>
+          </div>
+          <ul className="flex flex-col gap-2">
+            {DOKUMEN_UPLOADS.map((upload) => (
+              <DokumenUploadRow
+                key={upload.jenis}
+                label={upload.label}
+                nemuId={upload.nemuId}
+                namaFile={
+                  instance.dokumen.find((dokumen) => dokumen.jenis === upload.jenis)?.namaFile
+                }
+                disabled={isUnggahPending}
+                onFile={terbuka ? (file) => unggah(upload.jenis, file) : undefined}
+              />
+            ))}
+          </ul>
+        </TabsContent>
+      </Tabs>
+    </>
   );
 }
