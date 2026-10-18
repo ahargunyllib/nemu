@@ -38,8 +38,12 @@ import type { Box } from "../../shared/types/box";
 
 const NO_ACTIONS: NemuAction[] = [];
 const NO_ELEMENTS: PageElement[] = [];
-/** Room around the panel inside its scroll box, so the scroll box doesn't clip the cards' shadow. */
-const SHADOW_ROOM = 16;
+/**
+ * Room around the panel inside its scroll box, so the scroll box doesn't clip the cards' shadow
+ * into a square box. shadow/float (`--nemu-shadow-float`, 0 16px 40px) reaches 40px to each side,
+ * 24px above, and 56px below.
+ */
+const SHADOW_ROOM = { top: 24, x: 40, bottom: 56 };
 /** The Composer keeps its own width, so the panel makes room for it even when it is wider. */
 const PANEL_ROOM = Math.max(PANEL_WIDTH, COMPOSER_WIDTH);
 
@@ -162,10 +166,10 @@ export function NemuOverlay() {
           }
           style={{
             ...placement,
-            width: PANEL_ROOM + 2 * SHADOW_ROOM,
-            maxHeight: placement.maxHeight + 2 * SHADOW_ROOM,
-            margin: -SHADOW_ROOM,
-            padding: SHADOW_ROOM,
+            width: PANEL_ROOM + 2 * SHADOW_ROOM.x,
+            maxHeight: placement.maxHeight + SHADOW_ROOM.top + SHADOW_ROOM.bottom,
+            margin: `${-SHADOW_ROOM.top}px ${-SHADOW_ROOM.x}px ${-SHADOW_ROOM.bottom}px`,
+            padding: `${SHADOW_ROOM.top}px ${SHADOW_ROOM.x}px ${SHADOW_ROOM.bottom}px`,
           }}
         >
           {/* Measured inside the scroll box, so a panel shrunk to keep off a highlight still
