@@ -85,13 +85,6 @@ export const nemuActionSchema = z
     target: nemuIdSchema,
     level: actionLevelSchema,
     label: z.string().min(1).max(120),
-    /**
-     * The step card beside a guided target: why this step and what to enter, in one or two
-     * sentences. `**text**` is shown bold. Optional; without it the extension shows only the label.
-     */
-    note: z.string().trim().min(1).max(400).optional(),
-    /** The exact value to enter, shown bold under the note with a Salin (copy) button. */
-    value: z.string().trim().min(1).max(60).optional(),
   })
   .strict()
   .superRefine((action, context) => {
