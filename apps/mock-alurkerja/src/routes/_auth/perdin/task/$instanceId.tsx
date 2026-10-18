@@ -19,6 +19,7 @@ export const Route = createFileRoute("/_auth/perdin/task/$instanceId")({
 function RouteComponent() {
   const { instanceId } = Route.useParams();
   const navigate = Route.useNavigate();
+  const { user } = Route.useRouteContext();
   const { data: tasks } = useQuery(orpc.listMyTasks.queryOptions());
   const { data: instance, isPending } = useQuery(
     orpc.getProcessInstance.queryOptions({ input: { instanceId }, retry: false }),
@@ -45,9 +46,9 @@ function RouteComponent() {
             <TaskSheetSkeleton />
           ) : instance ? (
             instance.state === "Pertanggungjawaban" || instance.state === "Verifikasi" ? (
-              <PertanggungjawabanTask instance={instance} />
+              <PertanggungjawabanTask instance={instance} assignee={user.name} />
             ) : (
-              <TaskSummary instance={instance} />
+              <TaskSummary instance={instance} assignee={user.name} />
             )
           ) : (
             <>
