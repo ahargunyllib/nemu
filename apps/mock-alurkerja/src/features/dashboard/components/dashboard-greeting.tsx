@@ -8,7 +8,6 @@ const kickerDate = new Intl.DateTimeFormat("en-GB", {
   weekday: "long",
   day: "numeric",
   month: "long",
-  year: "numeric",
   timeZone: "UTC",
 });
 
@@ -21,7 +20,7 @@ export default function DashboardGreeting({ name }: { name: string }) {
     <PageHeading
       kicker={
         clock ? (
-          `My dashboard · ${kickerDate.format(new Date(`${clock.today}T00:00:00Z`)).replace(",", "")}`
+          `My dashboard · ${kickerDate.format(new Date(`${clock.today}T00:00:00Z`))}`
         ) : (
           <Skeleton className="h-4 w-56" />
         )

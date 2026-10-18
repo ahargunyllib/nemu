@@ -16,7 +16,7 @@ function RouteComponent() {
     <>
       <DashboardGreeting name={user.name} />
       <FavoriteProcessesCard />
-      <div className="grid items-start gap-6 xl:grid-cols-[3fr_2fr]">
+      <div className="grid items-start gap-4 lg:grid-cols-[3fr_2fr]">
         <UpNextCard />
         <MyPerformanceCard />
       </div>
