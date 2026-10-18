@@ -5,8 +5,10 @@
   "type": "module",
   "exports": {
     "./globals.css": "./src/styles/globals.css",
+    "./nemu.css": "./src/styles/nemu.css",
     "./lib/*": "./src/lib/*.ts",
     "./components/*": "./src/components/*.tsx",
+    "./nemu/*": "./src/nemu/*.tsx",
     "./hooks/*": "./src/hooks/*.ts",
     "./postcss.config": "./postcss.config.mjs"
   },

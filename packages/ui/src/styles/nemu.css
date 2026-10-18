@@ -1,0 +1,77 @@
+/*
+ * Nemu brand tokens (docs/design-system.md, "Colour"). The App keeps the AlurKerja palette
+ * (zinc + blue, the shadcn tokens in globals.css); everything Nemu draws on top of it uses
+ * nemu-amber, so Nemu's help never reads as part of the App. Step 600 is the only fill that carries
+ * white text (5.0:1); the lighter steps are for glow, rings, and accents, never under white text.
+ *
+ * Import after globals.css. Additive only: shadcn tokens and components stay untouched.
+ */
+
+:root {
+  --nemu-amber-50: #fff6eb;
+  --nemu-amber-100: #ffe7c7;
+  --nemu-amber-200: #ffd08f;
+  --nemu-amber-300: #fdb35a;
+  --nemu-amber-400: #f59331;
+  --nemu-amber-500: #e07a16;
+  --nemu-amber-600: #b0560c;
+  --nemu-amber-700: #8f460a;
+  --nemu-amber-800: #6e360a;
+
+  /* nemu/accent, nemu/composer-bg: the Composer pill, target labels, the Nemu outline button. */
+  --nemu: var(--nemu-amber-600);
+  /* nemu/composer-fg. */
+  --nemu-foreground: #ffffff;
+  /* nemu/composer-soft: icon buttons and chips sitting on a nemu fill. */
+  --nemu-soft: rgb(255 255 255 / 18%);
+  /* nemu/accent-text: Nemu links and text on white (6.9:1). */
+  --nemu-text: var(--nemu-amber-700);
+  /* nemu/accent-subtle + nemu/accent-strong-text: citation chips. */
+  --nemu-subtle: var(--nemu-amber-50);
+  --nemu-subtle-foreground: var(--nemu-amber-800);
+  /* nemu/ring: highlight outline, orbit ring, click ripple. Lines only, never text. */
+  --nemu-ring: var(--nemu-amber-500);
+  /* nemu/accent-glow: mascot glow, loading shimmer. */
+  --nemu-glow: var(--nemu-amber-400);
+
+  /* bg/success, text/success: "Kamu yang mengirim" label, success Answer Card. */
+  --nemu-success: #10b981;
+  --nemu-success-foreground: #ffffff;
+  --nemu-success-subtle: #ecfdf5;
+  --nemu-success-text: #047857;
+  /* bg/warning-subtle, text/warning. */
+  --nemu-warning-subtle: #fffbeb;
+  --nemu-warning-text: #b45309;
+  /* bg/danger-subtle: inline warnings inside an Answer Card. Text uses shadcn destructive. */
+  --nemu-danger-subtle: #fef2f2;
+  /* border/focus: Sorot konfirmasi, the dashed outline on a button the user presses. */
+  --nemu-confirm: #3b82f6;
+}
+
+@theme inline {
+  --color-nemu-amber-50: var(--nemu-amber-50);
+  --color-nemu-amber-100: var(--nemu-amber-100);
+  --color-nemu-amber-200: var(--nemu-amber-200);
+  --color-nemu-amber-300: var(--nemu-amber-300);
+  --color-nemu-amber-400: var(--nemu-amber-400);
+  --color-nemu-amber-500: var(--nemu-amber-500);
+  --color-nemu-amber-600: var(--nemu-amber-600);
+  --color-nemu-amber-700: var(--nemu-amber-700);
+  --color-nemu-amber-800: var(--nemu-amber-800);
+  --color-nemu: var(--nemu);
+  --color-nemu-foreground: var(--nemu-foreground);
+  --color-nemu-soft: var(--nemu-soft);
+  --color-nemu-text: var(--nemu-text);
+  --color-nemu-subtle: var(--nemu-subtle);
+  --color-nemu-subtle-foreground: var(--nemu-subtle-foreground);
+  --color-nemu-ring: var(--nemu-ring);
+  --color-nemu-glow: var(--nemu-glow);
+  --color-nemu-success: var(--nemu-success);
+  --color-nemu-success-foreground: var(--nemu-success-foreground);
+  --color-nemu-success-subtle: var(--nemu-success-subtle);
+  --color-nemu-success-text: var(--nemu-success-text);
+  --color-nemu-warning-subtle: var(--nemu-warning-subtle);
+  --color-nemu-warning-text: var(--nemu-warning-text);
+  --color-nemu-danger-subtle: var(--nemu-danger-subtle);
+  --color-nemu-confirm: var(--nemu-confirm);
+}

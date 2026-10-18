@@ -20,7 +20,9 @@ Wire in a paid third-party provider only once the user has chosen it. Until then
 
 ### UI composition
 
-Build UI by composing the vendored shadcn components in `packages/ui` with their stock variants. Add a missing component with the shadcn CLI from `packages/ui` instead of hand-building it, and use theme tokens such as `primary`, `muted`, and `destructive` rather than custom color variants or palettes. Show content that is loading or still being produced as a `Skeleton` shaped like that content; keep `Spinner` for a button whose action is pending. For example, `UserMenu` renders a button-shaped `Skeleton` while the session loads.
+Build UI by composing the vendored shadcn components in `packages/ui` with their stock variants. Add a missing component with the shadcn CLI from `packages/ui` instead of hand-building it, and use theme tokens such as `primary`, `muted`, and `destructive` rather than ad-hoc colors. Show content that is loading or still being produced as a `Skeleton` shaped like that content; keep `Spinner` for a button whose action is pending. For example, `UserMenu` renders a button-shaped `Skeleton` while the session loads.
+
+What Nemu draws over a page (Composer, Answer Card, target labels, highlights, mascot) follows the Nemu design system in `docs/design-system.md`: it uses the Nemu brand tokens in `packages/ui/src/styles/nemu.css` (`nemu`, `nemu-subtle`, `nemu-ring`, and the rest), while App surfaces keep the shadcn tokens. Give a vendored component a brand look by wrapping it, never by editing it or adding variants to it: a look several features share lives in `packages/ui/src/nemu/` (`@nemu/ui/nemu/<name>`), a one-feature look stays in that feature. For example, `NemuBadge` wraps the stock `Badge` for amber target labels and citation chips.
 
 Every vendored component must come from the `base-maia` style set in `packages/ui/components.json`: rounded corners (`rounded-2xl` to `rounded-4xl`) and `text-sm` body text. A component that looks off-style, such as one with sharp `rounded-none` corners or `text-xs/relaxed` text, was copied from another style. Re-add it with `shadcn add <name> --overwrite` from `packages/ui` instead of patching classes by hand. For example, `Dialog` and `Sheet` were re-added this way after the Upload document dialog rendered with sharp corners.
 
@@ -35,6 +37,8 @@ Co-locate tests with the source they protect and prioritize observable behavior.
 ### Commits and pull requests
 
 `main` accepts changes only through pull requests. Keep each pull request small and single-purpose, with a conventional-commit title.
+
+Don't name or link the external design file the design system was taken from in code, docs, commit messages, branch names, or PRs; refer to `docs/design-system.md` instead. For example, the Nemu brand token PR cites `docs/design-system.md`, not the design file.
 
 Don't add agent attribution: no `Co-Authored-By` trailers in commit messages and no "Generated with" lines in PR descriptions. Include this rule in briefs for any session or subagent you start.
 
