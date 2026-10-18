@@ -101,11 +101,9 @@ describe("Mascot", () => {
     const anchor = { x: 400, y: 300 };
     rerender({ listening: true }, anchor);
     const waiting = mascot()?.style.transform;
-    expect(screen.getByText("Space")).toBeTruthy();
 
     rerender({ listening: true }, anchor, { left: 40, top: 300, width: 520, height: 140 });
     expect(mascot()?.style.transform).toBe("translate(572px, 452px)");
-    expect(screen.queryByText("Space")).toBeNull();
 
     rerender({ listening: true }, anchor);
     expect(mascot()?.style.transform).toBe(waiting);

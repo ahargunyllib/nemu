@@ -163,5 +163,3 @@ way forward.
   radius 4 px, a `nemu-select-fill` fill, and round amber (`nemu-ring`) corner handles. The rest of
   the page is never darkened, and the box is never filled black. The mascot sits as the cursor at
   the box's bottom-right corner. While Nemu reads, the box stays as a grey dashed outline.
-- **Hotkey hint**: while the Composer is open beside the mascot, an amber chip on the mascot's
-  other side reads "Hotkey Ctrl + Shift + [Space]".

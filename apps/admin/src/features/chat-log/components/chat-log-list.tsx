@@ -105,7 +105,13 @@ export default function ChatLogList() {
                         <ChatStatusBadge status={entry.status} />
                       </TableCell>
                       <TableCell className="min-w-64 align-top whitespace-normal">
-                        {entry.result}
+                        {entry.status === "error" ? (
+                          <pre className="font-mono text-xs whitespace-pre-wrap text-destructive">
+                            {entry.result}
+                          </pre>
+                        ) : (
+                          entry.result
+                        )}
                       </TableCell>
                       <TableCell className="min-w-48 align-top whitespace-normal">
                         {entry.citations.length === 0 ? (

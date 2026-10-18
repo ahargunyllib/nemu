@@ -1,4 +1,3 @@
-import { Skeleton } from "@nemu/ui/components/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -11,18 +10,14 @@ export const Route = createFileRoute("/_auth/my-task")({
   component: RouteComponent,
 });
 
-/** My Task: the Task column, with a panel filling the space where a Task's sheet opens. */
+/** My Task: the Task column, with an empty-state panel beside it when there are no Tasks. */
 function RouteComponent() {
   const { data: tasks } = useQuery(orpc.listMyTasks.queryOptions());
 
   return (
     <div className="flex flex-1 gap-6">
       {tasks ? <TaskList tasks={tasks} /> : <TaskListSkeleton />}
-      {tasks ? (
-        <TaskPlaceholder hasTasks={tasks.some((instance) => instance.activeTask)} />
-      ) : (
-        <Skeleton className="flex-1 rounded-lg" />
-      )}
+      {tasks && !tasks.some((instance) => instance.activeTask) && <TaskPlaceholder />}
     </div>
   );
 }

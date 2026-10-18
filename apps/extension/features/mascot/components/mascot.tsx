@@ -5,7 +5,6 @@ import type { CursorFrame } from "../../navigation-click/lib/navigation-click";
 import { useMascotPosition } from "../hooks/use-mascot-position";
 import { useMascotState } from "../hooks/use-mascot-state";
 import { MASCOT_ART, MASCOT_MOTION } from "../lib/mascot-art";
-import { HotkeyHint } from "./hotkey-hint";
 import type { Point } from "../lib/mascot-position";
 import type { MascotActivity } from "../lib/mascot-state";
 
@@ -22,7 +21,7 @@ type MascotProps = {
 
 /**
  * The Nemu mascot on the page layer. It follows the cursor and shows what Nemu is doing; clicking
- * it opens the Composer, beside which it shows the shortcut that opens it too.
+ * it opens the Composer, beside which it waits.
  */
 export function Mascot({
   activity,
@@ -58,7 +57,6 @@ export function Mascot({
           dangerouslySetInnerHTML={{ __html: MASCOT_ART[state] }}
         />
       </Button>
-      {composerAnchor && !draggedArea && <HotkeyHint mascotAt={placement.at} />}
     </div>
   );
 }
