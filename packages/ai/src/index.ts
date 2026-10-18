@@ -70,6 +70,7 @@ type ToolResults = {
 
 type WorkflowScenario =
   | "start_travel_request"
+  | "travel_request_form_guidance"
   | "accommodation_guidance"
   | "accountability_follow_up"
   | null;
@@ -79,6 +80,14 @@ const PROHIBITED_ACTION_PATTERN = /(?:^|\b)(setuju|approve|hapus|delete|bayar|pa
 const ACCOMMODATION_GUIDANCE_TARGETS = [
   NEMU_IDS.perdinForm.lodgingNotHotel,
   NEMU_IDS.perdinForm.lodgingAmount,
+] as const;
+const TRAVEL_REQUEST_FORM_GUIDANCE_TARGETS = [
+  NEMU_IDS.perdinForm.jenisPerjalanan,
+  NEMU_IDS.perdinForm.nomorSuratTugas,
+  NEMU_IDS.perdinForm.kotaTujuan,
+  NEMU_IDS.perdinForm.maksud,
+  NEMU_IDS.perdinForm.tanggalBerangkat,
+  NEMU_IDS.perdinForm.tanggalKembali,
 ] as const;
 const ACCOUNTABILITY_UPLOAD_TARGETS = [
   { document: "surat_tugas", target: NEMU_IDS.pertanggungjawaban.uploadSuratTugas },
@@ -110,6 +119,15 @@ function resolveWorkflowScenario(
   const visibleElementIds = new Set(
     request.elements.filter((element) => element.visible).map((element) => element.nemu_id),
   );
+  const elementIds = new Set(request.elements.map((element) => element.nemu_id));
+
+  if (
+    decision.intent === "start_travel_request" &&
+    new URL(request.url).pathname === "/perdin/baru" &&
+    TRAVEL_REQUEST_FORM_GUIDANCE_TARGETS.some((target) => elementIds.has(target))
+  ) {
+    return "travel_request_form_guidance";
+  }
 
   if (
     decision.intent === "start_travel_request" &&
@@ -128,8 +146,8 @@ function resolveWorkflowScenario(
   const hasAccountabilityTask =
     activeTask === "pertanggungjawaban" || status === "pertanggungjawaban";
   const hasAccountabilityControl =
-    ACCOUNTABILITY_UPLOAD_TARGETS.some(({ target }) => visibleElementIds.has(target)) ||
-    visibleElementIds.has(ACCOUNTABILITY_SUBMIT_TARGET);
+    ACCOUNTABILITY_UPLOAD_TARGETS.some(({ target }) => elementIds.has(target)) ||
+    elementIds.has(ACCOUNTABILITY_SUBMIT_TARGET);
   if (hasAccountabilityTask && hasAccountabilityControl) {
     return "accountability_follow_up";
   }
@@ -141,6 +159,12 @@ function workflowGuidanceFor(scenario: WorkflowScenario): readonly string[] {
   if (scenario === "start_travel_request") {
     return [
       "Treat this as a new travel request. Do not ask whether it refers to an existing process.",
+    ];
+  }
+  if (scenario === "travel_request_form_guidance") {
+    return [
+      "Guide the user through the six initial travel request fields in page order, from travel type through return date.",
+      "The form is already open. Do not tell the user to open the travel request menu again.",
     ];
   }
   if (scenario === "accommodation_guidance") {
@@ -194,7 +218,8 @@ function runDeterministicTools(
 ): ToolResults {
   const results: ToolResults = { calculations: [], missingDocuments: [] };
   const requiredTool =
-    workflowScenario === "start_travel_request"
+    workflowScenario === "start_travel_request" ||
+    workflowScenario === "travel_request_form_guidance"
       ? "none"
       : workflowScenario === "accommodation_guidance"
         ? "lookup_sbm_and_accommodation"
@@ -320,29 +345,40 @@ function buildActions(
       .filter((element) => element.visible)
       .map((element) => [element.nemu_id, element] as const),
   );
+  const elementsById = new Map(
+    request.elements.map((element) => [element.nemu_id, element] as const),
+  );
   if (workflowScenario === "start_travel_request") {
     const element = visibleElementsById.get(START_TRAVEL_REQUEST_TARGET);
     if (!element || PROHIBITED_ACTION_PATTERN.test(`${element.nemu_id} ${element.label}`)) {
       return [];
     }
 
-    return decision.intentConfidence >= clickThreshold
-      ? [
-          {
-            type: "click",
-            target: element.nemu_id,
-            level: "jalan_sendiri",
-            label: "Buka formulir",
-          },
-        ]
-      : [
-          {
-            type: "highlight",
-            target: element.nemu_id,
-            level: "arahkan",
-            label: "Periksa ini",
-          },
-        ];
+    return [
+      {
+        type: "click",
+        target: element.nemu_id,
+        level: "jalan_sendiri",
+        label: "Buka formulir",
+      },
+    ];
+  }
+
+  if (workflowScenario === "travel_request_form_guidance") {
+    return TRAVEL_REQUEST_FORM_GUIDANCE_TARGETS.flatMap((targetId) => {
+      const element = elementsById.get(targetId);
+      if (!element || PROHIBITED_ACTION_PATTERN.test(`${element.nemu_id} ${element.label}`)) {
+        return [];
+      }
+      return [
+        {
+          type: "highlight" as const,
+          target: element.nemu_id,
+          level: "arahkan" as const,
+          label: "Periksa ini",
+        },
+      ];
+    });
   }
 
   if (workflowScenario === "accommodation_guidance") {
@@ -369,7 +405,7 @@ function buildActions(
     const missingDocumentSet = new Set(missingDocuments.map(normalizeDocumentName));
     const accountabilityActions: NemuAction[] = ACCOUNTABILITY_UPLOAD_TARGETS.flatMap(
       ({ document, target: targetId }) => {
-        const element = visibleElementsById.get(targetId);
+        const element = elementsById.get(targetId);
         if (
           !missingDocumentSet.has(normalizeDocumentName(document)) ||
           !element ||
@@ -387,7 +423,7 @@ function buildActions(
         ];
       },
     );
-    const submitElement = visibleElementsById.get(ACCOUNTABILITY_SUBMIT_TARGET);
+    const submitElement = elementsById.get(ACCOUNTABILITY_SUBMIT_TARGET);
     const submitDescription = submitElement
       ? `${submitElement.nemu_id} ${submitElement.label}`
       : "";

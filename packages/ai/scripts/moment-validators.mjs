@@ -8,6 +8,16 @@ function matchesExactActionPlan(actions, expectedActions) {
   );
 }
 
+export function hasUnnegatedAutomaticFillClaim(text) {
+  const automaticFillPattern =
+    /(?:terisi|diisi|mengisi(?:kan)?)\s+(?:secara\s+)?otomatis|otomatis\s+(?:terisi|diisi|mengisi(?:kan)?)/giu;
+
+  return [...text.matchAll(automaticFillPattern)].some((match) => {
+    const prefix = text.slice(Math.max(0, match.index - 40), match.index);
+    return !/\b(?:bukan|tidak|tak)\s+(?:(?:perlu|akan|pernah|secara)\s+){0,3}$/iu.test(prefix);
+  });
+}
+
 export function validateMoment2Response(res) {
   const isAnswer = res.status === "answer";
   const text = `${res.answer.ringkas} ${res.answer.detail}`;
@@ -15,12 +25,13 @@ export function validateMoment2Response(res) {
   const describesManualEntry =
     /\b(?:isi|masukkan|ketik)\s+(?:nilai\s+)?(?:nominal(?:\s+(?:penginapan|lumpsum))?|Rp\s*447[.,]000)[^.!?]{0,80}\b(?:secara\s+manual|sendiri)\b/iu.test(
       text,
+    ) ||
+    /\b(?:isi|masukkan|ketik)\s+(?:secara\s+)?manual\b[^.!?]{0,40}\b(?:nilai\s+)?(?:nominal(?:\s+(?:penginapan|lumpsum))?|Rp\s*447[.,]000)\b/iu.test(
+      text,
     );
   const deniesManualEntry =
     /\b(?:jangan|tidak perlu|tak perlu)\s+(?:meng)?(?:isi|masukkan|ketik)\b/iu.test(text);
-  const claimsAutomaticFill = /(?:terisi|diisi)\s+otomatis|otomatis\s+(?:terisi|diisi)/iu.test(
-    text,
-  );
+  const claimsAutomaticFill = hasUnnegatedAutomaticFillClaim(text);
   const hasCalc = res.calc.some(
     (c) => c.fungsi === "hitung_lumpsum_penginapan" && (c.hasil === 447_000 || c.hasil === 447000),
   );

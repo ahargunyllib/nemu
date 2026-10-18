@@ -8,6 +8,7 @@ import {
 } from "@nemu/contracts/fixtures";
 
 import {
+  hasUnnegatedAutomaticFillClaim,
   validateMoment2Response,
   validateMoment3FollowUpResponse,
   validateMoment3InitialResponse,
@@ -62,6 +63,69 @@ test("Moment 2 validation rejects negated manual-entry wording", () => {
     result.reasons.some((reason) => reason.includes("manual entry")),
     true,
   );
+});
+
+test("Moment 2 validation accepts manual wording before the field name", () => {
+  const result = validateMoment2Response({
+    ...momentTwoResponse,
+    answer: {
+      ringkas: "Pilih Tidak menginap di hotel, lalu isi manual Nominal penginapan Rp447.000.",
+      detail: "Perhitungannya 30 persen dari tarif hotel untuk dua malam.",
+    },
+  });
+
+  assert.equal(result.passed, true);
+});
+
+test("Moment 2 validation accepts an explicit denial of automatic fill", () => {
+  const result = validateMoment2Response({
+    ...momentTwoResponse,
+    answer: {
+      ringkas: "Isi manual Nominal penginapan Rp447.000.",
+      detail: "Nominal penginapan perlu dimasukkan sendiri, bukan terisi otomatis.",
+    },
+  });
+
+  assert.equal(result.passed, true);
+});
+
+test("automatic-fill validation handles each claim independently", () => {
+  assert.equal(
+    hasUnnegatedAutomaticFillClaim(
+      "Nominal tidak terisi otomatis saat offline, tetapi terisi otomatis saat online.",
+    ),
+    true,
+  );
+  assert.equal(hasUnnegatedAutomaticFillClaim("Nominal penginapan tidak otomatis terisi."), false);
+  assert.equal(
+    hasUnnegatedAutomaticFillClaim("Aplikasi mengisi otomatis nominal penginapan."),
+    true,
+  );
+  assert.equal(hasUnnegatedAutomaticFillClaim("Aplikasi tidak mengisi secara otomatis."), false);
+});
+
+test("Moment 2 validation rejects a positive claim after a negated automatic-fill claim", () => {
+  const result = validateMoment2Response({
+    ...momentTwoResponse,
+    answer: {
+      ringkas: "Isi manual Nominal penginapan Rp447.000.",
+      detail: "Nominal tidak terisi otomatis saat offline, tetapi terisi otomatis saat online.",
+    },
+  });
+
+  assert.equal(result.passed, false);
+});
+
+test("Moment 2 validation rejects an active automatic-fill claim", () => {
+  const result = validateMoment2Response({
+    ...momentTwoResponse,
+    answer: {
+      ringkas: "Isi manual Nominal penginapan Rp447.000.",
+      detail: "Namun aplikasi mengisi otomatis nominal penginapan.",
+    },
+  });
+
+  assert.equal(result.passed, false);
 });
 
 test("Moment 3 initial validation requires only the task navigation click", () => {

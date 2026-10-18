@@ -8,6 +8,7 @@ import {
   momentTwoRequest,
 } from "@nemu/contracts/fixtures";
 import { nemuActionSchema } from "@nemu/contracts";
+import { ALL_NEMU_IDS, NEMU_IDS } from "@nemu/contracts/nemu-ids";
 
 import {
   DEMO_HOLIDAYS_2026,
@@ -95,8 +96,24 @@ test("application guidance says the accommodation amount is entered manually", (
     .map((chunk) => chunk.text)
     .join("\n");
 
-  assert.match(applicationGuidance, /isi nominal lumpsum/iu);
-  assert.doesNotMatch(applicationGuidance, /nominal lumpsum.+terisi otomatis/iu);
+  assert.match(applicationGuidance, /isi nominal penginapan/iu);
+  assert.doesNotMatch(applicationGuidance, /nominal penginapan.+terisi otomatis/iu);
+});
+
+test("application guidance only references canonical Nemu element ids", () => {
+  const applicationGuidance = DEMO_KNOWLEDGE_CHUNKS.filter((chunk) => chunk.docId === "panduan-app")
+    .map((chunk) => chunk.text)
+    .join("\n");
+  const referencedIds = [...applicationGuidance.matchAll(/\[([^\]]+)\]/gu)].flatMap((match) =>
+    match[1] ? [match[1]] : [],
+  );
+  const canonicalIds = new Set<string>(ALL_NEMU_IDS);
+
+  assert.ok(referencedIds.length > 0);
+  assert.deepEqual(
+    referencedIds.filter((id) => !canonicalIds.has(id)),
+    [],
+  );
 });
 
 test("contract rejects clicks that are not jalan_sendiri", () => {
@@ -275,7 +292,7 @@ test("Moment 2 uses trusted workflow context when Jev returns a non-ideal decisi
   ]);
 });
 
-test("low confidence prevents automatic clicks", async () => {
+test("recognized start intent opens the safe menu even at low confidence", async () => {
   const jevDecider: JevDecider = async () => ({
     intent: "start_travel_request",
     intentConfidence: 0.6,
@@ -321,7 +338,141 @@ test("low confidence prevents automatic clicks", async () => {
     },
   );
 
+  assert.deepEqual(response.actions, [
+    {
+      type: "click",
+      target: "menu-ajukan-perjalanan-dinas",
+      level: "jalan_sendiri",
+      label: "Buka formulir",
+    },
+  ]);
+});
+
+test("generic low-confidence actions remain highlights", async () => {
+  const response = await runNemu(
+    {
+      session_id: "s-generic-low-confidence",
+      url: "https://app.demo/",
+      prompt: "Menu yang mana?",
+      elements: [
+        {
+          nemu_id: "menu-ajukan-perjalanan-dinas",
+          label: "Ajukan Perjalanan Dinas",
+          role: "link",
+          visible: true,
+        },
+      ],
+    },
+    {
+      userProfile: DEMO_USER_PROFILE,
+      knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      sbmRows: DEMO_SBM_ROWS,
+      holidays: [],
+      requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+      currentDate: "2026-10-17",
+      jevDecider: async () => ({
+        intent: "unclear",
+        intentConfidence: 0.6,
+        withinDomainProbability: 0.9,
+        injectionProbability: 0,
+        requiredTool: "none",
+        actionLevel: "jalan_sendiri",
+        actionConfidence: 0.7,
+        target: "menu-ajukan-perjalanan-dinas",
+        targetConfidence: 0.7,
+      }),
+      answerGenerator: async () => ({
+        status: "answer",
+        ringkas: "Saya tunjukkan menu pengajuan perjalanan dinas.",
+        detail: "Buka menu tersebut bila kamu ingin membuat pengajuan baru.",
+        citationIds: ["sop-pd-01-section-4"],
+        warnings: [],
+      }),
+    },
+  );
+
   assert.equal(response.actions[0]?.type, "highlight");
+});
+
+test("start intent on the request form guides its six required fields in order", async () => {
+  const targets = [
+    NEMU_IDS.perdinForm.jenisPerjalanan,
+    NEMU_IDS.perdinForm.nomorSuratTugas,
+    NEMU_IDS.perdinForm.kotaTujuan,
+    NEMU_IDS.perdinForm.maksud,
+    NEMU_IDS.perdinForm.tanggalBerangkat,
+    NEMU_IDS.perdinForm.tanggalKembali,
+  ] as const;
+  const response = await runNemu(
+    {
+      session_id: "s-form-guidance",
+      url: "https://app.demo/perdin/baru",
+      prompt: "Cara ajukan dinas gimana?",
+      elements: [
+        {
+          nemu_id: NEMU_IDS.shell.menuAjukanPerjalananDinas,
+          label: "Ajukan Perjalanan Dinas",
+          role: "link",
+          visible: true,
+        },
+        ...targets.map((nemu_id, index) => ({
+          nemu_id,
+          label: nemu_id,
+          role: "textbox",
+          visible: index < 2,
+        })),
+      ],
+      process_context: {
+        instance_id: "PD-DRAFT",
+        active_task: "isi_rencana",
+        uploaded_documents: [],
+      },
+    },
+    {
+      userProfile: DEMO_USER_PROFILE,
+      knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      sbmRows: DEMO_SBM_ROWS,
+      holidays: [],
+      requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+      currentDate: "2026-10-17",
+      jevDecider: async () => ({
+        intent: "start_travel_request",
+        intentConfidence: 0.6,
+        withinDomainProbability: 0.99,
+        injectionProbability: 0,
+        requiredTool: "process_status",
+        actionLevel: "arahkan",
+        actionConfidence: 0.6,
+        target: NEMU_IDS.shell.menuAjukanPerjalananDinas,
+        targetConfidence: 0.6,
+      }),
+      answerGenerator: async (input) => {
+        assert.equal(
+          input.workflowGuidance?.some((guidance) => guidance.includes("six initial")),
+          true,
+        );
+        const citationId = input.evidence[0]?.id;
+        assert.ok(citationId);
+        return {
+          status: "answer",
+          ringkas: "Isi enam bagian awal formulir secara berurutan.",
+          detail: "Mulai dari jenis perjalanan sampai tanggal kembali.",
+          citationIds: [citationId],
+          warnings: [],
+        };
+      },
+    },
+  );
+
+  assert.deepEqual(
+    response.actions,
+    targets.map((target) => ({
+      type: "highlight",
+      target,
+      level: "arahkan",
+      label: "Periksa ini",
+    })),
+  );
 });
 
 test("submit-like targets are always returned as confirmations", async () => {
@@ -435,12 +586,12 @@ test("Moment 3 follow-up uses trusted workflow context when Jev returns a non-id
   ]);
 });
 
-test("workflow guidance omits uploaded and hidden accountability controls", async () => {
+test("workflow guidance includes missing accountability controls that are rendered off-screen", async () => {
   const response = await runNemu(
     {
       ...momentThreeFollowUpRequest,
       elements: momentThreeFollowUpRequest.elements.map((element) =>
-        element.nemu_id === "upload-boarding-pass-pulang"
+        element.nemu_id === "upload-boarding-pass-pulang" || element.nemu_id === "button-kirim"
           ? { ...element, visible: false }
           : element,
       ),
@@ -473,7 +624,7 @@ test("workflow guidance omits uploaded and hidden accountability controls", asyn
       answerGenerator: async () => ({
         status: "answer",
         ringkas: "Unggah boarding pass pulang sebelum mengirim pertanggungjawaban.",
-        detail: "Kontrol unggah yang tidak terlihat tidak boleh ditargetkan.",
+        detail: "Kontrol yang ada di halaman tetap dapat dipandu setelah digulir.",
         citationIds: ["sop-pd-01-section-4"],
         warnings: [],
       }),
@@ -481,6 +632,12 @@ test("workflow guidance omits uploaded and hidden accountability controls", asyn
   );
 
   assert.deepEqual(response.actions, [
+    {
+      type: "highlight",
+      target: "upload-boarding-pass-pulang",
+      level: "arahkan",
+      label: "Unggah dokumen ini",
+    },
     {
       type: "confirm",
       target: "button-kirim",
