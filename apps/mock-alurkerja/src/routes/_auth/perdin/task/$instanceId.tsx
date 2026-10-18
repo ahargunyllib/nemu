@@ -2,6 +2,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@nemu/ui/compo
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@nemu/ui/components/sheet";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 
 import PertanggungjawabanTask from "@/features/perjalanan-dinas/components/pertanggungjawaban-task";
 import TaskList from "@/features/perjalanan-dinas/components/task-list";
@@ -15,10 +16,13 @@ export const Route = createFileRoute("/_auth/perdin/task/$instanceId")({
   component: RouteComponent,
 });
 
-/** A Task opens as a sheet over My Task, so the list stays in view and opens other Tasks. */
+/** A Task opens as a sheet over My Task: it slides in, and slides out before going back. */
 function RouteComponent() {
   const { instanceId } = Route.useParams();
   const navigate = Route.useNavigate();
+  // Opened after mount so the Sheet plays its enter transition; mounting it open skips it.
+  const [open, setOpen] = useState(false);
+  useEffect(() => setOpen(true), []);
   const { data: tasks } = useQuery(orpc.listMyTasks.queryOptions());
   const { data: instance, isPending } = useQuery(
     orpc.getProcessInstance.queryOptions({ input: { instanceId }, retry: false }),
@@ -27,19 +31,21 @@ function RouteComponent() {
   return (
     <>
       {tasks ? <TaskList tasks={tasks} /> : <TaskListSkeleton />}
+      {/* Non-modal so the Nemu overlay stays usable: a modal Sheet makes the rest of the page inert. */}
       <Sheet
-        open
+        open={open}
         modal={false}
-        disablePointerDismissal
-        onOpenChange={(open) => {
-          if (!open) void navigate({ to: "/my-task" });
+        onOpenChange={(next, details) => {
+          if (!next && isInNemuOverlay(details.event)) return details.cancel();
+          setOpen(next);
+        }}
+        onOpenChangeComplete={(next) => {
+          if (!next) void navigate({ to: "/my-task" });
         }}
       >
-        {/* data-task-sheet: index.css keeps the side menu, top bar, and list clear of its overlay. */}
         <SheetContent
-          data-task-sheet
           showCloseButton={false}
-          className="gap-0 data-[side=right]:top-14 data-[side=right]:h-auto data-[side=right]:w-full data-[side=right]:sm:max-w-2xl"
+          className="gap-0 data-[side=right]:w-full data-[side=right]:sm:max-w-2xl"
         >
           {isPending ? (
             <TaskSheetSkeleton />
@@ -67,4 +73,14 @@ function RouteComponent() {
       </Sheet>
     </>
   );
+}
+
+/** Whether a press or focus move landed in the Nemu extension, which must not close the sheet. */
+function isInNemuOverlay(event: Event | undefined) {
+  const target = event instanceof FocusEvent ? event.relatedTarget : event?.target;
+  if (!(target instanceof Element)) return false;
+  // The extension renders in a shadow root under <nemu-overlay>, and closest() stops at the root.
+  const root = target.getRootNode();
+  const element = root instanceof ShadowRoot ? root.host : target;
+  return element.closest("nemu-overlay") !== null;
 }

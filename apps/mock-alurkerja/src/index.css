@@ -20,13 +20,3 @@
   --color-task-header-foreground: var(--task-header-foreground);
   --color-task-done: var(--task-done);
 }
-
-/*
- * The task sheet opens beside My Task, as in AlurKerja: the side menu, top bar, and Task list stay
- * in view and clickable, so the stock Sheet overlay under it is see-through and lets clicks pass.
- */
-[data-slot="sheet-overlay"]:has(~ [data-task-sheet]) {
-  background: transparent;
-  backdrop-filter: none;
-  pointer-events: none;
-}

@@ -91,10 +91,12 @@ the browser. The Task detail page shows the same column behind its sheet.
 
 ### Task detail
 
-A Task opens as a sheet on the right of My Task, under the top bar: the Task
-list stays in view and clickable beside it, so another Task opens in the same
-sheet. Closing it (the × with the `link-kembali-my-task` id, or Esc) goes back
-to My Task. The URL stays `/perdin/task/$instanceId`, which the extension reads.
+A Task opens as the stock shadcn Sheet over My Task: it slides in from the
+right over a dimmed backdrop. Closing it (the × with the `link-kembali-my-task`
+id, a click on the backdrop, or Esc) slides it out and goes back to My Task. The
+Sheet is non-modal and ignores presses inside `<nemu-overlay>`, so the Nemu
+Composer stays usable while it is open. The URL stays `/perdin/task/$instanceId`,
+which the extension reads.
 
 The sheet's orange header names the process (Perjalanan Dinas and the Task ID),
 the Task (or the State while no Task is open, e.g. Verifikasi) with the nomor
