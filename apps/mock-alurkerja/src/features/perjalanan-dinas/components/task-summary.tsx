@@ -30,9 +30,6 @@ export default function TaskSummary({
         </span>
         <SheetDescription className="text-task-header-foreground">
           Perjalanan Dinas
-          {instance.activeTask && (
-            <span className="text-task-header-foreground/80"> · {instance.activeTask.id}</span>
-          )}
         </SheetDescription>
         <TaskSheetClose className="ml-auto -mr-2 hover:bg-task-header-foreground/15 hover:text-task-header-foreground" />
       </div>
