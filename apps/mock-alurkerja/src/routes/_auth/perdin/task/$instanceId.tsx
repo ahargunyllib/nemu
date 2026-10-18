@@ -2,7 +2,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@nemu/ui/compo
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@nemu/ui/components/sheet";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import PertanggungjawabanTask from "@/features/perjalanan-dinas/components/pertanggungjawaban-task";
 import TaskList from "@/features/perjalanan-dinas/components/task-list";
@@ -16,14 +16,12 @@ export const Route = createFileRoute("/_auth/perdin/task/$instanceId")({
   component: RouteComponent,
 });
 
-/** A Task opens as a sheet over My Task: it slides in, and slides out before going back. */
+/** A Task opens as a sheet over My Task; closing it slides it out, then goes back. */
 function RouteComponent() {
   const { instanceId } = Route.useParams();
   const navigate = Route.useNavigate();
   const { user } = Route.useRouteContext();
-  // Opened after mount so the Sheet plays its enter transition; mounting it open skips it.
-  const [open, setOpen] = useState(false);
-  useEffect(() => setOpen(true), []);
+  const [open, setOpen] = useState(true);
   const { data: tasks } = useQuery(orpc.listMyTasks.queryOptions());
   const { data: instance, isPending } = useQuery(
     orpc.getProcessInstance.queryOptions({ input: { instanceId }, retry: false }),
@@ -36,10 +34,7 @@ function RouteComponent() {
       <Sheet
         open={open}
         modal={false}
-        onOpenChange={(next, details) => {
-          if (!next && isInNemuOverlay(details.event)) return details.cancel();
-          setOpen(next);
-        }}
+        onOpenChange={setOpen}
         onOpenChangeComplete={(next) => {
           if (!next) void navigate({ to: "/my-task" });
         }}
@@ -74,14 +69,4 @@ function RouteComponent() {
       </Sheet>
     </>
   );
-}
-
-/** Whether a press or focus move landed in the Nemu extension, which must not close the sheet. */
-function isInNemuOverlay(event: Event | undefined) {
-  const target = event instanceof FocusEvent ? event.relatedTarget : event?.target;
-  if (!(target instanceof Element)) return false;
-  // The extension renders in a shadow root under <nemu-overlay>, and closest() stops at the root.
-  const root = target.getRootNode();
-  const element = root instanceof ShadowRoot ? root.host : target;
-  return element.closest("nemu-overlay") !== null;
 }

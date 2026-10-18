@@ -93,11 +93,11 @@ The Task detail page shows the same column behind its sheet.
 
 ### Task detail
 
-A Task opens as the stock shadcn Sheet over My Task: it slides in from the
-right over a dimmed backdrop. Closing it (the × with the `link-kembali-my-task`
-id, a click on the backdrop, or Esc) slides it out and goes back to My Task. The
-Sheet is non-modal and ignores presses inside `<nemu-overlay>`, so the Nemu
-Composer stays usable while it is open. The URL stays `/perdin/task/$instanceId`,
+A Task opens as the stock shadcn Sheet on the right of My Task, over a dimmed
+backdrop. It mounts already open, so it appears without sliding in. Closing it
+(the × with the `link-kembali-my-task` id, a click outside it, or Esc) slides it
+out and goes back to My Task. The Sheet is non-modal, so the page isn't inert and
+the Nemu Composer can take focus. The URL stays `/perdin/task/$instanceId`,
 which the extension reads.
 
 The sheet's orange header names the process (Perjalanan Dinas and the Task ID),
