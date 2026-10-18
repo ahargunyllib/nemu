@@ -23,6 +23,12 @@ export const NEMU_IDS = {
     accountMenu: "button-akun",
     signOut: "menu-item-keluar",
   },
+  /** Favorite Processes on Beranda (`/`): each opens that process's start form. */
+  favoriteProcess: {
+    perjalananDinas: "favorite-perjalanan-dinas",
+    pengajuanCuti: "favorite-pengajuan-cuti",
+    reimbursement: "favorite-reimbursement",
+  },
   /** Task links, one per Task, on Beranda (`/`) and My Task (`/my-task`). */
   task: {
     pertanggungjawaban: "task-pertanggungjawaban",
@@ -35,8 +41,15 @@ export const NEMU_IDS = {
   },
   /** Ajukan Perjalanan Dinas form (`/perdin/baru`). */
   perdinForm: {
+    tabJenisTujuan: "tab-jenis-tujuan",
+    tabJadwal: "tab-jadwal",
+    tabBiaya: "tab-biaya",
+    tabDokumen: "tab-dokumen",
     jenisPerjalanan: "select-jenis-perjalanan",
+    /** The surat tugas the trip is based on, picked from the user's surat tugas. */
+    dasarPenugasan: "select-dasar-penugasan",
     nomorSuratTugas: "input-nomor-surat-tugas",
+    /** Kept from when Kota tujuan was a select; ids are never renamed. */
     kotaTujuan: "select-kota-tujuan",
     maksud: "input-maksud-perjalanan",
     tanggalBerangkat: "input-tanggal-berangkat",

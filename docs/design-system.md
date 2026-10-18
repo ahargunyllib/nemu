@@ -82,6 +82,16 @@ close ×, with the Composer pill inside it below ("Tanya tentang bagian ini…")
   with a small white circle holding the mascot at its left: "Pilih ini", or
   "Isi Rp447.000 · 30% × 2 malam" (the part after · lighter). The success variant is green:
   "Kamu yang mengirim".
+- **Guided steps** (Momen 1 and 2): when an answer walks the user through several fields, there
+  is no Answer Card. Each step shows the Tingkat 0 outline and label, with the step count after
+  the label: "Pilih Dinas luar kota · langkah 1/3". Beside the target sits a small header-less
+  **step card** (white, rounded, about 280 px wide, close × top-right) holding the action's
+  `note`, with `**bold**` for the option to pick ("…jadi pilih **"Tidak menginap di hotel"**.").
+  When the action has a `value`, the card adds it bold under the note and a `nemu-subtle` strip
+  "Rp447.000 [copy] Salin". The mascot sits on the card's top-left corner. The card goes above or
+  below the target, wherever it does not cover the field. Nemu never fills the field: when the
+  user fills or picks it, the mascot turns green for a moment and the next step starts. After the
+  last step everything goes away.
 - **Tingkat 1 · Jawaban ringkas** (default): a white card beside the highlighted element, the
   element stays outlined. Header: mascot icon + title in Card title style ("Pilih \"Tidak menginap
   di hotel\""), close ×. Body: a muted bordered calc box ("30% × Rp745.000 × 2 malam" over a bold
@@ -112,8 +122,11 @@ Other pieces: a result strip "Rp447.000 [copy icon] Salin" on `nemu-subtle`; num
   appears in 250 ms. On a coloured header use a white dashed line instead.
 - **Click ripple**: an amber ring that expands at the click point.
 - **Loading**: a thin white bar with an amber shimmer moving across.
-- **Klik navigasi**: the mascot-cursor travels to the target, a ripple ring plays on it, and a
-  black pill tooltip under it says "Membuka Perjalanan Dinas… Esc".
+- **Klik navigasi**: the mascot-cursor travels to the target, a ripple ring plays on it, and an
+  amber (`nemu`) pill tooltip under it says "Membuka Perjalanan Dinas… [Esc]".
 - **Sorot guiding**: the target outlined with the "Pilih ini" label, the mascot waiting beside it.
-- **Blok area**: a dashed blue selection box with amber round corner handles, mascot at the
-  bottom-right corner, the rest of the page dimmed.
+- **Blok area**: a dashed amber (`nemu-ring`) selection box with round amber corner handles, the
+  mascot as a cursor at its bottom-right corner. While Nemu reads, the box stays as a grey dashed
+  outline.
+- **Hotkey hint**: while the Composer is open beside the mascot, an amber chip on the mascot's
+  other side reads "Hotkey Ctrl + Shift + [Space]".

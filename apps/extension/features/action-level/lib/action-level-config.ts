@@ -19,6 +19,7 @@ export const ACTION_LEVELS: Partial<Record<NemuId, ActionLevel>> = {
   [NEMU_IDS.shell.menuMyTask]: "jalan_sendiri",
   [NEMU_IDS.task.pertanggungjawaban]: "jalan_sendiri",
   [NEMU_IDS.taskDetail.back]: "jalan_sendiri",
+  [NEMU_IDS.favoriteProcess.perjalananDinas]: "jalan_sendiri",
 
   // Buttons that submit something: the user presses them.
   [NEMU_IDS.login.submit]: "konfirmasi",
