@@ -2,6 +2,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@nemu/ui/compo
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@nemu/ui/components/sheet";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 
 import PertanggungjawabanTask from "@/features/perjalanan-dinas/components/pertanggungjawaban-task";
 import TaskList from "@/features/perjalanan-dinas/components/task-list";
@@ -15,11 +16,12 @@ export const Route = createFileRoute("/_auth/perdin/task/$instanceId")({
   component: RouteComponent,
 });
 
-/** A Task opens as a sheet over My Task, so the list stays in view and opens other Tasks. */
+/** A Task opens as a sheet over My Task; closing it slides it out, then goes back. */
 function RouteComponent() {
   const { instanceId } = Route.useParams();
   const navigate = Route.useNavigate();
   const { user } = Route.useRouteContext();
+  const [open, setOpen] = useState(true);
   const { data: tasks } = useQuery(orpc.listMyTasks.queryOptions());
   const { data: instance, isPending } = useQuery(
     orpc.getProcessInstance.queryOptions({ input: { instanceId }, retry: false }),
@@ -28,19 +30,18 @@ function RouteComponent() {
   return (
     <>
       {tasks ? <TaskList tasks={tasks} /> : <TaskListSkeleton />}
+      {/* Non-modal so the Nemu overlay stays usable: a modal Sheet makes the rest of the page inert. */}
       <Sheet
-        open
+        open={open}
         modal={false}
-        disablePointerDismissal
-        onOpenChange={(open) => {
-          if (!open) void navigate({ to: "/my-task" });
+        onOpenChange={setOpen}
+        onOpenChangeComplete={(next) => {
+          if (!next) void navigate({ to: "/my-task" });
         }}
       >
-        {/* data-task-sheet: index.css keeps the side menu, top bar, and list clear of its overlay. */}
         <SheetContent
-          data-task-sheet
           showCloseButton={false}
-          className="gap-0 data-[side=right]:top-14 data-[side=right]:h-auto data-[side=right]:w-full data-[side=right]:sm:max-w-2xl"
+          className="gap-0 data-[side=right]:w-full data-[side=right]:sm:max-w-2xl"
         >
           {isPending ? (
             <TaskSheetSkeleton />

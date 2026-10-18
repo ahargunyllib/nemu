@@ -28,6 +28,8 @@ The Demo App and the Admin Workspace share one signed-in layout from `packages/u
 
 A design revision changes only how things look. Build the new look on the data the app already has, and leave the fixtures and the AI Responder as they are unless the user asks to change them. For example, the Momen 1 and 2 revision restyled the Demo App and the extension but kept the existing Momen fixtures.
 
+Use a vendored overlay (Sheet, Dialog, Popover) with its stock behaviour: its backdrop, its enter and exit animation, and its dismissal. Don't hide the backdrop or reposition the popup with CSS overrides to make it act like an inline panel; if the design needs a panel that sits beside the page, build a panel, not an overlay. Keep the code that drives it minimal too: no mount effects to force an enter animation and no event filters to second-guess dismissal. A route that renders an overlay holds `open` in state and navigates away in `onOpenChangeComplete`, so the exit animation plays. For example, the Task detail sheet dropped its see-through overlay and under-the-top-bar placement and became a stock Sheet; it also dropped a mount effect and a `<nemu-overlay>` press filter, so it appears without sliding in.
+
 Every vendored component must come from the `base-maia` style set in `packages/ui/components.json`: rounded corners (`rounded-2xl` to `rounded-4xl`) and `text-sm` body text. A component that looks off-style, such as one with sharp `rounded-none` corners or `text-xs/relaxed` text, was copied from another style. Re-add it with `shadcn add <name> --overwrite` from `packages/ui` instead of patching classes by hand. For example, `Dialog` and `Sheet` were re-added this way after the Upload document dialog rendered with sharp corners.
 
 ### Demo-only controls
