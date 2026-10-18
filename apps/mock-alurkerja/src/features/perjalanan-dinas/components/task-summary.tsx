@@ -2,11 +2,10 @@ import { SheetDescription, SheetHeader, SheetTitle } from "@nemu/ui/components/s
 import type { ReactNode } from "react";
 
 import TaskSheetClose from "@/features/perjalanan-dinas/components/task-sheet-close";
+import { taskDueDate } from "@/features/perjalanan-dinas/lib/task-due";
 import type { ProcessInstanceView } from "@/features/perjalanan-dinas/types/process-instance-view";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-/** Days a Task has before it falls due. The demo keeps no due date, so every Task gets a week. */
-const TASK_DUE_DAYS = 7;
 // The demo's Satker is in Yogyakarta, so Task dates read in WIB wherever the demo runs.
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
@@ -33,7 +32,7 @@ export default function TaskSummary({
   const meta = [
     ["Task Age", ageDays === 1 ? "1 day" : `${ageDays} days`],
     ["Created", dateFormatter.format(created)],
-    ["Due Date", dateFormatter.format(new Date(created.getTime() + TASK_DUE_DAYS * DAY_MS))],
+    ["Due Date", dateFormatter.format(taskDueDate(instance))],
     ["Assignee", assignee],
   ] as const;
 
