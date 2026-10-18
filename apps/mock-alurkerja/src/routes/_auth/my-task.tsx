@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { PageHeading } from "@nemu/ui/shell/page-heading";
 import { createFileRoute } from "@tanstack/react-router";
 
 import TaskList from "@/features/perjalanan-dinas/components/task-list";
@@ -13,10 +12,5 @@ export const Route = createFileRoute("/_auth/my-task")({
 function RouteComponent() {
   const { data: tasks } = useQuery(orpc.listMyTasks.queryOptions());
 
-  return (
-    <>
-      <PageHeading title="My Task" />
-      {tasks ? <TaskList tasks={tasks} /> : <TaskListSkeleton />}
-    </>
-  );
+  return tasks ? <TaskList tasks={tasks} /> : <TaskListSkeleton />;
 }

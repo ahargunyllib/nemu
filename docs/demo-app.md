@@ -71,6 +71,14 @@ Uang harian shows the SBM daily rate times the days for a luar kota trip.
 every field is valid. A field shows its error once touched, and a tab holding an
 error shows a red dot, so Rina can find it from any tab.
 
+### My Task
+
+My Task is one narrow column: the "My Tasks" heading, a **Search tasks…** box,
+a "Due date" label, and a compact row per Task (its label over "Perjalanan
+Dinas · <task ID>"). Each row keeps its `task-*` id and opens the Task detail
+page. The search filters the rows by Task label, Task ID, or nomor pengajuan in
+the browser. The Task detail page shows the same column behind its sheet.
+
 ## Process Instances
 
 Start Process on Ajukan Perjalanan Dinas stores a Process Instance in the
