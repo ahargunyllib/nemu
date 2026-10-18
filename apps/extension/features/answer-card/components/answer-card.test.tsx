@@ -10,12 +10,17 @@ import { cleanup, fireEvent, getDefaultNormalizer, render, screen } from "@testi
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 
 import { AnswerCard } from "./answer-card";
+import { AnswerCardHeader } from "./answer-card-header";
 
 afterEach(cleanup);
 
 function renderCard(response: NemuResponse, onReply = vi.fn(), children?: React.ReactNode) {
   render(
-    <AnswerCard response={response} header={null} onReply={onReply}>
+    <AnswerCard
+      response={response}
+      header={<AnswerCardHeader prompt="Pertanyaan" onClose={vi.fn()} />}
+      onReply={onReply}
+    >
       {children}
     </AnswerCard>,
   );
@@ -42,7 +47,7 @@ describe("AnswerCard", () => {
   test("shows the Momen 2 calculation breakdown", () => {
     renderCard(momentTwoResponse);
 
-    expect(screen.getByText(/30% × Rp745\.000 × 2 malam =/)).toBeTruthy();
+    expect(screen.getByText("30% × Rp745.000 × 2 malam")).toBeTruthy();
     expect(screen.getByText("Rp447.000")).toBeTruthy();
   });
 
@@ -71,8 +76,10 @@ describe("AnswerCard", () => {
     const keepLines = { normalizer: getDefaultNormalizer({ collapseWhitespace: false }) };
 
     expect(screen.queryByText(detail, keepLines)).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Lihat detail" }));
+    fireEvent.click(screen.getByRole("button", { name: "Rincian" }));
     expect(screen.getByText(detail, keepLines)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Tutup rincian" }));
+    expect(screen.queryByText(detail, keepLines)).toBeNull();
   });
 
   test("opens a citation's full reference when clicked", () => {
@@ -94,6 +101,12 @@ describe("AnswerCard", () => {
     expect(screen.getByText("Nemu butuh info tambahan")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Jawab" }));
     expect(onReply).toHaveBeenCalledOnce();
+  });
+
+  test("names an answer in the header's kicker", () => {
+    renderCard(momentTwoResponse);
+
+    expect(screen.getByText("Jawaban")).toBeTruthy();
   });
 
   test("marks a refusal as out of scope", () => {

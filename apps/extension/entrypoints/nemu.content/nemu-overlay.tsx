@@ -183,6 +183,7 @@ export function NemuOverlay() {
               <LoginRequiredCard
                 header={header}
                 loginUrl={new URL("/login", window.location.href).href}
+                onClose={close}
               />
             )}
             {state.kind === "error" && (
@@ -190,6 +191,7 @@ export function NemuOverlay() {
                 header={header}
                 message={state.message}
                 onRetry={() => ask(state.prompt, state.screenshotCrop)}
+                onClose={close}
               />
             )}
           </div>

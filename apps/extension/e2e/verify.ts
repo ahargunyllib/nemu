@@ -118,7 +118,8 @@ async function newestChatLogEntry(page: Page): Promise<{ prompt: string; hasArea
 }
 
 async function closeAnswerCard(page: Page) {
-  await page.getByRole("button", { name: "Tutup" }).click();
+  // The header's ×, not the Tutup link of a notice card or Rincian's "Tutup rincian".
+  await page.getByRole("button", { name: "Tutup", exact: true }).first().click();
 }
 
 type Box = { x: number; y: number; width: number; height: number };
@@ -269,7 +270,7 @@ async function main() {
             await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-1-clicking.png") });
           }
           await page.waitForURL(`${DEMO_APP_URL}/perdin/baru`);
-          await page.getByRole("button", { name: "Lihat detail" }).click();
+          await page.getByRole("button", { name: "Rincian", exact: true }).click();
           await page.getByText("Rincian perkiraan biaya", { exact: false }).waitFor();
           if (run === 1) {
             await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-1-form.png") });
