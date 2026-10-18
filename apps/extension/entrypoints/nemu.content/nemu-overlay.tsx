@@ -103,7 +103,7 @@ export function NemuOverlay() {
       }
     >
       <PageLayer>
-        {highlight && <HighlightRing box={highlight.box} label={highlight.action.label} />}
+        {highlight && <HighlightRing box={highlight.box} action={highlight.action} />}
         {cursor && <NavigationCursor frame={cursor} />}
         <Mascot
           activity={{

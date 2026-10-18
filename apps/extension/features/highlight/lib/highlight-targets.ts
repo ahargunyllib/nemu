@@ -8,7 +8,7 @@ export type HighlightTarget = { action: NemuAction; element: HTMLElement };
 export const RING_PADDING = 4;
 export const LABEL_SPACE = 28;
 /** Room for a typical action label, which can be wider than a small target such as a radio. */
-const LABEL_WIDTH = 160;
+const LABEL_WIDTH = 200;
 
 /**
  * Finds the page element for each `highlight` and `confirm` action: a confirm is shown the same
@@ -53,12 +53,22 @@ export function missingTargetWarning(action: NemuAction): string {
   return `Nemu tidak menemukan "${action.label}" (${action.target}) di halaman ini.`;
 }
 
+/**
+ * Whether a label wider than its target grows to the left, past the outline's left edge, because
+ * growing to the right would run it off the viewport. Otherwise it grows to the right.
+ */
+export function labelGrowsLeft(box: Box, viewportWidth: number): boolean {
+  return box.left - RING_PADDING + LABEL_WIDTH > viewportWidth;
+}
+
 /** The area a highlight draws on: the element, its outline, and its label on either side. */
-export function highlightFootprint(box: Box): Box {
+export function highlightFootprint(box: Box, viewportWidth = window.innerWidth): Box {
+  const width = Math.max(box.width + 2 * RING_PADDING, LABEL_WIDTH);
+  const right = box.left + box.width + RING_PADDING;
   return {
-    left: box.left - RING_PADDING,
+    left: labelGrowsLeft(box, viewportWidth) ? right - width : box.left - RING_PADDING,
     top: box.top - RING_PADDING - LABEL_SPACE,
-    width: Math.max(box.width + 2 * RING_PADDING, LABEL_WIDTH),
+    width,
     height: box.height + 2 * (RING_PADDING + LABEL_SPACE),
   };
 }

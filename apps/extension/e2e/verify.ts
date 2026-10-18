@@ -152,11 +152,18 @@ function sameBox(a: Box, b: Box): boolean {
 
 /** Checks that the overlay draws one ring, labelled `label`, around the target's box. */
 async function assertOnlyRing(overlay: Locator, target: string, label: string, targetBox: Box) {
-  // A ring's label is the only badge outside the Answer Card.
-  const rings = overlay.locator('[data-slot="badge"]:not([data-slot="card"] *)');
+  const rings = overlay.locator("[data-nemu-highlight]");
   if ((await rings.count()) !== 1) throw new Error(`${await rings.count()} rings, not one`);
-  if ((await rings.textContent()) !== label) throw new Error(`no "${label}" label on ${target}`);
-  if (!sameBox(await boxOf(rings.locator("..")), ringAround(targetBox))) {
+  // The label's text, without the mascot art beside it.
+  const text = await rings
+    .locator('[data-slot="badge"]')
+    .evaluate((badge) =>
+      Array.from(badge.childNodes, (node) =>
+        node instanceof Element && node.hasAttribute("aria-hidden") ? "" : node.textContent,
+      ).join(""),
+    );
+  if (text !== label) throw new Error(`no "${label}" label on ${target}`);
+  if (!sameBox(await boxOf(rings), ringAround(targetBox))) {
     throw new Error(`the "${label}" ring isn't around ${target}`);
   }
 }
@@ -444,6 +451,9 @@ async function main() {
             // The file name under the field appears once the refetch shows the upload.
             await page.getByText(file, { exact: true }).waitFor();
             await ringStep(index + 1);
+          }
+          if (run === 1) {
+            await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-3-kirim.png") });
           }
           await page.locator('[data-nemu-id="button-kirim"]').click();
 
