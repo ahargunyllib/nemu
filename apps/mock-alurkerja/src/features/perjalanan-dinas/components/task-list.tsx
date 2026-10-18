@@ -31,14 +31,8 @@ export default function TaskList({ tasks }: { tasks: readonly ProcessInstanceVie
         onChange={(event) => setQuery(event.target.value)}
         className="h-8 border-transparent bg-muted text-[13px] leading-[18px] md:text-[13px]"
       />
-      {withTask.length === 0 ? (
-        <Empty className="border">
-          <EmptyHeader>
-            <EmptyTitle>Tidak ada tugas</EmptyTitle>
-            <EmptyDescription>Tugas baru akan muncul di sini.</EmptyDescription>
-          </EmptyHeader>
-        </Empty>
-      ) : shown.length === 0 ? (
+      {/* With no Tasks at all, My Task's TaskPlaceholder says so beside the column. */}
+      {withTask.length === 0 ? null : shown.length === 0 ? (
         <Empty className="border">
           <EmptyHeader>
             <EmptyTitle>Tidak ada tugas yang cocok</EmptyTitle>
@@ -60,7 +54,7 @@ export default function TaskList({ tasks }: { tasks: readonly ProcessInstanceVie
                       params={{ instanceId: id }}
                       data-nemu-id={TASK_NEMU_IDS[activeTask.key]}
                       aria-label={`${activeTask.label} ${id}`}
-                      className="flex flex-col rounded-xl bg-muted px-3 py-2.5 transition-colors outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                      className="flex flex-col rounded-xl bg-muted px-3 py-2.5 ring-1 ring-transparent transition-[background-color,box-shadow] outline-none hover:bg-background hover:shadow-sm hover:ring-border focus-visible:ring-[3px] focus-visible:ring-ring/50"
                     >
                       <span className="text-[13px] leading-[18px] font-medium">
                         {activeTask.label}
