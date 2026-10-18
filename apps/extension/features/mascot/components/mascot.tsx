@@ -1,6 +1,4 @@
 import { Button } from "@nemu/ui/components/button";
-import { XIcon } from "lucide-react";
-import { useState } from "react";
 
 import type { Box } from "../../../shared/types/box";
 import type { CursorFrame } from "../../navigation-click/lib/navigation-click";
@@ -20,14 +18,11 @@ type MascotProps = {
   /** The Blok area while Rina drags it: the mascot sits as the cursor at its bottom-right corner. */
   draggedArea?: Box | null;
   onOpenComposer: (position: Point) => void;
-  /** Hiding the mascot also closes the Composer it waits beside. */
-  onCloseComposer: () => void;
 };
 
 /**
  * The Nemu mascot on the page layer. It follows the cursor and shows what Nemu is doing; clicking
- * it opens the Composer, beside which it shows the shortcut that opens it too. Hidden, it closes the
- * Composer and stays away until Rina opens it again.
+ * it opens the Composer, beside which it shows the shortcut that opens it too.
  */
 export function Mascot({
   activity,
@@ -35,24 +30,15 @@ export function Mascot({
   nemuCursor,
   draggedArea = null,
   onOpenComposer,
-  onCloseComposer,
 }: MascotProps) {
   const state = useMascotState(activity);
   const placement = useMascotPosition(composerAnchor, nemuCursor, draggedArea);
-  const [hidden, setHidden] = useState(false);
-  const [wasListening, setWasListening] = useState(activity.listening);
-
-  // Only opening the Composer brings it back, so hiding sticks while the Composer is still open.
-  if (wasListening !== activity.listening) {
-    setWasListening(activity.listening);
-    if (activity.listening) setHidden(false);
-  }
-  if (hidden || !placement) return null;
+  if (!placement) return null;
 
   return (
     <div
       data-mascot-state={state}
-      className="group pointer-events-auto absolute top-0 left-0 ease-in-out motion-reduce:transition-none"
+      className="pointer-events-auto absolute top-0 left-0 ease-in-out motion-reduce:transition-none"
       style={{
         transform: `translate(${placement.at.x}px, ${placement.at.y}px)`,
         transitionProperty: "transform",
@@ -73,18 +59,6 @@ export function Mascot({
         />
       </Button>
       {composerAnchor && !draggedArea && <HotkeyHint mascotAt={placement.at} />}
-      <Button
-        aria-label="Sembunyikan maskot"
-        size="icon-xs"
-        variant="secondary"
-        className="invisible absolute -top-3 -right-3 shadow-sm group-hover:visible"
-        onClick={() => {
-          setHidden(true);
-          onCloseComposer();
-        }}
-      >
-        <XIcon />
-      </Button>
     </div>
   );
 }

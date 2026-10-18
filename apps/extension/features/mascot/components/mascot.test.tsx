@@ -24,14 +24,12 @@ const NOTHING: MascotActivity = {
 
 function renderMascot() {
   const onOpenComposer = vi.fn();
-  const onCloseComposer = vi.fn();
   const view = render(
     <Mascot
       activity={NOTHING}
       composerAnchor={null}
       nemuCursor={null}
       onOpenComposer={onOpenComposer}
-      onCloseComposer={onCloseComposer}
     />,
   );
   function rerender(
@@ -46,11 +44,10 @@ function renderMascot() {
         nemuCursor={null}
         draggedArea={draggedArea}
         onOpenComposer={onOpenComposer}
-        onCloseComposer={onCloseComposer}
       />,
     );
   }
-  return { onOpenComposer, onCloseComposer, rerender };
+  return { onOpenComposer, rerender };
 }
 
 function moveCursor(x: number, y: number) {
@@ -114,33 +111,13 @@ describe("Mascot", () => {
     expect(mascot()?.style.transform).toBe(waiting);
   });
 
-  test("stays hidden until the Composer opens again", () => {
-    const { rerender } = renderMascot();
+  test("has no button but the mascot itself", () => {
+    renderMascot();
     moveCursor(400, 300);
 
-    fireEvent.click(screen.getByRole("button", { name: "Sembunyikan maskot" }));
-    moveCursor(500, 400);
-    expect(mascot()).toBeNull();
-
-    rerender({ listening: true }, { x: 500, y: 400 });
-    expect(mascot()).not.toBeNull();
-  });
-
-  test("hiding it while the Composer is open closes the Composer and stays hidden", () => {
-    const { onCloseComposer, rerender } = renderMascot();
-    moveCursor(400, 300);
-    rerender({ listening: true }, { x: 400, y: 300 });
-
-    fireEvent.click(screen.getByRole("button", { name: "Sembunyikan maskot" }));
-    expect(onCloseComposer).toHaveBeenCalledOnce();
-    expect(mascot()).toBeNull();
-
-    rerender({});
-    moveCursor(500, 400);
-    expect(mascot()).toBeNull();
-
-    rerender({ listening: true }, { x: 500, y: 400 });
-    expect(mascot()).not.toBeNull();
+    expect(
+      screen.getAllByRole("button").map((button) => button.getAttribute("aria-label")),
+    ).toEqual(["Tanya Nemu"]);
   });
 
   test("returns to idle 3 seconds after success", () => {
