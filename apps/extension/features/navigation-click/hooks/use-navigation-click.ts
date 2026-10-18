@@ -1,7 +1,8 @@
-import type { NemuAction } from "@nemu/contracts";
+import type { NemuAction, PageElement } from "@nemu/contracts";
 import { useEffect, useRef, useState } from "react";
 
 import {
+  clickDestination,
   type ClickOutcome,
   type CursorFrame,
   type Point,
@@ -18,17 +19,21 @@ const IDLE: NavigationClickState = { cursor: null, outcome: null };
 /**
  * Runs one `click` action, already cleared by the Action Levels, starting the cursor at `start`.
  * Esc stops it before the click lands. A new action, or none, cancels the running one.
+ * `elementList` names what the click opens.
  */
 export function useNavigationClick(
   action: NemuAction | undefined,
   start: Point | null,
+  elementList: readonly PageElement[],
 ): NavigationClickState {
   const [state, setState] = useState<NavigationClickState>(IDLE);
   const startRef = useRef(start);
+  const elementListRef = useRef(elementList);
 
   // Only a new action starts a click; a moved start point (the Composer reopened) doesn't.
   useEffect(() => {
     startRef.current = start;
+    elementListRef.current = elementList;
   });
 
   useEffect(() => {
@@ -38,6 +43,7 @@ export function useNavigationClick(
     const controller = new AbortController();
     let disposed = false;
     let restTimer: ReturnType<typeof setTimeout> | undefined;
+    const destination = clickDestination(action, elementListRef.current);
 
     function stopOnEscape(event: KeyboardEvent) {
       if (event.key === "Escape") controller.abort();
@@ -52,7 +58,7 @@ export function useNavigationClick(
       reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
       onFrame: (frame) => {
         if (disposed) return;
-        const cursor = frame.mascot === "clicking" ? { ...frame, label: action.label } : frame;
+        const cursor = frame.mascot === "clicking" ? { ...frame, destination } : frame;
         setState({ cursor, outcome: null });
       },
     }).then((outcome) => {

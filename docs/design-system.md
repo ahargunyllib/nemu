@@ -112,8 +112,10 @@ Other pieces: a result strip "Rp447.000 [copy icon] Salin" on `nemu-subtle`; num
   appears in 250 ms. On a coloured header use a white dashed line instead.
 - **Click ripple**: an amber ring that expands at the click point.
 - **Loading**: a thin white bar with an amber shimmer moving across.
-- **Klik navigasi**: the mascot-cursor travels to the target, a ripple ring plays on it, and an
-  amber (`nemu`) pill tooltip under it says "Membuka Perjalanan Dinas… [Esc]".
+- **Klik navigasi**: the mascot-cursor travels to the target, a ripple ring plays on it, and a
+  dark pill tooltip (the inverse `foreground` fill, white 11.5px medium text) under it says
+  "Membuka Perjalanan Dinas… [Esc]", naming the target. The Answer Card stays under the cursor,
+  its tooltip, and the mascot while that cursor is on the page.
 - **Sorot guiding**: the target outlined with the "Pilih ini" label, the mascot waiting beside it.
 - **Blok area**: a dashed amber (`nemu-ring`) selection box with round amber corner handles, the
   mascot as a cursor at its bottom-right corner. While Nemu reads, the box stays as a grey dashed

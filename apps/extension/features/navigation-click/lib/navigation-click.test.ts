@@ -1,10 +1,11 @@
 // @vitest-environment happy-dom
 import type { NemuAction } from "@nemu/contracts";
-import { momentOneResponse } from "@nemu/contracts/fixtures";
+import { momentOneRequest, momentOneResponse } from "@nemu/contracts/fixtures";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 
 import {
   CHECK_TIMEOUT_MS,
+  clickDestination,
   type CursorFrame,
   MAX_MOVE_MS,
   MIN_MOVE_MS,
@@ -125,5 +126,15 @@ describe("moveDuration", () => {
   test("stays within 400–800 ms however near or far the target is", () => {
     expect(moveDuration({ x: 0, y: 0 }, { x: 0, y: 0 })).toBe(MIN_MOVE_MS);
     expect(moveDuration({ x: 0, y: 0 }, { x: 4_000, y: 3_000 })).toBe(MAX_MOVE_MS);
+  });
+});
+
+describe("clickDestination", () => {
+  test("names what the click opens after its target in the Element List", () => {
+    expect(clickDestination(menuClick, momentOneRequest.elements)).toBe("Ajukan Perjalanan Dinas");
+  });
+
+  test("falls back to the action's label when the Element List lacks the target", () => {
+    expect(clickDestination(menuClick, [])).toBe(menuClick.label);
   });
 });

@@ -11,7 +11,7 @@ const TOOLTIP_ROOM = 88;
 
 /**
  * Klik navigasi from the design system, drawn on the page layer: a dot morphs into Nemu's cursor,
- * glides to the target, and an amber ripple plays where it clicks, while an amber pill under the
+ * glides to the target, and an amber ripple plays where it clicks, while a dark pill under the
  * target says what it opens. Then it shows success or a warning. The mascot rides along just below
  * and to the right of it, so the result badge sits past the mascot.
  */
@@ -29,9 +29,9 @@ export function NavigationCursor({ frame }: { frame: CursorFrame }) {
       {frame.mascot === "clicking" && (
         <>
           <ClickingCursor step={frame.step} />
-          {frame.label && (
+          {frame.destination && (
             <CursorTooltip
-              label={frame.label}
+              destination={frame.destination}
               // Esc only stops the click before it lands.
               stoppable={frame.step === "morph" || frame.step === "move"}
               above={frame.at.y + TOOLTIP_ROOM > window.innerHeight}
@@ -78,15 +78,15 @@ function ClickingCursor({ step }: { step: ClickStep }) {
 }
 
 /**
- * The amber pill under the target, "Membuka Perjalanan Dinas… Esc". Centered on the click point by a
+ * The dark pill under the target, "Membuka Perjalanan Dinas… Esc". Centered on the click point by a
  * zero-width flex row, not translate utilities, whose variables don't reach the shadow root.
  */
 function CursorTooltip({
-  label,
+  destination,
   stoppable,
   above,
 }: {
-  label: string;
+  destination: string;
   stoppable: boolean;
   above: boolean;
 }) {
@@ -95,9 +95,11 @@ function CursorTooltip({
       className="absolute left-0 flex w-0 justify-center"
       style={above ? { bottom: TOOLTIP_OFFSET } : { top: TOOLTIP_OFFSET }}
     >
-      <span className="flex animate-in items-center gap-2 rounded-4xl bg-nemu px-3 py-1.5 text-sm whitespace-nowrap text-nemu-foreground shadow-md fade-in">
-        {label}…
-        {stoppable && <kbd className="rounded-md bg-nemu-soft px-1.5 font-sans text-xs">Esc</kbd>}
+      <span className="flex animate-in items-center gap-1.5 rounded-full bg-foreground px-[11px] py-[5px] text-[11.5px]/[15px] font-medium whitespace-nowrap text-background shadow-md fade-in">
+        Membuka {destination}…
+        {stoppable && (
+          <kbd className="rounded-sm bg-background/15 px-1 font-sans text-[10px]/[13px]">Esc</kbd>
+        )}
       </span>
     </div>
   );

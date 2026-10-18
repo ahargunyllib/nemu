@@ -1,3 +1,5 @@
+import type { NemuAction, PageElement } from "@nemu/contracts";
+
 export type Point = { x: number; y: number };
 
 /** The step of a navigation click the cursor is showing. */
@@ -13,8 +15,8 @@ export type CursorFrame =
       step: ClickStep;
       at: Point;
       moveMs: number;
-      /** The click action's label, shown under the target while the cursor works on it. */
-      label?: string;
+      /** What the click opens, shown under the target while the cursor works on it. */
+      destination?: string;
     }
   | { mascot: "success" | "warning"; at: Point };
 
@@ -30,6 +32,14 @@ export const MAX_MOVE_MS = 800;
 /** How long the page has to show the click's result: a new URL or a new element. */
 export const CHECK_TIMEOUT_MS = 2_000;
 const CHECK_INTERVAL_MS = 50;
+
+/**
+ * What a click opens, for the tooltip's "Membuka <destination>…": the target's name in the Element
+ * List sent with the prompt, or the action's own label when the list doesn't have it.
+ */
+export function clickDestination(action: NemuAction, elementList: readonly PageElement[]): string {
+  return elementList.find((element) => element.nemu_id === action.target)?.label ?? action.label;
+}
 
 /** Longer trips take longer, within 400–800 ms. */
 export function moveDuration(from: Point, to: Point): number {
