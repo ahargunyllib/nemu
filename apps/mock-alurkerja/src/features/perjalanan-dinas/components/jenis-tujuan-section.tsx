@@ -1,100 +1,113 @@
 import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
-import { JENIS_PERJALANAN, KOTA_TUJUAN, type KotaTujuan } from "@nemu/contracts/process-instance";
-import { Field, FieldDescription, FieldError, FieldLabel } from "@nemu/ui/components/field";
+import { KOTA_TUJUAN } from "@nemu/contracts/process-instance";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@nemu/ui/components/field";
 import { Input } from "@nemu/ui/components/input";
 import { Textarea } from "@nemu/ui/components/textarea";
 
 import OptionSelect from "@/features/perjalanan-dinas/components/option-select";
-import PerdinFormSection from "@/features/perjalanan-dinas/components/perdin-form-section";
 import type { AjukanPerdinForm } from "@/features/perjalanan-dinas/hooks/use-ajukan-perdin-form";
-
-const KOTA_OPTIONS = Object.keys(KOTA_TUJUAN);
-
-function provinsiOf(kota: string): string | undefined {
-  return kota in KOTA_TUJUAN ? KOTA_TUJUAN[kota as KotaTujuan] : undefined;
-}
+import { usePerdinErrors } from "@/features/perjalanan-dinas/hooks/use-perdin-errors";
+import {
+  DASAR_PENUGASAN_OPTIONS,
+  JENIS_PERJALANAN_OPTIONS,
+  kotaTujuanOf,
+} from "@/features/perjalanan-dinas/lib/perdin-form";
 
 export default function JenisTujuanSection({ form }: { form: AjukanPerdinForm }) {
+  const errors = usePerdinErrors(form);
+
   return (
-    <PerdinFormSection title="A. Jenis dan tujuan">
-      <form.Field name="jenisPerjalanan">
-        {(field) => (
-          <Field data-invalid={!field.state.meta.isValid}>
-            <FieldLabel htmlFor={field.name}>Jenis perjalanan</FieldLabel>
-            <OptionSelect
-              id={field.name}
-              nemuId={NEMU_IDS.perdinForm.jenisPerjalanan}
-              options={JENIS_PERJALANAN}
-              placeholder="Pilih jenis perjalanan"
-              value={field.state.value}
-              invalid={!field.state.meta.isValid}
-              onChange={field.handleChange}
-            />
-            <FieldError errors={field.state.meta.errors} />
-          </Field>
-        )}
-      </form.Field>
+    <FieldGroup>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <form.Field name="jenisPerjalanan">
+          {(field) => {
+            return (
+              <Field data-invalid={Boolean(errors[field.name])}>
+                <FieldLabel htmlFor={field.name}>Jenis perjalanan</FieldLabel>
+                <OptionSelect
+                  id={field.name}
+                  nemuId={NEMU_IDS.perdinForm.jenisPerjalanan}
+                  options={JENIS_PERJALANAN_OPTIONS}
+                  placeholder="Pilih jenis perjalanan"
+                  value={field.state.value}
+                  invalid={Boolean(errors[field.name])}
+                  onChange={field.handleChange}
+                />
+                <FieldError>{errors[field.name]}</FieldError>
+              </Field>
+            );
+          }}
+        </form.Field>
 
-      <form.Field name="nomorSuratTugas">
-        {(field) => (
-          <Field data-invalid={!field.state.meta.isValid}>
-            <FieldLabel htmlFor={field.name}>Nomor surat tugas</FieldLabel>
-            <Input
-              id={field.name}
-              name={field.name}
-              data-nemu-id={NEMU_IDS.perdinForm.nomorSuratTugas}
-              placeholder="Contoh: ST-123/BLD/2026"
-              value={field.state.value}
-              aria-invalid={!field.state.meta.isValid}
-              onBlur={field.handleBlur}
-              onChange={(event) => field.handleChange(event.target.value)}
-            />
-            <FieldError errors={field.state.meta.errors} />
-          </Field>
-        )}
-      </form.Field>
+        <form.Field name="kotaTujuan">
+          {(field) => {
+            const kota = kotaTujuanOf(field.state.value);
+            return (
+              <Field data-invalid={Boolean(errors[field.name])}>
+                <FieldLabel htmlFor={field.name}>Kota tujuan</FieldLabel>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  data-nemu-id={NEMU_IDS.perdinForm.kotaTujuan}
+                  placeholder="Contoh: Makassar"
+                  value={field.state.value}
+                  aria-invalid={Boolean(errors[field.name])}
+                  onBlur={field.handleBlur}
+                  onChange={(event) => field.handleChange(event.target.value)}
+                />
+                {kota && <FieldDescription>Provinsi: {KOTA_TUJUAN[kota]}</FieldDescription>}
+                <FieldError>{errors[field.name]}</FieldError>
+              </Field>
+            );
+          }}
+        </form.Field>
+      </div>
 
-      <form.Field name="kotaTujuan">
+      <form.Field name="dasarPenugasan">
         {(field) => {
-          const provinsi = provinsiOf(field.state.value);
           return (
-            <Field data-invalid={!field.state.meta.isValid}>
-              <FieldLabel htmlFor={field.name}>Kota tujuan</FieldLabel>
+            <Field data-invalid={Boolean(errors[field.name])}>
+              <FieldLabel htmlFor={field.name}>Dasar penugasan (surat tugas)</FieldLabel>
               <OptionSelect
                 id={field.name}
-                nemuId={NEMU_IDS.perdinForm.kotaTujuan}
-                options={KOTA_OPTIONS}
-                placeholder="Pilih kota tujuan"
+                nemuId={NEMU_IDS.perdinForm.dasarPenugasan}
+                options={DASAR_PENUGASAN_OPTIONS}
+                placeholder="Pilih surat tugas"
                 value={field.state.value}
-                invalid={!field.state.meta.isValid}
+                invalid={Boolean(errors[field.name])}
                 onChange={field.handleChange}
               />
-              <FieldDescription>
-                {provinsi ? `Provinsi: ${provinsi}` : "Provinsi terisi otomatis dari kota tujuan."}
-              </FieldDescription>
-              <FieldError errors={field.state.meta.errors} />
+              <FieldError>{errors[field.name]}</FieldError>
             </Field>
           );
         }}
       </form.Field>
 
       <form.Field name="maksud">
-        {(field) => (
-          <Field data-invalid={!field.state.meta.isValid}>
-            <FieldLabel htmlFor={field.name}>Maksud perjalanan</FieldLabel>
-            <Textarea
-              id={field.name}
-              name={field.name}
-              data-nemu-id={NEMU_IDS.perdinForm.maksud}
-              value={field.state.value}
-              aria-invalid={!field.state.meta.isValid}
-              onBlur={field.handleBlur}
-              onChange={(event) => field.handleChange(event.target.value)}
-            />
-            <FieldError errors={field.state.meta.errors} />
-          </Field>
-        )}
+        {(field) => {
+          return (
+            <Field data-invalid={Boolean(errors[field.name])}>
+              <FieldLabel htmlFor={field.name}>Maksud perjalanan</FieldLabel>
+              <Textarea
+                id={field.name}
+                name={field.name}
+                data-nemu-id={NEMU_IDS.perdinForm.maksud}
+                value={field.state.value}
+                aria-invalid={Boolean(errors[field.name])}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+              />
+              <FieldError>{errors[field.name]}</FieldError>
+            </Field>
+          );
+        }}
       </form.Field>
-    </PerdinFormSection>
+    </FieldGroup>
   );
 }

@@ -50,8 +50,8 @@ function RootComponent() {
         <Outlet />
         <Toaster richColors position="top-center" />
       </ThemeProvider>
-      {/* Top left: the demo dock sits at the bottom left. */}
-      <TanStackRouterDevtools position="top-left" />
+      {/* Top right: Start a Process is at the top left and the demo dock at the bottom left. */}
+      <TanStackRouterDevtools position="top-right" />
       <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
     </>
   );

@@ -17,25 +17,21 @@ export default function OptionSelect({
 }: {
   id: string;
   nemuId: string;
-  options: readonly string[];
+  options: readonly { value: string; label: string }[];
   placeholder: string;
   value: string;
   invalid: boolean;
   onChange: (value: string) => void;
 }) {
   return (
-    <Select
-      items={options.map((option) => ({ label: option, value: option }))}
-      value={value || null}
-      onValueChange={(next) => onChange(next ?? "")}
-    >
+    <Select items={options} value={value || null} onValueChange={(next) => onChange(next ?? "")}>
       <SelectTrigger id={id} data-nemu-id={nemuId} aria-invalid={invalid} className="w-full">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
         {options.map((option) => (
-          <SelectItem key={option} value={option}>
-            {option}
+          <SelectItem key={option.value} value={option.value}>
+            {option.label}
           </SelectItem>
         ))}
       </SelectContent>
