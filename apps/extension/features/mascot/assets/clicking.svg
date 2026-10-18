@@ -1,7 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- Placeholder: replace with the designer's clicking art. Sky blue, square, focused, cursor in hand. -->
-  <rect x="3" y="4" width="24" height="23" rx="7" fill="#0ea5e9"/>
-  <path d="M8 13h5M17 13h5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M10.5 20h4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M19 17v11l3-2.8 2 4.3 2.2-1-2-4.2h4.1z" fill="#fff" stroke="#0f172a" stroke-width="1" stroke-linejoin="round"/>
+  <!-- Clicking: the body becomes an amber cursor arrow pointing up-left, with a click ripple at its tip. -->
+  <defs>
+    <linearGradient id="nemu-mascot-clicking-body" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FDB35A"/>
+      <stop offset="1" stop-color="#E07A16"/>
+    </linearGradient>
+    <radialGradient id="nemu-mascot-clicking-glow">
+      <stop offset="0.4" stop-color="#F59331" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#F59331" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="14" cy="17" r="15" fill="url(#nemu-mascot-clicking-glow)"/>
+  <circle cx="7" cy="6" r="4.2" fill="none" stroke="#E07A16" stroke-width="1.4"/>
+  <path d="M7 6v19.5l5.2-4.6 3.6 7.6 3.6-1.6-3.5-7.4h6.9z" fill="url(#nemu-mascot-clicking-body)" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/>
+  <ellipse cx="10.4" cy="16" rx="1.2" ry="1.6" fill="#fff"/>
+  <ellipse cx="14" cy="16" rx="1.2" ry="1.6" fill="#fff"/>
 </svg>

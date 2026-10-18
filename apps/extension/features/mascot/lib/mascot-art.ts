@@ -8,9 +8,8 @@ import warning from "../assets/warning.svg?raw";
 import type { MascotState } from "./mascot-state";
 
 /**
- * One SVG per state, drawn inline. The files in `assets/` are placeholders with their own color
- * and shape per state, so each state reads at a glance: swap in the designer's art under the same
- * names.
+ * One SVG per state, drawn inline: the firefly (docs/design-system.md, "Mascot"). The SVGs
+ * share one shadow root, so each file prefixes its gradient ids with `nemu-mascot-<state>-`.
  */
 export const MASCOT_ART: Record<MascotState, string> = {
   idle: fillBox(idle),
