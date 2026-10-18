@@ -1,9 +1,10 @@
-import { SidebarInset, SidebarProvider } from "@nemu/ui/components/sidebar";
+import { AppHeader } from "@nemu/ui/shell/app-header";
+import { AppShell } from "@nemu/ui/shell/app-shell";
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 
 import { authClient } from "@/features/auth/api/auth-client";
 import UserMenu from "@/features/auth/components/user-menu";
-import WorkspaceHeader from "@/features/workspace/components/workspace-header";
+import WorkspaceBreadcrumb from "@/features/workspace/components/workspace-breadcrumb";
 import WorkspaceSidebar from "@/features/workspace/components/workspace-sidebar";
 
 export const Route = createFileRoute("/_auth")({
@@ -20,15 +21,15 @@ export const Route = createFileRoute("/_auth")({
 });
 
 function AuthLayout() {
+  const { session } = Route.useRouteContext();
+
   return (
-    <SidebarProvider>
-      <WorkspaceSidebar footer={<UserMenu />} />
-      <SidebarInset>
-        <WorkspaceHeader />
-        <main className="mx-auto grid w-full max-w-6xl content-start gap-6 p-4 md:p-6">
-          <Outlet />
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
+    <AppShell
+      width="wide"
+      sidebar={<WorkspaceSidebar footer={<UserMenu />} />}
+      header={<AppHeader start={<WorkspaceBreadcrumb />} end={session.data?.user.email} />}
+    >
+      <Outlet />
+    </AppShell>
   );
 }

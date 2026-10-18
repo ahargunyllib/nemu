@@ -9,6 +9,7 @@
     "./lib/*": "./src/lib/*.ts",
     "./components/*": "./src/components/*.tsx",
     "./nemu/*": "./src/nemu/*.tsx",
+    "./shell/*": "./src/shell/*.tsx",
     "./hooks/*": "./src/hooks/*.ts",
     "./postcss.config": "./postcss.config.mjs"
   },

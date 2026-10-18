@@ -1,6 +1,5 @@
 import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
 import {
-  Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
@@ -10,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@nemu/ui/components/sidebar";
+import { AppSidebar } from "@nemu/ui/shell/app-sidebar";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
@@ -23,8 +23,7 @@ export default function SideMenu({ footer }: { footer: ReactNode }) {
   const { data: tasks } = useQuery(orpc.listMyTasks.queryOptions());
 
   return (
-    // `dark` switches the sidebar tokens to their dark values, so the menu stays on theme tokens.
-    <Sidebar collapsible="none" aria-label="Menu utama" className="dark sticky top-0 h-svh">
+    <AppSidebar aria-label="Menu utama">
       <SidebarHeader className="p-3">
         <SidebarMenu>
           <SidebarMenuItem>
@@ -72,6 +71,6 @@ export default function SideMenu({ footer }: { footer: ReactNode }) {
 
       {/* Bottom room for the demo dock, which floats over the end of the side menu. */}
       <SidebarFooter className="pb-24">{footer}</SidebarFooter>
-    </Sidebar>
+    </AppSidebar>
   );
 }

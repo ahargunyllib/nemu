@@ -1,4 +1,5 @@
 import { Skeleton } from "@nemu/ui/components/skeleton";
+import { PageHeading } from "@nemu/ui/shell/page-heading";
 import { useQuery } from "@tanstack/react-query";
 
 import { orpc } from "@/shared/api/orpc";
@@ -17,15 +18,15 @@ export default function DashboardGreeting({ name }: { name: string }) {
   const firstName = name.split(/\s+/)[0];
 
   return (
-    <div className="space-y-1">
-      {clock ? (
-        <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-          My dashboard · {kickerDate.format(new Date(`${clock.today}T00:00:00Z`)).replace(",", "")}
-        </p>
-      ) : (
-        <Skeleton className="h-4 w-56" />
-      )}
-      <h1 className="font-heading text-2xl font-semibold">Good morning, {firstName}.</h1>
-    </div>
+    <PageHeading
+      kicker={
+        clock ? (
+          `My dashboard · ${kickerDate.format(new Date(`${clock.today}T00:00:00Z`)).replace(",", "")}`
+        ) : (
+          <Skeleton className="h-4 w-56" />
+        )
+      }
+      title={`Good morning, ${firstName}.`}
+    />
   );
 }
