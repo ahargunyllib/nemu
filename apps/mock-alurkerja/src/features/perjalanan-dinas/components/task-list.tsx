@@ -1,6 +1,5 @@
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@nemu/ui/components/empty";
 import { Input } from "@nemu/ui/components/input";
-import { PageHeading } from "@nemu/ui/shell/page-heading";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 
@@ -22,15 +21,15 @@ export default function TaskList({ tasks }: { tasks: readonly ProcessInstanceVie
   );
 
   return (
-    <div className="flex w-full max-w-xs flex-col gap-3">
-      <PageHeading title="My Tasks" />
+    <div className="flex w-full max-w-68 flex-col gap-3">
+      <h1 className="font-heading text-[22px] leading-7 font-medium">My Tasks</h1>
       <Input
         type="search"
         aria-label="Search tasks"
         placeholder="Search tasks…"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        className="h-8 border-transparent bg-muted"
+        className="h-8 border-transparent bg-muted text-[13px] leading-[18px] md:text-[13px]"
       />
       {withTask.length === 0 ? (
         <Empty className="border">
@@ -48,10 +47,10 @@ export default function TaskList({ tasks }: { tasks: readonly ProcessInstanceVie
         </Empty>
       ) : (
         <>
-          <h2 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+          <h2 className="text-[10.5px] leading-3.5 font-semibold tracking-[0.08em] text-muted-foreground uppercase">
             Due date
           </h2>
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-3">
             {shown.map(
               ({ id, activeTask }) =>
                 activeTask && (
@@ -61,10 +60,12 @@ export default function TaskList({ tasks }: { tasks: readonly ProcessInstanceVie
                       params={{ instanceId: id }}
                       data-nemu-id={TASK_NEMU_IDS[activeTask.key]}
                       aria-label={`${activeTask.label} ${id}`}
-                      className="flex flex-col gap-0.5 rounded-2xl bg-muted px-3 py-2.5 transition-colors outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                      className="flex flex-col rounded-xl bg-muted px-3 py-2.5 transition-colors outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50"
                     >
-                      <span className="text-sm">{activeTask.label}</span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-[13px] leading-[18px] font-medium">
+                        {activeTask.label}
+                      </span>
+                      <span className="text-[11.5px] leading-[15px] text-muted-foreground">
                         Perjalanan Dinas · {activeTask.id}
                       </span>
                     </Link>
