@@ -20,6 +20,7 @@ export const Route = createFileRoute("/_auth/perdin/task/$instanceId")({
 function RouteComponent() {
   const { instanceId } = Route.useParams();
   const navigate = Route.useNavigate();
+  const { user } = Route.useRouteContext();
   // Opened after mount so the Sheet plays its enter transition; mounting it open skips it.
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(true), []);
@@ -51,9 +52,9 @@ function RouteComponent() {
             <TaskSheetSkeleton />
           ) : instance ? (
             instance.state === "Pertanggungjawaban" || instance.state === "Verifikasi" ? (
-              <PertanggungjawabanTask instance={instance} />
+              <PertanggungjawabanTask instance={instance} assignee={user.name} />
             ) : (
-              <TaskSummary instance={instance} />
+              <TaskSummary instance={instance} assignee={user.name} />
             )
           ) : (
             <>

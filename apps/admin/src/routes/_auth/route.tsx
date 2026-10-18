@@ -25,7 +25,6 @@ function AuthLayout() {
 
   return (
     <AppShell
-      width="wide"
       sidebar={<WorkspaceSidebar footer={<UserMenu />} />}
       header={<AppHeader start={<WorkspaceBreadcrumb />} end={session.data?.user.email} />}
     >

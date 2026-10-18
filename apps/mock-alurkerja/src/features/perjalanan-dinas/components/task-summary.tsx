@@ -1,25 +1,40 @@
 import { SheetDescription, SheetHeader, SheetTitle } from "@nemu/ui/components/sheet";
 import type { ReactNode } from "react";
 
-import { formatTanggal } from "@/shared/lib/format-tanggal";
 import TaskSheetClose from "@/features/perjalanan-dinas/components/task-sheet-close";
 import type { ProcessInstanceView } from "@/features/perjalanan-dinas/types/process-instance-view";
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+/** Days a Task has before it falls due. The demo keeps no due date, so every Task gets a week. */
+const TASK_DUE_DAYS = 7;
+// The demo's Satker is in Yogyakarta, so Task dates read in WIB wherever the demo runs.
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeZone: "Asia/Jakarta",
+});
+
 /**
  * The task sheet's orange header: the process, the Task (or the State while no Task is open), the
- * trip, and the Task's actions as `children`.
+ * Task's age, dates, and assignee, and the Task's actions as `children`.
+ *
+ * A Task opens when its State last changed, so `updatedAt` stands in for when it was created.
  */
 export default function TaskSummary({
   instance,
+  assignee,
   children,
 }: {
   instance: ProcessInstanceView;
+  assignee: string;
   children?: ReactNode;
 }) {
+  const created = instance.updatedAt;
+  const ageDays = Math.max(0, Math.floor((Date.now() - created.getTime()) / DAY_MS));
   const meta = [
-    ["Tujuan", instance.kotaTujuan],
-    ["Berangkat", formatTanggal(instance.tanggalBerangkat)],
-    ["Kembali", formatTanggal(instance.tanggalKembali)],
+    ["Task Age", ageDays === 1 ? "1 day" : `${ageDays} days`],
+    ["Created", dateFormatter.format(created)],
+    ["Due Date", dateFormatter.format(new Date(created.getTime() + TASK_DUE_DAYS * DAY_MS))],
+    ["Assignee", assignee],
   ] as const;
 
   return (
@@ -30,9 +45,6 @@ export default function TaskSummary({
         </span>
         <SheetDescription className="text-task-header-foreground">
           Perjalanan Dinas
-          {instance.activeTask && (
-            <span className="text-task-header-foreground/80"> · {instance.activeTask.id}</span>
-          )}
         </SheetDescription>
         <TaskSheetClose className="ml-auto -mr-2 hover:bg-task-header-foreground/15 hover:text-task-header-foreground" />
       </div>
