@@ -1,6 +1,6 @@
 import type { Box } from "../../../shared/types/box";
 
-export const PANEL_WIDTH = 384;
+export const PANEL_WIDTH = 280;
 const GAP = 12;
 
 export type Point = { x: number; y: number };

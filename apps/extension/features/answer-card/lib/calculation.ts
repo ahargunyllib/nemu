@@ -89,12 +89,26 @@ export function describeCalculation(calculation: Calculation): CalculationLine {
   };
 }
 
-/** The date in the answer's `batas_pertanggungjawaban` entry, formatted for the deadline chip. */
-export function pertanggungjawabanDeadline(
-  calculations: readonly Calculation[],
-): string | undefined {
-  const entry = calculations.find(({ fungsi }) => fungsi === "batas_pertanggungjawaban");
-  return typeof entry?.hasil === "string" && ISO_DATE.test(entry.hasil)
-    ? formatDate(entry.hasil)
+/** Results the user types into a form field as an amount, such as the Momen 2 lodging lumpsum. */
+const AMOUNTS: ReadonlySet<Calculation["fungsi"]> = new Set([
+  "hitung_lumpsum_penginapan",
+  "uang_harian",
+  "lookup_sbm",
+]);
+
+export type CopyableValue = {
+  /** As the card shows it: "Rp447.000". */
+  label: string;
+  /** As the form field takes it, digits only: "447000". */
+  text: string;
+};
+
+/** The first amount the answer computed, for the Salin nilai strip. */
+export function copyableValue(calculations: readonly Calculation[]): CopyableValue | undefined {
+  const entry = calculations.find(
+    ({ fungsi, hasil }) => AMOUNTS.has(fungsi) && typeof hasil === "number",
+  );
+  return typeof entry?.hasil === "number"
+    ? { label: formatRupiah(entry.hasil), text: String(entry.hasil) }
     : undefined;
 }

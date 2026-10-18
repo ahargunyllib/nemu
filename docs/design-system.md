@@ -114,28 +114,37 @@ for them yet, so they are left out.
   Pressing the ringed target, or changing the field it holds, removes its ring and rings the next
   step's target; after the last step nothing stays ringed. A click into a field or on a control
   that opens a popup only starts the step.
-- **Tingkat 1 · Jawaban ringkas** (default): a white card beside the highlighted element, the
-  element stays outlined. Header: mascot icon + title in Card title style ("Pilih \"Tidak menginap
-  di hotel\""), close ×. Body: a muted bordered calc box ("30% × Rp745.000 × 2 malam" over a bold
-  "Rp447.000"), then a citation chip (`NemuBadge tone="subtle"`). Footer: "Rincian" amber link
-  left, black "Lanjut" pill right.
-- **Tingkat 2 · Rincian**: the same card opened up: formula, sources, and warnings (a
-  `nemu-danger-subtle` box with destructive text, "Ubah isian bila nanti menginap di hotel.").
-  The footer link becomes "Tutup".
-- **Berhasil**: success card, green mascot, title "Terkirim ke verifikator", muted meta
-  ("PD-2026-0042 · tahap Verifikasi"), no buttons, disappears after 3 seconds.
-- **Peringatan / Tidak ditemukan**: red mascot, title "Laporan itu belum ada", body text, then an
-  amber outline pill "Buka My Requests" (`NemuButton tone="outline"`) and "Tutup" link.
+- **Tingkat 1 · Jawaban teks** (default): a white card beside the highlighted element, the
+  element stays outlined. The answer reads like plain chatbot output, see below.
+- **Tingkat 2 · Rincian**: a "Rincian" text link under the answer opens the detail and the
+  rate's source as more plain text; the link becomes "Tutup rincian".
+- While Nemu reads there is no card: the Composer's Membaca pill stands in for it.
 
-Panel variants carry a kicker row above the title: tiny mascot + Label/Caps text ("TANYA NEMU",
-"JAWABAN", "BERHASIL" in green, "TIDAK DITEMUKAN" in red), close × on the right. While Nemu
-reads there is no card: the Composer's Membaca pill stands in for it. The Tanya Nemu panel
-shows an "Area: Penginapan" muted chip, a bordered textarea, "Enter kirim · Esc batal" hint and a
-round black send button.
+**Jawaban teks**: one card, 280px wide, white, 14px corners, a 1px `border`, 12px padding (14px
+on the left), 10px between lines, `shadow-nemu-float`. All text is Body/Small (Regular 13/18).
+The only control in the header is the close × at the top-right, beside the first line. There is
+no kicker row, no echoed question, no title over a body, no red, no check marks, and no buttons
+besides ×:
 
-Other pieces: a result strip "Rp447.000 [copy icon] Salin" on `nemu-subtle`; numbered steps
-("1 Surat tugas dari atasan"); a black toast with a green dot
-"Task completed · moved to Verifikasi"; a red text chip "Batas 12 Nov 2026 · sisa 5 hari kerja".
+- The answer, then each calculation as a sentence ("Lumpsum penginapan: 30% × Rp745.000 ×
+  2 malam = Rp447.000."), then each warning as a sentence ("Ubah isian bila nanti menginap di
+  hotel."). Lists are written "1. 2. 3.", including the highlighted steps (their back and
+  forth arrows go once a step moves on when the user acts).
+- **Salin nilai**: when the answer computed an amount, a `nemu-subtle` strip under the text holds
+  it in medium weight on the left ("Rp447.000") and a copy icon with "Salin" on the right. It
+  copies the amount as the form field takes it ("447000") and says "Tersalin" for a moment.
+- **Sumber**: quiet muted text, "Sumber: PMK 119/2023"; each source is a link that shows its
+  pasal under the line.
+- **Balas**: the Composer pill ("Tanya Nemu…") inside the card, last, to ask again from it.
+
+Cards in place of an answer use the same format: plain text, ×, and at most one text link as the
+way forward.
+
+- **Peringatan / Tidak ditemukan**: "Kamu belum masuk ke Demo App. …" with a "Masuk ke Demo App"
+  link, or "Pertanyaan belum terjawab. …" with "Coba lagi". A target missing from the page is a
+  warning sentence in the answer.
+- **Berhasil**: once the user presses Kirim, the answer says "Terkirim, pindah ke Verifikasi.
+  ID tugas PJ-PD-2026-0042."
 
 ## Motion (Motion Kursor)
 
