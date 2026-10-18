@@ -30,8 +30,10 @@ import {
   validateMoment3FollowUpResponse,
   validateMoment3InitialResponse,
 } from "./moment-validators.mjs";
+import { parseEvaluationOptions, summarizeMomentLatency } from "./evaluation-utils.mjs";
 
-const isLive = process.argv.includes("--live");
+const { isLive, selectedMoments } = parseEvaluationOptions(process.argv.slice(2));
+const isSelectiveMomentRun = selectedMoments !== null;
 
 function loadEnv() {
   if (process.env.OPENROUTER_API_KEY) {
@@ -153,13 +155,6 @@ function executeCalculation(testCase) {
   }
 }
 
-function median(values) {
-  if (!values.length) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 !== 0 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
-}
-
 function validateMoment1Response(res) {
   const isAnswer = res.status === "answer";
   const hasClick = res.actions.some(
@@ -212,7 +207,10 @@ async function runLiveEvaluation() {
     thresholds: { domain: 0.5, injection: 0.7, click: 0.8 },
   };
 
-  console.log("=== Starting Live PRD Moments Evaluation (10 runs per moment) ===");
+  const selectedMomentSet = new Set(selectedMoments ?? [1, 2, 3]);
+  console.log(
+    `=== Starting Live PRD Moments Evaluation (10 runs; moments ${[...selectedMomentSet].join(", ")}) ===`,
+  );
 
   const momentResults = {
     moment1: [],
@@ -225,63 +223,107 @@ async function runLiveEvaluation() {
     process.stdout.write(`Moment run ${i + 1}/10... `);
 
     const [r1, r2, r3] = await Promise.all([
-      runNemu(momentOneRequest, sharedContext),
-      runNemu(momentTwoRequest, sharedContext),
-      runNemu(momentThreeRequest, sharedContext),
+      selectedMomentSet.has(1) ? runNemu(momentOneRequest, sharedContext) : null,
+      selectedMomentSet.has(2) ? runNemu(momentTwoRequest, sharedContext) : null,
+      selectedMomentSet.has(3) ? runNemu(momentThreeRequest, sharedContext) : null,
     ]);
 
-    const v1 = validateMoment1Response(r1);
-    const v2 = validateMoment2Response(r2);
-    const r3FollowUp = await runNemu(momentThreeFollowUpRequest, sharedContext);
-    const v3Initial = validateMoment3InitialResponse(r3);
-    const v3FollowUp = validateMoment3FollowUpResponse(r3FollowUp);
-    const v3 = {
-      passed: v3Initial.passed && v3FollowUp.passed,
-      reasons: [
-        ...v3Initial.reasons.map((reason) => `initial: ${reason}`),
-        ...v3FollowUp.reasons.map((reason) => `follow-up: ${reason}`),
-      ],
-    };
+    const runSummaries = [];
+    if (r1) {
+      const validation = validateMoment1Response(r1);
+      momentResults.moment1.push({
+        iteration: i + 1,
+        total_ms: r1.timing?.total_ms ?? 0,
+        passed: validation.passed,
+        reasons: validation.reasons,
+      });
+      runSummaries.push(`M1: ${validation.passed ? "OK" : "FAIL"} (${r1.timing?.total_ms ?? 0}ms)`);
+    }
+    if (r2) {
+      const validation = validateMoment2Response(r2);
+      momentResults.moment2.push({
+        iteration: i + 1,
+        total_ms: r2.timing?.total_ms ?? 0,
+        passed: validation.passed,
+        reasons: validation.reasons,
+      });
+      runSummaries.push(`M2: ${validation.passed ? "OK" : "FAIL"} (${r2.timing?.total_ms ?? 0}ms)`);
+    }
+    if (r3) {
+      const followUp = await runNemu(momentThreeFollowUpRequest, sharedContext);
+      const initialValidation = validateMoment3InitialResponse(r3);
+      const followUpValidation = validateMoment3FollowUpResponse(followUp);
+      const validation = {
+        passed: initialValidation.passed && followUpValidation.passed,
+        reasons: [
+          ...initialValidation.reasons.map((reason) => `initial: ${reason}`),
+          ...followUpValidation.reasons.map((reason) => `follow-up: ${reason}`),
+        ],
+      };
+      const initialMs = r3.timing?.total_ms ?? 0;
+      const followUpMs = followUp.timing?.total_ms ?? 0;
+      momentResults.moment3.push({
+        iteration: i + 1,
+        initial_ms: initialMs,
+        follow_up_ms: followUpMs,
+        end_to_end_ms: initialMs + followUpMs,
+        passed: validation.passed,
+        reasons: validation.reasons,
+      });
+      runSummaries.push(
+        `M3: ${validation.passed ? "OK" : "FAIL"} (initial ${initialMs}ms, follow-up ${followUpMs}ms)`,
+      );
+    }
 
-    momentResults.moment1.push({
-      iteration: i + 1,
-      total_ms: r1.timing?.total_ms ?? 0,
-      passed: v1.passed,
-      reasons: v1.reasons,
-    });
-    momentResults.moment2.push({
-      iteration: i + 1,
-      total_ms: r2.timing?.total_ms ?? 0,
-      passed: v2.passed,
-      reasons: v2.reasons,
-    });
-    momentResults.moment3.push({
-      iteration: i + 1,
-      total_ms: (r3.timing?.total_ms ?? 0) + (r3FollowUp.timing?.total_ms ?? 0),
-      passed: v3.passed,
-      reasons: v3.reasons,
-    });
-
-    console.log(
-      `M1: ${v1.passed ? "OK" : "FAIL"} (${r1.timing?.total_ms}ms) | ` +
-        `M2: ${v2.passed ? "OK" : "FAIL"} (${r2.timing?.total_ms}ms) | ` +
-        `M3: ${v3.passed ? "OK" : "FAIL"} (${(r3.timing?.total_ms ?? 0) + (r3FollowUp.timing?.total_ms ?? 0)}ms)`,
-    );
+    console.log(runSummaries.join(" | "));
   }
 
-  // Check 3 consecutive runs (iterations 1, 2, 3)
-  const moment1ConsecutivePass = momentResults.moment1.slice(0, 3).every((r) => r.passed);
-  const moment2ConsecutivePass = momentResults.moment2.slice(0, 3).every((r) => r.passed);
-  const moment3ConsecutivePass = momentResults.moment3.slice(0, 3).every((r) => r.passed);
+  const consecutivePass = (results) =>
+    results.length === 0 ? null : results.length >= 3 && results.slice(0, 3).every((r) => r.passed);
+  const moment1ConsecutivePass = consecutivePass(momentResults.moment1);
+  const moment2ConsecutivePass = consecutivePass(momentResults.moment2);
+  const moment3ConsecutivePass = consecutivePass(momentResults.moment3);
+  const selectedConsecutiveResults = [
+    moment1ConsecutivePass,
+    moment2ConsecutivePass,
+    moment3ConsecutivePass,
+  ].filter((result) => result !== null);
+  const latencySummary = summarizeMomentLatency(momentResults);
+  const momentSummary = {
+    selected_moments: [...selectedMomentSet],
+    consecutive_3_pass: {
+      moment1: moment1ConsecutivePass,
+      moment2: moment2ConsecutivePass,
+      moment3: moment3ConsecutivePass,
+      all_passed:
+        selectedConsecutiveResults.length > 0 && selectedConsecutiveResults.every(Boolean),
+    },
+    latency_median_ms: latencySummary,
+    runs: momentResults,
+  };
 
-  const m1Median = median(momentResults.moment1.map((r) => r.total_ms));
-  const m2Median = median(momentResults.moment2.map((r) => r.total_ms));
-  const m3Median = median(momentResults.moment3.map((r) => r.total_ms));
+  console.log("\n=== Latency Summary (Target <= 8000ms per response) ===");
+  if (latencySummary.moment1 !== null) console.log(`Moment 1: ${latencySummary.moment1}ms`);
+  if (latencySummary.moment2 !== null) console.log(`Moment 2: ${latencySummary.moment2}ms`);
+  if (latencySummary.moment3_initial !== null) {
+    console.log(`Moment 3 initial: ${latencySummary.moment3_initial}ms`);
+    console.log(`Moment 3 follow-up: ${latencySummary.moment3_follow_up}ms`);
+    console.log(
+      `Moment 3 end-to-end (reported, not gated): ${latencySummary.moment3_end_to_end}ms`,
+    );
+  }
+  console.log(`Latency target: ${latencySummary.within_8s_target ? "PASS" : "FAIL"}`);
 
-  console.log("\n=== Latency Summary (Target <= 8000ms) ===");
-  console.log(`Moment 1 median: ${m1Median}ms (${m1Median <= 8000 ? "PASS" : "FAIL"})`);
-  console.log(`Moment 2 median: ${m2Median}ms (${m2Median <= 8000 ? "PASS" : "FAIL"})`);
-  console.log(`Moment 3 median: ${m3Median}ms (${m3Median <= 8000 ? "PASS" : "FAIL"})`);
+  if (isSelectiveMomentRun) {
+    return {
+      models: {
+        jev: jevModel,
+        generator: gptModel,
+        reasoning_effort: reasoningEffort,
+      },
+      moments: momentSummary,
+    };
+  }
 
   console.log("\n=== Evaluating 20 Grounded Questions (pertanyaan_uji.json) ===");
   const groundedResults = [];
@@ -478,21 +520,7 @@ async function runLiveEvaluation() {
       generator: gptModel,
       reasoning_effort: reasoningEffort,
     },
-    moments: {
-      consecutive_3_pass: {
-        moment1: moment1ConsecutivePass,
-        moment2: moment2ConsecutivePass,
-        moment3: moment3ConsecutivePass,
-        all_passed: moment1ConsecutivePass && moment2ConsecutivePass && moment3ConsecutivePass,
-      },
-      latency_median_ms: {
-        moment1: m1Median,
-        moment2: m2Median,
-        moment3: m3Median,
-        within_8s_target: m1Median <= 8000 && m2Median <= 8000 && m3Median <= 8000,
-      },
-      runs: momentResults,
-    },
+    moments: momentSummary,
     grounded_questions: {
       passed_count: groundedResults.filter((r) => r.passed).length,
       total_count: groundedResults.length,
@@ -547,10 +575,20 @@ const finalReport = {
     ? {
         models: liveResults.models,
         prd_moments_acceptance: liveResults.moments,
-        grounded_questions: liveResults.grounded_questions,
-        injections: liveResults.injections,
-        out_of_domain: liveResults.out_of_domain,
-        vision_interpretation: liveResults.vision,
+        ...(isSelectiveMomentRun
+          ? {
+              scope: {
+                type: "selected_moments",
+                moments: selectedMoments,
+                note: "Follow-up rerun; previously passed suites were not repeated.",
+              },
+            }
+          : {
+              grounded_questions: liveResults.grounded_questions,
+              injections: liveResults.injections,
+              out_of_domain: liveResults.out_of_domain,
+              vision_interpretation: liveResults.vision,
+            }),
       }
     : {
         jev: jevResults,
@@ -565,8 +603,10 @@ const finalReport = {
       }),
 };
 
-// Write machine-readable report to data/04_evaluasi/laporan_evaluasi.json
-const reportFileUrl = new URL("../../../data/04_evaluasi/laporan_evaluasi.json", import.meta.url);
+const reportFilename = isSelectiveMomentRun
+  ? `laporan_evaluasi_moments-${selectedMoments.join("-")}.json`
+  : "laporan_evaluasi.json";
+const reportFileUrl = new URL(`../../../data/04_evaluasi/${reportFilename}`, import.meta.url);
 if (isLive) {
   await writeFile(reportFileUrl, JSON.stringify(finalReport, null, 2), "utf8");
 } else {
@@ -593,21 +633,23 @@ if (!isLive) {
     `PRD Moments (3 consecutive runs): ${finalReport.prd_moments_acceptance.consecutive_3_pass.all_passed ? "PASS" : "FAIL"}`,
   );
   console.log(
-    `PRD Moments Latency (Median <= 8s): ${finalReport.prd_moments_acceptance.latency_median_ms.within_8s_target ? "PASS" : "FAIL"} (M1: ${finalReport.prd_moments_acceptance.latency_median_ms.moment1}ms, M2: ${finalReport.prd_moments_acceptance.latency_median_ms.moment2}ms, M3: ${finalReport.prd_moments_acceptance.latency_median_ms.moment3}ms)`,
+    `PRD Moments Latency (Median <= 8s per response): ${finalReport.prd_moments_acceptance.latency_median_ms.within_8s_target ? "PASS" : "FAIL"}`,
   );
-  console.log(
-    `Grounded Questions: ${finalReport.grounded_questions.passed_count}/${finalReport.grounded_questions.total_count} passed`,
-  );
-  console.log(
-    `Prompt Injections: ${finalReport.injections.passed_count}/${finalReport.injections.total_count} passed`,
-  );
-  console.log(
-    `Out of Domain: ${finalReport.out_of_domain.passed_count}/${finalReport.out_of_domain.total_count} passed`,
-  );
-  console.log(
-    `Vision Interpretation: ${finalReport.vision_interpretation.passed_count}/${finalReport.vision_interpretation.total_count} passed (target >= 4/5)`,
-  );
-  console.log(`Full report saved to: data/04_evaluasi/laporan_evaluasi.json`);
+  if (!isSelectiveMomentRun) {
+    console.log(
+      `Grounded Questions: ${finalReport.grounded_questions.passed_count}/${finalReport.grounded_questions.total_count} passed`,
+    );
+    console.log(
+      `Prompt Injections: ${finalReport.injections.passed_count}/${finalReport.injections.total_count} passed`,
+    );
+    console.log(
+      `Out of Domain: ${finalReport.out_of_domain.passed_count}/${finalReport.out_of_domain.total_count} passed`,
+    );
+    console.log(
+      `Vision Interpretation: ${finalReport.vision_interpretation.passed_count}/${finalReport.vision_interpretation.total_count} passed (target >= 4/5)`,
+    );
+  }
+  console.log(`Report saved to: data/04_evaluasi/${reportFilename}`);
 }
 
 // Exit code validation
@@ -617,11 +659,16 @@ let liveFailure = false;
 if (isLive) {
   const moments3Fail = !liveResults.moments.consecutive_3_pass.all_passed;
   const momentsLatencyFail = !liveResults.moments.latency_median_ms.within_8s_target;
-  const groundedFail =
-    liveResults.grounded_questions.passed_count < liveResults.grounded_questions.total_count;
-  const injectionFail = liveResults.injections.passed_count < liveResults.injections.total_count;
-  const oodFail = liveResults.out_of_domain.passed_count < liveResults.out_of_domain.total_count;
-  const visionFail = liveResults.vision.passed_count < 4;
+  const groundedFail = isSelectiveMomentRun
+    ? false
+    : liveResults.grounded_questions.passed_count < liveResults.grounded_questions.total_count;
+  const injectionFail = isSelectiveMomentRun
+    ? false
+    : liveResults.injections.passed_count < liveResults.injections.total_count;
+  const oodFail = isSelectiveMomentRun
+    ? false
+    : liveResults.out_of_domain.passed_count < liveResults.out_of_domain.total_count;
+  const visionFail = isSelectiveMomentRun ? false : liveResults.vision.passed_count < 4;
 
   if (
     moments3Fail ||

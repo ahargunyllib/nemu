@@ -1,0 +1,297 @@
+{
+  "generated_at": "2026-10-18T05:57:12.931Z",
+  "source": "data/04_evaluasi from the team Drive package, version 1.0",
+  "mode": "live",
+  "calculations": {
+    "passed_count": 6,
+    "total_count": 6,
+    "results": [
+      {
+        "id": "K01",
+        "passed": true,
+        "actual": {
+          "tarif_hotel_sbm": 745000,
+          "persen": 30,
+          "per_malam": 223500,
+          "malam": 2,
+          "total": 447000,
+          "dasar": "PMK 119/2023 Pasal 8 ayat (5); PMK 32/2025 Lampiran I angka 30"
+        },
+        "expected": {
+          "tarif_hotel_sbm": 745000,
+          "persen": 30,
+          "per_malam": 223500,
+          "malam": 2,
+          "total": 447000,
+          "dasar": "PMK 119/2023 Pasal 8 ayat (5); PMK 32/2025 Lampiran I angka 30"
+        }
+      },
+      {
+        "id": "K02",
+        "passed": true,
+        "actual": {
+          "tarif_hotel_sbm": 1423000,
+          "persen": 30,
+          "per_malam": 426900,
+          "malam": 1,
+          "total": 426900,
+          "dasar": "PMK 119/2023 Pasal 8 ayat (5); PMK 32/2025 Lampiran I angka 30"
+        },
+        "expected": {
+          "tarif_hotel_sbm": 1423000,
+          "persen": 30,
+          "per_malam": 426900,
+          "malam": 1,
+          "total": 426900,
+          "dasar": "PMK 119/2023 Pasal 8 ayat (5); PMK 32/2025 Lampiran I angka 30"
+        }
+      },
+      {
+        "id": "K03",
+        "passed": true,
+        "actual": {
+          "tarif_per_hari": 430000,
+          "hari": 3,
+          "total": 1290000,
+          "dasar": "PMK 32/2025 Lampiran I angka 28.1"
+        },
+        "expected": {
+          "tarif_per_hari": 430000,
+          "hari": 3,
+          "total": 1290000,
+          "dasar": "PMK 32/2025 Lampiran I angka 28.1"
+        }
+      },
+      {
+        "id": "K04",
+        "passed": true,
+        "actual": {
+          "batas_sbm": 745000,
+          "tarif": 900000,
+          "melebihi": true,
+          "selisih": 155000,
+          "dasar": "PMK 32/2025 Lampiran I angka 30 (batas tertinggi)"
+        },
+        "expected": {
+          "batas_sbm": 745000,
+          "tarif": 900000,
+          "melebihi": true,
+          "selisih": 155000,
+          "dasar": "PMK 32/2025 Lampiran I angka 30 (batas tertinggi)"
+        }
+      },
+      {
+        "id": "K05",
+        "passed": true,
+        "actual": {
+          "tanggal_kembali": "2026-11-05",
+          "batas": "2026-11-12",
+          "hari": "Kamis",
+          "dasar": "PMK 113/2012 Pasal 34 ayat (1): paling lambat 5 hari kerja setelah perjalanan dinas"
+        },
+        "expected": {
+          "tanggal_kembali": "2026-11-05",
+          "batas": "2026-11-12",
+          "hari": "Kamis",
+          "dasar": "PMK 113/2012 Pasal 34 ayat (1): paling lambat 5 hari kerja setelah perjalanan dinas"
+        }
+      },
+      {
+        "id": "K06",
+        "passed": true,
+        "actual": {
+          "tanggal_kembali": "2026-12-22",
+          "batas": "2026-12-31",
+          "hari": "Kamis",
+          "dasar": "PMK 113/2012 Pasal 34 ayat (1): paling lambat 5 hari kerja setelah perjalanan dinas"
+        },
+        "expected": {
+          "tanggal_kembali": "2026-12-22",
+          "batas": "2026-12-31",
+          "hari": "Kamis",
+          "dasar": "PMK 113/2012 Pasal 34 ayat (1): paling lambat 5 hari kerja setelah perjalanan dinas"
+        }
+      }
+    ]
+  },
+  "models": {
+    "jev": "typesafe/jev-1.13",
+    "generator": "openai/gpt-6.1-sol",
+    "reasoning_effort": "low"
+  },
+  "prd_moments_acceptance": {
+    "selected_moments": [
+      2,
+      3
+    ],
+    "consecutive_3_pass": {
+      "moment1": null,
+      "moment2": true,
+      "moment3": true,
+      "all_passed": true
+    },
+    "latency_median_ms": {
+      "moment1": null,
+      "moment2": 5335,
+      "moment3_initial": 6598,
+      "moment3_follow_up": 6915,
+      "moment3_end_to_end": 13482,
+      "within_8s_target": true
+    },
+    "runs": {
+      "moment1": [],
+      "moment2": [
+        {
+          "iteration": 1,
+          "total_ms": 5758,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 2,
+          "total_ms": 5116,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 3,
+          "total_ms": 6327,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 4,
+          "total_ms": 5371,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 5,
+          "total_ms": 5288,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 6,
+          "total_ms": 5032,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 7,
+          "total_ms": 6038,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 8,
+          "total_ms": 5299,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 9,
+          "total_ms": 5161,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 10,
+          "total_ms": 6099,
+          "passed": true,
+          "reasons": []
+        }
+      ],
+      "moment3": [
+        {
+          "iteration": 1,
+          "initial_ms": 7840,
+          "follow_up_ms": 6949,
+          "end_to_end_ms": 14789,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 2,
+          "initial_ms": 6989,
+          "follow_up_ms": 6513,
+          "end_to_end_ms": 13502,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 3,
+          "initial_ms": 6402,
+          "follow_up_ms": 7478,
+          "end_to_end_ms": 13880,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 4,
+          "initial_ms": 5881,
+          "follow_up_ms": 6881,
+          "end_to_end_ms": 12762,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 5,
+          "initial_ms": 6571,
+          "follow_up_ms": 6387,
+          "end_to_end_ms": 12958,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 6,
+          "initial_ms": 6647,
+          "follow_up_ms": 6562,
+          "end_to_end_ms": 13209,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 7,
+          "initial_ms": 6481,
+          "follow_up_ms": 7165,
+          "end_to_end_ms": 13646,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 8,
+          "initial_ms": 5986,
+          "follow_up_ms": 7476,
+          "end_to_end_ms": 13462,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 9,
+          "initial_ms": 6624,
+          "follow_up_ms": 6478,
+          "end_to_end_ms": 13102,
+          "passed": true,
+          "reasons": []
+        },
+        {
+          "iteration": 10,
+          "initial_ms": 6752,
+          "follow_up_ms": 8150,
+          "end_to_end_ms": 14902,
+          "passed": true,
+          "reasons": []
+        }
+      ]
+    }
+  },
+  "scope": {
+    "type": "selected_moments",
+    "moments": [
+      2,
+      3
+    ],
+    "note": "Follow-up rerun; previously passed suites were not repeated."
+  }
+}

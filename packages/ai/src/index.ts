@@ -10,7 +10,7 @@ import {
 } from "@nemu/contracts";
 import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
 
-import type { AnswerGenerator, NemuUserProfile } from "./openai.js";
+import type { AnswerGenerator, GeneratedAnswer, NemuUserProfile } from "./openai.js";
 import type { JevDecider, JevDecision } from "./jev.js";
 import { retrieveKnowledge, type KnowledgeChunk, type RankedKnowledgeChunk } from "./knowledge.js";
 import {
@@ -295,6 +295,33 @@ function runDeterministicTools(
   }
 
   return results;
+}
+
+function enforceTrustedWorkflowAnswer(
+  generatedAnswer: GeneratedAnswer,
+  workflowScenario: WorkflowScenario,
+  calculations: readonly Calculation[],
+): GeneratedAnswer {
+  if (workflowScenario !== "accommodation_guidance" || generatedAnswer.status !== "answer") {
+    return generatedAnswer;
+  }
+
+  const accommodation = calculations.find(
+    (calculation) => calculation.fungsi === "hitung_lumpsum_penginapan",
+  );
+  const rate = accommodation?.input.tarif;
+  const nights = accommodation?.input.malam;
+  const total = accommodation?.hasil;
+  if (typeof rate !== "number" || typeof nights !== "number" || typeof total !== "number") {
+    return generatedAnswer;
+  }
+
+  const rupiah = (value: number) => new Intl.NumberFormat("id-ID").format(value);
+  return {
+    ...generatedAnswer,
+    ringkas: `Pilih Tidak menginap di hotel, lalu isi Nominal penginapan Rp${rupiah(total)} secara manual.`,
+    detail: `Masukkan nominal sendiri. Perhitungannya 30% × Rp${rupiah(rate)} × ${nights} malam = Rp${rupiah(total)}.`,
+  };
 }
 
 function citationsFromEvidence(
@@ -678,7 +705,7 @@ export async function runNemu(
 
   const gptStartedAt = performance.now();
   try {
-    const generatedAnswer = await context.answerGenerator({
+    const modelAnswer = await context.answerGenerator({
       request,
       userProfile: context.userProfile,
       processContext: answerProcessContext,
@@ -688,6 +715,18 @@ export async function runNemu(
       decision: jevResult.decision,
       missingDocuments: toolResults.missingDocuments,
     });
+    validateGeneratedAnswer(
+      modelAnswer,
+      toolResults.calculations,
+      context.sbmRows,
+      request.prompt,
+      evidence,
+    );
+    const generatedAnswer = enforceTrustedWorkflowAnswer(
+      modelAnswer,
+      workflowScenario,
+      toolResults.calculations,
+    );
     validateGeneratedAnswer(
       generatedAnswer,
       toolResults.calculations,
