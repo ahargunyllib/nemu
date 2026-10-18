@@ -34,7 +34,7 @@ export default function TaskList({ tasks }: { tasks: readonly ProcessInstanceVie
                 aria-label={`${instance.activeTask.label} ${instance.id}`}
                 className={cn(
                   buttonVariants({ variant: "ghost" }),
-                  "h-auto w-full justify-between gap-4 px-4 py-3",
+                  "h-auto w-full justify-between gap-4 px-4 py-3 whitespace-normal",
                 )}
               >
                 <span className="flex flex-col items-start gap-1 text-left">

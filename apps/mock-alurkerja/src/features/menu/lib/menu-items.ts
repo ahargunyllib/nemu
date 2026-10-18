@@ -1,19 +1,39 @@
 import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
-import { ClipboardList, FilePlus2, House, ListTodo } from "lucide-react";
+import {
+  ChartColumn,
+  ClipboardList,
+  Database,
+  House,
+  ListTodo,
+  type LucideIcon,
+  Users,
+  Workflow,
+} from "lucide-react";
 
-export const MENU_ITEMS = [
-  { to: "/", label: "Beranda", icon: House, nemuId: NEMU_IDS.shell.menuBeranda },
+type MenuItem = {
+  label: string;
+  icon: LucideIcon;
+  /** A page of the Demo App, or none for AlurKerja menus the demo does not open. */
+  link?: { to: "/" | "/my-task" | "/my-request"; nemuId: string };
+  /** `tasks` counts the signed-in user's Tasks; a number is a static demo count. */
+  badge?: "tasks" | number;
+};
+
+export const MENU_ITEMS: readonly MenuItem[] = [
+  { label: "Home", icon: House, link: { to: "/", nemuId: NEMU_IDS.shell.menuBeranda } },
   {
-    to: "/perdin/baru",
-    label: "Ajukan Perjalanan Dinas",
-    icon: FilePlus2,
-    nemuId: NEMU_IDS.shell.menuAjukanPerjalananDinas,
+    label: "My Tasks",
+    icon: ListTodo,
+    link: { to: "/my-task", nemuId: NEMU_IDS.shell.menuMyTask },
+    badge: "tasks",
   },
+  { label: "Group Tasks", icon: Users, badge: 2 },
   {
-    to: "/my-request",
-    label: "My Request",
+    label: "My Requests",
     icon: ClipboardList,
-    nemuId: NEMU_IDS.shell.menuMyRequest,
+    link: { to: "/my-request", nemuId: NEMU_IDS.shell.menuMyRequest },
   },
-  { to: "/my-task", label: "My Task", icon: ListTodo, nemuId: NEMU_IDS.shell.menuMyTask },
-] as const;
+  { label: "Analytics", icon: ChartColumn },
+  { label: "Master Data", icon: Database },
+  { label: "Business Processes", icon: Workflow },
+];

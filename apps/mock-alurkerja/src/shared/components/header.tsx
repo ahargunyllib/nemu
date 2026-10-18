@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 
 export default function Header({ children }: { children: ReactNode }) {
   return (
-    <header className="flex h-12 items-center justify-between border-b px-4">
-      <span className="text-sm font-semibold">Alur Kerja Demo</span>
-      <div className="flex items-center gap-2">{children}</div>
+    <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b bg-background px-6">
+      <span className="text-sm font-medium">Satker Demo · Yogyakarta</span>
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">{children}</div>
     </header>
   );
 }

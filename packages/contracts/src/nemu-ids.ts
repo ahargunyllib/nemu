@@ -34,6 +34,8 @@ export const NEMU_IDS = {
     pertanggungjawaban: "task-pertanggungjawaban",
     isiRencana: "task-isi-rencana",
     revisi: "task-revisi",
+    /** "View all … tasks" under Up next on Beranda; opens My Task. */
+    viewAll: "link-lihat-semua-task",
   },
   /** Task detail (`/perdin/task/$instanceId`). */
   taskDetail: {

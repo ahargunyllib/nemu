@@ -7,6 +7,7 @@ import { type DemoPageAction, DemoDockContext } from "@/features/demo/contexts/d
 /**
  * Keeps the demo controls out of the AlurKerja look: separate floating buttons at the bottom left,
  * over the end of the side menu, for the current page's one-click action and the demo panel.
+ * Both are light outline pills, so they read on the dark side menu.
  */
 export default function DemoDock({ children }: { children: ReactNode }) {
   const [pageAction, setPageAction] = useState<DemoPageAction | null>(null);
@@ -18,6 +19,7 @@ export default function DemoDock({ children }: { children: ReactNode }) {
       <div className="fixed bottom-4 left-4 z-40 flex flex-col items-start gap-2">
         {pageAction && (
           <Button
+            variant="outline"
             size="sm"
             className="shadow-lg"
             data-nemu-id={pageAction.nemuId}

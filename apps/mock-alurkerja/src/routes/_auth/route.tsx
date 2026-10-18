@@ -1,9 +1,9 @@
+import { SidebarInset, SidebarProvider } from "@nemu/ui/components/sidebar";
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 
 import { authClient } from "@/features/auth/api/auth-client";
 import UserMenu from "@/features/auth/components/user-menu";
 import DemoDock from "@/features/demo/components/demo-dock";
-import DemoToday from "@/features/demo/components/demo-today";
 import SideMenu from "@/features/menu/components/side-menu";
 import Header from "@/shared/components/header";
 
@@ -21,22 +21,21 @@ export const Route = createFileRoute("/_auth")({
 });
 
 function AuthLayout() {
+  const { user } = Route.useRouteContext();
+
   return (
     <DemoDock>
-      <div className="grid h-svh grid-rows-[auto_1fr]">
-        <Header>
-          <DemoToday />
-          <UserMenu />
-        </Header>
-        <div className="grid min-h-0 grid-cols-[14rem_1fr]">
-          <SideMenu />
-          <main className="overflow-y-auto p-6">
-            <div className="mx-auto max-w-4xl space-y-6">
+      <SidebarProvider>
+        <SideMenu footer={<UserMenu />} />
+        <SidebarInset className="bg-muted/40">
+          <Header>{user.email}</Header>
+          <main className="p-6">
+            <div className="mx-auto max-w-5xl space-y-6">
               <Outlet />
             </div>
           </main>
-        </div>
-      </div>
+        </SidebarInset>
+      </SidebarProvider>
     </DemoDock>
   );
 }
