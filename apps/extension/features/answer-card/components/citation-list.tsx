@@ -1,9 +1,10 @@
 import type { Citation } from "@nemu/contracts";
-import { Button } from "@nemu/ui/components/button";
+import { NemuBadge } from "@nemu/ui/nemu/nemu-badge";
 import { BookOpenIcon } from "lucide-react";
 import { useState } from "react";
 
 import { describeCitation } from "../lib/citation";
+import { CAPTION } from "../lib/typography";
 
 export function CitationList({ citations }: { citations: readonly Citation[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -15,20 +16,21 @@ export function CitationList({ citations }: { citations: readonly Citation[] }) 
     <section aria-label="Sumber" className="flex flex-col gap-1.5">
       <div className="flex flex-wrap gap-1">
         {citations.map((citation, index) => (
-          <Button
+          <NemuBadge
             key={`${citation.doc_id}-${index}`}
+            tone="subtle"
+            render={<button type="button" />}
             aria-expanded={openIndex === index}
-            size="xs"
-            variant="outline"
+            className="h-auto cursor-pointer py-1 text-[11.5px]/[15px] hover:bg-nemu-amber-100"
             onClick={() => setOpenIndex(openIndex === index ? null : index)}
           >
-            <BookOpenIcon />
+            <BookOpenIcon data-icon="inline-start" />
             {citation.judul}
-          </Button>
+          </NemuBadge>
         ))}
       </div>
       {open && (
-        <p className="bg-muted px-2 py-1.5 text-muted-foreground">
+        <p className={`rounded-xl bg-muted px-3 py-2 text-muted-foreground ${CAPTION}`}>
           {describeCitation(open)}
           <br />
           Dokumen: {open.doc_id}
