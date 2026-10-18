@@ -46,6 +46,9 @@
   --nemu-danger-subtle: #fef2f2;
   /* border/focus: Sorot konfirmasi, the dashed outline on a button the user presses. */
   --nemu-confirm: #3b82f6;
+
+  /* shadow/float: every Nemu surface floating over the page (Composer, Answer Card). */
+  --nemu-shadow-float: 0 2px 4px rgb(24 24 27 / 0.06), 0 16px 40px rgb(24 24 27 / 0.14);
 }
 
 @theme inline {
@@ -74,4 +77,5 @@
   --color-nemu-warning-text: var(--nemu-warning-text);
   --color-nemu-danger-subtle: var(--nemu-danger-subtle);
   --color-nemu-confirm: var(--nemu-confirm);
+  --shadow-nemu-float: var(--nemu-shadow-float);
 }

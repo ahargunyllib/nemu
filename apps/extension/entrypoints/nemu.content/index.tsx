@@ -1,6 +1,7 @@
 import ReactDOM from "react-dom/client";
 
 import { ALLOWED_MATCHES } from "../../shared/lib/config";
+import { loadNemuFont } from "./nemu-font";
 import { NemuOverlay } from "./nemu-overlay";
 
 import "./style.css";
@@ -10,6 +11,7 @@ export default defineContentScript({
   cssInjectionMode: "ui",
 
   async main(ctx) {
+    loadNemuFont();
     const ui = await createShadowRootUi(ctx, {
       name: "nemu-overlay",
       position: "inline",
