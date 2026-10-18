@@ -53,8 +53,11 @@ and "Good morning, Rina." it shows three cards:
   are not in the demo.
 - **Up next**: the user's Tasks from `listMyTasks`, each with its `task-*` id,
   and "View all … tasks" to My Task. A Task row shows the process initials, the
-  Task, the process and kota tujuan, and the return date. Tasks have no due
-  date, so the filter chips are static and only All Tasks shows a count.
+  Task, the process, and when it is due: "Today", the due day ("Nov 13"), or how
+  late it is ("1 day late", in red). The due date is the task sheet's Due Date,
+  a week after the Task opened, since the demo keeps no due date. The Overdue,
+  Due Today, Upcoming, and All Tasks chips count the Tasks and filter the list,
+  counting days in WIB.
 - **My Performance**: static demo figures for the 30 days up to the demo clock's
   day.
 
