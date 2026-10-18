@@ -35,8 +35,7 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   list a new id there to let Nemu click it.
 - **Mascot.** A 32 px mascot follows the cursor 12 px below and to the right of its tip (flipping
   sides at the viewport's edge), so it never sits on what Rina is about to click. It waits when
-  the cursor closes in on it, so it can be clicked to open the Composer, and its hover × hides it
-  until the Composer next opens. It waits beside the Composer while that is open and rides along
+  the cursor closes in on it, so it can be clicked to open the Composer. It waits beside the Composer while that is open and rides along
   with Nemu's cursor during a navigation click. Its seven states follow what Nemu is doing: idle,
   listening (Composer open), thinking (after Kirim), guiding (highlights) or clicking, then
   success (the click opened the page) or warning (a failed request, missing target, or click that

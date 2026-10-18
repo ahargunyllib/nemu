@@ -151,7 +151,6 @@ export function NemuOverlay() {
           nemuCursor={cursor}
           draggedArea={area.state.kind === "selecting" ? draggedArea : null}
           onOpenComposer={openComposer}
-          onCloseComposer={closeComposer}
         />
       </PageLayer>
       {placement && (
