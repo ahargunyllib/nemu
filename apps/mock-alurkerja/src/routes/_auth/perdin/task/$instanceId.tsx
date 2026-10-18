@@ -1,6 +1,5 @@
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@nemu/ui/components/empty";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@nemu/ui/components/sheet";
-import { PageHeading } from "@nemu/ui/shell/page-heading";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -27,7 +26,6 @@ function RouteComponent() {
 
   return (
     <>
-      <PageHeading title="My Task" />
       {tasks ? <TaskList tasks={tasks} /> : <TaskListSkeleton />}
       <Sheet
         open

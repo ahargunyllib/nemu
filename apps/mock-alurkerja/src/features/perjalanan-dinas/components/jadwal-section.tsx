@@ -12,49 +12,47 @@ export default function JadwalSection({ form }: { form: AjukanPerdinForm }) {
   const errors = usePerdinErrors(form);
 
   return (
-    <FieldGroup>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <form.Field name="tanggalBerangkat">
-          {(field) => {
-            return (
-              <Field data-invalid={Boolean(errors[field.name])}>
-                <FieldLabel htmlFor={field.name}>Tanggal berangkat</FieldLabel>
-                <DatePicker
-                  id={field.name}
-                  nemuId={NEMU_IDS.perdinForm.tanggalBerangkat}
-                  value={field.state.value}
-                  invalid={Boolean(errors[field.name])}
-                  onChange={field.handleChange}
-                />
-                <FieldError>{errors[field.name]}</FieldError>
-              </Field>
-            );
-          }}
-        </form.Field>
+    <FieldGroup className="gap-3">
+      <form.Field name="tanggalBerangkat">
+        {(field) => {
+          return (
+            <Field data-invalid={Boolean(errors[field.name])} className="gap-1.5">
+              <FieldLabel htmlFor={field.name}>Tanggal berangkat</FieldLabel>
+              <DatePicker
+                id={field.name}
+                nemuId={NEMU_IDS.perdinForm.tanggalBerangkat}
+                value={field.state.value}
+                invalid={Boolean(errors[field.name])}
+                onChange={field.handleChange}
+              />
+              <FieldError>{errors[field.name]}</FieldError>
+            </Field>
+          );
+        }}
+      </form.Field>
 
-        <form.Subscribe selector={(state) => state.values.tanggalBerangkat}>
-          {(tanggalBerangkat) => (
-            <form.Field name="tanggalKembali">
-              {(field) => {
-                return (
-                  <Field data-invalid={Boolean(errors[field.name])}>
-                    <FieldLabel htmlFor={field.name}>Tanggal kembali</FieldLabel>
-                    <DatePicker
-                      id={field.name}
-                      nemuId={NEMU_IDS.perdinForm.tanggalKembali}
-                      value={field.state.value}
-                      notBefore={tanggalBerangkat}
-                      invalid={Boolean(errors[field.name])}
-                      onChange={field.handleChange}
-                    />
-                    <FieldError>{errors[field.name]}</FieldError>
-                  </Field>
-                );
-              }}
-            </form.Field>
-          )}
-        </form.Subscribe>
-      </div>
+      <form.Subscribe selector={(state) => state.values.tanggalBerangkat}>
+        {(tanggalBerangkat) => (
+          <form.Field name="tanggalKembali">
+            {(field) => {
+              return (
+                <Field data-invalid={Boolean(errors[field.name])} className="gap-1.5">
+                  <FieldLabel htmlFor={field.name}>Tanggal kembali</FieldLabel>
+                  <DatePicker
+                    id={field.name}
+                    nemuId={NEMU_IDS.perdinForm.tanggalKembali}
+                    value={field.state.value}
+                    notBefore={tanggalBerangkat}
+                    invalid={Boolean(errors[field.name])}
+                    onChange={field.handleChange}
+                  />
+                  <FieldError>{errors[field.name]}</FieldError>
+                </Field>
+              );
+            }}
+          </form.Field>
+        )}
+      </form.Subscribe>
 
       <form.Subscribe
         selector={(state) =>
@@ -62,7 +60,7 @@ export default function JadwalSection({ form }: { form: AjukanPerdinForm }) {
         }
       >
         {(lama) => (
-          <Field>
+          <Field className="gap-1.5">
             <FieldLabel htmlFor="lamaPerjalanan">Lama perjalanan</FieldLabel>
             <Input
               id="lamaPerjalanan"
@@ -70,7 +68,6 @@ export default function JadwalSection({ form }: { form: AjukanPerdinForm }) {
               tabIndex={-1}
               placeholder="Terisi otomatis"
               value={lama ? `${lama.hari} hari · ${lama.malam} malam` : ""}
-              className="bg-muted"
             />
           </Field>
         )}
@@ -81,7 +78,7 @@ export default function JadwalSection({ form }: { form: AjukanPerdinForm }) {
           <form.Field name="modaTransport">
             {(field) => {
               return (
-                <Field data-invalid={Boolean(errors[field.name])}>
+                <Field data-invalid={Boolean(errors[field.name])} className="gap-1.5">
                   <FieldLabel htmlFor={field.name}>Moda transportasi</FieldLabel>
                   <OptionSelect
                     id={field.name}

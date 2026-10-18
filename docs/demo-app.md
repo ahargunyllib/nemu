@@ -47,17 +47,22 @@ reads "Satker Demo · Yogyakarta" on the left and the user's email on the right.
 Beranda is where Momen 1 starts. Under "My dashboard · <the demo clock's day>"
 and "Good morning, Rina." it shows three cards:
 
-- **Favorite Processes**: Perjalanan Dinas, Pengajuan Cuti, and Reimbursement,
-  each with its `favorite-*` id. Perjalanan Dinas opens Ajukan Perjalanan Dinas;
-  the other two only say they are not in the demo.
+- **Favorite Processes**: Perjalanan Dinas, Pengajuan Cuti, and Reimbursement
+  in one row, each with its coloured initials and its `favorite-*` id.
+  Perjalanan Dinas opens Ajukan Perjalanan Dinas; the other two only say they
+  are not in the demo.
 - **Up next**: the user's Tasks from `listMyTasks`, each with its `task-*` id,
-  and "View all … tasks" to My Task. The filter chips are static.
-- **My Performance**: static demo figures.
+  and "View all … tasks" to My Task. A Task row shows the process initials, the
+  Task, the process and kota tujuan, and the return date. Tasks have no due
+  date, so the filter chips are static and only All Tasks shows a count.
+- **My Performance**: static demo figures for the 30 days up to the demo clock's
+  day.
 
 ### Ajukan Perjalanan Dinas
 
 The page is titled "Start Perjalanan Dinas". The form is one card with four
-tabs, and only the open tab's fields render:
+pill tabs, each stacking its fields in one column, and only the open tab's
+fields render:
 
 | Tab              | Fields                                                                           |
 | ---------------- | -------------------------------------------------------------------------------- |
@@ -66,7 +71,8 @@ tabs, and only the open tab's fields render:
 | 3 Biaya          | Tiket PP, Penginapan (two cards), Nominal penginapan, Uang harian                |
 | 4 Dokumen        | Undangan upload                                                                  |
 
-Lama perjalanan fills itself from the two dates ("3 hari · 2 malam"). Kota
+A picked date reads with its weekday ("Selasa, 3 Nov 2026"), and Lama
+perjalanan fills itself from the two dates ("3 hari · 2 malam"). Kota
 tujuan must name one of the Demo App's cities (`KOTA_TUJUAN`). Dasar penugasan
 picks one of the user's surat tugas, and its nomor is sent as `nomorSuratTugas`.
 Uang harian shows the SBM daily rate times the days for a luar kota trip.
@@ -74,6 +80,14 @@ Uang harian shows the SBM daily rate times the days for a luar kota trip.
 **Start Process** (top right, `button-kirim-pengajuan`) stays disabled until
 every field is valid. A field shows its error once touched, and a tab holding an
 error shows a red dot, so Rina can find it from any tab.
+
+### My Task
+
+My Task is one narrow column: the "My Tasks" heading, a **Search tasks…** box,
+a "Due date" label, and a compact row per Task (its label over "Perjalanan
+Dinas · <task ID>"). Each row keeps its `task-*` id and opens the Task detail
+page. The search filters the rows by Task label, Task ID, or nomor pengajuan in
+the browser. The Task detail page shows the same column behind its sheet.
 
 ### Task detail
 

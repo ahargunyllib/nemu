@@ -262,6 +262,19 @@ export function toIsoDate(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
+const hariTanggalFormatter = new Intl.DateTimeFormat("id-ID", {
+  weekday: "long",
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+/** A picked date as the date picker shows it, e.g. Selasa, 3 Nov 2026. */
+export function formatHariTanggal(isoDate: string): string {
+  return hariTanggalFormatter.format(new Date(`${isoDate}T00:00:00Z`));
+}
+
 /** The local calendar day of a YYYY-MM-DD date, for the date picker. */
 export function fromIsoDate(isoDate: string): Date {
   const [year, month, day] = isoDate.split("-").map(Number);

@@ -6,6 +6,7 @@ import {
   PERDIN_FORM_DEMO_VALUES,
   PERDIN_TABS,
   type PerdinFormValues,
+  formatHariTanggal,
   lamaPerjalanan,
   perdinFormSchema,
   shownPerdinErrors,
@@ -148,5 +149,12 @@ describe("lamaPerjalanan", () => {
   it("has no length until both dates are valid", () => {
     expect(lamaPerjalanan("2026-11-03", "")).toBeNull();
     expect(lamaPerjalanan("2026-11-05", "2026-11-03")).toBeNull();
+  });
+});
+
+describe("formatHariTanggal", () => {
+  it("shows a picked date with its weekday, as the date picker reads it", () => {
+    expect(formatHariTanggal("2026-11-03")).toBe("Selasa, 3 Nov 2026");
+    expect(formatHariTanggal("2026-11-05")).toBe("Kamis, 5 Nov 2026");
   });
 });
