@@ -7,8 +7,11 @@
  * because automation can't press the toolbar icon or the browser-level shortcut. Check the
  * shortcut itself by hand.
  *
- * Needs the dev stack in fixture mode (`NEMU_RESPONDER=fixture pnpm dev`), which also keeps
- * .output/chrome-mv3-dev built. Run `pnpm --filter extension verify`; add `-- --headed` to watch.
+ * Needs the dev stack in fixture mode (`NEMU_RESPONDER=fixture pnpm dev`). It first runs a
+ * production `wxt build` into .output/chrome-mv3 pointed at the local Nemu Service and loads that:
+ * the dev build in .output/chrome-mv3-dev registers its content script from the WXT dev server
+ * instead of the manifest, so under Playwright no overlay ever appears. Run
+ * `pnpm --filter extension verify`; add `-- --headed` to watch.
  */
 import {
   momentOneRequest,
@@ -19,8 +22,8 @@ import {
   momentTwoRequest,
   momentTwoResponse,
 } from "@nemu/contracts/fixtures";
+import { execFileSync } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
 import path from "node:path";
 import { type BrowserContext, chromium, type Locator, type Page } from "playwright-core";
 import type { browser } from "wxt/browser";
@@ -30,7 +33,8 @@ import { RING_PADDING } from "../features/highlight/lib/highlight-targets.ts";
 import { CURSOR_OFFSET } from "../features/mascot/lib/mascot-position.ts";
 import { ALLOWED_ORIGINS, DEFAULT_SERVER_URL } from "../shared/lib/config.ts";
 
-const EXTENSION_DIR = path.resolve(import.meta.dirname, "../.output/chrome-mv3-dev");
+const EXTENSION_ROOT = path.resolve(import.meta.dirname, "..");
+const EXTENSION_DIR = path.join(EXTENSION_ROOT, ".output/chrome-mv3");
 const SCREENSHOT_DIR = path.resolve(import.meta.dirname, "../.output/verify");
 const [DEMO_APP_URL = ""] = ALLOWED_ORIGINS;
 // The Nemu Service's own origin is not on the allowlist, so it must get no overlay.
@@ -201,13 +205,50 @@ async function eventually(assertion: () => Promise<void>) {
   }
 }
 
-async function main() {
-  if (!existsSync(path.join(EXTENSION_DIR, "manifest.json"))) {
-    throw new Error(`No dev build at ${EXTENSION_DIR}. Start the dev stack: pnpm dev`);
+/** Builds the extension as it ships, but calling the local Nemu Service. */
+function buildExtension() {
+  execFileSync("pnpm", ["exec", "wxt", "build"], {
+    cwd: EXTENSION_ROOT,
+    env: { ...process.env, WXT_SERVER_URL: DEFAULT_SERVER_URL },
+    stdio: ["ignore", "ignore", "inherit"],
+  });
+}
+
+/**
+ * Fails fast when the Nemu Service answers with the AI Responder: its answers never match the
+ * fixtures, so every Momen check would otherwise wait out its timeout on the reading card.
+ */
+async function assertFixtureResponder(page: Page) {
+  const { user_id: _userId, ...request } = momentOneRequest;
+  const body = await page.evaluate(
+    async ({ serverUrl, json }) => {
+      const response = await fetch(`${serverUrl}/rpc/nemuChat`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ json }),
+      });
+      return response.json();
+    },
+    { serverUrl: DEFAULT_SERVER_URL, json: request },
+  );
+  if (body.json?.answer?.ringkas !== momentOneResponse.answer.ringkas) {
+    throw new Error(
+      "the Nemu Service isn't answering from the fixtures. Restart it with NEMU_RESPONDER=fixture pnpm dev",
+    );
   }
+}
+
+/** Beranda greets Rina by name in its page heading. */
+async function waitForBeranda(page: Page) {
+  await page.getByRole("heading", { level: 1, name: /^Good morning/ }).waitFor();
+}
+
+async function main() {
   await assertReachable(DEMO_APP_URL);
   await assertReachable(OUTSIDE_URL);
   await mkdir(SCREENSHOT_DIR, { recursive: true });
+  buildExtension();
 
   const context = await chromium.launchPersistentContext("", {
     // The full Chromium build, not the headless shell, because the shell can't load extensions.
@@ -250,7 +291,8 @@ async function main() {
 
     await check("signed in, the Answer Card shows the answer and its citation", async () => {
       await page.getByRole("button", { name: /Masuk sebagai Rina/ }).click();
-      await page.getByRole("heading", { name: "Beranda" }).waitFor();
+      await waitForBeranda(page);
+      await assertFixtureResponder(page);
       await ask(context, page, momentOneRequest.prompt);
       await page.getByText(momentOneResponse.answer.ringkas).waitFor();
       const [citation] = momentOneResponse.citations;
@@ -268,7 +310,7 @@ async function main() {
       async () => {
         for (let run = 1; run <= MOMEN_1_RUNS; run++) {
           await page.goto(DEMO_APP_URL);
-          await page.getByRole("heading", { name: "Beranda" }).waitFor();
+          await waitForBeranda(page);
           await ask(context, page, momentOneRequest.prompt);
           await page.getByText(momentOneResponse.answer.ringkas).waitFor();
           // Morph (200 ms) and part of the move: the cursor is on its way to the menu.
@@ -291,7 +333,9 @@ async function main() {
       "on the form, Momen 2 sends only the selected area, rings its targets one step at a time and the Answer Card avoids them",
       async () => {
         await page.goto(`${DEMO_APP_URL}/perdin/baru`);
-        await page.getByRole("heading", { name: "Ajukan Perjalanan Dinas" }).waitFor();
+        await page.getByRole("heading", { name: "Start Perjalanan Dinas" }).waitFor();
+        // The lodging fields render only while the form's Biaya tab is open.
+        await page.getByRole("tab", { name: "Biaya" }).click();
         const highlights = momentTwoResponse.actions.filter(({ type }) => type === "highlight");
         if (highlights.length === 0) throw new Error("momentTwoResponse has no highlight actions");
 
@@ -382,7 +426,7 @@ async function main() {
 
     await check("the mascot follows the cursor and opens the Composer when clicked", async () => {
       await page.goto(DEMO_APP_URL);
-      await page.getByRole("heading", { name: "Beranda" }).waitFor();
+      await waitForBeranda(page);
       const mascot = page.getByRole("button", { name: "Tanya Nemu" });
       // The overlay starts listening for the cursor a moment after the page renders, and the mascot
       // has no place until it sees the cursor move, so keep moving until it shows up.
@@ -414,7 +458,7 @@ async function main() {
         for (let run = 1; run <= MOMEN_3_RUNS; run++) {
           await resetDemoData(page);
           await page.goto(DEMO_APP_URL);
-          await page.getByRole("heading", { name: "Beranda" }).waitFor();
+          await waitForBeranda(page);
           await ask(context, page, momentThreeRequest.prompt);
           await page.getByText(momentThreeResponse.answer.ringkas).waitFor();
           await page.waitForURL(`${DEMO_APP_URL}/perdin/task/PD-2026-0042`);
@@ -441,7 +485,7 @@ async function main() {
             await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-3-task.png") });
           }
           // Nemu never presses Kirim: the task is still open until Rina does.
-          await page.getByText("Dokumen pertanggungjawaban").waitFor();
+          await page.locator(`[data-nemu-id="button-kirim"]`).waitFor();
 
           // Each upload moves the ring on by itself, ending on Kirim.
           for (const [index, [nemuId, file]] of Object.entries(MISSING_UPLOADS).entries()) {
