@@ -33,9 +33,13 @@ at the top (it opens Ajukan Perjalanan Dinas and keeps the old
 `menu-ajukan-perjalanan-dinas` id), then Home, My Tasks (with the Task count),
 Group Tasks, My Requests, Analytics, Master Data, and Business Processes, and
 the signed-in user at the bottom (name, jabatan, golongan; it opens the account
-menu). Group Tasks, Analytics, Master Data, and Business Processes are shown
-disabled, because the demo has no such pages. The side menu uses the `sidebar`
-tokens under a `dark` class, so it stays on the shared theme. The white top bar
+menu). Group Tasks, Analytics, Master Data, and Business Processes are
+disabled, because the demo has no such pages, but they keep full strength as in
+AlurKerja. The menu items are text only: the Start a Process pill has a
+blue-green-amber gradient ring and dot, counts are red pills, and menus that
+open a submenu in AlurKerja (My Requests, Analytics, Master Data, Business
+Processes) end in a chevron. The side menu uses the `sidebar` tokens under a
+`dark` class, so it stays on the shared theme. The white top bar
 reads "Satker Demo · Yogyakarta" on the left and the user's email on the right.
 
 ### Beranda
