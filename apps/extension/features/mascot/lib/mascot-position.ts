@@ -1,3 +1,5 @@
+import type { Box } from "../../../shared/types/box";
+
 export type Point = { x: number; y: number };
 export type Viewport = { width: number; height: number };
 
@@ -23,6 +25,14 @@ export function besideCursor(cursor: Point, viewport: Viewport): Point {
     x: cursor.x + reach <= viewport.width ? cursor.x + CURSOR_OFFSET : cursor.x - reach,
     y: cursor.y + reach <= viewport.height ? cursor.y + CURSOR_OFFSET : cursor.y - reach,
   };
+}
+
+/**
+ * Where the mascot sits while Rina drags a Blok area: as the cursor at the box's bottom-right
+ * corner, clear of the corner handle.
+ */
+export function atAreaCorner(area: Box, viewport: Viewport): Point {
+  return besideCursor({ x: area.left + area.width, y: area.top + area.height }, viewport);
 }
 
 /**

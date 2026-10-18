@@ -125,9 +125,13 @@ export function Composer({
 
   if (!hasAttachment) return pill;
 
-  // Kartu area: the white card holding the Area Crop above the pill.
+  // Kartu area (docs/design-system.md, "Composer"): a 288 px white card holding the Area Crop above
+  // the pill, which takes its full inner width.
   return (
-    <Card size="sm" className="gap-2 p-2 shadow-lg">
+    <Card
+      size="sm"
+      className="w-72 gap-2 rounded-[14px] border px-3 pt-2.5 pb-3 shadow-nemu-float ring-0"
+    >
       {children}
       {pill}
     </Card>

@@ -18,27 +18,48 @@ type AreaOutlineProps = {
 };
 
 /**
- * The Blok area box from the design system: dashed amber with round amber corner handles while
- * it is dragged and attached, then a grey dashed outline while Nemu reads it.
+ * The Blok area box from the design system: a light blue fill inside a 1.5 px dashed blue line
+ * (dash 5, gap 4) with round amber corner handles while it is dragged and attached, then a grey
+ * dashed outline while Nemu reads it.
  */
 export function AreaOutline({ box, reading = false, className }: AreaOutlineProps) {
+  if (reading) {
+    return (
+      <div
+        data-nemu-area="reading"
+        className={cn(
+          "absolute rounded-sm border-2 border-dashed border-muted-foreground/60",
+          className,
+        )}
+        style={box}
+      />
+    );
+  }
+
   return (
     <div
-      data-nemu-area={reading ? "reading" : "selected"}
-      className={cn(
-        "absolute rounded-sm border-2 border-dashed",
-        reading ? "border-muted-foreground/60" : "border-nemu-ring",
-        className,
-      )}
+      data-nemu-area="selected"
+      className={cn("absolute rounded-sm bg-nemu-select-fill", className)}
       style={box}
     >
-      {!reading &&
-        CORNERS.map((corner) => (
-          <span
-            key={corner}
-            className={`absolute size-3 rounded-full bg-nemu-ring ring-2 ring-white ${corner}`}
-          />
-        ))}
+      {/* A CSS dashed border can't set its dash and gap, so the line is an SVG stroke. */}
+      <svg aria-hidden className="absolute inset-0 size-full overflow-visible">
+        <rect
+          width="100%"
+          height="100%"
+          rx="4"
+          fill="none"
+          className="stroke-nemu-select"
+          strokeWidth="1.5"
+          strokeDasharray="5 4"
+        />
+      </svg>
+      {CORNERS.map((corner) => (
+        <span
+          key={corner}
+          className={`absolute size-3 rounded-full bg-nemu-ring ring-2 ring-white ${corner}`}
+        />
+      ))}
     </div>
   );
 }

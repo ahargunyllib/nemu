@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 
+import type { Box } from "../../../shared/types/box";
 import type { CursorFrame } from "../../navigation-click/lib/navigation-click";
 import {
+  atAreaCorner,
   besideComposer,
   besideCursor,
   FOLLOW_MS,
@@ -13,12 +15,14 @@ export type MascotPlacement = { at: Point; moveMs: number };
 
 /**
  * Where the mascot is and how long it takes to get there. It follows Rina's cursor, waits beside
- * the Composer while that is open, and rides along with Nemu's cursor during a navigation click.
+ * the Composer while that is open, sits at the corner of a Blok area while Rina drags it, and rides
+ * along with Nemu's cursor during a navigation click.
  * It has no place until the cursor first moves on the page.
  */
 export function useMascotPosition(
   composerAnchor: Point | null,
   nemuCursor: CursorFrame | null,
+  draggedArea: Box | null = null,
 ): MascotPlacement | null {
   const [followed, setFollowed] = useState<Point | null>(null);
 
@@ -35,6 +39,11 @@ export function useMascotPosition(
     return () => window.removeEventListener("mousemove", follow);
   }, []);
 
+  // Area select mode keeps the Composer open, so the dragged box comes first. It keeps up at once.
+  if (draggedArea) {
+    const viewport = { width: window.innerWidth, height: window.innerHeight };
+    return { at: atAreaCorner(draggedArea, viewport), moveMs: 0 };
+  }
   if (composerAnchor) return { at: besideComposer(composerAnchor), moveMs: FOLLOW_MS };
   if (nemuCursor) {
     const viewport = { width: window.innerWidth, height: window.innerHeight };

@@ -2,6 +2,7 @@ import { Button } from "@nemu/ui/components/button";
 import { XIcon } from "lucide-react";
 import { useState } from "react";
 
+import type { Box } from "../../../shared/types/box";
 import type { CursorFrame } from "../../navigation-click/lib/navigation-click";
 import { useMascotPosition } from "../hooks/use-mascot-position";
 import { useMascotState } from "../hooks/use-mascot-state";
@@ -16,6 +17,8 @@ type MascotProps = {
   composerAnchor: Point | null;
   /** Nemu's cursor during a navigation click: the mascot rides along with it. */
   nemuCursor: CursorFrame | null;
+  /** The Blok area while Rina drags it: the mascot sits as the cursor at its bottom-right corner. */
+  draggedArea?: Box | null;
   onOpenComposer: (position: Point) => void;
   /** Hiding the mascot also closes the Composer it waits beside. */
   onCloseComposer: () => void;
@@ -30,11 +33,12 @@ export function Mascot({
   activity,
   composerAnchor,
   nemuCursor,
+  draggedArea = null,
   onOpenComposer,
   onCloseComposer,
 }: MascotProps) {
   const state = useMascotState(activity);
-  const placement = useMascotPosition(composerAnchor, nemuCursor);
+  const placement = useMascotPosition(composerAnchor, nemuCursor, draggedArea);
   const [hidden, setHidden] = useState(false);
   const [wasListening, setWasListening] = useState(activity.listening);
 
@@ -68,7 +72,7 @@ export function Mascot({
           dangerouslySetInnerHTML={{ __html: MASCOT_ART[state] }}
         />
       </Button>
-      {composerAnchor && <HotkeyHint mascotAt={placement.at} />}
+      {composerAnchor && !draggedArea && <HotkeyHint mascotAt={placement.at} />}
       <Button
         aria-label="Sembunyikan maskot"
         size="icon-xs"

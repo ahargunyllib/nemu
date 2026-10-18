@@ -48,6 +48,8 @@ export function NemuOverlay() {
   const [composerOpen, setComposerOpen] = useState(false);
   /** The Blok area sent with the prompt Nemu is reading. */
   const [readArea, setReadArea] = useState<Box | null>(null);
+  /** The Blok area while Rina drags it. */
+  const [draggedArea, setDraggedArea] = useState<Box | null>(null);
   const chat = useNemuChat();
   const area = useAreaCrop();
   const { state } = chat;
@@ -131,6 +133,7 @@ export function NemuOverlay() {
           }}
           composerAnchor={composerOpen ? anchor : null}
           nemuCursor={cursor}
+          draggedArea={area.state.kind === "selecting" ? draggedArea : null}
           onOpenComposer={openComposer}
           onCloseComposer={closeComposer}
         />
@@ -211,7 +214,7 @@ export function NemuOverlay() {
         </div>
       )}
       {area.state.kind === "selecting" && (
-        <AreaSelectLayer onSelect={area.select} onCancel={area.clear} />
+        <AreaSelectLayer onSelect={area.select} onCancel={area.clear} onDrag={setDraggedArea} />
       )}
     </div>
   );
