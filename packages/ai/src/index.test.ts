@@ -1077,6 +1077,90 @@ test("untrusted rupiah amounts from GPT are rejected", async () => {
   assert.deepEqual(response.actions, []);
 });
 
+const ACCOMMODATION_DECISION = {
+  intent: "accommodation_question",
+  intentConfidence: 0.99,
+  withinDomainProbability: 0.99,
+  injectionProbability: 0,
+  requiredTool: "lookup_sbm_and_accommodation",
+  actionLevel: "arahkan",
+  actionConfidence: 0.99,
+  target: "opt-penginapan-tidak-hotel",
+  targetConfidence: 0.99,
+} as const;
+
+test("step notes from GPT ride on the actions the policy layer chose", async () => {
+  const response = await runNemu(momentTwoRequest, {
+    userProfile: DEMO_USER_PROFILE,
+    processContext: momentTwoRequest.process_context,
+    knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    sbmRows: DEMO_SBM_ROWS,
+    holidays: [],
+    requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+    currentDate: "2026-10-17",
+    jevDecider: async () => ACCOMMODATION_DECISION,
+    answerGenerator: async () => ({
+      status: "answer",
+      ringkas: "Pilih Tidak menginap di hotel.",
+      detail: "Nominalnya dihitung dari tarif hotel.",
+      citationIds: ["pmk-119-2023-page-6"],
+      warnings: [],
+      steps: [
+        { target: "opt-penginapan-tidak-hotel", note: 'Pilih **"Tidak menginap di hotel"**.' },
+        {
+          target: "input-nominal-penginapan",
+          note: "Isi Nominal penginapan.",
+          value: "Rp447.000",
+        },
+        { target: "button-kirim-pengajuan", note: "Lalu kirim." },
+      ],
+    }),
+  });
+
+  assert.equal(response.status, "answer");
+  assert.deepEqual(response.actions, [
+    {
+      type: "highlight",
+      target: "opt-penginapan-tidak-hotel",
+      level: "arahkan",
+      label: "Periksa ini",
+      note: 'Pilih **"Tidak menginap di hotel"**.',
+    },
+    {
+      type: "highlight",
+      target: "input-nominal-penginapan",
+      level: "arahkan",
+      label: "Periksa ini",
+      note: "Isi Nominal penginapan.",
+      value: "Rp447.000",
+    },
+  ]);
+});
+
+test("an untrusted rupiah amount in a step value is rejected", async () => {
+  const response = await runNemu(momentTwoRequest, {
+    userProfile: DEMO_USER_PROFILE,
+    processContext: momentTwoRequest.process_context,
+    knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    sbmRows: DEMO_SBM_ROWS,
+    holidays: [],
+    requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+    currentDate: "2026-10-17",
+    jevDecider: async () => ACCOMMODATION_DECISION,
+    answerGenerator: async () => ({
+      status: "answer",
+      ringkas: "Pilih Tidak menginap di hotel.",
+      detail: "Nominalnya dihitung dari tarif hotel.",
+      citationIds: ["pmk-119-2023-page-6"],
+      warnings: [],
+      steps: [{ target: "input-nominal-penginapan", note: "Isi nominal.", value: "Rp999.000" }],
+    }),
+  });
+
+  assert.equal(response.status, "error");
+  assert.deepEqual(response.actions, []);
+});
+
 test("a screenshot-only question receives active evidence for vision interpretation", async () => {
   let receivedEvidenceIds: string[] = [];
   const response = await runNemu(
@@ -1139,6 +1223,10 @@ test("the OpenRouter Responses adapter sends workflow guidance, crop, and strict
             detail: "Ikuti aturan pada sumber yang diberikan.",
             citation_ids: ["pmk-119-2023-page-6"],
             warnings: [],
+            steps: [
+              { target: "opt-penginapan-tidak-hotel", note: "Pilih **ini**.", value: null },
+              { target: "input-nominal-penginapan", note: "Isi nominal.", value: "Rp447.000" },
+            ],
           }),
         }),
         { status: 200, headers: { "Content-Type": "application/json" } },
@@ -1171,8 +1259,12 @@ test("the OpenRouter Responses adapter sends workflow guidance, crop, and strict
       "The accommodation amount is entered manually by the user. Never say it is filled automatically.",
     ],
   };
-  await generator(generationInput);
+  const answer = await generator(generationInput);
 
+  assert.deepEqual(answer.steps, [
+    { target: "opt-penginapan-tidak-hotel", note: "Pilih **ini**." },
+    { target: "input-nominal-penginapan", note: "Isi nominal.", value: "Rp447.000" },
+  ]);
   assert.equal(requestUrl, "https://openrouter.ai/api/v1/responses");
   assert.equal(requestBody?.model, "openai/gpt-6.1-sol");
   assert.equal(requestBody?.max_output_tokens, 2_000);

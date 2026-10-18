@@ -2,6 +2,8 @@ import { nemuResponseSchema } from "@nemu/contracts";
 import {
   momentOneRequest,
   momentOneResponse,
+  momentOneScheduleRequest,
+  momentOneScheduleResponse,
   momentThreeFollowUpRequest,
   momentThreeFollowUpResponse,
   momentThreeRequest,
@@ -16,6 +18,7 @@ import { findFixtureResponse } from "./fixture-responder";
 describe("fixture responder", () => {
   test.each([
     ["Momen 1", momentOneRequest, momentOneResponse],
+    ["Momen 1 · Jadwal", momentOneScheduleRequest, momentOneScheduleResponse],
     ["Momen 2", momentTwoRequest, momentTwoResponse],
     ["Momen 3", momentThreeRequest, momentThreeResponse],
     ["Momen 3 follow-up", momentThreeFollowUpRequest, momentThreeFollowUpResponse],

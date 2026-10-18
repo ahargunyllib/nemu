@@ -2,7 +2,6 @@
 import type { NemuAction, PageElement } from "@nemu/contracts";
 import {
   momentOneRequest,
-  momentOneResponse,
   momentThreeFollowUpRequest,
   momentThreeFollowUpResponse,
   momentThreeRequest,
@@ -16,6 +15,16 @@ import { MAX_MOVE_MS, MORPH_MS } from "../../navigation-click/lib/navigation-cli
 import { useAnswerActions } from "./use-answer-actions";
 
 const START = { x: 900, y: 500 };
+
+/** One click on the side menu, the shape of a Momen 1 navigation. */
+const MENU_CLICK: NemuAction[] = [
+  {
+    type: "click",
+    target: NEMU_IDS.shell.menuAjukanPerjalananDinas,
+    level: "jalan_sendiri",
+    label: "Buka formulir",
+  },
+];
 
 beforeEach(() => {
   window.history.replaceState(null, "", "/");
@@ -50,7 +59,7 @@ describe("useAnswerActions", () => {
       window.history.pushState(null, "", "/perdin/baru"),
     );
 
-    const result = renderActions(momentOneResponse.actions, momentOneRequest.elements);
+    const result = renderActions(MENU_CLICK, momentOneRequest.elements);
     await act(() => vi.advanceTimersByTimeAsync(MORPH_MS + MAX_MOVE_MS + 100));
 
     expect(menu.clicked).toHaveBeenCalledOnce();
@@ -120,7 +129,7 @@ describe("useAnswerActions", () => {
   test("a click on a target outside the Element List becomes a highlight", async () => {
     const menu = renderTarget(NEMU_IDS.shell.menuAjukanPerjalananDinas);
 
-    const result = renderActions(momentOneResponse.actions, []);
+    const result = renderActions(MENU_CLICK, []);
 
     await waitFor(() => expect(result.current.highlight).toBeDefined());
     expect(menu.clicked).not.toHaveBeenCalled();
@@ -129,7 +138,7 @@ describe("useAnswerActions", () => {
   test("Esc stops the click and highlights the target instead", async () => {
     vi.useFakeTimers();
     const menu = renderTarget(NEMU_IDS.shell.menuAjukanPerjalananDinas);
-    const result = renderActions(momentOneResponse.actions, momentOneRequest.elements);
+    const result = renderActions(MENU_CLICK, momentOneRequest.elements);
 
     act(() => {
       window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
@@ -144,7 +153,7 @@ describe("useAnswerActions", () => {
 
   test("a missing click target warns and falls back to a highlight", async () => {
     vi.useFakeTimers();
-    const result = renderActions(momentOneResponse.actions, momentOneRequest.elements);
+    const result = renderActions(MENU_CLICK, momentOneRequest.elements);
 
     await act(() => vi.advanceTimersByTimeAsync(0));
 

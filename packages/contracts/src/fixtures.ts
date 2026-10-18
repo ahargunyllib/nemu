@@ -12,6 +12,12 @@ export const momentOneRequest = {
       role: "link",
       visible: true,
     },
+    {
+      nemu_id: "favorite-perjalanan-dinas",
+      label: "Perjalanan Dinas",
+      role: "link",
+      visible: true,
+    },
   ],
 } satisfies NemuRequest;
 
@@ -19,13 +25,13 @@ export const momentOneResponse = {
   status: "answer",
   answer: {
     ringkas:
-      "Ini perjalanan dinas luar kota. Saya bukakan formulir Ajukan Perjalanan Dinas; siapkan empat dokumen sebelum mengirim.",
+      "Ini perjalanan dinas luar kota. Saya bukakan formulir Perjalanan Dinas; siapkan empat dokumen dan isi datanya di form.",
     detail: [
       "Dokumen yang disiapkan:",
-      "1. Nomor surat tugas dari Kepala Balai",
-      "2. Undangan atau kerangka acuan rapat",
-      "3. Jadwal berangkat dan kembali",
-      "4. Rincian perkiraan biaya (dibuat otomatis dari isian form)",
+      "1. Surat tugas dari atasan",
+      "2. Undangan rapat koordinasi",
+      "3. Jadwal & tiket transport",
+      "4. Rincian rencana biaya",
     ].join("\n"),
   },
   citations: [
@@ -35,9 +41,102 @@ export const momentOneResponse = {
   actions: [
     {
       type: "click",
-      target: "menu-ajukan-perjalanan-dinas",
+      target: "favorite-perjalanan-dinas",
       level: "jalan_sendiri",
-      label: "Buka formulir",
+      label: "Membuka Perjalanan Dinas",
+    },
+    {
+      type: "highlight",
+      target: "select-jenis-perjalanan",
+      level: "arahkan",
+      label: "Pilih Dinas luar kota",
+      note: "Siapkan 4 dokumen ini dulu dan isi datanya di form: 1. Surat tugas dari atasan 2. Undangan rapat koordinasi 3. Jadwal & tiket transport 4. Rincian rencana biaya. Mulai dari Jenis perjalanan, pilih **Dinas luar kota**.",
+    },
+    {
+      type: "highlight",
+      target: "select-kota-tujuan",
+      level: "arahkan",
+      label: "Isi Makassar",
+      note: "Sekarang isi Kota tujuan dengan **Makassar**, sesuai surat tugas.",
+    },
+    {
+      type: "highlight",
+      target: "select-dasar-penugasan",
+      level: "arahkan",
+      label: "Pilih surat tugas",
+      note: "Terakhir, pilih surat tugas yang jadi dasar perjalanan ini: **ST-090/2026 · Rapat koordinasi Makassar**.",
+    },
+  ],
+  warnings: [],
+} satisfies NemuResponse;
+
+export const momentOneScheduleRequest = {
+  session_id: "s-001",
+  user_id: "rina",
+  url: "https://app.demo/perdin/baru",
+  prompt: "Tanggal berangkat & kembali diisi sesuai apa?",
+  elements: [
+    {
+      nemu_id: "input-tanggal-berangkat",
+      label: "Tanggal berangkat",
+      role: "textbox",
+      visible: true,
+    },
+    {
+      nemu_id: "input-tanggal-kembali",
+      label: "Tanggal kembali",
+      role: "textbox",
+      visible: true,
+    },
+    {
+      nemu_id: "select-moda-transport",
+      label: "Moda transportasi",
+      role: "combobox",
+      visible: true,
+    },
+  ],
+} satisfies NemuRequest;
+
+export const momentOneScheduleResponse = {
+  status: "answer",
+  answer: {
+    ringkas:
+      "Isi sesuai surat tugas: berangkat 3 Nov 2026, kembali 5 Nov 2026, dengan pesawat Yogyakarta–Makassar PP.",
+    detail:
+      "Tanggal kembali jadi dasar batas pertanggungjawaban: lima hari kerja setelah pulang, yaitu 12 November 2026. Lama perjalanan terisi otomatis dari kedua tanggal.",
+  },
+  citations: [
+    { doc_id: "sop-pd-01", judul: "SOP-PD-01 Perjalanan Dinas" },
+    { doc_id: "pmk-113-2012", judul: "PMK 113/2012", pasal: "34" },
+  ],
+  calc: [
+    {
+      fungsi: "batas_pertanggungjawaban",
+      input: { tanggal_kembali: "2026-11-05", hari_kerja: 5 },
+      hasil: "2026-11-12",
+    },
+  ],
+  actions: [
+    {
+      type: "highlight",
+      target: "input-tanggal-berangkat",
+      level: "arahkan",
+      label: "Isi 3 Nov 2026",
+      note: "Sesuai surat tugas, kamu berangkat Selasa, 3 Nov 2026. Isi Tanggal berangkat dengan tanggal itu.",
+    },
+    {
+      type: "highlight",
+      target: "input-tanggal-kembali",
+      level: "arahkan",
+      label: "Isi 5 Nov 2026",
+      note: "Tanggal kembali Kamis, 5 Nov 2026. Tanggal ini juga jadi dasar batas pertanggungjawaban: 5 hari kerja setelah pulang. Lama perjalanan akan terisi otomatis.",
+    },
+    {
+      type: "highlight",
+      target: "select-moda-transport",
+      level: "arahkan",
+      label: "Pilih Pesawat",
+      note: "Terakhir, pilih **Pesawat** untuk rute Yogyakarta–Makassar PP, sesuai tiket di surat tugas.",
     },
   ],
   warnings: [],
@@ -103,12 +202,15 @@ export const momentTwoResponse = {
       target: "opt-penginapan-tidak-hotel",
       level: "arahkan",
       label: "Pilih ini",
+      note: 'Kamu menginap di rumah saudara, jadi pilih **"Tidak menginap di hotel"**. Kamu tetap dapat penggantian 30% dari tarif hotel per malam.',
     },
     {
       type: "highlight",
       target: "input-nominal-penginapan",
       level: "arahkan",
-      label: "Isi nominal ini",
+      label: "Isi Rp447.000",
+      note: "Sekarang isi Nominal penginapan (30% × Rp745.000 × 2 malam)",
+      value: "Rp447.000",
     },
   ],
   warnings: ["Ubah isian bila nanti menginap di hotel"],

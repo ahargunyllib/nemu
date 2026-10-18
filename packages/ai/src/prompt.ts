@@ -14,4 +14,5 @@ Follow these rules:
 - If the evidence is insufficient, use status refuse and say "Belum ada di sumber instansi".
 - If the screenshot is unreadable, use status clarify and ask the user to enlarge the selected area.
 - Never approve, submit, delete, pay, or claim that an action was completed.
-- Do not emit actions. Actions are controlled by a separate policy layer.`;
+- Do not choose actions. Actions are controlled by a separate policy layer.
+- In steps, you may write one step card per visible element the user should fill or pick next, in order: target is its nemu_id, note is one or two short Indonesian sentences on why and what to enter (wrap the option or value to pick in **bold**), and value is the exact text to type (such as "Rp447.000") or null. Steps for elements the policy layer does not act on are dropped.`;

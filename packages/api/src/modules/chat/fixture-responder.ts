@@ -2,6 +2,8 @@ import type { NemuRequest, NemuResponse } from "@nemu/contracts";
 import {
   momentOneRequest,
   momentOneResponse,
+  momentOneScheduleRequest,
+  momentOneScheduleResponse,
   momentThreeFollowUpRequest,
   momentThreeFollowUpResponse,
   momentThreeRequest,
@@ -18,6 +20,7 @@ type Fixture = { request: NemuRequest; response: NemuResponse };
 // follow-up wins only when the request carries more of the follow-up's elements.
 const FIXTURES: readonly Fixture[] = [
   { request: momentOneRequest, response: momentOneResponse },
+  { request: momentOneScheduleRequest, response: momentOneScheduleResponse },
   { request: momentTwoRequest, response: momentTwoResponse },
   { request: momentThreeRequest, response: momentThreeResponse },
   { request: momentThreeFollowUpRequest, response: momentThreeFollowUpResponse },

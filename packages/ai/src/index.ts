@@ -10,7 +10,7 @@ import {
 } from "@nemu/contracts";
 import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
 
-import type { AnswerGenerator, GeneratedAnswer, NemuUserProfile } from "./openai.js";
+import type { AnswerGenerator, GeneratedAnswer, GeneratedStep, NemuUserProfile } from "./openai.js";
 import type { JevDecider, JevDecision } from "./jev.js";
 import { retrieveKnowledge, type KnowledgeChunk, type RankedKnowledgeChunk } from "./knowledge.js";
 import {
@@ -32,6 +32,7 @@ export type {
   AnswerGenerationInput,
   AnswerGenerator,
   GeneratedAnswer,
+  GeneratedStep,
   NemuUserProfile,
 } from "./openai.js";
 export {
@@ -354,6 +355,16 @@ function citationsFromEvidence(
   return citations;
 }
 
+/** Puts the model's step card on each action the policy layer chose for that target. */
+function withStepNotes(actions: NemuAction[], steps: readonly GeneratedStep[] = []): NemuAction[] {
+  const stepsByTarget = new Map(steps.map((step) => [step.target, step] as const));
+  return actions.map((action) => {
+    const step = stepsByTarget.get(action.target);
+    if (!step) return action;
+    return { ...action, note: step.note, ...(step.value ? { value: step.value } : {}) };
+  });
+}
+
 function buildActions(
   decision: JevDecision,
   request: NemuRequest,
@@ -582,9 +593,12 @@ function validateGeneratedAnswer(
   evidence?: readonly RankedKnowledgeChunk[],
 ): void {
   const answerText = `${generatedAnswer.ringkas} ${generatedAnswer.detail}`;
+  const stepText = (generatedAnswer.steps ?? [])
+    .map((step) => `${step.note} ${step.value ?? ""}`)
+    .join(" ");
   const trustedNumbers = collectTrustedNumbers(calculations, sbmRows, prompt, evidence);
 
-  for (const match of answerText.matchAll(/Rp\s*([\d.]+(?:,\d{1,2})?)/giu)) {
+  for (const match of `${answerText} ${stepText}`.matchAll(/Rp\s*([\d.]+(?:,\d{1,2})?)/giu)) {
     const amount = parseRupiahAmount(match[1] ?? "");
     if (amount === undefined || !trustedNumbers.has(amount)) {
       throw new Error(`Generated answer contains an untrusted rupiah amount: ${match[0]}`);
@@ -752,14 +766,17 @@ export async function runNemu(
     ];
     const actions =
       generatedAnswer.status === "answer"
-        ? buildActions(
-            jevResult.decision,
-            request,
-            toolResults.missingDocuments,
-            thresholds.click,
-            injectionDetected,
-            jevResult.failed,
-            workflowScenario,
+        ? withStepNotes(
+            buildActions(
+              jevResult.decision,
+              request,
+              toolResults.missingDocuments,
+              thresholds.click,
+              injectionDetected,
+              jevResult.failed,
+              workflowScenario,
+            ),
+            generatedAnswer.steps,
           )
         : [];
 

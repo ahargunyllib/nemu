@@ -14,12 +14,20 @@ export type NemuUserProfile = {
   province: string;
 };
 
+/** A step card for one visible element: kept only when the policy layer acts on that target. */
+export type GeneratedStep = {
+  target: string;
+  note: string;
+  value?: string;
+};
+
 export type GeneratedAnswer = {
   status: "answer" | "clarify" | "refuse";
   ringkas: string;
   detail: string;
   citationIds: string[];
   warnings: string[];
+  steps?: GeneratedStep[];
 };
 
 export type AnswerGenerationInput = {
@@ -51,6 +59,18 @@ const generatedAnswerSchema = z
     detail: z.string().max(6_000),
     citation_ids: z.array(z.string().min(1).max(200)).max(20),
     warnings: z.array(z.string().min(1).max(500)).max(20),
+    steps: z
+      .array(
+        z
+          .object({
+            target: z.string().min(1).max(160),
+            note: z.string().trim().min(1).max(400),
+            value: z.string().trim().min(1).max(60).nullable(),
+          })
+          .strict(),
+      )
+      .max(20)
+      .default([]),
   })
   .strict();
 
@@ -86,8 +106,21 @@ const GENERATED_ANSWER_JSON_SCHEMA = {
     detail: { type: "string" },
     citation_ids: { type: "array", items: { type: "string" } },
     warnings: { type: "array", items: { type: "string" } },
+    steps: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          target: { type: "string" },
+          note: { type: "string" },
+          value: { type: ["string", "null"] },
+        },
+        required: ["target", "note", "value"],
+        additionalProperties: false,
+      },
+    },
   },
-  required: ["status", "ringkas", "detail", "citation_ids", "warnings"],
+  required: ["status", "ringkas", "detail", "citation_ids", "warnings", "steps"],
   additionalProperties: false,
 } as const;
 
@@ -194,6 +227,11 @@ export function createOpenRouterAnswerGenerator(config: OpenRouterClientConfig):
       detail: generatedAnswer.detail,
       citationIds: generatedAnswer.citation_ids,
       warnings: generatedAnswer.warnings,
+      steps: generatedAnswer.steps.map(({ target, note, value }) => ({
+        target,
+        note,
+        ...(value ? { value } : {}),
+      })),
     };
   };
 }
