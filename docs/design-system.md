@@ -33,15 +33,28 @@ colours: body gradient amber 300 → 500, wings amber 100, white outline, white 
 The black main button in a card ("Lanjut", "Complete Task") is bg/inverse `#18181B`: the stock
 shadcn `Button` default variant.
 
+Every Nemu surface floating over the page (Composer, Answer Card, Kartu area, tooltips) casts the
+**Float** shadow, `shadow-nemu-float` (`--nemu-shadow-float` in `nemu.css`):
+`0 2px 4px rgb(24 24 27 / 0.06), 0 16px 40px rgb(24 24 27 / 0.14)`.
+
 ## Typography (Fondasi · Tipografi)
+
+Everything Nemu draws is set in **Plus Jakarta Sans** (400, 500, 600, 700) with a sans-serif
+fallback; the App keeps Figtree for text and Outfit for headings. Inside the extension's shadow
+root `font-sans` and `font-heading` both resolve to Plus Jakarta Sans
+(`apps/extension/entrypoints/nemu.content/style.css`). The font is bundled from
+`@fontsource-variable/plus-jakarta-sans` and declared on the page's document by `nemu-font.ts`,
+because Chromium ignores `@font-face` inside a shadow root.
 
 | Style                                          | Weight · size/line                        |
 | ---------------------------------------------- | ----------------------------------------- |
 | Nemu/Card title                                | SemiBold 14.5/19                          |
 | Nemu/Card body                                 | Regular 12.5/17                           |
+| Body/Small                                     | Regular 13/18                             |
 | Nemu/Calc                                      | Medium 11.5/16                            |
 | Nemu/Calc result                               | Bold 14/18                                |
 | Label/Caps (card kicker, "RINCIAN HITUNG")     | SemiBold 10.5/14, +8% tracking, uppercase |
+| Label/State                                    | SemiBold 12/16                            |
 | Label/Chip                                     | Medium 11.5/15                            |
 | Label/Button                                   | Medium 13/16                              |
 | Caption ("lookup_sbm() · SBM TA 2026 hlm. 19") | Regular 11.5/15                           |
