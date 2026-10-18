@@ -13,12 +13,14 @@ export type MascotPlacement = { at: Point; moveMs: number };
 
 /**
  * Where the mascot is and how long it takes to get there. It follows Rina's cursor, waits beside
- * the Composer while that is open, and rides along with Nemu's cursor during a navigation click.
- * It has no place until the cursor first moves on the page.
+ * the Composer while that is open, rides along with Nemu's cursor during a navigation click, and
+ * perches on a guided step's card while one is up. It has no place until the cursor first moves on
+ * the page, unless it has a perch.
  */
 export function useMascotPosition(
   composerAnchor: Point | null,
   nemuCursor: CursorFrame | null,
+  perch: Point | null = null,
 ): MascotPlacement | null {
   const [followed, setFollowed] = useState<Point | null>(null);
 
@@ -43,5 +45,6 @@ export function useMascotPosition(
       moveMs: (nemuCursor.mascot === "clicking" && nemuCursor.moveMs) || FOLLOW_MS,
     };
   }
+  if (perch) return { at: perch, moveMs: FOLLOW_MS };
   return followed && { at: followed, moveMs: FOLLOW_MS };
 }

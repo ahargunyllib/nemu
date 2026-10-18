@@ -6,6 +6,7 @@ import type { CursorFrame } from "../../navigation-click/lib/navigation-click";
 import { useMascotPosition } from "../hooks/use-mascot-position";
 import { useMascotState } from "../hooks/use-mascot-state";
 import { MASCOT_ART, MASCOT_MOTION } from "../lib/mascot-art";
+import { HotkeyHint } from "./hotkey-hint";
 import type { Point } from "../lib/mascot-position";
 import type { MascotActivity } from "../lib/mascot-state";
 
@@ -15,6 +16,8 @@ type MascotProps = {
   composerAnchor: Point | null;
   /** Nemu's cursor during a navigation click: the mascot rides along with it. */
   nemuCursor: CursorFrame | null;
+  /** Where the mascot waits otherwise, such as a guided step card's top-left corner. */
+  perch?: Point | null;
   onOpenComposer: (position: Point) => void;
   /** Hiding the mascot also closes the Composer it waits beside. */
   onCloseComposer: () => void;
@@ -22,17 +25,19 @@ type MascotProps = {
 
 /**
  * The Nemu mascot on the page layer. It follows the cursor and shows what Nemu is doing; clicking
- * it opens the Composer. Hidden, it closes the Composer and stays away until Rina opens it again.
+ * it opens the Composer, beside which it shows the shortcut that opens it too. Hidden, it closes the
+ * Composer and stays away until Rina opens it again.
  */
 export function Mascot({
   activity,
   composerAnchor,
   nemuCursor,
+  perch = null,
   onOpenComposer,
   onCloseComposer,
 }: MascotProps) {
   const state = useMascotState(activity);
-  const placement = useMascotPosition(composerAnchor, nemuCursor);
+  const placement = useMascotPosition(composerAnchor, nemuCursor, perch);
   const [hidden, setHidden] = useState(false);
   const [wasListening, setWasListening] = useState(activity.listening);
 
@@ -66,6 +71,7 @@ export function Mascot({
           dangerouslySetInnerHTML={{ __html: MASCOT_ART[state] }}
         />
       </Button>
+      {composerAnchor && <HotkeyHint mascotAt={placement.at} />}
       <Button
         aria-label="Sembunyikan maskot"
         size="icon-xs"

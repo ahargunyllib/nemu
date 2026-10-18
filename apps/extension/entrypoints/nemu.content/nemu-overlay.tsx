@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 
 import { useAnswerActions } from "../../features/action-level/hooks/use-answer-actions";
 import { AreaCropChip } from "../../features/area-crop/components/area-crop-chip";
+import { AreaOutline } from "../../features/area-crop/components/area-outline";
 import { AreaSelectLayer } from "../../features/area-crop/components/area-select-layer";
 import { useAreaCrop } from "../../features/area-crop/hooks/use-area-crop";
 import { AnswerCard } from "../../features/answer-card/components/answer-card";
@@ -21,6 +22,8 @@ import {
   useComposerShortcut,
 } from "../../features/composer/hooks/use-composer-shortcut";
 import { collectElementList } from "../../features/element-list/lib/element-list";
+import { StepCard } from "../../features/guided-steps/components/step-card";
+import { placeStepCard } from "../../features/guided-steps/lib/guided-steps";
 import { HighlightRing } from "../../features/highlight/components/highlight-ring";
 import { HighlightSteps } from "../../features/highlight/components/highlight-steps";
 import {
@@ -33,25 +36,43 @@ import { ConfirmedStatus } from "../../features/process-status/components/confir
 import { useConfirmedStatus } from "../../features/process-status/hooks/use-confirmed-status";
 import { PageLayer } from "../../shared/components/page-layer";
 import { useElementHeight } from "../../shared/hooks/use-element-height";
+import type { Box } from "../../shared/types/box";
 
 const NO_ACTIONS: NemuAction[] = [];
 const NO_ELEMENTS: PageElement[] = [];
 /** Room around the panel inside its scroll box, so the scroll box doesn't clip the cards' shadow. */
 const SHADOW_ROOM = 16;
+/** Half the mascot, so it perches centered on the step card's top-left corner. */
+const PERCH_OFFSET = 16;
 
 export function NemuOverlay() {
   const [anchor, setAnchor] = useState<CursorPosition | null>(null);
   const [composerOpen, setComposerOpen] = useState(false);
+  /** The Blok area sent with the prompt Nemu is reading. */
+  const [readArea, setReadArea] = useState<Box | null>(null);
   const chat = useNemuChat();
   const area = useAreaCrop();
   const { state } = chat;
   const actions = state.kind === "response" ? state.response.actions : NO_ACTIONS;
-  const { highlight, steps, stepIndex, goTo, missing, warnings, cursor, outcome, clicked } =
-    useAnswerActions(actions, state.kind === "response" ? state.elements : NO_ELEMENTS, anchor);
+  const {
+    highlight,
+    steps,
+    stepIndex,
+    goTo,
+    missing,
+    warnings,
+    cursor,
+    outcome,
+    clicked,
+    guided,
+    searching,
+    done,
+  } = useAnswerActions(actions, state.kind === "response" ? state.elements : NO_ELEMENTS, anchor);
   // Momen 3: opening the task asks again from the task page, where the uploads and Kirim are.
   useClickFollowUp(clicked, chat.followUp);
   const confirmed = useConfirmedStatus(actions);
   const [panelRef, panelHeight] = useElementHeight<HTMLDivElement>();
+  const [stepCardRef, stepCardHeight] = useElementHeight<HTMLDivElement>();
   const nemuRef = useRef<HTMLDivElement>(null);
 
   function openComposer(position: CursorPosition) {
@@ -82,14 +103,20 @@ export function NemuOverlay() {
   const header =
     state.kind === "idle" ? null : <AnswerCardHeader prompt={state.prompt} onClose={close} />;
 
+  const viewport = { width: window.innerWidth, height: window.innerHeight };
+  // Guided steps show a step card instead of the Answer Card, unless no step was found at all.
+  const stepCard =
+    guided && highlight ? placeStepCard(highlight.box, viewport, stepCardHeight) : null;
+  const showAnswerCard = !guided || (!searching && steps.length === 0);
+  // Once the steps start, the step card takes the mascot from the click's resting cursor.
+  const nemuCursor = stepCard && cursor?.mascot !== "clicking" ? null : cursor;
+
   const placement =
     anchor &&
-    placePanel(
-      anchor,
-      { width: window.innerWidth, height: window.innerHeight },
-      panelHeight,
-      highlight ? [highlightFootprint(highlight.box)] : [],
-    );
+    placePanel(anchor, viewport, panelHeight, [
+      ...(highlight ? [highlightFootprint(highlight.box)] : []),
+      ...(stepCard ? [stepCard] : []),
+    ]);
 
   // One font and text color for everything Nemu draws: highlights, the mascot (#6), and the panel.
   // All of it is hidden while the viewport is captured, so an Area Crop shows only the page.
@@ -103,8 +130,25 @@ export function NemuOverlay() {
       }
     >
       <PageLayer>
-        {highlight && <HighlightRing box={highlight.box} action={highlight.action} />}
-        {cursor && <NavigationCursor frame={cursor} />}
+        {composerOpen && area.selection && <AreaOutline box={area.selection} />}
+        {state.kind === "loading" && readArea && <AreaOutline box={readArea} reading />}
+        {highlight && (
+          <HighlightRing
+            box={highlight.box}
+            action={highlight.action}
+            step={guided ? { index: stepIndex, total: steps.length } : undefined}
+          />
+        )}
+        {stepCard && highlight && (
+          <StepCard
+            key={highlight.action.target}
+            ref={stepCardRef}
+            action={highlight.action}
+            place={stepCard}
+            onClose={close}
+          />
+        )}
+        {nemuCursor && <NavigationCursor frame={nemuCursor} />}
         <Mascot
           activity={{
             // Area select mode keeps the Composer open, so dragging a box counts as listening too.
@@ -112,7 +156,8 @@ export function NemuOverlay() {
             thinking: state.kind === "loading",
             clicking: cursor?.mascot === "clicking",
             guiding: Boolean(highlight),
-            succeeded: outcome === "succeeded",
+            // A done guided step flashes success; a click's success gives way to the steps after it.
+            succeeded: done || (outcome === "succeeded" && !(guided && highlight)),
             failed:
               state.kind === "error" ||
               state.kind === "unauthorized" ||
@@ -121,7 +166,13 @@ export function NemuOverlay() {
               outcome === "no-change",
           }}
           composerAnchor={composerOpen ? anchor : null}
-          nemuCursor={cursor}
+          nemuCursor={nemuCursor}
+          perch={
+            stepCard && {
+              x: stepCard.left - PERCH_OFFSET,
+              y: stepCard.top - PERCH_OFFSET,
+            }
+          }
           onOpenComposer={openComposer}
           onCloseComposer={closeComposer}
         />
@@ -145,6 +196,7 @@ export function NemuOverlay() {
               <Composer
                 onSubmit={(prompt) => {
                   setComposerOpen(false);
+                  setReadArea(area.crop ? (area.selection ?? null) : null);
                   ask(prompt, area.crop);
                   area.clear();
                 }}
@@ -159,7 +211,7 @@ export function NemuOverlay() {
               </Composer>
             )}
             {state.kind === "loading" && <AnswerCardSkeleton header={header} />}
-            {state.kind === "response" && (
+            {state.kind === "response" && showAnswerCard && (
               <AnswerCard
                 key={state.prompt}
                 response={{
