@@ -1,9 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- Placeholder: replace with the designer's idle art. Slate, round, calm. -->
-  <circle cx="16" cy="17" r="13" fill="#64748b"/>
-  <circle cx="12" cy="15" r="2.5" fill="#fff"/>
-  <circle cx="20" cy="15" r="2.5" fill="#fff"/>
-  <circle cx="12" cy="15.5" r="1.2" fill="#0f172a"/>
-  <circle cx="20" cy="15.5" r="1.2" fill="#0f172a"/>
-  <path d="M12.5 21.5q3.5 2.5 7 0" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Idle: the round amber firefly, resting. -->
+  <defs>
+    <linearGradient id="nemu-mascot-idle-body" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FDB35A"/>
+      <stop offset="1" stop-color="#E07A16"/>
+    </linearGradient>
+    <radialGradient id="nemu-mascot-idle-glow">
+      <stop offset="0.4" stop-color="#F59331" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#F59331" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="16" cy="18" r="15" fill="url(#nemu-mascot-idle-glow)"/>
+  <ellipse cx="8" cy="12" rx="6" ry="3.4" transform="rotate(18 8 12)" fill="#FFE7C7" stroke="#fff" stroke-width="0.8"/>
+  <ellipse cx="24" cy="12" rx="6" ry="3.4" transform="rotate(-18 24 12)" fill="#FFE7C7" stroke="#fff" stroke-width="0.8"/>
+  <circle cx="16" cy="18" r="8.5" fill="url(#nemu-mascot-idle-body)" stroke="#fff" stroke-width="2.5"/>
+  <ellipse cx="13" cy="17.5" rx="1.5" ry="1.9" fill="#fff"/>
+  <ellipse cx="19" cy="17.5" rx="1.5" ry="1.9" fill="#fff"/>
 </svg>
