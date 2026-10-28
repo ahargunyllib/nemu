@@ -89,12 +89,12 @@ export function describeCalculation(calculation: Calculation): CalculationLine {
   };
 }
 
-/** Results the user types into a form field as an amount, such as the Momen 2 lodging lumpsum. */
-const AMOUNTS: ReadonlySet<Calculation["fungsi"]> = new Set([
-  "hitung_lumpsum_penginapan",
-  "uang_harian",
-  "lookup_sbm",
-]);
+/**
+ * Results the user types into a form field as an amount, most wanted first, such as the
+ * Momen 2 lodging lumpsum ahead of the daily allowance. `lookup_sbm` is a rate the answer
+ * computes from, not an amount anyone fills in, so it is never offered.
+ */
+const AMOUNTS: readonly Calculation["fungsi"][] = ["hitung_lumpsum_penginapan", "uang_harian"];
 
 export type CopyableValue = {
   /** As the card shows it: "Rp447.000". */
@@ -103,12 +103,13 @@ export type CopyableValue = {
   text: string;
 };
 
-/** The first amount the answer computed, for the Salin nilai strip. */
+/** The amount the answer computed for the user to fill in, for the Salin nilai strip. */
 export function copyableValue(calculations: readonly Calculation[]): CopyableValue | undefined {
-  const entry = calculations.find(
-    ({ fungsi, hasil }) => AMOUNTS.has(fungsi) && typeof hasil === "number",
-  );
-  return typeof entry?.hasil === "number"
-    ? { label: formatRupiah(entry.hasil), text: String(entry.hasil) }
-    : undefined;
+  for (const fungsi of AMOUNTS) {
+    const entry = calculations.find((calculation) => calculation.fungsi === fungsi);
+    if (typeof entry?.hasil === "number") {
+      return { label: formatRupiah(entry.hasil), text: String(entry.hasil) };
+    }
+  }
+  return undefined;
 }
