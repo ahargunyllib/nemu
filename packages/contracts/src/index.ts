@@ -146,6 +146,13 @@ export const nemuResponseSchema = z
         path: ["actions"],
       });
     }
+    if (response.status !== "answer" && response.calc.length) {
+      context.addIssue({
+        code: "custom",
+        message: `${response.status} responses cannot contain calculations`,
+        path: ["calc"],
+      });
+    }
   });
 
 export type PageElement = z.infer<typeof pageElementSchema>;

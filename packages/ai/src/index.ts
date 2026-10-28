@@ -767,7 +767,7 @@ export async function runNemu(
       status: generatedAnswer.status,
       answer: { ringkas: generatedAnswer.ringkas, detail: generatedAnswer.detail },
       citations,
-      calc: toolResults.calculations,
+      calc: generatedAnswer.status === "answer" ? toolResults.calculations : [],
       actions,
       warnings: [...generatedAnswer.warnings, ...providerWarnings],
       timing: {

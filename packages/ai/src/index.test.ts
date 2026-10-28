@@ -1077,6 +1077,43 @@ test("untrusted rupiah amounts from GPT are rejected", async () => {
   assert.deepEqual(response.actions, []);
 });
 
+test("a refusal on the lodging page carries no SBM calculations", async () => {
+  const response = await runNemu(
+    { ...momentTwoRequest, prompt: "Uang harian ke Tokyo berapa?" },
+    {
+      userProfile: DEMO_USER_PROFILE,
+      processContext: momentTwoRequest.process_context,
+      knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      sbmRows: DEMO_SBM_ROWS,
+      holidays: [],
+      requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+      currentDate: "2026-10-17",
+      jevDecider: async () => ({
+        intent: "accommodation_question",
+        intentConfidence: 0.99,
+        withinDomainProbability: 0.99,
+        injectionProbability: 0,
+        requiredTool: "lookup_sbm_and_accommodation",
+        actionLevel: "arahkan",
+        actionConfidence: 0.99,
+        target: "opt-penginapan-tidak-hotel",
+        targetConfidence: 0.99,
+      }),
+      answerGenerator: async () => ({
+        status: "refuse",
+        ringkas: "Tarif Tokyo tidak ada di sumber instansi.",
+        detail: "Sumber yang tersedia hanya mencakup perjalanan dinas dalam negeri.",
+        citationIds: [],
+        warnings: [],
+      }),
+    },
+  );
+
+  assert.equal(response.status, "refuse");
+  assert.deepEqual(response.calc, []);
+  assert.deepEqual(response.actions, []);
+});
+
 test("a screenshot-only question receives active evidence for vision interpretation", async () => {
   let receivedEvidenceIds: string[] = [];
   const response = await runNemu(
