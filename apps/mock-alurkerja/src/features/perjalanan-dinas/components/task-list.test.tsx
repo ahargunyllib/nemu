@@ -15,8 +15,9 @@ import TaskList from "./task-list";
 
 function instance(
   id: string,
-  activeTask: NonNullable<ProcessInstanceView["activeTask"]>,
+  task: Pick<NonNullable<ProcessInstanceView["activeTask"]>, "id" | "key" | "label">,
 ): ProcessInstanceView {
+  const activeTask = { ...task, openedOn: "2026-11-05", dueOn: "2026-11-12" };
   return {
     id,
     ownerId: "rina",

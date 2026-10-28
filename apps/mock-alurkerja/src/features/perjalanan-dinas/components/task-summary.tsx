@@ -1,22 +1,19 @@
 import { SheetDescription, SheetHeader, SheetTitle } from "@nemu/ui/components/sheet";
+import { Skeleton } from "@nemu/ui/components/skeleton";
+import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 
 import TaskSheetClose from "@/features/perjalanan-dinas/components/task-sheet-close";
-import { taskDueDate } from "@/features/perjalanan-dinas/lib/task-due";
+import { dayToDate, daysUntil } from "@/features/perjalanan-dinas/lib/task-due";
 import type { ProcessInstanceView } from "@/features/perjalanan-dinas/types/process-instance-view";
+import { orpc } from "@/shared/api/orpc";
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-// The demo's Satker is in Yogyakarta, so Task dates read in WIB wherever the demo runs.
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeZone: "Asia/Jakarta",
-});
+// Task dates are days on the demo clock, so they read in UTC (see `dayToDate`).
+const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" });
 
 /**
  * The task sheet's orange header: the process, the Task (or the State while no Task is open), the
- * Task's age, dates, and assignee, and the Task's actions as `children`.
- *
- * A Task opens when its State last changed, so `updatedAt` stands in for when it was created.
+ * Task's age and dates on the demo clock, the assignee, and the Task's actions as `children`.
  */
 export default function TaskSummary({
   instance,
@@ -27,14 +24,25 @@ export default function TaskSummary({
   assignee: string;
   children?: ReactNode;
 }) {
-  const created = instance.updatedAt;
-  const ageDays = Math.max(0, Math.floor((Date.now() - created.getTime()) / DAY_MS));
-  const meta = [
-    ["Task Age", ageDays === 1 ? "1 day" : `${ageDays} days`],
-    ["Created", dateFormatter.format(created)],
-    ["Due Date", dateFormatter.format(taskDueDate(instance))],
-    ["Assignee", assignee],
-  ] as const;
+  const { data: clock } = useQuery(orpc.getDemoClock.queryOptions({ staleTime: Infinity }));
+  const task = instance.activeTask;
+  const ageDays = task && clock && Math.max(0, -daysUntil(task.openedOn, clock.today));
+  // Without an open Task there is nothing to date, so only the assignee shows.
+  const meta: [string, ReactNode][] = task
+    ? [
+        [
+          "Task Age",
+          ageDays == null ? (
+            <Skeleton className="mt-1 h-4 w-12 bg-task-header-foreground/20" />
+          ) : (
+            `${ageDays} ${ageDays === 1 ? "day" : "days"}`
+          ),
+        ],
+        ["Created", dateFormatter.format(dayToDate(task.openedOn))],
+        ["Due Date", dateFormatter.format(dayToDate(task.dueOn))],
+        ["Assignee", assignee],
+      ]
+    : [["Assignee", assignee]];
 
   return (
     <SheetHeader className="gap-2 bg-linear-to-r from-task-header-from via-task-header-via to-task-header-to px-6 pt-4 pb-4.5 text-task-header-foreground">

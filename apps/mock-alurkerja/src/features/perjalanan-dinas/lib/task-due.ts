@@ -1,23 +1,17 @@
-import type { ProcessInstanceView } from "@/features/perjalanan-dinas/types/process-instance-view";
-
 const DAY_MS = 24 * 60 * 60 * 1000;
-/** Days a Task has before it falls due. The demo keeps no due date, so every Task gets a week. */
-const TASK_DUE_DAYS = 7;
-// The demo's Satker is in Yogyakarta, so Task days turn over at midnight WIB wherever the demo runs.
-const wibDay = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" });
 
 /**
- * When a Task falls due: a week after it opened. A Task opens when its State last changed, so
- * `updatedAt` stands in for when it was created.
+ * A YYYY-MM-DD day as a Date at midnight UTC; format it with `timeZone: "UTC"` to read the same day.
+ * The Nemu Service sends Task dates as days on the demo clock (NEMU_DEMO_DATE), the days the AI
+ * counts from.
  */
-export function taskDueDate(instance: Pick<ProcessInstanceView, "updatedAt">): Date {
-  return new Date(instance.updatedAt.getTime() + TASK_DUE_DAYS * DAY_MS);
+export function dayToDate(day: string): Date {
+  return new Date(`${day}T00:00:00Z`);
 }
 
-/** Whole WIB days from `now` to `due`: 0 on the due day, negative once the Task is late. */
-export function daysUntilDue(due: Date, now: Date): number {
-  const day = (date: Date) => Date.parse(`${wibDay.format(date)}T00:00:00Z`);
-  return Math.round((day(due) - day(now)) / DAY_MS);
+/** Whole days from `today` to `day` (both YYYY-MM-DD): 0 on the day, negative once it has passed. */
+export function daysUntil(day: string, today: string): number {
+  return Math.round((dayToDate(day).getTime() - dayToDate(today).getTime()) / DAY_MS);
 }
 
 export const DUE_FILTERS = ["Overdue", "Due Today", "Upcoming", "All Tasks"] as const;

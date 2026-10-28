@@ -24,6 +24,9 @@ vi.mock("@/shared/api/orpc", async () => {
   const { createTanstackQueryUtils } = await import("@orpc/tanstack-query");
   return {
     orpc: createTanstackQueryUtils({
+      async getDemoClock() {
+        return { today: "2026-11-06" };
+      },
       async getProcessInstance(): Promise<ProcessInstanceView> {
         const dokumen = [...server.dokumen];
         await server.refetchGate;
@@ -73,6 +76,8 @@ function instanceWith(dokumen: ProcessInstanceView["dokumen"]): ProcessInstanceV
       id: "PJ-PD-2026-0042",
       key: "pertanggungjawaban",
       label: "Pertanggungjawaban",
+      openedOn: "2026-11-05",
+      dueOn: "2026-11-12",
     },
     dokumen,
   };
@@ -104,9 +109,9 @@ afterEach(() => {
 });
 
 describe("PertanggungjawabanTask", () => {
-  test("the header shows the Task's age, dates, and assignee", async () => {
+  test("the header dates the Task on the demo clock, not the browser's", async () => {
     vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-11-07T12:00:00Z"));
+    vi.setSystemTime(new Date("2026-11-20T12:00:00Z"));
     server.dokumen = [];
     render(
       <QueryClientProvider client={new QueryClient()}>
@@ -116,9 +121,9 @@ describe("PertanggungjawabanTask", () => {
 
     const field = async (label: string) =>
       (await screen.findByText(label, { selector: "dt" })).nextElementSibling?.textContent;
-    expect(await field("Task Age")).toBe("1 day");
-    expect(await field("Created")).toBe("Nov 6, 2026");
-    expect(await field("Due Date")).toBe("Nov 13, 2026");
+    await waitFor(async () => expect(await field("Task Age")).toBe("1 day"));
+    expect(await field("Created")).toBe("Nov 5, 2026");
+    expect(await field("Due Date")).toBe("Nov 12, 2026");
     expect(await field("Assignee")).toBe("Rina");
   });
 
