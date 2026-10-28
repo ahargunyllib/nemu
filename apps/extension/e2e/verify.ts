@@ -28,6 +28,7 @@ import path from "node:path";
 import { type BrowserContext, chromium, type Locator, type Page } from "playwright-core";
 import type { browser } from "wxt/browser";
 
+import { cropRegion } from "../features/area-crop/lib/area-crop.ts";
 import { OPEN_COMPOSER_MESSAGE } from "../features/composer/lib/open-composer-message.ts";
 import { RING_PADDING } from "../features/highlight/lib/highlight-targets.ts";
 import { CURSOR_OFFSET } from "../features/mascot/lib/mascot-position.ts";
@@ -40,6 +41,8 @@ const [DEMO_APP_URL = ""] = ALLOWED_ORIGINS;
 // The Nemu Service's own origin is not on the allowlist, so it must get no overlay.
 const OUTSIDE_URL = DEFAULT_SERVER_URL;
 const TIMEOUT_MS = 15_000;
+/** Pixels an Area Crop may differ from the page by; the mascot and two Composer buttons were ~550. */
+const MAX_STRAY_PIXELS = 50;
 // Issue #8: Momen 1 must succeed five times out of five.
 const MOMEN_1_RUNS = 5;
 // Issue #10: so must Momen 3, from Beranda to Kirim.
@@ -84,6 +87,18 @@ async function ask(context: BrowserContext, page: Page, prompt: string) {
   await composer.press("Enter");
 }
 
+/** Drags `box` in area select mode, with a screenshot of the drag just before it is released. */
+async function dragArea(page: Page, box: Box, screenshot: string) {
+  await page.getByRole("button", { name: "Pilih area" }).click();
+  await page.getByRole("application", { name: "Pilih area" }).waitFor();
+  await page.mouse.move(box.x, box.y);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 5 });
+  await page.mouse.move(box.x + box.width, box.y + box.height, { steps: 5 });
+  await page.screenshot({ path: path.join(SCREENSHOT_DIR, screenshot) });
+  await page.mouse.up();
+}
+
 /** Drags a box over `targets` in area select mode, the way Rina selects the lodging field. */
 async function selectArea(page: Page, targets: Locator[]): Promise<Box> {
   await targets[0]?.scrollIntoViewIfNeeded();
@@ -93,16 +108,77 @@ async function selectArea(page: Page, targets: Locator[]): Promise<Box> {
   const top = Math.min(...boxes.map(({ y }) => y)) - margin;
   const right = Math.max(...boxes.map(({ x, width }) => x + width)) + margin;
   const bottom = Math.max(...boxes.map(({ y, height }) => y + height)) + margin;
+  const selection = { x: left, y: top, width: right - left, height: bottom - top };
+  await dragArea(page, selection, "momen-2-area-select.png");
+  return selection;
+}
 
-  await page.getByRole("button", { name: "Pilih area" }).click();
-  await page.getByRole("application", { name: "Pilih area" }).waitFor();
-  await page.mouse.move(left, top);
-  await page.mouse.down();
-  await page.mouse.move((left + right) / 2, (top + bottom) / 2, { steps: 5 });
-  await page.mouse.move(right, bottom, { steps: 5 });
-  await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-2-area-select.png") });
-  await page.mouse.up();
-  return { x: left, y: top, width: right - left, height: bottom - top };
+/**
+ * Compares the Area Crop with a screenshot of the same selection with Nemu's overlay taken out,
+ * so whatever Nemu drew that ended up in the crop fails the check.
+ */
+async function assertCropShowsOnlyPage(page: Page, cropUrl: string, selection: Box) {
+  // From inside the shadow root: WXT's `:host { all: initial !important }` beats any page style.
+  const overlay = page.locator("nemu-overlay");
+  await overlay.evaluate((host) => {
+    const style = document.createElement("style");
+    style.id = "verify-hide-nemu";
+    style.textContent = "* { visibility: hidden !important; transition: none !important; }";
+    host.shadowRoot?.append(style);
+  });
+  const clean = await page.screenshot();
+  await overlay.evaluate((host) => host.shadowRoot?.getElementById("verify-hide-nemu")?.remove());
+  // A PNG's IHDR holds its width and height at bytes 16 and 20.
+  const { source } = cropRegion(
+    { left: selection.x, top: selection.y, width: selection.width, height: selection.height },
+    await page.evaluate(() => ({ width: window.innerWidth, height: window.innerHeight })),
+    { width: clean.readUInt32BE(16), height: clean.readUInt32BE(20) },
+  );
+  const differing = await page.evaluate(
+    async ({ cropUrl, cleanUrl, source }) => {
+      async function decode(url: string) {
+        const image = new Image();
+        image.src = url;
+        await image.decode();
+        return image;
+      }
+      // Both drawn at the crop's own size, whatever scale either screenshot was taken at.
+      const crop = await decode(cropUrl);
+      const canvas = document.createElement("canvas");
+      canvas.width = crop.naturalWidth;
+      canvas.height = crop.naturalHeight;
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+      if (!context) throw new Error("no 2D canvas");
+      const { width, height } = canvas;
+      context.drawImage(crop, 0, 0);
+      const cropPixels = context.getImageData(0, 0, width, height).data;
+      const screenshot = await decode(cleanUrl);
+      context.drawImage(
+        screenshot,
+        source.left,
+        source.top,
+        source.width,
+        source.height,
+        0,
+        0,
+        width,
+        height,
+      );
+      const pagePixels = context.getImageData(0, 0, width, height).data;
+      let differing = 0;
+      for (let index = 0; index < cropPixels.length; index += 4) {
+        const channels = [0, 1, 2].map((channel) =>
+          Math.abs((cropPixels[index + channel] ?? 0) - (pagePixels[index + channel] ?? 0)),
+        );
+        if (Math.max(...channels) > 24) differing++;
+      }
+      return differing;
+    },
+    { cropUrl, cleanUrl: `data:image/png;base64,${clean.toString("base64")}`, source },
+  );
+  if (differing > MAX_STRAY_PIXELS) {
+    throw new Error(`the Area Crop shows Nemu's own UI: ${differing} pixels differ from the page`);
+  }
 }
 
 /** The newest Chat Log entry, read with Rina's Demo App session like the Admin Workspace does. */
@@ -368,6 +444,7 @@ async function main() {
             `the crop is ${cropWidth}×${cropHeight}, not the ${selection.width}×${selection.height} selection`,
           );
         }
+        await assertCropShowsOnlyPage(page, String(cropUrl), selection);
         await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-2-area-crop-chip.png") });
         await composer.press("Enter");
 
@@ -423,6 +500,23 @@ async function main() {
         }
       },
     );
+
+    // Issue #121: the mascot and the Composer's buttons once showed up in the crop.
+    await check("an Area Crop shows only the page, never what Nemu draws over it", async () => {
+      await page.goto(DEMO_APP_URL);
+      await waitForBeranda(page);
+      await openComposer(context, page);
+      // Almost the whole viewport, so the Composer and the mascot are inside the selection.
+      const { width, height } = await page.evaluate(() => ({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      }));
+      const selection = { x: 4, y: 4, width: width - 8, height: height - 8 };
+      await dragArea(page, selection, "area-crop-viewport-select.png");
+      const chip = page.getByRole("img", { name: "Area Crop" });
+      await chip.waitFor();
+      await assertCropShowsOnlyPage(page, String(await chip.getAttribute("src")), selection);
+    });
 
     await check("the mascot follows the cursor and opens the Composer when clicked", async () => {
       await page.goto(DEMO_APP_URL);

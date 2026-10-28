@@ -115,13 +115,15 @@ export function NemuOverlay() {
     );
 
   // One font and text color for everything Nemu draws: highlights, the mascot (#6), and the panel.
-  // All of it is hidden while the viewport is captured, so an Area Crop shows only the page.
+  // All of it is hidden while the viewport is captured, so an Area Crop shows only the page. Its
+  // transitions go too: a Button's transition-all would keep it visible for the whole transition,
+  // so the mascot and the Composer's buttons ended up in the capture.
   return (
     <div
       ref={nemuRef}
       className={
         area.state.kind === "capturing"
-          ? "invisible font-sans text-foreground"
+          ? "invisible font-sans text-foreground **:transition-none"
           : "font-sans text-foreground"
       }
     >
