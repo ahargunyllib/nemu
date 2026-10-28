@@ -13,6 +13,7 @@ import {
   LoginRequiredCard,
 } from "../../features/answer-card/components/chat-notice-card";
 import { PANEL_WIDTH, placePanel } from "../../features/answer-card/lib/panel-placement";
+import { useCancelOnEscape } from "../../features/chat/hooks/use-cancel-on-escape";
 import { useClickFollowUp } from "../../features/chat/hooks/use-click-follow-up";
 import { useNemuChat } from "../../features/chat/hooks/use-nemu-chat";
 import { COMPOSER_WIDTH, Composer } from "../../features/composer/components/composer";
@@ -98,6 +99,9 @@ export function NemuOverlay() {
     setComposerOpen(false);
     setAnchor(null);
   }
+
+  // Esc while Membaca shows cancels the prompt. With the Composer open, Esc only closes it.
+  useCancelOnEscape(state.kind === "loading" && !composerOpen, close);
 
   const header = state.kind === "idle" ? null : <AnswerCardHeader onClose={close} />;
   const areaChip = (area.state.kind === "attached" || area.state.kind === "failed") && (
