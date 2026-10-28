@@ -47,7 +47,7 @@ const MOMEN_3_RUNS = 5;
 const SAMPLE_DOCUMENTS = path.resolve(import.meta.dirname, "../../mock-alurkerja/sample-documents");
 const MISSING_UPLOADS = {
   "upload-laporan-perjalanan": "laporan-perjalanan-makassar.pdf",
-  "upload-boarding-pass-pulang": "boarding-pass-pulang-upg-cgk.pdf",
+  "upload-boarding-pass-pulang": "boarding-pass-pulang-upg-yia.pdf",
 } as const;
 
 // The service worker's own extension API, which `worker.evaluate` callbacks run against.

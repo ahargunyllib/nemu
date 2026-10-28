@@ -22,7 +22,8 @@ export const JENIS_PERJALANAN = [
   "Perjalanan dinas dalam kota",
 ] as const;
 
-export const MODA_TRANSPORT = ["Pesawat", "Kereta api", "Bus", "Kendaraan dinas"] as const;
+/** Only the modes that fit the demo's Yogyakarta–Makassar trip. */
+export const MODA_TRANSPORT = ["Pesawat", "Kendaraan dinas"] as const;
 
 /** Destination cities the Demo App offers, with the province that selects their SBM row. */
 export const KOTA_TUJUAN = {
