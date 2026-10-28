@@ -134,7 +134,8 @@ besides ×:
   it in medium weight on the left ("Rp447.000") and a copy icon with "Salin" on the right. It
   copies the amount as the form field takes it ("447000") and says "Tersalin" for a moment.
 - **Sumber**: quiet muted text, "Sumber: PMK 119/2023"; each source is a link that shows its
-  pasal under the line.
+  pasal under the line. A calculation's rate source, such as the SBM table, follows the links as
+  plain text, once.
 - **Balas**: the Composer pill ("Tanya Nemu…") inside the card, last, to ask again from it.
 
 Cards in place of an answer use the same format: plain text, ×, and at most one text link as the
