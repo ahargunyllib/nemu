@@ -11,12 +11,17 @@ import {
 import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 
+import { collectSettledElementList } from "../../element-list/lib/settled-element-list";
 import { sendChatRequest } from "../api/chat-messaging";
 import { useNemuChat } from "./use-nemu-chat";
 
 vi.mock("../api/chat-messaging", () => ({ sendChatRequest: vi.fn() }));
+vi.mock("../../element-list/lib/settled-element-list", () => ({
+  collectSettledElementList: vi.fn(),
+}));
 
 const send = vi.mocked(sendChatRequest);
+const collectSettled = vi.mocked(collectSettledElementList);
 
 beforeEach(() => {
   send.mockResolvedValue({ kind: "response", response: momentTwoResponse });
@@ -25,6 +30,8 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   send.mockReset();
+  collectSettled.mockReset();
+  window.history.replaceState(null, "", "/");
 });
 
 describe("useNemuChat", () => {
@@ -105,5 +112,32 @@ describe("useNemuChat", () => {
 
     expect(send).toHaveBeenCalledOnce();
     expect(result.current.state.kind).toBe("idle");
+  });
+
+  test("asks again from the page Rina went to while Nemu was reading", async () => {
+    window.history.replaceState(null, "", "/perdin/baru");
+    send.mockImplementationOnce(async () => {
+      // The side menu takes Rina to Beranda before the answer for the form arrives.
+      window.history.pushState(null, "", "/");
+      return { kind: "response", response: momentTwoResponse };
+    });
+    send.mockResolvedValue({ kind: "response", response: momentThreeResponse });
+    collectSettled.mockResolvedValue(momentThreeRequest.elements);
+    const { result } = renderHook(() => useNemuChat());
+
+    await act(() => result.current.send(momentThreeRequest.prompt, elements, crop));
+
+    expect(send).toHaveBeenCalledTimes(2);
+    expect(send.mock.calls[1]?.[0]).toMatchObject({
+      url: window.location.href,
+      prompt: momentThreeRequest.prompt,
+      elements: momentThreeRequest.elements,
+    });
+    expect(send.mock.calls[1]?.[0]).not.toHaveProperty("screenshot_crop");
+    expect(result.current.state).toMatchObject({
+      kind: "response",
+      response: momentThreeResponse,
+      elements: momentThreeRequest.elements,
+    });
   });
 });

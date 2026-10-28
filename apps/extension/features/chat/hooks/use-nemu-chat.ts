@@ -1,6 +1,7 @@
 import type { PageElement } from "@nemu/contracts";
 import { useCallback, useRef, useState } from "react";
 
+import { collectSettledElementList } from "../../element-list/lib/settled-element-list";
 import { sendChatRequest } from "../api/chat-messaging";
 import type { ChatResult } from "../lib/chat-message";
 
@@ -24,19 +25,27 @@ export function useNemuChat() {
   const question = useRef<Question | null>(null);
 
   const request = useCallback(
-    async (prompt: string, elements: PageElement[], screenshotCrop?: string) => {
+    async (prompt: string, elements: PageElement[], screenshotCrop?: string): Promise<void> => {
       const requestId = ++latestRequest.current;
+      const url = window.location.href;
       setState({ kind: "loading", prompt, elements, screenshotCrop });
       const result = await sendChatRequest({
         session_id: sessionId,
-        url: window.location.href,
+        url,
         prompt,
         elements,
         ...(screenshotCrop && { screenshot_crop: screenshotCrop }),
       });
-      if (requestId === latestRequest.current) {
-        setState({ ...result, prompt, elements, screenshotCrop });
+      if (requestId !== latestRequest.current) return;
+
+      if (window.location.href !== url) {
+        // Rina went to another page while Nemu was reading, so the answer points at targets that
+        // are gone. Ask again with the page she is on now; the Area Crop shows the old one.
+        const current = await collectSettledElementList(new AbortController().signal);
+        if (requestId === latestRequest.current) await request(prompt, current);
+        return;
       }
+      setState({ ...result, prompt, elements, screenshotCrop });
     },
     [sessionId],
   );

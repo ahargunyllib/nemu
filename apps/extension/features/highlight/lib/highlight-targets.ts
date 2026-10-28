@@ -55,8 +55,9 @@ export function completesStep(event: Event, target: HTMLElement): boolean {
   );
 }
 
+/** Names the target by its label only: Rina never sees a nemu_id. */
 export function missingTargetWarning(action: NemuAction): string {
-  return `Nemu tidak menemukan "${action.label}" (${action.target}) di halaman ini.`;
+  return `Nemu tidak menemukan "${action.label}" di halaman ini.`;
 }
 
 export type LabelSide = "right" | "top" | "bottom";

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vite-plus/test";
 
-import { highlightFootprint, labelSide } from "./highlight-targets";
+import { highlightFootprint, labelSide, missingTargetWarning } from "./highlight-targets";
 
 const VIEWPORT_WIDTH = 1280;
 
@@ -56,5 +56,18 @@ describe("highlightFootprint", () => {
       width: 252,
       height: 62,
     });
+  });
+});
+
+describe("missingTargetWarning", () => {
+  test("names the target by its label, without its nemu_id", () => {
+    const warning = missingTargetWarning({
+      type: "highlight",
+      target: "tab-biaya",
+      level: "arahkan",
+      label: "Periksa ini",
+    });
+
+    expect(warning).toBe('Nemu tidak menemukan "Periksa ini" di halaman ini.');
   });
 });
