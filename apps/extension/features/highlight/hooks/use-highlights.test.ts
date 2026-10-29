@@ -107,7 +107,11 @@ describe("useHighlights", () => {
     const result = renderHighlights(momentThreeFollowUpResponse.actions);
 
     await waitFor(() => expect(result.current.highlight?.action).toEqual(laporan));
-    expect(result.current.steps).toEqual([laporan, boardingPass, kirim]);
+    expect(result.current.steps.map(({ action }) => action)).toEqual([
+      laporan,
+      boardingPass,
+      kirim,
+    ]);
 
     // Clicking into the field only opens the file picker; choosing a file finishes the step.
     act(() => laporanInput.element.click());
@@ -162,7 +166,7 @@ describe("useHighlights", () => {
     const result = renderHighlights([amount, notHotel]);
 
     await waitFor(() => expect(result.current.highlight?.action).toEqual(notHotel));
-    expect(result.current.steps).toEqual([notHotel]);
+    expect(result.current.steps).toEqual([{ action: notHotel, position: 1 }]);
     expect(result.current.missing).toEqual([amount]);
   });
 

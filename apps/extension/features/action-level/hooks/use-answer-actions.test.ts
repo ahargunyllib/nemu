@@ -91,7 +91,7 @@ describe("useAnswerActions", () => {
         NEMU_IDS.pertanggungjawaban.uploadLaporanPerjalanan,
       ),
     );
-    expect(result.current.steps.map(({ target, label }) => [target, label])).toEqual([
+    expect(result.current.steps.map(({ action }) => [action.target, action.label])).toEqual([
       [NEMU_IDS.pertanggungjawaban.uploadLaporanPerjalanan, "Unggah laporan perjalanan"],
       [NEMU_IDS.pertanggungjawaban.uploadBoardingPassPulang, "Unggah boarding pass pulang"],
       [NEMU_IDS.pertanggungjawaban.kirim, "Kamu yang mengirim"],

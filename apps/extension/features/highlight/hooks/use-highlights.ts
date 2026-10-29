@@ -5,6 +5,7 @@ import type { Box } from "../../../shared/types/box";
 import {
   completesStep,
   findHighlightTargets,
+  type HighlightStep,
   type HighlightTarget,
 } from "../lib/highlight-targets";
 
@@ -75,8 +76,8 @@ export function useHighlights(actions: readonly NemuAction[]) {
   return {
     /** The current step's ring, once its target is on the page. */
     highlight,
-    /** The action of every target found, in the order the user takes them. */
-    steps: found.map(({ action }) => action),
+    /** Every target found, in the order the user takes them, with its position among all steps. */
+    steps: found.map(({ action, position }): HighlightStep => ({ action, position })),
     stepIndex,
     goTo: (index: number) => setStepIndex(Math.max(0, Math.min(index, found.length - 1))),
     missing: targets.missing,
