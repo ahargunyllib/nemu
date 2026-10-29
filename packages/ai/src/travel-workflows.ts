@@ -26,6 +26,8 @@ export type TravelWorkflowOutputInput = {
   actionsAllowed: boolean;
 };
 
+// Momen 1's steps in the form's order. A target label names the value to pick or type when Nemu
+// knows it, and the field otherwise (docs/design-system.md).
 const CREATE_TRAVEL_STEPS = [
   {
     id: "travel-type",
@@ -35,29 +37,50 @@ const CREATE_TRAVEL_STEPS = [
   {
     id: "destination-city",
     target: NEMU_IDS.perdinForm.kotaTujuan,
-    label: "Pilih kota tujuan",
+    label: "Isi kota tujuan",
   },
   {
     id: "assignment-letter",
     target: NEMU_IDS.perdinForm.dasarPenugasan,
-    label: "Pilih dasar penugasan",
-  },
-  {
-    id: "travel-purpose",
-    target: NEMU_IDS.perdinForm.maksud,
-    label: "Isi maksud perjalanan",
+    label: "Pilih surat tugas",
   },
   {
     id: "departure-date",
     target: NEMU_IDS.perdinForm.tanggalBerangkat,
-    label: "Isi tanggal berangkat",
+    label: "Pilih tanggal berangkat",
   },
   {
     id: "return-date",
     target: NEMU_IDS.perdinForm.tanggalKembali,
-    label: "Isi tanggal kembali",
+    label: "Pilih tanggal kembali",
+  },
+  {
+    id: "transport-mode",
+    target: NEMU_IDS.perdinForm.modaTransport,
+    label: "Pilih moda transportasi",
   },
 ] as const satisfies readonly NemuGuideStep[];
+
+/**
+ * Rina's trip to Makassar as the Demo App seeds it: the surat tugas she holds for it and the values
+ * its "Isi formulir demo" fills in (3–5 November 2026, by plane), each written as the form shows it.
+ */
+const MAKASSAR_TRIP_LABELS: Readonly<Record<(typeof CREATE_TRAVEL_STEPS)[number]["id"], string>> = {
+  "travel-type": "Pilih Dinas luar kota",
+  "destination-city": "Isi Makassar",
+  "assignment-letter": "Pilih ST-090/2026",
+  "departure-date": "Pilih 3 Nov 2026",
+  "return-date": "Pilih 5 Nov 2026",
+  "transport-mode": "Pilih Pesawat",
+};
+
+/** The Momen 1 steps, naming each value when the question is about Rina's trip to Makassar. */
+function createTravelSteps(request: NemuRequest): NemuGuideStep[] {
+  const knowsTrip = /\bmakassar\b/i.test(request.prompt);
+  return CREATE_TRAVEL_STEPS.map((step) =>
+    knowsTrip ? { ...step, label: MAKASSAR_TRIP_LABELS[step.id] } : { ...step },
+  );
+}
 
 const ACCOUNTABILITY_UPLOAD_STEPS = [
   {
@@ -167,7 +190,7 @@ export function travelWorkflowGuidance(
   }
   if (scenario === "travel_request_form_guidance") {
     return [
-      "Guide the user through the six initial travel request fields in page order, from travel type through return date.",
+      "Guide the user through the six initial travel request fields in page order, from travel type through transport mode.",
       "The form is already open. Do not tell the user to open the travel request menu again.",
     ];
   }
@@ -231,7 +254,7 @@ export function buildTravelWorkflowOutput({
   if (scenario === "start_travel_request") {
     const guide: NemuGuide = {
       id: "travel-request:create",
-      steps: [...CREATE_TRAVEL_STEPS],
+      steps: createTravelSteps(request),
       current_step: 1,
     };
     const menu = visibleElementsById.get(NEMU_IDS.shell.menuAjukanPerjalananDinas);
@@ -252,7 +275,7 @@ export function buildTravelWorkflowOutput({
   }
 
   if (scenario === "travel_request_form_guidance") {
-    const steps = [...CREATE_TRAVEL_STEPS];
+    const steps = createTravelSteps(request);
     const actions: NemuAction[] = actionsAllowed
       ? steps.flatMap((step) =>
           elementsById.has(step.target)
@@ -267,7 +290,8 @@ export function buildTravelWorkflowOutput({
             : [],
         )
       : [];
-    // The dates render only while the form's Jadwal tab is open, so point at the tab instead.
+    // The dates and the transport mode render only while the form's Jadwal tab is open, so point
+    // at the tab instead.
     if (
       actionsAllowed &&
       !elementsById.has(NEMU_IDS.perdinForm.tanggalBerangkat) &&

@@ -118,6 +118,12 @@ ikon Nemu di toolbar atau Ctrl+Shift+Space, lalu pilih area lagi.", the keys as 
   outline's top, so it covers none of the target; with no room on the right it falls back to the
   outline's top-right edge (bottom-right near the top of the viewport), overlapping it. The
   success variant, for Sorot konfirmasi, is `nemu-success`: "Kamu yang mengirim".
+- **Label names the value**: when Nemu knows what goes into the target, its label names that
+  value as the screen shows it, after the verb for the control: "Pilih Dinas luar kota", "Isi
+  Makassar", "Pilih ST-090/2026", "Pilih 3 Nov 2026", "Isi Rp447.000". Only when the value is
+  unknown does it name the field instead ("Pilih jenis perjalanan", "Unggah laporan perjalanan").
+  Momen 1 walks Jenis perjalanan, Kota tujuan, Surat tugas, Tanggal berangkat, Tanggal kembali,
+  and Moda transportasi, in that order.
 - **Steps**: an answer with several highlights rings one target at a time and waits for the user.
   Pressing the ringed target, or changing the field it holds, removes its ring and rings the next
   step's target; after the last step nothing stays ringed. A click into a field or on a control

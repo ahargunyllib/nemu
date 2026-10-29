@@ -43,24 +43,12 @@ export const momentOneResponse = {
   guide: {
     id: "travel-request:create",
     steps: [
-      { id: "travel-type", target: "select-jenis-perjalanan", label: "Pilih jenis perjalanan" },
-      { id: "destination-city", target: "select-kota-tujuan", label: "Pilih kota tujuan" },
-      {
-        id: "assignment-letter",
-        target: "select-dasar-penugasan",
-        label: "Pilih dasar penugasan",
-      },
-      {
-        id: "travel-purpose",
-        target: "input-maksud-perjalanan",
-        label: "Isi maksud perjalanan",
-      },
-      {
-        id: "departure-date",
-        target: "input-tanggal-berangkat",
-        label: "Isi tanggal berangkat",
-      },
-      { id: "return-date", target: "input-tanggal-kembali", label: "Isi tanggal kembali" },
+      { id: "travel-type", target: "select-jenis-perjalanan", label: "Pilih Dinas luar kota" },
+      { id: "destination-city", target: "select-kota-tujuan", label: "Isi Makassar" },
+      { id: "assignment-letter", target: "select-dasar-penugasan", label: "Pilih ST-090/2026" },
+      { id: "departure-date", target: "input-tanggal-berangkat", label: "Pilih 3 Nov 2026" },
+      { id: "return-date", target: "input-tanggal-kembali", label: "Pilih 5 Nov 2026" },
+      { id: "transport-mode", target: "select-moda-transport", label: "Pilih Pesawat" },
     ],
     current_step: 1,
   },
@@ -111,7 +99,7 @@ export const momentOneFollowUpResponse = {
   answer: {
     ringkas: "Formulir sudah terbuka. Ikuti enam langkah yang disorot sebelum mengirim pengajuan.",
     detail:
-      "Isi jenis perjalanan, kota tujuan, dasar penugasan, dan maksud perjalanan, lalu buka tab Jadwal untuk tanggal berangkat dan kembali.",
+      "Pilih jenis perjalanan, isi kota tujuan, dan pilih surat tugas, lalu buka tab Jadwal untuk tanggal berangkat, tanggal kembali, dan moda transportasi.",
   },
   citations: [
     { doc_id: "sop-pd-01", judul: "SOP-PD-01 Perjalanan Dinas", pasal: "Butir 4.1, 4.2" },
@@ -122,25 +110,19 @@ export const momentOneFollowUpResponse = {
       type: "highlight",
       target: "select-jenis-perjalanan",
       level: "arahkan",
-      label: "Pilih jenis perjalanan",
+      label: "Pilih Dinas luar kota",
     },
     {
       type: "highlight",
       target: "select-kota-tujuan",
       level: "arahkan",
-      label: "Pilih kota tujuan",
+      label: "Isi Makassar",
     },
     {
       type: "highlight",
       target: "select-dasar-penugasan",
       level: "arahkan",
-      label: "Pilih dasar penugasan",
-    },
-    {
-      type: "highlight",
-      target: "input-maksud-perjalanan",
-      level: "arahkan",
-      label: "Isi maksud perjalanan",
+      label: "Pilih ST-090/2026",
     },
     {
       type: "highlight",
@@ -152,24 +134,12 @@ export const momentOneFollowUpResponse = {
   guide: {
     id: "travel-request:create",
     steps: [
-      { id: "travel-type", target: "select-jenis-perjalanan", label: "Pilih jenis perjalanan" },
-      { id: "destination-city", target: "select-kota-tujuan", label: "Pilih kota tujuan" },
-      {
-        id: "assignment-letter",
-        target: "select-dasar-penugasan",
-        label: "Pilih dasar penugasan",
-      },
-      {
-        id: "travel-purpose",
-        target: "input-maksud-perjalanan",
-        label: "Isi maksud perjalanan",
-      },
-      {
-        id: "departure-date",
-        target: "input-tanggal-berangkat",
-        label: "Isi tanggal berangkat",
-      },
-      { id: "return-date", target: "input-tanggal-kembali", label: "Isi tanggal kembali" },
+      { id: "travel-type", target: "select-jenis-perjalanan", label: "Pilih Dinas luar kota" },
+      { id: "destination-city", target: "select-kota-tujuan", label: "Isi Makassar" },
+      { id: "assignment-letter", target: "select-dasar-penugasan", label: "Pilih ST-090/2026" },
+      { id: "departure-date", target: "input-tanggal-berangkat", label: "Pilih 3 Nov 2026" },
+      { id: "return-date", target: "input-tanggal-kembali", label: "Pilih 5 Nov 2026" },
+      { id: "transport-mode", target: "select-moda-transport", label: "Pilih Pesawat" },
     ],
     current_step: 1,
   },
