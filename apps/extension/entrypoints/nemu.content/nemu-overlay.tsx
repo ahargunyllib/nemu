@@ -13,6 +13,7 @@ import {
   LoginRequiredCard,
 } from "../../features/answer-card/components/chat-notice-card";
 import { PANEL_WIDTH, placePanel } from "../../features/answer-card/lib/panel-placement";
+import { useCancelOnEscape } from "../../features/chat/hooks/use-cancel-on-escape";
 import { useClickFollowUp } from "../../features/chat/hooks/use-click-follow-up";
 import { useNemuChat } from "../../features/chat/hooks/use-nemu-chat";
 import { COMPOSER_WIDTH, Composer } from "../../features/composer/components/composer";
@@ -99,6 +100,9 @@ export function NemuOverlay() {
     setAnchor(null);
   }
 
+  // Esc while Membaca shows cancels the prompt. With the Composer open, Esc only closes it.
+  useCancelOnEscape(state.kind === "loading" && !composerOpen, close);
+
   const header = state.kind === "idle" ? null : <AnswerCardHeader onClose={close} />;
   const areaChip = (area.state.kind === "attached" || area.state.kind === "failed") && (
     <AreaCropChip state={area.state} onRemove={area.clear} />
@@ -115,13 +119,15 @@ export function NemuOverlay() {
     );
 
   // One font and text color for everything Nemu draws: highlights, the mascot (#6), and the panel.
-  // All of it is hidden while the viewport is captured, so an Area Crop shows only the page.
+  // All of it is hidden while the viewport is captured, so an Area Crop shows only the page. Its
+  // transitions go too: a Button's transition-all would keep it visible for the whole transition,
+  // so the mascot and the Composer's buttons ended up in the capture.
   return (
     <div
       ref={nemuRef}
       className={
         area.state.kind === "capturing"
-          ? "invisible font-sans text-foreground"
+          ? "invisible font-sans text-foreground **:transition-none"
           : "font-sans text-foreground"
       }
     >

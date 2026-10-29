@@ -26,7 +26,7 @@ export function AnswerCard({ response, header, children, reply }: AnswerCardProp
   const [detailOpen, setDetailOpen] = useState(false);
   const { detail } = response.answer;
   const value = copyableValue(response.calc);
-  const sources = response.calc.flatMap(({ sumber }) => (sumber ? [sumber] : []));
+  const sources = [...new Set(response.calc.flatMap(({ sumber }) => (sumber ? [sumber] : [])))];
 
   return (
     <AnswerCardFrame header={header} lead={<p>{response.answer.ringkas}</p>}>
@@ -57,7 +57,7 @@ export function AnswerCard({ response, header, children, reply }: AnswerCardProp
           </TextLink>
         </p>
       )}
-      <CitationList citations={response.citations} />
+      <CitationList citations={response.citations} sources={sources} />
       {reply}
     </AnswerCardFrame>
   );

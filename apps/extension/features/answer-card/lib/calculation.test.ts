@@ -47,6 +47,36 @@ describe("copyableValue", () => {
     expect(copyableValue(momentTwoResponse.calc)).toEqual({ label: "Rp447.000", text: "447000" });
   });
 
+  test("offers the lodging lumpsum over the SBM rate and daily allowance in the real Momen 2 order", () => {
+    expect(
+      copyableValue([
+        {
+          fungsi: "lookup_sbm",
+          input: { provinsi: "Sulawesi Selatan", golongan: "III" },
+          hasil: 745_000,
+        },
+        {
+          fungsi: "uang_harian",
+          input: { provinsi: "Sulawesi Selatan", hari: 3 },
+          hasil: 1_290_000,
+        },
+        ...momentTwoResponse.calc,
+      ]),
+    ).toEqual({ label: "Rp447.000", text: "447000" });
+  });
+
+  test("offers nothing when the only amount is the SBM rate", () => {
+    expect(
+      copyableValue([
+        {
+          fungsi: "lookup_sbm",
+          input: { provinsi: "Sulawesi Selatan", golongan: "III" },
+          hasil: 745_000,
+        },
+      ]),
+    ).toBeUndefined();
+  });
+
   test("offers nothing for a date, such as the Momen 3 deadline", () => {
     expect(copyableValue(momentThreeResponse.calc)).toBeUndefined();
   });

@@ -13,6 +13,7 @@ import {
   getDefaultNormalizer,
   render,
   screen,
+  within,
 } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 
@@ -163,6 +164,37 @@ describe("AnswerCard", () => {
     fireEvent.click(screen.getByRole("button", { name: "PMK 119/2023" }));
 
     expect(screen.getByText(/PMK 119\/2023, Pasal 8 ayat \(5\), hlm\. 6/)).toBeTruthy();
+  });
+
+  test("lists the Momen 2 rate's source in the Sumber line after the citations", () => {
+    renderCard(momentTwoResponse);
+
+    expect(screen.getByRole("region", { name: "Sumber" }).textContent).toBe(
+      "Sumber: PMK 119/2023, SBM TA 2026 - Sulawesi Selatan - Hotel Golongan III",
+    );
+  });
+
+  test("keeps each comma in the same element as the source before it", () => {
+    renderCard(momentTwoResponse);
+
+    const citation = screen.getByRole("button", { name: "PMK 119/2023" });
+    expect(citation.parentElement?.textContent).toBe("PMK 119/2023,");
+  });
+
+  test("names each source in the Sumber line once", () => {
+    const sbm = "SBM TA 2026 - Sulawesi Selatan - Hotel Golongan III";
+    renderCard({
+      ...momentTwoResponse,
+      calc: [
+        ...momentTwoResponse.calc,
+        { fungsi: "lookup_sbm", input: {}, hasil: 745_000, sumber: sbm },
+        { fungsi: "lookup_sbm", input: {}, hasil: null, sumber: "PMK 119/2023" },
+      ],
+    });
+    const sumber = within(screen.getByRole("region", { name: "Sumber" }));
+
+    expect(sumber.getAllByText(/PMK 119\/2023/)).toHaveLength(1);
+    expect(sumber.getAllByText(sbm)).toHaveLength(1);
   });
 
   test("shows a refusal as plain text", () => {
