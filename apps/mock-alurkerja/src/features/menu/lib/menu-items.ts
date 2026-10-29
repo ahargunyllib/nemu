@@ -27,3 +27,11 @@ export const MENU_ITEMS: readonly MenuItem[] = [
   { label: "Master Data", submenu: true },
   { label: "Business Processes", submenu: true },
 ];
+
+export const TELCO_MENU_ITEMS = [
+  { href: "/", label: "Home", nemuId: NEMU_IDS.shell.menuBeranda },
+  { href: "/sla-claims", label: "Klaim SLA", nemuId: NEMU_IDS.shell.menuSlaClaims },
+  { href: "/crm/TN-ENT-002", label: "CRM Layanan", nemuId: NEMU_IDS.shell.menuCrmServices },
+  { href: "/noc/TN-ENT-002", label: "Tiket NOC", nemuId: NEMU_IDS.shell.menuNocTickets },
+  { href: "/billing/INV-2609-0042", label: "Billing", nemuId: NEMU_IDS.shell.menuBilling },
+] as const;

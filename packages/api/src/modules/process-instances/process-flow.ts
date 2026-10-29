@@ -1,3 +1,5 @@
+import { DEMO_HOLIDAYS_2026 } from "@nemu/ai/demo";
+import { calculateAccountabilityDeadline } from "@nemu/ai/tools";
 import type { ProcessState } from "@nemu/contracts/process-instance";
 
 export type TaskKey = "isi_rencana" | "revisi" | "pertanggungjawaban";
@@ -43,4 +45,38 @@ export function nightsBetween(tanggalBerangkat: string, tanggalKembali: string):
     (Date.parse(`${tanggalKembali}T00:00:00Z`) - Date.parse(`${tanggalBerangkat}T00:00:00Z`)) /
       DAY_MS,
   );
+}
+
+/** When a Task opened and when it falls due, as YYYY-MM-DD days. */
+export type TaskDates = { openedOn: string; dueOn: string };
+
+/** Days a Task other than Pertanggungjawaban has before it falls due. */
+const TASK_DUE_DAYS = 7;
+
+function addDays(date: string, days: number): string {
+  return new Date(Date.parse(`${date}T00:00:00Z`) + days * DAY_MS).toISOString().slice(0, 10);
+}
+
+/**
+ * When a Task opened and falls due, against the demo clock's `today`.
+ *
+ * Pertanggungjawaban opens when the trip ends and falls due on the batas pertanggungjawaban:
+ * 5 working days after `tanggalKembali`, counted by the AI's own `batas_pertanggungjawaban` on the
+ * same holidays, so the Demo App and Nemu agree. The demo keeps no due date for the other Tasks, so
+ * they open today and get a week.
+ */
+export function taskDatesOf(
+  key: TaskKey,
+  instance: { tanggalKembali: string },
+  today: string,
+): TaskDates {
+  if (key === "pertanggungjawaban") {
+    return {
+      openedOn: instance.tanggalKembali,
+      dueOn: String(
+        calculateAccountabilityDeadline(instance.tanggalKembali, DEMO_HOLIDAYS_2026).hasil,
+      ),
+    };
+  }
+  return { openedOn: today, dueOn: addDays(today, TASK_DUE_DAYS) };
 }

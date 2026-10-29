@@ -1,26 +1,32 @@
-import type { NemuAction } from "@nemu/contracts";
+import type { NemuAction, NemuGuide } from "@nemu/contracts";
 import { Button } from "@nemu/ui/components/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 type HighlightStepsProps = {
   steps: readonly NemuAction[];
+  guide?: NemuGuide;
   index: number;
   onGoTo: (index: number) => void;
 };
 
 /**
  * The highlighted steps as plain numbered text ("1. Pilih ini"), the current one in medium weight,
- * with buttons to step back and forth when there are several.
+ * with buttons to step back and forth when there are several. A server guide numbers the steps
+ * across pages, so its steps are listed instead of only this page's.
  */
-export function HighlightSteps({ steps, index, onGoTo }: HighlightStepsProps) {
+export function HighlightSteps({ steps, guide, index, onGoTo }: HighlightStepsProps) {
   const step = steps[index];
-  if (steps.length < 2 || !step) return null;
+  const canonicalIndex = guide
+    ? Math.min(guide.current_step - 1 + index, guide.steps.length - 1)
+    : index;
+  const total = guide?.steps.length ?? steps.length;
+  if (total < 2 || !step) return null;
 
   return (
     <section aria-label="Langkah" className="flex flex-col gap-1">
       <div className="flex items-center gap-1">
         <p className="min-w-0 flex-1 text-muted-foreground">
-          Langkah {index + 1} dari {steps.length}
+          Langkah {canonicalIndex + 1} dari {total}
         </p>
         <Button
           aria-label="Langkah sebelumnya"
@@ -42,15 +48,15 @@ export function HighlightSteps({ steps, index, onGoTo }: HighlightStepsProps) {
         </Button>
       </div>
       <ol className="flex flex-col">
-        {steps.map((action, position) => {
-          const current = position === index;
+        {(guide?.steps ?? steps).map((item, position) => {
+          const current = position === canonicalIndex;
           return (
             <li
-              key={`${position}-${action.target}`}
+              key={`${position}-${item.target}`}
               aria-current={current ? "step" : undefined}
               className={current ? "font-medium" : "text-muted-foreground"}
             >
-              {position + 1}. {action.label}
+              {position + 1}. {item.label}
             </li>
           );
         })}

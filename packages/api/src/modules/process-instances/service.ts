@@ -8,7 +8,14 @@ import {
 import type { Database } from "@nemu/db";
 
 import { DEMO_SEED_DOCUMENTS, DEMO_SEED_INSTANCES } from "./demo-seed";
-import { type ProcessTask, activeTaskOf, nextState, nightsBetween } from "./process-flow";
+import {
+  type ProcessTask,
+  type TaskDates,
+  activeTaskOf,
+  nextState,
+  nightsBetween,
+  taskDatesOf,
+} from "./process-flow";
 import {
   type ProcessDocumentRecord,
   type ProcessInstanceRecord,
@@ -24,9 +31,9 @@ export function createProcessInstanceDeps(db: Database): ProcessInstanceDeps {
   return { processInstances: createProcessInstanceRepository(db) };
 }
 
-/** A Process Instance with its active Task and the documents uploaded to it. */
+/** A Process Instance with its active Task, when that Task opened and falls due, and its documents. */
 export type ProcessInstanceView = ProcessInstanceRecord & {
-  activeTask: ProcessTask | null;
+  activeTask: (ProcessTask & TaskDates) | null;
   dokumen: Pick<ProcessDocumentRecord, "jenis" | "namaFile" | "uploadedAt">[];
 };
 
@@ -64,18 +71,23 @@ export function listMyProcessInstances({ processInstances }: ProcessInstanceDeps
   return processInstances.listByOwner(ownerId);
 }
 
+/** `today` is the demo clock's day (YYYY-MM-DD) that Task dates count from. */
 async function toViews(
   processInstances: ProcessInstanceRepository,
   records: readonly ProcessInstanceRecord[],
+  today: string,
 ): Promise<ProcessInstanceView[]> {
   const documents = await processInstances.listDocuments(records.map((record) => record.id));
-  return records.map((record) => ({
-    ...record,
-    activeTask: activeTaskOf(record),
-    dokumen: documents
-      .filter((document) => document.instanceId === record.id)
-      .map(({ jenis, namaFile, uploadedAt }) => ({ jenis, namaFile, uploadedAt })),
-  }));
+  return records.map((record) => {
+    const task = activeTaskOf(record);
+    return {
+      ...record,
+      activeTask: task && { ...task, ...taskDatesOf(task.key, record, today) },
+      dokumen: documents
+        .filter((document) => document.instanceId === record.id)
+        .map(({ jenis, namaFile, uploadedAt }) => ({ jenis, namaFile, uploadedAt })),
+    };
+  });
 }
 
 function notFound(instanceId: string): ProcessResult<never> {
@@ -87,10 +99,11 @@ export async function getProcessInstance(
   { processInstances }: ProcessInstanceDeps,
   ownerId: string,
   instanceId: string,
+  today: string,
 ): Promise<ProcessInstanceView | null> {
   const record = await processInstances.findOwned(ownerId, instanceId);
   if (!record) return null;
-  const [view] = await toViews(processInstances, [record]);
+  const [view] = await toViews(processInstances, [record], today);
   return view ?? null;
 }
 
@@ -98,11 +111,12 @@ export async function getProcessInstance(
 export async function listMyTasks(
   { processInstances }: ProcessInstanceDeps,
   ownerId: string,
+  today: string,
 ): Promise<ProcessInstanceView[]> {
   const withTask = (await processInstances.listByOwner(ownerId))
     .filter((record) => activeTaskOf(record))
     .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
-  return toViews(processInstances, withTask);
+  return toViews(processInstances, withTask, today);
 }
 
 const AJUKAN_PERJALANAN_DINAS_PATH = "/perdin/baru";
@@ -130,27 +144,26 @@ export async function loadProcessContext(
   );
   const active = records.find((record) => activeTaskOf(record)) ?? records[0];
   if (!active) return undefined;
-  const [view] = await toViews(processInstances, [active]);
-  if (!view) return undefined;
+  const documents = await processInstances.listDocuments([active.id]);
 
   if (isAjukanPerjalananDinas(pageUrl)) {
     return {
-      instance_id: view.id,
+      instance_id: active.id,
       active_task: "isi_rencana",
-      destination_province: view.provinsi,
-      nights: nightsBetween(view.tanggalBerangkat, view.tanggalKembali),
+      destination_province: active.provinsi,
+      nights: nightsBetween(active.tanggalBerangkat, active.tanggalKembali),
       uploaded_documents: [],
     };
   }
 
   return {
-    instance_id: view.id,
-    status: view.state,
-    active_task: view.activeTask?.key,
-    return_date: view.tanggalKembali,
-    destination_province: view.provinsi,
-    nights: nightsBetween(view.tanggalBerangkat, view.tanggalKembali),
-    uploaded_documents: view.dokumen.map((document) => document.jenis),
+    instance_id: active.id,
+    status: active.state,
+    active_task: activeTaskOf(active)?.key,
+    return_date: active.tanggalKembali,
+    destination_province: active.provinsi,
+    nights: nightsBetween(active.tanggalBerangkat, active.tanggalKembali),
+    uploaded_documents: documents.map((document) => document.jenis),
   };
 }
 

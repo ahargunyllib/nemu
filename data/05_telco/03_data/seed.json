@@ -1,0 +1,37 @@
+{
+  "synthetic": true,
+  "demo_clock": "2026-10-14T09:00:00+07:00",
+  "workspace_id": "W-TELKO",
+  "login_user": "U-101",
+  "process_key": "klaim_kompensasi_sla",
+  "tasks": [
+    {
+      "task_id": "T-0007-1",
+      "claim_id": "KLM-2610-0007",
+      "name": "Registrasi Klaim",
+      "assignee": "U-101",
+      "created": "2026-10-08T14:20:00+07:00",
+      "due_telaah": "2026-10-15",
+      "status": "OPEN"
+    },
+    {
+      "task_id": "T-0009-1",
+      "claim_id": "KLM-2610-0009",
+      "name": "Registrasi Klaim",
+      "assignee": "U-101",
+      "created": "2026-10-09T10:10:00+07:00",
+      "due_telaah": "2026-10-16",
+      "status": "OPEN"
+    },
+    {
+      "task_id": "T-0011-1",
+      "claim_id": "KLM-2610-0011",
+      "name": "Registrasi Klaim",
+      "assignee": "U-101",
+      "created": "2026-10-08T15:45:00+07:00",
+      "due_telaah": null,
+      "status": "OPEN"
+    }
+  ],
+  "calendar_note": "Hari kerja Senin-Jumat. Tidak ada libur nasional antara 8 dan 16 Oktober 2026 di data demo."
+}

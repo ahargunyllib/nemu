@@ -32,7 +32,15 @@ export function createAuth(
       // Demo accounts are seeded by a migration; these fields are never set from sign-up.
       additionalFields: {
         golongan: { type: "string", required: false, input: false },
+        unit: { type: "string", required: false, input: false },
+        province: { type: "string", required: false, input: false },
         role: { type: "string", required: false, defaultValue: "pegawai", input: false },
+        workspaceId: {
+          type: "string",
+          required: false,
+          defaultValue: "W-TRAVEL",
+          input: false,
+        },
       },
     },
     secret: env.BETTER_AUTH_SECRET,

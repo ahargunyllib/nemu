@@ -1,15 +1,18 @@
 import { createJevDecider, createOpenRouterAnswerGenerator, runNemu } from "@nemu/ai";
-import {
-  DEMO_HOLIDAYS_2026,
-  DEMO_KNOWLEDGE_CHUNKS,
-  DEMO_REQUIRED_DOCUMENTS,
-  DEMO_SBM_ROWS,
-  DEMO_USER_PROFILE,
-} from "@nemu/ai/demo";
 import type { DocumentFileStore, NemuService } from "@nemu/api/context";
 import { createFixtureNemuService } from "@nemu/api/modules/chat/fixture-responder";
+import {
+  createNemuRuntimeDataSource,
+  createRuntimeNemuService,
+} from "@nemu/api/modules/chat/nemu-data-source";
+import { createNemuProfileRepository } from "@nemu/api/modules/chat/profile-repository";
+import { createDocumentRepository } from "@nemu/api/modules/documents/repository";
+import { createReferenceTableRepository } from "@nemu/api/modules/reference-tables/repository";
+import { createSlaClaimRepository } from "@nemu/api/modules/sla-claims/repository";
+import { getSlaClaimContext } from "@nemu/api/modules/sla-claims/service";
 import { createAuth as createConfiguredAuth } from "@nemu/auth";
-import { type Database, createDb } from "@nemu/db";
+import { type Database, createDb, eq } from "@nemu/db";
+import { workspace } from "@nemu/db/schema/workspace";
 
 const REASONING_EFFORTS = ["low", "medium", "high", "xhigh", "max"] as const;
 
@@ -32,6 +35,19 @@ import { ENV } from "./env.server";
 export function getDb(): Database {
   return createDb(ENV);
 }
+
+export async function getWorkspaceDemoDate(
+  db: Database,
+  workspaceId: string,
+  fallback = ENV.NEMU_DEMO_DATE,
+): Promise<string> {
+  const [record] = await db
+    .select({ demoDate: workspace.demoDate })
+    .from(workspace)
+    .where(eq(workspace.id, workspaceId))
+    .limit(1);
+  return record?.demoDate ?? fallback;
+}
 export async function createAuth(database?: Database) {
   return createConfiguredAuth(ENV, database ?? (await getDb()));
 }
@@ -51,11 +67,11 @@ export function createDocumentFileStore(): DocumentFileStore {
   };
 }
 
-export function createNemuService(): NemuService {
-  return ENV.NEMU_RESPONDER === "fixture" ? createFixtureNemuService() : createAiNemuService();
+export function createNemuService(db: Database): NemuService {
+  return ENV.NEMU_RESPONDER === "fixture" ? createFixtureNemuService() : createAiNemuService(db);
 }
 
-function createAiNemuService(): NemuService {
+function createAiNemuService(db: Database): NemuService {
   if (!ENV.OPENROUTER_API_KEY) {
     return {
       async respond() {
@@ -74,22 +90,23 @@ function createAiNemuService(): NemuService {
     reasoningEffort: getReasoningEffort(),
   });
 
-  return {
-    async respond(request, authenticatedUserId) {
+  const slaClaims = createSlaClaimRepository(db);
+  const dataSource = createNemuRuntimeDataSource({
+    profiles: createNemuProfileRepository(db),
+    documents: createDocumentRepository(db),
+    tables: createReferenceTableRepository(db),
+    slaClaims: {
+      loadContext: (workspaceId, claimId) => getSlaClaimContext(slaClaims, workspaceId, claimId),
+    },
+    currentDate: (workspaceId) => getWorkspaceDemoDate(db, workspaceId),
+  });
+  return createRuntimeNemuService(dataSource, {
+    async respond(request, snapshot) {
       return runNemu(request, {
-        userProfile: {
-          ...DEMO_USER_PROFILE,
-          userId: authenticatedUserId,
-        },
-        processContext: request.process_context,
-        knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
-        sbmRows: DEMO_SBM_ROWS,
-        holidays: DEMO_HOLIDAYS_2026,
-        requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
-        currentDate: ENV.NEMU_DEMO_DATE,
+        ...snapshot,
         jevDecider,
         answerGenerator,
       });
     },
-  };
+  });
 }

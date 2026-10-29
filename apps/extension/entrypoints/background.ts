@@ -5,7 +5,7 @@ import {
   isCaptureViewportMessage,
 } from "../features/area-crop/lib/capture-message";
 import { createNemuClient } from "../features/chat/api/nemu-client";
-import { isChatRequestMessage } from "../features/chat/lib/chat-message";
+import { isChatCancelMessage, isChatRequestMessage } from "../features/chat/lib/chat-message";
 import { requestNemuChat } from "../features/chat/api/request-nemu-chat";
 import { OPEN_COMPOSER_MESSAGE } from "../features/composer/lib/open-composer-message";
 import { requestProcessInstance } from "../features/process-status/api/request-process-instance";
@@ -46,14 +46,24 @@ async function captureViewportOf(
 
 export default defineBackground(() => {
   const client = createNemuClient();
+  const pendingChats = new Map<string, AbortController>();
 
   browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (isCaptureViewportMessage(message)) {
       void captureViewportOf(sender.tab).then(sendResponse);
       return true;
     }
+    if (isChatCancelMessage(message)) {
+      pendingChats.get(message.requestId)?.abort();
+      pendingChats.delete(message.requestId);
+      return;
+    }
     if (isChatRequestMessage(message)) {
-      void requestNemuChat(client, message.request, sender.tab?.url).then(sendResponse);
+      const controller = new AbortController();
+      pendingChats.set(message.requestId, controller);
+      void requestNemuChat(client, message.request, sender.tab?.url, controller.signal)
+        .then(sendResponse)
+        .finally(() => pendingChats.delete(message.requestId));
       return true;
     }
     if (isProcessInstanceRequestMessage(message)) {
