@@ -1,15 +1,15 @@
 // @vitest-environment happy-dom
 import type { NemuGuide } from "@nemu/contracts";
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, test, vi } from "vite-plus/test";
+import { afterEach, describe, expect, test } from "vite-plus/test";
 
 import type { HighlightStep } from "../lib/highlight-targets";
-import { HighlightSteps } from "./highlight-steps";
+import { StepProgress } from "./step-progress";
 
 afterEach(cleanup);
 
-describe("HighlightSteps", () => {
-  test("renders canonical server progress even when this page has one local action", () => {
+describe("StepProgress", () => {
+  test("counts canonical server progress even when this page has one local action", () => {
     const steps: HighlightStep[] = [
       {
         action: {
@@ -30,11 +30,9 @@ describe("HighlightSteps", () => {
       current_step: 2,
     };
 
-    render(<HighlightSteps steps={steps} guide={guide} index={0} onGoTo={vi.fn()} />);
+    const { container } = render(<StepProgress steps={steps} guide={guide} index={0} />);
 
-    expect(screen.getByText(/Langkah 2 dari 2/)).toBeTruthy();
-    expect(screen.getByText("2. Pilih kota tujuan")).toBeTruthy();
-    expect(screen.queryByText("Local fallback label")).toBeNull();
+    expect(container.textContent).toBe("Langkah 2 dari 2");
   });
 
   test("numbers each step by its place in the guide when a target before it is missing", () => {
@@ -70,10 +68,19 @@ describe("HighlightSteps", () => {
       },
     ];
 
-    render(<HighlightSteps steps={steps} guide={guide} index={1} onGoTo={vi.fn()} />);
+    render(<StepProgress steps={steps} guide={guide} index={1} />);
 
-    expect(screen.getByText(/Langkah 3 dari 3/)).toBeTruthy();
-    expect(screen.getByText("3. Isi maksud perjalanan").getAttribute("aria-current")).toBe("step");
-    expect(screen.getByText("2. Pilih kota tujuan").getAttribute("aria-current")).toBeNull();
+    expect(screen.getByText("Langkah 3 dari 3")).toBeTruthy();
+  });
+
+  test("shows nothing once the last step is done", () => {
+    const steps: HighlightStep[] = ["select-type", "input-purpose"].map((target, position) => ({
+      action: { type: "highlight", target, level: "arahkan", label: target },
+      position,
+    }));
+
+    const { container } = render(<StepProgress steps={steps} index={2} />);
+
+    expect(container.textContent).toBe("");
   });
 });

@@ -61,6 +61,11 @@ export function comparableFillValue(value: string): string {
   return digits || value.trim();
 }
 
+/** The value as the fill's label names it: "Rp447.000" from "Isi Rp447.000". */
+export function fillValueLabel({ label, value }: FillAction): string {
+  return label.startsWith("Isi ") ? label.slice(4) : value;
+}
+
 /**
  * The Isi button shows `label` but writes `value`, so a fill is offered only when its label names
  * that value: the same digits for an amount, the value itself for text.

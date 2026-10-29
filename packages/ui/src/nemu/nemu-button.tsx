@@ -10,6 +10,8 @@ import type { ComponentProps } from "react";
 const nemuButtonVariants = cva("", {
   variants: {
     tone: {
+      /** "Isi" beside a value Nemu fills in: the nemu-amber 600 fill with white text. */
+      solid: "bg-nemu text-nemu-foreground hover:bg-nemu-amber-700",
       /** "Buka My Requests": amber outline pill. */
       outline:
         "border-nemu-ring bg-transparent text-nemu-text hover:bg-nemu-subtle hover:text-nemu-text",
@@ -27,7 +29,14 @@ type NemuButtonProps = Omit<ComponentProps<typeof Button>, "variant"> &
   Required<VariantProps<typeof nemuButtonVariants>>;
 
 export function NemuButton({ tone, className, ...props }: NemuButtonProps) {
-  const variant = tone === "outline" ? "outline" : tone === "link" ? "link" : "ghost";
+  const variant =
+    tone === "solid"
+      ? "default"
+      : tone === "outline"
+        ? "outline"
+        : tone === "link"
+          ? "link"
+          : "ghost";
   return (
     <Button variant={variant} className={cn(nemuButtonVariants({ tone }), className)} {...props} />
   );

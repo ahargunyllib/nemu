@@ -145,21 +145,6 @@ describe("useHighlights", () => {
     await waitFor(() => expect(result.current.highlight).toBeUndefined());
   });
 
-  test("steps back and forth by hand, and stays on the last step", async () => {
-    renderTarget(notHotel.target);
-    renderTarget(amount.target, "input");
-    const result = renderHighlights([notHotel, amount]);
-    await waitFor(() => expect(result.current.highlight?.action).toEqual(notHotel));
-
-    act(() => result.current.goTo(1));
-    await waitFor(() => expect(result.current.highlight?.action).toEqual(amount));
-    act(() => result.current.goTo(2));
-    expect(result.current.stepIndex).toBe(1);
-
-    act(() => result.current.goTo(0));
-    await waitFor(() => expect(result.current.highlight?.action).toEqual(notHotel));
-  });
-
   test("reports a target missing from the page instead of throwing, and skips it", async () => {
     renderTarget(notHotel.target);
 

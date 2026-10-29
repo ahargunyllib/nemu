@@ -116,26 +116,33 @@ for them yet, so they are left out.
   that opens a popup only starts the step.
 - **Tingkat 1 · Jawaban teks** (default): a white card beside the highlighted element, the
   element stays outlined. The answer reads like plain chatbot output, see below.
-- **Tingkat 2 · Rincian**: a "Rincian" text link under the answer opens the detail and the
-  rate's source as more plain text; the link becomes "Tutup rincian".
+- **Tingkat 2 · Rincian**: a "Rincian ›" text link under the answer opens a muted grey rounded
+  box with the detail, each calculation's formula line, and the sources; the link becomes
+  "Tutup rincian ›".
 - While Nemu reads there is no card: the Composer's Membaca pill stands in for it.
 
 **Jawaban teks**: one card, 280px wide, white, 14px corners, a 1px `border`, 12px padding (14px
 on the left), 10px between lines, `shadow-nemu-float`. All text is Body/Small (Regular 13/18).
 The only control in the header is the close × at the top-right, beside the first line. There is
-no kicker row, no echoed question, no title over a body, no red, no check marks, and no buttons
-besides ×:
+no echoed question, no title over a body, no red, and no check marks. Collapsed, a card is short:
+kicker, answer, value strip, Rincian:
 
-- The answer, then each calculation as a sentence ("Lumpsum penginapan: 30% × Rp745.000 ×
-  2 malam = Rp447.000."), then each warning as a sentence ("Ubah isian bila nanti menginap di
-  hotel."). Lists are written "1. 2. 3.", including the highlighted steps (their back and
-  forth arrows go once a step moves on when the user acts).
-- **Salin nilai**: when the answer computed an amount, a `nemu-subtle` strip under the text holds
-  it in medium weight on the left ("Rp447.000") and a copy icon with "Salin" on the right. It
-  copies the amount as the form field takes it ("447000") and says "Tersalin" for a moment.
-- **Sumber**: quiet muted text, "Sumber: PMK 119/2023"; each source is a link that shows its
-  pasal under the line. A calculation's rate source, such as the SBM table, follows the links as
-  plain text, once.
+- **Kicker**: for a guided answer, "Langkah 2 dari 6" (SemiBold 12/16, `nemu-text`) above the
+  answer, beside the ×. The card lists no steps and has no back and forth arrows: a step moves on
+  when the user acts on its target.
+- The answer, then each warning as a sentence ("Ubah isian bila nanti menginap di hotel.").
+- **Isi nilai**: when the current step is a confirmed `fill`, a `nemu-subtle` strip under the text
+  holds the value in medium weight on the left ("Rp447.000") and a small solid `nemu` **Isi**
+  button on the right, which writes it into the field. Once filled, a small green chip
+  (`nemu-success-subtle`) at the field's right end says "Sesuai"; if the user changes the value,
+  it becomes "Tidak sesuai hitungan Rp447.000 · **Isi ulang**", which writes it again.
+- **Salin nilai**: when the answer computed an amount it doesn't fill, the same strip has a copy
+  icon with "Salin" on the right. It copies the amount as the form field takes it ("447000") and
+  says "Tersalin" for a moment.
+- **Rincian** (opened): the detail as plain text, lists written "1. 2. 3."; each calculation's
+  formula line in Nemu/Calc ("30% × Rp745.000 × 2 malam = Rp447.000", led by what it computes
+  when there are several); then quiet Caption text "Sumber: PMK 119/2023 Pasal 8 ayat (5) · SBM
+  TA 2026 …", each source once.
 - **Balas**: the Composer pill ("Tanya Nemu…") inside the card, last, to ask again from it.
 
 Cards in place of an answer use the same format: plain text, ×, and at most one text link as the

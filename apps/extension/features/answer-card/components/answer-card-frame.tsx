@@ -7,20 +7,31 @@ type AnswerCardFrameProps = Omit<React.ComponentProps<typeof Card>, "className">
   header: React.ReactNode;
   /** The first paragraph, which the × sits beside. */
   lead: React.ReactNode;
+  /** A line above the first paragraph, such as "Langkah 2 dari 6"; the × then sits beside it. */
+  kicker?: React.ReactNode;
 };
 
 /**
  * Jawaban teks (docs/design-system.md, "Answers"): a white 280px card that reads like a chatbot
  * message, 14px corners, a 1px border, 12px padding (14px on the left) and 10px between lines.
  */
-export function AnswerCardFrame({ header, lead, children, ...props }: AnswerCardFrameProps) {
+export function AnswerCardFrame({
+  header,
+  lead,
+  kicker,
+  children,
+  ...props
+}: AnswerCardFrameProps) {
   return (
     <Card
       className={`gap-2.5 rounded-[14px] border py-3 pr-3 pl-3.5 shadow-nemu-float ring-0 ${CARD_BODY}`}
       {...props}
     >
       <div className="flex items-start gap-2">
-        <div className="min-w-0 flex-1">{lead}</div>
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          {kicker}
+          {lead}
+        </div>
         {header}
       </div>
       {children}

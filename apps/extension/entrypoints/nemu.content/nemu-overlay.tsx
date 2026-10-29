@@ -23,11 +23,12 @@ import {
   type CursorPosition,
   useComposerShortcut,
 } from "../../features/composer/hooks/use-composer-shortcut";
-import { ConfirmedFillControl } from "../../features/confirmed-fill/components/confirmed-fill-control";
+import { FillCheck } from "../../features/confirmed-fill/components/fill-check";
+import { FillValue } from "../../features/confirmed-fill/components/fill-value";
 import { useConfirmedFill } from "../../features/confirmed-fill/hooks/use-confirmed-fill";
 import { collectElementList } from "../../features/element-list/lib/element-list";
 import { HighlightRing } from "../../features/highlight/components/highlight-ring";
-import { HighlightSteps } from "../../features/highlight/components/highlight-steps";
+import { StepProgress } from "../../features/highlight/components/step-progress";
 import {
   highlightFootprint,
   missingTargetWarning,
@@ -62,7 +63,7 @@ export function NemuOverlay() {
   const area = useAreaCrop();
   const { state } = chat;
   const actions = state.kind === "response" ? state.response.actions : NO_ACTIONS;
-  const { highlight, steps, stepIndex, goTo, missing, warnings, cursor, outcome, clicked } =
+  const { highlight, steps, stepIndex, missing, warnings, cursor, outcome, clicked } =
     useAnswerActions(actions, state.kind === "response" ? state.elements : NO_ELEMENTS, anchor);
   const confirmedFills = useConfirmedFill(actions, highlight);
   // A guide continues from the settled page opened by its navigation click.
@@ -146,11 +147,8 @@ export function NemuOverlay() {
         )}
         {state.kind === "loading" && readArea && <AreaOutline box={readArea} reading />}
         {highlight && <HighlightRing box={highlight.box} action={highlight.action} />}
-        {confirmedFills.map((control) => (
-          <ConfirmedFillControl
-            key={`${control.mode}:${control.action.target}`}
-            control={control}
-          />
+        {confirmedFills.checks.map((check) => (
+          <FillCheck key={check.action.target} check={check} />
         ))}
         {cursor && <NavigationCursor frame={cursor} />}
         <Mascot
@@ -224,6 +222,10 @@ export function NemuOverlay() {
                   ],
                 }}
                 header={header}
+                kicker={
+                  <StepProgress steps={steps} guide={state.response.guide} index={stepIndex} />
+                }
+                fill={confirmedFills.pending && <FillValue fill={confirmedFills.pending} />}
                 reply={
                   // Balas: the same Composer inside the card, while none is open above it. A click
                   // on the page only drops its Area Crop, so the answer stays while Rina acts.
@@ -240,12 +242,6 @@ export function NemuOverlay() {
                   )
                 }
               >
-                <HighlightSteps
-                  steps={steps}
-                  guide={state.response.guide}
-                  index={stepIndex}
-                  onGoTo={goTo}
-                />
                 {confirmed && <ConfirmedStatus status={confirmed} />}
               </AnswerCard>
             )}

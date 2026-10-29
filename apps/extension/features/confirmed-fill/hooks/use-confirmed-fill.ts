@@ -8,13 +8,24 @@ import {
   type FillAction,
   type FillElement,
   fillLabelMatchesValue,
+  fillValueLabel,
 } from "../lib/confirmed-fill";
 
 export type FillHighlight = { action: NemuAction; box: Box };
 
-export type ConfirmedFillControlModel =
-  | { mode: "confirm"; action: FillAction; box: Box; confirm: () => void }
-  | { mode: "mismatch"; action: FillAction; box: Box; message: string };
+/** The highlighted `fill` step, waiting for Rina to press Isi. */
+export type PendingFill = { action: FillAction; value: string; confirm: () => void };
+
+/** A fill Rina applied, and whether its field still holds that value. */
+export type FillCheck = {
+  action: FillAction;
+  box: Box;
+  value: string;
+  matches: boolean;
+  refill: () => void;
+};
+
+export type ConfirmedFills = { pending?: PendingFill; checks: FillCheck[] };
 
 type AppliedFill = { action: FillAction; element: FillElement; box: Box; mismatch: boolean };
 
@@ -28,20 +39,15 @@ function targetBox(action: FillAction, element: FillElement): Box {
   return { left, top, width, height };
 }
 
-function mismatchMessage(action: FillAction): string {
-  const expected = action.label.startsWith("Isi ") ? action.label.slice(4) : action.value;
-  return `Tidak sesuai hitungan ${expected}`;
-}
-
 /**
- * Offers the Isi button for the highlighted `fill` step and, once Rina has pressed it, warns when
- * the field no longer holds that value. Every fill in the answer is confirmed and watched on its
- * own, so a second fill still gets its button after the first was applied.
+ * Offers the highlighted `fill` step for Rina to confirm with Isi and, once she has, checks
+ * whether the field still holds that value, so it can be filled again. Every fill in the answer is
+ * confirmed and watched on its own, so a second fill is still offered after the first was applied.
  */
 export function useConfirmedFill(
   actions: readonly NemuAction[],
   currentHighlight: FillHighlight | undefined,
-): ConfirmedFillControlModel[] {
+): ConfirmedFills {
   const fills = useMemo(() => actions.filter(isFillAction), [actions]);
   const fillKey = fills.map(({ target, value }) => `${target}\u0000${value}`).join("\u0001");
   const [applied, setApplied] = useState<readonly AppliedFill[]>([]);
@@ -81,38 +87,43 @@ export function useConfirmedFill(
     // Re-subscribe only when a fill is applied, not on every box update.
   }, [appliedKey]);
 
-  const currentFill =
-    currentHighlight && isFillAction(currentHighlight.action) ? currentHighlight.action : undefined;
-  const confirm = useCallback(() => {
-    if (!currentFill || !fillLabelMatchesValue(currentFill)) return;
-    const result = applyConfirmedFill(currentFill);
+  const apply = useCallback((action: FillAction) => {
+    if (!fillLabelMatchesValue(action)) return;
+    const result = applyConfirmedFill(action);
     if (result.status !== "applied") return;
     const fill: AppliedFill = {
-      action: currentFill,
+      action,
       element: result.element,
-      box: targetBox(currentFill, result.element),
+      box: targetBox(action, result.element),
       mismatch: false,
     };
     setApplied((current) => [
-      ...current.filter(({ action }) => action.target !== currentFill.target),
+      ...current.filter((entry) => entry.action.target !== action.target),
       fill,
     ]);
-  }, [currentFill]);
+  }, []);
 
-  const controls: ConfirmedFillControlModel[] = applied
-    .filter(({ mismatch }) => mismatch)
-    .map(({ action, box }) => ({
-      mode: "mismatch",
-      action,
-      box,
-      message: mismatchMessage(action),
-    }));
+  const checks = applied.map(({ action, box, mismatch }): FillCheck => ({
+    action,
+    box,
+    value: fillValueLabel(action),
+    matches: !mismatch,
+    refill: () => apply(action),
+  }));
 
+  const currentFill =
+    currentHighlight && isFillAction(currentHighlight.action) ? currentHighlight.action : undefined;
   const alreadyApplied = applied.some(
     ({ action }) => action.target === currentFill?.target && action.value === currentFill.value,
   );
-  if (currentHighlight && currentFill && !alreadyApplied && fillLabelMatchesValue(currentFill)) {
-    controls.push({ mode: "confirm", action: currentFill, box: currentHighlight.box, confirm });
-  }
-  return controls;
+  const pending =
+    currentFill && !alreadyApplied && fillLabelMatchesValue(currentFill)
+      ? {
+          action: currentFill,
+          value: fillValueLabel(currentFill),
+          confirm: () => apply(currentFill),
+        }
+      : undefined;
+
+  return { pending, checks };
 }
