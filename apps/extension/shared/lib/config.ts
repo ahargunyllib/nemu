@@ -14,5 +14,17 @@ export function isAllowedPage(url: string | undefined): boolean {
   return ALLOWED_ORIGINS.includes(new URL(url).origin);
 }
 
+/**
+ * The Demo App that goes with the Nemu Service at `serverUrl`: the local one for a local service,
+ * else the deployed one. The toolbar popup on other sites opens it.
+ */
+export function demoAppUrl(serverUrl: string): string {
+  const local = new URL(serverUrl).hostname === "localhost";
+  const origin = ALLOWED_ORIGINS.find(
+    (candidate) => (new URL(candidate).hostname === "localhost") === local,
+  );
+  return origin ?? ALLOWED_ORIGINS[0] ?? serverUrl;
+}
+
 /** Nemu Service used when `WXT_SERVER_URL` is not set at build time. */
 export const DEFAULT_SERVER_URL = "http://localhost:3000";

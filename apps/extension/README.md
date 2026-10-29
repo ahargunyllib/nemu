@@ -24,7 +24,12 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   install (ADR-0004). The catch: `captureVisibleTab` works only once the toolbar icon or
   Ctrl+Shift+Space has fired the action on that tab (until it navigates away). Opened only from
   the mascot, or in Arc, the Area Crop fails and the chip tells Rina to open Nemu from the toolbar
-  icon or the shortcut. The toolbar icon still does nothing on pages outside the allowlist.
+  icon or the shortcut.
+- **Toolbar popup.** On a page outside the allowlist the toolbar icon (and the shortcut) opens a
+  popup instead: "Nemu aktif di AlurKerja", with **Buka AlurKerja** opening the Demo App that
+  goes with `WXT_SERVER_URL` (the local one for a local service). It's the manifest's default
+  popup; the background clears it on Demo App tabs, so the action fires there and opens the
+  Composer.
 - **Highlight (Arahkan).** A `highlight` action scrolls to its target and draws a pulsing amber
   outline with the action label on a click-through page layer. The Answer Card hangs right next to
   the target with the mascot on its top-left corner: just above it, right-aligned with it, else
@@ -123,7 +128,8 @@ script from the WXT dev server instead of the manifest, so under Playwright no o
 It stops early if the Nemu Service answers with the AI Responder instead of the fixtures. The
 checks:
 
-- a page outside the allowlist gets no overlay;
+- a page outside the allowlist gets no overlay, its toolbar icon shows the popup (saved as
+  `toolbar-popup.png`) whose Buka AlurKerja opens the Demo App, and a Demo App tab has no popup;
 - signed out, the card asks Rina to log in;
 - signed in as Rina, the Momen 1 prompt comes back as an Answer Card;
 - Momen 1, five times in a row from Beranda: Nemu clicks Ajukan Perjalanan Dinas, the form opens,

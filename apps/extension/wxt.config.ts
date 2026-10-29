@@ -40,11 +40,11 @@ export default defineConfig({
       `${new URL(process.env.WXT_SERVER_URL || DEFAULT_SERVER_URL).origin}/*`,
       ...ALLOWED_MATCHES,
     ],
-    // The shortcut and the toolbar icon both trigger the action, which opens the Composer.
-    // It's bound to the built-in `_execute_action` command because Arc never fires custom
-    // commands. The browser handles the keys before the page sees them, and users can rebind
-    // them at chrome://extensions/shortcuts (arc://extensions/shortcuts in Arc).
-    action: { default_title: "Buka Composer Nemu" },
+    // The shortcut and the toolbar icon both trigger the action, which opens the Composer on
+    // Demo App tabs and the popup (entrypoints/popup) everywhere else. It's bound to the built-in
+    // `_execute_action` command because Arc never fires custom commands. The browser handles the
+    // keys before the page sees them, and users can rebind them at chrome://extensions/shortcuts
+    // (arc://extensions/shortcuts in Arc).
     commands: {
       _execute_action: {
         suggested_key: { default: "Ctrl+Shift+Space", mac: "MacCtrl+Shift+Space" },

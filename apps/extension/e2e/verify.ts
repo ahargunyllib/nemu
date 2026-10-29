@@ -33,6 +33,7 @@ import { execFileSync } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { type BrowserContext, chromium, type Locator, type Page, request } from "playwright-core";
+import type { browser } from "wxt/browser";
 
 import { DEMO_ACCOUNTS } from "../../mock-alurkerja/src/features/auth/lib/demo-accounts.ts";
 import { cropRegion } from "../features/area-crop/lib/area-crop.ts";
@@ -59,6 +60,9 @@ const MISSING_UPLOADS = {
   "upload-laporan-perjalanan": "laporan-perjalanan-makassar.pdf",
   "upload-boarding-pass-pulang": "boarding-pass-pulang-upg-yia.pdf",
 } as const;
+
+// The service worker's own extension API, which `worker.evaluate` callbacks run against.
+declare const chrome: typeof browser;
 
 async function assertReachable(url: string) {
   const response = await fetch(url).catch(() => null);
@@ -475,6 +479,47 @@ async function main() {
       const overlays = await page.locator("nemu-overlay").count();
       if (overlays > 0) throw new Error(`found ${overlays} nemu-overlay on ${OUTSIDE_URL}`);
     });
+
+    await check(
+      "on other sites the toolbar icon shows the popup, which opens AlurKerja",
+      async () => {
+        const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
+        const popupFor = (url: string) =>
+          worker.evaluate(
+            async (pattern) => {
+              const [tab] = await chrome.tabs.query({ url: pattern });
+              if (tab?.id === undefined) throw new Error(`no tab at ${pattern}`);
+              return chrome.action.getPopup({ tabId: tab.id });
+            },
+            `${new URL(url).origin}/*`,
+          );
+        // Still on OUTSIDE_URL from the check before.
+        const popupUrl = await popupFor(OUTSIDE_URL);
+        if (!popupUrl.endsWith("/popup.html")) throw new Error(`the popup there is "${popupUrl}"`);
+
+        const popup = await context.newPage();
+        try {
+          await popup.setViewportSize({ width: 320, height: 200 });
+          await popup.goto(popupUrl);
+          await popup.getByRole("heading", { name: "Nemu aktif di AlurKerja" }).waitFor();
+          await popup.screenshot({ path: path.join(SCREENSHOT_DIR, "toolbar-popup.png") });
+          const [app] = await Promise.all([
+            context.waitForEvent("page"),
+            popup.getByRole("button", { name: "Buka AlurKerja" }).click(),
+          ]);
+          await app.waitForURL(`${DEMO_APP_URL}/**`);
+          await app.close();
+        } finally {
+          if (!popup.isClosed()) await popup.close();
+        }
+
+        // On the Demo App the icon opens the Composer instead.
+        await page.goto(`${DEMO_APP_URL}/login`);
+        await page.locator("nemu-overlay").waitFor({ state: "attached" });
+        const onDemoApp = await popupFor(DEMO_APP_URL);
+        if (onDemoApp !== "") throw new Error(`the Demo App tab has the popup "${onDemoApp}"`);
+      },
+    );
 
     await check("signed out, the card asks Rina to log in", async () => {
       await page.goto(`${DEMO_APP_URL}/login`);
