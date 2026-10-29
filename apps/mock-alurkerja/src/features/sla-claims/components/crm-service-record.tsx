@@ -152,7 +152,7 @@ export default function CrmServiceRecord({
               <CardContent>
                 <Facts
                   rows={[
-                    ...(addendum
+                    ...(addendum?.signed
                       ? ([
                           ["Efektif", addendum.effectiveOn],
                           ["Mengganti", addendum.replaces],
@@ -177,9 +177,13 @@ export default function CrmServiceRecord({
             ) : (
               <ul className="flex flex-col gap-2">
                 {otherAddenda.map(([id, other]) => (
-                  <li key={id} className="flex items-center gap-2">
-                    {id} · {other.replaces}
-                    <Badge variant="outline">{other.status}</Badge>
+                  <li key={id}>
+                    {id}{" "}
+                    <span className="text-muted-foreground">
+                      ({other.status.toLowerCase()}
+                      {other.signed ? "" : ", belum disahkan"} · {other.subject.toLowerCase()}
+                      {other.signed ? "" : " · tidak berlaku"})
+                    </span>
                   </li>
                 ))}
               </ul>

@@ -1,6 +1,12 @@
+// @vitest-environment happy-dom
 import { describe, expect, test } from "vite-plus/test";
 
-import { highlightFootprint, labelSide, missingTargetWarning } from "./highlight-targets";
+import {
+  completesStep,
+  highlightFootprint,
+  labelSide,
+  missingTargetWarning,
+} from "./highlight-targets";
 
 const VIEWPORT_WIDTH = 1280;
 
@@ -69,5 +75,24 @@ describe("missingTargetWarning", () => {
     });
 
     expect(warning).toBe('Nemu tidak menemukan "Periksa ini" di halaman ini.');
+  });
+});
+
+describe("completesStep", () => {
+  function field(html: string): HTMLElement {
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = html;
+    return wrapper.firstElementChild as HTMLElement;
+  }
+
+  test("waits for a change in an editable field, not a click into it", () => {
+    const input = field("<input />");
+
+    expect(completesStep(new Event("click"), input)).toBe(false);
+    expect(completesStep(new Event("change"), input)).toBe(true);
+  });
+
+  test("takes a click on a read-only field as checking it", () => {
+    expect(completesStep(new Event("click"), field("<input readonly />"))).toBe(true);
   });
 });

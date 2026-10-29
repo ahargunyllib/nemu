@@ -400,6 +400,89 @@ export const momentThreeFollowUpResponse = {
   warnings: ["Kamu yang menekan Kirim setelah semua dokumen lengkap"],
 } satisfies NemuResponse;
 
+const k2RegistrationGuide = {
+  id: "sla-claim:registration",
+  steps: [
+    { id: "claim-letter", target: "input-nomor-surat-klaim", label: "Periksa nomor surat" },
+    { id: "claim-service", target: "input-service-id-klaim", label: "Periksa service ID" },
+    { id: "claim-period", target: "input-periode-klaim", label: "Periksa periode gangguan" },
+    {
+      id: "claim-received",
+      target: "input-tanggal-terima-klaim",
+      label: "Isi tanggal klaim diterima",
+    },
+    { id: "claim-hours", target: "input-jam-diklaim", label: "Periksa jam yang diklaim" },
+    { id: "claim-timely", target: "opt-klaim-tepat-waktu-ya", label: "Pilih Ya" },
+    { id: "claim-upload", target: "upload-surat-klaim", label: "Unggah surat klaim" },
+    {
+      id: "claim-complete",
+      target: "button-kirim-klaim",
+      label: "Kamu yang menyelesaikan tugas",
+    },
+  ],
+};
+
+/** Dimas asks on the Registrasi Klaim task, where every field of the guide is on the page. */
+export const k2RegistrationRequest = {
+  session_id: "k2-registration",
+  url: "https://app.demo/sla-claims/KLM-2610-0007",
+  prompt: "Bantu isi registrasi klaim ini",
+  elements: k2RegistrationGuide.steps.map((step) => ({
+    nemu_id: step.target,
+    label: step.label,
+    role: "textbox",
+    visible: true,
+  })),
+} satisfies NemuRequest;
+
+export const k2RegistrationResponse = {
+  status: "answer",
+  answer: {
+    ringkas:
+      "Isi kolom ini dengan 8 Okt 2026. Pakai tanggal surat masuk ke email billing, bukan 6 Okt di kop surat.",
+    detail:
+      "Batas pengajuan klaim periode September 2026 adalah 15 Oktober 2026, jadi klaim ini tepat waktu.",
+  },
+  citations: [{ doc_id: "SOP-KLAIM-SLA-01-v1.0", judul: "SOP Klaim SLA", pasal: "2 ayat (1)" }],
+  calc: [
+    {
+      fungsi: "claim_cutoff",
+      input: { period: "2026-09", received_date: "2026-10-08", timely: true },
+      hasil: "2026-10-15",
+    },
+  ],
+  actions: [
+    {
+      type: "fill",
+      target: "input-tanggal-terima-klaim",
+      level: "konfirmasi",
+      label: "Isi 8 Okt 2026",
+      value: "08/10/2026",
+    },
+    {
+      type: "highlight",
+      target: "input-jam-diklaim",
+      level: "arahkan",
+      label: "Periksa jam yang diklaim",
+    },
+    { type: "highlight", target: "opt-klaim-tepat-waktu-ya", level: "arahkan", label: "Pilih Ya" },
+    {
+      type: "highlight",
+      target: "upload-surat-klaim",
+      level: "arahkan",
+      label: "Unggah surat klaim",
+    },
+    {
+      type: "confirm",
+      target: "button-kirim-klaim",
+      level: "konfirmasi",
+      label: "Kamu yang menyelesaikan tugas",
+    },
+  ],
+  guide: { ...k2RegistrationGuide, current_step: 4 },
+  warnings: [],
+} satisfies NemuResponse;
+
 const k2ContractGuide = {
   id: "sla-claim:contract",
   steps: [
@@ -487,6 +570,62 @@ export const k2SlaContractResponse = {
     },
   ],
   guide: { ...k2ContractGuide, current_step: 2 },
+} satisfies NemuResponse;
+
+const k2TicketSteps = [
+  { id: "decide-inc-2609-014", target: "seg-keputusan-INC-2609-014", label: "Pilih Dihitung" },
+  { id: "decide-inc-2609-015", target: "seg-keputusan-INC-2609-015", label: "Pilih Dihitung" },
+  {
+    id: "decide-inc-2609-031",
+    target: "seg-keputusan-INC-2609-031",
+    label: "Pilih Dikecualikan",
+  },
+  { id: "decide-inc-2609-047", target: "seg-keputusan-INC-2609-047", label: "Pilih Dihitung" },
+  { id: "merge-intervals", target: "button-gabungkan-interval", label: "Gabungkan interval" },
+] as const;
+
+/** Dimas asks on Telaah Tiket Gangguan, with each ticket's Keputusan and Gabungkan interval. */
+export const k2TicketsRequest = {
+  session_id: "k2-tickets",
+  url: "https://app.demo/sla-claims/KLM-2610-0007",
+  prompt: "Tiket mana yang dihitung?",
+  elements: k2TicketSteps.map((step) => ({
+    nemu_id: step.target,
+    label: step.label,
+    role: "group",
+    visible: true,
+  })),
+} satisfies NemuRequest;
+
+export const k2TicketsResponse = {
+  status: "answer",
+  answer: {
+    ringkas: "Hitung tiket gangguan penyedia, kecualikan INC-2609-031.",
+    detail:
+      "INC-2609-031 terjadi karena listrik gudang padam dan UPS pelanggan habis, jaringan kita normal. INC-2609-014 dan INC-2609-015 melaporkan gangguan yang sama, jadi gabungkan intervalnya: A 17,5 jam.",
+  },
+  citations: [
+    { doc_id: "SOP-KLAIM-SLA-01-v1.0", judul: "SOP Klaim SLA", pasal: "5 ayat (2)" },
+    { doc_id: "SOP-KLAIM-SLA-01-v1.0", judul: "SOP Klaim SLA", pasal: "5 ayat (3)" },
+  ],
+  calc: [
+    {
+      fungsi: "merge_claim_intervals",
+      input: {
+        counted_tickets: "INC-2609-014, INC-2609-015, INC-2609-047",
+        excluded_tickets: "INC-2609-031",
+      },
+      hasil: 1_050,
+    },
+  ],
+  actions: k2TicketSteps.map((step) => ({
+    type: "highlight",
+    target: step.target,
+    level: "arahkan",
+    label: step.label,
+  })),
+  guide: { id: "sla-claim:tickets", steps: [...k2TicketSteps], current_step: 1 },
+  warnings: [],
 } satisfies NemuResponse;
 
 export const k2CompensationRequest = {

@@ -89,31 +89,37 @@ type ExecuteClaimWorkflowInput = {
   actionsAllowed: boolean;
 };
 
-const REGISTRATION_STEPS = [
-  { id: "claim-letter", target: NEMU_IDS.slaClaim.letterNumber, label: "Isi nomor surat" },
-  { id: "claim-service", target: NEMU_IDS.slaClaim.serviceId, label: "Periksa service ID" },
-  { id: "claim-period", target: NEMU_IDS.slaClaim.period, label: "Isi periode gangguan" },
-  {
-    id: "claim-received",
-    target: NEMU_IDS.slaClaim.receivedAt,
-    label: "Isi tanggal klaim diterima",
-  },
-  {
-    id: "claim-hours",
-    target: NEMU_IDS.slaClaim.claimedHours,
-    label: "Isi jam yang diklaim pelanggan",
-  },
-  {
-    id: "claim-upload",
-    target: NEMU_IDS.slaClaim.uploadLetter,
-    label: "Unggah surat klaim",
-  },
-  {
-    id: "claim-timely",
-    target: NEMU_IDS.slaClaim.timelyYes,
-    label: "Periksa batas pengajuan",
-  },
-] as const satisfies readonly NemuGuideStep[];
+/**
+ * Registrasi Klaim in the task's field order. The first three fields and the claimed hours come
+ * filled in from the customer's letter, so the user only checks them; the received date is the
+ * first field the letter doesn't give.
+ */
+function registrationSteps(timely: boolean): NemuGuideStep[] {
+  return [
+    { id: "claim-letter", target: NEMU_IDS.slaClaim.letterNumber, label: "Periksa nomor surat" },
+    { id: "claim-service", target: NEMU_IDS.slaClaim.serviceId, label: "Periksa service ID" },
+    { id: "claim-period", target: NEMU_IDS.slaClaim.period, label: "Periksa periode gangguan" },
+    {
+      id: "claim-received",
+      target: NEMU_IDS.slaClaim.receivedAt,
+      label: "Isi tanggal klaim diterima",
+    },
+    {
+      id: "claim-hours",
+      target: NEMU_IDS.slaClaim.claimedHours,
+      label: "Periksa jam yang diklaim",
+    },
+    timely
+      ? { id: "claim-timely", target: NEMU_IDS.slaClaim.timelyYes, label: "Pilih Ya" }
+      : { id: "claim-timely", target: NEMU_IDS.slaClaim.timelyNo, label: "Pilih Tidak" },
+    { id: "claim-upload", target: NEMU_IDS.slaClaim.uploadLetter, label: "Unggah surat klaim" },
+    {
+      id: "claim-complete",
+      target: NEMU_IDS.slaClaim.submit,
+      label: "Kamu yang menyelesaikan tugas",
+    },
+  ];
+}
 
 const SLA_STEPS = [
   { id: "open-crm", target: NEMU_IDS.slaClaim.crmService, label: "Buka CRM Layanan" },
@@ -135,12 +141,12 @@ const TASK_TARGET_BY_CLAIM = new Map([
   ["KLM-2610-0011", NEMU_IDS.slaClaim.taskKlm26100011],
 ]);
 
-const TICKET_TARGET_BY_ID = new Map([
-  ["INC-2609-014", NEMU_IDS.slaClaim.ticketInc2609014],
-  ["INC-2609-015", NEMU_IDS.slaClaim.ticketInc2609015],
-  ["INC-2609-031", NEMU_IDS.slaClaim.ticketInc2609031],
-  ["INC-2609-047", NEMU_IDS.slaClaim.ticketInc2609047],
-  ["INC-2609-058", NEMU_IDS.slaClaim.ticketInc2609058],
+const DECISION_TARGET_BY_TICKET = new Map([
+  ["INC-2609-014", NEMU_IDS.slaClaim.decisionInc2609014],
+  ["INC-2609-015", NEMU_IDS.slaClaim.decisionInc2609015],
+  ["INC-2609-031", NEMU_IDS.slaClaim.decisionInc2609031],
+  ["INC-2609-047", NEMU_IDS.slaClaim.decisionInc2609047],
+  ["INC-2609-058", NEMU_IDS.slaClaim.decisionInc2609058],
 ]);
 
 function currentStep(steps: readonly NemuGuideStep[], request: NemuRequest): number {
@@ -218,6 +224,42 @@ function formatRupiah(value: number): string {
   return `Rp${value.toLocaleString("id-ID")}`;
 }
 
+/** "2026-10-08" as the Answer Card names it: "8 Okt 2026". */
+function formatShortDate(isoDate: string): string {
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${isoDate}T00:00:00Z`));
+}
+
+/** "2026-10-08" as the Demo App's dd/mm/yyyy date field takes it: "08/10/2026". */
+function dayMonthYear(isoDate: string): string {
+  const [year, month, day] = isoDate.split("-");
+  return `${day}/${month}/${year}`;
+}
+
+/** The Registrasi Klaim step as an action: Isi for the received date, a ring for the rest. */
+function registrationAction(
+  step: NemuGuideStep,
+  cutoff: ReturnType<typeof calculateClaimCutoff>,
+): NemuAction {
+  if (step.target === NEMU_IDS.slaClaim.receivedAt) {
+    return {
+      type: "fill",
+      target: step.target,
+      level: "konfirmasi",
+      label: `Isi ${formatShortDate(cutoff.receivedDate)}`,
+      value: dayMonthYear(cutoff.receivedDate),
+    };
+  }
+  if (step.target === NEMU_IDS.slaClaim.submit) {
+    return { type: "confirm", target: step.target, level: "konfirmasi", label: step.label };
+  }
+  return { type: "highlight", target: step.target, level: "arahkan", label: step.label };
+}
+
 function baseOutput(): ClaimWorkflowOutput {
   return {
     facts: {},
@@ -271,7 +313,26 @@ export function executeClaimWorkflow({
   if (scenario === "registration") {
     output.facts.reviewDueOn = claim.task.reviewDueOn;
     output.sourceLocations = [{ docId: "SOP-KLAIM-SLA-01-v1.0", article: "2 ayat (3)" }];
-    output.guide = guide("sla-claim:registration", REGISTRATION_STEPS, request);
+    const cutoff = calculateClaimCutoff(claim.claim.period, claim.claim.receivedAt);
+    const steps = registrationSteps(cutoff.timely);
+    const onTask = request.elements.some(
+      (element) => element.nemu_id === NEMU_IDS.slaClaim.receivedAt,
+    );
+    if (onTask) {
+      // The letter's own fields are already filled in, so the guide starts at the received date.
+      const start = steps.findIndex((step) => step.target === NEMU_IDS.slaClaim.receivedAt);
+      output.facts.cutoff = cutoff;
+      output.guide = { id: "sla-claim:registration", steps, current_step: start + 1 };
+      if (actionsAllowed) {
+        output.actions = steps.slice(start).map((step) => registrationAction(step, cutoff));
+      }
+      output.sourceLocations.push({ docId: "SOP-KLAIM-SLA-01-v1.0", article: "2 ayat (1)" });
+      output.guidance.push(
+        `Fill Tanggal klaim diterima with ${cutoff.receivedDate}, the date the letter reached the billing email, not the letter's own date. The filing deadline is ${cutoff.deadline}, so the claim is ${cutoff.timely ? "timely" : "late"}.`,
+      );
+      return output;
+    }
+    output.guide = guide("sla-claim:registration", steps, request);
     output.guidance.push(
       `Open claim ${claim.claim.id} and state its review deadline ${claim.task.reviewDueOn ?? "unknown"}.`,
     );
@@ -386,18 +447,25 @@ export function executeClaimWorkflow({
       );
       return output;
     }
-    const steps = [...tickets.countedTicketIds, ...tickets.excludedTicketIds].flatMap(
-      (ticketId): NemuGuideStep[] => {
-        const target = TICKET_TARGET_BY_ID.get(ticketId);
-        return target
-          ? [{ id: `review-${ticketId.toLowerCase()}`, target, label: `Periksa ${ticketId}` }]
-          : [];
-      },
-    );
+    // Row by row in table order, each step names the Keputusan to pick, then merge the intervals.
+    const excluded = new Set(tickets.excludedTicketIds);
+    const decided = new Set([...tickets.countedTicketIds, ...tickets.excludedTicketIds]);
+    const steps: NemuGuideStep[] = claim.tickets.flatMap((ticket): NemuGuideStep[] => {
+      const target = DECISION_TARGET_BY_TICKET.get(ticket.id);
+      if (!target || !decided.has(ticket.id)) return [];
+      const decision = excluded.has(ticket.id) ? "Dikecualikan" : "Dihitung";
+      return [{ id: `decide-${ticket.id.toLowerCase()}`, target, label: `Pilih ${decision}` }];
+    });
+    steps.push({
+      id: "merge-intervals",
+      target: NEMU_IDS.slaClaim.mergeIntervals,
+      label: "Gabungkan interval",
+    });
     output.guide = guide("sla-claim:tickets", steps, request);
     if (actionsAllowed) {
+      const listed = new Set(request.elements.map((element) => element.nemu_id));
       for (const step of steps) {
-        if (visible.has(step.target)) {
+        if (listed.has(step.target)) {
           output.actions.push({
             type: "highlight",
             target: step.target,

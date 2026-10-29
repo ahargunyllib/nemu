@@ -33,6 +33,15 @@ describe("CrmServiceRecord", () => {
     expect(screen.getByText("SLA baru").nextElementSibling?.textContent).toBe("99,50%");
   });
 
+  test("lists the draft ADD-2026-03 under Adendum lain as not in force", () => {
+    renderRecord("ADD-2026-02");
+    fireEvent.click(screen.getByRole("tab", { name: "Kontrak & Adendum" }));
+
+    expect(screen.getByText(/^ADD-2026-03/).textContent).toBe(
+      "ADD-2026-03 (rancangan, belum disahkan · ubah jam pemeliharaan · tidak berlaku)",
+    );
+  });
+
   test("strikes the contract's SLA only when a signed addendum replaces it", () => {
     const { container } = renderRecord("ADD-2026-02");
     fireEvent.click(screen.getByRole("tab", { name: "Kontrak & Adendum" }));

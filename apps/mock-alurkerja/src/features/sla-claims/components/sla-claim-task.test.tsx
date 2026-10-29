@@ -108,7 +108,65 @@ describe("SlaClaimTask", () => {
     ]) {
       expect(container.querySelector(`[data-nemu-id="${id}"]`)).not.toBeNull();
     }
-    expect(screen.getByDisplayValue("25.5")).toBeTruthy();
+    expect(screen.getByDisplayValue("25,5 jam (sesuai surat)")).toBeTruthy();
+    expect(screen.getByDisplayValue("September 2026")).toBeTruthy();
+  });
+
+  test("leaves Tanggal klaim diterima empty for Nemu's Isi and the timely question unanswered", () => {
+    const { container } = renderTask(
+      <SlaClaimTask assignee="Dimas Pratama" detail={detail("Registrasi Klaim")} />,
+    );
+    const received = container.querySelector<HTMLInputElement>(
+      `[data-nemu-id="${NEMU_IDS.slaClaim.receivedAt}"]`,
+    );
+
+    expect(received?.value).toBe("");
+    expect(received?.placeholder).toBe("dd/mm/yyyy");
+    expect(received).toHaveProperty("readOnly", false);
+    for (const radio of screen.getAllByRole("radio")) {
+      expect(radio.getAttribute("aria-checked")).toBe("false");
+    }
+  });
+
+  test("counts A only from the tickets marked Dihitung once the intervals are merged", () => {
+    const tickets = [
+      ["INC-2609-014", "2026-09-03T08:00:00+07:00", "2026-09-03T20:00:00+07:00", "PENYEDIA"],
+      ["INC-2609-015", "2026-09-03T18:00:00+07:00", "2026-09-03T22:00:00+07:00", "PENYEDIA"],
+      ["INC-2609-031", "2026-09-10T00:00:00+07:00", "2026-09-10T06:00:00+07:00", "DAYA_PELANGGAN"],
+      ["INC-2609-047", "2026-09-21T13:00:00+07:00", "2026-09-21T16:30:00+07:00", "PENYEDIA"],
+    ].map(([id = "", start = "", end = "", cause = ""]) => ({
+      id,
+      start,
+      end,
+      cause,
+      rcaId: "RCA-2609-07",
+      rcaStatus: "DISAHKAN",
+    }));
+    const base = detail("Telaah Tiket Gangguan");
+    const { container } = renderTask(
+      <SlaClaimTask
+        assignee="Dimas Pratama"
+        detail={{ ...base, context: { ...base.context, tickets } }}
+      />,
+    );
+    const decide = (ticketId: string, decision: string) => {
+      const control = container.querySelector(`[data-nemu-id="seg-keputusan-${ticketId}"]`);
+      const option = [...(control?.querySelectorAll("button") ?? [])].find(
+        (button) => button.textContent === decision,
+      );
+      if (!option) throw new Error(`no ${decision} for ${ticketId}`);
+      fireEvent.click(option);
+    };
+
+    expect(screen.getByText("08.00–20.00").previousElementSibling?.textContent).toBe("3 Sep");
+    for (const id of ["INC-2609-014", "INC-2609-015", "INC-2609-047"]) decide(id, "Dihitung");
+    decide("INC-2609-031", "Dikecualikan");
+    fireEvent.click(screen.getByRole("button", { name: "Gabungkan interval" }));
+
+    expect(screen.getByText("Durasi dihitung (A)").nextElementSibling?.textContent).toBe(
+      "17,5 jam",
+    );
+    expect(screen.getByText("Diklaim pelanggan").nextElementSibling?.textContent).toBe("25,5 jam");
   });
 
   test("renders the missing-RCA branch without a final compensation amount", () => {
@@ -223,6 +281,26 @@ describe("SlaClaimTask", () => {
     renderTask(<SlaClaimTask assignee="Dimas Pratama" detail={detail("Susun Berita Acara")} />);
 
     expect(screen.queryByText(/579\.167/)).toBeNull();
+  });
+
+  test("fills in the computed terms on Hitung and drafts the berita acara from the amount", () => {
+    renderTask(<SlaClaimTask assignee="Dimas Pratama" detail={detail("Susun Berita Acara")} />);
+    const draft = screen.getByRole("button", { name: "Buat draft berita acara" });
+
+    expect(screen.getByText("A · dihitung").nextElementSibling?.textContent).toBe("–");
+    fireEvent.click(screen.getByRole("button", { name: "Hitung" }));
+    expect(screen.getByText("A · dihitung").nextElementSibling?.textContent).toBe("17,5 jam");
+
+    expect(screen.getByText("Sari Wulandari")).toBeTruthy();
+    expect(screen.getByText("Manajer Billing Operations")).toBeTruthy();
+    expect(screen.getByText("Di atas Rp500.000")).toBeTruthy();
+
+    expect(draft).toHaveProperty("disabled", true);
+    fireEvent.change(screen.getByLabelText("Nominal usulan"), { target: { value: "579167" } });
+    fireEvent.click(draft);
+    expect(screen.getByLabelText<HTMLTextAreaElement>("Draft berita acara").value).toContain(
+      "6. Nominal usulan: Rp579.167.",
+    );
   });
 
   test("heads the sheet with the stage, the claim's dates, and the assignee", () => {

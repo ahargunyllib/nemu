@@ -42,12 +42,13 @@ export function findHighlightTargets(
   return { found, missing };
 }
 
-const FORM_FIELD = "input:not([type=hidden]), textarea, select";
+// A read-only field is left out: it can't change, so pressing it is how the user checks it.
+const FORM_FIELD = "input:not([type=hidden]):not([readonly]), textarea:not([readonly]), select";
 
 /**
  * Whether the user just did the current step on its target: changed a field inside it, or pressed
- * a target that is a plain button or option. A click into a field, or on a control that opens a
- * popup such as a select, only starts the step.
+ * a target that is a plain button, option, or read-only field. A click into a field, or on a
+ * control that opens a popup such as a select, only starts the step.
  */
 export function completesStep(event: Event, target: HTMLElement): boolean {
   if (event.type === "change") return true;

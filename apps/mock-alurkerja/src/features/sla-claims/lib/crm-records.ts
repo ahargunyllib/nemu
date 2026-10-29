@@ -1,7 +1,8 @@
 /**
  * What CRM Layanan shows about the W-TELKO services, contracts, and addenda beyond the claim API,
  * which carries only their ids, the monthly fee, and the effective SLA. Copied from the seeded
- * `telco_service` rows and the KON-2026-01 and ADD-2026-02 documents.
+ * `telco_service` rows and the KON-2026-01 and ADD-2026-02 documents, plus the draft ADD-2026-03,
+ * which CRM lists but which was never signed, so it has no document and changes nothing.
  */
 export const CRM_SERVICES: Readonly<
   Record<string, { location: string; product: string; bandwidthMbps: number }>
@@ -34,14 +35,27 @@ export const CRM_CONTRACTS: Readonly<
   },
 };
 
-export const CRM_ADDENDA: Readonly<
-  Record<string, { status: string; effectiveOn: string; replaces: string; serviceId: string }>
-> = {
+export type CrmAddendum = {
+  status: string;
+  /** What the addendum changes, as CRM sums it up. */
+  subject: string;
+  serviceId: string;
+} & ({ signed: true; effectiveOn: string; replaces: string } | { signed: false });
+
+export const CRM_ADDENDA: Readonly<Record<string, CrmAddendum>> = {
   "ADD-2026-02": {
     status: "Disahkan",
+    subject: "Ubah SLA",
+    serviceId: "TN-ENT-002",
+    signed: true,
     effectiveOn: "1 Sep 2026",
     replaces: "KON-2026-01 Pasal 4.1",
+  },
+  "ADD-2026-03": {
+    status: "Rancangan",
+    subject: "Ubah jam pemeliharaan",
     serviceId: "TN-ENT-002",
+    signed: false,
   },
 };
 
