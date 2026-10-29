@@ -6,6 +6,7 @@ import {
   DropdownMenuSeparator,
 } from "@nemu/ui/components/dropdown-menu";
 import { AccountMenu, AccountMenuSkeleton } from "@nemu/ui/shell/account-menu";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 
 import { authClient } from "@/features/auth/api/auth-client";
@@ -14,6 +15,7 @@ import { JABATAN_LABELS } from "@/features/auth/lib/demo-accounts";
 /** The signed-in user at the bottom of the side menu; it opens the account menu. */
 export default function UserMenu() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data: session, isPending } = authClient.useSession();
 
   if (isPending || !session) return <AccountMenuSkeleton />;
@@ -37,8 +39,11 @@ export default function UserMenu() {
           onClick={() => {
             authClient.signOut({
               fetchOptions: {
-                onSuccess: () => {
-                  navigate({ to: "/login" });
+                // Drop the signed-out account's data, such as its workspace's demo clock, so the
+                // next account to sign in never sees it.
+                onSuccess: async () => {
+                  await navigate({ to: "/login" });
+                  queryClient.clear();
                 },
               },
             });
