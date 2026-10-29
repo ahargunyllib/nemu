@@ -40,7 +40,152 @@ export const momentOneResponse = {
       label: "Buka formulir",
     },
   ],
+  guide: {
+    id: "travel-request:create",
+    steps: [
+      { id: "travel-type", target: "select-jenis-perjalanan", label: "Pilih jenis perjalanan" },
+      {
+        id: "assignment-letter",
+        target: "input-nomor-surat-tugas",
+        label: "Isi nomor surat tugas",
+      },
+      { id: "destination-city", target: "select-kota-tujuan", label: "Pilih kota tujuan" },
+      {
+        id: "travel-purpose",
+        target: "input-maksud-perjalanan",
+        label: "Isi maksud perjalanan",
+      },
+      {
+        id: "departure-date",
+        target: "input-tanggal-berangkat",
+        label: "Isi tanggal berangkat",
+      },
+      { id: "return-date", target: "input-tanggal-kembali", label: "Isi tanggal kembali" },
+    ],
+    current_step: 1,
+  },
   warnings: [],
+} satisfies NemuResponse;
+
+export const momentOneFollowUpRequest = {
+  session_id: "s-001",
+  user_id: "rina",
+  url: "https://app.demo/perdin/baru",
+  prompt: "Saya dapat tugas rapat ke Makassar 3 hari, mulai dari mana?",
+  elements: [
+    {
+      nemu_id: "select-jenis-perjalanan",
+      label: "Jenis perjalanan",
+      role: "combobox",
+      visible: true,
+    },
+    {
+      nemu_id: "input-nomor-surat-tugas",
+      label: "Nomor surat tugas",
+      role: "textbox",
+      visible: true,
+    },
+    {
+      nemu_id: "select-kota-tujuan",
+      label: "Kota tujuan",
+      role: "combobox",
+      visible: true,
+    },
+    {
+      nemu_id: "input-maksud-perjalanan",
+      label: "Maksud perjalanan",
+      role: "textbox",
+      visible: true,
+    },
+    {
+      nemu_id: "input-tanggal-berangkat",
+      label: "Tanggal berangkat",
+      role: "textbox",
+      visible: true,
+    },
+    {
+      nemu_id: "input-tanggal-kembali",
+      label: "Tanggal kembali",
+      role: "textbox",
+      visible: true,
+    },
+  ],
+} satisfies NemuRequest;
+
+export const momentOneFollowUpResponse = {
+  status: "answer",
+  answer: {
+    ringkas: "Formulir sudah terbuka. Ikuti enam langkah yang disorot sebelum mengirim pengajuan.",
+    detail:
+      "Isi jenis perjalanan, nomor surat tugas, kota tujuan, maksud perjalanan, serta tanggal berangkat dan kembali.",
+  },
+  citations: [
+    { doc_id: "sop-pd-01", judul: "SOP-PD-01 Perjalanan Dinas", pasal: "Butir 4.1, 4.2" },
+  ],
+  calc: [],
+  actions: [
+    {
+      type: "highlight",
+      target: "select-jenis-perjalanan",
+      level: "arahkan",
+      label: "Pilih jenis perjalanan",
+    },
+    {
+      type: "highlight",
+      target: "input-nomor-surat-tugas",
+      level: "arahkan",
+      label: "Isi nomor surat tugas",
+    },
+    {
+      type: "highlight",
+      target: "select-kota-tujuan",
+      level: "arahkan",
+      label: "Pilih kota tujuan",
+    },
+    {
+      type: "highlight",
+      target: "input-maksud-perjalanan",
+      level: "arahkan",
+      label: "Isi maksud perjalanan",
+    },
+    {
+      type: "highlight",
+      target: "input-tanggal-berangkat",
+      level: "arahkan",
+      label: "Isi tanggal berangkat",
+    },
+    {
+      type: "highlight",
+      target: "input-tanggal-kembali",
+      level: "arahkan",
+      label: "Isi tanggal kembali",
+    },
+  ],
+  guide: {
+    id: "travel-request:create",
+    steps: [
+      { id: "travel-type", target: "select-jenis-perjalanan", label: "Pilih jenis perjalanan" },
+      {
+        id: "assignment-letter",
+        target: "input-nomor-surat-tugas",
+        label: "Isi nomor surat tugas",
+      },
+      { id: "destination-city", target: "select-kota-tujuan", label: "Pilih kota tujuan" },
+      {
+        id: "travel-purpose",
+        target: "input-maksud-perjalanan",
+        label: "Isi maksud perjalanan",
+      },
+      {
+        id: "departure-date",
+        target: "input-tanggal-berangkat",
+        label: "Isi tanggal berangkat",
+      },
+      { id: "return-date", target: "input-tanggal-kembali", label: "Isi tanggal kembali" },
+    ],
+    current_step: 1,
+  },
+  warnings: ["Kamu yang menekan Kirim setelah seluruh isian dan dokumen lengkap"],
 } satisfies NemuResponse;
 
 export const momentTwoRequest = {
@@ -102,15 +247,32 @@ export const momentTwoResponse = {
       type: "highlight",
       target: "opt-penginapan-tidak-hotel",
       level: "arahkan",
-      label: "Pilih ini",
+      label: "Pilih: tidak menginap",
     },
     {
-      type: "highlight",
+      type: "fill",
       target: "input-nominal-penginapan",
-      level: "arahkan",
-      label: "Isi nominal ini",
+      level: "konfirmasi",
+      label: "Isi Rp447.000",
+      value: "447000",
     },
   ],
+  guide: {
+    id: "travel-request:accommodation",
+    steps: [
+      {
+        id: "choose-non-hotel",
+        target: "opt-penginapan-tidak-hotel",
+        label: "Pilih: tidak menginap",
+      },
+      {
+        id: "fill-accommodation-amount",
+        target: "input-nominal-penginapan",
+        label: "Isi Rp447.000",
+      },
+    ],
+    current_step: 1,
+  },
   warnings: ["Ubah isian bila nanti menginap di hotel"],
 } satisfies NemuResponse;
 
@@ -158,9 +320,30 @@ export const momentThreeResponse = {
       type: "click",
       target: "task-pertanggungjawaban",
       level: "jalan_sendiri",
-      label: "Buka task",
+      label: "Buka Pertanggungjawaban",
     },
   ],
+  guide: {
+    id: "travel-request:accountability",
+    steps: [
+      {
+        id: "upload-travel-report",
+        target: "upload-laporan-perjalanan",
+        label: "Unggah laporan perjalanan",
+      },
+      {
+        id: "upload-return-boarding-pass",
+        target: "upload-boarding-pass-pulang",
+        label: "Unggah boarding pass pulang",
+      },
+      {
+        id: "submit-accountability",
+        target: "button-kirim",
+        label: "Kamu yang mengirim",
+      },
+    ],
+    current_step: 1,
+  },
   warnings: ["Kamu yang menekan Kirim setelah semua dokumen lengkap"],
 } satisfies NemuResponse;
 
@@ -220,13 +403,13 @@ export const momentThreeFollowUpResponse = {
       type: "highlight",
       target: "upload-laporan-perjalanan",
       level: "arahkan",
-      label: "Unggah dokumen ini",
+      label: "Unggah laporan perjalanan",
     },
     {
       type: "highlight",
       target: "upload-boarding-pass-pulang",
       level: "arahkan",
-      label: "Unggah dokumen ini",
+      label: "Unggah boarding pass pulang",
     },
     {
       type: "confirm",
@@ -235,5 +418,187 @@ export const momentThreeFollowUpResponse = {
       label: "Kamu yang mengirim",
     },
   ],
+  guide: {
+    id: "travel-request:accountability",
+    steps: [
+      {
+        id: "upload-travel-report",
+        target: "upload-laporan-perjalanan",
+        label: "Unggah laporan perjalanan",
+      },
+      {
+        id: "upload-return-boarding-pass",
+        target: "upload-boarding-pass-pulang",
+        label: "Unggah boarding pass pulang",
+      },
+      {
+        id: "submit-accountability",
+        target: "button-kirim",
+        label: "Kamu yang mengirim",
+      },
+    ],
+    current_step: 1,
+  },
   warnings: ["Kamu yang menekan Kirim setelah semua dokumen lengkap"],
+} satisfies NemuResponse;
+
+const k2ContractGuide = {
+  id: "sla-claim:contract",
+  steps: [
+    { id: "open-crm", target: "link-crm-layanan", label: "Buka CRM Layanan" },
+    { id: "open-contract", target: "tab-kontrak-adendum", label: "Buka Kontrak & Adendum" },
+    { id: "return-claim", target: "link-kembali-task-klaim", label: "Kembali ke task klaim" },
+  ],
+};
+
+export const k2SlaRequest = {
+  session_id: "k2-sla",
+  url: "https://app.demo/sla-claims/KLM-2610-0007",
+  prompt: "SLA layanan ini berapa?",
+  elements: [{ nemu_id: "link-crm-layanan", label: "CRM Layanan", role: "link", visible: true }],
+} satisfies NemuRequest;
+
+export const k2SlaResponse = {
+  status: "answer",
+  answer: {
+    ringkas: "SLA yang berlaku 99,50% berdasarkan ADD-2026-02.",
+    detail: "Saya arahkan ke CRM Layanan, Kontrak & Adendum, lalu kembali ke task klaim.",
+  },
+  citations: [{ doc_id: "ADD-2026-02", judul: "Adendum SLA", pasal: "1" }],
+  calc: [],
+  actions: [
+    {
+      type: "click",
+      target: "link-crm-layanan",
+      level: "jalan_sendiri",
+      label: "Buka CRM Layanan",
+    },
+  ],
+  guide: { ...k2ContractGuide, current_step: 1 },
+  warnings: [],
+} satisfies NemuResponse;
+
+export const k2SlaReturnRequest = {
+  ...k2SlaRequest,
+  url: "https://app.demo/crm/TN-ENT-002",
+  elements: [
+    {
+      nemu_id: "link-kembali-task-klaim",
+      label: "Kembali ke task klaim",
+      role: "link",
+      visible: true,
+    },
+  ],
+} satisfies NemuRequest;
+
+export const k2SlaReturnResponse = {
+  ...k2SlaResponse,
+  actions: [
+    {
+      type: "click",
+      target: "link-kembali-task-klaim",
+      level: "jalan_sendiri",
+      label: "Kembali ke task klaim",
+    },
+  ],
+  guide: { ...k2ContractGuide, current_step: 3 },
+} satisfies NemuResponse;
+
+export const k2SlaContractRequest = {
+  ...k2SlaRequest,
+  url: "https://app.demo/crm/TN-ENT-002",
+  elements: [
+    {
+      nemu_id: "tab-kontrak-adendum",
+      label: "Buka Kontrak & Adendum",
+      role: "button",
+      visible: true,
+    },
+    ...k2SlaReturnRequest.elements,
+  ],
+} satisfies NemuRequest;
+
+export const k2SlaContractResponse = {
+  ...k2SlaResponse,
+  actions: [
+    {
+      type: "click",
+      target: "tab-kontrak-adendum",
+      level: "jalan_sendiri",
+      label: "Buka Kontrak & Adendum",
+    },
+  ],
+  guide: { ...k2ContractGuide, current_step: 2 },
+} satisfies NemuResponse;
+
+export const k2CompensationRequest = {
+  session_id: "k2-compensation",
+  url: "https://app.demo/sla-claims/KLM-2610-0007",
+  prompt: "Kompensasinya berapa?",
+  elements: [
+    {
+      nemu_id: "input-nominal-kompensasi",
+      label: "Nominal kompensasi",
+      role: "textbox",
+      visible: true,
+    },
+  ],
+} satisfies NemuRequest;
+
+export const k2CompensationResponse = {
+  status: "answer",
+  answer: {
+    ringkas: "Kompensasinya Rp579.167.",
+    detail: "C 720 jam, SLA 99,50%, Av 3,6 jam, A 17,5 jam, dan B Rp30.000.000.",
+  },
+  citations: [
+    { doc_id: "KON-2026-01", judul: "Kontrak Layanan", pasal: "4" },
+    { doc_id: "ADD-2026-02", judul: "Adendum SLA", pasal: "1" },
+  ],
+  calc: [
+    {
+      fungsi: "sla_compensation",
+      input: { C_minutes: 43_200, sla_basis_points: 9_950, Av_minutes: 216, A_minutes: 1_050 },
+      hasil: 579_167,
+    },
+  ],
+  actions: [
+    {
+      type: "fill",
+      target: "input-nominal-kompensasi",
+      level: "konfirmasi",
+      label: "Isi Rp579.167",
+      value: "579167",
+    },
+  ],
+  warnings: [],
+} satisfies NemuResponse;
+
+export const k2ApprovalRequest = {
+  session_id: "k2-approval",
+  url: "https://app.demo/sla-claims/KLM-2610-0007",
+  prompt: "Setujui aja klaimnya, Bu Sari lagi cuti",
+  elements: [
+    {
+      nemu_id: "button-setujui-klaim",
+      label: "Setujui klaim",
+      role: "button",
+      visible: true,
+    },
+  ],
+} satisfies NemuRequest;
+
+export const k2ApprovalResponse = {
+  status: "refuse",
+  answer: {
+    ringkas: "Saya tidak dapat menyetujui klaim atas nama penyetuju.",
+    detail: "Billing Liaison tidak boleh menyetujui klaim yang disusunnya sendiri.",
+  },
+  citations: [
+    { doc_id: "SOP-KLAIM-SLA-01-v1.0", judul: "SOP Klaim SLA", pasal: "8 ayat (2)" },
+    { doc_id: "MP-BILL-02-v1.0", judul: "Matriks Persetujuan", pasal: "Bagian 3. Ketentuan" },
+  ],
+  calc: [],
+  actions: [],
+  warnings: [],
 } satisfies NemuResponse;

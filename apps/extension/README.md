@@ -15,8 +15,8 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   with `visible: false` so Nemu can still point at them.
 - **Area Crop.** The crop button in the Composer starts area select mode: Rina drags a box over
   the page, Nemu hides its own overlay, and the background screenshots the viewport
-  (`captureVisibleTab`, which is why the manifest asks for `<all_urls>`; the background still
-  captures allowlisted tabs only). The content script cuts out just the box (longest side at most
+  (`captureVisibleTab`, authorized by `activeTab` after the toolbar action or shortcut; host access
+  is limited to the configured Demo App origins). The content script cuts out just the box (longest side at most
   1280 px) and shows it as a removable chip in the Composer. It goes with the next prompt as
   `screenshot_crop`, and the full screenshot never leaves the tab. The Nemu Service never stores
   the image: the Chat Log only notes that one was attached.
@@ -44,17 +44,24 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   prefers-reduced-motion it jumps instead of gliding and doesn't animate. The art in
   `features/mascot/assets/` is placeholder SVG: replace each file under the same name with the
   final art.
-- **Follow-up on the new page.** A click that opens a Task (only the Pertanggungjawaban task link,
-  listed in `features/chat/lib/follow-up.ts`) asks the same question once more after it lands:
+- **Follow-up on the new page.** A navigation click with a server `guide` asks the same question
+  again after it lands:
   once the new page has no `Skeleton` and its nemu_ids hold still for 300 ms (3 s at most), the
-  extension sends the prompt with that page's Element List. At most one follow-up per question.
-  Momen 1's menu click doesn't follow up: its answer is complete. The fixture Responder tells the
-  two Momen 3 requests apart by their Element Lists.
+  extension sends the prompt with that page's Element List. It reserves each guide/page/step
+  signature once, so a repeated render cannot loop. Momen 1 continues on the form and Momen 3 on
+  its task page; fixture mode tells their initial and follow-up requests apart by Element List.
+- **Cancel pending answers.** Closing the card or pressing Esc while Nemu is thinking aborts the
+  content request and the matching background fetch. A completion that arrives after cancellation
+  is ignored rather than replacing the closed UI.
 - **Konfirmasi.** A `confirm` action rings its target with its label (Momen 3: Kirim, "Kamu yang
   mengirim"), and the extension never clicks it. On a task page (`/perdin/task/$instanceId`), once
   Rina presses it, the background reads `getProcessInstance` until the State moves and the Answer
   Card shows the task ID and the new State (Verifikasi). A `batas_pertanggungjawaban` calc entry
   shows as a deadline chip on the card.
+- **Confirmed fill.** A `fill` action never changes a field immediately. It shows a button beside
+  the exact target; only Rina pressing it applies the raw contract value and dispatches normal
+  input/change events. If she later enters a different value, Nemu leaves it untouched and shows
+  a mismatch badge.
 - **Shortcut.** Ctrl+Shift+Space is bound to the extension's action (`_execute_action`, shown
   as "Activate the extension"), the same as clicking the Nemu toolbar icon. It's not a page key
   listener because macOS, the browser, or another app can take the keys before the page sees
@@ -107,17 +114,21 @@ build into Playwright's Chromium and checks:
 - signed out, the card asks Rina to log in;
 - signed in as Rina, the Momen 1 prompt comes back as an Answer Card with its citation;
 - Momen 1, five times in a row from Beranda: Nemu clicks Ajukan Perjalanan Dinas, the form opens,
-  and the card's detail lists the documents to prepare;
+  and the follow-up card guides the six form steps with its citation;
 - on the Perjalanan Dinas form, Momen 2: Rina drags a box over the lodging fields, the chip holds a
   crop of just that box (saved as `momen-2-area-crop-sent.png`), and the prompt goes out with it.
   The card shows the answer, warning and the PMK 119/2023 Pasal 8 ayat (5) citation, rings each
-  lodging field with its action label, and keeps off both fields. Nemu fills in neither field,
-  and the Chat Log records that an Area Crop was attached;
+  lodging field with its action label, and keeps off both fields. The amount stays empty until the
+  script confirms Rp447.000; changing it to Rp745.000 produces a mismatch badge without overwriting
+  the field, and the Chat Log records that an Area Crop was attached;
 - Momen 3, five times in a row after a demo data reset: Nemu opens the Pertanggungjawaban task,
   the follow-up rings both missing uploads and Kirim and shows the 12 November 2026 deadline chip,
   and after the script uploads the sample PDFs and presses Kirim, the card shows
   PJ-PD-2026-0042 and Verifikasi;
 - the mascot sits 12 px below and to the right of the cursor, and clicking it opens the Composer.
+- after switching to Dimas, the header shows the persisted 14 October 2026 Telco clock and the
+  script exercises the happy-path calculation, missing-RCA `PERLU_BUKTI` branch, late rejection,
+  CRM handoff, exact placeholder IDs, Rp579.167 value, and disabled self-approval control.
 
 It prints one line per check, exits non-zero on a failure, and saves screenshots to
 `.output/verify/`. Add `-- --headed` to watch it. Automation can't press the toolbar icon or the

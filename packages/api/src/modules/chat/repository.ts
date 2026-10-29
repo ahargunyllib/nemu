@@ -8,7 +8,7 @@ export type ChatLogEntry = ChatLogRecord & { user: { name: string; email: string
 
 export type ChatLogRepository = {
   insert(record: NewChatLogRecord): Promise<void>;
-  listNewest(limit: number): Promise<ChatLogEntry[]>;
+  listNewest(limit: number, workspaceId: string): Promise<ChatLogEntry[]>;
 };
 
 export function createChatLogRepository(db: Database): ChatLogRepository {
@@ -16,7 +16,7 @@ export function createChatLogRepository(db: Database): ChatLogRepository {
     async insert(record) {
       await db.insert(chatLog).values(record);
     },
-    listNewest(limit) {
+    listNewest(limit, workspaceId) {
       return db
         .select({
           ...getColumns(chatLog),
@@ -24,6 +24,7 @@ export function createChatLogRepository(db: Database): ChatLogRepository {
         })
         .from(chatLog)
         .leftJoin(user, eq(chatLog.userId, user.id))
+        .where(eq(user.workspaceId, workspaceId))
         .orderBy(desc(chatLog.createdAt))
         .limit(limit);
     },

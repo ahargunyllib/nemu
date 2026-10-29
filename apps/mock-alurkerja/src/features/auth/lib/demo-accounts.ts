@@ -14,9 +14,16 @@ export const DEMO_ACCOUNTS = [
     email: "verifikator@nemu.demo",
     password: "verifikator-demo-2026",
   },
+  {
+    nemuId: NEMU_IDS.login.signInAsDimas,
+    label: "Masuk sebagai Dimas (Billing Liaison)",
+    email: "dimas@nemu.demo",
+    password: "dimas-demo-2026",
+  },
 ] as const;
 
 export const ROLE_LABELS: Record<string, string> = {
   pegawai: "Pegawai",
   verifikator: "Verifikator",
+  billing_liaison: "Billing Liaison",
 };

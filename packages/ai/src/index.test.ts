@@ -32,6 +32,51 @@ import {
   type JevDecider,
 } from "./index.js";
 
+function activeKnowledgeChunkId(location: {
+  docId: string;
+  page: number;
+  article: string;
+}): string {
+  const chunk = DEMO_KNOWLEDGE_CHUNKS.find(
+    (candidate) =>
+      candidate.active &&
+      candidate.docId === location.docId &&
+      candidate.page === location.page &&
+      candidate.article === location.article,
+  );
+  assert.ok(chunk, `Missing active knowledge chunk at ${JSON.stringify(location)}`);
+  return chunk.id;
+}
+
+const accommodationCitationId = activeKnowledgeChunkId({
+  docId: "pmk-119-2023",
+  page: 6,
+  article: "8 ayat (5)",
+});
+
+test("generated legal chunks preserve exact page and article boundaries", () => {
+  const deadlineChunk = DEMO_KNOWLEDGE_CHUNKS.find(
+    (chunk) =>
+      chunk.id ===
+      activeKnowledgeChunkId({
+        docId: "pmk-113-2012",
+        page: 9,
+        article: "34 ayat (1)",
+      }),
+  );
+  const accommodationChunk = DEMO_KNOWLEDGE_CHUNKS.find(
+    (chunk) => chunk.id === accommodationCitationId,
+  );
+
+  assert.match(deadlineChunk?.text ?? "", /5 \(lima\) hari kerja/u);
+  assert.match(accommodationChunk?.text ?? "", /30% \(tiga puluh persen\)/u);
+  assert.ok(
+    DEMO_KNOWLEDGE_CHUNKS.filter((chunk) => chunk.docId === "panduan-app").every(
+      (chunk) => chunk.article === undefined,
+    ),
+  );
+});
+
 test("calculates the two-night non-hotel lump sum", () => {
   const result = calculateAccommodationLumpSum(745_000, 2);
   assert.equal(result.hasil, 447_000);
@@ -171,6 +216,9 @@ test("Moment 1 ignores an unrelated active process and opens a new request", asy
       label: "Buka formulir",
     },
   ]);
+  assert.equal(response.guide?.id, "travel-request:create");
+  assert.equal(response.guide?.current_step, 1);
+  assert.equal(response.guide?.steps.length, 6);
 });
 
 test("Moment 1 takes precedence when other workflow controls are also visible", async () => {
@@ -249,14 +297,14 @@ test("Moment 2 uses trusted workflow context when Jev returns a non-ideal decisi
     const guidedInput = input as typeof input & { workflowGuidance?: readonly string[] };
     assert.equal(input.calculations.at(-1)?.hasil, 447_000);
     assert.equal(
-      guidedInput.workflowGuidance?.some((guidance) => guidance.includes("entered manually")),
+      guidedInput.workflowGuidance?.some((guidance) => guidance.includes("user-confirmed fill")),
       true,
     );
     return {
       status: "answer",
       ringkas: "Pilih Tidak menginap di hotel. Hak penginapanmu adalah Rp447.000.",
       detail: "Nilainya dihitung dari 30 persen tarif hotel untuk dua malam.",
-      citationIds: ["pmk-119-2023-page-6"],
+      citationIds: [accommodationCitationId],
       warnings: ["Ubah isian bila nanti menginap di hotel"],
     };
   };
@@ -275,21 +323,102 @@ test("Moment 2 uses trusted workflow context when Jev returns a non-ideal decisi
 
   assert.equal(response.status, "answer");
   assert.equal(response.calc.at(-1)?.hasil, 447_000);
-  assert.equal(response.citations[0]?.halaman, 6);
+  assert.equal(
+    response.citations.filter(
+      (citation) =>
+        citation.doc_id === "pmk-119-2023" &&
+        citation.pasal === "8 ayat (5)" &&
+        citation.halaman === 6,
+    ).length,
+    1,
+  );
+  assert.equal(
+    response.citations.some(
+      (citation) => citation.doc_id === "pmk-32-2025" && citation.halaman === 19,
+    ),
+    true,
+  );
   assert.deepEqual(response.actions, [
     {
       type: "highlight",
       target: "opt-penginapan-tidak-hotel",
       level: "arahkan",
-      label: "Periksa ini",
+      label: "Pilih: tidak menginap",
     },
     {
-      type: "highlight",
+      type: "fill",
       target: "input-nominal-penginapan",
-      level: "arahkan",
-      label: "Periksa ini",
+      level: "konfirmasi",
+      label: "Isi Rp447.000",
+      value: "447000",
     },
   ]);
+  assert.equal(response.guide?.id, "travel-request:accommodation");
+  assert.equal(response.guide?.current_step, 1);
+  assert.deepEqual(
+    response.guide?.steps.map(({ label }) => label),
+    ["Pilih: tidak menginap", "Isi Rp447.000"],
+  );
+  assert.equal(
+    response.actions.some((action) => "value" in action && action.value === "745000"),
+    false,
+  );
+});
+
+test("Moment 2 never fills a hidden or missing nominal target", async () => {
+  const nominalTarget = momentTwoRequest.elements.find(
+    (element) => element.nemu_id === "input-nominal-penginapan",
+  );
+  assert.ok(nominalTarget);
+
+  const requests = [
+    {
+      ...momentTwoRequest,
+      elements: momentTwoRequest.elements.map((element) =>
+        element.nemu_id === nominalTarget.nemu_id ? { ...element, visible: false } : element,
+      ),
+    },
+    {
+      ...momentTwoRequest,
+      elements: momentTwoRequest.elements.filter(
+        (element) => element.nemu_id !== nominalTarget.nemu_id,
+      ),
+    },
+  ];
+
+  for (const request of requests) {
+    const response = await runNemu(request, {
+      userProfile: DEMO_USER_PROFILE,
+      knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      sbmRows: DEMO_SBM_ROWS,
+      holidays: DEMO_HOLIDAYS_2026,
+      requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+      currentDate: "2026-11-06",
+      jevDecider: async () => ({
+        intent: "accommodation_question",
+        intentConfidence: 0.99,
+        withinDomainProbability: 0.99,
+        injectionProbability: 0,
+        requiredTool: "lookup_sbm_and_accommodation",
+        actionLevel: "konfirmasi",
+        actionConfidence: 0.99,
+        target: "input-nominal-penginapan",
+        targetConfidence: 0.99,
+      }),
+      answerGenerator: async () => ({
+        status: "answer",
+        ringkas: "Gunakan hasil hitung Rp447.000.",
+        detail: "Kamu tetap mengonfirmasi sebelum nilai dimasukkan.",
+        citationIds: [accommodationCitationId],
+        warnings: [],
+      }),
+    });
+
+    assert.equal(
+      response.actions.some((action) => action.type === "fill"),
+      false,
+    );
+  }
 });
 
 test("recognized start intent opens the safe menu even at low confidence", async () => {
@@ -466,12 +595,25 @@ test("start intent on the request form guides its six required fields in order",
 
   assert.deepEqual(
     response.actions,
-    targets.map((target) => ({
+    targets.map((target, index) => ({
       type: "highlight",
       target,
       level: "arahkan",
-      label: "Periksa ini",
+      label: [
+        "Pilih jenis perjalanan",
+        "Isi nomor surat tugas",
+        "Pilih kota tujuan",
+        "Isi maksud perjalanan",
+        "Isi tanggal berangkat",
+        "Isi tanggal kembali",
+      ][index],
     })),
+  );
+  assert.equal(response.guide?.id, "travel-request:create");
+  assert.equal(response.guide?.current_step, 1);
+  assert.deepEqual(
+    response.guide?.steps.map(({ target }) => target),
+    targets,
   );
 });
 
@@ -564,18 +706,33 @@ test("Moment 3 follow-up uses trusted workflow context when Jev returns a non-id
     ),
     true,
   );
+  assert.equal(
+    response.calc.some(
+      (calculation) => calculation.fungsi === "sisa_hari_kerja" && calculation.hasil === 4,
+    ),
+    true,
+  );
+  assert.equal(
+    response.citations.some(
+      (citation) =>
+        citation.doc_id === "pmk-113-2012" &&
+        citation.pasal === "34 ayat (1)" &&
+        citation.halaman === 9,
+    ),
+    true,
+  );
   assert.deepEqual(response.actions, [
     {
       type: "highlight",
       target: "upload-laporan-perjalanan",
       level: "arahkan",
-      label: "Unggah dokumen ini",
+      label: "Unggah laporan perjalanan",
     },
     {
       type: "highlight",
       target: "upload-boarding-pass-pulang",
       level: "arahkan",
-      label: "Unggah dokumen ini",
+      label: "Unggah boarding pass pulang",
     },
     {
       type: "confirm",
@@ -584,6 +741,55 @@ test("Moment 3 follow-up uses trusted workflow context when Jev returns a non-id
       label: "Kamu yang mengirim",
     },
   ]);
+  assert.equal(response.guide?.id, "travel-request:accountability");
+  assert.equal(response.guide?.current_step, 1);
+});
+
+test("accountability guidance uses the final control label from the current page", async () => {
+  let receivedGuidance: readonly string[] = [];
+  const response = await runNemu(
+    {
+      ...momentThreeFollowUpRequest,
+      elements: momentThreeFollowUpRequest.elements.map((element) =>
+        element.nemu_id === "button-kirim" ? { ...element, label: "Complete Task" } : element,
+      ),
+    },
+    {
+      userProfile: DEMO_USER_PROFILE,
+      knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      sbmRows: DEMO_SBM_ROWS,
+      holidays: DEMO_HOLIDAYS_2026,
+      requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+      currentDate: "2026-11-06",
+      jevDecider: async () => ({
+        intent: "accountability_question",
+        intentConfidence: 0.99,
+        withinDomainProbability: 0.99,
+        injectionProbability: 0,
+        requiredTool: "accountability_deadline",
+        actionLevel: "arahkan",
+        actionConfidence: 0.99,
+        target: "upload-laporan-perjalanan",
+        targetConfidence: 0.99,
+      }),
+      answerGenerator: async (input) => {
+        receivedGuidance = input.workflowGuidance ?? [];
+        return {
+          status: "answer",
+          ringkas: "Lengkapi dokumen, lalu gunakan Complete Task.",
+          detail: "Kamu yang menyelesaikan task setelah memeriksa dokumen.",
+          citationIds: ["sop-pd-01-section-4"],
+          warnings: [],
+        };
+      },
+    },
+  );
+
+  assert.equal(response.status, "answer");
+  assert.equal(
+    receivedGuidance.some((guidance) => guidance.includes("Complete Task")),
+    true,
+  );
 });
 
 test("workflow guidance includes missing accountability controls that are rendered off-screen", async () => {
@@ -636,7 +842,7 @@ test("workflow guidance includes missing accountability controls that are render
       type: "highlight",
       target: "upload-boarding-pass-pulang",
       level: "arahkan",
-      label: "Unggah dokumen ini",
+      label: "Unggah boarding pass pulang",
     },
     {
       type: "confirm",
@@ -837,9 +1043,11 @@ test("Moment 3 initial page keeps the task-navigation click", async () => {
       type: "click",
       target: "task-pertanggungjawaban",
       level: "jalan_sendiri",
-      label: "Buka ini",
+      label: "Buka Pertanggungjawaban",
     },
   ]);
+  assert.equal(response.guide?.id, "travel-request:accountability");
+  assert.equal(response.guide?.current_step, 1);
 });
 
 test("an unknown target never produces an action", async () => {
@@ -969,6 +1177,69 @@ test("out-of-domain requests are refused without calling GPT", async () => {
   assert.equal(answerGeneratorCalled, false);
 });
 
+test("a refused second request never inherits the first response's derived data", async () => {
+  const sharedContext = {
+    userProfile: DEMO_USER_PROFILE,
+    knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    sbmRows: DEMO_SBM_ROWS,
+    holidays: DEMO_HOLIDAYS_2026,
+    requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+    currentDate: "2026-11-06",
+  };
+  const firstResponse = await runNemu(momentTwoRequest, {
+    ...sharedContext,
+    jevDecider: async () => ({
+      intent: "accommodation_question",
+      intentConfidence: 0.99,
+      withinDomainProbability: 0.99,
+      injectionProbability: 0,
+      requiredTool: "lookup_sbm_and_accommodation",
+      actionLevel: "konfirmasi",
+      actionConfidence: 0.99,
+      target: "input-nominal-penginapan",
+      targetConfidence: 0.99,
+    }),
+    answerGenerator: async () => ({
+      status: "answer",
+      ringkas: "Gunakan hasil hitung Rp447.000.",
+      detail: "Kamu tetap mengonfirmasi sebelum nilai dimasukkan.",
+      citationIds: [accommodationCitationId],
+      warnings: [],
+    }),
+  });
+  assert.notEqual(firstResponse.calc.length, 0);
+
+  const refusedResponse = await runNemu(
+    {
+      ...momentTwoRequest,
+      prompt: "Uang harian ke Tokyo berapa?",
+    },
+    {
+      ...sharedContext,
+      jevDecider: async () => ({
+        intent: "unsupported",
+        intentConfidence: 0.99,
+        withinDomainProbability: 0.01,
+        injectionProbability: 0,
+        requiredTool: "none",
+        actionLevel: "dilarang",
+        actionConfidence: 0.99,
+        target: null,
+        targetConfidence: 0.99,
+      }),
+      answerGenerator: async () => {
+        throw new Error("refused requests must not call the answer generator");
+      },
+    },
+  );
+
+  assert.equal(refusedResponse.status, "refuse");
+  assert.deepEqual(refusedResponse.calc, []);
+  assert.deepEqual(refusedResponse.actions, []);
+  assert.deepEqual(refusedResponse.citations, []);
+  assert.equal(refusedResponse.guide, undefined);
+});
+
 test("missing SBM lookup input asks one clarification without calling GPT", async () => {
   let answerGeneratorCalled = false;
   const request = {
@@ -1033,13 +1304,57 @@ test("untrusted rupiah amounts from GPT are rejected", async () => {
       status: "answer",
       ringkas: "Nominalnya Rp999.000.",
       detail: "Nilai ini tidak berasal dari hasil hitung.",
-      citationIds: ["pmk-119-2023-page-6"],
+      citationIds: [accommodationCitationId],
       warnings: [],
     }),
   });
 
   assert.equal(response.status, "error");
   assert.deepEqual(response.actions, []);
+});
+
+test("missing or inactive deterministic tool provenance returns the safe error response", async () => {
+  const inactiveCitationId = DEMO_KNOWLEDGE_CHUNKS.find((chunk) => !chunk.active)?.id;
+  assert.ok(inactiveCitationId);
+
+  for (const sourceCitationId of ["missing-tool-source", inactiveCitationId]) {
+    const response = await runNemu(momentTwoRequest, {
+      userProfile: DEMO_USER_PROFILE,
+      processContext: momentTwoRequest.process_context,
+      knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      sbmRows: DEMO_SBM_ROWS.map((row) =>
+        row.component === "hotel" && row.province === "SULAWESI SELATAN" && row.grade === "III"
+          ? { ...row, sourceCitationId }
+          : row,
+      ),
+      holidays: [],
+      requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+      currentDate: "2026-10-17",
+      jevDecider: async () => ({
+        intent: "accommodation_question",
+        intentConfidence: 0.99,
+        withinDomainProbability: 0.99,
+        injectionProbability: 0,
+        requiredTool: "lookup_sbm_and_accommodation",
+        actionLevel: "konfirmasi",
+        actionConfidence: 0.99,
+        target: "input-nominal-penginapan",
+        targetConfidence: 0.99,
+      }),
+      answerGenerator: async () => ({
+        status: "answer",
+        ringkas: "Gunakan hasil hitung Rp447.000.",
+        detail: "Kamu tetap mengonfirmasi sebelum nilai dimasukkan.",
+        citationIds: [accommodationCitationId],
+        warnings: [],
+      }),
+    });
+
+    assert.equal(response.status, "error");
+    assert.deepEqual(response.citations, []);
+    assert.deepEqual(response.calc, []);
+    assert.deepEqual(response.actions, []);
+  }
 });
 
 test("a screenshot-only question receives active evidence for vision interpretation", async () => {
@@ -1071,7 +1386,7 @@ test("a screenshot-only question receives active evidence for vision interpretat
           status: "answer",
           ringkas: "Pilih opsi tidak menginap di hotel dengan nilai Rp447.000.",
           detail: "Potongan layar menunjukkan bagian penginapan.",
-          citationIds: ["pmk-119-2023-page-6"],
+          citationIds: [accommodationCitationId],
           warnings: [],
         };
       },
@@ -1079,7 +1394,7 @@ test("a screenshot-only question receives active evidence for vision interpretat
   );
 
   assert.equal(response.status, "answer");
-  assert.equal(receivedEvidenceIds.includes("pmk-119-2023-page-6"), true);
+  assert.equal(receivedEvidenceIds.includes(accommodationCitationId), true);
   assert.equal(
     receivedEvidenceIds.some((id) => id.startsWith("pmk-54-2026")),
     false,
@@ -1102,7 +1417,7 @@ test("the OpenRouter Responses adapter sends workflow guidance, crop, and strict
             status: "answer",
             ringkas: "Pilih opsi tidak menginap di hotel.",
             detail: "Ikuti aturan pada sumber yang diberikan.",
-            citation_ids: ["pmk-119-2023-page-6"],
+            citation_ids: [accommodationCitationId],
             warnings: [],
           }),
         }),

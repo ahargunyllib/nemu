@@ -7,6 +7,12 @@ export const nemuIntentSchema = z.enum([
   "start_travel_request",
   "accommodation_question",
   "accountability_question",
+  "start_sla_claim",
+  "claim_cutoff",
+  "claim_sla",
+  "claim_tickets",
+  "claim_compensation",
+  "claim_approval",
   "unsupported",
   "unclear",
 ]);
@@ -16,6 +22,10 @@ export const requiredToolSchema = z.enum([
   "lookup_sbm_and_accommodation",
   "accountability_deadline",
   "process_status",
+  "claim_cutoff",
+  "merge_claim_intervals",
+  "calculate_sla_compensation",
+  "claim_approval_route",
 ]);
 
 export const decisionActionLevelSchema = z.enum([
@@ -153,16 +163,26 @@ export function createJevDecider(config: JevClientConfig): JevDecider {
                   "The user asks about accommodation, hotel, staying with relatives, or accommodation cost fields.",
                 accountability_question:
                   "The user has returned and asks about accountability, missing documents, deadlines, or verification.",
+                start_sla_claim:
+                  "The user wants to begin, open, register, or navigate to a telecom SLA compensation claim.",
+                claim_cutoff:
+                  "The user asks whether an SLA claim was received by its filing deadline.",
+                claim_sla: "The user asks which contracted SLA or availability percentage applies.",
+                claim_tickets:
+                  "The user asks which incident intervals count, overlap, merge, or are excluded by RCA.",
+                claim_compensation:
+                  "The user asks for the deterministic SLA compensation amount or its inputs.",
+                claim_approval: "The user asks who must approve an SLA compensation amount.",
                 unsupported:
-                  "The user request is completely outside the government business-travel domain (e.g. food recipes, stocks, general HR leave, poetry, general chat).",
+                  "The request is outside the available business-travel and telecom SLA-claim workflows (e.g. food recipes, stocks, poetry, general chat).",
                 unclear:
-                  "The user asks about business-travel policies, rules, cancellations, geotagging, or tickets where no specific navigation action is needed.",
+                  "The user asks about an available workflow rule where no more specific intent applies.",
               },
             },
             within_domain: {
               type: "noul",
               instructions:
-                "Is the user's request within the organization's business-travel workflow domain?",
+                "Is the request within either available organization workflow: business travel or telecom SLA claims?",
             },
             contains_injection: {
               type: "noul",
@@ -179,6 +199,13 @@ export function createJevDecider(config: JevClientConfig): JevDecider {
                 accountability_deadline:
                   "Calculate the five-working-day accountability deadline and missing documents.",
                 process_status: "Read and explain the trusted workflow process status.",
+                claim_cutoff: "Compare the billing email receipt stamp with the claim cutoff.",
+                merge_claim_intervals:
+                  "Merge overlapping incident intervals and exclude only intervals supported by approved RCA evidence.",
+                calculate_sla_compensation:
+                  "Calculate SLA compensation from period minutes, SLA basis points, verified downtime, and monthly fee.",
+                claim_approval_route:
+                  "Select the approval route for the verified compensation amount.",
               },
             },
             action_level: {

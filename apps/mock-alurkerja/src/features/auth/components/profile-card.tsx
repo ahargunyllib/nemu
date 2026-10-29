@@ -8,7 +8,13 @@ import {
 
 import { ROLE_LABELS } from "@/features/auth/lib/demo-accounts";
 
-type Profile = { name: string; golongan?: string | null; role?: string | null };
+type Profile = {
+  name: string;
+  golongan?: string | null;
+  role?: string | null;
+  unit?: string | null;
+  workspaceId?: string | null;
+};
 
 export default function ProfileCard({ user }: { user: Profile }) {
   const role = ROLE_LABELS[user.role ?? ""] ?? "Pegawai";
@@ -23,7 +29,9 @@ export default function ProfileCard({ user }: { user: Profile }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="text-muted-foreground">
-        Pilih menu di samping untuk mengajukan Perjalanan Dinas atau melanjutkan tugas Anda.
+        {user.workspaceId === "W-TELKO"
+          ? `Kelola klaim SLA dan data pendukung${user.unit ? ` untuk ${user.unit}` : ""}.`
+          : "Pilih menu di samping untuk mengajukan Perjalanan Dinas atau melanjutkan tugas Anda."}
       </CardContent>
     </Card>
   );

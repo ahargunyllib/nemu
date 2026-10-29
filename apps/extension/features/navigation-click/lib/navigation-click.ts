@@ -80,7 +80,7 @@ export async function runNavigationClick({
   element.click();
 
   onFrame({ mascot: "clicking", step: "check", at: to, moveMs: 0 });
-  const changed = await waitForChange(root, before);
+  const changed = await waitForChange(root, before, target);
   onFrame({ mascot: changed ? "success" : "warning", at: to });
   return changed ? "succeeded" : "no-change";
 }
@@ -125,10 +125,15 @@ function nemuIdsOn(root: Document): Set<string> {
   );
 }
 
-/** The click worked when the URL changed or an element with a new nemu_id appeared. */
-async function waitForChange(root: Document, before: PageSnapshot): Promise<boolean> {
+/** The click worked when the URL changed, the completed target disappeared, or a new target appeared. */
+async function waitForChange(
+  root: Document,
+  before: PageSnapshot,
+  clickedTarget: string,
+): Promise<boolean> {
   for (let waited = 0; waited <= CHECK_TIMEOUT_MS; waited += CHECK_INTERVAL_MS) {
     if (root.location.href !== before.url) return true;
+    if (!findTarget(root, clickedTarget)) return true;
     for (const nemuId of nemuIdsOn(root)) if (!before.nemuIds.has(nemuId)) return true;
     await new Promise((resolve) => setTimeout(resolve, CHECK_INTERVAL_MS));
   }

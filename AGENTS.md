@@ -14,6 +14,10 @@ The Nemu Service is a modular monolith: `apps/server` composes it, and feature m
 
 The Demo App (`apps/mock-alurkerja`) and the Nemu Extension use route-owned (or entrypoint-owned) page composition and responsibility-based feature slices. Follow `docs/agents/frontend-architecture.md` for placement, composition, search validation, and audit rules.
 
+### End-to-end completion
+
+Treat a shared contract or provider response as an intermediate boundary, not a completed feature. A requirement is complete only when its producing service, consuming UI, and observable acceptance path all work together; keep partial layers explicitly marked as partial. For example, the confirmed `fill` action is complete only when the extension renders the user-controlled **Isi** action, applies its value after the click, and detects a later mismatch—not when the AI schema merely emits it. See ADR-0003.
+
 ### Third-party providers
 
 Wire in a paid third-party provider only once the user has chosen it. Until then, ship the adapter interface, inject it so tests use a fake, and fail clearly as missing configuration. For example, `nemuChat` reaches OpenRouter only through the `NemuService` seam, so a fixture responder can stand in for it (ADR-0001).

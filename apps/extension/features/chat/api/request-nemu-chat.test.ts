@@ -8,7 +8,7 @@ import { type NemuChatClient, requestNemuChat } from "./request-nemu-chat";
 
 const DEMO_APP_PAGE = "http://localhost:3001/";
 
-function fakeClient(respond: (request: NemuRequest) => Promise<unknown>) {
+function fakeClient(respond: (request: NemuRequest, signal?: AbortSignal) => Promise<unknown>) {
   const nemuChat = vi.fn(respond);
   const client: NemuChatClient = { nemuChat };
   return { client, nemuChat };
@@ -23,6 +23,15 @@ describe("requestNemuChat", () => {
     expect(result).toEqual({ kind: "response", response: momentOneResponse });
     expect(nemuChat).toHaveBeenCalledOnce();
     expect(nemuChat.mock.calls[0]?.[0]).not.toHaveProperty("user_id");
+  });
+
+  test("passes cancellation to the Nemu Service client", async () => {
+    const controller = new AbortController();
+    const { client, nemuChat } = fakeClient(async () => momentOneResponse);
+
+    await requestNemuChat(client, momentOneRequest, DEMO_APP_PAGE, controller.signal);
+
+    expect(nemuChat.mock.calls[0]?.[1]).toBe(controller.signal);
   });
 
   test("asks the user to log in when the Demo App session is missing", async () => {
@@ -69,7 +78,7 @@ describe("requestNemuChat", () => {
 
     const result = await requestNemuChat(client, request, pageUrl);
 
-    expect(result.kind).toBe("error");
+    expect(result?.kind).toBe("error");
     expect(nemuChat).not.toHaveBeenCalled();
   });
 });

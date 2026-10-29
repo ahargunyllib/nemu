@@ -5,6 +5,8 @@ import {
 } from "./demo.generated.js";
 import type { NemuUserProfile } from "./openai.js";
 
+// Offline test/evaluation fixtures only. The production server loads the equivalent
+// profile, active chunks, reference tables, and holidays from database repositories.
 export const DEMO_USER_PROFILE: NemuUserProfile = {
   userId: "rina",
   name: "Rina Pratiwi",

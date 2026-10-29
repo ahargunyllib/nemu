@@ -1,0 +1,4 @@
+claim_id,fixture,pelanggan,nomor_surat,service_id,periode,tanggal_surat,diterima,jam_diklaim,invoice_disebut,catatan
+KLM-2610-0007,C01,PT Arunika Retail,ARN/IT/118/X/2026,TN-ENT-002,2026-09,2026-10-06,2026-10-08T14:12:00+07:00,25.5,INV-2609-0042,Kasus utama demo
+KLM-2610-0009,C02,PT Arunika Retail,ARN/IT/121/X/2026,TN-ENT-001,2026-09,2026-10-09,2026-10-09T10:05:00+07:00,21,INV-2609-0041,Satu tiket belum ada RCA
+KLM-2610-0011,C03,PT Arunika Retail,ARN/IT/119/X/2026,TN-ENT-003,2026-08,2026-10-07,2026-10-08T15:40:00+07:00,9,INV-2608-0039,Lewat batas pengajuan

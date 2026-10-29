@@ -2,13 +2,14 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 
 import type { Context } from "../../context";
-import { protectedProcedure } from "../../index";
+import { workspaceAdminProcedure } from "../../index";
 import { createDocumentRepository } from "./repository";
 import {
   deleteDocument,
   documentFormatOf,
   listDocuments,
   readDocumentFile,
+  MAX_DOCUMENT_BYTES,
   setDocumentActive,
   uploadDocument,
 } from "./service";
@@ -26,36 +27,59 @@ const uploadDocumentInputSchema = z.object({
   isActive: z.boolean(),
   file: z
     .instanceof(File)
-    .refine((file) => documentFormatOf(file.name) !== null, "Upload a PDF or Markdown (.md) file"),
+    .refine((file) => documentFormatOf(file.name) !== null, "Upload a PDF or Markdown (.md) file")
+    .refine((file) => file.size <= MAX_DOCUMENT_BYTES, "Upload a file no larger than 10 MB"),
 });
 
 const documentIdSchema = z.object({ id: z.string().min(1) });
 
 export const documentsRouter = {
-  uploadDocument: protectedProcedure
+  uploadDocument: workspaceAdminProcedure
     .input(uploadDocumentInputSchema)
-    .handler(({ context, input }) => uploadDocument(documentDeps(context), input)),
+    .handler(({ context, input }) =>
+      uploadDocument(documentDeps(context), {
+        ...input,
+        workspaceId: context.session.user.workspaceId as "W-TRAVEL" | "W-TELKO",
+      }),
+    ),
 
-  listDocuments: protectedProcedure.handler(({ context }) => listDocuments(documentDeps(context))),
+  listDocuments: workspaceAdminProcedure.handler(({ context }) =>
+    listDocuments(documentDeps(context), context.session.user.workspaceId),
+  ),
 
-  setDocumentActive: protectedProcedure
+  setDocumentActive: workspaceAdminProcedure
     .input(documentIdSchema.extend({ isActive: z.boolean() }))
     .handler(async ({ context, input }) => {
-      const document = await setDocumentActive(documentDeps(context), input.id, input.isActive);
+      const document = await setDocumentActive(
+        documentDeps(context),
+        context.session.user.workspaceId,
+        input.id,
+        input.isActive,
+      );
       if (!document) throw new ORPCError("NOT_FOUND", { message: "Document not found" });
       return document;
     }),
 
-  deleteDocument: protectedProcedure.input(documentIdSchema).handler(async ({ context, input }) => {
-    const document = await deleteDocument(documentDeps(context), input.id);
-    if (!document) throw new ORPCError("NOT_FOUND", { message: "Document not found" });
-    return document;
-  }),
-
-  getDocumentFile: protectedProcedure
+  deleteDocument: workspaceAdminProcedure
     .input(documentIdSchema)
     .handler(async ({ context, input }) => {
-      const result = await readDocumentFile(documentDeps(context), input.id);
+      const document = await deleteDocument(
+        documentDeps(context),
+        context.session.user.workspaceId,
+        input.id,
+      );
+      if (!document) throw new ORPCError("NOT_FOUND", { message: "Document not found" });
+      return document;
+    }),
+
+  getDocumentFile: workspaceAdminProcedure
+    .input(documentIdSchema)
+    .handler(async ({ context, input }) => {
+      const result = await readDocumentFile(
+        documentDeps(context),
+        context.session.user.workspaceId,
+        input.id,
+      );
       if (!result) throw new ORPCError("NOT_FOUND", { message: "Document file not found" });
       return new File([result.body], result.document.fileName, {
         type: result.document.contentType,

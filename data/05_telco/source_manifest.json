@@ -1,0 +1,67 @@
+{
+  "source": "External team package; private storage locators intentionally omitted",
+  "imported_at": "2026-10-29",
+  "synthetic": true,
+  "files": [
+    {
+      "path": "data/05_telco/01_knowledge/01_SOP-KLAIM-SLA-01_v1.0.md",
+      "classification": "knowledge-active"
+    },
+    {
+      "path": "data/05_telco/01_knowledge/02_Kontrak-Layanan-KON-2026-01.md",
+      "classification": "knowledge-active"
+    },
+    {
+      "path": "data/05_telco/01_knowledge/03_Adendum-ADD-2026-02.md",
+      "classification": "knowledge-active"
+    },
+    {
+      "path": "data/05_telco/01_knowledge/04_Matriks-Persetujuan-MP-BILL-02_v1.0.md",
+      "classification": "knowledge-active"
+    },
+    {
+      "path": "data/05_telco/01_knowledge/05_Panduan-Aplikasi-PA-TN-01.md",
+      "classification": "knowledge-active"
+    },
+    {
+      "path": "data/05_telco/01_knowledge/06_Template-TPL-BILL-01-dan-02.md",
+      "classification": "knowledge-active"
+    },
+    {
+      "path": "data/05_telco/01_knowledge/archive/SOP-KLAIM-SLA-01_v0.9_TIDAK-BERLAKU.md",
+      "classification": "knowledge-inactive"
+    },
+    {
+      "path": "data/05_telco/03_data/claims.csv",
+      "classification": "operational-data"
+    },
+    {
+      "path": "data/05_telco/03_data/invoices.csv",
+      "classification": "operational-data"
+    },
+    {
+      "path": "data/05_telco/03_data/KAMUS-DATA.md",
+      "classification": "data-dictionary"
+    },
+    {
+      "path": "data/05_telco/03_data/rca.csv",
+      "classification": "operational-data"
+    },
+    {
+      "path": "data/05_telco/03_data/seed.json",
+      "classification": "operational-data"
+    },
+    {
+      "path": "data/05_telco/03_data/services.csv",
+      "classification": "operational-data"
+    },
+    {
+      "path": "data/05_telco/03_data/tickets.csv",
+      "classification": "operational-data"
+    },
+    {
+      "path": "data/05_telco/03_data/users.csv",
+      "classification": "operational-data"
+    }
+  ]
+}

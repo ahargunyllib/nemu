@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { formatTanggal } from "@/shared/lib/format-tanggal";
 import { orpc } from "@/shared/api/orpc";
 
-/** "Today" from the demo clock (NEMU_DEMO_DATE), the same date the AI counts from. */
+/** "Today" from the signed-in workspace, the same date the AI counts from. */
 export default function DemoToday() {
   const { data: clock } = useQuery(orpc.getDemoClock.queryOptions({ staleTime: Infinity }));
 

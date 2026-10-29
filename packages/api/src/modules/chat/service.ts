@@ -1,4 +1,11 @@
-import { type NemuRequest, type NemuResponse, nemuResponseSchema } from "@nemu/contracts";
+import {
+  type NemuRequest,
+  type NemuResponse,
+  type ProcessContext,
+  nemuResponseSchema,
+} from "@nemu/contracts";
+
+import type { SlaTaskRecord } from "../sla-claims/repository";
 
 import type { NemuService } from "../../context";
 import type { ChatLogRepository, NewChatLogRecord } from "./repository";
@@ -9,6 +16,71 @@ export type ChatDeps = {
 };
 
 export const CHAT_LOG_LIMIT = 200;
+
+type ChatActor = { id: string; workspaceId: string };
+
+type ChatProcessContextDeps = {
+  loadTravel(): Promise<ProcessContext | undefined>;
+  listSlaTasks(workspaceId: string): Promise<SlaTaskRecord[]>;
+  findSlaTaskByService(
+    workspaceId: string,
+    actorId: string,
+    serviceId: string,
+  ): Promise<SlaTaskRecord | undefined>;
+  findSlaTaskByInvoice(
+    workspaceId: string,
+    actorId: string,
+    invoiceId: string,
+  ): Promise<SlaTaskRecord | undefined>;
+};
+
+function claimIdFromUrl(pageUrl: string): string | undefined {
+  const match = new URL(pageUrl).pathname.match(/\/sla-claims\/([^/]+)\/?$/u);
+  return match?.[1] ? decodeURIComponent(match[1]) : undefined;
+}
+
+function operationalRecordFromUrl(
+  pageUrl: string,
+): { kind: "service" | "invoice"; id: string } | undefined {
+  const match = new URL(pageUrl).pathname.match(/\/(crm|noc|billing)\/([^/]+)\/?$/u);
+  if (!match?.[1] || !match[2]) return undefined;
+  return {
+    kind: match[1] === "billing" ? "invoice" : "service",
+    id: decodeURIComponent(match[2]),
+  };
+}
+
+export async function resolveChatProcessContext(
+  deps: ChatProcessContextDeps,
+  actor: ChatActor,
+  pageUrl: string,
+): Promise<ProcessContext | undefined> {
+  if (actor.workspaceId !== "W-TELKO") return deps.loadTravel();
+
+  const tasks = await deps.listSlaTasks(actor.workspaceId);
+  const routeClaimId = claimIdFromUrl(pageUrl);
+  const operationalRecord = operationalRecordFromUrl(pageUrl);
+  const task = routeClaimId
+    ? tasks.find((candidate) => candidate.claimId === routeClaimId)
+    : operationalRecord?.kind === "service"
+      ? await deps.findSlaTaskByService(actor.workspaceId, actor.id, operationalRecord.id)
+      : operationalRecord?.kind === "invoice"
+        ? await deps.findSlaTaskByInvoice(actor.workspaceId, actor.id, operationalRecord.id)
+        : tasks.find(
+            (candidate) => candidate.assigneeId === actor.id && candidate.status !== "SELESAI",
+          );
+  if (!task || task.assigneeId !== actor.id) {
+    throw new Error(`SLA claim ${routeClaimId ?? "task"} is not assigned to user ${actor.id}`);
+  }
+
+  return {
+    instance_id: task.claimId,
+    workspace: { id: actor.workspaceId, domain: "telco_sla" },
+    active_task: task.name,
+    status: task.status,
+    uploaded_documents: [],
+  };
+}
 
 type ChatOutcome = Pick<NewChatLogRecord, "status" | "result" | "citations" | "actions">;
 
@@ -65,6 +137,6 @@ async function writeChatLog(chatLog: ChatLogRepository, record: NewChatLogRecord
   }
 }
 
-export function listChatLog({ chatLog }: Pick<ChatDeps, "chatLog">) {
-  return chatLog.listNewest(CHAT_LOG_LIMIT);
+export function listChatLog({ chatLog }: Pick<ChatDeps, "chatLog">, workspaceId: string) {
+  return chatLog.listNewest(CHAT_LOG_LIMIT, workspaceId);
 }

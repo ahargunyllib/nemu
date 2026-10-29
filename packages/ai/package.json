@@ -3,13 +3,18 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./chunking": {
+      "types": "./scripts/knowledge-chunking.d.mts",
+      "import": "./scripts/knowledge-chunking.mjs"
+    },
     "./*": "./src/*.ts"
   },
   "scripts": {
     "data:generate": "node scripts/generate-demo-data.mjs",
+    "seed:generate": "node scripts/generate-workspace-seed.mjs",
     "build": "node scripts/generate-demo-data.mjs && tsc -b",
     "check-types": "tsc -b",
-    "test": "node scripts/generate-demo-data.mjs && tsc -b && node --test dist/index.test.js scripts/moment-validators.test.mjs",
+    "test": "node scripts/generate-demo-data.mjs && tsc -b && node --test dist/index.test.js dist/claim-tools.test.js dist/claim-workflows.test.js dist/claim-workflows.pipeline.test.js scripts/demo-data-lib.test.mjs scripts/moment-validators.test.mjs scripts/claim-validators.test.mjs scripts/workspace-seed-lib.test.mjs scripts/telco-workspace-seed.test.mjs",
     "eval": "node scripts/generate-demo-data.mjs && tsc -b && node scripts/evaluate.mjs",
     "eval:offline": "node scripts/generate-demo-data.mjs && tsc -b && node scripts/evaluate.mjs --offline",
     "eval:live": "node scripts/generate-demo-data.mjs && tsc -b && node scripts/evaluate.mjs --live"

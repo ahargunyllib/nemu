@@ -30,7 +30,7 @@ This project uses Cloudflare D1 (SQLite) with Drizzle ORM.
 
 Runtime database access uses the Cloudflare `DB` binding from `packages/infra/alchemy.run.ts`. If a local `DATABASE_URL` is present, it is only for database tooling.
 
-Alchemy provisions the D1 database and applies migrations during `deploy`. `pnpm run dev` does the same for the local D1 database, which includes the seeded demo accounts.
+Alchemy provisions the D1 database and applies migrations during `deploy`. `pnpm run dev` does the same for the local D1 database, which includes the seeded demo accounts, travel knowledge chunks, reference tables, and isolated `W-TELKO` SLA-claim workspace. Telco evaluator files under `data/05_telco/06_test-case` are never indexed by the live AI responder.
 
 `alchemy dev` keeps its state in `packages/infra/.alchemy/` alongside the local database, while `deploy` keeps state in Cloudflare. Each checkout or git worktree therefore gets its own migrated local database on its first `pnpm run dev`, with no manual step. Copy `apps/server/.env` into a new worktree before starting it. To reset the local database, stop dev and delete `packages/infra/.alchemy/`.
 
@@ -49,7 +49,9 @@ pnpm run dev
 Open [http://localhost:3001](http://localhost:3001) in your browser to see the Demo App.
 The API is running at [http://localhost:3000](http://localhost:3000).
 
-Sign in with a seeded demo account (Rina or the verifikator); see [docs/demo-app.md](docs/demo-app.md).
+Sign in with a seeded demo account (Rina, the verifikator, or Dimas as Billing Liaison); see
+[docs/demo-app.md](docs/demo-app.md). PRD acceptance evidence and remaining environment-dependent
+checks are tracked in [docs/prd-traceability.md](docs/prd-traceability.md).
 
 ## UI Customization
 

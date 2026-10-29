@@ -13,6 +13,7 @@ export const NEMU_IDS = {
     submit: "button-masuk",
     signInAsRina: "button-masuk-rina",
     signInAsVerifikator: "button-masuk-verifikator",
+    signInAsDimas: "button-masuk-dimas",
   },
   /** Header and side menu on every signed-in page. */
   shell: {
@@ -22,6 +23,10 @@ export const NEMU_IDS = {
     menuMyTask: "menu-my-task",
     accountMenu: "button-akun",
     signOut: "menu-item-keluar",
+    menuSlaClaims: "menu-klaim-sla",
+    menuCrmServices: "menu-crm-layanan",
+    menuNocTickets: "menu-tiket-noc",
+    menuBilling: "menu-billing",
   },
   /** Task links, one per Task, on Beranda (`/`) and My Task (`/my-task`). */
   task: {
@@ -58,6 +63,33 @@ export const NEMU_IDS = {
     uploadBoardingPassPulang: "upload-boarding-pass-pulang",
     kirim: "button-kirim",
   },
+  /** SLA-claim list, tasks, CRM, NOC, and Billing demo pages. */
+  slaClaim: {
+    taskKlm26100007: "task-klaim-klm-2610-0007",
+    taskKlm26100009: "task-klaim-klm-2610-0009",
+    taskKlm26100011: "task-klaim-klm-2610-0011",
+    letterNumber: "input-nomor-surat-klaim",
+    serviceId: "input-service-id-klaim",
+    period: "input-periode-klaim",
+    receivedAt: "input-tanggal-terima-klaim",
+    claimedHours: "input-jam-diklaim",
+    uploadLetter: "upload-surat-klaim",
+    timelyYes: "opt-klaim-tepat-waktu-ya",
+    timelyNo: "opt-klaim-tepat-waktu-tidak",
+    crmService: "link-crm-layanan",
+    crmContractTab: "tab-kontrak-adendum",
+    returnToTask: "link-kembali-task-klaim",
+    ticketInc2609014: "row-tiket-inc-2609-014",
+    ticketInc2609015: "row-tiket-inc-2609-015",
+    ticketInc2609031: "row-tiket-inc-2609-031",
+    ticketInc2609047: "row-tiket-inc-2609-047",
+    ticketInc2609058: "row-tiket-inc-2609-058",
+    requestRcaInc2609058: "button-minta-rca-inc-2609-058",
+    compensationAmount: "input-nominal-kompensasi",
+    rejectionTemplate: "link-template-penolakan",
+    submit: "button-kirim-klaim",
+    approve: "button-setujui-klaim",
+  },
   /**
    * Demo dock floating at the bottom left of every signed-in page: the demo panel moves a State
    * without the approvers, and a page can add a one-click demo action such as filling its form.
@@ -69,6 +101,7 @@ export const NEMU_IDS = {
     advance: "button-majukan-state",
     reset: "button-reset-demo",
     fillForm: "button-isi-formulir-demo",
+    advanceSlaClaim: "button-majukan-task-klaim",
   },
 } as const;
 

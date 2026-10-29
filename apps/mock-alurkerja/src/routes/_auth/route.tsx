@@ -21,6 +21,7 @@ export const Route = createFileRoute("/_auth")({
 });
 
 function AuthLayout() {
+  const { user } = Route.useRouteContext();
   return (
     <DemoDock>
       <div className="grid h-svh grid-rows-[auto_1fr]">
@@ -29,7 +30,7 @@ function AuthLayout() {
           <UserMenu />
         </Header>
         <div className="grid min-h-0 grid-cols-[14rem_1fr]">
-          <SideMenu />
+          <SideMenu workspaceId={user.workspaceId} />
           <main className="overflow-y-auto p-6">
             <div className="mx-auto max-w-4xl space-y-6">
               <Outlet />
