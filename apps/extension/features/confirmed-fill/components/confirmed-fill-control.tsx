@@ -1,5 +1,5 @@
-import { Badge } from "@nemu/ui/components/badge";
-import { Button } from "@nemu/ui/components/button";
+import { NemuBadge } from "@nemu/ui/nemu/nemu-badge";
+import { NemuButton } from "@nemu/ui/nemu/nemu-button";
 import { TriangleAlertIcon } from "lucide-react";
 
 import type { ConfirmedFillControlModel } from "../hooks/use-confirmed-fill";
@@ -12,22 +12,27 @@ export function ConfirmedFillControl({ control }: { control: ConfirmedFillContro
 
   if (control.mode === "mismatch") {
     return (
-      <Badge className="pointer-events-auto absolute" variant="destructive" style={style}>
+      <NemuBadge
+        tone="danger"
+        className="pointer-events-auto absolute shadow-nemu-float"
+        style={style}
+      >
         <TriangleAlertIcon data-icon="inline-start" />
         {control.message}
-      </Badge>
+      </NemuBadge>
     );
   }
 
+  // The hook offers this only when the label names the value it writes.
   return (
-    <Button
-      className="pointer-events-auto absolute"
+    <NemuButton
+      tone="outline"
       size="sm"
-      variant="default"
+      className="pointer-events-auto absolute bg-background shadow-nemu-float"
       style={style}
       onClick={control.confirm}
     >
       {control.action.label}
-    </Button>
+    </NemuButton>
   );
 }

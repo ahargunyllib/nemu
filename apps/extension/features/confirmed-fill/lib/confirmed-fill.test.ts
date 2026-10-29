@@ -2,7 +2,7 @@
 import type { NemuAction } from "@nemu/contracts";
 import { afterEach, describe, expect, test } from "vite-plus/test";
 
-import { applyConfirmedFill } from "./confirmed-fill";
+import { applyConfirmedFill, type FillAction, fillLabelMatchesValue } from "./confirmed-fill";
 
 const fill: Extract<NemuAction, { type: "fill" }> = {
   type: "fill",
@@ -52,5 +52,22 @@ describe("applyConfirmedFill", () => {
     document.body.append(target);
 
     expect(applyConfirmedFill(fill)).toEqual({ status: "unsupported" });
+  });
+});
+
+describe("fillLabelMatchesValue", () => {
+  test("accepts a Rupiah label whose digits are the value it writes", () => {
+    expect(fillLabelMatchesValue(fill)).toBe(true);
+  });
+
+  test("rejects a label that names a different amount", () => {
+    expect(fillLabelMatchesValue({ ...fill, value: "745000" })).toBe(false);
+    expect(fillLabelMatchesValue({ ...fill, label: "Isi nominal penginapan" })).toBe(false);
+  });
+
+  test("accepts a text value only when the label names it", () => {
+    const text: FillAction = { ...fill, label: "Isi Rapat koordinasi", value: "Rapat koordinasi" };
+    expect(fillLabelMatchesValue(text)).toBe(true);
+    expect(fillLabelMatchesValue({ ...text, label: "Isi alasan" })).toBe(false);
   });
 });

@@ -30,11 +30,11 @@ function renderTarget() {
 }
 
 function Harness() {
-  const control = useConfirmedFill([fill], {
+  const controls = useConfirmedFill([fill], {
     action: fill,
     box: { left: 40, top: 300, width: 200, height: 32 },
   });
-  return control ? <ConfirmedFillControl control={control} /> : null;
+  return controls.map((control) => <ConfirmedFillControl key={control.mode} control={control} />);
 }
 
 describe("ConfirmedFillControl", () => {

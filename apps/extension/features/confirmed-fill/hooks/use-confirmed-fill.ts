@@ -2,7 +2,13 @@ import type { NemuAction } from "@nemu/contracts";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { Box } from "../../../shared/types/box";
-import { applyConfirmedFill, type FillAction, type FillElement } from "../lib/confirmed-fill";
+import {
+  applyConfirmedFill,
+  comparableFillValue,
+  type FillAction,
+  type FillElement,
+  fillLabelMatchesValue,
+} from "../lib/confirmed-fill";
 
 export type FillHighlight = { action: NemuAction; box: Box };
 
@@ -10,15 +16,10 @@ export type ConfirmedFillControlModel =
   | { mode: "confirm"; action: FillAction; box: Box; confirm: () => void }
   | { mode: "mismatch"; action: FillAction; box: Box; message: string };
 
-type AppliedFill = { action: FillAction; element: FillElement; box: Box };
+type AppliedFill = { action: FillAction; element: FillElement; box: Box; mismatch: boolean };
 
 function isFillAction(action: NemuAction): action is FillAction {
   return action.type === "fill";
-}
-
-function comparableValue(value: string): string {
-  const digits = value.replace(/\D/gu, "").replace(/^0+(?=\d)/u, "");
-  return digits || value.trim();
 }
 
 function targetBox(action: FillAction, element: FillElement): Box {
@@ -32,66 +33,86 @@ function mismatchMessage(action: FillAction): string {
   return `Tidak sesuai hitungan ${expected}`;
 }
 
+/**
+ * Offers the Isi button for the highlighted `fill` step and, once Rina has pressed it, warns when
+ * the field no longer holds that value. Every fill in the answer is confirmed and watched on its
+ * own, so a second fill still gets its button after the first was applied.
+ */
 export function useConfirmedFill(
   actions: readonly NemuAction[],
   currentHighlight: FillHighlight | undefined,
-): ConfirmedFillControlModel | undefined {
+): ConfirmedFillControlModel[] {
   const fills = useMemo(() => actions.filter(isFillAction), [actions]);
   const fillKey = fills.map(({ target, value }) => `${target}\u0000${value}`).join("\u0001");
-  const [applied, setApplied] = useState<AppliedFill>();
-  const [mismatch, setMismatch] = useState(false);
+  const [applied, setApplied] = useState<readonly AppliedFill[]>([]);
 
   useEffect(() => {
-    setApplied(undefined);
-    setMismatch(false);
+    setApplied([]);
   }, [fillKey]);
 
+  const appliedKey = applied.map(({ action }) => action.target).join("\u0001");
   useEffect(() => {
-    if (!applied) return;
+    const elements = applied.map(({ element }) => element);
+    if (!elements.length) return;
     const update = () => {
-      setMismatch(comparableValue(applied.element.value) !== comparableValue(applied.action.value));
       setApplied((current) =>
-        current ? { ...current, box: targetBox(current.action, current.element) } : current,
+        current.map((fill) => ({
+          ...fill,
+          mismatch:
+            comparableFillValue(fill.element.value) !== comparableFillValue(fill.action.value),
+          box: targetBox(fill.action, fill.element),
+        })),
       );
     };
-    applied.element.addEventListener("input", update);
-    applied.element.addEventListener("change", update);
+    for (const element of elements) {
+      element.addEventListener("input", update);
+      element.addEventListener("change", update);
+    }
     window.addEventListener("scroll", update, true);
     window.addEventListener("resize", update);
     return () => {
-      applied.element.removeEventListener("input", update);
-      applied.element.removeEventListener("change", update);
+      for (const element of elements) {
+        element.removeEventListener("input", update);
+        element.removeEventListener("change", update);
+      }
       window.removeEventListener("scroll", update, true);
       window.removeEventListener("resize", update);
     };
-  }, [applied?.action.target, applied?.action.value, applied?.element]);
+    // Re-subscribe only when a fill is applied, not on every box update.
+  }, [appliedKey]);
 
-  const currentFill = currentHighlight?.action;
+  const currentFill =
+    currentHighlight && isFillAction(currentHighlight.action) ? currentHighlight.action : undefined;
   const confirm = useCallback(() => {
-    if (!currentFill || !isFillAction(currentFill)) return;
+    if (!currentFill || !fillLabelMatchesValue(currentFill)) return;
     const result = applyConfirmedFill(currentFill);
-    if (result.status === "applied") {
-      setMismatch(false);
-      setApplied({
-        action: currentFill,
-        element: result.element,
-        box: targetBox(currentFill, result.element),
-      });
-    }
+    if (result.status !== "applied") return;
+    const fill: AppliedFill = {
+      action: currentFill,
+      element: result.element,
+      box: targetBox(currentFill, result.element),
+      mismatch: false,
+    };
+    setApplied((current) => [
+      ...current.filter(({ action }) => action.target !== currentFill.target),
+      fill,
+    ]);
   }, [currentFill]);
 
-  if (applied) {
-    return mismatch
-      ? {
-          mode: "mismatch",
-          action: applied.action,
-          box: applied.box,
-          message: mismatchMessage(applied.action),
-        }
-      : undefined;
-  }
+  const controls: ConfirmedFillControlModel[] = applied
+    .filter(({ mismatch }) => mismatch)
+    .map(({ action, box }) => ({
+      mode: "mismatch",
+      action,
+      box,
+      message: mismatchMessage(action),
+    }));
 
-  return currentFill && isFillAction(currentFill)
-    ? { mode: "confirm", action: currentFill, box: currentHighlight.box, confirm }
-    : undefined;
+  const alreadyApplied = applied.some(
+    ({ action }) => action.target === currentFill?.target && action.value === currentFill.value,
+  );
+  if (currentHighlight && currentFill && !alreadyApplied && fillLabelMatchesValue(currentFill)) {
+    controls.push({ mode: "confirm", action: currentFill, box: currentHighlight.box, confirm });
+  }
+  return controls;
 }

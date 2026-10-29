@@ -64,7 +64,7 @@ export function NemuOverlay() {
   const actions = state.kind === "response" ? state.response.actions : NO_ACTIONS;
   const { highlight, steps, stepIndex, goTo, missing, warnings, cursor, outcome, clicked } =
     useAnswerActions(actions, state.kind === "response" ? state.elements : NO_ELEMENTS, anchor);
-  const confirmedFill = useConfirmedFill(actions, highlight);
+  const confirmedFills = useConfirmedFill(actions, highlight);
   // A guide continues from the settled page opened by its navigation click.
   useClickFollowUp(
     clicked,
@@ -146,7 +146,12 @@ export function NemuOverlay() {
         )}
         {state.kind === "loading" && readArea && <AreaOutline box={readArea} reading />}
         {highlight && <HighlightRing box={highlight.box} action={highlight.action} />}
-        {confirmedFill && <ConfirmedFillControl control={confirmedFill} />}
+        {confirmedFills.map((control) => (
+          <ConfirmedFillControl
+            key={`${control.mode}:${control.action.target}`}
+            control={control}
+          />
+        ))}
         {cursor && <NavigationCursor frame={cursor} />}
         <Mascot
           activity={{
