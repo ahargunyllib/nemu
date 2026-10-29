@@ -93,6 +93,7 @@ export const NEMU_IDS = {
     timelyNo: "opt-klaim-tepat-waktu-tidak",
     crmService: "link-crm-layanan",
     crmContractTab: "tab-kontrak-adendum",
+    crmSummaryTab: "tab-ringkasan-layanan",
     returnToTask: "link-kembali-task-klaim",
     ticketInc2609014: "row-tiket-inc-2609-014",
     ticketInc2609015: "row-tiket-inc-2609-015",
