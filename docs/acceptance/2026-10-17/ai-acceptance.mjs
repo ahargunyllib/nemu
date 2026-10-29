@@ -344,7 +344,7 @@ for (let r = 1; r <= ROUNDS; r++) {
       await shot(`r${r}-m3-task`);
       for (const [id, file] of [
         ["upload-laporan-perjalanan", "laporan-perjalanan-makassar.pdf"],
-        ["upload-boarding-pass-pulang", "boarding-pass-pulang-upg-cgk.pdf"],
+        ["upload-boarding-pass-pulang", "boarding-pass-pulang-upg-yia.pdf"],
       ]) {
         await page.locator(`[data-nemu-id="${id}"]`).setInputFiles(path.join(DOCS, file));
         await page.getByText(`${file} terunggah`).first().waitFor();
