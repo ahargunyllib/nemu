@@ -56,11 +56,13 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   mengirim"), and the extension never clicks it. On a task page (`/perdin/task/$instanceId`), once
   Rina presses it, the background reads `getProcessInstance` until the State moves and the Answer
   Card shows the task ID and the new State (Verifikasi). A `batas_pertanggungjawaban` calc entry
-  shows as a deadline chip on the card.
-- **Confirmed fill.** A `fill` action never changes a field immediately. It shows a button beside
-  the exact target; only Rina pressing it applies the raw contract value and dispatches normal
-  input/change events. If she later enters a different value, Nemu leaves it untouched and shows
-  a mismatch badge.
+  shows as a formula line under Rincian.
+- **Confirmed fill.** A `fill` action never changes a field immediately. While its step is ringed,
+  the Answer Card shows the value with an **Isi** button in place of Salin; only Rina pressing it
+  applies the raw contract value to the exact target and dispatches normal input/change events.
+  A "Sesuai" chip then sits at the field's right end. If she later enters a different value, Nemu
+  leaves it untouched and the chip says "Tidak sesuai hitungan Rp447.000 · Isi ulang", where
+  Isi ulang applies the value again.
 - **Shortcut.** Ctrl+Shift+Space is bound to the extension's action (`_execute_action`, shown
   as "Activate the extension"), the same as clicking the Nemu toolbar icon. It's not a page key
   listener because macOS, the browser, or another app can take the keys before the page sees
@@ -115,17 +117,20 @@ checks:
 
 - a page outside the allowlist gets no overlay;
 - signed out, the card asks Rina to log in;
-- signed in as Rina, the Momen 1 prompt comes back as an Answer Card with its citation;
+- signed in as Rina, the Momen 1 prompt comes back as an Answer Card;
 - Momen 1, five times in a row from Beranda: Nemu clicks Ajukan Perjalanan Dinas, the form opens,
-  and the follow-up card guides the six form steps with its citation;
+  and the follow-up card says "Langkah 1 dari 6" without listing the steps, with its citation
+  under Rincian;
 - on the Perjalanan Dinas form's Biaya tab, Momen 2: Rina drags a box over the lodging fields, the chip holds a
   crop of just that box (saved as `momen-2-area-crop-sent.png`), and the prompt goes out with it.
-  The card shows the answer, warning and the PMK 119/2023 Pasal 8 ayat (5) citation, rings each
-  lodging field with its action label, and keeps off both fields. The amount stays empty until the
-  script confirms Rp447.000; changing it to Rp745.000 produces a mismatch badge without overwriting
-  the field, and the Chat Log records that an Area Crop was attached;
+  The card shows the answer and warning, with the formula and the PMK 119/2023 Pasal 8 ayat (5)
+  citation under Rincian, rings each lodging field with its action label, and keeps off both
+  fields. The amount stays empty until the script presses the card's Isi Rp447.000 (there is no
+  Salin and no Isi outside the card), then shows Sesuai; changing it to Rp745.000 produces the
+  mismatch chip without overwriting the field, Isi ulang writes Rp447.000 again, and the Chat Log
+  records that an Area Crop was attached;
 - Momen 3, five times in a row after a demo data reset: Nemu opens the Pertanggungjawaban task,
-  the follow-up rings both missing uploads and Kirim and shows the 12 November 2026 deadline chip,
+  the follow-up rings both missing uploads and Kirim and names the 12 November 2026 deadline,
   and after the script uploads the sample PDFs and presses Kirim, the card shows
   PJ-PD-2026-0042 and Verifikasi;
 - the mascot sits 12 px below and to the right of the cursor, and clicking it opens the Composer.

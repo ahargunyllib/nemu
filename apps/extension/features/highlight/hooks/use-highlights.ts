@@ -19,8 +19,8 @@ const NO_TARGETS: Targets = { found: [], missing: [] };
  * Runs the `highlight` and `confirm` actions of an answer one step at a time: rings only the
  * current target, scrolls it into view, and follows its box each frame, so the ring stays attached
  * through scrolling, resizing, and layout shifts. Filling or pressing the target moves on to the
- * next step, and doing the last one ends the guide, so its ring goes away; `goTo` moves between
- * steps by hand. Targets missing from the page come back in `missing` and are skipped.
+ * next step, and doing the last one ends the guide, so its ring goes away. Targets missing from
+ * the page come back in `missing` and are skipped.
  */
 export function useHighlights(actions: readonly NemuAction[]) {
   const [targets, setTargets] = useState<Targets>(NO_TARGETS);
@@ -79,7 +79,6 @@ export function useHighlights(actions: readonly NemuAction[]) {
     /** Every target found, in the order the user takes them, with its position among all steps. */
     steps: found.map(({ action, position }): HighlightStep => ({ action, position })),
     stepIndex,
-    goTo: (index: number) => setStepIndex(Math.max(0, Math.min(index, found.length - 1))),
     missing: targets.missing,
   };
 }

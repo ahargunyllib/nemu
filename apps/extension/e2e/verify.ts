@@ -436,19 +436,12 @@ async function main() {
       await closeAnswerCard(page);
     });
 
-    await check("signed in, the Answer Card shows the answer and its citation", async () => {
+    await check("signed in, the Answer Card shows the answer", async () => {
       await page.getByRole("button", { name: /Masuk sebagai Rina/ }).click();
       await waitForBeranda(page);
       await assertFixtureResponder(page);
       await ask(context, page, momentOneRequest.prompt);
       await page.getByText(momentOneResponse.answer.ringkas).waitFor();
-      const [citation] = momentOneResponse.citations;
-      if (citation) {
-        await page
-          .getByRole("region", { name: "Sumber" })
-          .getByRole("button", { name: citation.judul })
-          .waitFor();
-      }
       await page.screenshot({ path: path.join(SCREENSHOT_DIR, "answer-card.png") });
     });
 
@@ -479,15 +472,23 @@ async function main() {
             const target = page.locator(`[data-nemu-id="${firstStep.target}"]`).first();
             await assertOnlyRing(overlay, firstStep.target, firstStep.label, await boxOf(target));
           });
-          await card.getByRole("button", { name: "Langkah berikutnya" }).click();
-          await card.getByText("Langkah 2 dari 6").waitFor();
-          const [citation] = momentOneFollowUpResponse.citations;
-          if (citation) {
-            await card.getByRole("button", { name: citation.judul }).click();
-            await card.getByText(describeCitation(citation), { exact: false }).waitFor();
+          // The card names the step it is on and no longer lists the six steps.
+          if (await card.locator("ol").count()) {
+            throw new Error("the Answer Card still lists the steps");
           }
           if (run === 1) {
             await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-1-form.png") });
+          }
+          const [citation] = momentOneFollowUpResponse.citations;
+          if (citation) {
+            await card.getByRole("button", { name: "Rincian" }).click();
+            await card
+              .getByRole("region", { name: "Sumber" })
+              .getByText(describeCitation(citation), { exact: false })
+              .waitFor();
+          }
+          if (run === 1) {
+            await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-1-rincian.png") });
           }
           await closeAnswerCard(page);
         }
@@ -564,10 +565,16 @@ async function main() {
           });
           if (index === 0) await page.locator(`[data-nemu-id="${target}"]`).click();
         }
+        await card.getByRole("button", { name: "Rincian" }).click();
+        await card.getByText("30% × Rp745.000 × 2 malam = Rp447.000").waitFor();
         for (const citation of momentTwoResponse.citations) {
-          await card.getByRole("button", { name: citation.judul }).click();
-          await card.getByText(describeCitation(citation), { exact: false }).waitFor();
+          await card
+            .getByRole("region", { name: "Sumber" })
+            .getByText(describeCitation(citation), { exact: false })
+            .waitFor();
         }
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-2-rincian.png") });
+        await card.getByRole("button", { name: "Tutup rincian" }).click();
 
         // The amount stays untouched until Rina confirms the exact calculated value.
         const [notHotel, amount] = guidedActions.map(({ target }) =>
@@ -585,18 +592,28 @@ async function main() {
           );
         if (await valueOfAmount()) throw new Error("Nemu filled before Rina confirmed");
 
-        await overlay.getByRole("button", { name: "Isi Rp447.000" }).click();
+        // The card offers Isi in place of Salin, and the field keeps no Isi button of its own.
+        if (await card.getByRole("button", { name: "Salin" }).count()) {
+          throw new Error("the Answer Card offers Salin for a value it fills");
+        }
+        if ((await overlay.getByRole("button", { name: "Isi Rp447.000" }).count()) !== 1) {
+          throw new Error("Isi is offered outside the Answer Card too");
+        }
+        await card.getByRole("button", { name: "Isi Rp447.000" }).click();
         await eventually(async () => {
           const amountValue = await valueOfAmount();
           if (amountValue !== "447000") {
             throw new Error(`the confirmed lodging amount is ${amountValue}, not 447000`);
           }
         });
+        await overlay.getByText("Sesuai", { exact: true }).waitFor();
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-2-filled.png") });
 
         const amountInput = amount?.locator("input");
         if (!amountInput) throw new Error("the lodging amount input is missing");
         await amountInput.fill("745000");
         await overlay.getByText("Tidak sesuai hitungan Rp447.000", { exact: true }).waitFor();
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-2-mismatch.png") });
         const changedAmount = await amount?.evaluate((element) =>
           element instanceof HTMLInputElement
             ? element.value
@@ -604,6 +621,12 @@ async function main() {
         );
         if (changedAmount !== "745000") {
           throw new Error(`the mismatch warning changed the field to ${changedAmount}`);
+        }
+        await overlay.getByRole("button", { name: "Isi ulang" }).click();
+        await overlay.getByText("Sesuai", { exact: true }).waitFor();
+        const refilledAmount = await valueOfAmount();
+        if (refilledAmount !== "447000") {
+          throw new Error(`Isi ulang left the lodging amount at ${refilledAmount}, not 447000`);
         }
 
         const entry = await newestChatLogEntry();
@@ -712,15 +735,13 @@ async function main() {
           await page.getByText(momentThreeResponse.answer.ringkas).waitFor();
           await page.waitForURL(`${DEMO_APP_URL}/perdin/task/PD-2026-0042`);
 
-          // The follow-up from the task page: its own answer, the deadline as a sentence, three steps.
+          // The follow-up from the task page: its own answer with the deadline, three steps. Rincian
+          // stays shut: any press outside the Task sheet, the Answer Card's included, closes it.
           const card = overlay
             .locator('[data-slot="card"]')
             .filter({ hasText: momentThreeFollowUpResponse.answer.ringkas });
           await card.waitFor();
-          await card
-            .getByRole("region", { name: "Perhitungan" })
-            .getByText(/^Batas Pertanggungjawaban: .* = 12 November 2026\.$/)
-            .waitFor();
+          await card.getByText(/sebelum 12 November 2026/).waitFor();
           const steps = momentThreeFollowUpResponse.actions;
           const ringStep = async (index: number) => {
             const step = steps[index];

@@ -13,6 +13,8 @@ const nemuBadgeVariants = cva("", {
       subtle: "bg-nemu-subtle text-nemu-subtle-foreground",
       /** "Kamu yang mengirim": the user, not Nemu, does the next step. */
       success: "bg-nemu-success text-nemu-success-foreground",
+      /** "Sesuai": a field still holds the value Nemu filled. */
+      "success-subtle": "bg-nemu-success-subtle text-nemu-success-text",
       /** "Tidak sesuai hitungan Rp447.000": a field no longer holds what Nemu filled. */
       danger: "bg-nemu-danger-subtle text-destructive",
     },

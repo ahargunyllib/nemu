@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import type { NemuResponse } from "@nemu/contracts";
 import {
+  momentOneFollowUpResponse,
   momentOneResponse,
   momentThreeFollowUpResponse,
   momentThreeResponse,
@@ -13,7 +14,6 @@ import {
   getDefaultNormalizer,
   render,
   screen,
-  within,
 } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 
@@ -26,18 +26,27 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function renderCard(response: NemuResponse, children?: React.ReactNode) {
+function renderCard(
+  response: NemuResponse,
+  children?: React.ReactNode,
+  slots: Pick<React.ComponentProps<typeof AnswerCard>, "kicker" | "fill"> = {},
+) {
   const onClose = vi.fn();
   render(
     <AnswerCard
       response={response}
       header={<AnswerCardHeader onClose={onClose} />}
       reply={<p>Balas</p>}
+      {...slots}
     >
       {children}
     </AnswerCard>,
   );
   return { onClose };
+}
+
+function openRincian() {
+  fireEvent.click(screen.getByRole("button", { name: "Rincian" }));
 }
 
 /** Each button by its accessible name, in order. */
@@ -46,6 +55,20 @@ function buttonNames() {
     .getAllByRole("button")
     .map((button) => button.getAttribute("aria-label") ?? button.textContent);
 }
+
+/** Momen 2 as an answer that only computes the amount, without a confirmed `fill`. */
+const withoutFill: NemuResponse = {
+  ...momentTwoResponse,
+  actions: momentTwoResponse.actions.filter((action) => action.type !== "fill"),
+};
+
+const withDailyAllowance: NemuResponse = {
+  ...momentTwoResponse,
+  calc: [
+    ...momentTwoResponse.calc,
+    { fungsi: "uang_harian", input: { hari: 3, tarif: 580_000 }, hasil: 1_740_000 },
+  ],
+};
 
 function stubClipboard(writeText: (text: string) => Promise<void>) {
   vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
@@ -63,16 +86,23 @@ describe("AnswerCard", () => {
     expect(screen.getByText(response.answer.ringkas)).toBeTruthy();
     for (const warning of response.warnings)
       expect(screen.getByText(asSentence(warning))).toBeTruthy();
-    for (const citation of response.citations) {
-      expect(screen.getByRole("button", { name: citation.judul })).toBeTruthy();
-    }
     expect(screen.getByText("Balas")).toBeTruthy();
   });
 
-  test("has no button but ×, Rincian, the sources and Salin", () => {
-    renderCard(momentTwoResponse);
+  test("collapsed, shows only the answer, its warning and Rincian", () => {
+    renderCard(momentThreeFollowUpResponse);
 
-    expect(buttonNames()).toEqual(["Tutup", "Salin", "Rincian", "PMK 119/2023"]);
+    expect(buttonNames()).toEqual(["Tutup", "Rincian"]);
+    expect(screen.queryByRole("region", { name: "Sumber" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "Perhitungan" })).toBeNull();
+  });
+
+  test("shows the guide's progress above the answer, beside the ×", () => {
+    renderCard(momentOneFollowUpResponse, undefined, { kicker: <p>Langkah 2 dari 6</p> });
+
+    const kicker = screen.getByText("Langkah 2 dari 6");
+    const answer = screen.getByText(momentOneFollowUpResponse.answer.ringkas);
+    expect(kicker.compareDocumentPosition(answer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   test("closes from the ×", () => {
@@ -83,28 +113,49 @@ describe("AnswerCard", () => {
     expect(onClose).toHaveBeenCalledOnce();
   });
 
-  test("says the Momen 2 calculation as a sentence", () => {
+  test("shows the Momen 2 formula in Rincian", () => {
     renderCard(momentTwoResponse);
 
+    expect(screen.queryByText("30% × Rp745.000 × 2 malam = Rp447.000")).toBeNull();
+    openRincian();
+
+    expect(screen.getByText("30% × Rp745.000 × 2 malam = Rp447.000")).toBeTruthy();
+  });
+
+  test("names what each formula computes when there are several", () => {
+    renderCard(withDailyAllowance);
+    openRincian();
+
     expect(
-      screen.getByText("Lumpsum penginapan: 30% × Rp745.000 × 2 malam = Rp447.000."),
+      screen.getByText("Lumpsum penginapan: 30% × Rp745.000 × 2 malam = Rp447.000"),
     ).toBeTruthy();
   });
 
-  test("says the Momen 3 Pertanggungjawaban deadline as a sentence", () => {
+  test("shows the Momen 3 Pertanggungjawaban deadline in Rincian", () => {
     renderCard(momentThreeFollowUpResponse);
+    openRincian();
 
     expect(
-      screen.getByText(
-        "Batas Pertanggungjawaban: 5 hari kerja setelah 5 November 2026 = 12 November 2026.",
-      ),
+      screen.getByText("5 hari kerja setelah 5 November 2026 = 12 November 2026"),
     ).toBeTruthy();
   });
 
-  test("copies the Momen 2 lodging value as the form field takes it", async () => {
+  test("offers the Isi strip instead of Salin for an answer that fills the value", () => {
+    renderCard(momentTwoResponse, undefined, { fill: <button type="button">Isi</button> });
+
+    expect(buttonNames()).toEqual(["Tutup", "Isi", "Rincian"]);
+  });
+
+  test("never offers Salin for an answer that fills the value, even once it was filled", () => {
+    renderCard(momentTwoResponse);
+
+    expect(screen.queryByRole("button", { name: "Salin" })).toBeNull();
+  });
+
+  test("copies a computed amount the answer doesn't fill as the form field takes it", async () => {
     const writeText = vi.fn(() => Promise.resolve());
     stubClipboard(writeText);
-    renderCard(momentTwoResponse);
+    renderCard(withoutFill);
 
     expect(screen.getByText("Rp447.000")).toBeTruthy();
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Salin" })));
@@ -115,7 +166,7 @@ describe("AnswerCard", () => {
 
   test("keeps Salin when the page denies the clipboard", async () => {
     stubClipboard(() => Promise.reject(new Error("denied")));
-    renderCard(momentTwoResponse);
+    renderCard(withoutFill);
 
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Salin" })));
 
@@ -134,7 +185,7 @@ describe("AnswerCard", () => {
     expect(screen.getByText("ID tugas PJ-PD-2026-0042")).toBeTruthy();
   });
 
-  test("keeps the detail and the rate's source collapsed until asked", () => {
+  test("keeps the detail collapsed until asked", () => {
     renderCard(momentOneResponse);
     const detail = momentOneResponse.answer.detail;
     // The Momen 1 checklist keeps one document per line, written 1. 2. 3.
@@ -147,38 +198,22 @@ describe("AnswerCard", () => {
     expect(screen.queryByText(detail, keepLines)).toBeNull();
   });
 
-  test("names the rate's source in the detail", () => {
+  test("lists the Momen 2 pasal and rate's source in the Sumber line in Rincian", () => {
     renderCard(momentTwoResponse);
-
-    fireEvent.click(screen.getByRole("button", { name: "Rincian" }));
-
-    expect(
-      screen.getByText("Tarif: SBM TA 2026 - Sulawesi Selatan - Hotel Golongan III"),
-    ).toBeTruthy();
-  });
-
-  test("opens a citation's full reference when clicked", () => {
-    renderCard(momentTwoResponse);
-
-    expect(screen.getByText(/^Sumber:/)).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "PMK 119/2023" }));
-
-    expect(screen.getByText(/PMK 119\/2023, Pasal 8 ayat \(5\), hlm\. 6/)).toBeTruthy();
-  });
-
-  test("lists the Momen 2 rate's source in the Sumber line after the citations", () => {
-    renderCard(momentTwoResponse);
+    openRincian();
 
     expect(screen.getByRole("region", { name: "Sumber" }).textContent).toBe(
-      "Sumber: PMK 119/2023, SBM TA 2026 - Sulawesi Selatan - Hotel Golongan III",
+      "Sumber: PMK 119/2023 Pasal 8 ayat (5) · SBM TA 2026 - Sulawesi Selatan - Hotel Golongan III",
     );
   });
 
-  test("keeps each comma in the same element as the source before it", () => {
-    renderCard(momentTwoResponse);
+  test("keeps a section such as an SOP's Butir by its own name", () => {
+    renderCard(momentOneFollowUpResponse);
+    openRincian();
 
-    const citation = screen.getByRole("button", { name: "PMK 119/2023" });
-    expect(citation.parentElement?.textContent).toBe("PMK 119/2023,");
+    expect(screen.getByRole("region", { name: "Sumber" }).textContent).toBe(
+      "Sumber: SOP-PD-01 Perjalanan Dinas Butir 4.1, 4.2",
+    );
   });
 
   test("names each source in the Sumber line once", () => {
@@ -191,10 +226,11 @@ describe("AnswerCard", () => {
         { fungsi: "lookup_sbm", input: {}, hasil: null, sumber: "PMK 119/2023" },
       ],
     });
-    const sumber = within(screen.getByRole("region", { name: "Sumber" }));
+    openRincian();
+    const sumber = screen.getByRole("region", { name: "Sumber" }).textContent ?? "";
 
-    expect(sumber.getAllByText(/PMK 119\/2023/)).toHaveLength(1);
-    expect(sumber.getAllByText(sbm)).toHaveLength(1);
+    expect(sumber.match(/PMK 119\/2023/g)).toHaveLength(1);
+    expect(sumber.split(sbm)).toHaveLength(2);
   });
 
   test("shows a refusal as plain text", () => {
