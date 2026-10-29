@@ -54,3 +54,19 @@ export function applyConfirmedFill(action: FillAction, root: ParentNode = docume
   element.dispatchEvent(new Event("change", { bubbles: true }));
   return { status: "applied", element };
 }
+
+/** Digits only, without leading zeros, so "Rp447.000" and "447000" compare equal. */
+export function comparableFillValue(value: string): string {
+  const digits = value.replace(/\D/gu, "").replace(/^0+(?=\d)/u, "");
+  return digits || value.trim();
+}
+
+/**
+ * The Isi button shows `label` but writes `value`, so a fill is offered only when its label names
+ * that value: the same digits for an amount, the value itself for text.
+ */
+export function fillLabelMatchesValue({ label, value }: FillAction): boolean {
+  return /\d/u.test(value)
+    ? comparableFillValue(label) === comparableFillValue(value)
+    : label.includes(value.trim());
+}
