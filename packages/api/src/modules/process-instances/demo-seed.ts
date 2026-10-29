@@ -30,6 +30,6 @@ export const DEMO_SEED_DOCUMENTS: readonly NewProcessDocumentRecord[] = [
   {
     instanceId: "PD-2026-0042",
     jenis: "boarding_pass_pergi",
-    namaFile: "boarding-pass-pergi-cgk-upg.pdf",
+    namaFile: "boarding-pass-pergi-yia-upg.pdf",
   },
 ];

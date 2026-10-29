@@ -23,6 +23,11 @@ rounded, as in AlurKerja.
 | My Request              | `/my-request`              |
 | My Task                 | `/my-task`                 |
 | Task detail             | `/perdin/task/$instanceId` |
+| Klaim SLA               | `/sla-claims`              |
+| Task klaim SLA          | `/sla-claims/$claimId`     |
+| CRM Layanan             | `/crm/$serviceId`          |
+| Tiket NOC               | `/noc/$serviceId`          |
+| Billing                 | `/billing/$invoiceId`      |
 
 The Task detail page of a Pertanggungjawaban is the Pertanggungjawaban task page.
 
@@ -176,8 +181,10 @@ ST-090/2026) and attaches a stand-in `undangan-rapat-koordinasi.pdf`. It leaves
 Penginapan and Nominal penginapan empty, because in Momen 2 Rina asks Nemu how
 to fill them in.
 
-"Today" is the demo clock, `NEMU_DEMO_DATE` (2026-11-06), the same setting the
-AI counts from; Beranda and the task sheet read it through `getDemoClock`.
+"Today" comes from the signed-in user's workspace and is the same date the AI
+uses. `W-TRAVEL` uses 2026-11-06 and `W-TELKO` uses 2026-10-14; Beranda and the
+task sheet read it through `getDemoClock`. `NEMU_DEMO_DATE` remains the fallback
+when a workspace has no stored configuration.
 
 ## 3-Momen fixtures
 
@@ -194,10 +201,11 @@ A migration (`packages/db/src/migrations/*_seed-demo-accounts`) seeds both
 accounts, so they exist locally and after every deploy. The login page also has
 one-click buttons for them.
 
-| Account     | Email                   | Password                | Golongan | Role        |
-| ----------- | ----------------------- | ----------------------- | -------- | ----------- |
-| Rina        | `rina@nemu.demo`        | `rina-demo-2026`        | III/a    | pegawai     |
-| Verifikator | `verifikator@nemu.demo` | `verifikator-demo-2026` | III/c    | verifikator |
+| Account     | Email                   | Password                | Golongan | Role            |
+| ----------- | ----------------------- | ----------------------- | -------- | --------------- |
+| Rina        | `rina@nemu.demo`        | `rina-demo-2026`        | III/a    | pegawai         |
+| Verifikator | `verifikator@nemu.demo` | `verifikator-demo-2026` | III/c    | verifikator     |
+| Dimas       | `dimas@nemu.demo`       | `dimas-demo-2026`       | –        | billing_liaison |
 
 Rina's user id is `rina`, matching the fixtures in `@nemu/contracts/fixtures`.
 

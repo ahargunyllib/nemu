@@ -51,6 +51,24 @@ describe("enforceActionLevels", () => {
     expect(action?.type).toBe("highlight");
   });
 
+  test.each([
+    NEMU_IDS.slaClaim.taskKlm26100007,
+    NEMU_IDS.slaClaim.taskKlm26100009,
+    NEMU_IDS.slaClaim.taskKlm26100011,
+    NEMU_IDS.slaClaim.crmService,
+    NEMU_IDS.slaClaim.crmContractTab,
+    NEMU_IDS.slaClaim.returnToTask,
+  ])("keeps an approved SLA navigation click on %s", (target) => {
+    expect(enforceActionLevels([click(target)], [listed(target)])).toEqual([click(target)]);
+  });
+
+  test.each([NEMU_IDS.login.signInAsDimas, NEMU_IDS.slaClaim.submit, NEMU_IDS.slaClaim.approve])(
+    "never clicks an explicitly protected SLA control %s",
+    (target) => {
+      expect(enforceActionLevels([click(target)], [listed(target)])[0]?.type).toBe("highlight");
+    },
+  );
+
   test("passes highlight actions through unchanged", () => {
     expect(enforceActionLevels(momentTwoResponse.actions, [])).toEqual(momentTwoResponse.actions);
   });

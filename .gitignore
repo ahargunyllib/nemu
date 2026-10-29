@@ -51,6 +51,8 @@ lerna-debug.log*
 # Testing
 coverage
 .nyc_output
+# Supplied private evaluator oracle; executable public regressions live in packages/ai.
+data/05_telco/06_test-case/
 
 # Misc
 *.tgz

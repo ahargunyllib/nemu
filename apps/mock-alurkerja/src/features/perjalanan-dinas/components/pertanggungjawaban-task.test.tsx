@@ -131,7 +131,7 @@ describe("PertanggungjawabanTask", () => {
     const uploadedAt = new Date("2026-11-06");
     server.dokumen = [
       { jenis: "surat_tugas", namaFile: "surat-tugas.pdf", uploadedAt },
-      { jenis: "boarding_pass_pergi", namaFile: "boarding-pass-pergi-cgk-upg.pdf", uploadedAt },
+      { jenis: "boarding_pass_pergi", namaFile: "boarding-pass-pergi-yia-upg.pdf", uploadedAt },
       { jenis: "laporan_perjalanan", namaFile: "laporan-perjalanan-makassar.pdf", uploadedAt },
     ];
     const toastSuccess = vi.spyOn(toast, "success");

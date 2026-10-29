@@ -15,6 +15,11 @@ const TITLES: Record<Calculation["fungsi"], string> = {
   uang_harian: "Uang harian",
   batas_pertanggungjawaban: "Batas Pertanggungjawaban",
   sisa_hari_kerja: "Sisa hari kerja",
+  claim_cutoff: "Batas pengajuan klaim",
+  merge_claim_intervals: "Durasi gangguan tergabung",
+  sla_compensation: "Kompensasi SLA",
+  claim_approval_route: "Rute persetujuan",
+  claim_evidence_guard: "Kelengkapan bukti RCA",
 };
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -70,6 +75,15 @@ function describeFormula(calculation: Calculation): Pick<CalculationLine, "formu
         result: formatValue(hasil),
       };
     }
+  }
+
+  if (calculation.fungsi === "sla_compensation" && typeof hasil === "number") {
+    return {
+      formula: Object.entries(input)
+        .map(([name, value]) => `${name.replaceAll("_", " ")}: ${formatValue(value)}`)
+        .join(", "),
+      result: formatRupiah(hasil),
+    };
   }
 
   return {

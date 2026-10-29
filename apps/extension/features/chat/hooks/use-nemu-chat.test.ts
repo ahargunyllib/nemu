@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import {
   momentOneRequest,
+  momentOneResponse,
   momentThreeFollowUpRequest,
   momentThreeFollowUpResponse,
   momentThreeRequest,
@@ -8,7 +9,7 @@ import {
   momentTwoRequest,
   momentTwoResponse,
 } from "@nemu/contracts/fixtures";
-import { act, cleanup, renderHook } from "@testing-library/react";
+import { act, cleanup, fireEvent, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 
 import { sendChatRequest } from "../api/chat-messaging";
@@ -37,6 +38,7 @@ describe("useNemuChat", () => {
 
     expect(send).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({ prompt, elements, screenshot_crop: crop }),
+      expect.any(AbortSignal),
     );
     expect(result.current.state).toMatchObject({ kind: "response", screenshotCrop: crop });
   });
@@ -68,6 +70,41 @@ describe("useNemuChat", () => {
       kind: "response",
       response: momentThreeFollowUpResponse,
       elements: momentThreeFollowUpRequest.elements,
+    });
+  });
+
+  test("a guide continues with the new page elements once per URL and server step", async () => {
+    const formElements = [
+      {
+        nemu_id: "select-jenis-perjalanan",
+        label: "Jenis perjalanan",
+        role: "combobox",
+        visible: true,
+      },
+    ];
+    const advanced = {
+      ...momentOneResponse,
+      guide: { ...momentOneResponse.guide, current_step: 2 },
+    };
+    send
+      .mockResolvedValueOnce({ kind: "response", response: momentOneResponse })
+      .mockResolvedValue({ kind: "response", response: advanced });
+    window.history.replaceState({}, "", "/perdin/baru#form");
+    const { result } = renderHook(() => useNemuChat());
+
+    await act(() => result.current.send(momentOneRequest.prompt, momentOneRequest.elements));
+    await act(() => result.current.followUp(formElements));
+    await act(() => result.current.followUp(formElements));
+    await act(() => result.current.followUp(formElements));
+
+    expect(send).toHaveBeenCalledTimes(3);
+    expect(send.mock.calls[1]?.[0]).toMatchObject({
+      prompt: momentOneRequest.prompt,
+      elements: formElements,
+    });
+    expect(result.current.guideSession).toMatchObject({
+      guideId: "travel-request:create",
+      currentStep: 2,
     });
   });
 
@@ -104,6 +141,33 @@ describe("useNemuChat", () => {
     await act(() => result.current.followUp(momentThreeFollowUpRequest.elements));
 
     expect(send).toHaveBeenCalledOnce();
+    expect(result.current.state.kind).toBe("idle");
+  });
+
+  test("Escape aborts a pending answer and its late completion stays hidden", async () => {
+    let finish: ((result: Awaited<ReturnType<typeof sendChatRequest>>) => void) | undefined;
+    let requestSignal: AbortSignal | undefined;
+    send.mockImplementationOnce((_request, signal) => {
+      requestSignal = signal;
+      return new Promise((resolve) => {
+        finish = resolve;
+      });
+    });
+    const { result } = renderHook(() => useNemuChat());
+
+    let pending: Promise<void> | undefined;
+    act(() => {
+      pending = result.current.send(prompt, elements);
+    });
+    expect(result.current.state.kind).toBe("loading");
+
+    fireEvent.keyDown(window, { key: "Escape" });
+
+    expect(requestSignal?.aborted).toBe(true);
+    expect(result.current.state.kind).toBe("idle");
+
+    finish?.({ kind: "response", response: momentTwoResponse });
+    await act(async () => pending);
     expect(result.current.state.kind).toBe("idle");
   });
 });

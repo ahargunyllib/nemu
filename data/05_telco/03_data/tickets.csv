@@ -1,0 +1,7 @@
+ticket_id,service_id,mulai,pulih,durasi_jam,penyebab,rca_id,rca_status,pelapor,ringkasan
+INC-2609-014,TN-ENT-002,2026-09-03T08:00:00+07:00,2026-09-03T20:00:00+07:00,12,PENYEDIA,RCA-2609-07,DISAHKAN,IT gudang,Kabel FO putus terkena galian proyek jalan
+INC-2609-015,TN-ENT-002,2026-09-03T18:00:00+07:00,2026-09-03T22:00:00+07:00,4,PENYEDIA,RCA-2609-07,DISAHKAN,Kepala gudang,"Laporan kedua untuk gangguan yang sama, pulih 22.00"
+INC-2609-031,TN-ENT-002,2026-09-10T00:00:00+07:00,2026-09-10T06:00:00+07:00,6,DAYA_PELANGGAN,RCA-2609-12,DISAHKAN,IT gudang,UPS gudang mati saat pemadaman listrik
+INC-2609-047,TN-ENT-002,2026-09-21T13:00:00+07:00,2026-09-21T16:30:00+07:00,3.5,PENYEDIA,RCA-2609-19,DISAHKAN,IT gudang,Perangkat agregasi POP Cikarang hang
+INC-2609-022,TN-ENT-001,2026-09-07T09:00:00+07:00,2026-09-07T21:00:00+07:00,12,PENYEDIA,RCA-2609-09,DISAHKAN,IT pusat,Gangguan core router Jakarta Selatan
+INC-2609-058,TN-ENT-001,2026-09-25T10:00:00+07:00,2026-09-25T19:00:00+07:00,9,BELUM_DIKETAHUI,,MENUNGGU,IT pusat,"Layanan putus, penyebab masih diselidiki NOC"

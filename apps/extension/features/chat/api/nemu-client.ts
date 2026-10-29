@@ -22,7 +22,7 @@ export function createNemuClient(): NemuChatClient & ProcessInstanceClient {
   });
   const client: NemuRouterClient = createORPCClient(link);
   return {
-    nemuChat: (request) => client.nemuChat(request),
+    nemuChat: (request, signal) => client.nemuChat(request, { signal }),
     getProcessInstance: (input) => client.getProcessInstance(input),
   };
 }

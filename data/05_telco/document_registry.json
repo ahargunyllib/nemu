@@ -1,0 +1,51 @@
+[
+  {
+    "doc_id": "SOP-KLAIM-SLA-01-v1.0",
+    "judul": "SOP Klaim Kompensasi SLA Pelanggan Korporat",
+    "status": "aktif",
+    "versi": "1.0",
+    "berkas": "05_telco/01_knowledge/01_SOP-KLAIM-SLA-01_v1.0.md"
+  },
+  {
+    "doc_id": "KON-2026-01",
+    "judul": "Perjanjian Layanan Internet Dedicated KON-2026-01",
+    "status": "aktif",
+    "versi": "1.0",
+    "berkas": "05_telco/01_knowledge/02_Kontrak-Layanan-KON-2026-01.md"
+  },
+  {
+    "doc_id": "ADD-2026-02",
+    "judul": "Adendum Perjanjian Layanan KON-2026-01",
+    "status": "aktif",
+    "versi": "1.0",
+    "berkas": "05_telco/01_knowledge/03_Adendum-ADD-2026-02.md"
+  },
+  {
+    "doc_id": "MP-BILL-02-v1.0",
+    "judul": "Matriks Persetujuan Kompensasi SLA",
+    "status": "aktif",
+    "versi": "1.0",
+    "berkas": "05_telco/01_knowledge/04_Matriks-Persetujuan-MP-BILL-02_v1.0.md"
+  },
+  {
+    "doc_id": "PA-TN-01",
+    "judul": "Panduan Aplikasi Modul Klaim SLA",
+    "status": "aktif",
+    "versi": "1.0",
+    "berkas": "05_telco/01_knowledge/05_Panduan-Aplikasi-PA-TN-01.md"
+  },
+  {
+    "doc_id": "TPL-BILL-01-02",
+    "judul": "Template Berita Acara dan Surat Penolakan",
+    "status": "aktif",
+    "versi": "1.0",
+    "berkas": "05_telco/01_knowledge/06_Template-TPL-BILL-01-dan-02.md"
+  },
+  {
+    "doc_id": "SOP-KLAIM-SLA-01-v0.9",
+    "judul": "SOP Klaim Kompensasi SLA Pelanggan Korporat",
+    "status": "nonaktif",
+    "versi": "0.9",
+    "berkas": "05_telco/01_knowledge/archive/SOP-KLAIM-SLA-01_v0.9_TIDAK-BERLAKU.md"
+  }
+]

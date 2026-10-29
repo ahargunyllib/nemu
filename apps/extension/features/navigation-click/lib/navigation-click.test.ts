@@ -91,6 +91,15 @@ describe("runNavigationClick", () => {
     await expect(run.outcome).resolves.toBe("succeeded");
   });
 
+  test("succeeds when a completed in-page step removes its target", async () => {
+    renderMenu(() => document.querySelector(`[data-nemu-id="${menuClick.target}"]`)?.remove());
+    const run = startClick();
+
+    await vi.advanceTimersByTimeAsync(MORPH_MS + MAX_MOVE_MS);
+
+    await expect(run.outcome).resolves.toBe("succeeded");
+  });
+
   test("Esc before the click lands stops it without clicking", async () => {
     const menu = renderMenu();
     const run = startClick();

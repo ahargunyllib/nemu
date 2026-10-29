@@ -26,8 +26,15 @@ function AuthLayout() {
   return (
     <DemoDock>
       <AppShell
-        sidebar={<SideMenu footer={<UserMenu />} />}
-        header={<AppHeader start="Satker Demo · Yogyakarta" end={user.email} />}
+        sidebar={<SideMenu footer={<UserMenu />} workspaceId={user.workspaceId} />}
+        header={
+          <AppHeader
+            start={
+              user.workspaceId === "W-TELKO" ? "Billing Operations" : "Satker Demo · Yogyakarta"
+            }
+            end={user.email}
+          />
+        }
       >
         <Outlet />
       </AppShell>

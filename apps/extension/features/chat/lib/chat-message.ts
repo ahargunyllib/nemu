@@ -3,7 +3,13 @@ import type { NemuRequest, NemuResponse } from "@nemu/contracts";
 /** Asks the background to call `nemuChat` with the Demo App session. */
 export type ChatRequestMessage = {
   type: "nemu:chat";
+  requestId: string;
   request: Omit<NemuRequest, "user_id">;
+};
+
+export type ChatCancelMessage = {
+  type: "nemu:chat:cancel";
+  requestId: string;
 };
 
 export type ChatResult =
@@ -23,7 +29,20 @@ export function isChatRequestMessage(message: unknown): message is ChatRequestMe
     typeof message === "object" &&
     message !== null &&
     "type" in message &&
-    message.type === "nemu:chat"
+    message.type === "nemu:chat" &&
+    "requestId" in message &&
+    typeof message.requestId === "string"
+  );
+}
+
+export function isChatCancelMessage(message: unknown): message is ChatCancelMessage {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "type" in message &&
+    message.type === "nemu:chat:cancel" &&
+    "requestId" in message &&
+    typeof message.requestId === "string"
   );
 }
 
