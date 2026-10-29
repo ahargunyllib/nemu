@@ -26,6 +26,7 @@ function createTelcoDatabase(): DatabaseSync {
   database.exec(migration("20261028174400_curious_white_tiger"));
   database.exec(migration("20261028175159_workspace-demo-context"));
   database.exec(migration("20261028180000_seed_telco_workspace"));
+  database.exec(migration("20261029062952_quote_indonesian_demo_labels"));
   return database;
 }
 
@@ -54,6 +55,25 @@ describe("seeded telco workspace", () => {
     expect(chunks.some((chunk) => chunk.text.includes("TPL-BILL-02"))).toBe(true);
     expect(chunks.some((chunk) => chunk.text.includes("_peringatan"))).toBe(false);
     expect(chunks.some((chunk) => chunk.text.includes("expected_results"))).toBe(false);
+  });
+
+  test("quotes the Demo App's Indonesian labels in the application guide", () => {
+    const database = createTelcoDatabase();
+    const guide = (
+      database
+        .prepare(
+          "SELECT text FROM knowledge_chunk WHERE document_id = 'PA-TN-01' ORDER BY sequence",
+        )
+        .all() as Array<{ text: string }>
+    )
+      .map((chunk) => chunk.text)
+      .join("\n");
+
+    expect(guide).toContain("Buka Tugas Saya");
+    expect(guide).toContain("tekan Selesaikan Tugas");
+    expect(guide).toContain('tombol "Kembali ke tugas"');
+    expect(guide).toContain("tab Riwayat");
+    expect(guide).not.toMatch(/My Tasks|Complete Task|tab History/u);
   });
 
   test("stores the three claim fixtures and normalized authoritative values", () => {

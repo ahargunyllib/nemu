@@ -2189,7 +2189,7 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "title": "SOP-PD-01 Perjalanan Dinas Jabatan Dalam Negeri v1.0",
     "version": "2026-01-02",
     "active": true,
-    "text": "## 5. Alur di aplikasi\n\n| No | Langkah | Pelaku | Menu |\n|---|---|---|---|\n| 1 | Terbitkan surat tugas | Kepala Balai | My Task |\n| 2 | Buat pengajuan, pilih jenis perjalanan dan surat tugas | Pelaksana SPD | Ajukan Perjalanan Dinas |\n| 3 | Isi jadwal, biaya, dokumen, lalu kirim | Pelaksana SPD | Form pengajuan |\n| 4 | Setujui pengajuan | Atasan langsung | My Task |\n| 5 | Uji biaya terhadap SBM, setujui | PPK | My Task |\n| 6 | Bayar uang muka (bila diminta) | Bendahara | My Task |\n| 7 | Geotagging empat titik | Pelaksana SPD | My Request, detail perjalanan |\n| 8 | Kirim pertanggungjawaban | Pelaksana SPD | My Task, task Pertanggungjawaban |\n| 9 | Periksa kelengkapan | Verifikator | My Task |\n| 10 | Hitung rampung dan bayar atau tagih selisih | PPK dan Bendahara | My Task |"
+    "text": "## 5. Alur di aplikasi\n\n| No | Langkah | Pelaku | Menu |\n|---|---|---|---|\n| 1 | Terbitkan surat tugas | Kepala Balai | Tugas Saya |\n| 2 | Buat pengajuan, pilih jenis perjalanan dan surat tugas | Pelaksana SPD | Ajukan Perjalanan Dinas |\n| 3 | Isi jadwal, biaya, dokumen, lalu kirim | Pelaksana SPD | Form pengajuan |\n| 4 | Setujui pengajuan | Atasan langsung | Tugas Saya |\n| 5 | Uji biaya terhadap SBM, setujui | PPK | Tugas Saya |\n| 6 | Bayar uang muka (bila diminta) | Bendahara | Tugas Saya |\n| 7 | Geotagging empat titik | Pelaksana SPD | Pengajuan Saya, detail perjalanan |\n| 8 | Kirim pertanggungjawaban | Pelaksana SPD | Tugas Saya, task Pertanggungjawaban |\n| 9 | Periksa kelengkapan | Verifikator | Tugas Saya |\n| 10 | Hitung rampung dan bayar atau tagih selisih | PPK dan Bendahara | Tugas Saya |"
   },
   {
     "id": "sop-pd-01-section-6",
@@ -2205,7 +2205,7 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "title": "Panduan aplikasi Perjalanan Dinas v1.0",
     "version": "1.0",
     "active": true,
-    "text": "## Menu utama\n\n| Menu | Kode | Fungsi |\n|---|---|---|\n| Beranda | `[menu-beranda]` | Ringkasan task dan pengajuan aktif |\n| Ajukan Perjalanan Dinas | `[menu-ajukan-perjalanan-dinas]` | Membuat pengajuan baru |\n| My Request | `[menu-my-request]` | Daftar pengajuan milik saya dan statusnya |\n| My Task | `[menu-my-task]` | Task yang harus saya kerjakan, termasuk Pertanggungjawaban |"
+    "text": "## Menu utama\n\n| Menu | Kode | Fungsi |\n|---|---|---|\n| Beranda | `[menu-beranda]` | Ringkasan task dan pengajuan aktif |\n| Ajukan Perjalanan Dinas | `[menu-ajukan-perjalanan-dinas]` | Membuat pengajuan baru |\n| Pengajuan Saya | `[menu-my-request]` | Daftar pengajuan milik saya dan statusnya |\n| Tugas Saya | `[menu-my-task]` | Task yang harus saya kerjakan, termasuk Pertanggungjawaban |"
   },
   {
     "id": "panduan-app-section-2",

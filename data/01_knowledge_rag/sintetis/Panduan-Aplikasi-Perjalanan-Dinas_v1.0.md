@@ -10,8 +10,8 @@ Panduan ini menjelaskan menu dan isian di aplikasi Perjalanan Dinas milik Balai 
 |---|---|---|
 | Beranda | `[menu-beranda]` | Ringkasan task dan pengajuan aktif |
 | Ajukan Perjalanan Dinas | `[menu-ajukan-perjalanan-dinas]` | Membuat pengajuan baru |
-| My Request | `[menu-my-request]` | Daftar pengajuan milik saya dan statusnya |
-| My Task | `[menu-my-task]` | Task yang harus saya kerjakan, termasuk Pertanggungjawaban |
+| Pengajuan Saya | `[menu-my-request]` | Daftar pengajuan milik saya dan statusnya |
+| Tugas Saya | `[menu-my-task]` | Task yang harus saya kerjakan, termasuk Pertanggungjawaban |
 
 ## Membuat pengajuan
 

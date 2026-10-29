@@ -16,7 +16,7 @@ Semua pekerjaan klaim ada di satu alamat AlurKerja App. Menu kiri berisi:
 | Menu | Isinya | Dipakai di langkah |
 |---|---|---|
 | Beranda | Ringkasan task dan tenggat | Awal hari |
-| My Tasks | Task proses yang ditugaskan ke saya | Semua langkah |
+| Tugas Saya | Task proses yang ditugaskan ke saya | Semua langkah |
 | Mulai Proses | Memulai proses baru, termasuk "Klaim Kompensasi SLA" | Bila klaim belum teregistrasi |
 | CRM Layanan | Data pelanggan, service ID, kontrak, adendum | Langkah 2 |
 | Tiket NOC | Tiket gangguan dan RCA | Langkah 3 |
@@ -26,23 +26,23 @@ Tanggal di semua layar mengikuti jam server. Di lingkungan demo, tanggal dikunci
 
 ## Bab 2. Langkah 1: Registrasi Klaim
 
-1. Buka My Tasks, pilih task "Registrasi Klaim" dengan nomor klaim yang sesuai, misalnya KLM-2610-0007.
+1. Buka Tugas Saya, pilih task "Registrasi Klaim" dengan nomor klaim yang sesuai, misalnya KLM-2610-0007.
 2. Panel task terbuka di kanan. Isi Nomor surat pelanggan dari kop surat.
 3. Pilih Service ID dari daftar. Daftar hanya berisi layanan milik pelanggan di surat.
 4. Isi Periode gangguan (bulan dan tahun).
 5. Isi Tanggal klaim diterima dari stempel email billing, bukan tanggal di kop surat.
 6. Isi Jam diklaim pelanggan sesuai surat.
 7. Jawab "Diajukan tepat waktu?" sesuai SOP Pasal 2 ayat (1).
-8. Unggah surat klaim (PDF), lalu tekan Complete Task.
+8. Unggah surat klaim (PDF), lalu tekan Selesaikan Tugas.
 
 ## Bab 3. Langkah 2: Cocokkan Layanan & Kontrak
 
 1. Di panel task, tekan tautan "Buka di CRM Layanan". Halaman layanan terbuka di tab yang sama.
 2. Di CRM Layanan, buka tab "Kontrak & Adendum". SLA dasar tampil di kartu Kontrak. Bila ada adendum yang disahkan, kartu Adendum muncul di bawahnya dan menunjukkan pasal yang diganti.
-3. Kembali ke task lewat tombol "Kembali ke task".
+3. Kembali ke task lewat tombol "Kembali ke tugas".
 4. Isi SLA berlaku (%) dan Sumber SLA (kontrak atau adendum).
 5. Tekan "Buka invoice". Modul Billing menampilkan invoice periode klaim. Salin nomor invoice, lalu isi Abonemen sebelum PPN.
-6. Pilih "Data cocok" atau "Tidak cocok", lalu tekan Complete Task.
+6. Pilih "Data cocok" atau "Tidak cocok", lalu tekan Selesaikan Tugas.
 
 ## Bab 4. Langkah 3: Telaah Tiket Gangguan
 
@@ -58,12 +58,12 @@ Tanggal di semua layar mengikuti jam server. Di lingkungan demo, tanggal dikunci
 1. Tekan "Hitung". Sistem mengisi C, Av, A, B, dan Nominal usulan memakai formula KON-2026-01 Pasal 4.2.
 2. Periksa rincian, lalu tekan "Buat draft berita acara". Draft memakai Template TPL-BILL-01.
 3. Kolom Rute persetujuan terisi otomatis sesuai MP-BILL-02.
-4. Tekan Complete Task untuk mengirim ke penyetuju. Tombol ini hanya boleh ditekan oleh Billing Liaison sendiri.
+4. Tekan Selesaikan Tugas untuk mengirim ke penyetuju. Tombol ini hanya boleh ditekan oleh Billing Liaison sendiri.
 
 ## Bab 6. Langkah 5 dan 6: Persetujuan dan Credit Note
 
-1. Status persetujuan bisa dilihat di tab History pada task.
-2. Setelah semua penyetuju setuju, task "Terbitkan Credit Note" muncul di My Tasks milik Billing Finance.
+1. Status persetujuan bisa dilihat di tab Riwayat pada task.
+2. Setelah semua penyetuju setuju, task "Terbitkan Credit Note" muncul di Tugas Saya milik Billing Finance.
 3. Billing Liaison tidak perlu melakukan apa pun di langkah ini, kecuali diminta revisi.
 
 ## Bab 7. Istilah
