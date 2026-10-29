@@ -8,6 +8,7 @@ import type {
 } from "@nemu/contracts";
 import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
 
+import { isConfirmActionTarget, isProhibitedActionTarget } from "./action-safety.js";
 import type { JevDecision } from "./jev.js";
 import { normalizeDocumentName } from "./tools.js";
 
@@ -261,7 +262,7 @@ export function buildTravelWorkflowOutput({
     return {
       guide,
       actions:
-        actionsAllowed && menu
+        actionsAllowed && menu && !isProhibitedActionTarget(menu)
           ? [
               {
                 type: "click",
@@ -277,8 +278,9 @@ export function buildTravelWorkflowOutput({
   if (scenario === "travel_request_form_guidance") {
     const steps = createTravelSteps(request);
     const actions: NemuAction[] = actionsAllowed
-      ? steps.flatMap((step) =>
-          elementsById.has(step.target)
+      ? steps.flatMap((step) => {
+          const element = elementsById.get(step.target);
+          return element && !isProhibitedActionTarget(element)
             ? [
                 {
                   type: "highlight" as const,
@@ -287,15 +289,17 @@ export function buildTravelWorkflowOutput({
                   label: step.label,
                 },
               ]
-            : [],
-        )
+            : [];
+        })
       : [];
     // The dates and the transport mode render only while the form's Jadwal tab is open, so point
     // at the tab instead.
+    const scheduleTab = elementsById.get(NEMU_IDS.perdinForm.tabJadwal);
     if (
       actionsAllowed &&
       !elementsById.has(NEMU_IDS.perdinForm.tanggalBerangkat) &&
-      elementsById.has(NEMU_IDS.perdinForm.tabJadwal)
+      scheduleTab &&
+      !isProhibitedActionTarget(scheduleTab)
     ) {
       actions.push({
         type: "highlight",
@@ -333,7 +337,8 @@ export function buildTravelWorkflowOutput({
       },
     ];
     const actions: NemuAction[] = [];
-    if (actionsAllowed && visibleElementsById.has(NEMU_IDS.perdinForm.lodgingNotHotel)) {
+    const lodgingChoice = visibleElementsById.get(NEMU_IDS.perdinForm.lodgingNotHotel);
+    if (actionsAllowed && lodgingChoice && !isProhibitedActionTarget(lodgingChoice)) {
       actions.push({
         type: "highlight",
         target: NEMU_IDS.perdinForm.lodgingNotHotel,
@@ -341,7 +346,8 @@ export function buildTravelWorkflowOutput({
         label: steps[0]?.label ?? "Pilih: tidak menginap",
       });
     }
-    if (actionsAllowed && visibleElementsById.has(NEMU_IDS.perdinForm.lodgingAmount)) {
+    const lodgingAmount = visibleElementsById.get(NEMU_IDS.perdinForm.lodgingAmount);
+    if (actionsAllowed && lodgingAmount && !isProhibitedActionTarget(lodgingAmount)) {
       actions.push({
         type: "fill",
         target: NEMU_IDS.perdinForm.lodgingAmount,
@@ -363,18 +369,19 @@ export function buildTravelWorkflowOutput({
   const steps = accountabilitySteps(missingDocuments);
   const task = visibleElementsById.get(NEMU_IDS.task.pertanggungjawaban);
   const actions: NemuAction[] = [];
-  if (actionsAllowed && task) {
+  if (actionsAllowed && task && !isProhibitedActionTarget(task)) {
     actions.push({
       type: "click",
       target: task.nemu_id,
       level: "jalan_sendiri",
-      label: `Buka ${task.label}`,
+      label: "Buka Pertanggungjawaban",
     });
   } else if (actionsAllowed) {
     for (const step of steps) {
       const element = elementsById.get(step.target);
-      if (!element) continue;
+      if (!element || isProhibitedActionTarget(element)) continue;
       if (step.target === NEMU_IDS.pertanggungjawaban.kirim) {
+        if (!isConfirmActionTarget(element)) continue;
         actions.push({
           type: "confirm",
           target: element.nemu_id,

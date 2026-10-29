@@ -1,4 +1,9 @@
-import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
+import {
+  NEMU_IDS,
+  slaClaimDecisionNemuId,
+  slaClaimRequestRcaNemuId,
+  slaClaimTicketNemuId,
+} from "@nemu/contracts/nemu-ids";
 import { Badge } from "@nemu/ui/components/badge";
 import { Button, buttonVariants } from "@nemu/ui/components/button";
 import {
@@ -99,22 +104,6 @@ export type SlaClaimDetail = {
     excludedTicketIds: string[];
     approvers: string[];
   };
-};
-
-const TICKET_NEMU_ID: Record<string, string> = {
-  "INC-2609-014": NEMU_IDS.slaClaim.ticketInc2609014,
-  "INC-2609-015": NEMU_IDS.slaClaim.ticketInc2609015,
-  "INC-2609-031": NEMU_IDS.slaClaim.ticketInc2609031,
-  "INC-2609-047": NEMU_IDS.slaClaim.ticketInc2609047,
-  "INC-2609-058": NEMU_IDS.slaClaim.ticketInc2609058,
-};
-
-const DECISION_NEMU_ID: Record<string, string> = {
-  "INC-2609-014": NEMU_IDS.slaClaim.decisionInc2609014,
-  "INC-2609-015": NEMU_IDS.slaClaim.decisionInc2609015,
-  "INC-2609-031": NEMU_IDS.slaClaim.decisionInc2609031,
-  "INC-2609-047": NEMU_IDS.slaClaim.decisionInc2609047,
-  "INC-2609-058": NEMU_IDS.slaClaim.decisionInc2609058,
 };
 
 function formatDate(value: string): string {
@@ -315,7 +304,9 @@ function formatInterval(start: string, end: string): { days: string; times: stri
  */
 function TicketReview({ detail }: { detail: SlaClaimDetail }) {
   const { claim, context, summary } = detail;
-  const [rcaRequested, setRcaRequested] = useState(false);
+  const [requestedRcaTicketIds, setRequestedRcaTicketIds] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
   const [countedMinutes, setCountedMinutes] = useState<number | null>(null);
 
@@ -366,8 +357,9 @@ function TicketReview({ detail }: { detail: SlaClaimDetail }) {
             const minutes = (Date.parse(ticket.end) - Date.parse(ticket.start)) / 60_000;
             const decision = decisions[ticket.id];
             const interval = formatInterval(ticket.start, ticket.end);
+            const rcaRequested = requestedRcaTicketIds.has(ticket.id);
             return (
-              <TableRow key={ticket.id} data-nemu-id={TICKET_NEMU_ID[ticket.id]}>
+              <TableRow key={ticket.id} data-nemu-id={slaClaimTicketNemuId(ticket.id)}>
                 <TableCell className="font-medium">{ticket.id}</TableCell>
                 <TableCell>
                   <div>{interval.days}</div>
@@ -381,14 +373,14 @@ function TicketReview({ detail }: { detail: SlaClaimDetail }) {
                     <Badge variant={missing ? "destructive" : "secondary"}>
                       {ticket.rcaStatus}
                     </Badge>
-                    {ticket.id === "INC-2609-058" && (
+                    {missing && (
                       <Button
                         size="sm"
                         variant="outline"
                         disabled={rcaRequested}
-                        data-nemu-id={NEMU_IDS.slaClaim.requestRcaInc2609058}
+                        data-nemu-id={slaClaimRequestRcaNemuId(ticket.id)}
                         onClick={() => {
-                          setRcaRequested(true);
+                          setRequestedRcaTicketIds((current) => new Set([...current, ticket.id]));
                           toast.success(`Permintaan RCA ${ticket.id} dikirim ke NOC`);
                         }}
                       >
@@ -406,7 +398,7 @@ function TicketReview({ detail }: { detail: SlaClaimDetail }) {
                     onValueChange={(next) => decide(ticket.id, next[0] as Decision | undefined)}
                     disabled={missing}
                     aria-label={`Keputusan ${ticket.id}`}
-                    data-nemu-id={DECISION_NEMU_ID[ticket.id]}
+                    data-nemu-id={slaClaimDecisionNemuId(ticket.id)}
                   >
                     <ToggleGroupItem value="dihitung">Dihitung</ToggleGroupItem>
                     <ToggleGroupItem value="dikecualikan">Dikecualikan</ToggleGroupItem>

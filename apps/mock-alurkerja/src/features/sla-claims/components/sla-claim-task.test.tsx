@@ -169,6 +169,34 @@ describe("SlaClaimTask", () => {
     expect(screen.getByText("Diklaim pelanggan").nextElementSibling?.textContent).toBe("25,5 jam");
   });
 
+  test("renders ticket and decision targets for a ticket outside the seeded id list", () => {
+    const base = detail("Telaah Tiket Gangguan");
+    const { container } = renderTask(
+      <SlaClaimTask
+        assignee="Dimas Pratama"
+        detail={{
+          ...base,
+          context: {
+            ...base.context,
+            tickets: [
+              {
+                id: "INC-2609-022",
+                start: "2026-09-07T09:00:00+07:00",
+                end: "2026-09-07T21:00:00+07:00",
+                cause: "PENYEDIA",
+                rcaId: "RCA-2609-09",
+                rcaStatus: "DISAHKAN",
+              },
+            ],
+          },
+        }}
+      />,
+    );
+
+    expect(container.querySelector('[data-nemu-id="row-tiket-inc-2609-022"]')).not.toBeNull();
+    expect(container.querySelector('[data-nemu-id="seg-keputusan-INC-2609-022"]')).not.toBeNull();
+  });
+
   test("renders the missing-RCA branch without a final compensation amount", () => {
     const { container } = renderTask(
       <SlaClaimTask
@@ -186,15 +214,15 @@ describe("SlaClaimTask", () => {
     expect(screen.getByText(/Nominal belum dapat ditetapkan/)).toBeTruthy();
   });
 
-  test("asks NOC for the missing RCA once", () => {
+  test("asks NOC once for a missing RCA outside the seeded ticket list", () => {
     const { container } = renderTask(
       <SlaClaimTask
         assignee="Dimas Pratama"
-        detail={detail("Telaah Tiket Gangguan", { missingTicketIds: ["INC-2609-058"] })}
+        detail={detail("Telaah Tiket Gangguan", { missingTicketIds: ["INC-2609-099"] })}
       />,
     );
     const request = container.querySelector<HTMLButtonElement>(
-      `[data-nemu-id="${NEMU_IDS.slaClaim.requestRcaInc2609058}"]`,
+      '[data-nemu-id="button-minta-rca-inc-2609-099"]',
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Minta RCA" }));
