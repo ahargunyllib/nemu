@@ -7,11 +7,17 @@ import {
   besideComposer,
   besideCursor,
   FOLLOW_MS,
+  type Followed,
   followCursor,
   type Point,
 } from "../lib/mascot-position";
 
-export type MascotPlacement = { at: Point; moveMs: number };
+export type MascotPlacement = {
+  at: Point;
+  moveMs: number;
+  /** Set while the mascot has stopped because the cursor is reaching for it: it can be clicked. */
+  waiting?: boolean;
+};
 
 /**
  * Where the mascot is and how long it takes to get there. It follows Rina's cursor, waits beside
@@ -24,7 +30,7 @@ export function useMascotPosition(
   nemuCursor: CursorFrame | null,
   draggedArea: Box | null = null,
 ): MascotPlacement | null {
-  const [followed, setFollowed] = useState<Point | null>(null);
+  const [followed, setFollowed] = useState<Followed | null>(null);
 
   useEffect(() => {
     let previous: Point | null = null;
@@ -32,7 +38,7 @@ export function useMascotPosition(
       const from = previous;
       const cursor = { x: event.clientX, y: event.clientY };
       const viewport = { width: window.innerWidth, height: window.innerHeight };
-      setFollowed((mascot) => followCursor(mascot, from, cursor, viewport));
+      setFollowed((mascot) => followCursor(mascot?.at ?? null, from, cursor, viewport));
       previous = cursor;
     }
     window.addEventListener("mousemove", follow, { passive: true });
@@ -52,5 +58,5 @@ export function useMascotPosition(
       moveMs: (nemuCursor.mascot === "clicking" && nemuCursor.moveMs) || FOLLOW_MS,
     };
   }
-  return followed && { at: followed, moveMs: FOLLOW_MS };
+  return followed && { ...followed, moveMs: FOLLOW_MS };
 }
