@@ -19,16 +19,25 @@ export const ACTION_LEVELS: Partial<Record<NemuId, ActionLevel>> = {
   [NEMU_IDS.shell.menuMyTask]: "jalan_sendiri",
   [NEMU_IDS.task.pertanggungjawaban]: "jalan_sendiri",
   [NEMU_IDS.taskDetail.back]: "jalan_sendiri",
+  [NEMU_IDS.slaClaim.taskKlm26100007]: "jalan_sendiri",
+  [NEMU_IDS.slaClaim.taskKlm26100009]: "jalan_sendiri",
+  [NEMU_IDS.slaClaim.taskKlm26100011]: "jalan_sendiri",
+  [NEMU_IDS.slaClaim.crmService]: "jalan_sendiri",
+  [NEMU_IDS.slaClaim.crmContractTab]: "jalan_sendiri",
+  [NEMU_IDS.slaClaim.returnToTask]: "jalan_sendiri",
   [NEMU_IDS.favoriteProcess.perjalananDinas]: "jalan_sendiri",
 
   // Buttons that submit something: the user presses them.
   [NEMU_IDS.login.submit]: "konfirmasi",
   [NEMU_IDS.perdinForm.kirim]: "konfirmasi",
   [NEMU_IDS.pertanggungjawaban.kirim]: "konfirmasi",
+  [NEMU_IDS.slaClaim.submit]: "konfirmasi",
+  [NEMU_IDS.slaClaim.approve]: "dilarang",
 
   // Account actions Nemu never takes.
   [NEMU_IDS.login.signInAsRina]: "dilarang",
   [NEMU_IDS.login.signInAsVerifikator]: "dilarang",
+  [NEMU_IDS.login.signInAsDimas]: "dilarang",
   [NEMU_IDS.shell.accountMenu]: "dilarang",
   [NEMU_IDS.shell.signOut]: "dilarang",
 };

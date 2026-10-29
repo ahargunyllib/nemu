@@ -1,6 +1,7 @@
 import type { PageElement } from "@nemu/contracts";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useGuideSession } from "../../guide/hooks/use-guide-session";
 import { sendChatRequest } from "../api/chat-messaging";
 import type { ChatResult } from "../lib/chat-message";
 
@@ -15,59 +16,88 @@ export type ChatState =
       | ChatResult
     ));
 
-type Question = { prompt: string; followedUp: boolean };
+type Question = { prompt: string; fallbackFollowedUp: boolean };
 
 export function useNemuChat() {
   const [sessionId] = useState(() => crypto.randomUUID());
   const [state, setState] = useState<ChatState>({ kind: "idle" });
   const latestRequest = useRef(0);
+  const pendingRequest = useRef<AbortController | null>(null);
   const question = useRef<Question | null>(null);
+  const guide = useGuideSession();
 
   const request = useCallback(
     async (prompt: string, elements: PageElement[], screenshotCrop?: string) => {
       const requestId = ++latestRequest.current;
+      pendingRequest.current?.abort();
+      const controller = new AbortController();
+      pendingRequest.current = controller;
       setState({ kind: "loading", prompt, elements, screenshotCrop });
-      const result = await sendChatRequest({
-        session_id: sessionId,
-        url: window.location.href,
-        prompt,
-        elements,
-        ...(screenshotCrop && { screenshot_crop: screenshotCrop }),
-      });
-      if (requestId === latestRequest.current) {
+      const result = await sendChatRequest(
+        {
+          session_id: sessionId,
+          url: window.location.href,
+          prompt,
+          elements,
+          ...(screenshotCrop && { screenshot_crop: screenshotCrop }),
+        },
+        controller.signal,
+      );
+      if (pendingRequest.current === controller) pendingRequest.current = null;
+      if (result && requestId === latestRequest.current) {
+        guide.synchronize(prompt, result.kind === "response" ? result.response.guide : undefined);
         setState({ ...result, prompt, elements, screenshotCrop });
       }
     },
-    [sessionId],
+    [guide.synchronize, sessionId],
   );
 
   const send = useCallback(
     (prompt: string, elements: PageElement[], screenshotCrop?: string) => {
-      question.current = { prompt, followedUp: false };
+      guide.clear();
+      question.current = { prompt, fallbackFollowedUp: false };
       return request(prompt, elements, screenshotCrop);
     },
-    [request],
+    [guide.clear, request],
   );
 
   /**
-   * Asks the current question again from the page a click opened, at most once per question.
+   * Asks the current question again from the page a click opened, once per guide/page/step.
+   * Responses without a guide keep the legacy one-follow-up limit.
    * The Area Crop shows the page before the click, so it stays behind.
    */
   const followUp = useCallback(
     (elements: PageElement[]) => {
       const current = question.current;
-      if (!current || current.followedUp) return;
-      current.followedUp = true;
+      if (!current) return;
+      if (guide.session) {
+        if (!guide.reserveFollowUp(window.location.href)) return;
+      } else {
+        if (current.fallbackFollowedUp) return;
+        current.fallbackFollowedUp = true;
+      }
       return request(current.prompt, elements);
     },
-    [request],
+    [guide.reserveFollowUp, guide.session, request],
   );
 
-  const reset = useCallback(() => {
+  const cancel = useCallback(() => {
     latestRequest.current++;
+    pendingRequest.current?.abort();
+    pendingRequest.current = null;
     question.current = null;
+    guide.clear();
     setState({ kind: "idle" });
-  }, []);
+  }, [guide.clear]);
 
-  return { state, send, followUp, reset };
+  useEffect(() => {
+    if (state.kind !== "loading") return;
+    const cancelOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") cancel();
+    };
+    window.addEventListener("keydown", cancelOnEscape, { capture: true });
+    return () => window.removeEventListener("keydown", cancelOnEscape, { capture: true });
+  }, [cancel, state.kind]);
+
+  return { state, guideSession: guide.session, send, followUp, cancel, reset: cancel };
 }

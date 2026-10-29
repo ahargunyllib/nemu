@@ -23,6 +23,11 @@ rounded, as in AlurKerja.
 | My Request              | `/my-request`              |
 | My Task                 | `/my-task`                 |
 | Task detail             | `/perdin/task/$instanceId` |
+| Klaim SLA               | `/sla-claims`              |
+| Task klaim SLA          | `/sla-claims/$claimId`     |
+| CRM Layanan             | `/crm/$serviceId`          |
+| Tiket NOC               | `/noc/$serviceId`          |
+| Billing                 | `/billing/$invoiceId`      |
 
 The Task detail page of a Pertanggungjawaban is the Pertanggungjawaban task page.
 
@@ -53,11 +58,14 @@ and "Good morning, Rina." it shows three cards:
   are not in the demo.
 - **Up next**: the user's Tasks from `listMyTasks`, each with its `task-*` id,
   and "View all … tasks" to My Task. A Task row shows the process initials, the
-  Task, the process, and when it is due: "Today", the due day ("Nov 13"), or how
-  late it is ("1 day late", in red). The due date is the task sheet's Due Date,
-  a week after the Task opened, since the demo keeps no due date. The Overdue,
-  Due Today, Upcoming, and All Tasks chips count the Tasks and filter the list,
-  counting days in WIB.
+  Task, the process, and when it is due: "Today", the due day ("Nov 12"), or how
+  late it is ("1 day late", in red), counted from the demo clock's day. The due
+  date is the task sheet's Due Date, which the Nemu Service sends with the Task:
+  Pertanggungjawaban opens on `tanggalKembali` and falls due on the batas
+  pertanggungjawaban, 5 working days later on the AI's own
+  `batas_pertanggungjawaban` and holidays; the other Tasks open on the demo
+  clock's day and get a week. The Overdue, Due Today, Upcoming, and All Tasks
+  chips count the Tasks and filter the list.
 - **My Performance**: static demo figures for the 30 days up to the demo clock's
   day.
 
@@ -176,8 +184,10 @@ ST-090/2026) and attaches a stand-in `undangan-rapat-koordinasi.pdf`. It leaves
 Penginapan and Nominal penginapan empty, because in Momen 2 Rina asks Nemu how
 to fill them in.
 
-"Today" is the demo clock, `NEMU_DEMO_DATE` (2026-11-06), the same setting the
-AI counts from; Beranda shows it through `getDemoClock`.
+"Today" comes from the signed-in user's workspace and is the same date the AI
+uses. `W-TRAVEL` uses 2026-11-06 and `W-TELKO` uses 2026-10-14; Beranda and the
+task sheet read it through `getDemoClock`. `NEMU_DEMO_DATE` remains the fallback
+when a workspace has no stored configuration.
 
 ## 3-Momen fixtures
 
@@ -187,7 +197,7 @@ Pertanggungjawaban with the surat tugas and boarding pass pergi uploaded, so
 the boarding pass pulang and laporan perjalanan are missing (Momen 3). That
 migration is already applied, so a change to
 `packages/api/src/modules/process-instances/demo-seed.ts` needs a new migration
-that updates the seeded rows, such as `*_fix-demo-boarding-pass-yia` (create
+that updates the seeded rows, such as `*_correct_demo_boarding_pass` (create
 one with `pnpm exec drizzle-kit generate --custom --name <name>` in
 `packages/db`). `demo-seed.test.ts` replays every migration and checks the
 result matches `demo-seed.ts`.
@@ -198,10 +208,11 @@ A migration (`packages/db/src/migrations/*_seed-demo-accounts`) seeds both
 accounts, so they exist locally and after every deploy. The login page also has
 one-click buttons for them.
 
-| Account     | Email                   | Password                | Golongan | Role        |
-| ----------- | ----------------------- | ----------------------- | -------- | ----------- |
-| Rina        | `rina@nemu.demo`        | `rina-demo-2026`        | III/a    | pegawai     |
-| Verifikator | `verifikator@nemu.demo` | `verifikator-demo-2026` | III/c    | verifikator |
+| Account     | Email                   | Password                | Golongan | Role            |
+| ----------- | ----------------------- | ----------------------- | -------- | --------------- |
+| Rina        | `rina@nemu.demo`        | `rina-demo-2026`        | III/a    | pegawai         |
+| Verifikator | `verifikator@nemu.demo` | `verifikator-demo-2026` | III/c    | verifikator     |
+| Dimas       | `dimas@nemu.demo`       | `dimas-demo-2026`       | –        | billing_liaison |
 
 Rina's user id is `rina`, matching the fixtures in `@nemu/contracts/fixtures`.
 

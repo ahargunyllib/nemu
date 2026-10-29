@@ -1,8 +1,8 @@
 {
-  "id": "26f9103b-2c23-474a-8113-0a4368810f64",
-  "prevIds": ["ff650b53-d752-40b6-a221-5dbd47ce2dfb"],
   "version": "7",
   "dialect": "sqlite",
+  "id": "9e99a754-65d8-4538-93f7-f317a764f934",
+  "prevIds": ["2def9214-722e-45c6-8689-f84259bcd73d"],
   "ddl": [
     {
       "name": "account",
@@ -18,6 +18,10 @@
     },
     {
       "name": "verification",
+      "entityType": "tables"
+    },
+    {
+      "name": "knowledge_chunk",
       "entityType": "tables"
     },
     {
@@ -312,6 +316,26 @@
     },
     {
       "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "unit",
+      "entityType": "columns",
+      "table": "user"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "province",
+      "entityType": "columns",
+      "table": "user"
+    },
+    {
+      "type": "text",
       "notNull": true,
       "autoincrement": false,
       "default": "'pegawai'",
@@ -399,6 +423,76 @@
       "name": "updated_at",
       "entityType": "columns",
       "table": "verification"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "knowledge_chunk"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "document_id",
+      "entityType": "columns",
+      "table": "knowledge_chunk"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "article",
+      "entityType": "columns",
+      "table": "knowledge_chunk"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "section",
+      "entityType": "columns",
+      "table": "knowledge_chunk"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "page",
+      "entityType": "columns",
+      "table": "knowledge_chunk"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "sequence",
+      "entityType": "columns",
+      "table": "knowledge_chunk"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "text",
+      "entityType": "columns",
+      "table": "knowledge_chunk"
     },
     {
       "type": "text",
@@ -953,6 +1047,17 @@
       "table": "session"
     },
     {
+      "columns": ["document_id"],
+      "tableTo": "knowledge_document",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "name": "fk_knowledge_chunk_document_id_knowledge_document_id_fk",
+      "entityType": "fks",
+      "table": "knowledge_chunk"
+    },
+    {
       "columns": ["instance_id"],
       "tableTo": "process_instance",
       "columnsTo": ["id"],
@@ -1018,6 +1123,13 @@
       "nameExplicit": false,
       "name": "verification_pk",
       "table": "verification",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "knowledge_chunk_pk",
+      "table": "knowledge_chunk",
       "entityType": "pks"
     },
     {
@@ -1089,6 +1201,24 @@
       "name": "verification_identifier_idx",
       "entityType": "indexes",
       "table": "verification"
+    },
+    {
+      "columns": [
+        {
+          "value": "document_id",
+          "isExpression": false
+        },
+        {
+          "value": "sequence",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "knowledge_chunk_documentId_idx",
+      "entityType": "indexes",
+      "table": "knowledge_chunk"
     },
     {
       "columns": [

@@ -1,15 +1,32 @@
-import { type Database, desc, eq } from "@nemu/db";
-import { knowledgeDocument } from "@nemu/db/schema/documents";
+import { and, type Database, desc, eq, getColumns } from "@nemu/db";
+import { knowledgeChunk, knowledgeDocument } from "@nemu/db/schema/documents";
 
 export type DocumentRecord = typeof knowledgeDocument.$inferSelect;
 export type NewDocumentRecord = typeof knowledgeDocument.$inferInsert;
+export type KnowledgeChunkRecord = typeof knowledgeChunk.$inferSelect;
+export type NewKnowledgeChunkRecord = typeof knowledgeChunk.$inferInsert;
+export type ActiveKnowledgeChunkRecord = KnowledgeChunkRecord & {
+  documentTitle: string;
+  documentVersion: string;
+};
 
 export type DocumentRepository = {
   insert(record: NewDocumentRecord): Promise<DocumentRecord>;
-  list(): Promise<DocumentRecord[]>;
-  findById(id: string): Promise<DocumentRecord | undefined>;
-  setActive(id: string, isActive: boolean): Promise<DocumentRecord | undefined>;
-  delete(id: string): Promise<DocumentRecord | undefined>;
+  list(workspaceId: string): Promise<DocumentRecord[]>;
+  findById(workspaceId: string, id: string): Promise<DocumentRecord | undefined>;
+  setActive(
+    workspaceId: string,
+    id: string,
+    isActive: boolean,
+  ): Promise<DocumentRecord | undefined>;
+  setFailed(id: string, failureReason: string): Promise<DocumentRecord | undefined>;
+  replaceChunksAndSetReady(
+    documentId: string,
+    chunks: NewKnowledgeChunkRecord[],
+    isActive: boolean,
+  ): Promise<DocumentRecord>;
+  listActiveReadyChunks(workspaceId?: string): Promise<ActiveKnowledgeChunkRecord[]>;
+  delete(workspaceId: string, id: string): Promise<DocumentRecord | undefined>;
 };
 
 export function createDocumentRepository(db: Database): DocumentRepository {
@@ -21,29 +38,80 @@ export function createDocumentRepository(db: Database): DocumentRepository {
       }
       return inserted;
     },
-    list() {
-      return db.select().from(knowledgeDocument).orderBy(desc(knowledgeDocument.createdAt));
+    list(workspaceId) {
+      return db
+        .select()
+        .from(knowledgeDocument)
+        .where(eq(knowledgeDocument.workspaceId, workspaceId))
+        .orderBy(desc(knowledgeDocument.createdAt));
     },
-    async findById(id) {
+    async findById(workspaceId, id) {
       const [found] = await db
         .select()
         .from(knowledgeDocument)
-        .where(eq(knowledgeDocument.id, id))
+        .where(and(eq(knowledgeDocument.workspaceId, workspaceId), eq(knowledgeDocument.id, id)))
         .limit(1);
       return found;
     },
-    async setActive(id, isActive) {
+    async setActive(workspaceId, id, isActive) {
       const [updated] = await db
         .update(knowledgeDocument)
         .set({ isActive })
+        .where(
+          and(
+            eq(knowledgeDocument.workspaceId, workspaceId),
+            eq(knowledgeDocument.id, id),
+            eq(knowledgeDocument.status, "ready"),
+          ),
+        )
+        .returning();
+      return updated;
+    },
+    async setFailed(id, failureReason) {
+      const [updated] = await db
+        .update(knowledgeDocument)
+        .set({ status: "failed", failureReason, isActive: false })
         .where(eq(knowledgeDocument.id, id))
         .returning();
       return updated;
     },
-    async delete(id) {
+    replaceChunksAndSetReady(documentId, chunks, isActive) {
+      return db.transaction(async (tx) => {
+        await tx.delete(knowledgeChunk).where(eq(knowledgeChunk.documentId, documentId));
+        if (chunks.length > 0) await tx.insert(knowledgeChunk).values(chunks);
+        const [updated] = await tx
+          .update(knowledgeDocument)
+          .set({ status: "ready", failureReason: null, isActive })
+          .where(eq(knowledgeDocument.id, documentId))
+          .returning();
+        if (!updated) {
+          throw new Error(`Knowledge document ${documentId} disappeared while indexing`);
+        }
+        return updated;
+      });
+    },
+    listActiveReadyChunks(workspaceId = "W-TRAVEL") {
+      return db
+        .select({
+          ...getColumns(knowledgeChunk),
+          documentTitle: knowledgeDocument.title,
+          documentVersion: knowledgeDocument.version,
+        })
+        .from(knowledgeChunk)
+        .innerJoin(knowledgeDocument, eq(knowledgeDocument.id, knowledgeChunk.documentId))
+        .where(
+          and(
+            eq(knowledgeDocument.workspaceId, workspaceId),
+            eq(knowledgeDocument.isActive, true),
+            eq(knowledgeDocument.status, "ready"),
+          ),
+        )
+        .orderBy(knowledgeChunk.documentId, knowledgeChunk.sequence);
+    },
+    async delete(workspaceId, id) {
       const [deleted] = await db
         .delete(knowledgeDocument)
-        .where(eq(knowledgeDocument.id, id))
+        .where(and(eq(knowledgeDocument.workspaceId, workspaceId), eq(knowledgeDocument.id, id)))
         .returning();
       return deleted;
     },

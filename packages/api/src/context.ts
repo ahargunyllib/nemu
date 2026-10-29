@@ -18,9 +18,13 @@ export type Context = {
   db: Database;
   nemu: NemuService;
   documentFiles: DocumentFileStore;
-  /** "Today" in the demo (NEMU_DEMO_DATE, YYYY-MM-DD), shared by the Demo App and the AI. */
+  /** Workspace-owned demo date (YYYY-MM-DD), shared by the Demo App and the AI. */
   demoDate: string;
 };
 
-/** The context of a `protectedProcedure`: the session is always there. */
-export type AuthenticatedContext = Context & { session: Session };
+export type AuthenticatedSession = Session & {
+  user: Session["user"] & { role: string; workspaceId: string };
+};
+
+/** The context of a `protectedProcedure`: the session and authorization fields are always there. */
+export type AuthenticatedContext = Omit<Context, "session"> & { session: AuthenticatedSession };

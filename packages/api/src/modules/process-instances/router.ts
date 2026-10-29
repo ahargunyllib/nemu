@@ -36,7 +36,7 @@ export const processInstancesRouter = {
   ),
 
   listMyTasks: protectedProcedure.handler(({ context }) =>
-    listMyTasks(createProcessInstanceDeps(context.db), context.session.user.id),
+    listMyTasks(createProcessInstanceDeps(context.db), context.session.user.id, context.demoDate),
   ),
 
   getProcessInstance: protectedProcedure
@@ -46,6 +46,7 @@ export const processInstancesRouter = {
         createProcessInstanceDeps(context.db),
         context.session.user.id,
         input.instanceId,
+        context.demoDate,
       );
       if (!instance) {
         throw new ORPCError("NOT_FOUND", {

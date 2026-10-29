@@ -29,6 +29,13 @@ export const pageElementSchema = z
 export const processContextSchema = z
   .object({
     instance_id: z.string().min(1).max(160),
+    workspace: z
+      .object({
+        id: z.string().min(1).max(160),
+        domain: z.enum(["travel", "telco_sla"]),
+      })
+      .strict()
+      .optional(),
     active_task: z.string().min(1).max(160).optional(),
     status: z.string().min(1).max(120).optional(),
     return_date: isoDateSchema.optional(),
@@ -69,6 +76,11 @@ export const calculationSchema = z
       "uang_harian",
       "batas_pertanggungjawaban",
       "sisa_hari_kerja",
+      "claim_cutoff",
+      "merge_claim_intervals",
+      "sla_compensation",
+      "claim_approval_route",
+      "claim_evidence_guard",
     ]),
     input: z.record(z.string(), calculationValueSchema),
     hasil: calculationValueSchema,
@@ -76,31 +88,67 @@ export const calculationSchema = z
   })
   .strict();
 
-export const actionTypeSchema = z.enum(["click", "highlight", "confirm"]);
+export const actionTypeSchema = z.enum(["click", "highlight", "confirm", "fill"]);
 export const actionLevelSchema = z.enum(["jalan_sendiri", "arahkan", "konfirmasi"]);
 
-export const nemuActionSchema = z
+const actionTargetShape = {
+  target: nemuIdSchema,
+  label: z.string().min(1).max(120),
+};
+
+export const nemuActionSchema = z.discriminatedUnion("type", [
+  z
+    .object({
+      type: z.literal("click"),
+      ...actionTargetShape,
+      level: z.literal("jalan_sendiri"),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("highlight"),
+      ...actionTargetShape,
+      level: actionLevelSchema,
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("confirm"),
+      ...actionTargetShape,
+      level: z.literal("konfirmasi"),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("fill"),
+      ...actionTargetShape,
+      level: z.literal("konfirmasi"),
+      value: z.string().min(1).max(500),
+    })
+    .strict(),
+]);
+
+export const nemuGuideStepSchema = z
   .object({
-    type: actionTypeSchema,
+    id: z.string().min(1).max(160),
     target: nemuIdSchema,
-    level: actionLevelSchema,
     label: z.string().min(1).max(120),
   })
-  .strict()
-  .superRefine((action, context) => {
-    if (action.type === "click" && action.level !== "jalan_sendiri") {
-      context.addIssue({
-        code: "custom",
-        message: "A click action requires the jalan_sendiri level",
-        path: ["level"],
-      });
-    }
+  .strict();
 
-    if (action.type === "confirm" && action.level !== "konfirmasi") {
+export const nemuGuideSchema = z
+  .object({
+    id: z.string().min(1).max(160),
+    steps: z.array(nemuGuideStepSchema).min(1).max(20),
+    current_step: z.number().int().min(1),
+  })
+  .strict()
+  .superRefine((guide, context) => {
+    if (guide.current_step > guide.steps.length) {
       context.addIssue({
         code: "custom",
-        message: "A confirm action requires the konfirmasi level",
-        path: ["level"],
+        message: "Guide progress must reference an existing step",
+        path: ["current_step"],
       });
     }
   });
@@ -134,11 +182,19 @@ export const nemuResponseSchema = z
     citations: z.array(citationSchema).max(20),
     calc: z.array(calculationSchema).max(20),
     actions: z.array(nemuActionSchema).max(20),
+    guide: nemuGuideSchema.optional(),
     warnings: z.array(z.string().min(1).max(500)).max(20),
     timing: timingSchema.optional(),
   })
   .strict()
   .superRefine((response, context) => {
+    if (response.status !== "answer" && response.guide) {
+      context.addIssue({
+        code: "custom",
+        message: `${response.status} responses cannot contain a guide`,
+        path: ["guide"],
+      });
+    }
     if ((response.status === "refuse" || response.status === "error") && response.actions.length) {
       context.addIssue({
         code: "custom",
@@ -154,5 +210,7 @@ export type NemuRequest = z.infer<typeof nemuRequestSchema>;
 export type Citation = z.infer<typeof citationSchema>;
 export type Calculation = z.infer<typeof calculationSchema>;
 export type NemuAction = z.infer<typeof nemuActionSchema>;
+export type NemuGuideStep = z.infer<typeof nemuGuideStepSchema>;
+export type NemuGuide = z.infer<typeof nemuGuideSchema>;
 export type NemuAnswer = z.infer<typeof nemuAnswerSchema>;
 export type NemuResponse = z.infer<typeof nemuResponseSchema>;

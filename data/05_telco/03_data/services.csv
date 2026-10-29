@@ -1,0 +1,4 @@
+service_id,pelanggan,lokasi,produk,bandwidth_mbps,abonemen_idr,kontrak_id,adendum_id,sla_dasar_persen,sla_berlaku_persen,aktif_sejak
+TN-ENT-001,PT Arunika Retail,"Kantor pusat, Jakarta Selatan",Internet Dedicated,100,30000000,KON-2026-01,,99.00,99.00,2026-09-01
+TN-ENT-002,PT Arunika Retail,"Gudang distribusi, Cikarang",Internet Dedicated,100,30000000,KON-2026-01,ADD-2026-02,99.00,99.50,2026-09-01
+TN-ENT-003,PT Arunika Retail,"Toko flagship, Bandung",Internet Dedicated,50,12000000,KON-2026-01,,99.00,99.00,2026-08-01

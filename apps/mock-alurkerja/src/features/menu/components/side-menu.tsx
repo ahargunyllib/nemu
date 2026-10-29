@@ -15,13 +15,49 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronRightIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { MENU_ITEMS } from "@/features/menu/lib/menu-items";
+import { MENU_ITEMS, TELCO_MENU_ITEMS } from "@/features/menu/lib/menu-items";
 import { orpc } from "@/shared/api/orpc";
 
-/** AlurKerja's dark side menu: Start a Process, the menus, and the signed-in user at the bottom. */
-export default function SideMenu({ footer }: { footer: ReactNode }) {
+/**
+ * AlurKerja's dark side menu: Start a Process, the menus, and the signed-in user at the bottom.
+ * The W-TELKO workspace gets its SLA-claim menus instead.
+ */
+export default function SideMenu({
+  footer,
+  workspaceId,
+}: {
+  footer: ReactNode;
+  workspaceId?: string | null;
+}) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const { data: tasks } = useQuery(orpc.listMyTasks.queryOptions());
+  const isTelco = workspaceId === "W-TELKO";
+  const { data: tasks } = useQuery(orpc.listMyTasks.queryOptions({ enabled: !isTelco }));
+
+  if (isTelco) {
+    return (
+      <AppSidebar aria-label="Menu utama">
+        <SidebarContent>
+          <SidebarGroup className="px-3 pt-4.5 pb-0">
+            <SidebarMenu className="gap-0.75">
+              {TELCO_MENU_ITEMS.map(({ href, label, nemuId }) => (
+                <SidebarMenuItem key={href}>
+                  <SidebarMenuButton
+                    className="px-2.5"
+                    isActive={href === "/" ? pathname === "/" : pathname.startsWith(href)}
+                    data-nemu-id={nemuId}
+                    render={<a href={href} />}
+                  >
+                    <span className="flex-1 truncate">{label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarFooter className="px-3 pb-24">{footer}</SidebarFooter>
+      </AppSidebar>
+    );
+  }
 
   return (
     <AppSidebar aria-label="Menu utama">

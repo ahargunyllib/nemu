@@ -1,8 +1,13 @@
 import type { Context as ApiContext } from "@nemu/api/context";
 import type { Context as HonoContext } from "hono";
 
-import { ENV } from "./env.server";
-import { createAuth, createDocumentFileStore, createNemuService, getDb } from "./services";
+import {
+  createAuth,
+  createDocumentFileStore,
+  createNemuService,
+  getDb,
+  getWorkspaceDemoDate,
+} from "./services";
 
 export type CreateContextOptions = {
   context: HonoContext;
@@ -15,12 +20,13 @@ export async function createContext({ context }: CreateContextOptions): Promise<
   ).api.getSession({
     headers: context.req.raw.headers,
   });
+  const workspaceId = session?.user.workspaceId ?? "W-TRAVEL";
   return {
     db,
     session,
-    nemu: createNemuService(),
+    nemu: createNemuService(db),
     documentFiles: createDocumentFileStore(),
-    demoDate: ENV.NEMU_DEMO_DATE,
+    demoDate: await getWorkspaceDemoDate(db, workspaceId),
   };
 }
 

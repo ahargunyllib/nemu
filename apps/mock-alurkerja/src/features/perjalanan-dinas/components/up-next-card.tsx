@@ -12,9 +12,9 @@ import { useState } from "react";
 import {
   DUE_FILTERS,
   type DueFilter,
-  daysUntilDue,
+  dayToDate,
+  daysUntil,
   matchesDueFilter,
-  taskDueDate,
 } from "@/features/perjalanan-dinas/lib/task-due";
 import { TASK_NEMU_IDS } from "@/features/perjalanan-dinas/lib/tasks";
 import type { ProcessInstanceView } from "@/features/perjalanan-dinas/types/process-instance-view";
@@ -22,34 +22,33 @@ import ProcessBadge from "@/features/processes/components/process-badge";
 import { PERJALANAN_DINAS } from "@/features/processes/lib/processes";
 import { orpc } from "@/shared/api/orpc";
 
-// Due dates read in WIB, as on the task sheet.
+// Due dates are days on the demo clock, so they read in UTC (see `dayToDate`).
 const shortDate = new Intl.DateTimeFormat("en-US", {
   month: "short",
   day: "numeric",
-  timeZone: "Asia/Jakarta",
+  timeZone: "UTC",
 });
 
 type DueTask = ProcessInstanceView & {
   activeTask: NonNullable<ProcessInstanceView["activeTask"]>;
-  due: Date;
   daysLeft: number;
 };
 
 /**
  * Up next on Beranda: the signed-in user's Tasks with their due dates, filtered by the chips, each
- * opening its task page.
+ * opening its task page. Days left count from the demo clock's day, the same "today" as the AI.
  */
 export default function UpNextCard() {
   const { data } = useQuery(orpc.listMyTasks.queryOptions());
+  const { data: clock } = useQuery(orpc.getDemoClock.queryOptions({ staleTime: Infinity }));
   const [filter, setFilter] = useState<DueFilter>("All Tasks");
-  const now = new Date();
-  const tasks = data?.flatMap((instance): DueTask[] => {
-    if (!instance.activeTask) return [];
-    const due = taskDueDate(instance);
-    return [
-      { ...instance, activeTask: instance.activeTask, due, daysLeft: daysUntilDue(due, now) },
-    ];
-  });
+  const tasks =
+    clock &&
+    data?.flatMap((instance): DueTask[] => {
+      const { activeTask } = instance;
+      if (!activeTask) return [];
+      return [{ ...instance, activeTask, daysLeft: daysUntil(activeTask.dueOn, clock.today) }];
+    });
 
   return (
     <Card size="sm" className="gap-0 pb-0">
@@ -151,7 +150,7 @@ function UpNextList({ tasks, filtered }: { tasks: readonly DueTask[]; filtered: 
                 {PERJALANAN_DINAS.name}
               </span>
             </span>
-            <DueLabel due={task.due} daysLeft={task.daysLeft} />
+            <DueLabel dueOn={task.activeTask.dueOn} daysLeft={task.daysLeft} />
           </Link>
         </li>
       ))}
@@ -160,7 +159,7 @@ function UpNextList({ tasks, filtered }: { tasks: readonly DueTask[]; filtered: 
 }
 
 /** "Today", the due day ("Nov 13"), or how late the Task is ("1 day late") in red. */
-function DueLabel({ due, daysLeft }: { due: Date; daysLeft: number }) {
+function DueLabel({ dueOn, daysLeft }: { dueOn: string; daysLeft: number }) {
   const late = -daysLeft;
   return (
     <span
@@ -172,7 +171,7 @@ function DueLabel({ due, daysLeft }: { due: Date; daysLeft: number }) {
       {daysLeft === 0
         ? "Today"
         : daysLeft > 0
-          ? shortDate.format(due)
+          ? shortDate.format(dayToDate(dueOn))
           : `${late} ${late === 1 ? "day" : "days"} late`}
     </span>
   );

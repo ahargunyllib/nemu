@@ -9,7 +9,10 @@ export const authClient = createAuthClient({
     inferAdditionalFields({
       user: {
         golongan: { type: "string", required: false },
+        unit: { type: "string", required: false },
+        province: { type: "string", required: false },
         role: { type: "string", required: false },
+        workspaceId: { type: "string", required: false },
       },
     }),
   ],

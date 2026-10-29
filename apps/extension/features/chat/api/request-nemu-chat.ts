@@ -6,7 +6,7 @@ import { CHAT_ERRORS, type ChatResult } from "../lib/chat-message";
 
 /** The reply is `unknown` until it passes the contract: the wire may carry anything. */
 export type NemuChatClient = {
-  nemuChat(request: NemuRequest): Promise<unknown>;
+  nemuChat(request: NemuRequest, signal?: AbortSignal): Promise<unknown>;
 };
 
 /**
@@ -17,7 +17,8 @@ export async function requestNemuChat(
   client: NemuChatClient,
   request: unknown,
   pageUrl: string | undefined,
-): Promise<ChatResult> {
+  signal?: AbortSignal,
+): Promise<ChatResult | undefined> {
   if (!isAllowedPage(pageUrl)) return { kind: "error", message: CHAT_ERRORS.notAllowed };
 
   const parsed = nemuRequestSchema.safeParse(request);
@@ -28,9 +29,10 @@ export async function requestNemuChat(
   delete input.user_id;
 
   try {
-    const response = nemuResponseSchema.parse(await client.nemuChat(input));
+    const response = nemuResponseSchema.parse(await client.nemuChat(input, signal));
     return { kind: "response", response };
   } catch (error) {
+    if (signal?.aborted) return undefined;
     if (error instanceof ORPCError && error.code === "UNAUTHORIZED")
       return { kind: "unauthorized" };
     console.error("[nemu] nemuChat failed", error);

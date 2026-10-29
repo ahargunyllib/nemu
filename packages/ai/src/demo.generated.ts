@@ -5,208 +5,1772 @@ import type { SbmRow } from "./tools.js";
 
 export const GENERATED_KNOWLEDGE_CHUNKS = [
   {
+    "id": "pmk-113-2012-document",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "active": true,
+    "text": "# PMK 113/PMK.05/2012 tentang Perjalanan Dinas Dalam Negeri bagi Pejabat Negara, Pegawai Negeri, dan Pegawai Tidak Tetap\n\ndoc_id: `pmk-113-2012` · status: berlaku, diubah oleh PMK 119/2023 · sumber: https://peraturan.bpk.go.id/Details/126950/pmk-no-113pmk052012\n\n> Teks ini hasil ekstraksi otomatis dari PDF resmi. Penanda `[Halaman N]` mengikuti nomor halaman PDF sumber. Untuk kutipan formal, cocokkan dengan PDF asli. Versi Drive ini merapatkan baris kosong; isi pasal tidak diubah."
+  },
+  {
     "id": "pmk-113-2012-page-1",
     "docId": "pmk-113-2012",
     "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
     "version": "1.0",
-    "article": "7 ayat (2)",
     "page": 1,
     "active": true,
-    "text": "```text\nPERATURAN MENTERI KEUANGAN REPUBLIK INDONESIA\nNOMOR 113/PMK.05/2012\nTENTANG\nPERJALANAN DINAS DALAM NEGERI BAGI PEJABAT NEGARA,\nPEGAWAI NEGERI, DAN PEGAWAI TIDAK TETAP\nDENGAN RAHMAT TUHAN YANG MAHA ESA\nMENTERI KEUANGAN REPUBLIK INDONESIA,\nMenimbang:\na. bahwa dalam rangka mengatur ketentuan mengenai perjalanan dinas dalam negeri bagi pejabat negara, pegawai negeri,\ndan pegawai tidak tetap, telah ditetapkan Keputusan Menteri Keuangan Nomor 7/KMK.02/2003 tentang Perjalanan\nDinas Dalam Negeri Bagi Pejabat Negara, Pegawai Negeri Sipil, dan Pegawai Tidak Tetap dan Peraturan Menteri\nKeuangan Nomor 45/PMK.05/2007 tentang Perjalanan Dinas Jabatan Dalam Negeri Bagi Pejabat Negara, Pegawai\nNegeri, dan Pegawai Tidak Tetap sebagaimana telah beberapa kali diubah terakhir dengan Peraturan Menteri Keuangan\nNomor 7/PMK.05/2008;\nb. bahwa berdasarkan Pasal 7 ayat (2) huruf a Undang-Undang Nomor 1 Tahun 2004 tentang Perbendaharaan Negara,\nMenteri Keuangan selaku Bendahara Umum Negara berwenang untuk menetapkan kebijakan dan pedoman\npelaksanaan anggaran negara;\nc. bahwa agar Perjalanan Dinas Dalam Negeri dapat dilaksanakan secara lebih tertib, efisien, ekonomis, efektif,\ntransparan, dan bertanggung jawab, perlu mengatur kembali ketentuan mengenai perjalanan dinas dalam negeri bagi\npejabat negara, pegawai negeri, dan pegawai tidak tetap;\nd. bahwa berdasarkan pertimbangan sebagaimana dimaksud dalam huruf a, huruf b, dan huruf c, perlu menetapkan\nPeraturan Menteri Keuangan tentang Perjalanan Dinas Dalam Negeri bagi Pejabat Negara, Pegawai Negeri, dan Pegawai\nTidak Tetap;\nMengingat:\n1. Undang-Undang Nomor 8 Tahun 1974 tentang Pokok-Pokok Kepegawaian sebagaimana telah diubah dengan\nUndang-Undang Nomor 43 Tahun 1999;\n2. Undang-Undang Nomor 17 Tahun 2003 tentang Keuangan Negara;\n3. Undang-Undang Nomor 1 Tahun 2004 tentang Perbendaharaan Negara;\n4. Undang-Undang Nomor 15 Tahun 2004 tentang Pemeriksaan Pengelolaan dan Tanggung jawab Keuangan Negara;\n5. Keputusan Presiden Nomor 42 Tahun 2002 tentang Pedoman Pelaksanaan Anggaran Pendapatan dan Belanja Negara\nsebagaimana telah beberapa kali diubah terakhir dengan Peraturan Presiden Nomor 53 Tahun 2010;\n6. Keputusan Presiden Nomor 56/P Tahun 2010;\nMEMUTUSKAN:\nMenetapkan: PERATURAN MENTERI KEUANGAN TENTANG PERJALANAN DINAS DALAM NEGERI BAGI PEJABAT NEGARA, PEGAWAI\nNEGERI, DAN PEGAWAI TIDAK TETAP.\nBAB I\nKETENTUAN UMUM\nPasal 1\nDalam Peraturan Menteri ini, yang dimaksud dengan:\n1. Perjalanan Dinas Dalam Negeri yang selanjutnya disebut Perjalanan Dinas adalah perjalanan ke luar Tempat\nKedudukan yang dilakukan dalam wilayah Republik Indonesia untuk kepentingan negara.\n2. Pejabat Negara adalah pimpinan dan anggota lembaga tertinggi/tinggi negara sebagaimana dimaksud dalam Undang-Undang Dasar Tahun 1945 dan Pejabat Negara lainnya yang ditentukan oleh Undang-Undang.\n3. Pegawai Negeri adalah setiap warga negara Republik Indonesia yang telah memenuhi syarat yang ditentukan, diangkat\noleh pejabat berwenang dan diserahi tugas dalam suatu jabatan dalam negeri, atau diserahi tugas negara lainnya, dan\ndigaji berdasarkan peraturan perundangan-undangan yang berlaku.\n4. Pegawai Tidak Tetap adalah Pegawai yang diangkat untuk jangka waktu tertentu guna melaksanakan tugas\npemerintahan dan pembangunan yang bersifat teknis profesional dan administrasi sesuai dengan kebutuhan dan\nkemampuan organisasi.\n5. Perjalanan Dinas Jabatan adalah Perjalanan Dinas melewati batas Kota dan/atau dalam Kota dari tempat kedudukan\nke tempat yang dituju, melaksanakan tugas, dan kembali ke tempat kedudukan semula di dalam negeri.\n```"
+    "text": "```text\nPERATURAN MENTERI KEUANGAN REPUBLIK INDONESIA\nNOMOR 113/PMK.05/2012\nTENTANG\nPERJALANAN DINAS DALAM NEGERI BAGI PEJABAT NEGARA,\nPEGAWAI NEGERI, DAN PEGAWAI TIDAK TETAP\nDENGAN RAHMAT TUHAN YANG MAHA ESA\nMENTERI KEUANGAN REPUBLIK INDONESIA,\nMenimbang:\na. bahwa dalam rangka mengatur ketentuan mengenai perjalanan dinas dalam negeri bagi pejabat negara, pegawai negeri,\ndan pegawai tidak tetap, telah ditetapkan Keputusan Menteri Keuangan Nomor 7/KMK.02/2003 tentang Perjalanan\nDinas Dalam Negeri Bagi Pejabat Negara, Pegawai Negeri Sipil, dan Pegawai Tidak Tetap dan Peraturan Menteri\nKeuangan Nomor 45/PMK.05/2007 tentang Perjalanan Dinas Jabatan Dalam Negeri Bagi Pejabat Negara, Pegawai\nNegeri, dan Pegawai Tidak Tetap sebagaimana telah beberapa kali diubah terakhir dengan Peraturan Menteri Keuangan\nNomor 7/PMK.05/2008;\nb. bahwa berdasarkan Pasal 7 ayat (2) huruf a Undang-Undang Nomor 1 Tahun 2004 tentang Perbendaharaan Negara,\nMenteri Keuangan selaku Bendahara Umum Negara berwenang untuk menetapkan kebijakan dan pedoman\npelaksanaan anggaran negara;\nc. bahwa agar Perjalanan Dinas Dalam Negeri dapat dilaksanakan secara lebih tertib, efisien, ekonomis, efektif,\ntransparan, dan bertanggung jawab, perlu mengatur kembali ketentuan mengenai perjalanan dinas dalam negeri bagi\npejabat negara, pegawai negeri, dan pegawai tidak tetap;\nd. bahwa berdasarkan pertimbangan sebagaimana dimaksud dalam huruf a, huruf b, dan huruf c, perlu menetapkan\nPeraturan Menteri Keuangan tentang Perjalanan Dinas Dalam Negeri bagi Pejabat Negara, Pegawai Negeri, dan Pegawai\nTidak Tetap;\nMengingat:\n1. Undang-Undang Nomor 8 Tahun 1974 tentang Pokok-Pokok Kepegawaian sebagaimana telah diubah dengan\nUndang-Undang Nomor 43 Tahun 1999;\n2. Undang-Undang Nomor 17 Tahun 2003 tentang Keuangan Negara;\n3. Undang-Undang Nomor 1 Tahun 2004 tentang Perbendaharaan Negara;\n4. Undang-Undang Nomor 15 Tahun 2004 tentang Pemeriksaan Pengelolaan dan Tanggung jawab Keuangan Negara;\n5. Keputusan Presiden Nomor 42 Tahun 2002 tentang Pedoman Pelaksanaan Anggaran Pendapatan dan Belanja Negara\nsebagaimana telah beberapa kali diubah terakhir dengan Peraturan Presiden Nomor 53 Tahun 2010;\n6. Keputusan Presiden Nomor 56/P Tahun 2010;\nMEMUTUSKAN:\nMenetapkan: PERATURAN MENTERI KEUANGAN TENTANG PERJALANAN DINAS DALAM NEGERI BAGI PEJABAT NEGARA, PEGAWAI\nNEGERI, DAN PEGAWAI TIDAK TETAP.\nBAB I\nKETENTUAN UMUM"
   },
   {
-    "id": "pmk-113-2012-page-2",
+    "id": "pmk-113-2012-page-1-pasal-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "1",
+    "page": 1,
+    "active": true,
+    "text": "Pasal 1\nDalam Peraturan Menteri ini, yang dimaksud dengan:\n1. Perjalanan Dinas Dalam Negeri yang selanjutnya disebut Perjalanan Dinas adalah perjalanan ke luar Tempat\nKedudukan yang dilakukan dalam wilayah Republik Indonesia untuk kepentingan negara.\n2. Pejabat Negara adalah pimpinan dan anggota lembaga tertinggi/tinggi negara sebagaimana dimaksud dalam Undang-Undang Dasar Tahun 1945 dan Pejabat Negara lainnya yang ditentukan oleh Undang-Undang.\n3. Pegawai Negeri adalah setiap warga negara Republik Indonesia yang telah memenuhi syarat yang ditentukan, diangkat\noleh pejabat berwenang dan diserahi tugas dalam suatu jabatan dalam negeri, atau diserahi tugas negara lainnya, dan\ndigaji berdasarkan peraturan perundangan-undangan yang berlaku.\n4. Pegawai Tidak Tetap adalah Pegawai yang diangkat untuk jangka waktu tertentu guna melaksanakan tugas\npemerintahan dan pembangunan yang bersifat teknis profesional dan administrasi sesuai dengan kebutuhan dan\nkemampuan organisasi.\n5. Perjalanan Dinas Jabatan adalah Perjalanan Dinas melewati batas Kota dan/atau dalam Kota dari tempat kedudukan\nke tempat yang dituju, melaksanakan tugas, dan kembali ke tempat kedudukan semula di dalam negeri.\n```"
+  },
+  {
+    "id": "pmk-113-2012-page-2-pasal-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "1",
+    "page": 2,
+    "active": true,
+    "text": "```text\n6. Perjalanan Dinas Pindah adalah Perjalanan Dinas dari tempat kedudukan yang lama ke tempat kedudukan yang baru\nberdasarkan surat keputusan pindah.\n7. Kuasa Pengguna Anggaran yang selanjutnya disingkat KPA adalah pejabat yang memperoleh kuasa dari Pengguna\nAnggaran untuk melaksanakan sebagian kewenangan dan tanggung jawab penggunaan anggaran pada Kementerian\nNegara/Lembaga yang bersangkutan.\n8. Pejabat Pembuat Komitmen yang selanjutnya disingkat PPK adalah pejabat yang diberi kewenangan oleh Pengguna\nAnggaran/Kuasa Pengguna Anggaran untuk mengambil keputusan dan/atau tindakan yang dapat mengakibatkan\npengeluaran atas beban Anggaran Pendapatan dan Belanja Negara (APBN).\n9. Surat Perjalanan Dinas yang selanjutnya disingkat SPD adalah dokumen yang diterbitkan oleh Pejabat Pembuat\nKomitmen dalam rangka pelaksanaan Perjalanan Dinas Pejabat Negara, Pegawai Negeri, Pegawai Tidak Tetap, dan Pihak\nLain.\n10. Pelaksana SPD adalah Pejabat Negara, Pegawai Negeri, dan Pegawai Tidak Tetap yang melaksanakan Perjalanan Dinas.\n11. Lumpsum adalah suatu jumlah uang yang telah dihitung terlebih dahulu (pre-calculated amount) dan dibayarkan\nsekaligus.\n12. Biaya Riil adalah biaya yang dikeluarkan sesuai dengan bukti pengeluaran yang sah.\n13. Perhitungan Rampung adalah perhitungan biaya Perjalanan Dinas yang dihitung sesuai kebutuhan riil berdasarkan\nketentuan yang berlaku.\n14. Tempat Kedudukan adalah lokasi kantor/satuan kerja.\n15. Tempat Tujuan adalah tempat/Kota yang menjadi tujuan Perjalanan Dinas.\n16. Tempat Tujuan Pindah adalah tempat/Kota tujuan pindah.\n17. Pengumandahan (Detasering) adalah penugasan sementara waktu.\n18. Kota adalah Kota/Kabupaten pembagian wilayah administratif di Indonesia di bawah Provinsi.\n19. Uang Persediaan yang selanjutnya disingkat UP adalah uang muka kerja dalam jumlah tertentu yang diberikan kepada\nBendahara Pengeluaran untuk membiayai kegiatan operasional sehari-hari satuan kerja, yang tidak mungkin dilakukan\nmelalui mekanisme pembayaran langsung.\n20. Standar Biaya adalah satuan biaya yang ditetapkan sebagai acuan penghitungan kebutuhan anggaran dalam Rencana\nKerja dan Anggaran Kementerian Negara/Lembaga, baik berupa Standar Biaya Masukan maupun Standar Biaya\nKeluaran.\nBAB II\nRUANG LINGKUP PERJALANAN DINAS"
+  },
+  {
+    "id": "pmk-113-2012-page-2-pasal-2",
     "docId": "pmk-113-2012",
     "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
     "version": "1.0",
     "article": "2",
     "page": 2,
     "active": true,
-    "text": "```text\n6. Perjalanan Dinas Pindah adalah Perjalanan Dinas dari tempat kedudukan yang lama ke tempat kedudukan yang baru\nberdasarkan surat keputusan pindah.\n7. Kuasa Pengguna Anggaran yang selanjutnya disingkat KPA adalah pejabat yang memperoleh kuasa dari Pengguna\nAnggaran untuk melaksanakan sebagian kewenangan dan tanggung jawab penggunaan anggaran pada Kementerian\nNegara/Lembaga yang bersangkutan.\n8. Pejabat Pembuat Komitmen yang selanjutnya disingkat PPK adalah pejabat yang diberi kewenangan oleh Pengguna\nAnggaran/Kuasa Pengguna Anggaran untuk mengambil keputusan dan/atau tindakan yang dapat mengakibatkan\npengeluaran atas beban Anggaran Pendapatan dan Belanja Negara (APBN).\n9. Surat Perjalanan Dinas yang selanjutnya disingkat SPD adalah dokumen yang diterbitkan oleh Pejabat Pembuat\nKomitmen dalam rangka pelaksanaan Perjalanan Dinas Pejabat Negara, Pegawai Negeri, Pegawai Tidak Tetap, dan Pihak\nLain.\n10. Pelaksana SPD adalah Pejabat Negara, Pegawai Negeri, dan Pegawai Tidak Tetap yang melaksanakan Perjalanan Dinas.\n11. Lumpsum adalah suatu jumlah uang yang telah dihitung terlebih dahulu (pre-calculated amount) dan dibayarkan\nsekaligus.\n12. Biaya Riil adalah biaya yang dikeluarkan sesuai dengan bukti pengeluaran yang sah.\n13. Perhitungan Rampung adalah perhitungan biaya Perjalanan Dinas yang dihitung sesuai kebutuhan riil berdasarkan\nketentuan yang berlaku.\n14. Tempat Kedudukan adalah lokasi kantor/satuan kerja.\n15. Tempat Tujuan adalah tempat/Kota yang menjadi tujuan Perjalanan Dinas.\n16. Tempat Tujuan Pindah adalah tempat/Kota tujuan pindah.\n17. Pengumandahan (Detasering) adalah penugasan sementara waktu.\n18. Kota adalah Kota/Kabupaten pembagian wilayah administratif di Indonesia di bawah Provinsi.\n19. Uang Persediaan yang selanjutnya disingkat UP adalah uang muka kerja dalam jumlah tertentu yang diberikan kepada\nBendahara Pengeluaran untuk membiayai kegiatan operasional sehari-hari satuan kerja, yang tidak mungkin dilakukan\nmelalui mekanisme pembayaran langsung.\n20. Standar Biaya adalah satuan biaya yang ditetapkan sebagai acuan penghitungan kebutuhan anggaran dalam Rencana\nKerja dan Anggaran Kementerian Negara/Lembaga, baik berupa Standar Biaya Masukan maupun Standar Biaya\nKeluaran.\nBAB II\nRUANG LINGKUP PERJALANAN DINAS\nPasal 2\n(1) Peraturan Menteri ini mengatur mengenai pelaksanaan dan pertanggungjawaban Perjalanan Dinas bagi Pejabat Negara,\nPegawai Negeri, dan Pegawai Tidak Tetap yang dibebankan pada Anggaran Pendapatan dan Belanja Negara.\n(2) Perjalanan Dinas sebagaimana dimaksud pada ayat (1) meliputi:\na. Perjalanan Dinas Jabatan; dan\nb. Perjalanan Dinas Pindah.\n(3) Pegawai Negeri sebagaimana dimaksud pada ayat (1) meliputi:\na. Pegawai Negeri Sipil;\nb. Calon Pegawai Negeri Sipil;\nc. Anggota Tentara Nasional Indonesia; dan\nd. Anggota Kepolisian Negara Republik Indonesia.\nBAB III\nPRINSIP PERJALANAN DINAS\nPasal 3\nPerjalanan Dinas dilaksanakan dengan memperhatikan prinsip sebagai berikut:\na. selektif, yaitu hanya untuk kepentingan yang sangat tinggi dan prioritas yang berkaitan dengan penyelenggaraan\npemerintahan;\nb. ketersediaan anggaran dan kesesuaian dengan pencapaian kinerja Kementerian Negara/Lembaga;\nc. efisiensi penggunaan belanja negara; dan\nd. akuntabilitas pemberian perintah pelaksanaan Perjalanan Dinas dan pembebanan biaya Perjalanan Dinas.\nBAB IV\nPERJALANAN DINAS JABATAN\nPasal 4\n(1) Perjalanan Dinas Jabatan sebagaimana dmaksud dalam Pasal 2 ayat (2) digolongkan menjadi:\na. Perjalanan Dinas Jabatan yang melewati batas Kota; dan\nb. Perjalanan Dinas Jabatan yang dilaksanakan di dalam Kota.\n(2) Batas Kota sebagaimana dimaksud pada ayat (1) huruf a khusus untuk Provinsi DKI Jakarta meliputi kesatuan wilayah\nJakarta Pusat, Jakarta Timur, Jakarta Utara, Jakarta Barat, dan Jakarta Selatan.\n(3) Perjalanan Dinas Jabatan yang dilaksanakan di dalam Kota sebagaimana dimaksud pada ayat (1) huruf b terdiri atas:\n```"
+    "text": "Pasal 2"
   },
   {
-    "id": "pmk-113-2012-page-3",
+    "id": "pmk-113-2012-page-2-pasal-2-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "2 ayat (1)",
+    "page": 2,
+    "active": true,
+    "text": "(1) Peraturan Menteri ini mengatur mengenai pelaksanaan dan pertanggungjawaban Perjalanan Dinas bagi Pejabat Negara,\nPegawai Negeri, dan Pegawai Tidak Tetap yang dibebankan pada Anggaran Pendapatan dan Belanja Negara."
+  },
+  {
+    "id": "pmk-113-2012-page-2-pasal-2-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "2 ayat (2)",
+    "page": 2,
+    "active": true,
+    "text": "(2) Perjalanan Dinas sebagaimana dimaksud pada ayat (1) meliputi:\na. Perjalanan Dinas Jabatan; dan\nb. Perjalanan Dinas Pindah."
+  },
+  {
+    "id": "pmk-113-2012-page-2-pasal-2-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "2 ayat (3)",
+    "page": 2,
+    "active": true,
+    "text": "(3) Pegawai Negeri sebagaimana dimaksud pada ayat (1) meliputi:\na. Pegawai Negeri Sipil;\nb. Calon Pegawai Negeri Sipil;\nc. Anggota Tentara Nasional Indonesia; dan\nd. Anggota Kepolisian Negara Republik Indonesia.\nBAB III\nPRINSIP PERJALANAN DINAS"
+  },
+  {
+    "id": "pmk-113-2012-page-2-pasal-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "3",
+    "page": 2,
+    "active": true,
+    "text": "Pasal 3\nPerjalanan Dinas dilaksanakan dengan memperhatikan prinsip sebagai berikut:\na. selektif, yaitu hanya untuk kepentingan yang sangat tinggi dan prioritas yang berkaitan dengan penyelenggaraan\npemerintahan;\nb. ketersediaan anggaran dan kesesuaian dengan pencapaian kinerja Kementerian Negara/Lembaga;\nc. efisiensi penggunaan belanja negara; dan\nd. akuntabilitas pemberian perintah pelaksanaan Perjalanan Dinas dan pembebanan biaya Perjalanan Dinas.\nBAB IV\nPERJALANAN DINAS JABATAN"
+  },
+  {
+    "id": "pmk-113-2012-page-2-pasal-4",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "4",
+    "page": 2,
+    "active": true,
+    "text": "Pasal 4"
+  },
+  {
+    "id": "pmk-113-2012-page-2-pasal-4-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "4 ayat (1)",
+    "page": 2,
+    "active": true,
+    "text": "(1) Perjalanan Dinas Jabatan sebagaimana dmaksud dalam Pasal 2 ayat (2) digolongkan menjadi:\na. Perjalanan Dinas Jabatan yang melewati batas Kota; dan\nb. Perjalanan Dinas Jabatan yang dilaksanakan di dalam Kota."
+  },
+  {
+    "id": "pmk-113-2012-page-2-pasal-4-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "4 ayat (2)",
+    "page": 2,
+    "active": true,
+    "text": "(2) Batas Kota sebagaimana dimaksud pada ayat (1) huruf a khusus untuk Provinsi DKI Jakarta meliputi kesatuan wilayah\nJakarta Pusat, Jakarta Timur, Jakarta Utara, Jakarta Barat, dan Jakarta Selatan."
+  },
+  {
+    "id": "pmk-113-2012-page-2-pasal-4-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "4 ayat (3)",
+    "page": 2,
+    "active": true,
+    "text": "(3) Perjalanan Dinas Jabatan yang dilaksanakan di dalam Kota sebagaimana dimaksud pada ayat (1) huruf b terdiri atas:\n```"
+  },
+  {
+    "id": "pmk-113-2012-page-3-pasal-4-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "4 ayat (3)",
+    "page": 3,
+    "active": true,
+    "text": "```text\na. Perjalanan Dinas Jabatan yang dilaksanakan lebih dari 8 (delapan) jam; dan\nb. Perjalanan Dinas Jabatan yang dilaksanakan sampai dengan 8 (delapan) jam."
+  },
+  {
+    "id": "pmk-113-2012-page-3-pasal-5",
     "docId": "pmk-113-2012",
     "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
     "version": "1.0",
     "article": "5",
     "page": 3,
     "active": true,
-    "text": "```text\na. Perjalanan Dinas Jabatan yang dilaksanakan lebih dari 8 (delapan) jam; dan\nb. Perjalanan Dinas Jabatan yang dilaksanakan sampai dengan 8 (delapan) jam.\nPasal 5\nPerjalanan Dinas Jabatan dilakukan dalam rangka:\na. pelaksanaan tugas dan fungsi yang melekat pada jabatan;\nb. mengikuti rapat, seminar, dan sejenisnya;\nc. Pengumandahan (Detasering);\nd. menempuh ujian dinas/ujian jabatan;\ne. menghadap Majelis Penguji Kesehatan Pegawai Negeri atau menghadap seorang dokter penguji kesehatan yang ditunjuk,\nuntuk mendapatkan surat keterangan dokter tentang kesehatannya guna kepentingan jabatan;\nf. memperoleh pengobatan berdasarkan surat keterangan dokter karena mendapat cedera pada waktu/karena melakukan\ntugas;\ng. mendapatkan pengobatan berdasarkan keputusan Majelis Penguji Kesehatan Pegawai Negeri;\nh. mengikuti pendidikan setara Diploma/S1/S2/S3;\ni. mengikuti pendidikan dan pelatihan;\nj. menjemput/mengantarkan ke tempat pemakaman jenazah Pejabat Negara/Pegawai Negeri yang meninggal dunia dalam\nmelakukan Perjalanan Dinas; atau\nk. menjemput/mengantarkan ke tempat pemakaman jenazah Pejabat Negara/Pegawai Negeri yang meninggal dunia dari\nTempat Kedudukan yang terakhir ke Kota tempat pemakaman.\nPasal 6\n(1) Perjalanan Dinas Jabatan oleh Pelaksana SPD dilakukan sesuai perintah atasan Pelaksana SPD yang tertuang dalam\nSurat Tugas.\n(2) Surat Tugas sebagaimana dimaksud pada ayat (1) diterbitkan oleh:\na. kepala satuan kerja untuk Perjalanan Dinas Jabatan yang dilakukan oleh Pelaksana SPD pada satuan kerja\nberkenaan;\nb. atasan langsung kepala satuan kerja untuk Perjalanan Dinas Jabatan yang dilakukan oleh kepala satuan kerja;\nc. Pejabat Eselon II untuk Perjalanan Dinas Jabatan yang dilakukan oleh Pelaksana SPD dalam lingkup unit eselon\nII/setingkat unit eselon II berkenaan; atau\nd. Menteri/Pimpinan Lembaga/Pejabat Eselon I untuk Perjalanan Dinas Jabatan yang dilakukan oleh\nMenteri/Pimpinan Lembaga/ Pejabat Eselon I/Pejabat Eselon II.\n(3) Kewenangan penerbitan Surat Tugas sebagaimana dimaksud pada ayat (2) dapat didelegasikan kepada pejabat yang\nditunjuk.\n(4) Surat Tugas sebagaimana dimaksud pada ayat (2) paling sedikit mencantumkan hal-hal sebagai berikut:\na. Pemberi tugas;\nb. Pelaksana tugas;\nc. Waktu pelaksanaan tugas; dan\nd. Tempat pelaksanaan tugas.\n(5) Dalam hal berdasarkan Surat Tugas sebagaimana dimaksud pada ayat (1), dilakukan:\na. Perjalanan Dinas Jabatan yang melewati batas Kota; atau\nb. Perjalanan Dinas Jabatan yang dilaksanakan di dalam Kota lebih dari 8 (delapan) jam,\nSurat Tugas dimaksud menjadi dasar penerbitan SPD.\n(6) Perjalanan Dinas Jabatan di dalam Kota yang dilaksanakan sampai dengan 8 (delapan) jam dapat dilakukan tanpa\npenerbitan SPD.\n(7) SPD sebagaimana dimaksud pada ayat (5) dibuat sesuai dengan format sebagaimana tercantum dalam Lampiran I yang\nmerupakan bagian tidak terpisahkan dari Peraturan Menteri ini.\nPasal 7\n(1) Dalam penerbitan SPD, PPK berwenang untuk menetapkan tingkat biaya Perjalanan Dinas dan alat transpor yang\ndigunakan untuk melaksanakan Perjalanan Dinas Jabatan yang bersangkutan dengan memperhatikan kepentingan\nserta tujuan Perjalanan Dinas tersebut.\n(2) Perjalanan Dinas Jabatan di dalam Kota yang dilaksanakan sampai dengan 8 (delapan) jam tanpa penerbitan SPD\nsebagaimana dimaksud dalam Pasal 6 ayat (6), pembebanan biaya Perjalanan Dinas Jabatan dicantumkan dalam Surat\nTugas.\nBAB V\nBIAYA PERJALANAN DINAS JABATAN\nPasal 8\n(1) Perjalanan Dinas Jabatan terdiri atas komponen-komponen sebagai berikut:\na. uang harian;\nb. biaya transpor;\n```"
+    "text": "Pasal 5\nPerjalanan Dinas Jabatan dilakukan dalam rangka:\na. pelaksanaan tugas dan fungsi yang melekat pada jabatan;\nb. mengikuti rapat, seminar, dan sejenisnya;\nc. Pengumandahan (Detasering);\nd. menempuh ujian dinas/ujian jabatan;\ne. menghadap Majelis Penguji Kesehatan Pegawai Negeri atau menghadap seorang dokter penguji kesehatan yang ditunjuk,\nuntuk mendapatkan surat keterangan dokter tentang kesehatannya guna kepentingan jabatan;\nf. memperoleh pengobatan berdasarkan surat keterangan dokter karena mendapat cedera pada waktu/karena melakukan\ntugas;\ng. mendapatkan pengobatan berdasarkan keputusan Majelis Penguji Kesehatan Pegawai Negeri;\nh. mengikuti pendidikan setara Diploma/S1/S2/S3;\ni. mengikuti pendidikan dan pelatihan;\nj. menjemput/mengantarkan ke tempat pemakaman jenazah Pejabat Negara/Pegawai Negeri yang meninggal dunia dalam\nmelakukan Perjalanan Dinas; atau\nk. menjemput/mengantarkan ke tempat pemakaman jenazah Pejabat Negara/Pegawai Negeri yang meninggal dunia dari\nTempat Kedudukan yang terakhir ke Kota tempat pemakaman."
   },
   {
-    "id": "pmk-113-2012-page-4",
+    "id": "pmk-113-2012-page-3-pasal-6",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "6",
+    "page": 3,
+    "active": true,
+    "text": "Pasal 6"
+  },
+  {
+    "id": "pmk-113-2012-page-3-pasal-6-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "6 ayat (1)",
+    "page": 3,
+    "active": true,
+    "text": "(1) Perjalanan Dinas Jabatan oleh Pelaksana SPD dilakukan sesuai perintah atasan Pelaksana SPD yang tertuang dalam\nSurat Tugas."
+  },
+  {
+    "id": "pmk-113-2012-page-3-pasal-6-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "6 ayat (2)",
+    "page": 3,
+    "active": true,
+    "text": "(2) Surat Tugas sebagaimana dimaksud pada ayat (1) diterbitkan oleh:\na. kepala satuan kerja untuk Perjalanan Dinas Jabatan yang dilakukan oleh Pelaksana SPD pada satuan kerja\nberkenaan;\nb. atasan langsung kepala satuan kerja untuk Perjalanan Dinas Jabatan yang dilakukan oleh kepala satuan kerja;\nc. Pejabat Eselon II untuk Perjalanan Dinas Jabatan yang dilakukan oleh Pelaksana SPD dalam lingkup unit eselon\nII/setingkat unit eselon II berkenaan; atau\nd. Menteri/Pimpinan Lembaga/Pejabat Eselon I untuk Perjalanan Dinas Jabatan yang dilakukan oleh\nMenteri/Pimpinan Lembaga/ Pejabat Eselon I/Pejabat Eselon II."
+  },
+  {
+    "id": "pmk-113-2012-page-3-pasal-6-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "6 ayat (3)",
+    "page": 3,
+    "active": true,
+    "text": "(3) Kewenangan penerbitan Surat Tugas sebagaimana dimaksud pada ayat (2) dapat didelegasikan kepada pejabat yang\nditunjuk."
+  },
+  {
+    "id": "pmk-113-2012-page-3-pasal-6-ayat-4",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "6 ayat (4)",
+    "page": 3,
+    "active": true,
+    "text": "(4) Surat Tugas sebagaimana dimaksud pada ayat (2) paling sedikit mencantumkan hal-hal sebagai berikut:\na. Pemberi tugas;\nb. Pelaksana tugas;\nc. Waktu pelaksanaan tugas; dan\nd. Tempat pelaksanaan tugas."
+  },
+  {
+    "id": "pmk-113-2012-page-3-pasal-6-ayat-5",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "6 ayat (5)",
+    "page": 3,
+    "active": true,
+    "text": "(5) Dalam hal berdasarkan Surat Tugas sebagaimana dimaksud pada ayat (1), dilakukan:\na. Perjalanan Dinas Jabatan yang melewati batas Kota; atau\nb. Perjalanan Dinas Jabatan yang dilaksanakan di dalam Kota lebih dari 8 (delapan) jam,\nSurat Tugas dimaksud menjadi dasar penerbitan SPD."
+  },
+  {
+    "id": "pmk-113-2012-page-3-pasal-6-ayat-6",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "6 ayat (6)",
+    "page": 3,
+    "active": true,
+    "text": "(6) Perjalanan Dinas Jabatan di dalam Kota yang dilaksanakan sampai dengan 8 (delapan) jam dapat dilakukan tanpa\npenerbitan SPD."
+  },
+  {
+    "id": "pmk-113-2012-page-3-pasal-6-ayat-7",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "6 ayat (7)",
+    "page": 3,
+    "active": true,
+    "text": "(7) SPD sebagaimana dimaksud pada ayat (5) dibuat sesuai dengan format sebagaimana tercantum dalam Lampiran I yang\nmerupakan bagian tidak terpisahkan dari Peraturan Menteri ini."
+  },
+  {
+    "id": "pmk-113-2012-page-3-pasal-7",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "7",
+    "page": 3,
+    "active": true,
+    "text": "Pasal 7"
+  },
+  {
+    "id": "pmk-113-2012-page-3-pasal-7-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "7 ayat (1)",
+    "page": 3,
+    "active": true,
+    "text": "(1) Dalam penerbitan SPD, PPK berwenang untuk menetapkan tingkat biaya Perjalanan Dinas dan alat transpor yang\ndigunakan untuk melaksanakan Perjalanan Dinas Jabatan yang bersangkutan dengan memperhatikan kepentingan\nserta tujuan Perjalanan Dinas tersebut."
+  },
+  {
+    "id": "pmk-113-2012-page-3-pasal-7-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "7 ayat (2)",
+    "page": 3,
+    "active": true,
+    "text": "(2) Perjalanan Dinas Jabatan di dalam Kota yang dilaksanakan sampai dengan 8 (delapan) jam tanpa penerbitan SPD\nsebagaimana dimaksud dalam Pasal 6 ayat (6), pembebanan biaya Perjalanan Dinas Jabatan dicantumkan dalam Surat\nTugas.\nBAB V\nBIAYA PERJALANAN DINAS JABATAN"
+  },
+  {
+    "id": "pmk-113-2012-page-3-pasal-8",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "8",
+    "page": 3,
+    "active": true,
+    "text": "Pasal 8"
+  },
+  {
+    "id": "pmk-113-2012-page-3-pasal-8-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "8 ayat (1)",
+    "page": 3,
+    "active": true,
+    "text": "(1) Perjalanan Dinas Jabatan terdiri atas komponen-komponen sebagai berikut:\na. uang harian;\nb. biaya transpor;\n```"
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-8-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "8 ayat (1)",
+    "page": 4,
+    "active": true,
+    "text": "```text\nc. biaya penginapan;\nd. uang representasi;\ne. sewa kendaraan dalam Kota; dan/atau\nf. biaya menjemput/mengantar jenazah."
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-8-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "8 ayat (2)",
+    "page": 4,
+    "active": true,
+    "text": "(2) Uang harian sebagaimana dimaksud pada ayat (1) huruf a terdiri atas:\na. uang makan;\nb. uang transpor lokal; dan\nc. uang saku."
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-8-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "8 ayat (3)",
+    "page": 4,
+    "active": true,
+    "text": "(3) Biaya transpor sebagaimana dimaksud pada ayat (1) huruf b terdiri atas:\na. perjalanan dinas dari Tempat Kedudukan sampai Tempat Tujuan keberangkatan dan kepulangan termasuk biaya\nke terminal bus/ stasiun/bandara/pelabuhan keberangkatan;\nb. retribusi yang dipungut di terminal bus/stasiun/bandara/pelabuhan keberangkatan dan kepulangan."
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-8-ayat-4",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "8 ayat (4)",
+    "page": 4,
+    "active": true,
+    "text": "(4) Biaya penginapan sebagaimana dimaksud pada ayat (1) huruf c merupakan biaya yang diperlukan untuk menginap:\na. di hotel; atau\nb. di tempat menginap lainnya."
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-8-ayat-5",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "8 ayat (5)",
+    "page": 4,
+    "active": true,
+    "text": "(5) Dalam hal Pelaksana SPD tidak menggunakan biaya penginapan sebagaimana dimaksud pada ayat (4), berlaku\nketentuan sebagai berikut:\na. Pelaksana SPD diberikan biaya penginapan sebesar 30% (tiga puluh persen) dari tarif hotel di Kota Tempat Tujuan\nsebagaimana diatur dalam Peraturan Menteri Keuangan mengenai Standar Biaya;\nb. Biaya penginapan sebagaimana dimaksud pada huruf a dibayarkan secara lumpsum."
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-8-ayat-6",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "8 ayat (6)",
+    "page": 4,
+    "active": true,
+    "text": "(6) Uang representasi sebagaimana dimaksud pada ayat (1) huruf d dapat diberikan kepada Pejabat Negara, Pejabat Eselon\nI, dan Pejabat Eselon II selama melakukan Perjalanan Dinas."
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-8-ayat-7",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "8 ayat (7)",
+    "page": 4,
+    "active": true,
+    "text": "(7) Sewa kendaraan dalam Kota sebagaimana dimaksud pada ayat (1) huruf e dapat diberikan kepada Pejabat Negara untuk\nkeperluan pelaksanaan tugas di Tempat Tujuan."
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-8-ayat-8",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "8 ayat (8)",
+    "page": 4,
+    "active": true,
+    "text": "(8) Sewa kendaraan sebagaimana dimaksud pada ayat (7) sudah termasuk biaya untuk pengemudi, bahan bakar minyak,\ndan pajak."
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-8-ayat-9",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "8 ayat (9)",
+    "page": 4,
+    "active": true,
+    "text": "(9) Biaya menjemput/mengantar jenazah sebagaimana dimaksud pada ayat (1) huruf f meliputi biaya bagi\npenjemput/pengantar, biaya pemetian dan biaya angkutan jenazah."
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-8-ayat-10",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "8 ayat (10)",
+    "page": 4,
+    "active": true,
+    "text": "(10) Komponen biaya Perjalanan Dinas Jabatan sebagaimana dimaksud pada ayat (1) dicantumkan pada Rincian Biaya\nPerjalanan Dinas sesuai dengan format sebagaimana tercantum dalam Lampiran II yang merupakan bagian tidak\nterpisahkan dari Peraturan Menteri ini."
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-9",
     "docId": "pmk-113-2012",
     "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
     "version": "1.0",
     "article": "9",
     "page": 4,
     "active": true,
-    "text": "```text\nc. biaya penginapan;\nd. uang representasi;\ne. sewa kendaraan dalam Kota; dan/atau\nf. biaya menjemput/mengantar jenazah.\n(2) Uang harian sebagaimana dimaksud pada ayat (1) huruf a terdiri atas:\na. uang makan;\nb. uang transpor lokal; dan\nc. uang saku.\n(3) Biaya transpor sebagaimana dimaksud pada ayat (1) huruf b terdiri atas:\na. perjalanan dinas dari Tempat Kedudukan sampai Tempat Tujuan keberangkatan dan kepulangan termasuk biaya\nke terminal bus/ stasiun/bandara/pelabuhan keberangkatan;\nb. retribusi yang dipungut di terminal bus/stasiun/bandara/pelabuhan keberangkatan dan kepulangan.\n(4) Biaya penginapan sebagaimana dimaksud pada ayat (1) huruf c merupakan biaya yang diperlukan untuk menginap:\na. di hotel; atau\nb. di tempat menginap lainnya.\n(5) Dalam hal Pelaksana SPD tidak menggunakan biaya penginapan sebagaimana dimaksud pada ayat (4), berlaku\nketentuan sebagai berikut:\na. Pelaksana SPD diberikan biaya penginapan sebesar 30% (tiga puluh persen) dari tarif hotel di Kota Tempat Tujuan\nsebagaimana diatur dalam Peraturan Menteri Keuangan mengenai Standar Biaya;\nb. Biaya penginapan sebagaimana dimaksud pada huruf a dibayarkan secara lumpsum.\n(6) Uang representasi sebagaimana dimaksud pada ayat (1) huruf d dapat diberikan kepada Pejabat Negara, Pejabat Eselon\nI, dan Pejabat Eselon II selama melakukan Perjalanan Dinas.\n(7) Sewa kendaraan dalam Kota sebagaimana dimaksud pada ayat (1) huruf e dapat diberikan kepada Pejabat Negara untuk\nkeperluan pelaksanaan tugas di Tempat Tujuan.\n(8) Sewa kendaraan sebagaimana dimaksud pada ayat (7) sudah termasuk biaya untuk pengemudi, bahan bakar minyak,\ndan pajak.\n(9) Biaya menjemput/mengantar jenazah sebagaimana dimaksud pada ayat (1) huruf f meliputi biaya bagi\npenjemput/pengantar, biaya pemetian dan biaya angkutan jenazah.\n(10) Komponen biaya Perjalanan Dinas Jabatan sebagaimana dimaksud pada ayat (1) dicantumkan pada Rincian Biaya\nPerjalanan Dinas sesuai dengan format sebagaimana tercantum dalam Lampiran II yang merupakan bagian tidak\nterpisahkan dari Peraturan Menteri ini.\nPasal 9\nBiaya Perjalanan Dinas Jabatan sebagaimana dimaksud dalam Pasal 8 ayat (1) diberikan untuk Perjalanan Dinas Jabatan\nsebagaimana dimaksud dalam Pasal 4 ayat (1) dengan ketentuan sebagaimana tercantum dalam Lampiran III yang\nmerupakan bagian tidak terpisahkan dari Peraturan Menteri ini.\nPasal 10\n(1) Biaya Perjalanan Dinas Jabatan sebagaimana dimaksud dalam Pasal 8 ayat (1), digolongkan dalam 3 (tiga) tingkat,\nyaitu:\na. Tingkat A untuk Ketua/Wakil Ketua dan Anggota pada Majelis Permusyawaratan Rakyat, Dewan Perwakilan\nRakyat, Dewan Perwakilan Daerah, Badan Pemeriksa Keuangan, Mahkamah Agung, Mahkamah Konstitusi, dan\nMenteri, Wakil Menteri, Pejabat setingkat Menteri, Gubernur, Wakil Gubernur, Bupati, Wakil Bupati, Walikota,\nWakil Walikota, Ketua/Wakil Ketua/ Anggota Komisi, Pejabat Eselon I, serta Pejabat lainnya yang setara;\nb. Tingkat B untuk Pejabat Negara Lainnya, Pejabat Eselon II, dan Pejabat Lainnya yang setara; dan\nc. Tingkat C untuk Pejabat Eselon III/PNS Golongan IV, Pejabat Eselon IV/PNS Golongan III, PNS Golongan II dan I.\n(2) Penyetaraan tingkat biaya Perjalanan Dinas sebagaimana dimaksud pada ayat (1) di lingkungan Kementerian\nPertahanan/Tentara Nasional Indonesia ditetapkan oleh Menteri Pertahanan setelah berkoordinasi dengan Menteri\nKeuangan.\n(3) Penyetaraan tingkat biaya Perjalanan Dinas sebagaimana dimaksud pada ayat (1) di lingkungan Kepolisian Negara\nRepublik Indonesia ditetapkan oleh Kepala Kepolisian Republik Indonesia setelah berkoordinasi dengan Menteri\nKeuangan.\n(4) Penyetaraan tingkat biaya Perjalanan Dinas sebagaimana dimaksud pada ayat (1) untuk Pegawai Tidak Tetap yang\nmelakukan Perjalanan Dinas untuk kepentingan negara ditentukan oleh KPA sesuai dengan tingkat\npendidikan/kepatutan/tugas yang bersangkutan.\n(5) Biaya Perjalanan Dinas sebagaimana dimaksud dalam Pasal 8 ayat (1) diberikan berdasarkan tingkat biaya Perjalanan\nDinas sebagaimana dimaksud pada ayat (1), dengan ketentuan sebagai berikut:\na. uang harian dibayarkan secara lumpsum dan merupakan batas tertinggi sebagaimana diatur dalam Peraturan\nMenteri Keuangan mengenai Standar Biaya;\nb. biaya transpor pegawai dibayarkan sesuai dengan Biaya Riil berdasarkan Fasilitas Transpor sebagaimana\ntercantum dalam Lampiran IV yang merupakan bagian tidak terpisahkan dari Peraturan Menteri ini;\nc. biaya penginapan dibayarkan sesuai dengan Biaya Riil dan berpedoman pada Peraturan Menteri Keuangan\nmengenai Standar Biaya;\n```"
+    "text": "Pasal 9\nBiaya Perjalanan Dinas Jabatan sebagaimana dimaksud dalam Pasal 8 ayat (1) diberikan untuk Perjalanan Dinas Jabatan\nsebagaimana dimaksud dalam Pasal 4 ayat (1) dengan ketentuan sebagaimana tercantum dalam Lampiran III yang\nmerupakan bagian tidak terpisahkan dari Peraturan Menteri ini."
   },
   {
-    "id": "pmk-113-2012-page-5",
+    "id": "pmk-113-2012-page-4-pasal-10",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "10",
+    "page": 4,
+    "active": true,
+    "text": "Pasal 10"
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-10-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "10 ayat (1)",
+    "page": 4,
+    "active": true,
+    "text": "(1) Biaya Perjalanan Dinas Jabatan sebagaimana dimaksud dalam Pasal 8 ayat (1), digolongkan dalam 3 (tiga) tingkat,\nyaitu:\na. Tingkat A untuk Ketua/Wakil Ketua dan Anggota pada Majelis Permusyawaratan Rakyat, Dewan Perwakilan\nRakyat, Dewan Perwakilan Daerah, Badan Pemeriksa Keuangan, Mahkamah Agung, Mahkamah Konstitusi, dan\nMenteri, Wakil Menteri, Pejabat setingkat Menteri, Gubernur, Wakil Gubernur, Bupati, Wakil Bupati, Walikota,\nWakil Walikota, Ketua/Wakil Ketua/ Anggota Komisi, Pejabat Eselon I, serta Pejabat lainnya yang setara;\nb. Tingkat B untuk Pejabat Negara Lainnya, Pejabat Eselon II, dan Pejabat Lainnya yang setara; dan\nc. Tingkat C untuk Pejabat Eselon III/PNS Golongan IV, Pejabat Eselon IV/PNS Golongan III, PNS Golongan II dan I."
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-10-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "10 ayat (2)",
+    "page": 4,
+    "active": true,
+    "text": "(2) Penyetaraan tingkat biaya Perjalanan Dinas sebagaimana dimaksud pada ayat (1) di lingkungan Kementerian\nPertahanan/Tentara Nasional Indonesia ditetapkan oleh Menteri Pertahanan setelah berkoordinasi dengan Menteri\nKeuangan."
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-10-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "10 ayat (3)",
+    "page": 4,
+    "active": true,
+    "text": "(3) Penyetaraan tingkat biaya Perjalanan Dinas sebagaimana dimaksud pada ayat (1) di lingkungan Kepolisian Negara\nRepublik Indonesia ditetapkan oleh Kepala Kepolisian Republik Indonesia setelah berkoordinasi dengan Menteri\nKeuangan."
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-10-ayat-4",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "10 ayat (4)",
+    "page": 4,
+    "active": true,
+    "text": "(4) Penyetaraan tingkat biaya Perjalanan Dinas sebagaimana dimaksud pada ayat (1) untuk Pegawai Tidak Tetap yang\nmelakukan Perjalanan Dinas untuk kepentingan negara ditentukan oleh KPA sesuai dengan tingkat\npendidikan/kepatutan/tugas yang bersangkutan."
+  },
+  {
+    "id": "pmk-113-2012-page-4-pasal-10-ayat-5",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "10 ayat (5)",
+    "page": 4,
+    "active": true,
+    "text": "(5) Biaya Perjalanan Dinas sebagaimana dimaksud dalam Pasal 8 ayat (1) diberikan berdasarkan tingkat biaya Perjalanan\nDinas sebagaimana dimaksud pada ayat (1), dengan ketentuan sebagai berikut:\na. uang harian dibayarkan secara lumpsum dan merupakan batas tertinggi sebagaimana diatur dalam Peraturan\nMenteri Keuangan mengenai Standar Biaya;\nb. biaya transpor pegawai dibayarkan sesuai dengan Biaya Riil berdasarkan Fasilitas Transpor sebagaimana\ntercantum dalam Lampiran IV yang merupakan bagian tidak terpisahkan dari Peraturan Menteri ini;\nc. biaya penginapan dibayarkan sesuai dengan Biaya Riil dan berpedoman pada Peraturan Menteri Keuangan\nmengenai Standar Biaya;\n```"
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-10-ayat-5",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "10 ayat (5)",
+    "page": 5,
+    "active": true,
+    "text": "```text\nd. uang representasi dibayarkan secara lumpsum dan merupakan batas tertinggi sebagaimana diatur dalam Peraturan\nMenteri Keuangan mengenai Standar Biaya;\ne. sewa kendaraan dalam Kota dibayarkan sesuai dengan Biaya Riil dan berpedoman pada Peraturan Menteri\nKeuangan mengenai Standar Biaya;\nf. biaya pemetian jenazah termasuk yang berhubungan dengan pengruktian/pengurusan jenazah dibayarkan sesuai\ndengan Biaya Riil; dan\ng. biaya angkutan jenazah termasuk yang berhubungan dengan pengruktian/pengurusan jenazah dibayarkan sesuai\ndengan Biaya Riil."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-11",
     "docId": "pmk-113-2012",
     "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
     "version": "1.0",
     "article": "11",
     "page": 5,
     "active": true,
-    "text": "```text\nd. uang representasi dibayarkan secara lumpsum dan merupakan batas tertinggi sebagaimana diatur dalam Peraturan\nMenteri Keuangan mengenai Standar Biaya;\ne. sewa kendaraan dalam Kota dibayarkan sesuai dengan Biaya Riil dan berpedoman pada Peraturan Menteri\nKeuangan mengenai Standar Biaya;\nf. biaya pemetian jenazah termasuk yang berhubungan dengan pengruktian/pengurusan jenazah dibayarkan sesuai\ndengan Biaya Riil; dan\ng. biaya angkutan jenazah termasuk yang berhubungan dengan pengruktian/pengurusan jenazah dibayarkan sesuai\ndengan Biaya Riil.\nPasal 11\n(1) Perjalanan Dinas Jabatan untuk mengikuti rapat, seminar, dan sejenisnya sebagaimana dimaksud dalam Pasal 5 huruf\nb dilaksanakan dengan biaya Perjalanan Dinas Jabatan yang ditanggung oleh panitia penyelenggara.\n(2) Dalam hal biaya Perjalanan Dinas Jabatan untuk mengikuti rapat, seminar, dan sejenisnya sebagaimana dimaksud\npada ayat (1) tidak ditanggung oleh panitia penyelenggara, biaya Perjalanan Dinas Jabatan dimaksud dibebankan pada\nDIPA satuan kerja Pelaksana SPD.\n(3) Panitia penyelenggara menyampaikan pemberitahuan mengenai pembebanan biaya Perjalanan Dinas Jabatan\nsebagaimana dimaksud pada ayat (1) dan ayat (2) dalam surat/undangan mengikuti rapat, seminar, dan sejenisnya.\n(4) Rincian biaya Perjalanan Dinas Jabatan untuk mengikuti rapat, seminar, dan sejenisnya sebagaimana dimaksud dalam\nPasal 5 huruf b tercantum dalam Lampiran V yang merupakan bagian tidak terpisahkan dari Peraturan Menteri ini.\n(5) Dalam hal Perjalanan Dinas Jabatan dilakukan secara bersama-sama untuk melaksanakan suatu kegiatan rapat,\nseminar, dan sejenisnya, seluruh Pelaksana SPD dapat menginap pada hotel/penginapan yang sama.\n(6) Dalam hal biaya penginapan pada hotel/penginapan yang sama sebagaimana dimaksud pada ayat (5) lebih tinggi dari\nsatuan biaya hotel/penginapan sebagaimana diatur dalam Peraturan Menteri Keuangan mengenai Standar Biaya, maka\nPelaksana SPD menggunakan fasilitas kamar dengan biaya terendah pada hotel/penginapan dimaksud.\nPasal 12\nDalam hal Perjalanan Dinas Jabatan menggunakan kapal laut/sungai untuk waktu paling kurang 24 (dua puluh empat)\njam, selama waktu transportasi tersebut kepada Pelaksana SPD hanya diberikan uang harian.\nPasal 13\n(1) Biaya Perjalanan Dinas Jabatan dibayarkan sebelum Perjalanan Dinas Jabatan dilaksanakan.\n(2) Dalam hal Perjalanan Dinas Jabatan harus segera dilaksanakan, biaya Perjalanan Dinas sebagaimana dimaksud pada\nayat (1) dapat dibayarkan setelah Perjalanan Dinas selesai.\nPasal 14\n(1) Dalam hal jumlah hari Perjalanan Dinas Jabatan melebihi jumlah hari yang ditetapkan dalam Surat Tugas/SPD dan\ntidak disebabkan oleh kesalahan/kelalaian, Pelaksana SPD dapat diberikan tambahan uang harian, biaya penginapan,\nuang representasi, dan sewa kendaraan dalam Kota.\n(2) Tambahan uang harian, biaya penginapan, uang representasi, dan sewa kendaraan dalam Kota sebagaimana dimaksud\npada ayat (1) dapat dimintakan kepada PPK untuk mendapat persetujuan dengan melampirkan dokumen berupa:\na. Surat keterangan kesalahan/kelalaian dari Syahbandar/Kepala Bandara/perusahaan jasa transportasi lainnya;\ndan/atau\nb. Surat keterangan perpanjangan tugas dari pemberi tugas.\n(3) Berdasarkan dokumen sebagaimana dimaksud pada ayat (2) PPK membebankan biaya tambahan uang harian, biaya\npenginapan, uang representasi, dan sewa kendaraan dalam Kota pada DIPA satuan kerja berkenaan.\n(4) Tambahan uang harian, biaya penginapan, uang representasi, dan sewa kendaraan dalam Kota sebagaimana dimaksud\npada ayat (1), tidak dapat dipertimbangkan untuk hal-hal sebagaimana dimaksud dalam Pasal 5 huruf e sampai dengan\nhuruf k.\n(5) Dalam hal jumlah hari Perjalanan Dinas kurang dari jumlah hari yang ditetapkan dalam SPD, Pelaksana SPD harus\nmengembalikan kelebihan uang harian, biaya penginapan, uang representasi, dan sewa kendaraan dalam Kota yang\ntelah diterimanya kepada PPK.\n(6) Ketentuan pengembalian kelebihan uang harian, biaya penginapan, uang representasi, dan sewa kendaraan dalam Kota\nsebagaimana dimaksud pada ayat (5) tidak berlaku untuk ketentuan sebagaimana dimaksud dalam Pasal 5 huruf k.\nPasal 15\nBiaya Perjalanan Dinas Jabatan dibebankan pada Daftar Isian Pelaksanaan Anggaran (DIPA) satuan kerja penerbit SPD.\nBAB VI\nPERJALANAN DINAS PINDAH\nPasal 16\n(1) Perjalanan Dinas Pindah oleh Pelaksana SPD dilakukan berdasarkan Surat Keputusan Pindah.\n(2) Surat Keputusan Pindah sebagaimana dimaksud pada ayat (1) diterbitkan oleh pejabat yang berwenang sesuai\nketentuan peraturan perundang-undangan.\n(3) Surat Keputusan Pindah sebagaimana dimaksud pada ayat (1) menjadi dasar diterbitkannya SPD.\n(4) SPD sebagaimana dimaksud pada ayat (3) dibuat sesuai dengan format sebagaimana tercantum dalam Lampiran I yang\nmerupakan bagian tidak terpisahkan dari Peraturan Menteri ini.\n```\n\n[Halaman 6-7]\n\n```text\nPasal 17 sampai Pasal 24 mengatur Perjalanan Dinas Pindah (keluarga yang sah, komponen biaya pindah, pengepakan\ndan angkutan barang). Bagian ini tidak dipakai di skenario demo; lihat PDF asli bila diperlukan.\nBAB VIII\nPELAKSANAAN DAN PROSEDUR\nPEMBAYARAN BIAYA PERJALANAN DINAS\nPasal 25\n(1) Pembayaran biaya Perjalanan Dinas diberikan dalam batas pagu anggaran yang tersedia dalam DIPA satuan kerja\nberkenaan.\n(2) Pembayaran biaya Perjalanan Dinas kepada Pelaksana SPD paling cepat 5 (lima) hari kerja sebelum Perjalanan Dinas\ndilaksanakan.\n(3) Pada akhir tahun anggaran, ketentuan sebagaimana dimaksud pada ayat (2) dapat melebihi 5 (lima) hari kerja\nmenyesuaikan dengan ketentuan yang mengatur mengenai langkah-langkah menghadapi akhir tahun anggaran.\n(4) Pengajuan biaya Perjalanan Dinas Pindah sebagaimana dimaksud dalam Pasal 17 ayat (2) diatur sebagai berikut:\na. untuk huruf d berlaku untuk jangka waktu 1 (satu) tahun terhitung sejak tanggal pemberhentian atau meninggal\ndunia;\nb. untuk huruf b, huruf c, dan huruf e berlaku paling lambat 1 (satu) tahun terhitung sejak tanggal dibayarkan\npensiun pertama.\nPasal 26\n(1) Pembayaran biaya Perjalanan Dinas dilakukan melalui mekanisme UP dan/atau mekanisme Pembayaran Langsung (LS).\n(2) Pembayaran biaya Perjalanan Dinas dengan mekanisme LS dilakukan melalui:\na. perikatan dengan penyedia jasa;\nb. Bendahara Pengeluaran; atau\nc. Pelaksana SPD.\n(3) Perjalanan Dinas Jabatan yang dilakukan melalui perikatan dengan penyedia jasa sebagaimana dimaksud pada ayat (2)\nhuruf a meliputi:\na. Perjalanan Dinas Jabatan dalam rangka pelaksanaan tugas dan fungsi yang melekat pada jabatan; dan\nb. Perjalanan Dinas Jabatan dalam rangka mengikuti rapat, seminar dan sejenisnya.\nPasal 27\n(1) Pembayaran biaya Perjalanan Dinas dengan mekanisme UP dilakukan dengan memberikan uang muka kepada\nPelaksana SPD oleh Bendahara Pengeluaran.\n```"
+    "text": "Pasal 11"
   },
   {
-    "id": "pmk-113-2012-page-8",
+    "id": "pmk-113-2012-page-5-pasal-11-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "11 ayat (1)",
+    "page": 5,
+    "active": true,
+    "text": "(1) Perjalanan Dinas Jabatan untuk mengikuti rapat, seminar, dan sejenisnya sebagaimana dimaksud dalam Pasal 5 huruf\nb dilaksanakan dengan biaya Perjalanan Dinas Jabatan yang ditanggung oleh panitia penyelenggara."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-11-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "11 ayat (2)",
+    "page": 5,
+    "active": true,
+    "text": "(2) Dalam hal biaya Perjalanan Dinas Jabatan untuk mengikuti rapat, seminar, dan sejenisnya sebagaimana dimaksud\npada ayat (1) tidak ditanggung oleh panitia penyelenggara, biaya Perjalanan Dinas Jabatan dimaksud dibebankan pada\nDIPA satuan kerja Pelaksana SPD."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-11-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "11 ayat (3)",
+    "page": 5,
+    "active": true,
+    "text": "(3) Panitia penyelenggara menyampaikan pemberitahuan mengenai pembebanan biaya Perjalanan Dinas Jabatan\nsebagaimana dimaksud pada ayat (1) dan ayat (2) dalam surat/undangan mengikuti rapat, seminar, dan sejenisnya."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-11-ayat-4",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "11 ayat (4)",
+    "page": 5,
+    "active": true,
+    "text": "(4) Rincian biaya Perjalanan Dinas Jabatan untuk mengikuti rapat, seminar, dan sejenisnya sebagaimana dimaksud dalam"
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-5",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "5",
+    "page": 5,
+    "active": true,
+    "text": "Pasal 5 huruf b tercantum dalam Lampiran V yang merupakan bagian tidak terpisahkan dari Peraturan Menteri ini."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-5-ayat-5",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "5 ayat (5)",
+    "page": 5,
+    "active": true,
+    "text": "(5) Dalam hal Perjalanan Dinas Jabatan dilakukan secara bersama-sama untuk melaksanakan suatu kegiatan rapat,\nseminar, dan sejenisnya, seluruh Pelaksana SPD dapat menginap pada hotel/penginapan yang sama."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-5-ayat-6",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "5 ayat (6)",
+    "page": 5,
+    "active": true,
+    "text": "(6) Dalam hal biaya penginapan pada hotel/penginapan yang sama sebagaimana dimaksud pada ayat (5) lebih tinggi dari\nsatuan biaya hotel/penginapan sebagaimana diatur dalam Peraturan Menteri Keuangan mengenai Standar Biaya, maka\nPelaksana SPD menggunakan fasilitas kamar dengan biaya terendah pada hotel/penginapan dimaksud."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-12",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "12",
+    "page": 5,
+    "active": true,
+    "text": "Pasal 12\nDalam hal Perjalanan Dinas Jabatan menggunakan kapal laut/sungai untuk waktu paling kurang 24 (dua puluh empat)\njam, selama waktu transportasi tersebut kepada Pelaksana SPD hanya diberikan uang harian."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-13",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "13",
+    "page": 5,
+    "active": true,
+    "text": "Pasal 13"
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-13-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "13 ayat (1)",
+    "page": 5,
+    "active": true,
+    "text": "(1) Biaya Perjalanan Dinas Jabatan dibayarkan sebelum Perjalanan Dinas Jabatan dilaksanakan."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-13-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "13 ayat (2)",
+    "page": 5,
+    "active": true,
+    "text": "(2) Dalam hal Perjalanan Dinas Jabatan harus segera dilaksanakan, biaya Perjalanan Dinas sebagaimana dimaksud pada\nayat (1) dapat dibayarkan setelah Perjalanan Dinas selesai."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-14",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "14",
+    "page": 5,
+    "active": true,
+    "text": "Pasal 14"
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-14-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "14 ayat (1)",
+    "page": 5,
+    "active": true,
+    "text": "(1) Dalam hal jumlah hari Perjalanan Dinas Jabatan melebihi jumlah hari yang ditetapkan dalam Surat Tugas/SPD dan\ntidak disebabkan oleh kesalahan/kelalaian, Pelaksana SPD dapat diberikan tambahan uang harian, biaya penginapan,\nuang representasi, dan sewa kendaraan dalam Kota."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-14-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "14 ayat (2)",
+    "page": 5,
+    "active": true,
+    "text": "(2) Tambahan uang harian, biaya penginapan, uang representasi, dan sewa kendaraan dalam Kota sebagaimana dimaksud\npada ayat (1) dapat dimintakan kepada PPK untuk mendapat persetujuan dengan melampirkan dokumen berupa:\na. Surat keterangan kesalahan/kelalaian dari Syahbandar/Kepala Bandara/perusahaan jasa transportasi lainnya;\ndan/atau\nb. Surat keterangan perpanjangan tugas dari pemberi tugas."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-14-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "14 ayat (3)",
+    "page": 5,
+    "active": true,
+    "text": "(3) Berdasarkan dokumen sebagaimana dimaksud pada ayat (2) PPK membebankan biaya tambahan uang harian, biaya\npenginapan, uang representasi, dan sewa kendaraan dalam Kota pada DIPA satuan kerja berkenaan."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-14-ayat-4",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "14 ayat (4)",
+    "page": 5,
+    "active": true,
+    "text": "(4) Tambahan uang harian, biaya penginapan, uang representasi, dan sewa kendaraan dalam Kota sebagaimana dimaksud\npada ayat (1), tidak dapat dipertimbangkan untuk hal-hal sebagaimana dimaksud dalam Pasal 5 huruf e sampai dengan\nhuruf k."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-14-ayat-5",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "14 ayat (5)",
+    "page": 5,
+    "active": true,
+    "text": "(5) Dalam hal jumlah hari Perjalanan Dinas kurang dari jumlah hari yang ditetapkan dalam SPD, Pelaksana SPD harus\nmengembalikan kelebihan uang harian, biaya penginapan, uang representasi, dan sewa kendaraan dalam Kota yang\ntelah diterimanya kepada PPK."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-14-ayat-6",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "14 ayat (6)",
+    "page": 5,
+    "active": true,
+    "text": "(6) Ketentuan pengembalian kelebihan uang harian, biaya penginapan, uang representasi, dan sewa kendaraan dalam Kota\nsebagaimana dimaksud pada ayat (5) tidak berlaku untuk ketentuan sebagaimana dimaksud dalam Pasal 5 huruf k."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-15",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "15",
+    "page": 5,
+    "active": true,
+    "text": "Pasal 15\nBiaya Perjalanan Dinas Jabatan dibebankan pada Daftar Isian Pelaksanaan Anggaran (DIPA) satuan kerja penerbit SPD.\nBAB VI\nPERJALANAN DINAS PINDAH"
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-16",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "16",
+    "page": 5,
+    "active": true,
+    "text": "Pasal 16"
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-16-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "16 ayat (1)",
+    "page": 5,
+    "active": true,
+    "text": "(1) Perjalanan Dinas Pindah oleh Pelaksana SPD dilakukan berdasarkan Surat Keputusan Pindah."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-16-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "16 ayat (2)",
+    "page": 5,
+    "active": true,
+    "text": "(2) Surat Keputusan Pindah sebagaimana dimaksud pada ayat (1) diterbitkan oleh pejabat yang berwenang sesuai\nketentuan peraturan perundang-undangan."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-16-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "16 ayat (3)",
+    "page": 5,
+    "active": true,
+    "text": "(3) Surat Keputusan Pindah sebagaimana dimaksud pada ayat (1) menjadi dasar diterbitkannya SPD."
+  },
+  {
+    "id": "pmk-113-2012-page-5-pasal-16-ayat-4",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "16 ayat (4)",
+    "page": 5,
+    "active": true,
+    "text": "(4) SPD sebagaimana dimaksud pada ayat (3) dibuat sesuai dengan format sebagaimana tercantum dalam Lampiran I yang\nmerupakan bagian tidak terpisahkan dari Peraturan Menteri ini.\n```"
+  },
+  {
+    "id": "pmk-113-2012-page-6-pasal-17",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "17",
+    "page": 6,
+    "active": true,
+    "text": "Pasal 17 sampai Pasal 24 mengatur Perjalanan Dinas Pindah (keluarga yang sah, komponen biaya pindah, pengepakan\ndan angkutan barang). Bagian ini tidak dipakai di skenario demo; lihat PDF asli bila diperlukan.\nBAB VIII\nPELAKSANAAN DAN PROSEDUR\nPEMBAYARAN BIAYA PERJALANAN DINAS"
+  },
+  {
+    "id": "pmk-113-2012-page-6-pasal-25",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "25",
+    "page": 6,
+    "active": true,
+    "text": "Pasal 25"
+  },
+  {
+    "id": "pmk-113-2012-page-6-pasal-25-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "25 ayat (1)",
+    "page": 6,
+    "active": true,
+    "text": "(1) Pembayaran biaya Perjalanan Dinas diberikan dalam batas pagu anggaran yang tersedia dalam DIPA satuan kerja\nberkenaan."
+  },
+  {
+    "id": "pmk-113-2012-page-6-pasal-25-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "25 ayat (2)",
+    "page": 6,
+    "active": true,
+    "text": "(2) Pembayaran biaya Perjalanan Dinas kepada Pelaksana SPD paling cepat 5 (lima) hari kerja sebelum Perjalanan Dinas\ndilaksanakan."
+  },
+  {
+    "id": "pmk-113-2012-page-6-pasal-25-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "25 ayat (3)",
+    "page": 6,
+    "active": true,
+    "text": "(3) Pada akhir tahun anggaran, ketentuan sebagaimana dimaksud pada ayat (2) dapat melebihi 5 (lima) hari kerja\nmenyesuaikan dengan ketentuan yang mengatur mengenai langkah-langkah menghadapi akhir tahun anggaran."
+  },
+  {
+    "id": "pmk-113-2012-page-6-pasal-25-ayat-4",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "25 ayat (4)",
+    "page": 6,
+    "active": true,
+    "text": "(4) Pengajuan biaya Perjalanan Dinas Pindah sebagaimana dimaksud dalam Pasal 17 ayat (2) diatur sebagai berikut:\na. untuk huruf d berlaku untuk jangka waktu 1 (satu) tahun terhitung sejak tanggal pemberhentian atau meninggal\ndunia;\nb. untuk huruf b, huruf c, dan huruf e berlaku paling lambat 1 (satu) tahun terhitung sejak tanggal dibayarkan\npensiun pertama."
+  },
+  {
+    "id": "pmk-113-2012-page-6-pasal-26",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "26",
+    "page": 6,
+    "active": true,
+    "text": "Pasal 26"
+  },
+  {
+    "id": "pmk-113-2012-page-6-pasal-26-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "26 ayat (1)",
+    "page": 6,
+    "active": true,
+    "text": "(1) Pembayaran biaya Perjalanan Dinas dilakukan melalui mekanisme UP dan/atau mekanisme Pembayaran Langsung (LS)."
+  },
+  {
+    "id": "pmk-113-2012-page-6-pasal-26-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "26 ayat (2)",
+    "page": 6,
+    "active": true,
+    "text": "(2) Pembayaran biaya Perjalanan Dinas dengan mekanisme LS dilakukan melalui:\na. perikatan dengan penyedia jasa;\nb. Bendahara Pengeluaran; atau\nc. Pelaksana SPD."
+  },
+  {
+    "id": "pmk-113-2012-page-6-pasal-26-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "26 ayat (3)",
+    "page": 6,
+    "active": true,
+    "text": "(3) Perjalanan Dinas Jabatan yang dilakukan melalui perikatan dengan penyedia jasa sebagaimana dimaksud pada ayat (2)\nhuruf a meliputi:\na. Perjalanan Dinas Jabatan dalam rangka pelaksanaan tugas dan fungsi yang melekat pada jabatan; dan\nb. Perjalanan Dinas Jabatan dalam rangka mengikuti rapat, seminar dan sejenisnya."
+  },
+  {
+    "id": "pmk-113-2012-page-6-pasal-27",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "27",
+    "page": 6,
+    "active": true,
+    "text": "Pasal 27"
+  },
+  {
+    "id": "pmk-113-2012-page-6-pasal-27-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "27 ayat (1)",
+    "page": 6,
+    "active": true,
+    "text": "(1) Pembayaran biaya Perjalanan Dinas dengan mekanisme UP dilakukan dengan memberikan uang muka kepada\nPelaksana SPD oleh Bendahara Pengeluaran.\n```"
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-27-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "27 ayat (2)",
+    "page": 8,
+    "active": true,
+    "text": "(2) Pemberian uang muka sebagaimana dimaksud pada ayat (1), berdasarkan persetujuan pemberian uang muka dari PPK\ndengan melampirkan dokumen sebagai berikut:\na. Surat Tugas atau surat keputusan pindah;\nb. fotokopi SPD;\nc. kuitansi tanda terima uang muka; dan\nd. rincian perkiraan biaya Perjalanan Dinas."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-28",
     "docId": "pmk-113-2012",
     "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
     "version": "1.0",
     "article": "28",
     "page": 8,
     "active": true,
-    "text": "```text\n(2) Pemberian uang muka sebagaimana dimaksud pada ayat (1), berdasarkan persetujuan pemberian uang muka dari PPK\ndengan melampirkan dokumen sebagai berikut:\na. Surat Tugas atau surat keputusan pindah;\nb. fotokopi SPD;\nc. kuitansi tanda terima uang muka; dan\nd. rincian perkiraan biaya Perjalanan Dinas.\nPasal 28\n(1) Penyedia jasa untuk pelaksanaan Perjalanan Dinas dapat berupa event organizer, biro jasa perjalanan, perusahaan jasa\ntransportasi, dan perusahaan jasa perhotelan/ penginapan.\n(2) Penetapan penyedia jasa sebagaimana dimaksud pada ayat (1) dilakukan sesuai ketentuan yang mengatur pengadaan\nbarang/jasa pemerintah.\n(3) Komponen biaya Perjalanan Dinas yang dapat dilaksanakan dengan perikatan meliputi biaya transpor termasuk\npembelian/pengadaan tiket dan/atau biaya penginapan.\nPasal 29\n(1) Kontrak/perjanjian dengan penyedia jasa dapat dilakukan untuk 1 (satu) paket kegiatan atau untuk kebutuhan periode\ntertentu.\n(2) Nilai satuan harga dalam kontrak/perjanjian tidak diperkenankan melebihi tarif tiket resmi yang dikeluarkan oleh\nperusahaan jasa transportasi atau tarif penginapan/hotel resmi yang dikeluarkan oleh perusahaan jasa\npenginapan/hotel.\nPasal 30\n(1) Pembayaran biaya Perjalanan Dinas kepada penyedia jasa didasarkan atas prestasi kerja yang telah diselesaikan\nsebagaimana diatur dalam kontrak/perjanjian.\n(2) Atas dasar prestasi kerja yang telah diselesaikan, penyedia jasa mengajukan tagihan kepada PPK.\nPasal 31\n(1) Pembayaran biaya Perjalanan Dinas Jabatan dengan mekanisme LS dilakukan melalui transfer dari Kas Negara ke\nrekening Bendahara Pengeluaran, pihak ketiga atau Pelaksana SPD.\n(2) Dalam hal biaya Perjalanan Dinas Jabatan yang dibayarkan kepada Pelaksana SPD melebihi biaya Perjalanan Dinas\nJabatan yang seharusnya dipertanggungjawabkan, kelebihan biaya Perjalanan Dinas Jabatan tersebut harus disetor ke\nKas Negara melalui PPK.\n(3) Penyetoran kelebihan pembayaran sebagaimana dimaksud pada ayat (2) dilakukan dengan:\na. menggunakan Surat Setoran Pengembalian Belanja (SSPB) untuk tahun anggaran berjalan; atau\nb. menggunakan Surat Setoran Bukan Pajak (SSBP) untuk tahun anggaran lalu.\n(4) Dalam hal biaya Perjalanan Dinas Jabatan yang dibayarkan kepada Pelaksana SPD kurang dari yang seharusnya, dapat\ndimintakan kekurangannya.\n(5) Pembayaran kekurangan biaya Perjalanan Dinas Jabatan sebagaimana dimaksud pada ayat (4) dapat dilakukan melalui\nmekanisme UP atau LS.\nPasal 32\nTata cara pengajuan tagihan kepada PPK, pengujian surat permintaan pembayaran, dan penerbitan Surat Perintah\nMembayar oleh Pejabat Penanda Tangan SPM, dan penerbitan Surat Perintah Pencairan Dana (SP2D) oleh Kantor Pelayanan\nPerbendaharaan Negara (KPPN) berpedoman pada Peraturan Menteri Keuangan mengenai tata cara pembayaran atas beban\nAnggaran Pendapatan dan Belanja Negara.\nPasal 33\n(1) Dalam hal terjadi pembatalan pelaksanaan Perjalanan Dinas Jabatan, biaya pembatalan dapat dibebankan pada DIPA\nsatuan kerja berkenaan.\n(2) Dokumen yang harus dilampirkan dalam rangka pembebanan biaya pembatalan sebagaimana dimaksud pada ayat (1)\nmeliputi:\na. Surat Pernyataan Pembatalan Tugas Perjalanan Dinas Jabatan dari atasan Pelaksana SPD, atau paling rendah\nPejabat Eselon II bagi Pelaksana SPD di bawah Pejabat Eselon III ke bawah, yang dibuat sesuai format sebagaimana\ntercantum dalam Lampiran VII yang merupakan bagian tidak terpisahkan dari Peraturan Menteri ini;\nb. Surat Pernyataan Pembebanan Biaya Pembatalan Perjalanan Dinas Jabatan yang dibuat sesuai format\nsebagaimana tercantum dalam Lampiran VIII yang merupakan bagian tidak terpisahkan dari Peraturan Menteri ini;\nc. Pernyataan/Tanda Bukti Besaran Pengembalian Biaya Transpor dan/atau biaya penginapan dari perusahaan jasa\ntransportasi dan/atau penginapan yang disahkan oleh PPK.\n(3) Biaya pembatalan yang dapat dibebankan pada DIPA satuan kerja sebagaimana dimaksud pada ayat (1) sebagai berikut:\na. biaya pembatalan tiket transportasi atau biaya penginapan; atau\nb. sebagian atau seluruh biaya tiket transportasi atau biaya penginapan yang tidak dapat dikembalikan/refund.\nBAB IX\nPERTANGGUNGJAWABAN BIAYA PERJALANAN DINAS\nPasal 34\n```"
+    "text": "Pasal 28"
   },
   {
-    "id": "pmk-113-2012-page-9",
+    "id": "pmk-113-2012-page-8-pasal-28-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "28 ayat (1)",
+    "page": 8,
+    "active": true,
+    "text": "(1) Penyedia jasa untuk pelaksanaan Perjalanan Dinas dapat berupa event organizer, biro jasa perjalanan, perusahaan jasa\ntransportasi, dan perusahaan jasa perhotelan/ penginapan."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-28-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "28 ayat (2)",
+    "page": 8,
+    "active": true,
+    "text": "(2) Penetapan penyedia jasa sebagaimana dimaksud pada ayat (1) dilakukan sesuai ketentuan yang mengatur pengadaan\nbarang/jasa pemerintah."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-28-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "28 ayat (3)",
+    "page": 8,
+    "active": true,
+    "text": "(3) Komponen biaya Perjalanan Dinas yang dapat dilaksanakan dengan perikatan meliputi biaya transpor termasuk\npembelian/pengadaan tiket dan/atau biaya penginapan."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-29",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "29",
+    "page": 8,
+    "active": true,
+    "text": "Pasal 29"
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-29-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "29 ayat (1)",
+    "page": 8,
+    "active": true,
+    "text": "(1) Kontrak/perjanjian dengan penyedia jasa dapat dilakukan untuk 1 (satu) paket kegiatan atau untuk kebutuhan periode\ntertentu."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-29-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "29 ayat (2)",
+    "page": 8,
+    "active": true,
+    "text": "(2) Nilai satuan harga dalam kontrak/perjanjian tidak diperkenankan melebihi tarif tiket resmi yang dikeluarkan oleh\nperusahaan jasa transportasi atau tarif penginapan/hotel resmi yang dikeluarkan oleh perusahaan jasa\npenginapan/hotel."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-30",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "30",
+    "page": 8,
+    "active": true,
+    "text": "Pasal 30"
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-30-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "30 ayat (1)",
+    "page": 8,
+    "active": true,
+    "text": "(1) Pembayaran biaya Perjalanan Dinas kepada penyedia jasa didasarkan atas prestasi kerja yang telah diselesaikan\nsebagaimana diatur dalam kontrak/perjanjian."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-30-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "30 ayat (2)",
+    "page": 8,
+    "active": true,
+    "text": "(2) Atas dasar prestasi kerja yang telah diselesaikan, penyedia jasa mengajukan tagihan kepada PPK."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-31",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "31",
+    "page": 8,
+    "active": true,
+    "text": "Pasal 31"
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-31-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "31 ayat (1)",
+    "page": 8,
+    "active": true,
+    "text": "(1) Pembayaran biaya Perjalanan Dinas Jabatan dengan mekanisme LS dilakukan melalui transfer dari Kas Negara ke\nrekening Bendahara Pengeluaran, pihak ketiga atau Pelaksana SPD."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-31-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "31 ayat (2)",
+    "page": 8,
+    "active": true,
+    "text": "(2) Dalam hal biaya Perjalanan Dinas Jabatan yang dibayarkan kepada Pelaksana SPD melebihi biaya Perjalanan Dinas\nJabatan yang seharusnya dipertanggungjawabkan, kelebihan biaya Perjalanan Dinas Jabatan tersebut harus disetor ke\nKas Negara melalui PPK."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-31-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "31 ayat (3)",
+    "page": 8,
+    "active": true,
+    "text": "(3) Penyetoran kelebihan pembayaran sebagaimana dimaksud pada ayat (2) dilakukan dengan:\na. menggunakan Surat Setoran Pengembalian Belanja (SSPB) untuk tahun anggaran berjalan; atau\nb. menggunakan Surat Setoran Bukan Pajak (SSBP) untuk tahun anggaran lalu."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-31-ayat-4",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "31 ayat (4)",
+    "page": 8,
+    "active": true,
+    "text": "(4) Dalam hal biaya Perjalanan Dinas Jabatan yang dibayarkan kepada Pelaksana SPD kurang dari yang seharusnya, dapat\ndimintakan kekurangannya."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-31-ayat-5",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "31 ayat (5)",
+    "page": 8,
+    "active": true,
+    "text": "(5) Pembayaran kekurangan biaya Perjalanan Dinas Jabatan sebagaimana dimaksud pada ayat (4) dapat dilakukan melalui\nmekanisme UP atau LS."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-32",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "32",
+    "page": 8,
+    "active": true,
+    "text": "Pasal 32\nTata cara pengajuan tagihan kepada PPK, pengujian surat permintaan pembayaran, dan penerbitan Surat Perintah\nMembayar oleh Pejabat Penanda Tangan SPM, dan penerbitan Surat Perintah Pencairan Dana (SP2D) oleh Kantor Pelayanan\nPerbendaharaan Negara (KPPN) berpedoman pada Peraturan Menteri Keuangan mengenai tata cara pembayaran atas beban\nAnggaran Pendapatan dan Belanja Negara."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-33",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "33",
+    "page": 8,
+    "active": true,
+    "text": "Pasal 33"
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-33-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "33 ayat (1)",
+    "page": 8,
+    "active": true,
+    "text": "(1) Dalam hal terjadi pembatalan pelaksanaan Perjalanan Dinas Jabatan, biaya pembatalan dapat dibebankan pada DIPA\nsatuan kerja berkenaan."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-33-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "33 ayat (2)",
+    "page": 8,
+    "active": true,
+    "text": "(2) Dokumen yang harus dilampirkan dalam rangka pembebanan biaya pembatalan sebagaimana dimaksud pada ayat (1)\nmeliputi:\na. Surat Pernyataan Pembatalan Tugas Perjalanan Dinas Jabatan dari atasan Pelaksana SPD, atau paling rendah\nPejabat Eselon II bagi Pelaksana SPD di bawah Pejabat Eselon III ke bawah, yang dibuat sesuai format sebagaimana\ntercantum dalam Lampiran VII yang merupakan bagian tidak terpisahkan dari Peraturan Menteri ini;\nb. Surat Pernyataan Pembebanan Biaya Pembatalan Perjalanan Dinas Jabatan yang dibuat sesuai format\nsebagaimana tercantum dalam Lampiran VIII yang merupakan bagian tidak terpisahkan dari Peraturan Menteri ini;\nc. Pernyataan/Tanda Bukti Besaran Pengembalian Biaya Transpor dan/atau biaya penginapan dari perusahaan jasa\ntransportasi dan/atau penginapan yang disahkan oleh PPK."
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-33-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "33 ayat (3)",
+    "page": 8,
+    "active": true,
+    "text": "(3) Biaya pembatalan yang dapat dibebankan pada DIPA satuan kerja sebagaimana dimaksud pada ayat (1) sebagai berikut:\na. biaya pembatalan tiket transportasi atau biaya penginapan; atau\nb. sebagian atau seluruh biaya tiket transportasi atau biaya penginapan yang tidak dapat dikembalikan/refund.\nBAB IX\nPERTANGGUNGJAWABAN BIAYA PERJALANAN DINAS"
+  },
+  {
+    "id": "pmk-113-2012-page-8-pasal-34",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "34",
+    "page": 8,
+    "active": true,
+    "text": "Pasal 34\n```"
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-34-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "34 ayat (1)",
+    "page": 9,
+    "active": true,
+    "text": "(1) Pelaksana SPD mempertanggungjawabkan pelaksanaan Perjalanan Dinas kepada pemberi tugas dan biaya Perjalanan\nDinas kepada PPK paling lambat 5 (lima) hari kerja setelah Perjalanan Dinas dilaksanakan."
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-34-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "34 ayat (2)",
+    "page": 9,
+    "active": true,
+    "text": "(2) Pertanggungjawaban biaya Perjalanan Dinas Jabatan sebagaimana dimaksud pada ayat (1) dengan melampirkan\ndokumen berupa:\na. Surat Tugas yang sah dari atasan Pelaksana SPD;\nb. SPD yang telah ditandatangani oleh PPK dan pejabat di tempat pelaksanaan Perjalanan Dinas atau pihak terkait\nyang menjadi Tempat Tujuan Perjalanan Dinas;\nc. tiket pesawat, boarding pass, airport tax, retribusi, dan bukti pembayaran moda transportasi lainnya;\nd. Daftar Pengeluaran Riil sesuai dengan format sebagaimana tercantum dalam Lampiran IX yang merupakan bagian\ntidak terpisahkan dari Peraturan Menteri ini;\ne. bukti pembayaran yang sah untuk sewa kendaraan dalam Kota berupa kuitansi atau bukti pembayaran lainnya\nyang dikeluarkan oleh badan usaha yang bergerak di bidang jasa penyewaan kendaraan; dan\nf. bukti pembayaran hotel atau tempat menginap lainnya."
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-34-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "34 ayat (3)",
+    "page": 9,
+    "active": true,
+    "text": "(3) Dalam hal bukti pengeluaran transportasi dan/atau penginapan/hotel sebagaimana dimaksud pada ayat (2) huruf c,\nhuruf e, dan huruf f tidak diperoleh, pertanggungjawaban biaya Perjalanan Dinas Jabatan dapat hanya menggunakan\nDaftar Pengeluaran Riil sebagaimana dimaksud pada ayat (2) huruf d."
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-34-ayat-4",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "34 ayat (4)",
+    "page": 9,
+    "active": true,
+    "text": "(4) Pertanggungjawaban biaya Perjalanan Dinas Pindah sebagaimana dimaksud pada ayat (1) dengan melampirkan\ndokumen berupa: fotokopi surat keputusan pindah; SPD yang telah ditandatangani pihak yang berwenang;\nkuitansi/bukti penerimaan untuk uang harian; kuitansi/bukti penerimaan untuk biaya transpor; dan\nkuitansi/bukti penerimaan untuk biaya pengepakan dan angkutan barang."
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-35",
     "docId": "pmk-113-2012",
     "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
     "version": "1.0",
     "article": "35",
     "page": 9,
     "active": true,
-    "text": "```text\n(1) Pelaksana SPD mempertanggungjawabkan pelaksanaan Perjalanan Dinas kepada pemberi tugas dan biaya Perjalanan\nDinas kepada PPK paling lambat 5 (lima) hari kerja setelah Perjalanan Dinas dilaksanakan.\n(2) Pertanggungjawaban biaya Perjalanan Dinas Jabatan sebagaimana dimaksud pada ayat (1) dengan melampirkan\ndokumen berupa:\na. Surat Tugas yang sah dari atasan Pelaksana SPD;\nb. SPD yang telah ditandatangani oleh PPK dan pejabat di tempat pelaksanaan Perjalanan Dinas atau pihak terkait\nyang menjadi Tempat Tujuan Perjalanan Dinas;\nc. tiket pesawat, boarding pass, airport tax, retribusi, dan bukti pembayaran moda transportasi lainnya;\nd. Daftar Pengeluaran Riil sesuai dengan format sebagaimana tercantum dalam Lampiran IX yang merupakan bagian\ntidak terpisahkan dari Peraturan Menteri ini;\ne. bukti pembayaran yang sah untuk sewa kendaraan dalam Kota berupa kuitansi atau bukti pembayaran lainnya\nyang dikeluarkan oleh badan usaha yang bergerak di bidang jasa penyewaan kendaraan; dan\nf. bukti pembayaran hotel atau tempat menginap lainnya.\n(3) Dalam hal bukti pengeluaran transportasi dan/atau penginapan/hotel sebagaimana dimaksud pada ayat (2) huruf c,\nhuruf e, dan huruf f tidak diperoleh, pertanggungjawaban biaya Perjalanan Dinas Jabatan dapat hanya menggunakan\nDaftar Pengeluaran Riil sebagaimana dimaksud pada ayat (2) huruf d.\n(4) Pertanggungjawaban biaya Perjalanan Dinas Pindah sebagaimana dimaksud pada ayat (1) dengan melampirkan\ndokumen berupa: fotokopi surat keputusan pindah; SPD yang telah ditandatangani pihak yang berwenang;\nkuitansi/bukti penerimaan untuk uang harian; kuitansi/bukti penerimaan untuk biaya transpor; dan\nkuitansi/bukti penerimaan untuk biaya pengepakan dan angkutan barang.\nPasal 35\n(1) PPK melakukan Perhitungan Rampung seluruh bukti pengeluaran biaya Perjalanan Dinas dan disampaikan kepada\nBendahara Pengeluaran.\n(2) PPK berwenang untuk menilai kesesuaian dan kewajaran atas biaya-biaya yang tercantum dalam daftar pengeluaran\nsebagaimana dimaksud dalam Pasal 34.\n(3) PPK mengesahkan bukti pengeluaran sebagaimana dimaksud pada ayat (1) dan menyampaikan kepada Bendahara\nPengeluaran sebagai pertanggungjawaban UP atau bukti pengesahan Surat Permintaan Membayar/Surat Permintaan\nPencairan Dana (SPM/SP2D) LS Perjalanan Dinas.\nPasal 36\nPihak-pihak yang melakukan pemalsuan dokumen, menaikkan dari harga sebenarnya (mark up), dan/atau Perjalanan Dinas\nrangkap (dua kali atau lebih) dalam pertanggungjawaban Perjalanan Dinas yang berakibat kerugian yang diderita oleh\nnegara, bertanggung jawab sepenuhnya atas seluruh tindakan yang dilakukan.\nBAB X\nPENGENDALIAN INTERNAL\nPasal 37\n(1) Menteri/Pimpinan Lembaga menyelenggarakan pengendalian internal terhadap pelaksanaan Perjalanan Dinas.\n(2) Pengendalian internal sebagaimana dimaksud pada ayat (1) dilaksanakan sesuai ketentuan peraturan perundang-undangan.\nBAB XI\nKETENTUAN LAIN-LAIN\nPasal 38\n(1) Pejabat penerbit Surat Tugas sebagaimana dimaksud dalam Pasal 6 ayat (2) dapat memerintahkan pihak lain di luar\nPejabat Negara/ Pegawai Negeri/Pegawai Tidak Tetap untuk melakukan Perjalanan Dinas.\n(2) Pihak lain sebagaimana dimaksud pada ayat (1) yang melakukan Perjalanan Dinas untuk kepentingan negara,\ndigolongkan dalam tingkat sebagaimana dimaksud dalam Pasal 10 ayat (1).\n(3) Penggolongan terhadap pihak lain sebagaimana dimaksud pada ayat (2) ditentukan oleh PPK dengan\nmempertimbangkan tingkat pendidikan/kepatutan/tugas yang bersangkutan.\n(4) Pegawai Negeri Sipil Golongan I dapat melakukan Perjalanan Dinas dalam hal mendesak/khusus, dalam hal tenaga\nteknis tidak diperoleh di tempat bersangkutan.\nPasal 39\nKetentuan lebih lanjut yang diperlukan dalam rangka pelaksanaan Peraturan Menteri ini ditetapkan oleh Direktur Jenderal\nPerbendaharaan.\n```"
+    "text": "Pasal 35"
   },
   {
-    "id": "pmk-113-2012-page-10",
+    "id": "pmk-113-2012-page-9-pasal-35-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "35 ayat (1)",
+    "page": 9,
+    "active": true,
+    "text": "(1) PPK melakukan Perhitungan Rampung seluruh bukti pengeluaran biaya Perjalanan Dinas dan disampaikan kepada\nBendahara Pengeluaran."
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-35-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "35 ayat (2)",
+    "page": 9,
+    "active": true,
+    "text": "(2) PPK berwenang untuk menilai kesesuaian dan kewajaran atas biaya-biaya yang tercantum dalam daftar pengeluaran\nsebagaimana dimaksud dalam Pasal 34."
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-35-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "35 ayat (3)",
+    "page": 9,
+    "active": true,
+    "text": "(3) PPK mengesahkan bukti pengeluaran sebagaimana dimaksud pada ayat (1) dan menyampaikan kepada Bendahara\nPengeluaran sebagai pertanggungjawaban UP atau bukti pengesahan Surat Permintaan Membayar/Surat Permintaan\nPencairan Dana (SPM/SP2D) LS Perjalanan Dinas."
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-36",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "36",
+    "page": 9,
+    "active": true,
+    "text": "Pasal 36\nPihak-pihak yang melakukan pemalsuan dokumen, menaikkan dari harga sebenarnya (mark up), dan/atau Perjalanan Dinas\nrangkap (dua kali atau lebih) dalam pertanggungjawaban Perjalanan Dinas yang berakibat kerugian yang diderita oleh\nnegara, bertanggung jawab sepenuhnya atas seluruh tindakan yang dilakukan.\nBAB X\nPENGENDALIAN INTERNAL"
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-37",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "37",
+    "page": 9,
+    "active": true,
+    "text": "Pasal 37"
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-37-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "37 ayat (1)",
+    "page": 9,
+    "active": true,
+    "text": "(1) Menteri/Pimpinan Lembaga menyelenggarakan pengendalian internal terhadap pelaksanaan Perjalanan Dinas."
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-37-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "37 ayat (2)",
+    "page": 9,
+    "active": true,
+    "text": "(2) Pengendalian internal sebagaimana dimaksud pada ayat (1) dilaksanakan sesuai ketentuan peraturan perundang-undangan.\nBAB XI\nKETENTUAN LAIN-LAIN"
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-38",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "38",
+    "page": 9,
+    "active": true,
+    "text": "Pasal 38"
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-38-ayat-1",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "38 ayat (1)",
+    "page": 9,
+    "active": true,
+    "text": "(1) Pejabat penerbit Surat Tugas sebagaimana dimaksud dalam Pasal 6 ayat (2) dapat memerintahkan pihak lain di luar\nPejabat Negara/ Pegawai Negeri/Pegawai Tidak Tetap untuk melakukan Perjalanan Dinas."
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-38-ayat-2",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "38 ayat (2)",
+    "page": 9,
+    "active": true,
+    "text": "(2) Pihak lain sebagaimana dimaksud pada ayat (1) yang melakukan Perjalanan Dinas untuk kepentingan negara,\ndigolongkan dalam tingkat sebagaimana dimaksud dalam Pasal 10 ayat (1)."
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-38-ayat-3",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "38 ayat (3)",
+    "page": 9,
+    "active": true,
+    "text": "(3) Penggolongan terhadap pihak lain sebagaimana dimaksud pada ayat (2) ditentukan oleh PPK dengan\nmempertimbangkan tingkat pendidikan/kepatutan/tugas yang bersangkutan."
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-38-ayat-4",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "38 ayat (4)",
+    "page": 9,
+    "active": true,
+    "text": "(4) Pegawai Negeri Sipil Golongan I dapat melakukan Perjalanan Dinas dalam hal mendesak/khusus, dalam hal tenaga\nteknis tidak diperoleh di tempat bersangkutan."
+  },
+  {
+    "id": "pmk-113-2012-page-9-pasal-39",
+    "docId": "pmk-113-2012",
+    "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
+    "version": "1.0",
+    "article": "39",
+    "page": 9,
+    "active": true,
+    "text": "Pasal 39\nKetentuan lebih lanjut yang diperlukan dalam rangka pelaksanaan Peraturan Menteri ini ditetapkan oleh Direktur Jenderal\nPerbendaharaan.\n```"
+  },
+  {
+    "id": "pmk-113-2012-page-10-pasal-40",
     "docId": "pmk-113-2012",
     "title": "PMK 113/PMK.05/2012 Perjalanan Dinas Dalam Negeri",
     "version": "1.0",
     "article": "40",
     "page": 10,
     "active": true,
-    "text": "```text\nPasal 40 sampai Pasal 43: ketentuan peralihan dan penutup. Peraturan ini mencabut KMK 7/KMK.02/2003 dan\nPMK 45/PMK.05/2007 beserta perubahannya, dan mulai berlaku pada tanggal diundangkan.\nDitetapkan di Jakarta pada tanggal 3 Juli 2012, MENTERI KEUANGAN REPUBLIK INDONESIA, AGUS D. W. MARTOWARDOJO.\nDiundangkan di Jakarta pada tanggal 3 Juli 2012. BERITA NEGARA REPUBLIK INDONESIA TAHUN 2012 NOMOR 678.\n```"
+    "text": "Pasal 40 sampai Pasal 43: ketentuan peralihan dan penutup. Peraturan ini mencabut KMK 7/KMK.02/2003 dan\nPMK 45/PMK.05/2007 beserta perubahannya, dan mulai berlaku pada tanggal diundangkan.\nDitetapkan di Jakarta pada tanggal 3 Juli 2012, MENTERI KEUANGAN REPUBLIK INDONESIA, AGUS D. W. MARTOWARDOJO.\nDiundangkan di Jakarta pada tanggal 3 Juli 2012. BERITA NEGARA REPUBLIK INDONESIA TAHUN 2012 NOMOR 678.\n```"
+  },
+  {
+    "id": "pmk-119-2023-document",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "active": true,
+    "text": "# PMK 119 Tahun 2023 tentang Perubahan atas PMK 113/PMK.05/2012\n\ndoc_id: `pmk-119-2023` · status: berlaku sejak 15 November 2023 · sumber: https://peraturan.bpk.go.id/Details/272360/pmk-no-119-tahun-2023. PDF sumber adalah hasil pindai; beberapa kata hasil OCR keliru (misalnya `clan` untuk `dan`, `pos1s1` untuk `posisi`).\n\n> Teks ini hasil ekstraksi otomatis dari PDF resmi. Penanda `[Halaman N]` mengikuti nomor halaman PDF sumber. Untuk kutipan formal, cocokkan dengan PDF asli."
   },
   {
     "id": "pmk-119-2023-page-1",
     "docId": "pmk-119-2023",
     "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
     "version": "2023-11-15",
-    "article": "17 ayat (3)",
     "page": 1,
     "active": true,
-    "text": "```text\nMENTERIKEUANGAN\nREPUBLIK INDONESIA\n\nSALINAN\n\nPERATURAN MENTERI KEUANGAN REPUBLIK INDONESIA\nNOMOR 119 TAHUN 2023\nTENTANG\nPERUBAHAN ATAS PERATURAN MENTERI KEUANGAN NOMOR\n113/PMK.05/2012 TENTANG PERJALANAN DINAS DALAM NEGERI BAGI\nPEJABAT NEGARA, PEGAWAI NEGERI, DAN PEGAWAI TIDAK TETAP\nDENGAN RAHMAT TUHAN YANG MAHA ESA\nMENTERI KEUANGAN REPUBLIK INDONESIA,\n\nMenimbang\n\na.\n\nb.\n\nMengingat\n\n1.\n2.\n\n3.\n\n4.\n\n5.\n\nbahwa\nuntuk\nmenjaga\nefisiensi,\nefektivitas,\ntransparansi, dan akuntabilitas dalam pelaksanaan\nperjalanan dinas dalam negeri yang menggunakan\nsistem elektronik, perlu mengubah Peraturan Menteri\nKeuangan\nNomor\n113/PMK.05/2012\ntenta ng\nPerjalanan Dinas Dalam Negeri bagi Pejabat Negara,\nPegawai Negeri, dan Pegawai Tidak Tetap;\nbahwa\nberdasarkan\npertimbangan\nsebagaimana\ndimaksud dalam huruf a, perlu menetapkan Peraturan\nMenteri Keuangan tentang Perubahan atas Peraturan\nMenteri Keuangan Nomor 113/PMK.05/2012 tentang\nPerjalanan Dinas Dalam Negeri bagi Pejabat Negara,\nPegawai Negeri, dan Pegawai Tidak Tetap;\nPasal 17 ayat (3) Undang-Undang Dasar Negara\nRepublik Indonesia Tahun 1945;\nUndang-Undang Nomor 1 Tahun 2004 tentang\nPerbendaharaan Negara (Lembaran Negara Republik\nIndonesia Tahun 2004 Nomor 5, Tambahan Lembaran\nNegara Republik Indonesia Nomor 4355);\nUndang-Undang Nomor 39 Tahun 2008 tentang\nKementerian Nega ra (Lembaran Negara Republik\nIndonesia Tahun 2008 Nomor 166, Tambahan\nLembaran Negara Republik Indonesia Nomor 4916);\nPeraturan Presiden Nomor 57 Tahun 2020 tentang\nKementerian Keuangan (Lembaran Negara Republik\nIndonesia Tahun 2020 Nomor 98);\nPeraturan Menteri Keuangan Nomor 113/PMK.05/2012\ntentang Perjalanan Dinas Dalam Negeri bagi Pejabat\nNegara, Pegawai Negeri, dan Pegawai Tidak Tetap\n(Berita Negara Republik Indonesia Tahun 2012 Nomor\n678);\n\njdih.kemenkeu.go.id\n```"
+    "text": "```text\nMENTERIKEUANGAN\nREPUBLIK INDONESIA\n\nSALINAN\n\nPERATURAN MENTERI KEUANGAN REPUBLIK INDONESIA\nNOMOR 119 TAHUN 2023\nTENTANG\nPERUBAHAN ATAS PERATURAN MENTERI KEUANGAN NOMOR\n113/PMK.05/2012 TENTANG PERJALANAN DINAS DALAM NEGERI BAGI\nPEJABAT NEGARA, PEGAWAI NEGERI, DAN PEGAWAI TIDAK TETAP\nDENGAN RAHMAT TUHAN YANG MAHA ESA\nMENTERI KEUANGAN REPUBLIK INDONESIA,\n\nMenimbang\n\na.\n\nb.\n\nMengingat\n\n1.\n2.\n\n3.\n\n4.\n\n5.\n\nbahwa\nuntuk\nmenjaga\nefisiensi,\nefektivitas,\ntransparansi, dan akuntabilitas dalam pelaksanaan\nperjalanan dinas dalam negeri yang menggunakan\nsistem elektronik, perlu mengubah Peraturan Menteri\nKeuangan\nNomor\n113/PMK.05/2012\ntenta ng\nPerjalanan Dinas Dalam Negeri bagi Pejabat Negara,\nPegawai Negeri, dan Pegawai Tidak Tetap;\nbahwa\nberdasarkan\npertimbangan\nsebagaimana\ndimaksud dalam huruf a, perlu menetapkan Peraturan\nMenteri Keuangan tentang Perubahan atas Peraturan\nMenteri Keuangan Nomor 113/PMK.05/2012 tentang\nPerjalanan Dinas Dalam Negeri bagi Pejabat Negara,\nPegawai Negeri, dan Pegawai Tidak Tetap;"
   },
   {
-    "id": "pmk-119-2023-page-2",
+    "id": "pmk-119-2023-page-1-pasal-17",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "17",
+    "page": 1,
+    "active": true,
+    "text": "Pasal 17 ayat (3) Undang-Undang Dasar Negara\nRepublik Indonesia Tahun 1945;\nUndang-Undang Nomor 1 Tahun 2004 tentang\nPerbendaharaan Negara (Lembaran Negara Republik\nIndonesia Tahun 2004 Nomor 5, Tambahan Lembaran\nNegara Republik Indonesia Nomor 4355);\nUndang-Undang Nomor 39 Tahun 2008 tentang\nKementerian Nega ra (Lembaran Negara Republik\nIndonesia Tahun 2008 Nomor 166, Tambahan\nLembaran Negara Republik Indonesia Nomor 4916);\nPeraturan Presiden Nomor 57 Tahun 2020 tentang\nKementerian Keuangan (Lembaran Negara Republik\nIndonesia Tahun 2020 Nomor 98);\nPeraturan Menteri Keuangan Nomor 113/PMK.05/2012\ntentang Perjalanan Dinas Dalam Negeri bagi Pejabat\nNegara, Pegawai Negeri, dan Pegawai Tidak Tetap\n(Berita Negara Republik Indonesia Tahun 2012 Nomor\n678);\n\njdih.kemenkeu.go.id\n```"
+  },
+  {
+    "id": "pmk-119-2023-page-2-pasal-17",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "17",
+    "page": 2,
+    "active": true,
+    "text": "```text\n- 2 -\n\n6.\n\nMenetapkan\n\nPeraturan Menteri Keuangan Nomor 118/PMK.01/2021\ntentang Organisasi dan Tata Kerja Kementerian\nKeuangan (Berita Negara Republik Indonesia Tahun\n2021 Nomor 1031) sebagaimana telah diubah dengan\nPeraturan Menteri Keuangan Nomor 141/PMK.07 /2022\ntentang Perubahan atas Peraturan Menteri Keuangan\nNomor 118/PMK.07 /2021 tentang Organisasi dan Tata\nKerja Kementerian Keuangan (Berita Negara Republik\nIndonesia Tahun 2022 Nomor 954);\n\nMEMUTUSKAN:\nPERATURAN MENTERI KEUANGAN TENTANG PERUBAHAN\nATAS\nPERATURAN\nMENTER!\nKEUANGAN\nNOMOR\n113/PMK.05/2012 TENTANG PERJALANAN DINAS DALAM\nNEGERI BAGI PEJABAT NEGARA, PEGAWAI NEGERI, DAN\nPEGAWAI TIDAK TETAP.\nPasal I\nBeberapa ketentuan dalam Peraturan Menteri Keuangan\nNomor 113/PMK.05/2012 tentang Perjalanan Dinas Dalam\nNegeri bagi Pejabat Negara, Pegawai Negeri, dan Pegawai\nTidak Tetap (Berita Negara Republik Indonesia Tahun 2012\nNomor 678) diubah sebagai berikut:\n1.\n\nKetentuan Pasal 1 diubah sehingga berbunyi sebagai\nberikut:"
+  },
+  {
+    "id": "pmk-119-2023-page-2-pasal-1",
     "docId": "pmk-119-2023",
     "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
     "version": "2023-11-15",
     "article": "1",
     "page": 2,
     "active": true,
-    "text": "```text\n- 2 -\n\n6.\n\nMenetapkan\n\nPeraturan Menteri Keuangan Nomor 118/PMK.01/2021\ntentang Organisasi dan Tata Kerja Kementerian\nKeuangan (Berita Negara Republik Indonesia Tahun\n2021 Nomor 1031) sebagaimana telah diubah dengan\nPeraturan Menteri Keuangan Nomor 141/PMK.07 /2022\ntentang Perubahan atas Peraturan Menteri Keuangan\nNomor 118/PMK.07 /2021 tentang Organisasi dan Tata\nKerja Kementerian Keuangan (Berita Negara Republik\nIndonesia Tahun 2022 Nomor 954);\n\nMEMUTUSKAN:\nPERATURAN MENTERI KEUANGAN TENTANG PERUBAHAN\nATAS\nPERATURAN\nMENTER!\nKEUANGAN\nNOMOR\n113/PMK.05/2012 TENTANG PERJALANAN DINAS DALAM\nNEGERI BAGI PEJABAT NEGARA, PEGAWAI NEGERI, DAN\nPEGAWAI TIDAK TETAP.\nPasal I\nBeberapa ketentuan dalam Peraturan Menteri Keuangan\nNomor 113/PMK.05/2012 tentang Perjalanan Dinas Dalam\nNegeri bagi Pejabat Negara, Pegawai Negeri, dan Pegawai\nTidak Tetap (Berita Negara Republik Indonesia Tahun 2012\nNomor 678) diubah sebagai berikut:\n1.\n\nKetentuan Pasal 1 diubah sehingga berbunyi sebagai\nberikut:\nPasal 1\nDalam Peraturan Menteri ini yang dimaksud dengan:\n1.\nPerjalanan Dinas Dalam Negeri yang selanjutnya\ndisebut Perjalanan Dinas adalah perjalanan ke\nluar tempat kedudukan yang dilakukan dalam\nwilayah Republik Indonesia untuk kepentingan\nnegara.\n2.\nPejabat\nNegara\nadalah\npejabat\nnegara\nsebagaimana\ndimaksud\ndalam\nperaturan\nperundang-undangan mengenai aparatur sipil\nnegara dan pejabat negara lainnya yang\nditentukan oleh Undang-Undang.\n3.\nPegawai Negeri adalah pegawai negen sipil\nse bagaimana\ndimaksud\ndalam\nperaturan\nperundang-undangan mengenai aparatur sipil\nnegara.\n4.\nPegawai Tidak Tetap adalah pegawai pemerintah\ndengan perjanjian kerja sebagaimana dimaksud\ndalam peraturan perundang-undangan mengenai\naparatur sipil negara.\n5.\nPihak Lain adalah pihak selain Pejabat Negara,\nPegawai Negeri, dan Pegawai Tidak Tetap.\n6.\nKota adalah Kota/Kabupaten pembagian wilayah\nadministratif di Indonesia di bawah Provinsi.\n7.\nPerjalanan Dinas Jabatan adalah Perjalanan Dinas\nmelewati batas Kota dan/ a tau dalam Kota dari\ntempat kedudukan ke tempat yang dituju,\nmelaksanakan tugas, dan kembali ke tempat\nkedudukan semula di dalam negeri.\n\nI\n\njdih.kemenkeu.go.id\n```"
+    "text": "Pasal 1\nDalam Peraturan Menteri ini yang dimaksud dengan:\n1.\nPerjalanan Dinas Dalam Negeri yang selanjutnya\ndisebut Perjalanan Dinas adalah perjalanan ke\nluar tempat kedudukan yang dilakukan dalam\nwilayah Republik Indonesia untuk kepentingan\nnegara.\n2.\nPejabat\nNegara\nadalah\npejabat\nnegara\nsebagaimana\ndimaksud\ndalam\nperaturan\nperundang-undangan mengenai aparatur sipil\nnegara dan pejabat negara lainnya yang\nditentukan oleh Undang-Undang.\n3.\nPegawai Negeri adalah pegawai negen sipil\nse bagaimana\ndimaksud\ndalam\nperaturan\nperundang-undangan mengenai aparatur sipil\nnegara.\n4.\nPegawai Tidak Tetap adalah pegawai pemerintah\ndengan perjanjian kerja sebagaimana dimaksud\ndalam peraturan perundang-undangan mengenai\naparatur sipil negara.\n5.\nPihak Lain adalah pihak selain Pejabat Negara,\nPegawai Negeri, dan Pegawai Tidak Tetap.\n6.\nKota adalah Kota/Kabupaten pembagian wilayah\nadministratif di Indonesia di bawah Provinsi.\n7.\nPerjalanan Dinas Jabatan adalah Perjalanan Dinas\nmelewati batas Kota dan/ a tau dalam Kota dari\ntempat kedudukan ke tempat yang dituju,\nmelaksanakan tugas, dan kembali ke tempat\nkedudukan semula di dalam negeri.\n\nI\n\njdih.kemenkeu.go.id\n```"
   },
   {
-    "id": "pmk-119-2023-page-3",
+    "id": "pmk-119-2023-page-3-pasal-1",
     "docId": "pmk-119-2023",
     "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
     "version": "2023-11-15",
+    "article": "1",
     "page": 3,
     "active": true,
     "text": "```text\n- 3 -\n\n8.\n\n9.\n\n10.\n\n11.\n\n12.\n\n13.\n\n14.\n15.\n\n16.\n17.\n18.\n\n19.\n20.\n21.\n\nPerjalanan Dinas Pindah adalah Perjalanan Dinas\ndari tempat kedudukan yang lama ke tempat\nkedudukan yang baru berdasarkan surat\nkeputusan pindah.\nKuasa Pengguna Anggaran yang selanjutnya\ndisingkat KPA adalah pejabat yang memperoleh\nkuasa\ndari\npengguna\nanggaran\nuntuk\nmelaksanakan\nse bagian\nkewenangan\ndan\ntanggung jawab penggunaan anggaran. pada\nkementerian negara/lembaga yang bersangkutan.\nPejabat Pembuat Komitmen yang selanjutnya\ndisingkat PPK adalah pejabat yang melaksanakan\nkewenangan pengguna anggaran/KPA untuk\nmengambil keputusan dan/atau tindakan yang\ndapat mengakibatkan pengeluaran atas beban\nAnggaran Pendapatan dan Belanja Negara.\nSurat Perjalanan Dinas yang selanjutnya disingkat\nSPD adalah dokumen yang diterbitkan oleh PPK\ndalam rangka pelaksanaan Perjalanan Dinas bagi\nPejabat Negara, Pegawai Negeri, Pegawai Tidak\nTetap, dan Pihak Lain.\nPelaksana SPD atau Pelaksana Perjalanan Dinas\nyang selanjutnya disebut Pelaksana SPD adalah\nPejabat Negara, Pegawai Negeri, Pegawai Tidak\nTetap, dan Pihak Lain yang melaksanakan\nPerjalanan Dinas.\nLumpsum adalah suatu jumlah uang yang telah\ndihitung terlebih dahulu (pre-calculated amount)\ndan dibayarkan sekaligus.\nBiaya Riil adalah biaya yang dikeluarkan sesuai\ndengan bukti pengeluaran yang sah.\nPerhitungan Rampung adalah perhitungan biaya\nPerjalanan Dinas yang dihitung sesuai dengan\nkebutuhan riil berdasarkan ketentuan yang\nberlaku.\nTempat Kedudukan adalah lokasi kantor/satuan\nkerja.\nTempat Tujuan adalah tempat/lokasi Kota yang\nmenjadi tujuan Perjalanan Dinas.\nTempat Sah adalah lokasi Kota Pelaksana SPD\nberada\nsecara\nsah,\ndiantaranya\nlokasi\npelaksanaan fleksibilitas tempat bekerja (flexible\nworking space}, lokasi cuti, lokasi ketika sedang\nmenjalani libur resmi, dan Tempat Tujuan\npenugasan Perjalanan Dinas lainnya.\nTempat Tujuan Pindah adalah tempat/Kota tujuan\npindah.\nPengumandahan (Detasering) adalah penugasan\nsementara waktu.\nPembayaran Langsung yang selanjutnya disebut\nPembayaran LS adalah pembayaran yang\ndilakukan\nlangsung\nkepada\nbendahara\npengeluaran/penerima hak lainnya atas dasar\nperjanjian kerja, surat keputusan, surat tugas\natau surat perintah kerja lainnya melalui\npenerbitan Surat Perintah Membayar Langsung.\n\njdih.kemenkeu.go.id\n```"
   },
   {
-    "id": "pmk-119-2023-page-4",
+    "id": "pmk-119-2023-page-4-pasal-1",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "1",
+    "page": 4,
+    "active": true,
+    "text": "```text\n- 4 -\n\n22. Uang Persediaan yang selanjutnya disingkat UP\nadalah uang muka kerja dalam jumlah tertentu\nyang diberikan kepada bendahara pengeluaran\nuntuk membiayai kegiatan operasional sehari-hari\nsatuan kerja atau membiayai pengeluaran yang\nmenurut sifat dan tujuannya tidak mungkin\ndilakukan\nmelalui\nmekanisme\npembayaran\nlangsung.\n23. Standar Biaya adalah satuan biaya yang\nditetapkan oleh Menteri Keuangan selaku\npengelola fiskal (chief .financial officer) yang\ndigunakan\nsebagai\nacuan\npenghitungan\nkebutuhan anggaran dalam penyusunan rencana\nkerja dan anggaran dan pelaksanaan anggaran.\n24. Sistem Elektronik Perjalanan Dinas adalah sistem\nterintegrasi atas seluruh proses perjalanan dinas,\nyang\ndikelola\noleh\nkementerian\nyang\nmelaksanakan urusan pemerintahan di bidang\nkeuangan\nnegara,\nmeliputi\nperencanaan,\npelaksanaan,\ndan\npertanggungjawaban\npelaksanaan kegiatan Perjalanan Dinas.\n2.\n\nKetentuan Pasal 2 diubah sehingga berbunyi sebagai\nberikut:"
+  },
+  {
+    "id": "pmk-119-2023-page-4-pasal-1-ayat-1",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "1 ayat (1)",
+    "page": 4,
+    "active": true,
+    "text": "(1)"
+  },
+  {
+    "id": "pmk-119-2023-page-4-pasal-1-ayat-2",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "1 ayat (2)",
+    "page": 4,
+    "active": true,
+    "text": "(2)"
+  },
+  {
+    "id": "pmk-119-2023-page-4-pasal-1-ayat-3",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "1 ayat (3)",
+    "page": 4,
+    "active": true,
+    "text": "(3)\n\n3."
+  },
+  {
+    "id": "pmk-119-2023-page-4-pasal-2",
     "docId": "pmk-119-2023",
     "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
     "version": "2023-11-15",
     "article": "2",
     "page": 4,
     "active": true,
-    "text": "```text\n- 4 -\n\n22. Uang Persediaan yang selanjutnya disingkat UP\nadalah uang muka kerja dalam jumlah tertentu\nyang diberikan kepada bendahara pengeluaran\nuntuk membiayai kegiatan operasional sehari-hari\nsatuan kerja atau membiayai pengeluaran yang\nmenurut sifat dan tujuannya tidak mungkin\ndilakukan\nmelalui\nmekanisme\npembayaran\nlangsung.\n23. Standar Biaya adalah satuan biaya yang\nditetapkan oleh Menteri Keuangan selaku\npengelola fiskal (chief .financial officer) yang\ndigunakan\nsebagai\nacuan\npenghitungan\nkebutuhan anggaran dalam penyusunan rencana\nkerja dan anggaran dan pelaksanaan anggaran.\n24. Sistem Elektronik Perjalanan Dinas adalah sistem\nterintegrasi atas seluruh proses perjalanan dinas,\nyang\ndikelola\noleh\nkementerian\nyang\nmelaksanakan urusan pemerintahan di bidang\nkeuangan\nnegara,\nmeliputi\nperencanaan,\npelaksanaan,\ndan\npertanggungjawaban\npelaksanaan kegiatan Perjalanan Dinas.\n2.\n\nKetentuan Pasal 2 diubah sehingga berbunyi sebagai\nberikut:\n\n(1)\n\n(2)\n\n(3)\n\n3.\n\nPasal 2\nPeraturan Menteri ini mengatur mengena1\nperencanaan,\npelaksanaan,\ndan\npertanggungjawaban Perjalanan Dinas bagi\nPelaksana SPD, meliputi Pejabat Negara, Pegawai\nNegeri, Pegawai Tidak Tetap, dan Pihak Lain yang\ndibebankan pada Anggaran Pendapatan dan\nBelanja Negara.\nPerjalanan Dinas sebagaimana dimaksud pada\nayat (1) meliputi:\na.\nPerjalanan Dinas Jabatan; dan\nb.\nPerjalanan Dinas Pindah.\nPegawai Negeri sebagaimana dimaksud pada ayat\n( 1) termasuk:\na.\ncalon Pegawai Negeri;\nb.\nprajurit Tentara Nasional Indonesia; dan\nc.\nanggota\nKepolisian\nNegara\nRepublik\nIndonesia.\n\nKetentuan Pasal 3 diubah sehingga berbunyi sebagai\nberikut:\nPasal 3\nPerjalanan Dinas dilaksanakan dengan memperhatikan\nprinsip sebagai berikut:\na.\nselektif, yaitu hanya untuk kepentingan yang\nsangat tinggi dan prioritas yang berkaitan dengan\npenyelenggaraan pemerin tahan;\nb.\nketersediaan anggaran dan kesesuaian dengan\npencapaian kinerja kementerian negara/lembaga;\n\n/\n\njdih.kemenkeu.go.id\n```"
+    "text": "Pasal 2\nPeraturan Menteri ini mengatur mengena1\nperencanaan,\npelaksanaan,\ndan\npertanggungjawaban Perjalanan Dinas bagi\nPelaksana SPD, meliputi Pejabat Negara, Pegawai\nNegeri, Pegawai Tidak Tetap, dan Pihak Lain yang\ndibebankan pada Anggaran Pendapatan dan\nBelanja Negara.\nPerjalanan Dinas sebagaimana dimaksud pada\nayat (1) meliputi:\na.\nPerjalanan Dinas Jabatan; dan\nb.\nPerjalanan Dinas Pindah.\nPegawai Negeri sebagaimana dimaksud pada ayat\n( 1) termasuk:\na.\ncalon Pegawai Negeri;\nb.\nprajurit Tentara Nasional Indonesia; dan\nc.\nanggota\nKepolisian\nNegara\nRepublik\nIndonesia.\n\nKetentuan Pasal 3 diubah sehingga berbunyi sebagai\nberikut:"
   },
   {
-    "id": "pmk-119-2023-page-5",
+    "id": "pmk-119-2023-page-4-pasal-3",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "3",
+    "page": 4,
+    "active": true,
+    "text": "Pasal 3\nPerjalanan Dinas dilaksanakan dengan memperhatikan\nprinsip sebagai berikut:\na.\nselektif, yaitu hanya untuk kepentingan yang\nsangat tinggi dan prioritas yang berkaitan dengan\npenyelenggaraan pemerin tahan;\nb.\nketersediaan anggaran dan kesesuaian dengan\npencapaian kinerja kementerian negara/lembaga;\n\n/\n\njdih.kemenkeu.go.id\n```"
+  },
+  {
+    "id": "pmk-119-2023-page-5-pasal-3",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "3",
+    "page": 5,
+    "active": true,
+    "text": "```text\n- 5 -\n\nc.\nd.\n\n4.\n\nefisiensi dan efektivitas dalam penggunaan belanja\nnegara; dan\ntransparansi dan akuntabilitas dalam pemberian\nperintah pelaksanaan Perjalanan Dinas dan\npembebanan biaya Perjalanan Dinas.\n\nKetentuan ayat (3) dan ayat (5) Pasal 8 diubah dan di\nantara ayat (3) dan ayat (4) Pasal 8 disisipkan 2 (dua)\nayat yakni ayat (3a) dan ayat (3b) sehingga Pasal 8\nberbunyi sebagai berikut:"
+  },
+  {
+    "id": "pmk-119-2023-page-5-pasal-8",
     "docId": "pmk-119-2023",
     "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
     "version": "2023-11-15",
     "article": "8",
     "page": 5,
     "active": true,
-    "text": "```text\n- 5 -\n\nc.\nd.\n\n4.\n\nefisiensi dan efektivitas dalam penggunaan belanja\nnegara; dan\ntransparansi dan akuntabilitas dalam pemberian\nperintah pelaksanaan Perjalanan Dinas dan\npembebanan biaya Perjalanan Dinas.\n\nKetentuan ayat (3) dan ayat (5) Pasal 8 diubah dan di\nantara ayat (3) dan ayat (4) Pasal 8 disisipkan 2 (dua)\nayat yakni ayat (3a) dan ayat (3b) sehingga Pasal 8\nberbunyi sebagai berikut:\nPasal 8\n(1) Perjalanan Dinas Jabatan terdiri atas komponenkomponen sebagai berikut:\na.\nuang harian;\nb.\nbiaya transpor;\nc.\nbiaya penginapan;\nd.\nuang representasi;\ne.\nsewa kendaraan dalam Kota; dan/ atau\nf.\nbiaya menjemput/ mengantar jenazah.\n(2) Uang harian sebagaimana dimaksud pada ayat (1)\nhuruf a terdiri atas:\na.\nuang makan;\nb. uang transpor lokal; dan\nc.\nuang saku.\n(3) Biaya transpor sebagaimana dimaksud pada ayat\n( 1) huruf b terdiri atas:\na.\nPerjalanan Dinas dari Tempat Kedudukan\nsampai\ndengan\nTempat\nTujuan\nke berangkatan dan kepulangan termasuk\nbiaya\nperjalanan\nke\nterminal\nbus/stasiun/bandara/pelabuhan\nke berangkatan;\nb.\nretribusi\nyang\ndipungut\ndi\nterminal\nbus/ stasiun / bandara/ pelabuhan\nkeberangkatan dan kepulangan; dan\nc.\nbiaya layanan dan sejenisnya yang tidak\ndapat dihindari pada pengadaan dan\npembayaran tiket, moda transportasi, dan\npengmapan,\ndiantaranya\nbiaya\nplatform/biaya penyedia layanan, biaya\nbagasi, dan biaya lainnya dalam hal tidak\ntermasuk dalam harga tiket.\n(3a) Biaya layanan dan sejenisnya sebagaimana\ndimaksud pada ayat (3) huruf c dapat diberikan\nsepanjang terdapat pernyataan, baik secara\ntertulis maupun secara sistem, dari Pelaksana SPD\nsetelah mendapat persetujuan dari PPK bahwa\nbiaya dimaksud dibutuhkan untuk pelaksanaan\ntugas Pelaksana SPD.\n(3b) Perjalanan Dinas dari Tempat Kedudukan sampai\ndengan Tempat Tujuan keberangkatan dan\nkepulangan sebagaimana dimaksud pada ayat (3)\nhuruf a dilaksanakan dengan ketentuan sebagai\nberikut:\n\n(\n\njdih.kemenkeu.go.id\n```"
+    "text": "Pasal 8"
   },
   {
-    "id": "pmk-119-2023-page-6",
+    "id": "pmk-119-2023-page-5-pasal-8-ayat-1",
     "docId": "pmk-119-2023",
     "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
     "version": "2023-11-15",
-    "page": 6,
+    "article": "8 ayat (1)",
+    "page": 5,
     "active": true,
-    "text": "```text\n- 6 -\n\na.\n\nPerjalanan Dinas keberangkatan ke Tempat\nTujuan dan kepulangan dilakukan dari dan\nke Tempat Kedudukan;\nb.\nPerjalanan Dinas keberangkatan ke Tempat\nTujuan dan kepulangan dapat dilakukan dari\ndan ke selain Tempat Kedudukan dengan\nmemperhatikan efisiensi dan efektivitas, serta\ndibayarkan sesuai dengan Biaya Riil, paling\nbanyak sebesar estimasi biaya transportasi\ndari Tempat Kedudukan ke Tempat Tujuan\nsesuai\ndengan\nketentuan\nperaturan\nperundang-undangan\nmengenai\nstandar\nbiaya; dan\nc.\nPerjalanan Dinas keberangkatan ke Tempat\nTujuan dan kepulangan selain dari dan ke\nTempat Kedudukan sebagaimana dimaksud\ndalam huruf b dilakukan dari dan ke Tempat\nSah.\n(4) Biaya penginapan sebagaimana dimaksud pada\nayat (1) huruf c merupakan biaya yang diperlukan\nuntuk menginap:\na.\ndi hotel; atau\nb.\ndi tempat menginap lainnya.\n(5) Dalam hal Pelaksana SPD tidak menggunakan\nbiaya penginapan se bagaimana dimaksud pada\nayat (4), berlaku ketentuan sebagai berikut:\na.\nPelaksana SPD diberikan biaya penginapan\nsebesar 30% (tiga puluh persen) dari tarif\nhotel di Kota Tempat Tujuan sesuai dengan\nketentuan peraturan perundang-undangan\nmengenai standar biaya; dan\nb.\nbiaya penginapan sebagaimana dimaksud\ndalam huruf a dibayarkan secara Lumpsum.\n(6) Uang representasi sebagaimana dimaksud pada\nayat ( 1) huruf d dapat diberikan kepada Pejabat\nNegara, Pejabat Eselon I, dan Pejabat Eselon II\nselama melakukan Perjalanan Dinas.\n(7) Sewa kendaraan dalam Kota se bagaimana\ndimaksud pada ayat (1) huruf e dapat diberikan\nkepada\nPejabat\nNegara\nuntuk\nkeperluan\npelaksanaan tugas di Tempat Tujuan.\n(8) Sewa kendaraan sebagaimana dimaksud pada ayat\n(7) sudah termasuk biaya untuk pengemudi,\nbahan bakar minyak, dan pajak.\n(9) Biaya\nmenjemput/ mengantar\njenazah\nsebagaimana dimaksud pada ayat (1) huruf f\nmeliputi biaya bagi penjemput/pengantar, biaya\npemetian, dan biaya pengangkutan jenazah.\n(10) Komponen biaya Perjalanan Dinas Jabatan\nsebagaimana dimaksud pada ayat (1) dicantumkan\npada Rincian Biaya Perjalanan Dinas sesuai\ndengan format sebagaimana tercantum dalam\nLampiran II yang merupakan bagian tidak\nterpisahkan dari Peraturan Menteri ini.\n\njdih.kemenkeu.go.id\n```"
+    "text": "(1) Perjalanan Dinas Jabatan terdiri atas komponenkomponen sebagai berikut:\na.\nuang harian;\nb.\nbiaya transpor;\nc.\nbiaya penginapan;\nd.\nuang representasi;\ne.\nsewa kendaraan dalam Kota; dan/ atau\nf.\nbiaya menjemput/ mengantar jenazah."
   },
   {
-    "id": "pmk-119-2023-page-7",
+    "id": "pmk-119-2023-page-5-pasal-8-ayat-2",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "8 ayat (2)",
+    "page": 5,
+    "active": true,
+    "text": "(2) Uang harian sebagaimana dimaksud pada ayat (1)\nhuruf a terdiri atas:\na.\nuang makan;\nb. uang transpor lokal; dan\nc.\nuang saku."
+  },
+  {
+    "id": "pmk-119-2023-page-5-pasal-8-ayat-3",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "8 ayat (3)",
+    "page": 5,
+    "active": true,
+    "text": "(3) Biaya transpor sebagaimana dimaksud pada ayat\n( 1) huruf b terdiri atas:\na.\nPerjalanan Dinas dari Tempat Kedudukan\nsampai\ndengan\nTempat\nTujuan\nke berangkatan dan kepulangan termasuk\nbiaya\nperjalanan\nke\nterminal\nbus/stasiun/bandara/pelabuhan\nke berangkatan;\nb.\nretribusi\nyang\ndipungut\ndi\nterminal\nbus/ stasiun / bandara/ pelabuhan\nkeberangkatan dan kepulangan; dan\nc.\nbiaya layanan dan sejenisnya yang tidak\ndapat dihindari pada pengadaan dan\npembayaran tiket, moda transportasi, dan\npengmapan,\ndiantaranya\nbiaya\nplatform/biaya penyedia layanan, biaya\nbagasi, dan biaya lainnya dalam hal tidak\ntermasuk dalam harga tiket."
+  },
+  {
+    "id": "pmk-119-2023-page-5-pasal-8-ayat-3a",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "8 ayat (3a)",
+    "page": 5,
+    "active": true,
+    "text": "(3a) Biaya layanan dan sejenisnya sebagaimana\ndimaksud pada ayat (3) huruf c dapat diberikan\nsepanjang terdapat pernyataan, baik secara\ntertulis maupun secara sistem, dari Pelaksana SPD\nsetelah mendapat persetujuan dari PPK bahwa\nbiaya dimaksud dibutuhkan untuk pelaksanaan\ntugas Pelaksana SPD."
+  },
+  {
+    "id": "pmk-119-2023-page-5-pasal-8-ayat-3b",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "8 ayat (3b)",
+    "page": 5,
+    "active": true,
+    "text": "(3b) Perjalanan Dinas dari Tempat Kedudukan sampai\ndengan Tempat Tujuan keberangkatan dan\nkepulangan sebagaimana dimaksud pada ayat (3)\nhuruf a dilaksanakan dengan ketentuan sebagai\nberikut:\n\n(\n\njdih.kemenkeu.go.id\n```"
+  },
+  {
+    "id": "pmk-119-2023-page-6-pasal-8-ayat-3b",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "8 ayat (3b)",
+    "page": 6,
+    "active": true,
+    "text": "```text\n- 6 -\n\na.\n\nPerjalanan Dinas keberangkatan ke Tempat\nTujuan dan kepulangan dilakukan dari dan\nke Tempat Kedudukan;\nb.\nPerjalanan Dinas keberangkatan ke Tempat\nTujuan dan kepulangan dapat dilakukan dari\ndan ke selain Tempat Kedudukan dengan\nmemperhatikan efisiensi dan efektivitas, serta\ndibayarkan sesuai dengan Biaya Riil, paling\nbanyak sebesar estimasi biaya transportasi\ndari Tempat Kedudukan ke Tempat Tujuan\nsesuai\ndengan\nketentuan\nperaturan\nperundang-undangan\nmengenai\nstandar\nbiaya; dan\nc.\nPerjalanan Dinas keberangkatan ke Tempat\nTujuan dan kepulangan selain dari dan ke\nTempat Kedudukan sebagaimana dimaksud\ndalam huruf b dilakukan dari dan ke Tempat\nSah."
+  },
+  {
+    "id": "pmk-119-2023-page-6-pasal-8-ayat-4",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "8 ayat (4)",
+    "page": 6,
+    "active": true,
+    "text": "(4) Biaya penginapan sebagaimana dimaksud pada\nayat (1) huruf c merupakan biaya yang diperlukan\nuntuk menginap:\na.\ndi hotel; atau\nb.\ndi tempat menginap lainnya."
+  },
+  {
+    "id": "pmk-119-2023-page-6-pasal-8-ayat-5",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "8 ayat (5)",
+    "page": 6,
+    "active": true,
+    "text": "(5) Dalam hal Pelaksana SPD tidak menggunakan\nbiaya penginapan se bagaimana dimaksud pada\nayat (4), berlaku ketentuan sebagai berikut:\na.\nPelaksana SPD diberikan biaya penginapan\nsebesar 30% (tiga puluh persen) dari tarif\nhotel di Kota Tempat Tujuan sesuai dengan\nketentuan peraturan perundang-undangan\nmengenai standar biaya; dan\nb.\nbiaya penginapan sebagaimana dimaksud\ndalam huruf a dibayarkan secara Lumpsum."
+  },
+  {
+    "id": "pmk-119-2023-page-6-pasal-8-ayat-6",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "8 ayat (6)",
+    "page": 6,
+    "active": true,
+    "text": "(6) Uang representasi sebagaimana dimaksud pada\nayat ( 1) huruf d dapat diberikan kepada Pejabat\nNegara, Pejabat Eselon I, dan Pejabat Eselon II\nselama melakukan Perjalanan Dinas."
+  },
+  {
+    "id": "pmk-119-2023-page-6-pasal-8-ayat-7",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "8 ayat (7)",
+    "page": 6,
+    "active": true,
+    "text": "(7) Sewa kendaraan dalam Kota se bagaimana\ndimaksud pada ayat (1) huruf e dapat diberikan\nkepada\nPejabat\nNegara\nuntuk\nkeperluan\npelaksanaan tugas di Tempat Tujuan."
+  },
+  {
+    "id": "pmk-119-2023-page-6-pasal-8-ayat-8",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "8 ayat (8)",
+    "page": 6,
+    "active": true,
+    "text": "(8) Sewa kendaraan sebagaimana dimaksud pada ayat\n(7) sudah termasuk biaya untuk pengemudi,\nbahan bakar minyak, dan pajak."
+  },
+  {
+    "id": "pmk-119-2023-page-6-pasal-8-ayat-9",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "8 ayat (9)",
+    "page": 6,
+    "active": true,
+    "text": "(9) Biaya\nmenjemput/ mengantar\njenazah\nsebagaimana dimaksud pada ayat (1) huruf f\nmeliputi biaya bagi penjemput/pengantar, biaya\npemetian, dan biaya pengangkutan jenazah."
+  },
+  {
+    "id": "pmk-119-2023-page-6-pasal-8-ayat-10",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "8 ayat (10)",
+    "page": 6,
+    "active": true,
+    "text": "(10) Komponen biaya Perjalanan Dinas Jabatan\nsebagaimana dimaksud pada ayat (1) dicantumkan\npada Rincian Biaya Perjalanan Dinas sesuai\ndengan format sebagaimana tercantum dalam\nLampiran II yang merupakan bagian tidak\nterpisahkan dari Peraturan Menteri ini.\n\njdih.kemenkeu.go.id\n```"
+  },
+  {
+    "id": "pmk-119-2023-page-7-pasal-8-ayat-10",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "8 ayat (10)",
+    "page": 7,
+    "active": true,
+    "text": "```text\n-7 -\n\n5.\n\nKetentuan ayat (1) clan ayat (2) Pasal 27 diubah, di\nantara ayat (1) clan ayat (2) disisipkan 2 (dua) ayat,\nyakni ayat (la) clan ayat (lb), sehingga Pasal 27\nberbunyi sebagai berikut:"
+  },
+  {
+    "id": "pmk-119-2023-page-7-pasal-27",
     "docId": "pmk-119-2023",
     "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
     "version": "2023-11-15",
     "article": "27",
     "page": 7,
     "active": true,
-    "text": "```text\n-7 -\n\n5.\n\nKetentuan ayat (1) clan ayat (2) Pasal 27 diubah, di\nantara ayat (1) clan ayat (2) disisipkan 2 (dua) ayat,\nyakni ayat (la) clan ayat (lb), sehingga Pasal 27\nberbunyi sebagai berikut:\nPasal 27\nPembayaran biaya Perjalanan Dinas dengan\nmekanisme UP dilakukan dengan:\na.\nUP tunai; clan/ atau\nb.\nUP Kartu Kredit Pemerintah (KKP).\n(la) Pembayaran\nPerjalanan\nDinas\ndengan\nmenggunakan mekanisme UP tunai se bagaimana\ndimaksud pada ayat (1) huruf a dilakukan dengan\nmemberikan uang muka kepada Pelaksana SPD\noleh bendahara pengeluaran.\n(1 b) Pembayaran\nPerjalanan\nDinas\ndengan\nmenggunakan UP KKP se bagaimana dimaksud\npada ayat (1) huruf b dilaksanakan sesuai dengan\nketentuan\nperaturan\nperundang-undangan\nmengenai kartu kredit pemerintah.\n(2) Pemberian uang muka sebagaimana dimaksud\npada ayat (la), dilaksanakan berdasarkan\npersetujuan pemberian uang muka dari PPK\ndengan melampirkan dokumen sebagai berikut:\na.\nsurat tugas atau surat keputusan pindah;\nb.\nSPD;\nkuitansi tanda terima uang muka; clan\nc.\nd.\nrincian perkiraan biaya Perjalanan Dinas.\n(1)\n\n6.\n\nKetentuan Pasal 32 diubah sehingga berbunyi sebagai\nberikut:\nPasal32\nTata cara pengajuan tagihan kepada PPK, pengujian\nsurat permintaan pembayaran, penerbitan surat\nperintah membayar oleh pejabat penanda tangan surat\nperintah membayar, clan penerbitan surat perintah\npencairan dana oleh kantor pelayanan perbendaharaan\nnegara mengacu pada Peraturan Menteri Keuangan\nmengenai\nperencanaan\nanggaran,\npelaksanaan\nanggaran, serta akuntansi clan pelaporan keuangan.\n\n7.\n\nDi antara BAB IX clan BAB X, disisipkan 1 (satu) bab,\nyakni BAB IXA sehingga berbunyi sebagai berikut:\n\nBABIXA\nPERJALANAN DINAS JABATAN MENGGUNAKAN SISTEM\nELEKTRONIK PERJALANAN DINAS\n8.\n\nDi antara Pasal 36 clan Pasal 37 disisipkan 5 (lima)\nPasal, yakni Pasal 36A, Pasal 36B, Pasal 36C, Pasal\n36D, clan Pasal 36E yang berbunyi sebagai berikut:\n\n( 1)\n\nPasal36A\nPerjalanan Dinas yang menggunakan Sistem\nElektronik Perjalanan Dinas dilakukan untuk:\n\njdih.kemenkeu.go.id\n```"
+    "text": "Pasal 27\nPembayaran biaya Perjalanan Dinas dengan\nmekanisme UP dilakukan dengan:\na.\nUP tunai; clan/ atau\nb.\nUP Kartu Kredit Pemerintah (KKP).\n(la) Pembayaran\nPerjalanan\nDinas\ndengan\nmenggunakan mekanisme UP tunai se bagaimana\ndimaksud pada ayat (1) huruf a dilakukan dengan\nmemberikan uang muka kepada Pelaksana SPD\noleh bendahara pengeluaran.\n(1 b) Pembayaran\nPerjalanan\nDinas\ndengan\nmenggunakan UP KKP se bagaimana dimaksud\npada ayat (1) huruf b dilaksanakan sesuai dengan\nketentuan\nperaturan\nperundang-undangan\nmengenai kartu kredit pemerintah."
   },
   {
-    "id": "pmk-119-2023-page-8",
+    "id": "pmk-119-2023-page-7-pasal-27-ayat-2",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "27 ayat (2)",
+    "page": 7,
+    "active": true,
+    "text": "(2) Pemberian uang muka sebagaimana dimaksud\npada ayat (la), dilaksanakan berdasarkan\npersetujuan pemberian uang muka dari PPK\ndengan melampirkan dokumen sebagai berikut:\na.\nsurat tugas atau surat keputusan pindah;\nb.\nSPD;\nkuitansi tanda terima uang muka; clan\nc.\nd.\nrincian perkiraan biaya Perjalanan Dinas."
+  },
+  {
+    "id": "pmk-119-2023-page-7-pasal-27-ayat-1",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "27 ayat (1)",
+    "page": 7,
+    "active": true,
+    "text": "(1)\n\n6.\n\nKetentuan Pasal 32 diubah sehingga berbunyi sebagai\nberikut:\nPasal32\nTata cara pengajuan tagihan kepada PPK, pengujian\nsurat permintaan pembayaran, penerbitan surat\nperintah membayar oleh pejabat penanda tangan surat\nperintah membayar, clan penerbitan surat perintah\npencairan dana oleh kantor pelayanan perbendaharaan\nnegara mengacu pada Peraturan Menteri Keuangan\nmengenai\nperencanaan\nanggaran,\npelaksanaan\nanggaran, serta akuntansi clan pelaporan keuangan.\n\n7.\n\nDi antara BAB IX clan BAB X, disisipkan 1 (satu) bab,\nyakni BAB IXA sehingga berbunyi sebagai berikut:\n\nBABIXA\nPERJALANAN DINAS JABATAN MENGGUNAKAN SISTEM\nELEKTRONIK PERJALANAN DINAS\n8.\n\nDi antara Pasal 36 clan Pasal 37 disisipkan 5 (lima)\nPasal, yakni Pasal 36A, Pasal 36B, Pasal 36C, Pasal\n36D, clan Pasal 36E yang berbunyi sebagai berikut:\n\n( 1)\n\nPasal36A\nPerjalanan Dinas yang menggunakan Sistem\nElektronik Perjalanan Dinas dilakukan untuk:\n\njdih.kemenkeu.go.id\n```"
+  },
+  {
+    "id": "pmk-119-2023-page-8-pasal-27-ayat-1",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "27 ayat (1)",
+    "page": 8,
+    "active": true,
+    "text": "```text\n- 8 -\n\na."
+  },
+  {
+    "id": "pmk-119-2023-page-8-pasal-27-ayat-2",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "27 ayat (2)",
+    "page": 8,
+    "active": true,
+    "text": "(2)"
+  },
+  {
+    "id": "pmk-119-2023-page-8-pasal-27-ayat-3",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "27 ayat (3)",
+    "page": 8,
+    "active": true,
+    "text": "(3)"
+  },
+  {
+    "id": "pmk-119-2023-page-8-pasal-27-ayat-1-2",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "27 ayat (1)",
+    "page": 8,
+    "active": true,
+    "text": "(1)"
+  },
+  {
+    "id": "pmk-119-2023-page-8-pasal-27-ayat-2-2",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "27 ayat (2)",
+    "page": 8,
+    "active": true,
+    "text": "(2)"
+  },
+  {
+    "id": "pmk-119-2023-page-8-pasal-27-ayat-3-2",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "27 ayat (3)",
+    "page": 8,
+    "active": true,
+    "text": "(3)"
+  },
+  {
+    "id": "pmk-119-2023-page-8-pasal-27-ayat-4",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "27 ayat (4)",
+    "page": 8,
+    "active": true,
+    "text": "(4)\n\nPerjalanan Dinas Jabatan yang melewati\nbatas Kota; dan\nb.\nPerjalanan Dinas Jabatan yang dilaksanakan\ndi dalam Kota.\nAdministrasi atas Perjalanan Dinas sebagaimana\ndimaksud pada ayat (1) dilaksanakan dengan\nmenerapkan keamanan sistem dan data elektronik\nsesuai dengan ketentuan peraturan perundangundangan mengenai pengelolaan keamanan\ninformasi.\nSistem Elektronik Perjalanan Dinas mencakup:\na.\npenerbitan surat tugas dan SPD;\nb.\nperhitungan biaya Perjalanan Dinas;\nc.\npengadaan dan pembayaran tiket, moda\ntransportasi, dan penginapan;\nd.\npelaksanaan\nPerjalanan\nDinas\ndengan\nmenggunakan\npemindaian\npos1s1\nberdasarkan koordinat (geotagging);\ne.\npertanggungjawaban biaya Perjalanan Dinas;\ndan\nf.\npertanggungjawaban pelaksanaan Perjalanan\nDinas."
+  },
+  {
+    "id": "pmk-119-2023-page-8-pasal-36b",
     "docId": "pmk-119-2023",
     "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
     "version": "2023-11-15",
     "article": "36B",
     "page": 8,
     "active": true,
-    "text": "```text\n- 8 -\n\na.\n\n(2)\n\n(3)\n\n(1)\n\n(2)\n\n(3)\n\n(4)\n\nPerjalanan Dinas Jabatan yang melewati\nbatas Kota; dan\nb.\nPerjalanan Dinas Jabatan yang dilaksanakan\ndi dalam Kota.\nAdministrasi atas Perjalanan Dinas sebagaimana\ndimaksud pada ayat (1) dilaksanakan dengan\nmenerapkan keamanan sistem dan data elektronik\nsesuai dengan ketentuan peraturan perundangundangan mengenai pengelolaan keamanan\ninformasi.\nSistem Elektronik Perjalanan Dinas mencakup:\na.\npenerbitan surat tugas dan SPD;\nb.\nperhitungan biaya Perjalanan Dinas;\nc.\npengadaan dan pembayaran tiket, moda\ntransportasi, dan penginapan;\nd.\npelaksanaan\nPerjalanan\nDinas\ndengan\nmenggunakan\npemindaian\npos1s1\nberdasarkan koordinat (geotagging);\ne.\npertanggungjawaban biaya Perjalanan Dinas;\ndan\nf.\npertanggungjawaban pelaksanaan Perjalanan\nDinas.\nPasal 36B\nPenerbitan surat tugas sebagaimana dimaksud\ndalam Pasal 36A ayat (3) huruf a dilakukan\nmenggunakan Sistem Elektronik Perjalanan Dinas\ndengan mencantumkan hal-hal sebagaimana\ndiatur dalam Pasal 6 ayat (4).\nPenerbitan SPD se bagaimana dimaksud dalam\nPasal 36A ayat (3) huruf a, paling sedikit memuat:\na.\nnama PPK;\nb.\nnama/ nomor\ninduk\npegawai\nyang\nmelaksanakan Perjalanan Dinas;\nc.\npangkat dan golongan;\nd. jabatan/ instansi;\ne.\ntingkat biaya Perjalanan Dinas;\nf.\nmaksud Perjalanan Dinas;\ng.\nalat angkutan yang dipergunakan;\nh. tempat berangkat;\n1.\nTempat Tujuan;\nJ.\nlamanya Perjalanan Dinas;\nk.\ntanggal berangkat;\n1.\ntanggal kembali;\nm. pembebanan anggaran; dan\nn. pemindaian posisi berdasarkan koordinat\n(geotagging) pelaksanaan Perjalanan Dinas.\nPerhitungan biaya Perjalanan Dinas sebagaimana\ndimaksud dalam Pasal 36A ayat (3) huruf b\ndilakukan menggunakan Sistem Elektronik\nPerjalanan Dinas berdasarkan surat tugas dan\nSPD dilaksanakan sesuai dengan ketentuan\nperundang-undangan yang mengatur mengenai\nstandar biaya.\nPengadaan\ndan\npembayaran\ntiket,\nmoda\ntransportasi,\ndan\npenginapan\nsebagaimana\n\njdih.kemenkeu.go.id\n```"
+    "text": "Pasal 36B\nPenerbitan surat tugas sebagaimana dimaksud\ndalam Pasal 36A ayat (3) huruf a dilakukan\nmenggunakan Sistem Elektronik Perjalanan Dinas\ndengan mencantumkan hal-hal sebagaimana\ndiatur dalam Pasal 6 ayat (4).\nPenerbitan SPD se bagaimana dimaksud dalam"
   },
   {
-    "id": "pmk-119-2023-page-9",
+    "id": "pmk-119-2023-page-8-pasal-36a",
     "docId": "pmk-119-2023",
     "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
     "version": "2023-11-15",
-    "article": "36A ayat (3)",
-    "page": 9,
+    "article": "36A",
+    "page": 8,
     "active": true,
-    "text": "```text\n- 9 -\n\n(5)\n\n(6)\n\ndimaksud dalam Pasal 36A ayat (3) huruf c\ndilakukan dengan ketentuan sebagai berikut:\na.\npengadaan tiket, moda transportasi, dan\npengmapan\ndilakukan\nmelalui\nsistem\npengadaan tiket, moda transportasi, dan\npenginapan yang terinterkoneksi dengan\nSistem Elektronik Perjalanan Dinas;\nb.\ndalam hal sistem pengadaan tiket, moda\ntransportasi, dan penginapan se bagaimana\ndimaksud dalam huruf a belum tersedia,\nmekanisme pengadaan tiket dan penginapan\ndilakukan\ndi\nluar\nSistem\nElektronik\nPerjalanan Dinas; dan\nc.\npembayaran\npengadaan\ntiket,\nmoda\ntransportasi, dan penginapan yang dilakukan\nmelalui sistem pengadaan tiket, moda\ntransportasi,\ndan\npenginapan\nyang\nterintegrasi\ndengan\nSistem\nElektronik\nPerjalanan Dinas dapat dilakukan dengan\nmenggunakan kartu kredit pemerintah atau\nmekanisme pembayaran\nyang disediakan\noleh sistem penyedia jasa.\nMekanisme pembayaran pengadaan tiket, moda\ntransportasi, dan penginapan yang disediakan oleh\nsistem penyedia jasa sebagaimana dimaksud pada\nayat (4) huruf c mengacu pada ketentuan\nperaturan\nperundang-undangan\nmengenai\nperencanaan anggaran, pelaksanaan anggaran,\nserta akuntansi dan pelaporan keuangan.\nDalam\nhal\npembayaran\nperjalanan\ndinas\ndilakukan dengan pemberian uang muka sebagai\ndimaksud dalam Pasal 27 ayat ( 1a), persetujuan\npemberian uang muka dari PPK didasarkan pada\ndokumen/ data elektronik pada Sistem Elektronik\nPerjalanan Dinas.\nPasal 36C\nPelaksanaan\nPerjalanan\nDinas\nmenggunakan\npemindaian\npos1s1\nberdasarkan\nkoordinat\n(geotagging) sebagaimana dimaksud dalam Pasal 36A\nayat (3) huruf d dilakukan dengan ketentuan sebagai\nberikut:\na.\nPelaksana SPD melakukan pemindaian posisi\nberdasarkan koordinat (geotagging) melalui\nSistem Elektronik Perjalanan Dinas pada\ntanggal keberangkatan di Tempat Kedudukan,\npada tanggal tiba di Tempat Tujuan, pada\ntanggal kepulangan di Tempat Tujuan, dan pada\ntanggal tiba di Tempat Kedudukan semula;\nb.\ndalam hal Perjalanan Dinas keberangkatan ke\nTempat Tujuan dan/ atau kepulangan dilakukan\ndari dan/ atau ke selain Tempat Kedudukan\nsebagaimana dimaksud dalam Pasal 8 ayat (3a)\nhuruf c, Pelaksana SPD melakukan pemindaian\npos1s1 berdasarkan koordinat (geotagging)\nmelalui Sistem Elektronik Perjalanan Dinas\n\njdih.kemenkeu.go.id\n```"
+    "text": "Pasal 36A ayat (3) huruf a, paling sedikit memuat:\na.\nnama PPK;\nb.\nnama/ nomor\ninduk\npegawai\nyang\nmelaksanakan Perjalanan Dinas;\nc.\npangkat dan golongan;\nd. jabatan/ instansi;\ne.\ntingkat biaya Perjalanan Dinas;\nf.\nmaksud Perjalanan Dinas;\ng.\nalat angkutan yang dipergunakan;\nh. tempat berangkat;\n1.\nTempat Tujuan;\nJ.\nlamanya Perjalanan Dinas;\nk.\ntanggal berangkat;\n1.\ntanggal kembali;\nm. pembebanan anggaran; dan\nn. pemindaian posisi berdasarkan koordinat\n(geotagging) pelaksanaan Perjalanan Dinas.\nPerhitungan biaya Perjalanan Dinas sebagaimana\ndimaksud dalam Pasal 36A ayat (3) huruf b\ndilakukan menggunakan Sistem Elektronik\nPerjalanan Dinas berdasarkan surat tugas dan\nSPD dilaksanakan sesuai dengan ketentuan\nperundang-undangan yang mengatur mengenai\nstandar biaya.\nPengadaan\ndan\npembayaran\ntiket,\nmoda\ntransportasi,\ndan\npenginapan\nsebagaimana\n\njdih.kemenkeu.go.id\n```"
   },
   {
-    "id": "pmk-119-2023-page-10",
+    "id": "pmk-119-2023-page-9-pasal-36a",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "36A",
+    "page": 9,
+    "active": true,
+    "text": "```text\n- 9 -"
+  },
+  {
+    "id": "pmk-119-2023-page-9-pasal-36a-ayat-5",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "36A ayat (5)",
+    "page": 9,
+    "active": true,
+    "text": "(5)"
+  },
+  {
+    "id": "pmk-119-2023-page-9-pasal-36a-ayat-6",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "36A ayat (6)",
+    "page": 9,
+    "active": true,
+    "text": "(6)\n\ndimaksud dalam Pasal 36A ayat (3) huruf c\ndilakukan dengan ketentuan sebagai berikut:\na.\npengadaan tiket, moda transportasi, dan\npengmapan\ndilakukan\nmelalui\nsistem\npengadaan tiket, moda transportasi, dan\npenginapan yang terinterkoneksi dengan\nSistem Elektronik Perjalanan Dinas;\nb.\ndalam hal sistem pengadaan tiket, moda\ntransportasi, dan penginapan se bagaimana\ndimaksud dalam huruf a belum tersedia,\nmekanisme pengadaan tiket dan penginapan\ndilakukan\ndi\nluar\nSistem\nElektronik\nPerjalanan Dinas; dan\nc.\npembayaran\npengadaan\ntiket,\nmoda\ntransportasi, dan penginapan yang dilakukan\nmelalui sistem pengadaan tiket, moda\ntransportasi,\ndan\npenginapan\nyang\nterintegrasi\ndengan\nSistem\nElektronik\nPerjalanan Dinas dapat dilakukan dengan\nmenggunakan kartu kredit pemerintah atau\nmekanisme pembayaran\nyang disediakan\noleh sistem penyedia jasa.\nMekanisme pembayaran pengadaan tiket, moda\ntransportasi, dan penginapan yang disediakan oleh\nsistem penyedia jasa sebagaimana dimaksud pada\nayat (4) huruf c mengacu pada ketentuan\nperaturan\nperundang-undangan\nmengenai\nperencanaan anggaran, pelaksanaan anggaran,\nserta akuntansi dan pelaporan keuangan.\nDalam\nhal\npembayaran\nperjalanan\ndinas\ndilakukan dengan pemberian uang muka sebagai\ndimaksud dalam Pasal 27 ayat ( 1a), persetujuan\npemberian uang muka dari PPK didasarkan pada\ndokumen/ data elektronik pada Sistem Elektronik\nPerjalanan Dinas."
+  },
+  {
+    "id": "pmk-119-2023-page-9-pasal-36c",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "36C",
+    "page": 9,
+    "active": true,
+    "text": "Pasal 36C\nPelaksanaan\nPerjalanan\nDinas\nmenggunakan\npemindaian\npos1s1\nberdasarkan\nkoordinat\n(geotagging) sebagaimana dimaksud dalam Pasal 36A\nayat (3) huruf d dilakukan dengan ketentuan sebagai\nberikut:\na.\nPelaksana SPD melakukan pemindaian posisi\nberdasarkan koordinat (geotagging) melalui\nSistem Elektronik Perjalanan Dinas pada\ntanggal keberangkatan di Tempat Kedudukan,\npada tanggal tiba di Tempat Tujuan, pada\ntanggal kepulangan di Tempat Tujuan, dan pada\ntanggal tiba di Tempat Kedudukan semula;\nb.\ndalam hal Perjalanan Dinas keberangkatan ke\nTempat Tujuan dan/ atau kepulangan dilakukan\ndari dan/ atau ke selain Tempat Kedudukan\nsebagaimana dimaksud dalam Pasal 8 ayat (3a)\nhuruf c, Pelaksana SPD melakukan pemindaian\npos1s1 berdasarkan koordinat (geotagging)\nmelalui Sistem Elektronik Perjalanan Dinas\n\njdih.kemenkeu.go.id\n```"
+  },
+  {
+    "id": "pmk-119-2023-page-10-pasal-36c",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "36C",
+    "page": 10,
+    "active": true,
+    "text": "```text\n- 10 -\n\nc.\n\nd.\n\ne.\n\nf.\n\npada tanggal keberangkatan di Tempat Sah,\npada tanggal tiba di Tempat Tujuan, pada\ntanggal kepulangan di Tempat Tujuan, dan pada\ntanggal tiba di Tempat Sah;\npemindaian lokasi berdasarkan koordinat\n(geotagging) se bagaimana dimaksud dalam\nhuruf a dan huruf b digunakan sebagai dasar\npembayaran uang harian, uang representasi,\ndan uang saku rapat secara Lumpsum sesuai\ndengan ketentuan peraturan perundangundangan mengenai standar biaya;\npemindaian pos1s1 berdasarkan koordinat\n(geotagging) di lokasi transit harus dilakukan\ndalam hal kehadiran di lokasi transit berakibat\npada tambahan biaya uang harian dan/atau\nakomodasi;\ndalam hal Pelaksana SPD tidak dapat\nmelakukan pemindaian pos1s1 berdasarkan\nkoordinat\n(geotagging),\nPelaksana\nSPD\nmengunggah foto\nke\nSistem Elektronik\nPerjalanan Dinas yang menunjukkan bahwa\nPelaksana SPD ada di Tempat Kedudukan,\nTempat Tujuan, dan/ atau Tempat Sah; dan\ndalam hal Pelaksana SPD tidak dapat\nmengunggah foto se bagaimana dimaksud dalam\nhuruf e, Pelaksana SPD menyampaikan surat\npernyataan yang menyatakan bahwa Pelaksana\nSPD hadir dan melaksanakan tugas dengan\npersetujuan\nPPK\nke\nSistem\nElektronik\nPerjalanan Dinas."
+  },
+  {
+    "id": "pmk-119-2023-page-10-pasal-36d",
     "docId": "pmk-119-2023",
     "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
     "version": "2023-11-15",
     "article": "36D",
     "page": 10,
     "active": true,
-    "text": "```text\n- 10 -\n\nc.\n\nd.\n\ne.\n\nf.\n\npada tanggal keberangkatan di Tempat Sah,\npada tanggal tiba di Tempat Tujuan, pada\ntanggal kepulangan di Tempat Tujuan, dan pada\ntanggal tiba di Tempat Sah;\npemindaian lokasi berdasarkan koordinat\n(geotagging) se bagaimana dimaksud dalam\nhuruf a dan huruf b digunakan sebagai dasar\npembayaran uang harian, uang representasi,\ndan uang saku rapat secara Lumpsum sesuai\ndengan ketentuan peraturan perundangundangan mengenai standar biaya;\npemindaian pos1s1 berdasarkan koordinat\n(geotagging) di lokasi transit harus dilakukan\ndalam hal kehadiran di lokasi transit berakibat\npada tambahan biaya uang harian dan/atau\nakomodasi;\ndalam hal Pelaksana SPD tidak dapat\nmelakukan pemindaian pos1s1 berdasarkan\nkoordinat\n(geotagging),\nPelaksana\nSPD\nmengunggah foto\nke\nSistem Elektronik\nPerjalanan Dinas yang menunjukkan bahwa\nPelaksana SPD ada di Tempat Kedudukan,\nTempat Tujuan, dan/ atau Tempat Sah; dan\ndalam hal Pelaksana SPD tidak dapat\nmengunggah foto se bagaimana dimaksud dalam\nhuruf e, Pelaksana SPD menyampaikan surat\npernyataan yang menyatakan bahwa Pelaksana\nSPD hadir dan melaksanakan tugas dengan\npersetujuan\nPPK\nke\nSistem\nElektronik\nPerjalanan Dinas.\n\nPasal 36D\nPertanggungjawaban\nbiaya\nPerjalanan\nDinas\nsebagaimana dimaksud dalam Pasal 36A ayat (3)\nhuruf e dilakukan dengan ketentuan sebagai berikut:\na.\nPelaksana\nSPD\nmenyampaikan\npertanggungjawaban biaya Perjalanan Dinas\ndisertai dengan bukti pengeluaran yang\ndiperoleh dalam bentuk catatan elektronik\nmelalui interkoneksi antara Sistem Elektronik\nPerjalanan Dinas dan sistem yang menyediakan\npemesanan tiket, moda transportasi, dan\nakomodasi;\nb.\ndalam hal interkoneksi antara Sistem Elektronik\nPerjalanan Dinas dan sistem yang menyediakan\npemesanan tiket, moda transportasi, dan\nakomodasi belum tersedia, Pelaksana SPD\nmenyampaikan bukti pengeluaran dengan\nmengunggah bukti pengeluaran ke Sistem\nElektronik Perjalanan Dinas;\nc.\nPertanggungjawaban biaya Perjalanan Dinas\nsebagaimana dimaksud\ndalam huruf a\ndilakukan dengan mencantumkan komponen\nbiaya Perjalanan Dinas sebagaimana dimaksud\ndalam Pasal 8 ayat (1) pada rincian biaya\n\njdih.kemenkeu.go.id\n```"
+    "text": "Pasal 36D\nPertanggungjawaban\nbiaya\nPerjalanan\nDinas\nsebagaimana dimaksud dalam Pasal 36A ayat (3)\nhuruf e dilakukan dengan ketentuan sebagai berikut:\na.\nPelaksana\nSPD\nmenyampaikan\npertanggungjawaban biaya Perjalanan Dinas\ndisertai dengan bukti pengeluaran yang\ndiperoleh dalam bentuk catatan elektronik\nmelalui interkoneksi antara Sistem Elektronik\nPerjalanan Dinas dan sistem yang menyediakan\npemesanan tiket, moda transportasi, dan\nakomodasi;\nb.\ndalam hal interkoneksi antara Sistem Elektronik\nPerjalanan Dinas dan sistem yang menyediakan\npemesanan tiket, moda transportasi, dan\nakomodasi belum tersedia, Pelaksana SPD\nmenyampaikan bukti pengeluaran dengan\nmengunggah bukti pengeluaran ke Sistem\nElektronik Perjalanan Dinas;\nc.\nPertanggungjawaban biaya Perjalanan Dinas\nsebagaimana dimaksud\ndalam huruf a\ndilakukan dengan mencantumkan komponen\nbiaya Perjalanan Dinas sebagaimana dimaksud\ndalam Pasal 8 ayat (1) pada rincian biaya\n\njdih.kemenkeu.go.id\n```"
   },
   {
-    "id": "pmk-119-2023-page-11",
+    "id": "pmk-119-2023-page-11-pasal-36d",
     "docId": "pmk-119-2023",
     "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
     "version": "2023-11-15",
-    "article": "34 ayat (3)",
+    "article": "36D",
     "page": 11,
     "active": true,
-    "text": "```text\n- 11 -\n\nd.\n\ne.\n\nf.\n\nPerjalanan Dinas pada Sistem Elektronik\nPerjalanan Dinas;\nPPK\nmelakukan\npengujian\nterhadap\npertanggungjawaban biaya Perjalanan Dinas\nsebagaimana dimaksud dalam huruf a dan\nhuruf b melalui Sistem Elektronik Perjalanan\nDinas;\nberdasarkan pengujian sebagaimana dimaksud\ndalam huruf d, PPK memberikan persetujuan\natau penolakan melalui Sistem Elektronik\nPerjalanan Dinas; dan/ atau\ndalam hal bukti pengeluaran se bagaimana\ndimaksud dalam huruf a dan huruf b tidak\ndiperoleh, rusak, atau hilang, Pelaksana SPD\nmenyampaikan\npertanggungjawaban\nbiaya .\nPerjalanan Dinas dengan menyampaikan Daftar\nPengeluaran Riil sebagaimana dimaksud dalam\nPasal 34 ayat (3) melalui Sistem Elektronik\nPerjalanan Dinas.\n\nPasal 36E\nPertanggungjawaban pelaksanaan Perjalanan Dinas\nsebagaimana dimaksud dalam Pasal 36A ayat (3)\nhuruf f dilakukan dengan menyampaikan laporan\nkepada pemberi tugas sebagaimana diatur dalam\nPasal 34 ayat (1).\n1.\n\n2.\n\nPasal II\nPada saat Peraturan Menteri ini mulai berlaku,\nperencanaan,\npelaksanaan,\ndan\npertanggungjawaban\nsecara\nadministrasi\nPerj alanan Dinas yang dilaksanakan dengan\nmenggunakan Sistem Elektronik Perjalanan\nDinas sebelum berlakunya Peraturan Menteri\nKeuangan ini, dinyatakan sah dan berlaku\nsesuai dengan Peraturan Menteri ini.\nPeraturan Menteri ini mulai berlaku pada\ntanggal diundangkan.\n\njdih.kemenkeu.go.id\n```"
+    "text": "```text\n- 11 -\n\nd.\n\ne.\n\nf.\n\nPerjalanan Dinas pada Sistem Elektronik\nPerjalanan Dinas;\nPPK\nmelakukan\npengujian\nterhadap\npertanggungjawaban biaya Perjalanan Dinas\nsebagaimana dimaksud dalam huruf a dan\nhuruf b melalui Sistem Elektronik Perjalanan\nDinas;\nberdasarkan pengujian sebagaimana dimaksud\ndalam huruf d, PPK memberikan persetujuan\natau penolakan melalui Sistem Elektronik\nPerjalanan Dinas; dan/ atau\ndalam hal bukti pengeluaran se bagaimana\ndimaksud dalam huruf a dan huruf b tidak\ndiperoleh, rusak, atau hilang, Pelaksana SPD\nmenyampaikan\npertanggungjawaban\nbiaya .\nPerjalanan Dinas dengan menyampaikan Daftar\nPengeluaran Riil sebagaimana dimaksud dalam"
   },
   {
-    "id": "pmk-119-2023-page-12",
+    "id": "pmk-119-2023-page-11-pasal-34",
     "docId": "pmk-119-2023",
     "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
     "version": "2023-11-15",
+    "article": "34",
+    "page": 11,
+    "active": true,
+    "text": "Pasal 34 ayat (3) melalui Sistem Elektronik\nPerjalanan Dinas."
+  },
+  {
+    "id": "pmk-119-2023-page-11-pasal-36e",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "36E",
+    "page": 11,
+    "active": true,
+    "text": "Pasal 36E\nPertanggungjawaban pelaksanaan Perjalanan Dinas\nsebagaimana dimaksud dalam Pasal 36A ayat (3)\nhuruf f dilakukan dengan menyampaikan laporan\nkepada pemberi tugas sebagaimana diatur dalam"
+  },
+  {
+    "id": "pmk-119-2023-page-11-pasal-34-2",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "34",
+    "page": 11,
+    "active": true,
+    "text": "Pasal 34 ayat (1).\n1.\n\n2.\n\nPasal II\nPada saat Peraturan Menteri ini mulai berlaku,\nperencanaan,\npelaksanaan,\ndan\npertanggungjawaban\nsecara\nadministrasi\nPerj alanan Dinas yang dilaksanakan dengan\nmenggunakan Sistem Elektronik Perjalanan\nDinas sebelum berlakunya Peraturan Menteri\nKeuangan ini, dinyatakan sah dan berlaku\nsesuai dengan Peraturan Menteri ini.\nPeraturan Menteri ini mulai berlaku pada\ntanggal diundangkan.\n\njdih.kemenkeu.go.id\n```"
+  },
+  {
+    "id": "pmk-119-2023-page-12-pasal-34",
+    "docId": "pmk-119-2023",
+    "title": "PMK 119 Tahun 2023 Perubahan PMK 113/PMK.05/2012",
+    "version": "2023-11-15",
+    "article": "34",
     "page": 12,
     "active": true,
     "text": "```text\n- 12 Agar\nsetiap\norang\nmengetahuinya,\nmemerintahkan\npengundangan Peraturan Menteri ini dengan penempatannya\ndalam Berita Negara Republik Indonesia.\nDitetapkan di Jakarta\npada tanggal 10 November 2023\nMENTERI KEUANGAN REPUBLIK INDONESIA,\nttd.\nSRI MULYANI INDRAWATI\nDiundangkan di Jakarta\npada tanggal 15 November 2023\nDIREKTUR JENDERAL\nPERATURAN PERUNDANG-UNDANGAN\nKEMENTERIAN HUKUM DAN HAK ASASI MANUSIA\nREPUBLIK INDONESIA,\nttd.\nASEP N. MULYANA\nBERITA NEGARA REPUBLIK INDONESIA TAHUN 2023 NOMOR 907\nSalinan sesuai dengan aslinya,\nKepala Biro Umum\nu.b.\nPlt. Kepala Bagian Administrasi Kementerian\n\nDitandatangani secara elektronik\nDEWI SURIANI HASLAM\n\njdih.kemenkeu.go.id\n```"
+  },
+  {
+    "id": "pmk-32-2025-document",
+    "docId": "pmk-32-2025",
+    "title": "PMK 32 Tahun 2025 SBM TA 2026 (kutipan perjalanan dinas)",
+    "version": "TA 2026",
+    "active": true,
+    "text": "# PMK 32 Tahun 2025 tentang Standar Biaya Masukan TA 2026 (kutipan bagian perjalanan dinas dalam negeri)\n\ndoc_id: `pmk-32-2025` · status: berlaku untuk TA 2026 · sumber: https://peraturan.bpk.go.id/Details/319323/pmk-no-32-tahun-2025\n\nKutipan: batang tubuh (hlm. 1-3), judul Lampiran I (hlm. 4), uang harian (hlm. 15), penginapan (hlm. 19), penjelasan angka 28-30 (hlm. 53-55), judul Lampiran II (hlm. 62), transport terminal/bandara (hlm. 85), tiket pesawat (hlm. 86-90, tabel lengkap di `02_tabel/sbm2026_tiket_pesawat_pp_dalam_negeri.csv`), penjelasan angka 16-17 Lampiran II (hlm. 107). Bagian lain yang tidak terkait perjalanan dinas dalam negeri dihilangkan.\n\n> Teks ini hasil ekstraksi otomatis dari PDF resmi. Penanda `[Halaman N]` mengikuti nomor halaman PDF sumber. Untuk kutipan formal, cocokkan dengan PDF asli."
   },
   {
     "id": "pmk-32-2025-page-1",
     "docId": "pmk-32-2025",
     "title": "PMK 32 Tahun 2025 SBM TA 2026 (kutipan perjalanan dinas)",
     "version": "TA 2026",
-    "article": "10 ayat (4)",
     "page": 1,
     "active": true,
     "text": "```text\nPERATURAN MENTERI KEUANGAN REPUBLIK INDONESIA\nNOMOR 32 TAHUN 2025\nTENTANG\nSTANDAR BIAYA MASUKAN TAHUN ANGGARAN 2026\nDENGAN RAHMAT TUHAN YANG MAHA ESA\nMENTERI KEUANGAN REPUBLIK INDONESIA,\nMenimbang : bahwa untuk melaksanakan ketentuan Pasal 10 ayat (4) Peraturan Pemerintah Nomor 6 Tahun 2023 tentang\nPenyusunan Rencana Kerja dan Anggaran dan Pasal 47 ayat (3) Peraturan Menteri Keuangan Nomor 62 Tahun 2023 tentang\nPerencanaan Anggaran, Pelaksanaan Anggaran, serta Akuntansi dan Pelaporan Keuangan sebagaimana telah diubah\ndengan Peraturan Menteri Keuangan Nomor 107 Tahun 2024, perlu menetapkan Peraturan Menteri Keuangan tentang Standar\nBiaya Masukan Tahun Anggaran 2026;\n```"
@@ -216,16 +1780,86 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "docId": "pmk-32-2025",
     "title": "PMK 32 Tahun 2025 SBM TA 2026 (kutipan perjalanan dinas)",
     "version": "TA 2026",
-    "article": "1",
     "page": 2,
     "active": true,
-    "text": "```text\nMEMUTUSKAN:\nMenetapkan : PERATURAN MENTERI KEUANGAN TENTANG STANDAR BIAYA MASUKAN TAHUN ANGGARAN 2026.\nPasal 1\nStandar Biaya Masukan Tahun Anggaran 2026 merupakan satuan biaya berupa harga satuan, tarif, dan indeks yang\nditetapkan untuk menghasilkan biaya komponen keluaran dalam penyusunan Rencana Kerja dan Anggaran Tahun\nAnggaran 2026.\nPasal 2\nPenggunaan Standar Biaya Masukan Tahun Anggaran 2026 bersifat:\na. batas tertinggi; atau\nb. dapat dilampaui.\nPasal 3\n(1) Standar Biaya Masukan Tahun Anggaran 2026 yang bersifat batas tertinggi sebagaimana dimaksud dalam Pasal 2 huruf a\ntercantum dalam Lampiran I yang merupakan bagian tidak terpisahkan dari Peraturan Menteri ini.\n(2) Standar Biaya Masukan Tahun Anggaran 2026 yang bersifat dapat dilampaui sebagaimana dimaksud dalam Pasal 2 huruf b\ntercantum dalam Lampiran II yang merupakan bagian tidak terpisahkan dari Peraturan Menteri ini.\nPasal 4\nPenerapan penggunaan Standar Biaya Masukan Tahun Anggaran 2026 sebagaimana dimaksud dalam Pasal 2 berpedoman pada\nPeraturan Menteri Keuangan mengenai Perencanaan Anggaran, Pelaksanaan Anggaran, serta Akuntansi dan Pelaporan Keuangan.\nPasal 5\nPeraturan Menteri ini mulai berlaku pada tanggal diundangkan.\n```"
+    "text": "```text\nMEMUTUSKAN:\nMenetapkan : PERATURAN MENTERI KEUANGAN TENTANG STANDAR BIAYA MASUKAN TAHUN ANGGARAN 2026."
   },
   {
-    "id": "pmk-32-2025-page-3",
+    "id": "pmk-32-2025-page-2-pasal-1",
     "docId": "pmk-32-2025",
     "title": "PMK 32 Tahun 2025 SBM TA 2026 (kutipan perjalanan dinas)",
     "version": "TA 2026",
+    "article": "1",
+    "page": 2,
+    "active": true,
+    "text": "Pasal 1\nStandar Biaya Masukan Tahun Anggaran 2026 merupakan satuan biaya berupa harga satuan, tarif, dan indeks yang\nditetapkan untuk menghasilkan biaya komponen keluaran dalam penyusunan Rencana Kerja dan Anggaran Tahun\nAnggaran 2026."
+  },
+  {
+    "id": "pmk-32-2025-page-2-pasal-2",
+    "docId": "pmk-32-2025",
+    "title": "PMK 32 Tahun 2025 SBM TA 2026 (kutipan perjalanan dinas)",
+    "version": "TA 2026",
+    "article": "2",
+    "page": 2,
+    "active": true,
+    "text": "Pasal 2\nPenggunaan Standar Biaya Masukan Tahun Anggaran 2026 bersifat:\na. batas tertinggi; atau\nb. dapat dilampaui."
+  },
+  {
+    "id": "pmk-32-2025-page-2-pasal-3",
+    "docId": "pmk-32-2025",
+    "title": "PMK 32 Tahun 2025 SBM TA 2026 (kutipan perjalanan dinas)",
+    "version": "TA 2026",
+    "article": "3",
+    "page": 2,
+    "active": true,
+    "text": "Pasal 3"
+  },
+  {
+    "id": "pmk-32-2025-page-2-pasal-3-ayat-1",
+    "docId": "pmk-32-2025",
+    "title": "PMK 32 Tahun 2025 SBM TA 2026 (kutipan perjalanan dinas)",
+    "version": "TA 2026",
+    "article": "3 ayat (1)",
+    "page": 2,
+    "active": true,
+    "text": "(1) Standar Biaya Masukan Tahun Anggaran 2026 yang bersifat batas tertinggi sebagaimana dimaksud dalam Pasal 2 huruf a\ntercantum dalam Lampiran I yang merupakan bagian tidak terpisahkan dari Peraturan Menteri ini."
+  },
+  {
+    "id": "pmk-32-2025-page-2-pasal-3-ayat-2",
+    "docId": "pmk-32-2025",
+    "title": "PMK 32 Tahun 2025 SBM TA 2026 (kutipan perjalanan dinas)",
+    "version": "TA 2026",
+    "article": "3 ayat (2)",
+    "page": 2,
+    "active": true,
+    "text": "(2) Standar Biaya Masukan Tahun Anggaran 2026 yang bersifat dapat dilampaui sebagaimana dimaksud dalam Pasal 2 huruf b\ntercantum dalam Lampiran II yang merupakan bagian tidak terpisahkan dari Peraturan Menteri ini."
+  },
+  {
+    "id": "pmk-32-2025-page-2-pasal-4",
+    "docId": "pmk-32-2025",
+    "title": "PMK 32 Tahun 2025 SBM TA 2026 (kutipan perjalanan dinas)",
+    "version": "TA 2026",
+    "article": "4",
+    "page": 2,
+    "active": true,
+    "text": "Pasal 4\nPenerapan penggunaan Standar Biaya Masukan Tahun Anggaran 2026 sebagaimana dimaksud dalam Pasal 2 berpedoman pada\nPeraturan Menteri Keuangan mengenai Perencanaan Anggaran, Pelaksanaan Anggaran, serta Akuntansi dan Pelaporan Keuangan."
+  },
+  {
+    "id": "pmk-32-2025-page-2-pasal-5",
+    "docId": "pmk-32-2025",
+    "title": "PMK 32 Tahun 2025 SBM TA 2026 (kutipan perjalanan dinas)",
+    "version": "TA 2026",
+    "article": "5",
+    "page": 2,
+    "active": true,
+    "text": "Pasal 5\nPeraturan Menteri ini mulai berlaku pada tanggal diundangkan.\n```"
+  },
+  {
+    "id": "pmk-32-2025-page-3-pasal-5",
+    "docId": "pmk-32-2025",
+    "title": "PMK 32 Tahun 2025 SBM TA 2026 (kutipan perjalanan dinas)",
+    "version": "TA 2026",
+    "article": "5",
     "page": 3,
     "active": true,
     "text": "```text\nDitetapkan di Jakarta pada tanggal 14 Mei 2025\nMENTERI KEUANGAN REPUBLIK INDONESIA, SRI MULYANI INDRAWATI\n```"
@@ -237,7 +1871,7 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "version": "TA 2026",
     "page": 4,
     "active": true,
-    "text": "```text\nLAMPIRAN I\nPERATURAN MENTERI KEUANGAN REPUBLIK INDONESIA NOMOR 32 TAHUN 2025\nTENTANG STANDAR BIAYA MASUKAN TAHUN ANGGARAN 2026\nSTANDAR BIAYA MASUKAN TAHUN ANGGARAN 2026 YANG BERSIFAT SEBAGAI BATAS TERTINGGI\n```"
+    "text": "LAMPIRAN I\nPERATURAN MENTERI KEUANGAN REPUBLIK INDONESIA NOMOR 32 TAHUN 2025\nTENTANG STANDAR BIAYA MASUKAN TAHUN ANGGARAN 2026\nSTANDAR BIAYA MASUKAN TAHUN ANGGARAN 2026 YANG BERSIFAT SEBAGAI BATAS TERTINGGI\n```"
   },
   {
     "id": "pmk-32-2025-page-15",
@@ -291,7 +1925,7 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "version": "TA 2026",
     "page": 62,
     "active": true,
-    "text": "```text\nLAMPIRAN II\nPERATURAN MENTERI KEUANGAN REPUBLIK INDONESIA NOMOR 32 TAHUN 2025\nTENTANG STANDAR BIAYA MASUKAN TAHUN ANGGARAN 2026\nSTANDAR BIAYA MASUKAN TAHUN ANGGARAN 2026 YANG BERSIFAT DAPAT DILAMPAUI\n```"
+    "text": "LAMPIRAN II\nPERATURAN MENTERI KEUANGAN REPUBLIK INDONESIA NOMOR 32 TAHUN 2025\nTENTANG STANDAR BIAYA MASUKAN TAHUN ANGGARAN 2026\nSTANDAR BIAYA MASUKAN TAHUN ANGGARAN 2026 YANG BERSIFAT DAPAT DILAMPAUI\n```"
   },
   {
     "id": "pmk-32-2025-page-85",
@@ -300,7 +1934,16 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "version": "TA 2026",
     "page": 85,
     "active": true,
-    "text": "```text\n16. SATUAN BIAYA TRANSPORTASI DARI DAN/ATAU KE TERMINAL BUS/STASIUN/BANDARA/PELABUHAN DALAM RANGKA\nPERJALANAN DINAS DALAM NEGERI\nNO. PROVINSI | SATUAN | BESARAN\n1. ACEH | Orang/Kali | Rp123.000\n2. SUMATRA UTARA | Orang/Kali | Rp278.000\n3. RIAU | Orang/Kali | Rp99.000\n4. KEPULAUAN RIAU | Orang/Kali | Rp159.000\n5. JAMBI | Orang/Kali | Rp133.000\n6. SUMATRA BARAT | Orang/Kali | Rp171.000\n7. SUMATRA SELATAN | Orang/Kali | Rp162.000\n8. LAMPUNG | Orang/Kali | Rp162.000\n9. BENGKULU | Orang/Kali | Rp106.000\n10. BANGKA BELITUNG | Orang/Kali | Rp94.000\n11. BANTEN | Orang/Kali | Rp300.000\n12. JAWA BARAT | Orang/Kali | Rp180.000\n13. D.K.I. JAKARTA | Orang/Kali | Rp250.000\n14. JAWA TENGAH | Orang/Kali | Rp105.000\n15. D.I. YOGYAKARTA | Orang/Kali | Rp258.000\n16. JAWA TIMUR | Orang/Kali | Rp225.000\n17. BALI | Orang/Kali | Rp219.000\n18. NUSA TENGGARA BARAT | Orang/Kali | Rp224.000\n19. NUSA TENGGARA TIMUR | Orang/Kali | Rp105.000\n20. KALIMANTAN BARAT | Orang/Kali | Rp165.000\n21. KALIMANTAN TENGAH | Orang/Kali | Rp130.000\n22. KALIMANTAN SELATAN | Orang/Kali | Rp174.000\n23. KALIMANTAN TIMUR | Orang/Kali | Rp300.000\n24. KALIMANTAN UTARA | Orang/Kali | Rp211.000\n25. SULAWESI UTARA | Orang/Kali | Rp134.000\n26. GORONTALO | Orang/Kali | Rp256.000\n27. SULAWESI BARAT | Orang/Kali | Rp283.000\n28. SULAWESI SELATAN | Orang/Kali | Rp181.000\n29. SULAWESI TENGAH | Orang/Kali | Rp149.000\n30. SULAWESI TENGGARA | Orang/Kali | Rp154.000\n31. MALUKU | Orang/Kali | Rp279.000\n32. MALUKU UTARA | Orang/Kali | Rp208.000\n33. PAPUA | Orang/Kali | Rp462.000\n34. PAPUA BARAT | Orang/Kali | Rp228.000\n```\n\n[Halaman 86-90]\n\n```text\n17. SATUAN BIAYA TIKET PESAWAT PERJALANAN DINAS DALAM NEGERI PERGI PULANG (PP)\nKolom: NO. | KOTA ASAL | KOTA TUJUAN | BISNIS | EKONOMI\nContoh baris: 16. JAKARTA | MAKASSAR | Rp7.444.000 | Rp3.829.000\nContoh baris: 184. YOGYAKARTA | MAKASSAR | Rp6.525.000 | Rp3.893.000\nTabel lengkap 316 baris ada di 02_tabel/sbm2026_tiket_pesawat_pp_dalam_negeri.csv.\n```"
+    "text": "```text\n16. SATUAN BIAYA TRANSPORTASI DARI DAN/ATAU KE TERMINAL BUS/STASIUN/BANDARA/PELABUHAN DALAM RANGKA\nPERJALANAN DINAS DALAM NEGERI\nNO. PROVINSI | SATUAN | BESARAN\n1. ACEH | Orang/Kali | Rp123.000\n2. SUMATRA UTARA | Orang/Kali | Rp278.000\n3. RIAU | Orang/Kali | Rp99.000\n4. KEPULAUAN RIAU | Orang/Kali | Rp159.000\n5. JAMBI | Orang/Kali | Rp133.000\n6. SUMATRA BARAT | Orang/Kali | Rp171.000\n7. SUMATRA SELATAN | Orang/Kali | Rp162.000\n8. LAMPUNG | Orang/Kali | Rp162.000\n9. BENGKULU | Orang/Kali | Rp106.000\n10. BANGKA BELITUNG | Orang/Kali | Rp94.000\n11. BANTEN | Orang/Kali | Rp300.000\n12. JAWA BARAT | Orang/Kali | Rp180.000\n13. D.K.I. JAKARTA | Orang/Kali | Rp250.000\n14. JAWA TENGAH | Orang/Kali | Rp105.000\n15. D.I. YOGYAKARTA | Orang/Kali | Rp258.000\n16. JAWA TIMUR | Orang/Kali | Rp225.000\n17. BALI | Orang/Kali | Rp219.000\n18. NUSA TENGGARA BARAT | Orang/Kali | Rp224.000\n19. NUSA TENGGARA TIMUR | Orang/Kali | Rp105.000\n20. KALIMANTAN BARAT | Orang/Kali | Rp165.000\n21. KALIMANTAN TENGAH | Orang/Kali | Rp130.000\n22. KALIMANTAN SELATAN | Orang/Kali | Rp174.000\n23. KALIMANTAN TIMUR | Orang/Kali | Rp300.000\n24. KALIMANTAN UTARA | Orang/Kali | Rp211.000\n25. SULAWESI UTARA | Orang/Kali | Rp134.000\n26. GORONTALO | Orang/Kali | Rp256.000\n27. SULAWESI BARAT | Orang/Kali | Rp283.000\n28. SULAWESI SELATAN | Orang/Kali | Rp181.000\n29. SULAWESI TENGAH | Orang/Kali | Rp149.000\n30. SULAWESI TENGGARA | Orang/Kali | Rp154.000\n31. MALUKU | Orang/Kali | Rp279.000\n32. MALUKU UTARA | Orang/Kali | Rp208.000\n33. PAPUA | Orang/Kali | Rp462.000\n34. PAPUA BARAT | Orang/Kali | Rp228.000\n```"
+  },
+  {
+    "id": "pmk-32-2025-page-86",
+    "docId": "pmk-32-2025",
+    "title": "PMK 32 Tahun 2025 SBM TA 2026 (kutipan perjalanan dinas)",
+    "version": "TA 2026",
+    "page": 86,
+    "active": true,
+    "text": "```text\n17. SATUAN BIAYA TIKET PESAWAT PERJALANAN DINAS DALAM NEGERI PERGI PULANG (PP)\nKolom: NO. | KOTA ASAL | KOTA TUJUAN | BISNIS | EKONOMI\nContoh baris: 16. JAKARTA | MAKASSAR | Rp7.444.000 | Rp3.829.000\nContoh baris: 184. YOGYAKARTA | MAKASSAR | Rp6.525.000 | Rp3.893.000\nTabel lengkap 316 baris ada di 02_tabel/sbm2026_tiket_pesawat_pp_dalam_negeri.csv.\n```"
   },
   {
     "id": "pmk-32-2025-page-107",
@@ -312,40 +1955,198 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "text": "```text\n16. Satuan Biaya Transportasi dari dan/atau ke Terminal Bus/Stasiun/Bandara/Pelabuhan dalam rangka Perjalanan Dinas\nDalam Negeri\nSatuan biaya transportasi dari dan/atau ke terminal bus/stasiun/bandara/pelabuhan dalam rangka perjalanan dinas dalam\nnegeri merupakan satuan biaya yang digunakan untuk kebutuhan biaya satu kali perjalanan transportasi menuju/dari\nterminal bus/stasiun/bandara/pelabuhan keberangkatan atau dari terminal bus/stasiun/bandara/pelabuhan kedatangan menuju\ntempat di kota tujuan kedatangan dan sebaliknya.\nDalam pelaksanaan anggaran, satuan biaya transportasi dari dan/atau ke terminal bus/stasiun/bandara/pelabuhan dalam\nrangka perjalanan dinas dalam negeri menggunakan metode lumpsum. Apabila dalam pelaksanaannya memerlukan biaya melebihi\nsatuan biaya yang sudah ditetapkan, maka dapat dibayarkan menggunakan biaya riil sepanjang perjalanan dilakukan dari\ndan/atau ke kantor dan bukan menggunakan kendaraan pribadi.\n17. Satuan Biaya Tiket Pesawat Perjalanan Dinas Dalam Negeri Pergi Pulang (PP)\nSatuan biaya tiket pesawat perjalanan dinas dalam negeri pergi pulang adalah satuan biaya untuk pembelian tiket pesawat\nudara pergi pulang (PP) dari bandara keberangkatan suatu kota ke bandara kota tujuan. Satuan biaya tiket termasuk biaya\nasuransi, tidak termasuk airport tax, bagasi, dan biaya retribusi lainnya. Dalam pelaksanaan anggaran, satuan biaya tiket\nperjalanan dinas dalam negeri menggunakan metode biaya riil.\n```"
   },
   {
+    "id": "pmk-54-2026-document",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "active": false,
+    "text": "# PMK 54 Tahun 2026 tentang Standar Biaya Masukan (untuk TA 2027)\n\ndoc_id: `pmk-54-2026` · status: NONAKTIF untuk demo. Pasal 5 menyatakan dipakai mulai TA 2027, sehingga tidak berlaku untuk perjalanan dinas tahun 2026. Disimpan untuk menguji bahwa AI tidak memakai dokumen nonaktif. Hanya batang tubuh (hlm. 1-4) yang disertakan.\n\n> Teks ini hasil ekstraksi otomatis dari PDF resmi. Penanda `[Halaman N]` mengikuti nomor halaman PDF sumber. Untuk kutipan formal, cocokkan dengan PDF asli."
+  },
+  {
     "id": "pmk-54-2026-page-1",
     "docId": "pmk-54-2026",
     "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
     "version": "1.0",
-    "article": "10 ayat (4)",
     "page": 1,
     "active": false,
-    "text": "```text\nPERATURAN MENTERI KEUANGAN REPUBLIK INDONESIA\nNOMOR 54 TAHUN 2026\nTENTANG\nSTANDAR BIAYA MASUKAN\nDENGAN RAHMAT TUHAN YANG MAHA ESA\nMENTERI KEUANGAN REPUBLIK INDONESIA,\nMenimbang\n\n: bahwa untuk melaksanakan ketentuan Pasal 10 ayat (4)\nPeraturan Pemerintah Nomor 6 Tahun 2023 tentang\nPenyusunan Rencana Kerja dan Anggaran dan Pasal 47 ayat (3)\nPeraturan Menteri Keuangan Nomor 62 Tahun 2023 tentang\nPerencanaan Anggaran, Pelaksanaan Anggaran, serta\nAkuntansi dan Pelaporan Keuangan sebagaimana telah\nbeberapa kali diubah terakhir dengan Peraturan Menteri\nKeuangan Nomor 41 Tahun 2026 tentang Perubahan Kedua\natas Peraturan Menteri Keuangan Nomor 62 Tahun 2023\ntentang Perencanaan Anggaran, Pelaksanaan Anggaran, serta\nAkuntansi dan Pelaporan Keuangan, perlu menetapkan\nPeraturan Menteri Keuangan tentang Standar Biaya Masukan;\n\nMengingat\n\n: 1.\n2.\n\n3.\n\n4.\n5.\n\nPasal 17 ayat (3) Undang-Undang Dasar Negara Republik\nIndonesia Tahun 1945;\nUndang-Undang Nomor 39 Tahun 2008 tentang\nKementerian Negara (Lembaran Negara Republik\nIndonesia Tahun 2008 Nomor 166, Tambahan Lembaran\nNegara Republik Indonesia Nomor 4916) sebagaimana\ntelah diubah dengan Undang-Undang Nomor 61 Tahun\n2024 tentang Perubahan atas Undang-Undang Nomor 39\nTahun 2008 tentang Kementerian Negara (Lembaran\nNegara Republik Indonesia Tahun 2024 Nomor 225,\nTambahan Lembaran Negara Republik Indonesia Nomor\n6994);\nPeraturan Pemerintah Nomor 6 Tahun 2023 tentang\nPenyusunan Rencana Kerja dan Anggaran (Lembaran\nNegara Republik Indonesia Tahun 2023 Nomor 25,\nTambahan Lembaran Negara Republik Indonesia Nomor\n6850);\nPeraturan Presiden Nomor 158 Tahun 2024 tentang\nKementerian Keuangan (Lembaran Negara Republik\nIndonesia Tahun 2024 Nomor 354);\nPeraturan Menteri Keuangan Nomor 62 Tahun 2023\ntentang Perencanaan Anggaran, Pelaksanaan Anggaran,\nserta Akuntansi dan Pelaporan Keuangan (Berita Negara\nRepublik Indonesia Tahun 2023 Nomor 472) sebagaimana\n```"
+    "text": "```text\nPERATURAN MENTERI KEUANGAN REPUBLIK INDONESIA\nNOMOR 54 TAHUN 2026\nTENTANG\nSTANDAR BIAYA MASUKAN\nDENGAN RAHMAT TUHAN YANG MAHA ESA\nMENTERI KEUANGAN REPUBLIK INDONESIA,\nMenimbang\n\n: bahwa untuk melaksanakan ketentuan Pasal 10 ayat (4)\nPeraturan Pemerintah Nomor 6 Tahun 2023 tentang\nPenyusunan Rencana Kerja dan Anggaran dan Pasal 47 ayat (3)\nPeraturan Menteri Keuangan Nomor 62 Tahun 2023 tentang\nPerencanaan Anggaran, Pelaksanaan Anggaran, serta\nAkuntansi dan Pelaporan Keuangan sebagaimana telah\nbeberapa kali diubah terakhir dengan Peraturan Menteri\nKeuangan Nomor 41 Tahun 2026 tentang Perubahan Kedua\natas Peraturan Menteri Keuangan Nomor 62 Tahun 2023\ntentang Perencanaan Anggaran, Pelaksanaan Anggaran, serta\nAkuntansi dan Pelaporan Keuangan, perlu menetapkan\nPeraturan Menteri Keuangan tentang Standar Biaya Masukan;\n\nMengingat\n\n: 1.\n2.\n\n3.\n\n4.\n5."
   },
   {
-    "id": "pmk-54-2026-page-2",
+    "id": "pmk-54-2026-page-1-pasal-17",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "article": "17",
+    "page": 1,
+    "active": false,
+    "text": "Pasal 17 ayat (3) Undang-Undang Dasar Negara Republik\nIndonesia Tahun 1945;\nUndang-Undang Nomor 39 Tahun 2008 tentang\nKementerian Negara (Lembaran Negara Republik\nIndonesia Tahun 2008 Nomor 166, Tambahan Lembaran\nNegara Republik Indonesia Nomor 4916) sebagaimana\ntelah diubah dengan Undang-Undang Nomor 61 Tahun\n2024 tentang Perubahan atas Undang-Undang Nomor 39\nTahun 2008 tentang Kementerian Negara (Lembaran\nNegara Republik Indonesia Tahun 2024 Nomor 225,\nTambahan Lembaran Negara Republik Indonesia Nomor\n6994);\nPeraturan Pemerintah Nomor 6 Tahun 2023 tentang\nPenyusunan Rencana Kerja dan Anggaran (Lembaran\nNegara Republik Indonesia Tahun 2023 Nomor 25,\nTambahan Lembaran Negara Republik Indonesia Nomor\n6850);\nPeraturan Presiden Nomor 158 Tahun 2024 tentang\nKementerian Keuangan (Lembaran Negara Republik\nIndonesia Tahun 2024 Nomor 354);\nPeraturan Menteri Keuangan Nomor 62 Tahun 2023\ntentang Perencanaan Anggaran, Pelaksanaan Anggaran,\nserta Akuntansi dan Pelaporan Keuangan (Berita Negara\nRepublik Indonesia Tahun 2023 Nomor 472) sebagaimana\n```"
+  },
+  {
+    "id": "pmk-54-2026-page-2-pasal-17",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "article": "17",
+    "page": 2,
+    "active": false,
+    "text": "```text\n2\n\n6.\n\ntelah beberapa kali diubah terakhir dengan Peraturan\nMenteri Keuangan Nomor 41 Tahun 2026 tentang\nPerubahan Kedua atas Peraturan Menteri Keuangan\nNomor 62 Tahun 2023 tentang Perencanaan Anggaran,\nPelaksanaan Anggaran, serta Akuntansi dan Pelaporan\nKeuangan (Berita Negara Republik Indonesia Tahun 2026\nNomor 409);\nPeraturan Menteri Keuangan Nomor 124 Tahun 2024\ntentang Organisasi dan Tata Kerja Kementerian Keuangan\n(Berita Negara Republik Indonesia Tahun 2024 Nomor\n1063) sebagaimana telah diubah dengan Peraturan\nMenteri Keuangan Nomor 117 Tahun 2025 tentang\nPerubahan atas Peraturan Menteri Keuangan Nomor 124\nTahun 2024 tentang Organisasi dan Tata Kerja\nKementerian Keuangan (Berita Negara Republik Indonesia\nTahun 2025 Nomor 1208);\nMEMUTUSKAN:\n\nMenetapkan : PERATURAN MENTERI\nBIAYA MASUKAN.\n\nKEUANGAN\n\nTENTANG\n\nSTANDAR"
+  },
+  {
+    "id": "pmk-54-2026-page-2-pasal-1",
     "docId": "pmk-54-2026",
     "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
     "version": "1.0",
     "article": "1",
     "page": 2,
     "active": false,
-    "text": "```text\n2\n\n6.\n\ntelah beberapa kali diubah terakhir dengan Peraturan\nMenteri Keuangan Nomor 41 Tahun 2026 tentang\nPerubahan Kedua atas Peraturan Menteri Keuangan\nNomor 62 Tahun 2023 tentang Perencanaan Anggaran,\nPelaksanaan Anggaran, serta Akuntansi dan Pelaporan\nKeuangan (Berita Negara Republik Indonesia Tahun 2026\nNomor 409);\nPeraturan Menteri Keuangan Nomor 124 Tahun 2024\ntentang Organisasi dan Tata Kerja Kementerian Keuangan\n(Berita Negara Republik Indonesia Tahun 2024 Nomor\n1063) sebagaimana telah diubah dengan Peraturan\nMenteri Keuangan Nomor 117 Tahun 2025 tentang\nPerubahan atas Peraturan Menteri Keuangan Nomor 124\nTahun 2024 tentang Organisasi dan Tata Kerja\nKementerian Keuangan (Berita Negara Republik Indonesia\nTahun 2025 Nomor 1208);\nMEMUTUSKAN:\n\nMenetapkan : PERATURAN MENTERI\nBIAYA MASUKAN.\n\nKEUANGAN\n\nTENTANG\n\nSTANDAR\n\nPasal 1\nStandar Biaya Masukan yang selanjutnya disingkat SBM\nadalah standar biaya yang digunakan sebagai masukan (input)\nuntuk menyusun rincian biaya dalam suatu keluaran.\nPasal 2\n(1)\n\n(2)\n\n(3)\n\n(4)\n\n(1)\n\nSBM meliputi:\na. satuan biaya honorarium;\nb. satuan biaya fasilitas;\nc. satuan biaya perjalanan dinas;\nd. satuan biaya pemeliharaan;\ne. satuan biaya barang dan jasa; dan\nf. satuan biaya bantuan.\nPenggunaan SBM bersifat:\na. batas tertinggi; atau\nb. dapat dilampaui.\nSifat batas tertinggi sebagaimana dimaksud pada ayat (2)\nhuruf a, merupakan besaran biaya yang tidak dapat\ndilampaui.\nSifat dapat dilampaui sebagaimana dimaksud pada ayat\n(2) huruf b, dapat dilakukan dalam pelaksanaan\nanggaran dengan mempertimbangkan:\na. harga pasar; dan\nb. prinsip ekonomis, efisien, dan efektif.\nPasal 3\nSBM yang bersifat batas tertinggi sebagaimana dimaksud\ndalam Pasal 2 ayat (2) huruf a tercantum dalam Lampiran\nI yang merupakan bagian tidak terpisahkan dari Peraturan\nMenteri ini.\n```"
+    "text": "Pasal 1\nStandar Biaya Masukan yang selanjutnya disingkat SBM\nadalah standar biaya yang digunakan sebagai masukan (input)\nuntuk menyusun rincian biaya dalam suatu keluaran."
   },
   {
-    "id": "pmk-54-2026-page-3",
+    "id": "pmk-54-2026-page-2-pasal-2",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "article": "2",
+    "page": 2,
+    "active": false,
+    "text": "Pasal 2"
+  },
+  {
+    "id": "pmk-54-2026-page-2-pasal-2-ayat-1",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "article": "2 ayat (1)",
+    "page": 2,
+    "active": false,
+    "text": "(1)"
+  },
+  {
+    "id": "pmk-54-2026-page-2-pasal-2-ayat-2",
     "docId": "pmk-54-2026",
     "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
     "version": "1.0",
     "article": "2 ayat (2)",
-    "page": 3,
+    "page": 2,
     "active": false,
-    "text": "```text\n3\n\n(2)\n\n(3)\n\nSBM yang bersifat dapat dilampaui sebagaimana\ndimaksud dalam Pasal 2 ayat (2) huruf b tercantum dalam\nLampiran II yang merupakan bagian tidak terpisahkan\ndari Peraturan Menteri ini.\nRincian besaran satuan biaya dan penjelasan SBM\nsebagaimana dimaksud pada ayat (1) dan ayat (2)\nditetapkan oleh Menteri Keuangan.\n\nPasal 4\nPenerapan penggunaan SBM sebagaimana dimaksud dalam\nPasal 2 berpedoman pada Peraturan Menteri Keuangan\nmengenai Perencanaan Anggaran, Pelaksanaan Anggaran,\nserta Akuntansi dan Pelaporan Keuangan.\nPasal 5\nKetentuan dalam Peraturan Menteri ini digunakan dalam\npenyusunan rencana kerja dan anggaran mulai tahun\nanggaran 2027.\nPeraturan Menteri\ndiundangkan.\n\nPasal 6\nini mulai\n\nberlaku\n\npada\n\ntanggal\n```"
+    "text": "(2)"
   },
   {
-    "id": "pmk-54-2026-page-4",
+    "id": "pmk-54-2026-page-2-pasal-2-ayat-3",
     "docId": "pmk-54-2026",
     "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
     "version": "1.0",
+    "article": "2 ayat (3)",
+    "page": 2,
+    "active": false,
+    "text": "(3)"
+  },
+  {
+    "id": "pmk-54-2026-page-2-pasal-2-ayat-4",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "article": "2 ayat (4)",
+    "page": 2,
+    "active": false,
+    "text": "(4)"
+  },
+  {
+    "id": "pmk-54-2026-page-2-pasal-2-ayat-1-2",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "article": "2 ayat (1)",
+    "page": 2,
+    "active": false,
+    "text": "(1)\n\nSBM meliputi:\na. satuan biaya honorarium;\nb. satuan biaya fasilitas;\nc. satuan biaya perjalanan dinas;\nd. satuan biaya pemeliharaan;\ne. satuan biaya barang dan jasa; dan\nf. satuan biaya bantuan.\nPenggunaan SBM bersifat:\na. batas tertinggi; atau\nb. dapat dilampaui.\nSifat batas tertinggi sebagaimana dimaksud pada ayat (2)\nhuruf a, merupakan besaran biaya yang tidak dapat\ndilampaui.\nSifat dapat dilampaui sebagaimana dimaksud pada ayat\n(2) huruf b, dapat dilakukan dalam pelaksanaan\nanggaran dengan mempertimbangkan:\na. harga pasar; dan\nb. prinsip ekonomis, efisien, dan efektif."
+  },
+  {
+    "id": "pmk-54-2026-page-2-pasal-3",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "article": "3",
+    "page": 2,
+    "active": false,
+    "text": "Pasal 3\nSBM yang bersifat batas tertinggi sebagaimana dimaksud\ndalam Pasal 2 ayat (2) huruf a tercantum dalam Lampiran\nI yang merupakan bagian tidak terpisahkan dari Peraturan\nMenteri ini.\n```"
+  },
+  {
+    "id": "pmk-54-2026-page-3-pasal-3",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "article": "3",
+    "page": 3,
+    "active": false,
+    "text": "```text\n3"
+  },
+  {
+    "id": "pmk-54-2026-page-3-pasal-3-ayat-2",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "article": "3 ayat (2)",
+    "page": 3,
+    "active": false,
+    "text": "(2)"
+  },
+  {
+    "id": "pmk-54-2026-page-3-pasal-3-ayat-3",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "article": "3 ayat (3)",
+    "page": 3,
+    "active": false,
+    "text": "(3)\n\nSBM yang bersifat dapat dilampaui sebagaimana\ndimaksud dalam Pasal 2 ayat (2) huruf b tercantum dalam\nLampiran II yang merupakan bagian tidak terpisahkan\ndari Peraturan Menteri ini.\nRincian besaran satuan biaya dan penjelasan SBM\nsebagaimana dimaksud pada ayat (1) dan ayat (2)\nditetapkan oleh Menteri Keuangan."
+  },
+  {
+    "id": "pmk-54-2026-page-3-pasal-4",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "article": "4",
+    "page": 3,
+    "active": false,
+    "text": "Pasal 4\nPenerapan penggunaan SBM sebagaimana dimaksud dalam"
+  },
+  {
+    "id": "pmk-54-2026-page-3-pasal-2",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "article": "2",
+    "page": 3,
+    "active": false,
+    "text": "Pasal 2 berpedoman pada Peraturan Menteri Keuangan\nmengenai Perencanaan Anggaran, Pelaksanaan Anggaran,\nserta Akuntansi dan Pelaporan Keuangan."
+  },
+  {
+    "id": "pmk-54-2026-page-3-pasal-5",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "article": "5",
+    "page": 3,
+    "active": false,
+    "text": "Pasal 5\nKetentuan dalam Peraturan Menteri ini digunakan dalam\npenyusunan rencana kerja dan anggaran mulai tahun\nanggaran 2027.\nPeraturan Menteri\ndiundangkan."
+  },
+  {
+    "id": "pmk-54-2026-page-3-pasal-6",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "article": "6",
+    "page": 3,
+    "active": false,
+    "text": "Pasal 6\nini mulai\n\nberlaku\n\npada\n\ntanggal\n```"
+  },
+  {
+    "id": "pmk-54-2026-page-4-pasal-6",
+    "docId": "pmk-54-2026",
+    "title": "PMK 54 Tahun 2026 SBM (untuk TA 2027)",
+    "version": "1.0",
+    "article": "6",
     "page": 4,
     "active": false,
     "text": "```text\n4\n\nAgar\nsetiap\norang\nmengetahuinya,\nmemerintahkan\npengundangan Peraturan Menteri ini dengan penempatannya\ndalam Berita Negara Republik Indonesia.\nDitetapkan di Jakarta\npada tanggal 22 Juli 2026\nMENTERI KEUANGAN REPUBLIK INDONESIA,\n\nDitandatangani secara elektronik\nPURBAYA YUDHI SADEWA\nDiundangkan di Jakarta\npada tanggal\nД\nDIREKTUR JENDERAL\nPERATURAN PERUNDANG-UNDANGAN\nKEMENTERIAN HUKUM REPUBLIK INDONESIA,\nѼ\nDHAHANA PUTRA\nBERITA NEGARA REPUBLIK INDONESIA TAHUN 2026 NOMOR\n\nЖ\n```"
@@ -355,7 +2156,6 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "docId": "sop-pd-01",
     "title": "SOP-PD-01 Perjalanan Dinas Jabatan Dalam Negeri v1.0",
     "version": "2026-01-02",
-    "article": "1. Tujuan",
     "active": true,
     "text": "## 1. Tujuan\n\nSOP ini mengatur cara pegawai mengajukan, melaksanakan, dan mempertanggungjawabkan perjalanan dinas jabatan dalam negeri melalui aplikasi Perjalanan Dinas."
   },
@@ -364,7 +2164,6 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "docId": "sop-pd-01",
     "title": "SOP-PD-01 Perjalanan Dinas Jabatan Dalam Negeri v1.0",
     "version": "2026-01-02",
-    "article": "2. Dasar hukum",
     "active": true,
     "text": "## 2. Dasar hukum\n\n1. PMK 113/PMK.05/2012 tentang Perjalanan Dinas Dalam Negeri bagi Pejabat Negara, Pegawai Negeri, dan Pegawai Tidak Tetap.\n2. PMK 119 Tahun 2023 tentang Perubahan atas PMK 113/PMK.05/2012.\n3. PMK 32 Tahun 2025 tentang Standar Biaya Masukan Tahun Anggaran 2026."
   },
@@ -373,7 +2172,6 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "docId": "sop-pd-01",
     "title": "SOP-PD-01 Perjalanan Dinas Jabatan Dalam Negeri v1.0",
     "version": "2026-01-02",
-    "article": "3. Peran",
     "active": true,
     "text": "## 3. Peran\n\n| Peran | Pejabat di Balai | Tugas di aplikasi |\n|---|---|---|\n| Pelaksana SPD | Pegawai yang ditugaskan | Mengajukan, geotagging, pertanggungjawaban |\n| Pemberi tugas | Kepala Balai | Menerbitkan surat tugas |\n| Atasan langsung | Kepala Seksi pelaksana | Menyetujui pengajuan |\n| PPK | Pejabat Pembuat Komitmen | Menguji biaya terhadap SBM, menyetujui atau menolak |\n| Bendahara Pengeluaran | Bendahara | Membayar uang muka dan selisih |\n| Verifikator keuangan | Staf Subbagian Keuangan | Memeriksa kelengkapan pertanggungjawaban |"
   },
@@ -382,7 +2180,6 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "docId": "sop-pd-01",
     "title": "SOP-PD-01 Perjalanan Dinas Jabatan Dalam Negeri v1.0",
     "version": "2026-01-02",
-    "article": "8 ayat (5)",
     "active": true,
     "text": "## 4. Ketentuan\n\n4.1 Jenis perjalanan dinas jabatan:\na. luar kota: melewati batas Kota Yogyakarta;\nb. dalam kota lebih dari 8 jam: memakai SPD dan mendapat uang harian dalam kota;\nc. dalam kota sampai dengan 8 jam: tidak diajukan lewat aplikasi ini.\n\n4.2 Surat tugas diterbitkan Kepala Balai melalui aplikasi sebelum pengajuan dibuat. Pengajuan tanpa nomor surat tugas tidak dapat dikirim.\n\n4.3 Pengajuan dikirim paling lambat 3 hari kerja sebelum tanggal berangkat. Pengajuan yang terlambat memerlukan catatan alasan dari atasan langsung.\n\n4.4 Dokumen yang dilampirkan saat pengajuan:\na. surat tugas;\nb. undangan atau kerangka acuan kegiatan;\nc. rincian perkiraan biaya (dibuat otomatis oleh aplikasi dari isian form).\n\n4.5 Uang harian, biaya penginapan, tiket, dan transport ke atau dari bandara diisi sesuai SBM TA 2026. Uang harian dan biaya penginapan bersifat batas tertinggi dan tidak boleh dilampaui. Tiket pesawat dan transport terminal termasuk standar biaya yang dapat dilampaui; bila melebihi SBM, lampirkan bukti harga pasar dan persetujuan PPK.\n\n4.6 Pegawai yang tidak menginap di hotel atau tempat menginap lain memilih opsi \"Tidak menginap di hotel\". Aplikasi menghitung biaya penginapan sebesar 30% dari tarif hotel kota tujuan sesuai golongan, dibayarkan lumpsum (PMK 119/2023 Pasal 8 ayat (5)). Bila rencana berubah dan pegawai menginap di hotel, isian diubah sebelum pertanggungjawaban.\n\n4.7 Uang muka bersifat opsional. Pegawai yang membutuhkan uang muka memilih \"Ya\" pada isian Uang Muka. Bendahara membayar setelah PPK menyetujui (PMK 113/2012 Pasal 27).\n\n4.8 Pegawai melakukan geotagging melalui aplikasi pada empat titik: saat berangkat di tempat kedudukan, saat tiba di tempat tujuan, saat pulang dari tempat tujuan, dan saat tiba kembali di tempat kedudukan (PMK 119/2023 Pasal 36C). Bila geotagging gagal, unggah foto lokasi; bila foto juga tidak bisa, unggah surat pernyataan yang disetujui PPK.\n\n4.9 Pertanggungjawaban dikirim paling lambat 5 hari kerja setelah perjalanan dinas selesai (PMK 113/2012 Pasal 34 ayat (1)). Hari kerja tidak menghitung Sabtu, Minggu, libur nasional, dan cuti bersama.\n\n4.10 Dokumen pertanggungjawaban:\na. laporan perjalanan dinas sesuai format Lampiran SOP ini;\nb. tiket atau bukti pembayaran transportasi;\nc. boarding pass pergi dan pulang (untuk pesawat);\nd. bukti pembayaran hotel, kecuali memilih \"Tidak menginap di hotel\";\ne. Daftar Pengeluaran Riil bila bukti transportasi atau penginapan tidak diperoleh, rusak, atau hilang (PMK 113/2012 Pasal 34 ayat (3)).\n\n4.11 Verifikator memeriksa kelengkapan paling lama 3 hari kerja. Pertanggungjawaban yang tidak lengkap dikembalikan dengan status Revisi beserta alasannya.\n\n4.12 Pembatalan perjalanan diajukan lewat menu Batalkan Pengajuan disertai surat pernyataan pembatalan dari atasan (PMK 113/2012 Pasal 33)."
   },
@@ -391,7 +2188,6 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "docId": "sop-pd-01",
     "title": "SOP-PD-01 Perjalanan Dinas Jabatan Dalam Negeri v1.0",
     "version": "2026-01-02",
-    "article": "5. Alur di aplikasi",
     "active": true,
     "text": "## 5. Alur di aplikasi\n\n| No | Langkah | Pelaku | Menu |\n|---|---|---|---|\n| 1 | Terbitkan surat tugas | Kepala Balai | My Task |\n| 2 | Buat pengajuan, pilih jenis perjalanan dan surat tugas | Pelaksana SPD | Ajukan Perjalanan Dinas |\n| 3 | Isi jadwal, biaya, dokumen, lalu kirim | Pelaksana SPD | Form pengajuan |\n| 4 | Setujui pengajuan | Atasan langsung | My Task |\n| 5 | Uji biaya terhadap SBM, setujui | PPK | My Task |\n| 6 | Bayar uang muka (bila diminta) | Bendahara | My Task |\n| 7 | Geotagging empat titik | Pelaksana SPD | My Request, detail perjalanan |\n| 8 | Kirim pertanggungjawaban | Pelaksana SPD | My Task, task Pertanggungjawaban |\n| 9 | Periksa kelengkapan | Verifikator | My Task |\n| 10 | Hitung rampung dan bayar atau tagih selisih | PPK dan Bendahara | My Task |"
   },
@@ -400,7 +2196,6 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "docId": "sop-pd-01",
     "title": "SOP-PD-01 Perjalanan Dinas Jabatan Dalam Negeri v1.0",
     "version": "2026-01-02",
-    "article": "Lampiran: format laporan perjalanan dinas",
     "active": true,
     "text": "## Lampiran: format laporan perjalanan dinas\n\n1. Nomor dan tanggal surat tugas\n2. Nama dan jabatan pelaksana\n3. Tujuan dan tanggal pelaksanaan\n4. Kegiatan yang dilaksanakan\n5. Hasil dan tindak lanjut\n6. Tanda tangan pelaksana"
   },
@@ -409,7 +2204,6 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "docId": "panduan-app",
     "title": "Panduan aplikasi Perjalanan Dinas v1.0",
     "version": "1.0",
-    "article": "Menu utama",
     "active": true,
     "text": "## Menu utama\n\n| Menu | Kode | Fungsi |\n|---|---|---|\n| Beranda | `[menu-beranda]` | Ringkasan task dan pengajuan aktif |\n| Ajukan Perjalanan Dinas | `[menu-ajukan-perjalanan-dinas]` | Membuat pengajuan baru |\n| My Request | `[menu-my-request]` | Daftar pengajuan milik saya dan statusnya |\n| My Task | `[menu-my-task]` | Task yang harus saya kerjakan, termasuk Pertanggungjawaban |"
   },
@@ -418,7 +2212,6 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "docId": "panduan-app",
     "title": "Panduan aplikasi Perjalanan Dinas v1.0",
     "version": "1.0",
-    "article": "Membuat pengajuan",
     "active": true,
     "text": "## Membuat pengajuan\n\n1. Klik `[menu-ajukan-perjalanan-dinas]`.\n2. Bagian A, Jenis dan tujuan: pilih jenis perjalanan `[select-jenis-perjalanan]`, isi nomor surat tugas `[input-nomor-surat-tugas]`, pilih kota tujuan `[select-kota-tujuan]`, lalu isi maksud perjalanan `[input-maksud-perjalanan]`. Provinsi terisi otomatis setelah kota dipilih.\n3. Bagian B, Jadwal: isi tanggal berangkat `[input-tanggal-berangkat]` dan tanggal kembali `[input-tanggal-kembali]`. Jumlah hari dihitung otomatis.\n4. Bagian C, Biaya: pilih moda `[select-moda-transport]`, lalu isi total perkiraan biaya transport pada `[input-biaya-transport]`.\n5. Penginapan: pilih `[opt-penginapan-hotel]` bila menginap di hotel atau `[opt-penginapan-tidak-hotel]` bila tidak menginap di hotel. Isi nominal penginapan `[input-nominal-penginapan]` secara manual sesuai hasil perhitungan Nemu.\n6. Isi uang harian `[input-uang-harian]` sesuai hasil perhitungan dan ketentuan SBM.\n7. Bagian D, Dokumen: unggah undangan `[upload-undangan]`.\n8. Klik `[button-kirim-pengajuan]` setelah semua isian dan dokumen diperiksa. Status berubah menjadi Diajukan."
   },
@@ -427,7 +2220,6 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "docId": "panduan-app",
     "title": "Panduan aplikasi Perjalanan Dinas v1.0",
     "version": "1.0",
-    "article": "Setelah pulang",
     "active": true,
     "text": "## Setelah pulang\n\n1. Buka `[menu-my-task]`, lalu klik task Pertanggungjawaban `[task-pertanggungjawaban]`.\n2. Unggah surat tugas `[upload-surat-tugas]`, boarding pass pergi `[upload-boarding-pass-pergi]`, laporan perjalanan `[upload-laporan-perjalanan]`, dan boarding pass pulang `[upload-boarding-pass-pulang]` pada kontrol yang tersedia.\n3. Klik `[button-kirim]` setelah seluruh dokumen wajib lengkap. Pengguna tetap harus menekan tombol Kirim sendiri."
   },
@@ -436,7 +2228,6 @@ export const GENERATED_KNOWLEDGE_CHUNKS = [
     "docId": "panduan-app",
     "title": "Panduan aplikasi Perjalanan Dinas v1.0",
     "version": "1.0",
-    "article": "Status pengajuan",
     "active": true,
     "text": "## Status pengajuan\n\nDraf, Diajukan, Disetujui Atasan, Disetujui PPK, Berangkat, Kembali, Pertanggungjawaban, Verifikasi, Selesai. Bila dokumen kurang, status berubah menjadi Revisi."
   }
@@ -448,5460 +2239,6240 @@ export const GENERATED_SBM_ROWS = [
     "component": "hotel",
     "grade": "IV",
     "value": 1578000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "ACEH",
     "component": "hotel",
     "grade": "III",
     "value": 770000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SUMATERA UTARA",
     "component": "hotel",
     "grade": "IV",
     "value": 1188000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SUMATERA UTARA",
     "component": "hotel",
     "grade": "III",
     "value": 699000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "RIAU",
     "component": "hotel",
     "grade": "IV",
     "value": 1650000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "RIAU",
     "component": "hotel",
     "grade": "III",
     "value": 852000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "KEPULAUAN RIAU",
     "component": "hotel",
     "grade": "IV",
     "value": 1388000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "KEPULAUAN RIAU",
     "component": "hotel",
     "grade": "III",
     "value": 792000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "JAMBI",
     "component": "hotel",
     "grade": "IV",
     "value": 1252000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "JAMBI",
     "component": "hotel",
     "grade": "III",
     "value": 580000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SUMATERA BARAT",
     "component": "hotel",
     "grade": "IV",
     "value": 1353000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SUMATERA BARAT",
     "component": "hotel",
     "grade": "III",
     "value": 701000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SUMATERA SELATAN",
     "component": "hotel",
     "grade": "IV",
     "value": 1966000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SUMATERA SELATAN",
     "component": "hotel",
     "grade": "III",
     "value": 861000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "LAMPUNG",
     "component": "hotel",
     "grade": "IV",
     "value": 1539000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "LAMPUNG",
     "component": "hotel",
     "grade": "III",
     "value": 621000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "BENGKULU",
     "component": "hotel",
     "grade": "IV",
     "value": 1546000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "BENGKULU",
     "component": "hotel",
     "grade": "III",
     "value": 692000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "KEPULAUAN BANGKA BELITUNG",
     "component": "hotel",
     "grade": "IV",
     "value": 1957000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "KEPULAUAN BANGKA BELITUNG",
     "component": "hotel",
     "grade": "III",
     "value": 724000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "BANTEN",
     "component": "hotel",
     "grade": "IV",
     "value": 1301000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "BANTEN",
     "component": "hotel",
     "grade": "III",
     "value": 775000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "JAWA BARAT",
     "component": "hotel",
     "grade": "IV",
     "value": 1366000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "JAWA BARAT",
     "component": "hotel",
     "grade": "III",
     "value": 735000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "DKI JAKARTA",
     "component": "hotel",
     "grade": "IV",
     "value": 1062000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "DKI JAKARTA",
     "component": "hotel",
     "grade": "III",
     "value": 730000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "JAWA TENGAH",
     "component": "hotel",
     "grade": "IV",
     "value": 1286000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "JAWA TENGAH",
     "component": "hotel",
     "grade": "III",
     "value": 810000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "DI YOGYAKARTA",
     "component": "hotel",
     "grade": "IV",
     "value": 1600000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "DI YOGYAKARTA",
     "component": "hotel",
     "grade": "III",
     "value": 845000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "JAWA TIMUR",
     "component": "hotel",
     "grade": "IV",
     "value": 1234000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "JAWA TIMUR",
     "component": "hotel",
     "grade": "III",
     "value": 814000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "BALI",
     "component": "hotel",
     "grade": "IV",
     "value": 1754000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "BALI",
     "component": "hotel",
     "grade": "III",
     "value": 1138000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "NUSA TENGGARA BARAT",
     "component": "hotel",
     "grade": "IV",
     "value": 1418000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "NUSA TENGGARA BARAT",
     "component": "hotel",
     "grade": "III",
     "value": 907000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "NUSA TENGGARA TIMUR",
     "component": "hotel",
     "grade": "IV",
     "value": 1450000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "NUSA TENGGARA TIMUR",
     "component": "hotel",
     "grade": "III",
     "value": 737000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "KALIMANTAN BARAT",
     "component": "hotel",
     "grade": "IV",
     "value": 1125000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "KALIMANTAN BARAT",
     "component": "hotel",
     "grade": "III",
     "value": 576000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "KALIMANTAN TENGAH",
     "component": "hotel",
     "grade": "IV",
     "value": 1189000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "KALIMANTAN TENGAH",
     "component": "hotel",
     "grade": "III",
     "value": 706000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "KALIMANTAN SELATAN",
     "component": "hotel",
     "grade": "IV",
     "value": 1500000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "KALIMANTAN SELATAN",
     "component": "hotel",
     "grade": "III",
     "value": 746000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "KALIMANTAN TIMUR",
     "component": "hotel",
     "grade": "IV",
     "value": 1507000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "KALIMANTAN TIMUR",
     "component": "hotel",
     "grade": "III",
     "value": 804000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "KALIMANTAN UTARA",
     "component": "hotel",
     "grade": "IV",
     "value": 1507000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "KALIMANTAN UTARA",
     "component": "hotel",
     "grade": "III",
     "value": 904000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SULAWESI UTARA",
     "component": "hotel",
     "grade": "IV",
     "value": 1270000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SULAWESI UTARA",
     "component": "hotel",
     "grade": "III",
     "value": 978000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "GORONTALO",
     "component": "hotel",
     "grade": "IV",
     "value": 1606000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "GORONTALO",
     "component": "hotel",
     "grade": "III",
     "value": 955000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SULAWESI BARAT",
     "component": "hotel",
     "grade": "IV",
     "value": 1344000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SULAWESI BARAT",
     "component": "hotel",
     "grade": "III",
     "value": 704000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SULAWESI SELATAN",
     "component": "hotel",
     "grade": "IV",
     "value": 1423000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SULAWESI SELATAN",
     "component": "hotel",
     "grade": "III",
     "value": 745000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SULAWESI TENGAH",
     "component": "hotel",
     "grade": "IV",
     "value": 1679000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SULAWESI TENGAH",
     "component": "hotel",
     "grade": "III",
     "value": 951000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SULAWESI TENGGARA",
     "component": "hotel",
     "grade": "IV",
     "value": 1297000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "SULAWESI TENGGARA",
     "component": "hotel",
     "grade": "III",
     "value": 786000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "MALUKU",
     "component": "hotel",
     "grade": "IV",
     "value": 1059000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "MALUKU",
     "component": "hotel",
     "grade": "III",
     "value": 667000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "MALUKU UTARA",
     "component": "hotel",
     "grade": "IV",
     "value": 1160000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "MALUKU UTARA",
     "component": "hotel",
     "grade": "III",
     "value": 654000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "PAPUA",
     "component": "hotel",
     "grade": "IV",
     "value": 2521000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "PAPUA",
     "component": "hotel",
     "grade": "III",
     "value": 1038000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "PAPUA BARAT",
     "component": "hotel",
     "grade": "IV",
     "value": 2056000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "PAPUA BARAT",
     "component": "hotel",
     "grade": "III",
     "value": 967000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "PAPUA BARAT DAYA",
     "component": "hotel",
     "grade": "IV",
     "value": 2056000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "PAPUA BARAT DAYA",
     "component": "hotel",
     "grade": "III",
     "value": 967000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "PAPUA TENGAH",
     "component": "hotel",
     "grade": "IV",
     "value": 2521000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "PAPUA TENGAH",
     "component": "hotel",
     "grade": "III",
     "value": 1038000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "PAPUA SELATAN",
     "component": "hotel",
     "grade": "IV",
     "value": 3706000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "PAPUA SELATAN",
     "component": "hotel",
     "grade": "III",
     "value": 1526000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "PAPUA PEGUNUNGAN",
     "component": "hotel",
     "grade": "IV",
     "value": 3731000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "PAPUA PEGUNUNGAN",
     "component": "hotel",
     "grade": "III",
     "value": 1536000,
-    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19"
+    "source": "PMK 32/2025 Lampiran I angka 30, hlm. 19",
+    "sourceCitationId": "pmk-32-2025-page-19"
   },
   {
     "province": "ACEH",
     "component": "uang_harian",
     "grade": "*",
     "value": 360000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "SUMATERA UTARA",
     "component": "uang_harian",
     "grade": "*",
     "value": 370000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "RIAU",
     "component": "uang_harian",
     "grade": "*",
     "value": 370000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "KEPULAUAN RIAU",
     "component": "uang_harian",
     "grade": "*",
     "value": 370000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "JAMBI",
     "component": "uang_harian",
     "grade": "*",
     "value": 370000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "SUMATERA BARAT",
     "component": "uang_harian",
     "grade": "*",
     "value": 380000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "SUMATERA SELATAN",
     "component": "uang_harian",
     "grade": "*",
     "value": 380000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "LAMPUNG",
     "component": "uang_harian",
     "grade": "*",
     "value": 380000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "BENGKULU",
     "component": "uang_harian",
     "grade": "*",
     "value": 380000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "KEPULAUAN BANGKA BELITUNG",
     "component": "uang_harian",
     "grade": "*",
     "value": 410000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "BANTEN",
     "component": "uang_harian",
     "grade": "*",
     "value": 370000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "JAWA BARAT",
     "component": "uang_harian",
     "grade": "*",
     "value": 430000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "DKI JAKARTA",
     "component": "uang_harian",
     "grade": "*",
     "value": 530000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "JAWA TENGAH",
     "component": "uang_harian",
     "grade": "*",
     "value": 370000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "DI YOGYAKARTA",
     "component": "uang_harian",
     "grade": "*",
     "value": 420000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "JAWA TIMUR",
     "component": "uang_harian",
     "grade": "*",
     "value": 410000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "BALI",
     "component": "uang_harian",
     "grade": "*",
     "value": 480000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "NUSA TENGGARA BARAT",
     "component": "uang_harian",
     "grade": "*",
     "value": 440000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "NUSA TENGGARA TIMUR",
     "component": "uang_harian",
     "grade": "*",
     "value": 430000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "KALIMANTAN BARAT",
     "component": "uang_harian",
     "grade": "*",
     "value": 380000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "KALIMANTAN TENGAH",
     "component": "uang_harian",
     "grade": "*",
     "value": 360000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "KALIMANTAN SELATAN",
     "component": "uang_harian",
     "grade": "*",
     "value": 380000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "KALIMANTAN TIMUR",
     "component": "uang_harian",
     "grade": "*",
     "value": 430000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "KALIMANTAN UTARA",
     "component": "uang_harian",
     "grade": "*",
     "value": 430000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "SULAWESI UTARA",
     "component": "uang_harian",
     "grade": "*",
     "value": 370000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "GORONTALO",
     "component": "uang_harian",
     "grade": "*",
     "value": 370000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "SULAWESI BARAT",
     "component": "uang_harian",
     "grade": "*",
     "value": 410000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "SULAWESI SELATAN",
     "component": "uang_harian",
     "grade": "*",
     "value": 430000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "SULAWESI TENGAH",
     "component": "uang_harian",
     "grade": "*",
     "value": 370000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "SULAWESI TENGGARA",
     "component": "uang_harian",
     "grade": "*",
     "value": 380000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "MALUKU",
     "component": "uang_harian",
     "grade": "*",
     "value": 380000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "MALUKU UTARA",
     "component": "uang_harian",
     "grade": "*",
     "value": 430000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "PAPUA",
     "component": "uang_harian",
     "grade": "*",
     "value": 580000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "PAPUA BARAT",
     "component": "uang_harian",
     "grade": "*",
     "value": 480000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "PAPUA BARAT DAYA",
     "component": "uang_harian",
     "grade": "*",
     "value": 480000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "PAPUA TENGAH",
     "component": "uang_harian",
     "grade": "*",
     "value": 580000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "PAPUA SELATAN",
     "component": "uang_harian",
     "grade": "*",
     "value": 580000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "PAPUA PEGUNUNGAN",
     "component": "uang_harian",
     "grade": "*",
     "value": 580000,
-    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15"
+    "source": "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
+    "sourceCitationId": "pmk-32-2025-page-15"
   },
   {
     "province": "JAKARTA - AMBON",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 13285000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - AMBON",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 7081000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7412000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3797000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7519000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4807000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - BANDAR LAMPUNG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 2407000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - BANDAR LAMPUNG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 1583000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - BANJARMASIN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5252000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - BANJARMASIN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3205000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - BATAM",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4867000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - BATAM",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3091000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - BENGKULU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4364000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - BENGKULU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2770000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - BIAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 14065000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - BIAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8046000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5305000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3262000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - GORONTALO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7231000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - GORONTALO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5162000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - JAMBI",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4065000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - JAMBI",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2584000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 14568000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8767000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4107000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2268000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - KENDARI",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7658000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - KENDARI",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4265000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - KUPANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9413000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - KUPANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5081000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7444000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3829000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - MALANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4599000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - MALANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2695000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - MAMUJU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7295000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - MAMUJU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5208000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - MANADO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10824000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - MANADO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5460000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - MANOKWARI",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 16226000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - MANOKWARI",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 10824000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - MATARAM",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5316000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - MATARAM",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3230000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - MEDAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7252000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - MEDAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4054000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5530000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3159000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - PALANGKARAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4984000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - PALANGKARAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2984000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 3861000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2268000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - PALU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9348000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - PALU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5113000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - PANGKAL PINANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 3412000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - PANGKAL PINANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2139000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5583000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3016000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4353000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2781000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 3861000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2182000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 3861000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2342000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5466000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2674000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - TERNATE",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10001000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - TERNATE",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6664000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 13830000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 7902000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - TANJUNG SELOR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7424000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAKARTA - TANJUNG SELOR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4341000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8054000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4784000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7434000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4453000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - KENDARI",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4824000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - KENDARI",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3056000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6022000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3697000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - MANOKWARI",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5177000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - MANOKWARI",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3239000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - PALU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6140000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - PALU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3754000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - SORONG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 3637000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - SORONG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2415000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8803000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5185000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - TERNATE",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4022000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "AMBON - TERNATE",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2621000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 12739000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 7222000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - BATAM",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10354000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - BATAM",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5677000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10739000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6044000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 19071000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 10793000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9669000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5082000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 12664000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6581000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - MANADO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 15702000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - MANADO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 7806000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - MEDAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 12493000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - MEDAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6570000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10942000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5745000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9445000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5082000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10996000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5803000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9445000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5002000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9445000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5150000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10889000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5471000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 18408000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BALIKPAPAN - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 10107000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10835000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6719000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 19167000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 11468000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9765000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5757000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 12760000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 7256000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - MANADO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 15798000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - MANADO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8481000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9990000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6249000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9530000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5677000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9530000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5826000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10985000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6147000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 18504000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDA ACEH - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 10782000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8129000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4419000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8225000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5094000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - BANJARMASIN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6193000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - BANJARMASIN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3651000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - BATAM",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5840000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - BATAM",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3549000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - BIAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 14119000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - BIAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8012000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6236000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3903000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 14568000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8664000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5155000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2954000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - KENDARI",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8354000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - KENDARI",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4796000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8161000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4453000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - MALANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5594000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - MALANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3354000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - MANADO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 11199000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - MANADO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5677000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - MATARAM",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6246000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - MATARAM",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3880000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - MEDAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7979000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - MEDAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4441000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6439000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3617000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - PALANGKARAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5947000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - PALANGKARAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3640000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4931000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2954000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6482000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3674000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5380000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3446000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4931000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2873000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4931000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3022000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6386000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3342000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 13905000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDAR LAMPUNG - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 7977000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - BATAM",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6289000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - BATAM",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3583000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5626000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3252000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - JAMBI",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5006000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - JAMBI",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2941000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 3369000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2279000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6129000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3508000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4385000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2631000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - PANGKAL PINANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4599000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - PANGKAL PINANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2738000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6525000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3701000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 3027000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 1957000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 3647000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2268000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4824000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3056000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - TANJUNG PANDAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4439000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANDUNG - TANJUNG PANDAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2850000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10792000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6022000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - BATAM",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8407000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - BATAM",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4578000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - BIAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 16686000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - BIAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8749000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8792000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4920000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 17135000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 9359000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7723000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4304000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - MEDAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10546000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - MEDAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5412000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9006000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4642000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7498000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4022000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9049000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4696000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7498000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3958000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7498000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4097000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8942000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4592000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 16472000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BANJARMASIN - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8897000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10439000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5936000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8450000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4824000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 16782000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 9263000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7370000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3936000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10375000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5711000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - MANADO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 13413000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - MANADO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6482000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - MEDAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10193000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - MEDAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5316000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8653000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4546000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7145000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3936000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8707000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4599000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7594000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4396000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7145000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3861000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7145000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4000000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8600000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4300000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 16119000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BATAM - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8621000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BENGKULU - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 2899000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BENGKULU - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2026000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 18622000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 9477000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 18718000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 10108000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - BATAM",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 16333000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - BATAM",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8664000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 16729000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8995000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 3615000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2321000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 15648000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8108000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - MANADO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 11734000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - MANADO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6353000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - MEDAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 18472000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - MEDAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 9498000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 16932000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8728000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 15424000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8108000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 16985000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8781000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 15873000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8568000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 12782000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 7081000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5808000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "BIAK - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3444000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 11680000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 7325000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - KUPANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5091000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - KUPANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3159000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4182000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2816000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - MANADO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7851000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - MANADO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4578000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - MATARAM",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 1840000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - MATARAM",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 1488000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - MEDAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10589000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - MEDAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5658000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9049000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4888000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - PALANGKARAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8557000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - PALANGKARAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4909000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7541000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4278000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9092000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4942000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7990000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4738000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10140000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "DENPASAR - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6559000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7733000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4407000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - BANJARMASIN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7690000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - BANJARMASIN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4193000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7733000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4439000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6653000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3551000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - KUPANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 11434000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - KUPANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6075000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9659000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4952000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - MALANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7091000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - MALANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3925000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - MANADO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 12707000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - MANADO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6097000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - PALANGKARAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7444000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - PALANGKARAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4193000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6878000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4011000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6428000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3476000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6428000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3615000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7883000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAMBI - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3915000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 13274000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 7690000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - MANADO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 22109000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - MANADO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 11263000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - MEDAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 18932000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - MEDAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 10097000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 17381000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 9327000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 15873000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8717000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 17435000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 9380000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 16322000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 9177000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 3615000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "JAYAPURA - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2289000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 3861000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2655000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6525000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3893000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - MANADO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10536000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - MANADO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5722000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - MEDAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9519000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - MEDAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4770000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7969000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4280000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6460000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3617000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8022000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4054000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6910000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3840000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 11894000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "YOGYAKARTA - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 7114000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 12953000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 7102000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - BATAM",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10568000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - BATAM",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5658000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5455000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3503000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8129000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4706000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 11167000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5722000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9659000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5102000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 11220000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5776000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9659000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5027000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9659000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5166000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 11103000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5466000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 18633000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KENDARI - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 9798000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KUPANG - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 14386000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KUPANG - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8676000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KUPANG - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7348000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KUPANG - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4182000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KUPANG - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7637000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KUPANG - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4311000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KUPANG - MANADO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 11648000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KUPANG - MANADO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6140000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KUPANG - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6749000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "KUPANG - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3983000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MAKASSAR - BIAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8493000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MAKASSAR - BIAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4931000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MAKASSAR - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10193000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MAKASSAR - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6193000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MAKASSAR - KENDARI",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 2663000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MAKASSAR - KENDARI",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 1912000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MAKASSAR - MANADO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5327000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MAKASSAR - MANADO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2909000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MAKASSAR - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 11723000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MAKASSAR - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 7027000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10108000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5134000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10204000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5765000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - BANJARMASIN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8161000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - BANJARMASIN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4407000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - BATAM",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7819000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - BATAM",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4311000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - BIAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 16087000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - BIAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8482000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 16536000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 9092000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - KENDARI",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10322000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - KENDARI",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5487000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10129000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5166000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - MANADO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 13167000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - MANADO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6311000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - MEDAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9958000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - MEDAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5145000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8418000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4385000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - PALANGKARAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7915000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - PALANGKARAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4407000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6899000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3765000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8461000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4439000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 15873000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MALANG - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8461000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - MEDAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 15552000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - MEDAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 7316000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 14012000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6546000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 12504000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5926000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 14055000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6599000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 12953000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6396000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 12504000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5851000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 12504000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5990000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9937000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5262000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 16183000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MANADO - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8995000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10750000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5615000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10846000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6246000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - BANJARMASIN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8803000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - BANJARMASIN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4888000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - BATAM",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8461000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - BATAM",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4803000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - BIAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 11552000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - BIAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6546000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 13092000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 7575000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4417000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2968000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4717000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3113000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - MANADO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8717000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - MANADO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5070000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - MEDAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10600000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - MEDAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5637000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9060000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4867000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7551000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4246000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9102000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4909000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8001000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4706000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 3829000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MATARAM - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2484000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MEDAN - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 3466000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MEDAN - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2347000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MEDAN - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 12514000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MEDAN - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6172000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MEDAN - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9733000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MEDAN - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5230000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MEDAN - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9284000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MEDAN - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4696000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MEDAN - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9284000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MEDAN - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4835000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MEDAN - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10739000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MEDAN - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5134000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MEDAN - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 18258000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "MEDAN - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 9455000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PADANG - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10974000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PADANG - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5402000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PADANG - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8193000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PADANG - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4460000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PADANG - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7744000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PADANG - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3925000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PADANG - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7744000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PADANG - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4065000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PADANG - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9199000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PADANG - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4364000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PADANG - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 16718000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PADANG - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8685000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10546000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - BANDA ACEH",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6022000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - BATAM",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8161000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - BATAM",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4578000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7477000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4304000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - MATARAM",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8557000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - MATARAM",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4888000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - MEDAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 10300000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - MEDAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5412000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8760000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4642000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7252000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4022000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8803000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4696000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7252000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3947000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7252000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4086000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8696000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALANGKARAYA - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4385000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALEMBANG - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9894000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALEMBANG - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5220000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALEMBANG - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9466000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALEMBANG - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4781000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALEMBANG - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6685000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALEMBANG - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3840000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALEMBANG - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6236000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALEMBANG - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3305000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALEMBANG - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6236000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALEMBANG - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3444000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALEMBANG - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7690000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALEMBANG - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3744000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALEMBANG - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 15210000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALEMBANG - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8076000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALU - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 4268000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALU - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2578000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALU - POSO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 1957000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALU - POSO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 1423000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALU - SORONG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6878000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALU - SORONG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4155000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALU - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6878000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALU - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3883000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALU - TOLI-TOLI",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 2941000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PALU - TOLI-TOLI",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 1915000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9038000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - BALIKPAPAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4631000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - BANJARMASIN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7091000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - BANJARMASIN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3915000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - BATAM",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6739000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - BATAM",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3818000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6065000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - YOGYAKARTA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3262000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9060000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4663000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - MANADO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 12097000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - MANADO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5808000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - MEDAN",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8888000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - MEDAN",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4653000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - PADANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7337000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - PADANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3883000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5829000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - PALEMBANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3262000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7391000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - PEKANBARU",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3936000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6279000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3733000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5829000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3187000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5829000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3326000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7284000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PANGKAL PINANG - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3626000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PEKANBARU - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8247000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PEKANBARU - PONTIANAK",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4514000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PEKANBARU - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7797000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PEKANBARU - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3979000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PEKANBARU - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 7797000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PEKANBARU - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4118000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PEKANBARU - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9241000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PEKANBARU - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4407000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PEKANBARU - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 16771000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PEKANBARU - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8739000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PONTIANAK - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9915000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PONTIANAK - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 5241000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PONTIANAK - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6685000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PONTIANAK - SEMARANG",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3765000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PONTIANAK - SOLO",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 6685000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PONTIANAK - SOLO",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3904000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PONTIANAK - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 8140000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PONTIANAK - SURABAYA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4204000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PONTIANAK - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 15659000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "PONTIANAK - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 8535000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "SEMARANG - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9466000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "SEMARANG - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4706000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "SOLO - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 9466000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "SOLO - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 4845000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "SURABAYA - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 3198000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "SURABAYA - DENPASAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 2118000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "SURABAYA - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 12675000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "SURABAYA - JAYAPURA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 7250000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "SURABAYA - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 5936000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "SURABAYA - MAKASSAR",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 3674000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "SURABAYA - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "bisnis",
     "value": 11295000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "SURABAYA - TIMIKA",
     "component": "tiket_pesawat",
     "grade": "ekonomi",
     "value": 6589000,
-    "source": "PMK 32/2025 Lampiran II angka 17"
+    "source": "PMK 32/2025 Lampiran II angka 17",
+    "sourceCitationId": "pmk-32-2025-page-86"
   },
   {
     "province": "ACEH",
     "component": "transport_bandara",
     "grade": "*",
     "value": 123000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "SUMATERA UTARA",
     "component": "transport_bandara",
     "grade": "*",
     "value": 278000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "RIAU",
     "component": "transport_bandara",
     "grade": "*",
     "value": 99000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "KEPULAUAN RIAU",
     "component": "transport_bandara",
     "grade": "*",
     "value": 159000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "JAMBI",
     "component": "transport_bandara",
     "grade": "*",
     "value": 133000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "SUMATERA BARAT",
     "component": "transport_bandara",
     "grade": "*",
     "value": 171000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "SUMATERA SELATAN",
     "component": "transport_bandara",
     "grade": "*",
     "value": 162000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "LAMPUNG",
     "component": "transport_bandara",
     "grade": "*",
     "value": 162000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "BENGKULU",
     "component": "transport_bandara",
     "grade": "*",
     "value": 106000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "KEPULAUAN BANGKA BELITUNG",
     "component": "transport_bandara",
     "grade": "*",
     "value": 94000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "BANTEN",
     "component": "transport_bandara",
     "grade": "*",
     "value": 300000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "JAWA BARAT",
     "component": "transport_bandara",
     "grade": "*",
     "value": 180000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "DKI JAKARTA",
     "component": "transport_bandara",
     "grade": "*",
     "value": 250000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "JAWA TENGAH",
     "component": "transport_bandara",
     "grade": "*",
     "value": 105000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "DI YOGYAKARTA",
     "component": "transport_bandara",
     "grade": "*",
     "value": 258000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "JAWA TIMUR",
     "component": "transport_bandara",
     "grade": "*",
     "value": 225000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "BALI",
     "component": "transport_bandara",
     "grade": "*",
     "value": 219000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "NUSA TENGGARA BARAT",
     "component": "transport_bandara",
     "grade": "*",
     "value": 224000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "NUSA TENGGARA TIMUR",
     "component": "transport_bandara",
     "grade": "*",
     "value": 105000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "KALIMANTAN BARAT",
     "component": "transport_bandara",
     "grade": "*",
     "value": 165000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "KALIMANTAN TENGAH",
     "component": "transport_bandara",
     "grade": "*",
     "value": 130000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "KALIMANTAN SELATAN",
     "component": "transport_bandara",
     "grade": "*",
     "value": 174000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "KALIMANTAN TIMUR",
     "component": "transport_bandara",
     "grade": "*",
     "value": 300000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "KALIMANTAN UTARA",
     "component": "transport_bandara",
     "grade": "*",
     "value": 211000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "SULAWESI UTARA",
     "component": "transport_bandara",
     "grade": "*",
     "value": 134000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "GORONTALO",
     "component": "transport_bandara",
     "grade": "*",
     "value": 256000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "SULAWESI BARAT",
     "component": "transport_bandara",
     "grade": "*",
     "value": 283000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "SULAWESI SELATAN",
     "component": "transport_bandara",
     "grade": "*",
     "value": 181000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "SULAWESI TENGAH",
     "component": "transport_bandara",
     "grade": "*",
     "value": 149000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "SULAWESI TENGGARA",
     "component": "transport_bandara",
     "grade": "*",
     "value": 154000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "MALUKU",
     "component": "transport_bandara",
     "grade": "*",
     "value": 279000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "MALUKU UTARA",
     "component": "transport_bandara",
     "grade": "*",
     "value": 208000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "PAPUA",
     "component": "transport_bandara",
     "grade": "*",
     "value": 462000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   },
   {
     "province": "PAPUA BARAT",
     "component": "transport_bandara",
     "grade": "*",
     "value": 228000,
-    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85"
+    "source": "PMK 32/2025 Lampiran II angka 16, hlm. 85",
+    "sourceCitationId": "pmk-32-2025-page-85"
   }
 ] satisfies readonly SbmRow[];
 
