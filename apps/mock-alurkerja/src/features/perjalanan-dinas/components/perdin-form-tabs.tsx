@@ -7,14 +7,26 @@ import JadwalSection from "@/features/perjalanan-dinas/components/jadwal-section
 import JenisTujuanSection from "@/features/perjalanan-dinas/components/jenis-tujuan-section";
 import type { AjukanPerdinForm } from "@/features/perjalanan-dinas/hooks/use-ajukan-perdin-form";
 import { usePerdinErrors } from "@/features/perjalanan-dinas/hooks/use-perdin-errors";
-import { PERDIN_TABS, tabsWithErrors } from "@/features/perjalanan-dinas/lib/perdin-form";
+import {
+  PERDIN_TABS,
+  type PerdinTab,
+  tabsWithErrors,
+} from "@/features/perjalanan-dinas/lib/perdin-form";
 
 /** The form's four tabs; only the open tab's fields render, and a tab with an error shows a dot. */
-export default function PerdinFormTabs({ form }: { form: AjukanPerdinForm }) {
+export default function PerdinFormTabs({
+  form,
+  tab,
+  onTabChange,
+}: {
+  form: AjukanPerdinForm;
+  tab: PerdinTab;
+  onTabChange: (tab: PerdinTab) => void;
+}) {
   const invalidTabs = tabsWithErrors(usePerdinErrors(form));
 
   return (
-    <Tabs defaultValue={PERDIN_TABS[0].value} className="gap-3">
+    <Tabs value={tab} onValueChange={(next) => onTabChange(next as PerdinTab)} className="gap-3">
       <TabsList>
         {PERDIN_TABS.map((tab, index) => {
           const invalid = invalidTabs.includes(tab.value);

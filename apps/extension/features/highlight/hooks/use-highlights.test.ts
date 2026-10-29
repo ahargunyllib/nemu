@@ -1,6 +1,10 @@
 // @vitest-environment happy-dom
 import type { NemuAction } from "@nemu/contracts";
-import { momentThreeFollowUpResponse, momentTwoResponse } from "@nemu/contracts/fixtures";
+import {
+  momentOneFollowUpResponse,
+  momentThreeFollowUpResponse,
+  momentTwoResponse,
+} from "@nemu/contracts/fixtures";
 import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 
@@ -126,6 +130,28 @@ describe("useHighlights", () => {
       boardingPassInput.element.dispatchEvent(new Event("change", { bubbles: true }));
     });
     await waitFor(() => expect(result.current.highlight?.action).toEqual(kirim));
+  });
+
+  test("a Select step moves on once an option picked in its popup shows on the trigger", async () => {
+    const [jenis, kota] = momentOneFollowUpResponse.actions;
+    if (!jenis || !kota) throw new Error("expected the Momen 1 follow-up's first two actions");
+    const trigger = renderTarget(jenis.target);
+    trigger.element.setAttribute("aria-haspopup", "listbox");
+    trigger.element.textContent = "Pilih jenis perjalanan";
+    renderTarget(kota.target, "input");
+    const result = renderHighlights([jenis, kota]);
+    await waitFor(() => expect(result.current.highlight?.action).toEqual(jenis));
+
+    // Opening the popup only starts the step.
+    act(() => trigger.element.click());
+    expect(result.current.stepIndex).toBe(0);
+
+    // The option is picked in the popup, outside the trigger, and the trigger shows it.
+    act(() => {
+      trigger.element.textContent = "Dinas luar kota";
+    });
+    await waitFor(() => expect(result.current.highlight?.action).toEqual(kota));
+    expect(result.current.stepIndex).toBe(1);
   });
 
   test("pressing the only highlighted target ends the guide and removes its ring", async () => {

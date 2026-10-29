@@ -4,6 +4,8 @@ import test from "node:test";
 import {
   momentOneFollowUpRequest,
   momentOneFollowUpResponse,
+  momentOneJadwalRequest,
+  momentOneJadwalResponse,
   momentOneRequest,
   momentThreeFollowUpRequest,
   momentThreeRequest,
@@ -684,6 +686,38 @@ test("on the request form's first tab the guide points at the Jadwal tab for the
 
   assert.deepEqual(response.actions, momentOneFollowUpResponse.actions);
   assert.deepEqual(response.guide, momentOneFollowUpResponse.guide);
+});
+
+test("on the request form's Jadwal tab the guide goes on from the departure date", async () => {
+  const response = await runNemu(momentOneJadwalRequest, {
+    userProfile: DEMO_USER_PROFILE,
+    knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    sbmRows: DEMO_SBM_ROWS,
+    holidays: [],
+    requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+    currentDate: "2026-10-17",
+    jevDecider: async () => ({
+      intent: "start_travel_request",
+      intentConfidence: 0.99,
+      withinDomainProbability: 0.99,
+      injectionProbability: 0,
+      requiredTool: "process_status",
+      actionLevel: "arahkan",
+      actionConfidence: 0.99,
+      target: NEMU_IDS.perdinForm.tanggalBerangkat,
+      targetConfidence: 0.99,
+    }),
+    answerGenerator: async (input) => ({
+      status: "answer",
+      ringkas: "Tinggal jadwal perjalanan.",
+      detail: "Pilih tanggal berangkat, tanggal kembali, lalu moda.",
+      citationIds: [input.evidence[0]?.id ?? ""],
+      warnings: [],
+    }),
+  });
+
+  assert.deepEqual(response.actions, momentOneJadwalResponse.actions);
+  assert.deepEqual(response.guide, momentOneJadwalResponse.guide);
 });
 
 test("submit-like targets are always returned as confirmations", async () => {

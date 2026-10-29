@@ -14,6 +14,9 @@ import {
   k2SlaReturnResponse,
   k2TicketsRequest,
   k2TicketsResponse,
+  k1StartTravelRequest,
+  momentOneJadwalRequest,
+  momentOneJadwalResponse,
   momentOneRequest,
   momentOneResponse,
   momentOneFollowUpRequest,
@@ -33,6 +36,12 @@ describe("fixture responder", () => {
   test.each([
     ["Momen 1", momentOneRequest, momentOneResponse],
     ["Momen 1 follow-up", momentOneFollowUpRequest, momentOneFollowUpResponse],
+    ["Momen 1 on the Jadwal tab", momentOneJadwalRequest, momentOneJadwalResponse],
+    [
+      "K1-01 on the Jadwal tab",
+      { ...momentOneJadwalRequest, prompt: k1StartTravelRequest.prompt },
+      momentOneJadwalResponse,
+    ],
     ["Momen 2", momentTwoRequest, momentTwoResponse],
     ["Momen 3", momentThreeRequest, momentThreeResponse],
     ["Momen 3 follow-up", momentThreeFollowUpRequest, momentThreeFollowUpResponse],

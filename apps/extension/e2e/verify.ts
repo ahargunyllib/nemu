@@ -13,6 +13,7 @@
  * instead of the manifest, so under Playwright no overlay ever appears. Run
  * `pnpm --filter extension verify`; add `-- --headed` to watch.
  */
+import type { NemuAction } from "@nemu/contracts";
 import {
   k2ApprovalRequest,
   k2ApprovalResponse,
@@ -24,7 +25,9 @@ import {
   k2SlaResponse,
   k2TicketsRequest,
   k2TicketsResponse,
+  k1StartTravelRequest,
   momentOneFollowUpResponse,
+  momentOneJadwalResponse,
   momentOneRequest,
   momentOneResponse,
   momentThreeFollowUpResponse,
@@ -601,6 +604,73 @@ async function main() {
           }
           await closeAnswerCard(page);
         }
+      },
+    );
+
+    await check(
+      "K1-01 from Beranda opens the form and walks its six fields in order, moving on after each Select and date choice",
+      async () => {
+        await page.goto(DEMO_APP_URL);
+        await waitForBeranda(page);
+        await ask(context, page, k1StartTravelRequest.prompt);
+        await page.waitForURL(`${DEMO_APP_URL}/perdin/baru`);
+        const overlay = page.locator("nemu-overlay");
+        const cardFor = (ringkas: string) =>
+          overlay.locator('[data-slot="card"]').filter({ hasText: ringkas });
+        const ringStep = async (card: Locator, step: number, action?: NemuAction) => {
+          if (!action) throw new Error(`no action for step ${step}`);
+          await card.getByText(`Langkah ${step} dari 6`).waitFor();
+          await waitForScrollToSettle(page);
+          await eventually(async () => {
+            const target = page.locator(`[data-nemu-id="${action.target}"]`).first();
+            await assertOnlyRing(overlay, action.target, action.label, await boxOf(target));
+          });
+        };
+        const pick = async (nemuId: string, option: RegExp) => {
+          await page.locator(`[data-nemu-id="${nemuId}"]`).click();
+          await page.getByRole("option", { name: option }).click();
+        };
+        const pickDate = async (nemuId: string, day: RegExp) => {
+          await page.locator(`[data-nemu-id="${nemuId}"]`).click();
+          // The calendar opens on today's month; the trip is in November 2026.
+          for (let month = 0; month < 12; month++) {
+            if (await page.getByRole("button", { name: day }).count()) break;
+            await page.getByRole("button", { name: "Ke bulan berikutnya" }).click();
+          }
+          await page.getByRole("button", { name: day }).click();
+        };
+
+        // On the first tab: Jenis perjalanan, Kota tujuan, Surat tugas, then the Jadwal tab.
+        const firstTab = cardFor(momentOneFollowUpResponse.answer.ringkas);
+        const [jenis, kota, suratTugas, tabJadwal] = momentOneFollowUpResponse.actions;
+        await ringStep(firstTab, 1, jenis);
+        await pick("select-jenis-perjalanan", /^Dinas luar kota$/);
+        await ringStep(firstTab, 2, kota);
+        await page.locator('[data-nemu-id="select-kota-tujuan"]').fill("Makassar");
+        await page.keyboard.press("Tab");
+        await ringStep(firstTab, 3, suratTugas);
+        await pick("select-dasar-penugasan", /^ST-090\/2026/);
+        await ringStep(firstTab, 4, tabJadwal);
+        await page.locator('[data-nemu-id="tab-jadwal"]').click();
+
+        // Opening the Jadwal tab is a page change, so Nemu asks again and goes on from step 4.
+        await page.waitForURL(`${DEMO_APP_URL}/perdin/baru?tab=jadwal`);
+        const jadwal = cardFor(momentOneJadwalResponse.answer.ringkas);
+        const [berangkat, kembali, moda] = momentOneJadwalResponse.actions;
+        await ringStep(jadwal, 4, berangkat);
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "k1-01-jadwal.png") });
+        await pickDate("input-tanggal-berangkat", /\b3 November 2026$/);
+        await ringStep(jadwal, 5, kembali);
+        await pickDate("input-tanggal-kembali", /\b5 November 2026$/);
+        await ringStep(jadwal, 6, moda);
+        await pick("select-moda-transport", /^Pesawat/);
+
+        // After the last step nothing stays ringed.
+        await eventually(async () => {
+          const rings = await overlay.locator("[data-nemu-highlight]").count();
+          if (rings > 0) throw new Error(`${rings} rings left after the last step`);
+        });
+        await closeAnswerCard(page);
       },
     );
 

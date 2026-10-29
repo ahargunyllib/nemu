@@ -146,6 +146,86 @@ export const momentOneFollowUpResponse = {
   warnings: ["Kamu yang menekan Kirim setelah seluruh isian dan dokumen lengkap"],
 } satisfies NemuResponse;
 
+/** The form's Jadwal tab, where Momen 1 goes on after the first three steps. */
+export const momentOneJadwalRequest = {
+  session_id: "s-001",
+  user_id: "rina",
+  url: "https://app.demo/perdin/baru?tab=jadwal",
+  prompt: "Saya dapat tugas rapat ke Makassar 3 hari, mulai dari mana?",
+  elements: [
+    { nemu_id: "tab-jenis-tujuan", label: "1 Jenis & tujuan", role: "tab", visible: true },
+    { nemu_id: "tab-jadwal", label: "2 Jadwal", role: "tab", visible: true },
+    {
+      nemu_id: "input-tanggal-berangkat",
+      label: "Tanggal berangkat",
+      role: "button",
+      visible: true,
+    },
+    { nemu_id: "input-tanggal-kembali", label: "Tanggal kembali", role: "button", visible: true },
+    {
+      nemu_id: "select-moda-transport",
+      label: "Moda transportasi",
+      role: "combobox",
+      visible: true,
+    },
+  ],
+} satisfies NemuRequest;
+
+export const momentOneJadwalResponse = {
+  status: "answer",
+  answer: {
+    ringkas: "Tinggal jadwal perjalanan. Pilih tanggal berangkat, tanggal kembali, lalu moda.",
+    detail:
+      "Tanggal mengikuti surat tugas: berangkat 3 November 2026, kembali 5 November 2026. Moda transportasi ke Makassar adalah pesawat.",
+  },
+  citations: [
+    { doc_id: "sop-pd-01", judul: "SOP-PD-01 Perjalanan Dinas", pasal: "Butir 4.1, 4.2" },
+  ],
+  calc: [],
+  actions: [
+    {
+      type: "highlight",
+      target: "input-tanggal-berangkat",
+      level: "arahkan",
+      label: "Pilih 3 Nov 2026",
+    },
+    {
+      type: "highlight",
+      target: "input-tanggal-kembali",
+      level: "arahkan",
+      label: "Pilih 5 Nov 2026",
+    },
+    {
+      type: "highlight",
+      target: "select-moda-transport",
+      level: "arahkan",
+      label: "Pilih Pesawat",
+    },
+  ],
+  guide: {
+    id: "travel-request:create",
+    steps: [
+      { id: "travel-type", target: "select-jenis-perjalanan", label: "Pilih Dinas luar kota" },
+      { id: "destination-city", target: "select-kota-tujuan", label: "Isi Makassar" },
+      { id: "assignment-letter", target: "select-dasar-penugasan", label: "Pilih ST-090/2026" },
+      { id: "departure-date", target: "input-tanggal-berangkat", label: "Pilih 3 Nov 2026" },
+      { id: "return-date", target: "input-tanggal-kembali", label: "Pilih 5 Nov 2026" },
+      { id: "transport-mode", target: "select-moda-transport", label: "Pilih Pesawat" },
+    ],
+    current_step: 4,
+  },
+  warnings: ["Kamu yang menekan Kirim setelah seluruh isian dan dokumen lengkap"],
+} satisfies NemuResponse;
+
+/**
+ * QA's K1-01 question from Beranda (#127). In fixture mode it gets the Momen 1 answers, which name
+ * the same trip to Makassar.
+ */
+export const k1StartTravelRequest = {
+  ...momentOneRequest,
+  prompt: "Mau ajukan perjalanan dinas ke Makassar, mulai dari mana?",
+} satisfies NemuRequest;
+
 export const momentTwoRequest = {
   session_id: "s-001",
   user_id: "rina",

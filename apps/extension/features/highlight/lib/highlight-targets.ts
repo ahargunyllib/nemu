@@ -53,11 +53,16 @@ const FORM_FIELD = "input:not([type=hidden]):not([readonly]), textarea:not([read
 export function completesStep(event: Event, target: HTMLElement): boolean {
   if (event.type === "change") return true;
   if (event.type !== "click") return false;
-  return (
-    !target.matches(FORM_FIELD) &&
-    !target.querySelector(FORM_FIELD) &&
-    !target.closest("[aria-haspopup]")
-  );
+  return !target.matches(FORM_FIELD) && !target.querySelector(FORM_FIELD) && !opensPopup(target);
+}
+
+/**
+ * Whether the target is a control that opens a popup, such as a select or a date picker. The user
+ * picks its value in the popup, which fires no change on the target; the target's text switches
+ * to the picked value instead.
+ */
+export function opensPopup(target: HTMLElement): boolean {
+  return target.closest("[aria-haspopup]") !== null;
 }
 
 /** Names the target by its label only: Rina never sees a nemu_id. */
