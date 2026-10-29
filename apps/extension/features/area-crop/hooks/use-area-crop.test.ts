@@ -2,6 +2,7 @@
 import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 
+import { NoTabAccessError } from "../api/capture-viewport";
 import { useAreaCrop } from "./use-area-crop";
 
 afterEach(cleanup);
@@ -34,8 +35,25 @@ describe("useAreaCrop", () => {
 
     act(() => result.current.select(lodgingField));
 
-    await waitFor(() => expect(result.current.state.kind).toBe("failed"));
+    await waitFor(() =>
+      expect(result.current.state).toEqual({ kind: "failed", reason: "unknown" }),
+    );
     expect(result.current.crop).toBeUndefined();
+  });
+
+  test("says when the tab has no activeTab grant, so the chip can say how to get one", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const { result } = renderHook(() =>
+      useAreaCrop(async () => {
+        throw new NoTabAccessError();
+      }),
+    );
+
+    act(() => result.current.select(lodgingField));
+
+    await waitFor(() =>
+      expect(result.current.state).toEqual({ kind: "failed", reason: "no-tab-access" }),
+    );
   });
 
   test("removing the chip detaches the crop", async () => {

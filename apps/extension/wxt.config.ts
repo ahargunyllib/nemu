@@ -1,7 +1,7 @@
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "wxt";
 
-import { DEFAULT_SERVER_URL } from "./shared/lib/config";
+import { ALLOWED_MATCHES, DEFAULT_SERVER_URL } from "./shared/lib/config";
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -29,12 +29,16 @@ export default defineConfig({
     // have in chrome://extensions. Local builds keep package.json's 0.0.0.
     version: process.env.WXT_EXTENSION_VERSION,
     description: "Pemandu Perjalanan Dinas di Demo App.",
-    // `captureVisibleTab` for the Area Crop needs `<all_urls>` (a Demo App host permission isn't
-    // enough). `activeTab` would only cover a tab whose action was just pressed, and Arc fires the
-    // action without a tab. The background still captures allowlisted tabs only.
+    // Only the Nemu Service and the Demo App, so Chrome doesn't warn "read and change all your data
+    // on all websites" at install (ADR-0004). The trade-off: `captureVisibleTab` for the Area Crop
+    // needs `<all_urls>` or an `activeTab` grant, and a Demo App host permission isn't enough.
+    // `activeTab` is granted only when the toolbar icon or the shortcut fires the action on that
+    // tab, until it navigates away. Opening the Composer from the mascot grants nothing, and Arc
+    // fires the action without a tab, so there the Area Crop fails with a hint to use the icon.
+    permissions: ["activeTab"],
     host_permissions: [
       `${new URL(process.env.WXT_SERVER_URL || DEFAULT_SERVER_URL).origin}/*`,
-      "<all_urls>",
+      ...ALLOWED_MATCHES,
     ],
     // The shortcut and the toolbar icon both trigger the action, which opens the Composer.
     // It's bound to the built-in `_execute_action` command because Arc never fires custom

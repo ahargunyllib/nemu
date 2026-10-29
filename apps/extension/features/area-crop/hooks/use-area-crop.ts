@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import type { Box } from "../../../shared/types/box";
-import { captureAreaCrop } from "../api/capture-viewport";
+import { captureAreaCrop, NoTabAccessError } from "../api/capture-viewport";
 
 export type AreaCropState =
   | { kind: "none" }
@@ -9,7 +9,8 @@ export type AreaCropState =
   /** Nemu hides its own overlay while the viewport is captured, so the crop shows only the page. */
   | { kind: "capturing"; selection: Box }
   | { kind: "attached"; crop: string }
-  | { kind: "failed" };
+  /** `no-tab-access`: opened without the toolbar icon or shortcut, so the tab can't be captured. */
+  | { kind: "failed"; reason: "no-tab-access" | "unknown" };
 
 /** Waits until the browser has painted the frame with the overlay hidden. */
 function nextPaint(): Promise<void> {
@@ -38,7 +39,9 @@ export function useAreaCrop(capture: (selection: Box) => Promise<string> = captu
         },
         (error: unknown) => {
           console.warn("[nemu] Area Crop failed", error);
-          if (current) setState({ kind: "failed" });
+          if (!current) return;
+          const reason = error instanceof NoTabAccessError ? "no-tab-access" : "unknown";
+          setState({ kind: "failed", reason });
         },
       );
     return () => {

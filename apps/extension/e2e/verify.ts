@@ -3,9 +3,9 @@
  * what the unit tests can't: the allowlist, the shadow-root overlay, background ↔ content
  * messaging, and the Demo App session cookie reaching the Nemu Service.
  *
- * It opens the Composer by sending the background's open message from the service worker,
- * because automation can't press the toolbar icon or the browser-level shortcut. Check the
- * shortcut itself by hand.
+ * It opens the Composer by pressing the toolbar icon through CDP (`Extensions.triggerAction`),
+ * which also grants `activeTab` for the Area Crop the way a real click does (ADR-0004).
+ * Automation can't press the browser-level shortcut, so check that by hand.
  *
  * Needs the dev stack in fixture mode (`NEMU_RESPONDER=fixture pnpm dev`). It first runs a
  * production `wxt build` into .output/chrome-mv3 pointed at the local Nemu Service and loads that:
@@ -33,12 +33,10 @@ import { execFileSync } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { type BrowserContext, chromium, type Locator, type Page, request } from "playwright-core";
-import type { browser } from "wxt/browser";
 
 import { DEMO_ACCOUNTS } from "../../mock-alurkerja/src/features/auth/lib/demo-accounts.ts";
 import { cropRegion } from "../features/area-crop/lib/area-crop.ts";
 import { describeCitation } from "../features/answer-card/lib/citation.ts";
-import { OPEN_COMPOSER_MESSAGE } from "../features/composer/lib/open-composer-message.ts";
 import { RING_PADDING } from "../features/highlight/lib/highlight-targets.ts";
 import { CURSOR_OFFSET, MASCOT_SIZE } from "../features/mascot/lib/mascot-position.ts";
 import { ALLOWED_ORIGINS, DEFAULT_SERVER_URL } from "../shared/lib/config.ts";
@@ -62,9 +60,6 @@ const MISSING_UPLOADS = {
   "upload-boarding-pass-pulang": "boarding-pass-pulang-upg-yia.pdf",
 } as const;
 
-// The service worker's own extension API, which `worker.evaluate` callbacks run against.
-declare const chrome: typeof browser;
-
 async function assertReachable(url: string) {
   const response = await fetch(url).catch(() => null);
   if (!response) {
@@ -74,19 +69,40 @@ async function assertReachable(url: string) {
   }
 }
 
-/** Does what the background does when the toolbar icon or Ctrl+Shift+Space fires the action. */
+/** Presses the toolbar icon on `page`'s tab, which opens the Composer and grants `activeTab`. */
 async function openComposer(context: BrowserContext, page: Page) {
   const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
   await page.locator("nemu-overlay").waitFor({ state: "attached" });
-  await worker.evaluate(
-    async ({ url, message }) => {
-      const tabs = await chrome.tabs.query({});
-      const tab = tabs.find((candidate) => candidate.url === url);
-      if (tab?.id === undefined) throw new Error(`no tab at ${url}`);
-      await chrome.tabs.sendMessage(tab.id, message);
-    },
-    { url: page.url(), message: OPEN_COMPOSER_MESSAGE },
-  );
+  const browser = context.browser();
+  if (!browser) throw new Error("no browser to press the toolbar icon in");
+  const session = await browser.newBrowserCDPSession();
+  try {
+    const { targetInfos } = await session.send("Target.getTargets", {
+      filter: [{ type: "tab" }],
+    });
+    const tab = targetInfos.find((target) => target.url === page.url());
+    if (!tab) throw new Error(`no tab at ${page.url()}`);
+    // Only on a tab target; the page target inside it is refused.
+    await session.send("Extensions.triggerAction", {
+      id: new URL(worker.url()).host,
+      targetId: tab.targetId,
+    });
+  } finally {
+    await session.detach();
+  }
+}
+
+/** Moves the cursor until the mascot shows up beside it at (600, 400). */
+async function summonMascot(page: Page): Promise<Locator> {
+  const mascot = page.getByRole("button", { name: "Tanya Nemu" });
+  // The overlay starts listening for the cursor a moment after the page renders, and the mascot
+  // has no place until it sees the cursor move, so keep moving until it shows up.
+  await eventually(async () => {
+    await page.mouse.move(0, 0);
+    await page.mouse.move(600, 400);
+    await mascot.waitFor({ timeout: 200 });
+  });
+  return mascot;
 }
 
 async function ask(context: BrowserContext, page: Page, prompt: string) {
@@ -429,7 +445,12 @@ async function main() {
     channel: "chromium",
     headless: !process.argv.includes("--headed"),
     viewport: { width: 1280, height: 800 },
-    args: [`--disable-extensions-except=${EXTENSION_DIR}`, `--load-extension=${EXTENSION_DIR}`],
+    args: [
+      `--disable-extensions-except=${EXTENSION_DIR}`,
+      `--load-extension=${EXTENSION_DIR}`,
+      // Lets `openComposer` press the toolbar icon through CDP.
+      "--enable-unsafe-extension-debugging",
+    ],
   });
   context.setDefaultTimeout(TIMEOUT_MS);
   const page = await context.newPage();
@@ -721,14 +742,7 @@ async function main() {
     await check("the mascot follows the cursor and opens the Composer when clicked", async () => {
       await page.goto(DEMO_APP_URL);
       await waitForBeranda(page);
-      const mascot = page.getByRole("button", { name: "Tanya Nemu" });
-      // The overlay starts listening for the cursor a moment after the page renders, and the mascot
-      // has no place until it sees the cursor move, so keep moving until it shows up.
-      await eventually(async () => {
-        await page.mouse.move(0, 0);
-        await page.mouse.move(600, 400);
-        await mascot.waitFor({ timeout: 200 });
-      });
+      const mascot = await summonMascot(page);
       await eventually(async () => {
         const box = await boxOf(mascot);
         if (
@@ -750,6 +764,30 @@ async function main() {
       await page.screenshot({ path: path.join(SCREENSHOT_DIR, "mascot-listening.png") });
       await page.keyboard.press("Escape");
     });
+
+    // ADR-0004: without `<all_urls>`, only the toolbar icon or the shortcut grants the capture.
+    await check(
+      "an Area Crop from a Composer the mascot opened on a fresh tab says to use the toolbar icon",
+      async () => {
+        const fresh = await context.newPage();
+        try {
+          await fresh.goto(DEMO_APP_URL);
+          await waitForBeranda(fresh);
+          await (await summonMascot(fresh)).click();
+          await dragArea(
+            fresh,
+            { x: 40, y: 120, width: 480, height: 240 },
+            "area-crop-mascot-select.png",
+          );
+          await fresh.getByRole("alert").getByText("Area belum bisa diambil di tab ini.").waitFor();
+          await fresh.screenshot({
+            path: path.join(SCREENSHOT_DIR, "area-crop-no-tab-access.png"),
+          });
+        } finally {
+          await fresh.close();
+        }
+      },
+    );
 
     await check(
       `Momen 3 opens the task, rings the uploads then Kirim, then shows Verifikasi, ${MOMEN_3_RUNS} out of ${MOMEN_3_RUNS}`,

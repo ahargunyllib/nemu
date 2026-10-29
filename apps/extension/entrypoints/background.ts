@@ -3,6 +3,7 @@ import type { Browser } from "wxt/browser";
 import {
   type CaptureViewportResult,
   isCaptureViewportMessage,
+  toCaptureViewportFailure,
 } from "../features/area-crop/lib/capture-message";
 import { createNemuClient } from "../features/chat/api/nemu-client";
 import { isChatCancelMessage, isChatRequestMessage } from "../features/chat/lib/chat-message";
@@ -40,7 +41,7 @@ async function captureViewportOf(
     };
   } catch (error) {
     console.warn("[nemu] capture-viewport failed", error);
-    return { ok: false };
+    return toCaptureViewportFailure(error);
   }
 }
 

@@ -3,7 +3,13 @@ export type CaptureViewportMessage = { type: "nemu:capture-viewport" };
 
 export const CAPTURE_VIEWPORT_MESSAGE: CaptureViewportMessage = { type: "nemu:capture-viewport" };
 
-export type CaptureViewportResult = { ok: true; dataUrl: string } | { ok: false };
+/**
+ * `no-tab-access`: the tab has no `activeTab` grant, because the toolbar icon or the shortcut
+ * hasn't fired the action on it (ADR-0004).
+ */
+export type CaptureViewportResult =
+  | { ok: true; dataUrl: string }
+  | { ok: false; reason?: "no-tab-access" };
 
 export function isCaptureViewportMessage(message: unknown): message is CaptureViewportMessage {
   return (
@@ -12,6 +18,16 @@ export function isCaptureViewportMessage(message: unknown): message is CaptureVi
     "type" in message &&
     message.type === "nemu:capture-viewport"
   );
+}
+
+/** Chrome's `captureVisibleTab` error when the tab has neither `<all_urls>` nor an `activeTab` grant. */
+const NO_TAB_ACCESS = /activeTab|<all_urls>/;
+
+/** What the background answers when `captureVisibleTab` throws `error`. */
+export function toCaptureViewportFailure(error: unknown): CaptureViewportResult {
+  return error instanceof Error && NO_TAB_ACCESS.test(error.message)
+    ? { ok: false, reason: "no-tab-access" }
+    : { ok: false };
 }
 
 function isCaptureViewportResult(value: unknown): value is CaptureViewportResult {
