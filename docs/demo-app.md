@@ -138,9 +138,9 @@ carries its `upload-*` id. After Selesaikan Tugas the rows stay, read-only.
 
 ### Klaim SLA
 
-Dimas's workspace (`W-TELKO`) lists his claim Tasks the way Tugas Saya
-lists Rina's: Klaim SLA (`/sla-claims`) is the "Tugas Saya" column with **Cari
-tugas…** and a "Tenggat" label, one compact row per Task ("Registrasi Klaim ·
+Dimas's Knowledge Workspace (`W-TELKO`) lists his claim Tasks the way Tugas
+Saya lists Rina's: Klaim SLA (`/sla-claims`) is the "Tugas Saya" column with
+**Cari tugas…** and a "Tenggat" label, one compact row per Task ("Registrasi Klaim ·
 KLM-2610-0007" over "PT Arunika Retail · TN-ENT-002 · Sep 2026"), each with
 its `task-klaim-*` id. A Task opens at `/sla-claims/$claimId` as the same stock,
 non-modal Sheet beside that column. Its × or Esc closes it and goes back to Klaim
@@ -214,10 +214,10 @@ ST-090/2026) and attaches a stand-in `undangan-rapat-koordinasi.pdf`. It leaves
 Penginapan and Nominal penginapan empty, because in Momen 2 Rina asks Nemu how
 to fill them in.
 
-"Today" comes from the signed-in user's workspace and is the same date the AI
+"Today" comes from the signed-in user's Knowledge Workspace and is the same date the AI
 uses. `W-TRAVEL` uses 2026-11-06 and `W-TELKO` uses 2026-10-14; Beranda and the
 task sheet read it through `getDemoClock`. `NEMU_DEMO_DATE` remains the fallback
-when a workspace has no stored configuration.
+when a Knowledge Workspace has no stored configuration.
 
 ## 3-Momen fixtures
 

@@ -1,6 +1,6 @@
 # Nemu
 
-Nemu is an AI guide in the browser that walks an employee through a work process inside their organisation's web app, answering only from knowledge the admin manages. The MVP guides one Perjalanan Dinas on a fake AlurKerja app.
+Nemu is an AI guide in the browser that walks an employee through a work process inside their organisation's web app, answering only from knowledge the admin manages. The MVP guides two cases on a fake AlurKerja app: a Perjalanan Dinas and a Klaim SLA.
 
 ## Products
 
@@ -19,6 +19,10 @@ _Avoid_: workspace (alone), dashboard
 **Demo App**:
 Our fake AlurKerja App, the only place Nemu runs in the MVP. It is not the real AlurKerja. Its UI is in Indonesian, so Nemu can quote its labels.
 _Avoid_: Tiruan App, AlurKerja App, web app
+
+**Knowledge Workspace**:
+The set of knowledge, Reference Tables, process data and users Nemu answers from for one case: `W-TRAVEL` (Perjalanan Dinas) or `W-TELKO` (Klaim SLA). A signed-in user belongs to one, and the Nemu Service reads only that one's data.
+_Avoid_: workspace (alone), tenant
 
 **AlurKerja tenant**:
 An organisation's own instance of the real AlurKerja SaaS. Out of scope for the MVP.
@@ -40,6 +44,10 @@ _Avoid_: selector, element id
 
 **Element List**:
 The visible interactive elements the Nemu Extension sends with each prompt; Nemu may only act on elements in it.
+
+**Guide**:
+An ordered list of steps (target and label) for one process, returned with an answer, with a one-based `current_step`. It is not executable: only the steps on the current page become actions. The Nemu Service derives it afresh from each request; the Nemu Extension keeps its progress across pages.
+_Avoid_: tour, wizard, flow
 
 **Area Crop**:
 An image of a viewport region the user drags a box around, sent with the prompt.
@@ -85,3 +93,21 @@ One employee's Perjalanan Dinas running in the Demo App, with a single current *
 
 **Task**:
 The work item a Process Instance currently asks of the employee (e.g. fill the plan, submit Pertanggungjawaban); derived from its State.
+
+## Klaim SLA domain
+
+**Klaim SLA**:
+A corporate customer's claim for compensation after an internet outage beyond its contracted SLA, reviewed under SOP-KLAIM-SLA-01 and settled as a credit note on the next invoice, never as cash. The second case of the MVP, in the `W-TELKO` Knowledge Workspace.
+_Avoid_: refund, complaint
+
+**Billing Liaison**:
+The employee (Dimas) who registers a Klaim SLA, matches its data, reviews its tickets and drafts the Berita Acara. Supervisor Billing and Manajer Billing Operations approve by amount.
+_Avoid_: admin, agent
+
+**RCA**:
+The root-cause report the NOC completes for an incident ticket. Only an approved RCA can exclude an interval (customer-power or customer-device cause) from the downtime counted for compensation.
+_Avoid_: root cause, cause report
+
+**PERLU_BUKTI**:
+The result of a Klaim SLA calculation while an RCA is not yet approved: Nemu shows no final amount and asks for the RCA instead.
+_Avoid_: pending, unknown

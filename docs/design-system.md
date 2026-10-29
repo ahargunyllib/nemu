@@ -51,7 +51,9 @@ because Chromium ignores `@font-face` inside a shadow root.
 | ---------------------------------------------- | ----------------------------------------- |
 | Nemu/Card title                                | SemiBold 14.5/19                          |
 | Nemu/Card body                                 | Regular 12.5/17                           |
+| Heading/H3 (toolbar popup title)               | SemiBold 15/20                            |
 | Body/Small                                     | Regular 13/18                             |
+| Body/Small Strong                              | Medium 13/18                              |
 | Nemu/Calc                                      | Medium 11.5/16                            |
 | Nemu/Calc result                               | Bold 14/18                                |
 | Label/Caps (card kicker, "RINCIAN HITUNG")     | SemiBold 10.5/14, +8% tracking, uppercase |
@@ -98,6 +100,12 @@ thumbnail (about 48 × 28, rounded and bordered) sits top-left and a close × to
 pill fills the card's inner width below them ("Tanya tentang bagian ini…"). The design also puts a
 title (the detected section) and a subtitle (page and step) beside the thumbnail; Nemu has no data
 for them yet, so they are left out.
+
+When the tab can't be captured because Nemu wasn't opened from the toolbar icon or the shortcut
+(ADR-0004), the thumbnail's place shows a `destructive` crop icon on `destructive/10`, then
+"Area belum bisa diambil di tab ini." in `destructive` and, in `muted-foreground`, "Buka Nemu dari
+ikon Nemu di toolbar atau Ctrl+Shift+Space, lalu pilih area lagi.", the keys as a subtle
+`NemuBadge`.
 
 ## Answers: three levels (Tingkat)
 
@@ -153,6 +161,19 @@ way forward.
   warning sentence in the answer.
 - **Berhasil**: once the user presses Selesaikan Tugas, the answer says "Terkirim, pindah ke Verifikasi.
   ID tugas PJ-PD-2026-0042."
+
+## Toolbar popup (Akses · situs lain)
+
+On a page outside the allowlist the toolbar icon opens a popup instead of the Composer
+(ADR-0004). It is 320 px wide, white, padding 16 px, 10 px between rows; the browser draws the
+popup's frame and shadow. Rows:
+
+1. The idle mascot at 28 px, 8 px gap, "Nemu" in Body/Small Strong.
+2. "Nemu aktif di AlurKerja" in Heading/H3.
+3. "Di situs ini Nemu tidak membaca apa pun. Buka AlurKerja untuk bertanya soal proses kerja." in
+   Body/Small, `muted-foreground` (the design's text/secondary `#52525B` has no token yet).
+4. "Buka AlurKerja": a full-width `NemuButton` with `tone="solid"`, opening the Demo App in a new
+   tab.
 
 ## Motion (Motion Kursor)
 

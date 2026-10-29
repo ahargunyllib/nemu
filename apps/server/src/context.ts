@@ -1,4 +1,5 @@
 import type { Context as ApiContext } from "@nemu/api/context";
+import { WORKSPACES } from "@nemu/api/workspace-ids";
 import type { Context as HonoContext } from "hono";
 
 import {
@@ -20,7 +21,7 @@ export async function createContext({ context }: CreateContextOptions): Promise<
   ).api.getSession({
     headers: context.req.raw.headers,
   });
-  const workspaceId = session?.user.workspaceId ?? "W-TRAVEL";
+  const workspaceId = session?.user.workspaceId ?? WORKSPACES.travel;
   return {
     db,
     session,

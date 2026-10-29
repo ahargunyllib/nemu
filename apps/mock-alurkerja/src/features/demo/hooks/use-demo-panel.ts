@@ -8,11 +8,16 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : "Gagal mengubah data demo";
 }
 
-/** The demo panel: pick one of the user's Process Instances and move its State, or reset the demo. */
-export function useDemoPanel() {
+/**
+ * The demo panel: pick one of the user's Process Instances and move its State, or reset the demo.
+ * The W-TELKO workspace has no Perjalanan Dinas, so it lists none.
+ */
+export function useDemoPanel(workspaceId?: string | null) {
   const queryClient = useQueryClient();
   const refresh = () => queryClient.invalidateQueries();
-  const { data: instances } = useQuery(orpc.listMyProcessInstances.queryOptions());
+  const isTelco = workspaceId === "W-TELKO";
+  const { data } = useQuery(orpc.listMyProcessInstances.queryOptions({ enabled: !isTelco }));
+  const instances = isTelco ? [] : data;
   const [pickedId, setPickedId] = useState<string | null>(null);
   const selected = instances?.find((instance) => instance.id === pickedId) ?? instances?.[0];
 

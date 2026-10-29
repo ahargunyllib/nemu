@@ -10,7 +10,6 @@ import {
   type UploadDocumentInput,
   deleteDocument,
   listDocuments,
-  listActiveKnowledgeChunks,
   readDocumentFile,
   setDocumentActive,
   uploadDocument,
@@ -78,11 +77,14 @@ function createFakes() {
       row.isActive = isActive;
       return row;
     },
-    async listActiveReadyChunks() {
+    async listActiveReadyChunks(workspaceId) {
       return chunks.flatMap((chunk) => {
         const document = rows.find(
           (candidate) =>
-            candidate.id === chunk.documentId && candidate.isActive && candidate.status === "ready",
+            candidate.id === chunk.documentId &&
+            candidate.workspaceId === workspaceId &&
+            candidate.isActive &&
+            candidate.status === "ready",
         );
         return document
           ? [
@@ -115,7 +117,14 @@ function createFakes() {
 }
 
 function upload(file: File, overrides: Partial<UploadDocumentInput> = {}): UploadDocumentInput {
-  return { title: "SOP Perjalanan Dinas", version: "1.0", isActive: true, file, ...overrides };
+  return {
+    workspaceId: "W-TRAVEL",
+    title: "SOP Perjalanan Dinas",
+    version: "1.0",
+    isActive: true,
+    file,
+    ...overrides,
+  };
 }
 
 describe("uploadDocument", () => {
@@ -140,10 +149,10 @@ describe("uploadDocument", () => {
     expect(chunks).toEqual([
       expect.objectContaining({ documentId: document.id, text: "# SOP\n\nIsi dokumen." }),
     ]);
-    expect(await listActiveKnowledgeChunks(deps)).toHaveLength(0);
+    expect(await deps.documents.listActiveReadyChunks("W-TRAVEL")).toHaveLength(0);
 
     await setDocumentActive(deps, "W-TRAVEL", document.id, true);
-    expect(await listActiveKnowledgeChunks(deps)).toEqual([
+    expect(await deps.documents.listActiveReadyChunks("W-TRAVEL")).toEqual([
       expect.objectContaining({
         documentId: document.id,
         documentTitle: "SOP Perjalanan Dinas",
@@ -152,7 +161,7 @@ describe("uploadDocument", () => {
     ]);
 
     await setDocumentActive(deps, "W-TRAVEL", document.id, false);
-    expect(await listActiveKnowledgeChunks(deps)).toHaveLength(0);
+    expect(await deps.documents.listActiveReadyChunks("W-TRAVEL")).toHaveLength(0);
   });
 
   it("stores a valid PDF attachment while marking retrieval indexing unsupported", async () => {
@@ -248,7 +257,7 @@ describe("uploadDocument", () => {
       failureReason: "The document index could not be stored.",
     });
     expect(objects.size).toBe(0);
-    expect(await listActiveKnowledgeChunks({ ...deps, documents: failingDocuments })).toEqual([]);
+    expect(await failingDocuments.listActiveReadyChunks("W-TRAVEL")).toEqual([]);
   });
 
   it("uploads and lists every knowledge document in data/01_knowledge_rag", async () => {

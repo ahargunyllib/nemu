@@ -2,6 +2,7 @@ import type { KnowledgeChunk, NemuUserProfile, SbmRow, SlaClaimContext } from "@
 import type { NemuRequest, NemuResponse, ProcessContext } from "@nemu/contracts";
 
 import type { NemuService } from "../../context";
+import { WORKSPACES } from "../../workspace-ids";
 
 import type { ActiveKnowledgeChunkRecord, DocumentRepository } from "../documents/repository";
 import type {
@@ -213,9 +214,9 @@ export function createNemuRuntimeDataSource(deps: NemuRuntimeDataDeps): NemuRunt
   return {
     async load(userId, request) {
       const workspace = request.process_context?.workspace;
-      const workspaceId = workspace?.id ?? "W-TRAVEL";
+      const workspaceId = workspace?.id ?? WORKSPACES.travel;
       if (workspace?.domain === "telco_sla") {
-        if (workspaceId !== "W-TELKO") {
+        if (workspaceId !== WORKSPACES.telco) {
           throw new Error(`Unsupported telco workspace: ${workspaceId}`);
         }
         if (!deps.slaClaims) {

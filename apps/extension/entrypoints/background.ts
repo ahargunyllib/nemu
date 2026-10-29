@@ -3,6 +3,7 @@ import type { Browser } from "wxt/browser";
 import {
   type CaptureViewportResult,
   isCaptureViewportMessage,
+  toCaptureViewportFailure,
 } from "../features/area-crop/lib/capture-message";
 import { createNemuClient } from "../features/chat/api/nemu-client";
 import { isChatCancelMessage, isChatRequestMessage } from "../features/chat/lib/chat-message";
@@ -11,6 +12,8 @@ import { OPEN_COMPOSER_MESSAGE } from "../features/composer/lib/open-composer-me
 import { requestProcessInstance } from "../features/process-status/api/request-process-instance";
 import { isProcessInstanceRequestMessage } from "../features/process-status/lib/process-instance-message";
 import { isAllowedPage } from "../shared/lib/config";
+
+const POPUP = "popup.html";
 
 /**
  * Asks the tab's content script to open the Composer; tabs outside the allowlist have none.
@@ -28,6 +31,22 @@ async function openComposerIn(tab: Browser.tabs.Tab | undefined) {
   });
 }
 
+/**
+ * The manifest's default popup is the one for other sites. Demo App tabs clear it, so the toolbar
+ * icon there fires the action (opening the Composer and granting `activeTab`) instead. A tab's URL
+ * is readable only on hosts the manifest lists, so every other page keeps the popup.
+ */
+function syncPopup(tab: Browser.tabs.Tab) {
+  if (tab.id === undefined) return;
+  const allowed = isAllowedPage(tab.url);
+  void browser.action.setPopup({ tabId: tab.id, popup: allowed ? "" : POPUP });
+  void browser.action.setTitle({ tabId: tab.id, title: allowed ? "Buka Composer Nemu" : "Nemu" });
+}
+
+async function syncAllPopups() {
+  for (const tab of await browser.tabs.query({})) syncPopup(tab);
+}
+
 /** Screenshots the viewport of an allowlisted tab; the content script cuts the Area Crop from it. */
 async function captureViewportOf(
   tab: Browser.tabs.Tab | undefined,
@@ -40,7 +59,7 @@ async function captureViewportOf(
     };
   } catch (error) {
     console.warn("[nemu] capture-viewport failed", error);
-    return { ok: false };
+    return toCaptureViewportFailure(error);
   }
 }
 
@@ -72,6 +91,11 @@ export default defineBackground(() => {
     }
   });
 
-  // Fired by the toolbar icon and by the `_execute_action` shortcut (Ctrl+Shift+Space).
+  // Fired by the toolbar icon and by the `_execute_action` shortcut (Ctrl+Shift+Space), on Demo App
+  // tabs only: everywhere else they open the popup.
   browser.action.onClicked.addListener((tab) => void openComposerIn(tab));
+  browser.tabs.onUpdated.addListener((_tabId, _change, tab) => syncPopup(tab));
+  // Tabs opened before the extension was installed or the browser started have no update yet.
+  browser.runtime.onInstalled.addListener(() => void syncAllPopups());
+  browser.runtime.onStartup.addListener(() => void syncAllPopups());
 });

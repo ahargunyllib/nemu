@@ -15,11 +15,21 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   with `visible: false` so Nemu can still point at them.
 - **Area Crop.** The crop button in the Composer starts area select mode: Rina drags a box over
   the page, Nemu hides its own overlay, and the background screenshots the viewport
-  (`captureVisibleTab`, which is why the manifest asks for `<all_urls>`; the background still
-  captures allowlisted tabs only). The content script cuts out just the box (longest side at most
-  1280 px) and shows it as a removable chip in the Composer. It goes with the next prompt as
-  `screenshot_crop`, and the full screenshot never leaves the tab. The Nemu Service never stores
-  the image: the Chat Log only notes that one was attached.
+  (`captureVisibleTab`, allowlisted tabs only). The content script cuts out just the box (longest
+  side at most 1280 px) and shows it as a removable chip in the Composer. It goes with the next
+  prompt as `screenshot_crop`, and the full screenshot never leaves the tab. The Nemu Service never
+  stores the image: the Chat Log only notes that one was attached.
+- **Permissions.** The manifest asks for `activeTab` and host permissions on the Nemu Service and
+  the Demo App origins only, never `<all_urls>`, so Chrome doesn't warn about "all websites" at
+  install (ADR-0004). The catch: `captureVisibleTab` works only once the toolbar icon or
+  Ctrl+Shift+Space has fired the action on that tab (until it navigates away). Opened only from
+  the mascot, or in Arc, the Area Crop fails and the chip tells Rina to open Nemu from the toolbar
+  icon or the shortcut.
+- **Toolbar popup.** On a page outside the allowlist the toolbar icon (and the shortcut) opens a
+  popup instead: "Nemu aktif di AlurKerja", with **Buka AlurKerja** opening the Demo App that
+  goes with `WXT_SERVER_URL` (the local one for a local service). It's the manifest's default
+  popup; the background clears it on Demo App tabs, so the action fires there and opens the
+  Composer.
 - **Highlight (Arahkan).** A `highlight` action scrolls to its target and draws a pulsing amber
   outline with the action label on a click-through page layer. The Answer Card hangs right next to
   the target with the mascot on its top-left corner: just above it, right-aligned with it, else
@@ -118,7 +128,8 @@ script from the WXT dev server instead of the manifest, so under Playwright no o
 It stops early if the Nemu Service answers with the AI Responder instead of the fixtures. The
 checks:
 
-- a page outside the allowlist gets no overlay;
+- a page outside the allowlist gets no overlay, its toolbar icon shows the popup (saved as
+  `toolbar-popup.png`) whose Buka AlurKerja opens the Demo App, and a Demo App tab has no popup;
 - signed out, the card asks Rina to log in;
 - signed in as Rina, the Momen 1 prompt comes back as an Answer Card;
 - Momen 1, five times in a row from Beranda: Nemu clicks Ajukan Perjalanan Dinas, the form opens,
@@ -136,16 +147,19 @@ checks:
   the follow-up rings both missing uploads and Selesaikan Tugas and names the 12 November 2026 deadline,
   and after the script uploads the sample PDFs and presses Selesaikan Tugas, the card shows
   PJ-PD-2026-0042 and Verifikasi;
-- the mascot sits 12 px below and to the right of the cursor, and clicking it opens the Composer.
+- the mascot sits 12 px below and to the right of the cursor, and clicking it opens the Composer;
+- on a fresh tab where only the mascot opened the Composer, an Area Crop fails with the hint to
+  open Nemu from the toolbar icon or Ctrl+Shift+Space (saved as `area-crop-no-tab-access.png`);
 - after switching to Dimas, the header shows the persisted 14 October 2026 Telco clock and the
   script exercises the happy-path calculation, missing-RCA `PERLU_BUKTI` branch, late rejection,
   CRM handoff, exact placeholder IDs, Rp579.167 value, and disabled self-approval control.
 
 It prints one line per check, exits non-zero on a failure, and saves screenshots to
-`.output/verify/`. Add `-- --headed` to watch it. Automation can't press the toolbar icon or the
-browser-level shortcut, so the script opens the Composer by sending the background's open message
-from the service worker. Check Ctrl+Shift+Space by hand when you change the shortcut or the
-manifest. If Playwright's Chromium isn't installed yet, run
+`.output/verify/`. Add `-- --headed` to watch it. The script opens the Composer by pressing the
+toolbar icon through CDP (`Extensions.triggerAction`, enabled by
+`--enable-unsafe-extension-debugging`), so the tab gets the same `activeTab` grant a real click
+gives. Automation can't press the browser-level shortcut: check Ctrl+Shift+Space by hand when you
+change the shortcut or the manifest. If Playwright's Chromium isn't installed yet, run
 `pnpm --filter extension exec playwright-core install chromium` once.
 
 In dev, the extension calls `http://localhost:3000` by default. Set `WXT_SERVER_URL` (in
