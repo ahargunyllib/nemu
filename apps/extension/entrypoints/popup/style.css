@@ -1,0 +1,9 @@
+@import "@fontsource-variable/plus-jakarta-sans";
+@import "@nemu/ui/globals.css";
+@import "@nemu/ui/nemu.css";
+
+/* Everything Nemu draws uses Plus Jakarta Sans (docs/design-system.md, "Typography"). */
+@theme inline {
+  --font-sans: "Plus Jakarta Sans Variable", sans-serif;
+  --font-heading: "Plus Jakarta Sans Variable", sans-serif;
+}
