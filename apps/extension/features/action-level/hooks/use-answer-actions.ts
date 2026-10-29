@@ -40,6 +40,8 @@ export function useAnswerActions(
     outcome: navigation.outcome,
     /** The click once it has changed the page. */
     clicked: navigation.outcome === "succeeded" ? click : undefined,
+    /** The nemu_ids of the page that click left. */
+    clickedFrom: navigation.leaving,
   };
 }
 

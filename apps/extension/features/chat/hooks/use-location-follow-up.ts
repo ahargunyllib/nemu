@@ -1,7 +1,10 @@
 import type { PageElement } from "@nemu/contracts";
 import { useEffect } from "react";
 
-import { collectSettledElementList } from "../../element-list/lib/settled-element-list";
+import {
+  collectSettledElementList,
+  pageNemuIds,
+} from "../../element-list/lib/settled-element-list";
 import type { GuideSession } from "../../guide/lib/guide-session";
 
 const LOCATION_CHECK_MS = 100;
@@ -15,14 +18,19 @@ export function useLocationFollowUp(
     if (!session || session.currentStep >= session.steps.length) return;
 
     let currentUrl = window.location.href;
+    // What was on screen at `currentUrl`, so the follow-up waits until the new page replaces it.
+    let currentIds = pageNemuIds();
     let collection: AbortController | undefined;
     const timer = window.setInterval(() => {
-      if (window.location.href === currentUrl) return;
+      if (window.location.href === currentUrl) {
+        currentIds = pageNemuIds();
+        return;
+      }
       currentUrl = window.location.href;
       collection?.abort();
       collection = new AbortController();
       const { signal } = collection;
-      void collectSettledElementList(signal).then((elements) => {
+      void collectSettledElementList(signal, { leaving: currentIds }).then((elements) => {
         if (!signal.aborted) followUp(elements);
       });
     }, LOCATION_CHECK_MS);
