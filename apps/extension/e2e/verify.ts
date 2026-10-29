@@ -32,10 +32,12 @@ import {
 import { execFileSync } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { type BrowserContext, chromium, type Locator, type Page } from "playwright-core";
+import { type BrowserContext, chromium, type Locator, type Page, request } from "playwright-core";
 import type { browser } from "wxt/browser";
 
+import { DEMO_ACCOUNTS } from "../../mock-alurkerja/src/features/auth/lib/demo-accounts.ts";
 import { cropRegion } from "../features/area-crop/lib/area-crop.ts";
+import { describeCitation } from "../features/answer-card/lib/citation.ts";
 import { OPEN_COMPOSER_MESSAGE } from "../features/composer/lib/open-composer-message.ts";
 import { RING_PADDING } from "../features/highlight/lib/highlight-targets.ts";
 import { CURSOR_OFFSET } from "../features/mascot/lib/mascot-position.ts";
@@ -221,19 +223,26 @@ async function slowChatRequests(context: BrowserContext, delayMs: number) {
 }
 
 /** The newest Chat Log entry, read with Rina's Demo App session like the Admin Workspace does. */
-async function newestChatLogEntry(page: Page): Promise<{ prompt: string; hasAreaCrop: boolean }> {
-  const body = await page.evaluate(async (serverUrl) => {
-    const response = await fetch(`${serverUrl}/rpc/listChatLog`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({}),
+/** The newest Chat Log entry, read as the Verifikator: only a workspace admin may list the log. */
+async function newestChatLogEntry(): Promise<{ prompt: string; hasAreaCrop: boolean }> {
+  const verifikator = DEMO_ACCOUNTS.find(({ email }) => email.startsWith("verifikator@"));
+  if (!verifikator) throw new Error("no Verifikator demo account");
+  const api = await request.newContext({
+    baseURL: DEFAULT_SERVER_URL,
+    extraHTTPHeaders: { origin: DEMO_APP_URL },
+  });
+  try {
+    const signIn = await api.post("/api/auth/sign-in/email", {
+      data: { email: verifikator.email, password: verifikator.password },
     });
-    return response.json();
-  }, DEFAULT_SERVER_URL);
-  const [entry] = body.json ?? [];
-  if (!entry) throw new Error(`no Chat Log entry: ${JSON.stringify(body).slice(0, 200)}`);
-  return entry;
+    if (!signIn.ok()) throw new Error(`the Verifikator couldn't sign in: ${signIn.status()}`);
+    const body = await (await api.post("/rpc/listChatLog", { data: {} })).json();
+    const [entry] = Array.isArray(body.json) ? body.json : [];
+    if (!entry) throw new Error(`no Chat Log entry: ${JSON.stringify(body).slice(0, 200)}`);
+    return entry;
+  } finally {
+    await api.dispose();
+  }
 }
 
 async function closeAnswerCard(page: Page) {
@@ -247,6 +256,29 @@ async function boxOf(locator: Locator): Promise<Box> {
   const box = await locator.boundingBox();
   if (!box) throw new Error(`${String(locator)} is not rendered`);
   return box;
+}
+
+/**
+ * The box inside the locator's padding. The panel's scroll box pads itself with clear room for the
+ * cards' shadow, which is not part of what covers the page.
+ */
+async function paddingBoxInset(locator: Locator): Promise<Box> {
+  const box = await boxOf(locator);
+  const padding = await locator.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      top: Number.parseFloat(style.paddingTop),
+      right: Number.parseFloat(style.paddingRight),
+      bottom: Number.parseFloat(style.paddingBottom),
+      left: Number.parseFloat(style.paddingLeft),
+    };
+  });
+  return {
+    x: box.x + padding.left,
+    y: box.y + padding.top,
+    width: box.width - padding.left - padding.right,
+    height: box.height - padding.top - padding.bottom,
+  };
 }
 
 function overlaps(a: Box, b: Box): boolean {
@@ -452,9 +484,7 @@ async function main() {
           const [citation] = momentOneFollowUpResponse.citations;
           if (citation) {
             await card.getByRole("button", { name: citation.judul }).click();
-            if (citation.pasal) {
-              await card.getByText(`Pasal ${citation.pasal}`, { exact: false }).waitFor();
-            }
+            await card.getByText(describeCitation(citation), { exact: false }).waitFor();
           }
           if (run === 1) {
             await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-1-form.png") });
@@ -524,7 +554,7 @@ async function main() {
           await waitForScrollToSettle(page);
           await eventually(async () => {
             // The panel around the card, which scrolls when it's shrunk to keep off the ring.
-            const cardBox = await boxOf(card.locator("xpath=../.."));
+            const cardBox = await paddingBoxInset(card.locator("xpath=../.."));
             const targetBox = await boxOf(page.locator(`[data-nemu-id="${target}"]`).first());
             await assertOnlyRing(overlay, target, label, targetBox);
             if (overlaps(cardBox, targetBox)) throw new Error(`the Answer Card covers ${target}`);
@@ -534,16 +564,17 @@ async function main() {
           });
           if (index === 0) await page.locator(`[data-nemu-id="${target}"]`).click();
         }
-        for (const { judul, pasal } of momentTwoResponse.citations) {
-          await card.getByRole("button", { name: judul }).click();
-          if (pasal) await card.getByText(`Pasal ${pasal}`, { exact: false }).waitFor();
+        for (const citation of momentTwoResponse.citations) {
+          await card.getByRole("button", { name: citation.judul }).click();
+          await card.getByText(describeCitation(citation), { exact: false }).waitFor();
         }
 
         // The amount stays untouched until Rina confirms the exact calculated value.
         const [notHotel, amount] = guidedActions.map(({ target }) =>
           page.locator(`[data-nemu-id="${target}"]`).first(),
         );
-        if ((await notHotel?.getAttribute("aria-checked")) !== "true") {
+        // The nemu_id rings the option's whole card; the radio inside it holds the checked state.
+        if (!(await notHotel?.getByRole("radio").isChecked())) {
           throw new Error("the selected lodging option did not advance the guide");
         }
         const valueOfAmount = () =>
@@ -575,7 +606,7 @@ async function main() {
           throw new Error(`the mismatch warning changed the field to ${changedAmount}`);
         }
 
-        const entry = await newestChatLogEntry(page);
+        const entry = await newestChatLogEntry();
         if (entry.prompt !== momentTwoRequest.prompt || !entry.hasAreaCrop) {
           throw new Error(`the Chat Log doesn't record the Area Crop: ${JSON.stringify(entry)}`);
         }
@@ -734,8 +765,9 @@ async function main() {
         await page.locator('[data-nemu-id="menu-item-keluar"]').click();
         await page.waitForURL(`${DEMO_APP_URL}/login`);
         await page.getByRole("button", { name: /Masuk sebagai Dimas/ }).click();
-        await page.getByRole("heading", { name: "Beranda" }).waitFor();
-        await page.getByText("Hari ini 14 Oktober 2026", { exact: true }).waitFor();
+        await waitForBeranda(page);
+        // W-TELKO's own demo clock, not the W-TRAVEL day Rina's session just showed.
+        await page.getByText("My dashboard · Wednesday 14 October", { exact: true }).waitFor();
 
         await page.locator('[data-nemu-id="task-klaim-klm-2610-0007"]').click();
         await page.waitForURL(`${DEMO_APP_URL}/sla-claims/KLM-2610-0007`);
