@@ -156,6 +156,19 @@ Pelaksana. It holds **Delegasikan** (disabled) and **Selesaikan Tugas**
 a finished claim shows "Selesai". The body holds the stage's fields; Credit
 Note, the last stage, adds the approved amount and who approved it.
 
+Registrasi Klaim lists its fields in one column. The letter's own fields come
+filled in from the claim (Nomor surat pelanggan, the Service ID select, Periode
+gangguan, Jam gangguan diklaim pelanggan); Tanggal klaim diterima starts empty
+(dd/mm/yyyy) for Nemu's **Isi**, then come Diajukan tepat waktu? (Ya and Tidak
+cards) and Surat klaim (PDF). Telaah Tiket Gangguan gives each NOC ticket a
+**Dihitung | Dikecualikan** Keputusan (`seg-keputusan-<ticket>`), and
+**Gabungkan interval** adds up the tickets marked Dihitung, counting an overlap
+once, into Durasi dihitung (A) beside the hours the customer claimed. Susun
+Berita Acara shows the Rincian hitung tiles, whose computed terms appear on
+**Hitung**, then Nominal usulan (empty for Nemu's Isi, and editable), the Rute
+persetujuan, and **Buat draft berita acara**, which fills in TPL-BILL-01 from the
+amount. The task never prints the compensation amount itself.
+
 Persetujuan follows the route in MP-BILL-02: up to Rp500.000 Sari Wulandari
 (Supervisor Billing) approves; above it Sari, then Hendra Gunawan (Manajer
 Billing Operations). From Persetujuan the claim also shows in each approver's

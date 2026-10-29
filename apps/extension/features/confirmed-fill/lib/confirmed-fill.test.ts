@@ -2,7 +2,12 @@
 import type { NemuAction } from "@nemu/contracts";
 import { afterEach, describe, expect, test } from "vite-plus/test";
 
-import { applyConfirmedFill, type FillAction, fillLabelMatchesValue } from "./confirmed-fill";
+import {
+  applyConfirmedFill,
+  comparableFillValue,
+  type FillAction,
+  fillLabelMatchesValue,
+} from "./confirmed-fill";
 
 const fill: Extract<NemuAction, { type: "fill" }> = {
   type: "fill",
@@ -69,5 +74,25 @@ describe("fillLabelMatchesValue", () => {
     const text: FillAction = { ...fill, label: "Isi Rapat koordinasi", value: "Rapat koordinasi" };
     expect(fillLabelMatchesValue(text)).toBe(true);
     expect(fillLabelMatchesValue({ ...text, label: "Isi alasan" })).toBe(false);
+  });
+
+  test("accepts a date label that names the dd/mm/yyyy value it writes", () => {
+    const date: FillAction = { ...fill, label: "Isi 8 Okt 2026", value: "08/10/2026" };
+    expect(fillLabelMatchesValue(date)).toBe(true);
+    expect(fillLabelMatchesValue({ ...date, label: "Isi 6 Okt 2026" })).toBe(false);
+  });
+});
+
+describe("comparableFillValue", () => {
+  test("compares a date however it is written", () => {
+    for (const written of [
+      "8 Okt 2026",
+      "8 Oktober 2026",
+      "08/10/2026",
+      "8/10/2026",
+      "2026-10-08",
+    ]) {
+      expect(comparableFillValue(written)).toBe("2026-10-08");
+    }
   });
 });

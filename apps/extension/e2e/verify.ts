@@ -18,8 +18,12 @@ import {
   k2ApprovalResponse,
   k2CompensationRequest,
   k2CompensationResponse,
+  k2RegistrationRequest,
+  k2RegistrationResponse,
   k2SlaRequest,
   k2SlaResponse,
+  k2TicketsRequest,
+  k2TicketsResponse,
   momentOneFollowUpResponse,
   momentOneRequest,
   momentOneResponse,
@@ -931,6 +935,30 @@ async function main() {
         ]) {
           await page.locator(`[data-nemu-id="${nemuId}"]`).waitFor();
         }
+        // #172: the registration guide picks up at Tanggal klaim diterima, step 4 of 8, with Isi.
+        const overlay = page.locator("nemu-overlay");
+        const received = page.locator('[data-nemu-id="input-tanggal-terima-klaim"]');
+        if ((await received.inputValue()) !== "") throw new Error("received date starts filled");
+        await ask(context, page, k2RegistrationRequest.prompt);
+        await page.getByText(k2RegistrationResponse.answer.ringkas, { exact: true }).waitFor();
+        await overlay.getByText("Langkah 4 dari 8").waitFor();
+        await waitForScrollToSettle(page);
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "k2-registration-received.png") });
+        await page.getByRole("button", { name: "Isi 8 Okt 2026" }).click();
+        if ((await received.inputValue()) !== "08/10/2026") {
+          throw new Error("the received date was not filled as dd/mm/yyyy");
+        }
+        // Checking the claimed hours and answering Ya each move the guide on, up to the upload.
+        await overlay.getByText("Langkah 5 dari 8").waitFor();
+        await page.locator('[data-nemu-id="input-jam-diklaim"]').click();
+        await overlay.getByText("Langkah 6 dari 8").waitFor();
+        await page.locator('[data-nemu-id="opt-klaim-tepat-waktu-ya"]').click();
+        await overlay.getByText("Langkah 7 dari 8").waitFor();
+        await page
+          .locator('[data-nemu-id="upload-surat-klaim"]')
+          .setInputFiles(path.join(SAMPLE_DOCUMENTS, "surat-tugas.pdf"));
+        await overlay.getByText("Langkah 8 dari 8").waitFor();
+        await closeAnswerCard(page);
         await page.locator('[data-nemu-id="button-kirim-klaim"]').click();
         await page.getByRole("heading", { name: "Cocokkan Layanan & Kontrak" }).waitFor();
         await ask(context, page, k2SlaRequest.prompt);
@@ -939,6 +967,18 @@ async function main() {
         await page.waitForURL(`${DEMO_APP_URL}/sla-claims/KLM-2610-0007`);
         await page.getByText("ADD-2026-02", { exact: false }).first().waitFor();
         await closeAnswerCard(page);
+        // CRM lists the unsigned draft ADD-2026-03 too, as not in force.
+        await page.goto(`${DEMO_APP_URL}/crm/TN-ENT-002`);
+        await page.locator('[data-nemu-id="tab-kontrak-adendum"]').click();
+        await page
+          .getByText(
+            "ADD-2026-03 (rancangan, belum disahkan · ubah jam pemeliharaan · tidak berlaku)",
+          )
+          .waitFor();
+        // The tab indicator slides over; let it land before the screenshot.
+        await page.waitForTimeout(500);
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "k2-crm-other-addenda.png") });
+        await page.goto(`${DEMO_APP_URL}/sla-claims/KLM-2610-0007`);
         await page.locator('[data-nemu-id="button-kirim-klaim"]').click();
         await page.getByRole("heading", { name: "Telaah Tiket Gangguan" }).waitFor();
         for (const nemuId of [
@@ -949,12 +989,44 @@ async function main() {
         ]) {
           await page.locator(`[data-nemu-id="${nemuId}"]`).waitFor();
         }
+        // The ticket guide names each Keputusan; INC-2609-031, a customer power cut, is excluded.
+        await ask(context, page, k2TicketsRequest.prompt);
+        await page.getByText(k2TicketsResponse.answer.ringkas, { exact: true }).waitFor();
+        const decide = (ticketId: string, decision: string) =>
+          page
+            .locator(`[data-nemu-id="seg-keputusan-${ticketId}"]`)
+            .getByRole("button", { name: decision, exact: true })
+            .click();
+        await decide("INC-2609-014", "Dihitung");
+        await decide("INC-2609-015", "Dihitung");
+        await overlay.getByText("Langkah 3 dari 5").waitFor();
+        await page.locator("[data-sonner-toast]").first().waitFor({ state: "detached" });
+        await waitForScrollToSettle(page);
+        await eventually(async () => {
+          const target = "seg-keputusan-INC-2609-031";
+          const targetBox = await boxOf(page.locator(`[data-nemu-id="${target}"]`));
+          await assertOnlyRing(overlay, target, "Pilih Dikecualikan", targetBox);
+        });
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "k2-tickets-excluded.png") });
+        await decide("INC-2609-031", "Dikecualikan");
+        await decide("INC-2609-047", "Dihitung");
+        await overlay.getByText("Langkah 5 dari 5").waitFor();
+        await page.locator('[data-nemu-id="button-gabungkan-interval"]').click();
+        await page.getByText("17,5 jam", { exact: true }).waitFor();
+        await closeAnswerCard(page);
         await page.locator('[data-nemu-id="button-kirim-klaim"]').click();
         await page.getByRole("heading", { name: "Susun Berita Acara" }).waitFor();
         const amount = page.locator('[data-nemu-id="input-nominal-kompensasi"]');
         if ((await amount.inputValue()) !== "") throw new Error("compensation starts prefilled");
+        // Hitung first, as PA-TN-01 Bab 5 says; it fills in C, Av and A but never the amount.
+        await page.locator('[data-nemu-id="button-hitung-kompensasi"]').click();
+        await page.getByText("17,5 jam", { exact: true }).waitFor();
+        if ((await amount.inputValue()) !== "") throw new Error("Hitung filled in the amount");
         await ask(context, page, k2CompensationRequest.prompt);
         await page.getByText(k2CompensationResponse.answer.ringkas, { exact: true }).waitFor();
+        await page.locator("[data-sonner-toast]").first().waitFor({ state: "detached" });
+        await waitForScrollToSettle(page);
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "k2-compensation-isi.png") });
         await page.getByRole("button", { name: "Isi Rp579.167" }).click();
         if ((await amount.inputValue()) !== "579167") throw new Error("confirmed fill was not raw");
         await amount.fill("1");
@@ -1000,7 +1072,7 @@ async function main() {
           await switchAccount(page, approver);
           await page.locator('[data-nemu-id="task-klaim-klm-2610-0007"]').click();
           await page.waitForURL(`${DEMO_APP_URL}/sla-claims/KLM-2610-0007`);
-          await page.getByRole("heading", { name: "Persetujuan" }).waitFor();
+          await page.getByRole("heading", { name: /^Persetujuan/ }).waitFor();
           if (await approval.isDisabled())
             throw new Error(`${approver} can't approve on their turn`);
           if (approver === "Sari") {

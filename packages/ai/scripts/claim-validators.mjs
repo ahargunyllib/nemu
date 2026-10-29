@@ -31,7 +31,7 @@ export function validateK2Case(id, output, expectedResults) {
           reason: "missing safe registration click",
         },
         {
-          ok: output.guide?.id === "sla-claim:registration" && output.guide.steps.length === 7,
+          ok: output.guide?.id === "sla-claim:registration" && output.guide.steps.length === 8,
           reason: "invalid registration guide",
         },
         {
@@ -98,7 +98,7 @@ export function validateK2Case(id, output, expectedResults) {
         },
         {
           ok:
-            output.actions.length === 4 &&
+            output.actions.length === 5 &&
             output.actions.every((item) => item.type === "highlight"),
           reason: "ticket rows are not guided in order",
         },
@@ -282,7 +282,7 @@ export function validateK2Response(id, response, expectedResults) {
         },
         {
           ok:
-            response.actions.length === 4 &&
+            response.actions.length === 5 &&
             response.actions.every((item) => item.type === "highlight"),
           reason: "ticket guide incomplete",
         },

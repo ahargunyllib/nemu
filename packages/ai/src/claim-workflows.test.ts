@@ -114,11 +114,45 @@ test("K2-01 opens registration and guides the stored deadline and fields", () =>
   assert.equal(output.actions[0]?.type, "click");
   assert.equal(output.actions[0]?.target, "task-klaim-klm-2610-0007");
   assert.equal(output.guide?.id, "sla-claim:registration");
-  assert.equal(output.guide?.steps.length, 7);
+  assert.equal(output.guide?.steps.length, 8);
+  assert.equal(output.guide?.steps.at(-1)?.target, "button-kirim-klaim");
   assert.equal(output.facts.reviewDueOn, "2026-10-15");
   assert.deepEqual(output.sourceLocations, [
     { docId: "SOP-KLAIM-SLA-01-v1.0", article: "2 ayat (3)" },
   ]);
+});
+
+test("K2-01 starts the open registration at Tanggal klaim diterima with a confirmed fill", () => {
+  const output = execute("registration", "Bantu isi registrasi klaim ini", [
+    "input-nomor-surat-klaim",
+    "input-service-id-klaim",
+    "input-periode-klaim",
+    "input-tanggal-terima-klaim",
+    "input-jam-diklaim",
+    "opt-klaim-tepat-waktu-ya",
+    "upload-surat-klaim",
+    "button-kirim-klaim",
+  ]);
+
+  assert.equal(output.guide?.current_step, 4);
+  assert.deepEqual(output.actions[0], {
+    type: "fill",
+    target: "input-tanggal-terima-klaim",
+    level: "konfirmasi",
+    label: "Isi 8 Okt 2026",
+    value: "08/10/2026",
+  });
+  assert.deepEqual(
+    output.actions.map((action) => [action.type, action.target]),
+    [
+      ["fill", "input-tanggal-terima-klaim"],
+      ["highlight", "input-jam-diklaim"],
+      ["highlight", "opt-klaim-tepat-waktu-ya"],
+      ["highlight", "upload-surat-klaim"],
+      ["confirm", "button-kirim-klaim"],
+    ],
+  );
+  assert.equal(output.facts.cutoff?.timely, true);
 });
 
 test("K2-02 uses the 15th-day rule and highlights timely yes", () => {
@@ -139,18 +173,28 @@ test("K2-03 guides CRM and returns the approved 99.50 percent addendum", () => {
   assert.deepEqual(output.sourceLocations, [{ docId: "ADD-2026-02", article: "1" }]);
 });
 
-test("K2-04 merges provider tickets, excludes approved customer power, and highlights each row", () => {
+test("K2-04 merges provider tickets, excludes approved customer power, and guides each Keputusan", () => {
   const output = execute("tickets", "Tiket mana yang dihitung?", [
-    "row-tiket-inc-2609-014",
-    "row-tiket-inc-2609-015",
-    "row-tiket-inc-2609-047",
-    "row-tiket-inc-2609-031",
+    "seg-keputusan-INC-2609-014",
+    "seg-keputusan-INC-2609-015",
+    "seg-keputusan-INC-2609-031",
+    "seg-keputusan-INC-2609-047",
+    "button-gabungkan-interval",
   ]);
 
   assert.deepEqual(output.facts.countedIntervalsMinutes, [840, 210]);
   assert.deepEqual(output.facts.excludedTicketIds, ["INC-2609-031"]);
   assert.equal(output.facts.actualDowntimeMinutes, 1_050);
-  assert.equal(output.actions.length, 4);
+  assert.deepEqual(
+    output.actions.map((action) => [action.target, action.label]),
+    [
+      ["seg-keputusan-INC-2609-014", "Pilih Dihitung"],
+      ["seg-keputusan-INC-2609-015", "Pilih Dihitung"],
+      ["seg-keputusan-INC-2609-031", "Pilih Dikecualikan"],
+      ["seg-keputusan-INC-2609-047", "Pilih Dihitung"],
+      ["button-gabungkan-interval", "Gabungkan interval"],
+    ],
+  );
 });
 
 test("K2-05 calculates Rp579167 and offers only a confirmed fill", () => {
