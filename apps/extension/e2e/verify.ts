@@ -438,6 +438,17 @@ async function waitForBeranda(page: Page) {
   await page.getByRole("heading", { level: 1, name: /^Selamat pagi/ }).waitFor();
 }
 
+/** Signs out and back in with the login page's one-click button for `name`. */
+async function switchAccount(page: Page, name: string) {
+  // From Beranda, so no open task sheet covers the account menu.
+  await page.goto(DEMO_APP_URL);
+  await page.locator('[data-nemu-id="button-akun"]').click();
+  await page.locator('[data-nemu-id="menu-item-keluar"]').click();
+  await page.waitForURL(`${DEMO_APP_URL}/login`);
+  await page.getByRole("button", { name: new RegExp(`Masuk sebagai ${name}`) }).click();
+  await waitForBeranda(page);
+}
+
 async function main() {
   await assertReachable(DEMO_APP_URL);
   await assertReachable(OUTSIDE_URL);
@@ -960,6 +971,7 @@ async function main() {
         await page.getByText(k2ApprovalResponse.answer.ringkas, { exact: true }).waitFor();
         if (!(await approval.isDisabled())) throw new Error("Nemu enabled self-approval");
         await closeAnswerCard(page);
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "k2-approval-dimas.png") });
 
         await page.goto(`${DEMO_APP_URL}/sla-claims/KLM-2610-0009`);
         await page.locator('[data-nemu-id="button-kirim-klaim"]').click();
@@ -977,6 +989,39 @@ async function main() {
         await page.getByRole("heading", { name: "Surat Penolakan" }).first().waitFor();
         await page.locator('[data-nemu-id="link-template-penolakan"]').waitFor();
         await page.screenshot({ path: path.join(SCREENSHOT_DIR, "k2-late-rejection.png") });
+      },
+    );
+
+    await check(
+      "Sari, then Hendra, approve KLM-2610-0007 to Credit Note, and the demo reset puts it back",
+      async () => {
+        const approval = page.locator('[data-nemu-id="button-setujui-klaim"]');
+        for (const approver of ["Sari", "Hendra"]) {
+          await switchAccount(page, approver);
+          await page.locator('[data-nemu-id="task-klaim-klm-2610-0007"]').click();
+          await page.waitForURL(`${DEMO_APP_URL}/sla-claims/KLM-2610-0007`);
+          await page.getByRole("heading", { name: "Persetujuan" }).waitFor();
+          if (await approval.isDisabled())
+            throw new Error(`${approver} can't approve on their turn`);
+          if (approver === "Sari") {
+            await page.screenshot({ path: path.join(SCREENSHOT_DIR, "k2-approval-sari.png") });
+          }
+          await approval.click();
+        }
+        await page.getByRole("heading", { name: "Credit Note" }).waitFor();
+        await page.getByText("Rp579.167", { exact: true }).waitFor();
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "k2-credit-note.png") });
+
+        await switchAccount(page, "Dimas");
+        await resetDemoData(page);
+        await page.goto(`${DEMO_APP_URL}/sla-claims`);
+        for (const claimId of ["0007", "0009", "0011"]) {
+          await page
+            .locator(`[data-nemu-id="task-klaim-klm-2610-${claimId}"]`)
+            .getByText("Registrasi Klaim", { exact: false })
+            .waitFor();
+        }
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "k2-after-reset.png") });
       },
     );
   } finally {

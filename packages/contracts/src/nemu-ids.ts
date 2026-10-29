@@ -14,6 +14,8 @@ export const NEMU_IDS = {
     signInAsRina: "button-masuk-rina",
     signInAsVerifikator: "button-masuk-verifikator",
     signInAsDimas: "button-masuk-dimas",
+    signInAsSari: "button-masuk-sari",
+    signInAsHendra: "button-masuk-hendra",
   },
   /** Header and side menu on every signed-in page. */
   shell: {

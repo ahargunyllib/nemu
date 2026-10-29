@@ -7,23 +7,13 @@ import {
   type SlaClaimContext,
 } from "@nemu/ai";
 
-import type { SlaClaimRecord, SlaClaimRepository, SlaTaskRecord } from "./repository";
-
-export function listSlaClaims(
-  repository: Pick<SlaClaimRepository, "listClaims">,
-  workspaceId: string,
-  assigneeId: string,
-): Promise<SlaClaimRecord[]> {
-  return repository.listClaims(workspaceId, assigneeId);
-}
-
-export function listSlaClaimTasks(
-  repository: Pick<SlaClaimRepository, "listTasks">,
-  workspaceId: string,
-  assigneeId: string,
-): Promise<SlaTaskRecord[]> {
-  return repository.listTasks(workspaceId, assigneeId);
-}
+import { SLA_CLAIM_SEED_TASKS } from "./demo-seed";
+import type {
+  SlaClaimRecord,
+  SlaClaimRepository,
+  SlaTaskRecord,
+  SlaUserRecord,
+} from "./repository";
 
 function requireRecord<T>(record: T | undefined, message: string): T {
   if (!record) throw new Error(message);
@@ -169,19 +159,105 @@ export function summarizeSlaClaim(context: SlaClaimContext): SlaClaimSummary {
 
 export class SlaClaimNotFoundError extends Error {}
 
-// An unknown claim and another assignee's claim fail the same way, before any
-// state check, so the response never reveals which claims exist.
-async function findAssignedTask(
-  repository: Pick<SlaClaimRepository, "findTask">,
+export class SlaClaimAccessError extends Error {}
+
+export type SlaClaimActor = { id: string };
+
+/** How MP-BILL-02 names an approver: "Sari Wulandari (Supervisor Billing)". */
+function approverName(user: SlaUserRecord): string {
+  return `${user.name} (${user.role})`;
+}
+
+async function approvalRouteOf(
+  repository: SlaClaimRepository,
+  workspaceId: string,
+  claimId: string,
+): Promise<string[]> {
+  return summarizeSlaClaim(await getSlaClaimContext(repository, workspaceId, claimId)).approvers;
+}
+
+// A claim Task belongs to its assignee. At Persetujuan the approvers on its route see it too, and
+// each keeps it after approving, so the approver who closes the route still sees the Credit Note.
+async function canSeeTask(
+  repository: SlaClaimRepository,
+  workspaceId: string,
+  task: SlaTaskRecord,
+  actorId: string,
+  approver: string | undefined,
+): Promise<boolean> {
+  if (task.assigneeId === actorId || task.approvedBy.includes(actorId)) return true;
+  if (task.name !== "Persetujuan" || !approver) return false;
+  return (await approvalRouteOf(repository, workspaceId, task.claimId)).includes(approver);
+}
+
+/** Whether it is `approver`'s turn on the route. The assignee never approves its own claim (SOP Pasal 8). */
+function isApproversTurn(
+  task: SlaTaskRecord,
+  approvers: readonly string[],
+  actorId: string,
+  approver: string | undefined,
+): boolean {
+  return (
+    task.name === "Persetujuan" &&
+    task.assigneeId !== actorId &&
+    approver !== undefined &&
+    approvers[task.approvedBy.length] === approver
+  );
+}
+
+async function approverOf(
+  repository: Pick<SlaClaimRepository, "findUser">,
+  workspaceId: string,
+  actorId: string,
+): Promise<string | undefined> {
+  const user = await repository.findUser(workspaceId, actorId);
+  return user && approverName(user);
+}
+
+export async function listSlaClaimTasks(
+  repository: SlaClaimRepository,
+  workspaceId: string,
+  actorId: string,
+): Promise<SlaTaskRecord[]> {
+  const [tasks, approver] = await Promise.all([
+    repository.listWorkspaceTasks(workspaceId),
+    approverOf(repository, workspaceId, actorId),
+  ]);
+  const visible = await Promise.all(
+    tasks.map((task) => canSeeTask(repository, workspaceId, task, actorId, approver)),
+  );
+  return tasks.filter((_, index) => visible[index]);
+}
+
+export async function listSlaClaims(
+  repository: SlaClaimRepository,
+  workspaceId: string,
+  actorId: string,
+): Promise<SlaClaimRecord[]> {
+  const [claims, tasks] = await Promise.all([
+    repository.listClaims(workspaceId),
+    listSlaClaimTasks(repository, workspaceId, actorId),
+  ]);
+  const claimIds = new Set(tasks.map((task) => task.claimId));
+  return claims.filter((claim) => claimIds.has(claim.id));
+}
+
+// An unknown claim and a claim the actor may not see fail the same way, before any state check,
+// so the response never reveals which claims exist.
+async function findVisibleTask(
+  repository: SlaClaimRepository,
   workspaceId: string,
   claimId: string,
   actorId: string,
-): Promise<SlaTaskRecord> {
-  const task = await repository.findTask(workspaceId, claimId);
-  if (!task || task.assigneeId !== actorId) {
+): Promise<{ task: SlaTaskRecord; approver: string | undefined }> {
+  const [task, approver] = await Promise.all([
+    repository.findTask(workspaceId, claimId),
+    approverOf(repository, workspaceId, actorId),
+  ]);
+  if (!task || !(await canSeeTask(repository, workspaceId, task, actorId, approver))) {
     throw new SlaClaimNotFoundError(`Klaim SLA ${claimId} tidak ditemukan`);
   }
-  return task;
+  return { task, approver };
 }
 
 export async function getSlaClaimDetail(
@@ -190,16 +266,26 @@ export async function getSlaClaimDetail(
   claimId: string,
   actorId: string,
 ) {
-  const task = await findAssignedTask(repository, workspaceId, claimId, actorId);
-  const [context, claimRecord] = await Promise.all([
+  const { task, approver } = await findVisibleTask(repository, workspaceId, claimId, actorId);
+  const [context, claimRecord, assignee] = await Promise.all([
     getSlaClaimContext(repository, workspaceId, claimId),
     repository.findClaim(workspaceId, claimId),
+    repository.findUser(workspaceId, task.assigneeId),
   ]);
   const claim = requireRecord(
     claimRecord,
     `SLA claim ${claimId} was not found in workspace ${workspaceId}`,
   );
-  return { context, task, claim, summary: summarizeSlaClaim(context) };
+  const summary = summarizeSlaClaim(context);
+  return {
+    context,
+    task,
+    claim,
+    summary,
+    assignee: assignee?.name ?? task.assigneeId,
+    canAdvance: task.assigneeId === actorId && task.name !== "Persetujuan",
+    canApprove: isApproversTurn(task, summary.approvers, actorId, approver),
+  };
 }
 
 const NEXT_TASK = new Map([
@@ -209,9 +295,39 @@ const NEXT_TASK = new Map([
   ["Persetujuan", "Credit Note"],
 ]);
 
-export type SlaClaimActor = { id: string };
-
-export class SlaClaimAccessError extends Error {}
+// Persetujuan follows MP-BILL-02: each approver on the route approves in turn, and the last
+// approval moves the claim to Credit Note.
+async function approveSlaClaim(
+  repository: SlaClaimRepository,
+  workspaceId: string,
+  task: SlaTaskRecord,
+  actorId: string,
+  approver: string | undefined,
+): Promise<SlaTaskRecord> {
+  if (task.assigneeId === actorId) {
+    throw new SlaClaimAccessError(
+      "Billing Liaison tidak boleh menyetujui klaim yang disusunnya sendiri",
+    );
+  }
+  const approvers = await approvalRouteOf(repository, workspaceId, task.claimId);
+  if (!isApproversTurn(task, approvers, actorId, approver)) {
+    throw new SlaClaimAccessError(
+      `Klaim ${task.claimId} menunggu persetujuan ${approvers[task.approvedBy.length] ?? "penyetuju"}`,
+    );
+  }
+  const approvedBy = [...task.approvedBy, actorId];
+  return requireRecord(
+    await repository.updateTask(workspaceId, task.id, {
+      name:
+        approvedBy.length === approvers.length
+          ? (NEXT_TASK.get(task.name) ?? task.name)
+          : task.name,
+      status: "OPEN",
+      approvedBy,
+    }),
+    `Task ${task.id} could not be updated`,
+  );
+}
 
 export async function advanceSlaClaimTask(
   repository: SlaClaimRepository,
@@ -219,11 +335,12 @@ export async function advanceSlaClaimTask(
   claimId: string,
   actor: SlaClaimActor,
 ): Promise<SlaTaskRecord> {
-  const task = await findAssignedTask(repository, workspaceId, claimId, actor.id);
+  const { task, approver } = await findVisibleTask(repository, workspaceId, claimId, actor.id);
   if (task.name === "Persetujuan") {
-    throw new SlaClaimAccessError(
-      `Claim ${claimId} requires the dedicated approval workflow with stable approver identities`,
-    );
+    return approveSlaClaim(repository, workspaceId, task, actor.id, approver);
+  }
+  if (task.assigneeId !== actor.id) {
+    throw new SlaClaimAccessError(`Task ${task.name} klaim ${claimId} milik assignee-nya`);
   }
   const context = await getSlaClaimContext(repository, workspaceId, claimId);
   let name = NEXT_TASK.get(task.name) ?? task.name;
@@ -248,4 +365,11 @@ export async function advanceSlaClaimTask(
     await repository.updateTask(workspaceId, task.id, { name, status }),
     `Task ${task.id} could not be updated`,
   );
+}
+
+/** The demo panel's reset: every seeded claim Task back at Registrasi Klaim, with no approvals. */
+export function resetSlaClaimTasks(
+  repository: Pick<SlaClaimRepository, "replaceTasks">,
+): Promise<void> {
+  return repository.replaceTasks("W-TELKO", SLA_CLAIM_SEED_TASKS);
 }

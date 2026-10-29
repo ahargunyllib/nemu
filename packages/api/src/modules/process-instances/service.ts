@@ -7,6 +7,8 @@ import {
 } from "@nemu/contracts/process-instance";
 import type { Database } from "@nemu/db";
 
+import { createSlaClaimRepository, type SlaClaimRepository } from "../sla-claims/repository";
+import { resetSlaClaimTasks } from "../sla-claims/service";
 import { DEMO_SEED_DOCUMENTS, DEMO_SEED_INSTANCES } from "./demo-seed";
 import {
   type ProcessTask,
@@ -25,10 +27,14 @@ import {
 
 export type ProcessInstanceDeps = {
   processInstances: ProcessInstanceRepository;
+  slaClaims: Pick<SlaClaimRepository, "replaceTasks">;
 };
 
 export function createProcessInstanceDeps(db: Database): ProcessInstanceDeps {
-  return { processInstances: createProcessInstanceRepository(db) };
+  return {
+    processInstances: createProcessInstanceRepository(db),
+    slaClaims: createSlaClaimRepository(db),
+  };
 }
 
 /** A Process Instance with its active Task, when that Task opened and falls due, and its documents. */
@@ -235,10 +241,17 @@ export async function kirimPertanggungjawaban(
   return { ok: true, value: { taskId: task?.id ?? instanceId, instance } };
 }
 
-/** The demo panel's reset: puts back the user's 3-Momen fixtures and drops everything else they made. */
-export async function resetDemo({ processInstances }: ProcessInstanceDeps, ownerId: string) {
+/**
+ * The demo panel's reset: puts back the user's 3-Momen fixtures and drops everything else they made,
+ * and puts the shared Klaim SLA Tasks back at Registrasi Klaim.
+ */
+export async function resetDemo(
+  { processInstances, slaClaims }: ProcessInstanceDeps,
+  ownerId: string,
+) {
   const instances = DEMO_SEED_INSTANCES.filter((instance) => instance.ownerId === ownerId);
   const ids = new Set(instances.map((instance) => instance.id));
   const documents = DEMO_SEED_DOCUMENTS.filter((document) => ids.has(document.instanceId));
   await processInstances.replaceOwned(ownerId, instances, documents);
+  await resetSlaClaimTasks(slaClaims);
 }

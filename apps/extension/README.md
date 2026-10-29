@@ -152,7 +152,9 @@ checks:
   open Nemu from the toolbar icon or Ctrl+Shift+Space (saved as `area-crop-no-tab-access.png`);
 - after switching to Dimas, the header shows the persisted 14 October 2026 Telco clock and the
   script exercises the happy-path calculation, missing-RCA `PERLU_BUKTI` branch, late rejection,
-  CRM handoff, exact placeholder IDs, Rp579.167 value, and disabled self-approval control.
+  CRM handoff, exact placeholder IDs, Rp579.167 value, and disabled self-approval control;
+- Sari, then Hendra, approve KLM-2610-0007 with Setujui klaim, which moves it to Credit Note,
+  and Reset data demo as Dimas puts all three claims back at Registrasi Klaim.
 
 It prints one line per check, exits non-zero on a failure, and saves screenshots to
 `.output/verify/`. Add `-- --headed` to watch it. The script opens the Composer by pressing the

@@ -1,0 +1,1 @@
+ALTER TABLE `telco_task` ADD `approved_by` text DEFAULT '[]' NOT NULL;

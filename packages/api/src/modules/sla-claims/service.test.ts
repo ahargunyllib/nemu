@@ -1,20 +1,37 @@
 import { expect, test } from "vite-plus/test";
 
-import type { SlaClaimRepository } from "./repository";
+import type { SlaClaimRepository, SlaTaskRecord, SlaUserRecord } from "./repository";
 import {
   advanceSlaClaimTask,
   getSlaClaimContext,
   getSlaClaimDetail,
   listSlaClaims,
+  listSlaClaimTasks,
+  SlaClaimAccessError,
   SlaClaimNotFoundError,
   summarizeSlaClaim,
 } from "./service";
 
 const BILLING_LIAISON = { id: "U-101" };
+const SUPERVISOR = { id: "U-102" };
+const MANAGER = { id: "U-103" };
+
+const USERS: SlaUserRecord[] = [
+  ["U-101", "Dimas Pratama", "Billing Liaison"],
+  ["U-102", "Sari Wulandari", "Supervisor Billing"],
+  ["U-103", "Hendra Gunawan", "Manajer Billing Operations"],
+].map(([id, name, role]) => ({
+  id: id!,
+  workspaceId: "W-TELKO",
+  name: name!,
+  role: role!,
+  joinedOn: "2021-03-01",
+  email: `${id}@telkonusantara.example`,
+}));
 
 function repository(): SlaClaimRepository {
   return {
-    async listClaims(_workspaceId, _assigneeId) {
+    async listClaims(_workspaceId) {
       return [
         {
           id: "KLM-2610-0007",
@@ -33,7 +50,7 @@ function repository(): SlaClaimRepository {
       ];
     },
     async findClaim() {
-      return (await this.listClaims("W-TELKO", "U-101"))[0];
+      return (await this.listClaims("W-TELKO"))[0];
     },
     async findService() {
       return {
@@ -102,10 +119,17 @@ function repository(): SlaClaimRepository {
         createdAt: "2026-10-08T14:20:00+07:00",
         reviewDueOn: "2026-10-15",
         status: "OPEN",
+        approvedBy: [],
       };
     },
     async listTasks(_workspaceId, _assigneeId) {
       return [(await this.findTask("W-TELKO", "KLM-2610-0007"))!];
+    },
+    async listWorkspaceTasks(_workspaceId) {
+      return [(await this.findTask("W-TELKO", "KLM-2610-0007"))!];
+    },
+    async findUser(_workspaceId, userId) {
+      return USERS.find((user) => user.id === userId);
     },
     async findAssignedTaskByService() {
       return this.findTask("W-TELKO", "KLM-2610-0007");
@@ -116,6 +140,7 @@ function repository(): SlaClaimRepository {
     async updateTask(_workspaceId, taskId, update) {
       return { ...(await this.findTask("W-TELKO", "KLM-2610-0007"))!, id: taskId, ...update };
     },
+    async replaceTasks() {},
   };
 }
 
@@ -184,16 +209,106 @@ test.each([
   },
 );
 
-test("rejects a Billing Liaison advancing a claim through approval", async () => {
+/**
+ * KLM-2610-0007 at Persetujuan, its Rp350.000 above a two-approver rule, with the Task stored so
+ * that each approval is seen by the next call.
+ */
+async function claimAtApproval(approvedBy: string[] = []) {
   const fake = repository();
-  fake.findTask = async () => ({
+  let task: SlaTaskRecord = {
     ...(await repository().findTask("W-TELKO", "KLM-2610-0007"))!,
     name: "Persetujuan",
-  });
+    approvedBy,
+  };
+  fake.findTask = async () => task;
+  fake.listWorkspaceTasks = async () => [task];
+  fake.updateTask = async (_workspaceId, _taskId, update) => (task = { ...task, ...update });
+  fake.listApprovalRules = async () => [
+    ...(await repository().listApprovalRules("W-TELKO")),
+    {
+      id: "MP-BILL-02-2",
+      workspaceId: "W-TELKO",
+      minimumAmount: 300_000,
+      approvers: [
+        "Sari Wulandari (Supervisor Billing)",
+        "Hendra Gunawan (Manajer Billing Operations)",
+      ],
+    },
+  ];
+  return fake;
+}
+
+test("refuses the Billing Liaison approving the claim it drafted", async () => {
+  const fake = await claimAtApproval();
+
+  const result = advanceSlaClaimTask(fake, "W-TELKO", "KLM-2610-0007", BILLING_LIAISON);
+
+  await expect(result).rejects.toBeInstanceOf(SlaClaimAccessError);
+  await expect(result).rejects.toThrow("tidak boleh menyetujui klaim yang disusunnya sendiri");
+  await expect(
+    getSlaClaimDetail(fake, "W-TELKO", "KLM-2610-0007", BILLING_LIAISON.id),
+  ).resolves.toMatchObject({ canApprove: false, canAdvance: false, assignee: "Dimas Pratama" });
+});
+
+test("approves through the route in order and then moves the claim to Credit Note", async () => {
+  const fake = await claimAtApproval();
+
+  await expect(advanceSlaClaimTask(fake, "W-TELKO", "KLM-2610-0007", MANAGER)).rejects.toThrow(
+    "menunggu persetujuan Sari Wulandari (Supervisor Billing)",
+  );
+  await expect(
+    getSlaClaimDetail(fake, "W-TELKO", "KLM-2610-0007", SUPERVISOR.id),
+  ).resolves.toMatchObject({ canApprove: true, assignee: "Dimas Pratama" });
 
   await expect(
+    advanceSlaClaimTask(fake, "W-TELKO", "KLM-2610-0007", SUPERVISOR),
+  ).resolves.toMatchObject({ name: "Persetujuan", status: "OPEN", approvedBy: ["U-102"] });
+  await expect(
+    advanceSlaClaimTask(fake, "W-TELKO", "KLM-2610-0007", SUPERVISOR),
+  ).rejects.toBeInstanceOf(SlaClaimAccessError);
+  await expect(
+    getSlaClaimDetail(fake, "W-TELKO", "KLM-2610-0007", MANAGER.id),
+  ).resolves.toMatchObject({ canApprove: true });
+
+  await expect(
+    advanceSlaClaimTask(fake, "W-TELKO", "KLM-2610-0007", MANAGER),
+  ).resolves.toMatchObject({
+    name: "Credit Note",
+    status: "OPEN",
+    approvedBy: ["U-102", "U-103"],
+  });
+});
+
+test("lets only the assignee complete the Credit Note an approver can still see", async () => {
+  const fake = await claimAtApproval();
+  await advanceSlaClaimTask(fake, "W-TELKO", "KLM-2610-0007", SUPERVISOR);
+  await advanceSlaClaimTask(fake, "W-TELKO", "KLM-2610-0007", MANAGER);
+
+  await expect(
+    getSlaClaimDetail(fake, "W-TELKO", "KLM-2610-0007", MANAGER.id),
+  ).resolves.toMatchObject({ canAdvance: false, canApprove: false });
+  await expect(
+    advanceSlaClaimTask(fake, "W-TELKO", "KLM-2610-0007", MANAGER),
+  ).rejects.toBeInstanceOf(SlaClaimAccessError);
+  await expect(
     advanceSlaClaimTask(fake, "W-TELKO", "KLM-2610-0007", BILLING_LIAISON),
-  ).rejects.toThrow("dedicated approval workflow");
+  ).resolves.toMatchObject({ name: "Credit Note", status: "SELESAI" });
+});
+
+test("shows an approver only the claims waiting at Persetujuan on their route", async () => {
+  await expect(listSlaClaimTasks(repository(), "W-TELKO", SUPERVISOR.id)).resolves.toEqual([]);
+  await expect(listSlaClaims(repository(), "W-TELKO", SUPERVISOR.id)).resolves.toEqual([]);
+  await expect(
+    getSlaClaimDetail(repository(), "W-TELKO", "KLM-2610-0007", SUPERVISOR.id),
+  ).rejects.toBeInstanceOf(SlaClaimNotFoundError);
+
+  const fake = await claimAtApproval();
+  await expect(listSlaClaims(fake, "W-TELKO", SUPERVISOR.id)).resolves.toMatchObject([
+    { id: "KLM-2610-0007" },
+  ]);
+  await expect(listSlaClaimTasks(fake, "W-TELKO", MANAGER.id)).resolves.toMatchObject([
+    { name: "Persetujuan" },
+  ]);
 });
 
 function unknownClaim(): SlaClaimRepository {

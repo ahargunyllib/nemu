@@ -170,6 +170,7 @@ describe("resolveChatProcessContext", () => {
             createdAt: "2026-10-08T14:20:00+07:00",
             reviewDueOn: "2026-10-15",
             status: "OPEN",
+            approvedBy: [],
           },
         ],
       },
@@ -203,6 +204,7 @@ describe("resolveChatProcessContext", () => {
               createdAt: "2026-10-08T14:20:00+07:00",
               reviewDueOn: "2026-10-15",
               status: "OPEN",
+              approvedBy: [],
             },
           ],
         },
@@ -228,6 +230,7 @@ describe("resolveChatProcessContext", () => {
                 createdAt: "2026-10-08T15:45:00+07:00",
                 reviewDueOn: null,
                 status: "OPEN",
+                approvedBy: [],
               }
             : undefined,
         findSlaTaskByInvoice: async () => undefined,

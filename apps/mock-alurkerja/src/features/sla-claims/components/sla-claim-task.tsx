@@ -58,6 +58,12 @@ export type SlaClaimDetail = {
     tickets: readonly Ticket[];
   };
   task: { id: string; name: string; status: string; reviewDueOn: string | null };
+  /** The Task's assignee, who drafted the claim. */
+  assignee: string;
+  /** Whether the signed-in user may complete this stage: only the assignee, never at Persetujuan. */
+  canAdvance: boolean;
+  /** Whether it is the signed-in user's turn on the approval route at Persetujuan. */
+  canApprove: boolean;
   summary: {
     cutoff: { period: string; receivedDate: string; deadline: string; timely: boolean };
     totalPeriodMinutes: number;
@@ -366,6 +372,30 @@ function rejectionLetter({ claim }: SlaClaimDetail): string {
   ].join("\n");
 }
 
+function CreditNote({ detail }: { detail: SlaClaimDetail }) {
+  const { claim, summary } = detail;
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Credit note</CardTitle>
+        <CardDescription>
+          Diterbitkan Billing Finance setelah semua persetujuan lengkap.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2">
+          <dt className="text-muted-foreground">Nominal disetujui</dt>
+          <dd>Rp{summary.compensationAmount?.toLocaleString("id-ID")}</dd>
+          <dt className="text-muted-foreground">Disetujui oleh</dt>
+          <dd>{summary.approvers.join(", ")}</dd>
+          <dt className="text-muted-foreground">Dipotong dari</dt>
+          <dd>Invoice bulan berikutnya untuk {claim.serviceId}</dd>
+        </dl>
+      </CardContent>
+    </Card>
+  );
+}
+
 function Rejection({ detail }: { detail: SlaClaimDetail }) {
   const [letter, setLetter] = useState(() => rejectionLetter(detail));
   return (
@@ -396,8 +426,8 @@ function Rejection({ detail }: { detail: SlaClaimDetail }) {
 }
 
 /**
- * A claim Task in its sheet: the orange header with Delegasikan and Selesaikan Tugas (or the disabled
- * approval on Persetujuan), then the stage's fields.
+ * A claim Task in its sheet: the orange header with Delegasikan and Selesaikan Tugas (or Setujui
+ * klaim on Persetujuan, enabled only for the approver whose turn it is), then the stage's fields.
  */
 export default function SlaClaimTask({
   detail,
@@ -433,17 +463,19 @@ export default function SlaClaimTask({
           // The Billing Liaison drafted this claim, so only the approvers may approve it.
           <Button
             variant="outline"
-            disabled
+            onClick={onAdvance}
+            disabled={!detail.canApprove || advancing}
             data-nemu-id={NEMU_IDS.slaClaim.approve}
-            className="bg-background text-foreground"
+            className="bg-background text-foreground hover:bg-muted"
           >
+            {advancing && <Spinner />}
             Setujui klaim
           </Button>
         ) : (
           <Button
             variant="outline"
             onClick={onAdvance}
-            disabled={advancing}
+            disabled={!detail.canAdvance || advancing}
             data-nemu-id={NEMU_IDS.slaClaim.submit}
             className="bg-background text-foreground hover:bg-muted"
           >
@@ -457,6 +489,7 @@ export default function SlaClaimTask({
         {task.name === "Cocokkan Layanan & Kontrak" && <ServiceMatch detail={detail} />}
         {task.name === "Telaah Tiket Gangguan" && <TicketReview detail={detail} />}
         {showCalculation && <Calculation detail={detail} />}
+        {task.name === "Credit Note" && <CreditNote detail={detail} />}
         {task.name === "Surat Penolakan" && <Rejection detail={detail} />}
       </div>
     </>
