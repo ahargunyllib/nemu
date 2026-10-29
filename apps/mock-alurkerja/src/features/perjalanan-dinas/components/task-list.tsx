@@ -31,7 +31,7 @@ export default function TaskList({ tasks }: { tasks: readonly ProcessInstanceVie
         onChange={(event) => setQuery(event.target.value)}
         className="h-8 border-transparent bg-muted text-[13px] leading-[18px] md:text-[13px]"
       />
-      {/* With no Tasks at all, My Task shows TaskPlaceholder beside the column instead. */}
+      {/* With no Tasks at all, Tugas Saya shows TaskPlaceholder beside the column instead. */}
       {withTask.length === 0 ? null : shown.length === 0 ? (
         <Empty className="border">
           <EmptyHeader>

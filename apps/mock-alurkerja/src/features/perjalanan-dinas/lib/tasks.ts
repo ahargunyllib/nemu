@@ -5,7 +5,7 @@ import type { ProcessInstanceView } from "@/features/perjalanan-dinas/types/proc
 
 type TaskKey = NonNullable<ProcessInstanceView["activeTask"]>["key"];
 
-/** The nemu_id of a Task's link on Beranda and My Task. */
+/** The nemu_id of a Task's link on Beranda and Tugas Saya. */
 export const TASK_NEMU_IDS: Record<TaskKey, string> = {
   isi_rencana: NEMU_IDS.task.isiRencana,
   revisi: NEMU_IDS.task.revisi,

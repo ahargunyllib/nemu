@@ -34,7 +34,7 @@ export const NEMU_IDS = {
     pengajuanCuti: "favorite-pengajuan-cuti",
     reimbursement: "favorite-reimbursement",
   },
-  /** Task links, one per Task, on Beranda (`/`) and My Task (`/my-task`). */
+  /** Task links, one per Task, on Beranda (`/`) and Tugas Saya (`/my-task`). */
   task: {
     pertanggungjawaban: "task-pertanggungjawaban",
     isiRencana: "task-isi-rencana",

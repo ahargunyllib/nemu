@@ -7,7 +7,7 @@ import {
 } from "@nemu/ui/components/empty";
 import { ClipboardListIcon } from "lucide-react";
 
-/** Fills My Task beside the Task column when there are no Tasks yet, saying so. */
+/** Fills Tugas Saya beside the Task column when there are no Tasks yet, saying so. */
 export default function TaskPlaceholder() {
   return (
     <Empty className="border bg-background">

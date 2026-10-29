@@ -12,7 +12,7 @@ const nemuButtonVariants = cva("", {
     tone: {
       /** "Isi" beside a value Nemu fills in: the nemu-amber 600 fill with white text. */
       solid: "bg-nemu text-nemu-foreground hover:bg-nemu-amber-700",
-      /** "Buka My Requests": amber outline pill. */
+      /** "Buka Pengajuan Saya": amber outline pill. */
       outline:
         "border-nemu-ring bg-transparent text-nemu-text hover:bg-nemu-subtle hover:text-nemu-text",
       /** "Rincian", "Tutup", "Lihat detail": amber underlined text. */

@@ -35,7 +35,7 @@ role.
 | Tugas Saya              | `/my-task`                 |
 | Task detail             | `/perdin/task/$instanceId` |
 | Klaim SLA               | `/sla-claims`              |
-| Task klaim SLA          | `/sla-claims/$claimId`     |
+| Tugas klaim SLA         | `/sla-claims/$claimId`     |
 | CRM Layanan             | `/crm/$serviceId`          |
 | Tiket NOC               | `/noc/$serviceId`          |
 | Billing                 | `/billing/$invoiceId`      |
