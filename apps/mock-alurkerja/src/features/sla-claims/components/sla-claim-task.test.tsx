@@ -187,14 +187,14 @@ describe("SlaClaimTask", () => {
     expect(screen.getByText("Dimas Pratama")).toBeTruthy();
   });
 
-  test("shows a spinner on Complete Task while the Task advances", () => {
+  test("shows a spinner on Selesaikan Tugas while the Task advances", () => {
     const { container } = renderTask(
       <SlaClaimTask assignee="Dimas Pratama" detail={detail("Registrasi Klaim")} advancing />,
     );
     const submit = container.querySelector(`[data-nemu-id="${NEMU_IDS.slaClaim.submit}"]`);
 
     expect(submit).toHaveProperty("disabled", true);
-    expect(submit?.textContent).toBe("Complete Task");
+    expect(submit?.textContent).toBe("Selesaikan Tugas");
     expect(submit?.querySelector('[role="status"]')).not.toBeNull();
   });
 });

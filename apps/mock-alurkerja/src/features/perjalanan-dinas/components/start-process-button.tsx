@@ -29,7 +29,7 @@ export default function StartProcessButton({
           disabled={!valid || isSubmitting}
         >
           {isSubmitting && <Spinner />}
-          Start Process
+          Mulai Proses
           {!isSubmitting && <Play data-icon="inline-end" />}
         </Button>
       )}

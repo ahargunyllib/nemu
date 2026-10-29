@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_auth/my-task")({
   component: RouteComponent,
 });
 
-/** My Task: the Task column, with an empty-state panel beside it when there are no Tasks. */
+/** Tugas Saya: the Task column, with an empty-state panel beside it when there are no Tasks. */
 function RouteComponent() {
   const { data: tasks } = useQuery(orpc.listMyTasks.queryOptions());
 

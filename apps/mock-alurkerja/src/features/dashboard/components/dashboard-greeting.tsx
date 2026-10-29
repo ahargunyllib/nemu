@@ -4,14 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 
 import { orpc } from "@/shared/api/orpc";
 
-const kickerDate = new Intl.DateTimeFormat("en-GB", {
+const kickerDate = new Intl.DateTimeFormat("id-ID", {
   weekday: "long",
   day: "numeric",
   month: "long",
   timeZone: "UTC",
 });
 
-/** "My dashboard" on the demo clock's day (NEMU_DEMO_DATE), the same date the AI counts from. */
+/** "Dasbor saya" on the demo clock's day (NEMU_DEMO_DATE), the same date the AI counts from. */
 export default function DashboardGreeting({ name }: { name: string }) {
   const { data: clock } = useQuery(orpc.getDemoClock.queryOptions({ staleTime: Infinity }));
   const firstName = name.split(/\s+/)[0];
@@ -20,12 +20,12 @@ export default function DashboardGreeting({ name }: { name: string }) {
     <PageHeading
       kicker={
         clock ? (
-          `My dashboard · ${kickerDate.format(new Date(`${clock.today}T00:00:00Z`))}`
+          `Dasbor saya · ${kickerDate.format(new Date(`${clock.today}T00:00:00Z`))}`
         ) : (
           <Skeleton className="h-4 w-56" />
         )
       }
-      title={`Good morning, ${firstName}.`}
+      title={`Selamat pagi, ${firstName}.`}
     />
   );
 }

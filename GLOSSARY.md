@@ -17,7 +17,7 @@ The web console where an admin manages documents, tables, domains, action rules 
 _Avoid_: workspace (alone), dashboard
 
 **Demo App**:
-Our fake AlurKerja App, the only place Nemu runs in the MVP. It is not the real AlurKerja.
+Our fake AlurKerja App, the only place Nemu runs in the MVP. It is not the real AlurKerja. Its UI is in Indonesian, so Nemu can quote its labels.
 _Avoid_: Tiruan App, AlurKerja App, web app
 
 **AlurKerja tenant**:

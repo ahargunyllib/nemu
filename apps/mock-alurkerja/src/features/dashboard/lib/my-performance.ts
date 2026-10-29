@@ -1,10 +1,10 @@
-/** Static demo figures for My Performance on Beranda; the Demo App does not track them. */
+/** Static demo figures for Kinerja Saya on Beranda; the Demo App does not track them. */
 export const MY_PERFORMANCE = [
-  { label: "Most Requested Process", value: "Perjalanan Dinas" },
-  { label: "Most Performed Task", value: "Pertanggungjawaban" },
-  { label: "Slowest Closing Task", value: "Verifikasi" },
-  { label: "Process Diversity", value: "3 of 6" },
+  { label: "Proses paling sering diajukan", value: "Perjalanan Dinas" },
+  { label: "Tugas paling sering dikerjakan", value: "Pertanggungjawaban" },
+  { label: "Tugas paling lama selesai", value: "Verifikasi" },
+  { label: "Ragam proses", value: "3 dari 6" },
 ] as const;
 
-/** Days My Performance looks back from the demo clock's day. */
+/** Days Kinerja Saya looks back from the demo clock's day. */
 export const MY_PERFORMANCE_DAYS = 30;

@@ -396,7 +396,7 @@ function Rejection({ detail }: { detail: SlaClaimDetail }) {
 }
 
 /**
- * A claim Task in its sheet: the orange header with Delegate and Complete Task (or the disabled
+ * A claim Task in its sheet: the orange header with Delegasikan and Selesaikan Tugas (or the disabled
  * approval on Persetujuan), then the stage's fields.
  */
 export default function SlaClaimTask({
@@ -420,13 +420,13 @@ export default function SlaClaimTask({
           disabled
           className="border-task-header-foreground/80 bg-transparent text-task-header-foreground"
         >
-          Delegate
+          Delegasikan
         </Button>
         {task.status === "SELESAI" ? (
           <span
             className={cn(buttonVariants({ variant: "outline" }), "bg-background text-foreground")}
           >
-            Completed
+            Selesai
             <CheckIcon data-icon="inline-end" />
           </span>
         ) : task.name === "Persetujuan" ? (
@@ -448,7 +448,7 @@ export default function SlaClaimTask({
             className="bg-background text-foreground hover:bg-muted"
           >
             {advancing && <Spinner />}
-            Complete Task
+            Selesaikan Tugas
           </Button>
         )}
       </SlaClaimTaskHeader>

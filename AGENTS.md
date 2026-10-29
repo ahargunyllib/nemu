@@ -40,6 +40,10 @@ Every vendored component must come from the `base-maia` style set in `packages/u
 
 Keep controls that exist only to run the demo out of the Demo App's AlurKerja chrome (header, side menu, page content), so the demo still looks like AlurKerja. Put them on the floating demo dock at the bottom left as separate buttons, not a joined bar that reads as tabs. For example, Panel demo moved from the header to the dock, and Ajukan Perjalanan Dinas adds **Isi formulir demo** there through `useDemoPageAction` (`docs/demo-app.md`).
 
+### Demo App language
+
+Write the Demo App's UI in Indonesian, the language Nemu answers in, so Nemu can quote the label on the screen, and format its dates with the `id-ID` locale. Keep the terms the client's own Indonesian documents use as they are (Service ID, Invoice, Billing, RCA). When a label changes, change every guide, fixture, and test that quotes it in the same PR. For example, AlurKerja's Complete Task became **Selesaikan Tugas** after QA found Nemu telling Rina to press "Kirim" on a button labelled Complete Task (#123). See `docs/demo-app.md`.
+
 ### Tests
 
 Co-locate tests with the source they protect and prioritize observable behavior. See `docs/agents/testing.md`.

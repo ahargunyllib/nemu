@@ -16,7 +16,7 @@ export default function ClaimOriginBanner({
   return (
     <Alert className="rounded-2xl border-task-header-to/40 bg-task-header-to/10 has-data-[slot=alert-action]:pr-44">
       <AlertDescription className="text-foreground">
-        Kamu datang dari task {taskName} · {claimId}
+        Kamu datang dari tugas {taskName} · {claimId}
       </AlertDescription>
       <AlertAction className="top-1/2 -translate-y-1/2">
         <Link
@@ -26,7 +26,7 @@ export default function ClaimOriginBanner({
           className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
         >
           <ArrowLeftIcon data-icon="inline-start" />
-          Kembali ke task
+          Kembali ke tugas
         </Link>
       </AlertAction>
     </Alert>

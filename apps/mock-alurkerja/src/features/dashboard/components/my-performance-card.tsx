@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { MY_PERFORMANCE, MY_PERFORMANCE_DAYS } from "@/features/dashboard/lib/my-performance";
 import { orpc } from "@/shared/api/orpc";
 
-const rangeDate = new Intl.DateTimeFormat("en-US", {
+const rangeDate = new Intl.DateTimeFormat("id-ID", {
   day: "numeric",
   month: "short",
   year: "numeric",
@@ -20,7 +20,7 @@ export default function MyPerformanceCard() {
   return (
     <Card size="sm">
       <CardHeader className="gap-3">
-        <CardTitle>My Performance</CardTitle>
+        <CardTitle>Kinerja Saya</CardTitle>
         {clock ? (
           <Badge variant="outline" className="h-7 w-full justify-start px-3 font-normal">
             {performanceRange(clock.today)}

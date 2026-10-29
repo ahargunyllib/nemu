@@ -30,14 +30,14 @@ const filled: PerdinFormValues = {
 };
 
 describe("perdinFormSchema", () => {
-  it("blocks Start Process on an empty form with an error on every field", () => {
+  it("blocks Mulai Proses on an empty form with an error on every field", () => {
     const result = perdinFormSchema.safeParse(PERDIN_FORM_DEFAULTS);
 
     const invalidFields = new Set(result.error?.issues.map((issue) => issue.path[0]));
     expect(invalidFields).toEqual(new Set(Object.keys(PERDIN_FORM_DEFAULTS)));
   });
 
-  it("blocks Start Process when any single field is left empty", () => {
+  it("blocks Mulai Proses when any single field is left empty", () => {
     for (const field of Object.keys(PERDIN_FORM_DEFAULTS) as (keyof PerdinFormValues)[]) {
       const result = perdinFormSchema.safeParse({
         ...filled,

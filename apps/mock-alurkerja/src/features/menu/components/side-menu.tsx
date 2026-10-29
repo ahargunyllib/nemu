@@ -19,7 +19,7 @@ import { MENU_ITEMS, claimInFocus, telcoMenuItems } from "@/features/menu/lib/me
 import { orpc } from "@/shared/api/orpc";
 
 /**
- * AlurKerja's dark side menu: Start a Process, the menus, and the signed-in user at the bottom.
+ * AlurKerja's dark side menu: Mulai Proses, the menus, and the signed-in user at the bottom.
  * The W-TELKO workspace gets its SLA-claim menus instead.
  */
 export default function SideMenu({
@@ -88,7 +88,7 @@ export default function SideMenu({
                   aria-hidden
                   className="size-7 shrink-0 rounded-full bg-linear-to-br from-indigo-500 to-sky-400"
                 />
-                <span className="truncate">Start a Process</span>
+                <span className="truncate">Mulai Proses</span>
               </span>
             </SidebarMenuButton>
           </SidebarMenuItem>

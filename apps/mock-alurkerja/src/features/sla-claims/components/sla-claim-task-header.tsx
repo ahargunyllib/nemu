@@ -27,7 +27,7 @@ export default function SlaClaimTaskHeader({
     ...(task.reviewDueOn
       ? [["Tenggat telaah", formatClaimDay(task.reviewDueOn)] as [string, string]]
       : []),
-    ["Assignee", assignee],
+    ["Pelaksana", assignee],
   ];
 
   return (

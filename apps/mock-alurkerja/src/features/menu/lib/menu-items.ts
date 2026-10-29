@@ -12,21 +12,21 @@ type MenuItem = {
 };
 
 export const MENU_ITEMS: readonly MenuItem[] = [
-  { label: "Home", link: { to: "/", nemuId: NEMU_IDS.shell.menuBeranda } },
+  { label: "Beranda", link: { to: "/", nemuId: NEMU_IDS.shell.menuBeranda } },
   {
-    label: "My Tasks",
+    label: "Tugas Saya",
     link: { to: "/my-task", nemuId: NEMU_IDS.shell.menuMyTask },
     badge: "tasks",
   },
-  { label: "Group Tasks", badge: 2 },
+  { label: "Tugas Grup", badge: 2 },
   {
-    label: "My Requests",
+    label: "Pengajuan Saya",
     link: { to: "/my-request", nemuId: NEMU_IDS.shell.menuMyRequest },
     submenu: true,
   },
-  { label: "Analytics", submenu: true },
-  { label: "Master Data", submenu: true },
-  { label: "Business Processes", submenu: true },
+  { label: "Analitik", submenu: true },
+  { label: "Data Master", submenu: true },
+  { label: "Proses Bisnis", submenu: true },
 ];
 
 /** The records of a claim that CRM Layanan, Tiket NOC, and Billing open. */
@@ -59,7 +59,7 @@ export function claimInFocus<Claim extends ClaimRecords>(
 export function telcoMenuItems(claim: ClaimRecords | undefined) {
   return [
     {
-      label: "Home",
+      label: "Beranda",
       section: "/",
       nemuId: NEMU_IDS.shell.menuBeranda,
       link: linkOptions({ to: "/" }),

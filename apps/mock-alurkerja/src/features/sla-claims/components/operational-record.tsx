@@ -46,7 +46,7 @@ export default function OperationalRecord({
       data-nemu-id={NEMU_IDS.slaClaim.returnToTask}
       className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
     >
-      Kembali ke task klaim
+      Kembali ke tugas klaim
     </Link>
   );
 

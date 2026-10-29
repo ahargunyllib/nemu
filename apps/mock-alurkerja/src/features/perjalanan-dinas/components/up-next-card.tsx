@@ -23,9 +23,9 @@ import { PERJALANAN_DINAS } from "@/features/processes/lib/processes";
 import { orpc } from "@/shared/api/orpc";
 
 // Due dates are days on the demo clock, so they read in UTC (see `dayToDate`).
-const shortDate = new Intl.DateTimeFormat("en-US", {
-  month: "short",
+const shortDate = new Intl.DateTimeFormat("id-ID", {
   day: "numeric",
+  month: "short",
   timeZone: "UTC",
 });
 
@@ -35,13 +35,13 @@ type DueTask = ProcessInstanceView & {
 };
 
 /**
- * Up next on Beranda: the signed-in user's Tasks with their due dates, filtered by the chips, each
+ * Tugas berikutnya on Beranda: the signed-in user's Tasks with their due dates, filtered by the chips, each
  * opening its task page. Days left count from the demo clock's day, the same "today" as the AI.
  */
 export default function UpNextCard() {
   const { data } = useQuery(orpc.listMyTasks.queryOptions());
   const { data: clock } = useQuery(orpc.getDemoClock.queryOptions({ staleTime: Infinity }));
-  const [filter, setFilter] = useState<DueFilter>("All Tasks");
+  const [filter, setFilter] = useState<DueFilter>("Semua tugas");
   const tasks =
     clock &&
     data?.flatMap((instance): DueTask[] => {
@@ -54,7 +54,7 @@ export default function UpNextCard() {
     <Card size="sm" className="gap-0 pb-0">
       <CardHeader className="border-b">
         <CardTitle className="font-heading text-base font-medium whitespace-nowrap">
-          Up next
+          Tugas berikutnya
         </CardTitle>
         <CardAction className="flex flex-wrap justify-end gap-1.5">
           {DUE_FILTERS.map((option) => {
@@ -72,7 +72,7 @@ export default function UpNextCard() {
                 {count !== undefined && (
                   <span
                     className={
-                      option === "Overdue" && count > 0
+                      option === "Terlambat" && count > 0
                         ? "text-destructive"
                         : "text-muted-foreground"
                     }
@@ -88,7 +88,7 @@ export default function UpNextCard() {
       {tasks ? (
         <UpNextList
           tasks={tasks.filter((task) => matchesDueFilter(filter, task.daysLeft))}
-          filtered={filter !== "All Tasks"}
+          filtered={filter !== "Semua tugas"}
         />
       ) : (
         <UpNextSkeleton />
@@ -103,7 +103,7 @@ export default function UpNextCard() {
               "font-normal text-muted-foreground",
             )}
           >
-            View all {tasks.length} {tasks.length === 1 ? "task" : "tasks"}
+            Lihat semua {tasks.length} tugas
             <ChevronRight className="size-3.5" />
           </Link>
         </CardFooter>
@@ -158,7 +158,7 @@ function UpNextList({ tasks, filtered }: { tasks: readonly DueTask[]; filtered: 
   );
 }
 
-/** "Today", the due day ("Nov 13"), or how late the Task is ("1 day late") in red. */
+/** "Hari ini", the due day ("13 Nov"), or how late the Task is ("Terlambat 1 hari") in red. */
 function DueLabel({ dueOn, daysLeft }: { dueOn: string; daysLeft: number }) {
   const late = -daysLeft;
   return (
@@ -169,10 +169,10 @@ function DueLabel({ dueOn, daysLeft }: { dueOn: string; daysLeft: number }) {
       )}
     >
       {daysLeft === 0
-        ? "Today"
+        ? "Hari ini"
         : daysLeft > 0
           ? shortDate.format(dayToDate(dueOn))
-          : `${late} ${late === 1 ? "day" : "days"} late`}
+          : `Terlambat ${late} hari`}
     </span>
   );
 }

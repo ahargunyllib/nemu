@@ -5,7 +5,7 @@ import type { ComponentProps } from "react";
 
 /**
  * Nemu-branded looks layered on the stock shadcn Button, which stays untouched. The main action
- * in an Answer Card ("Lanjut", "Complete Task") is the stock default Button, not one of these.
+ * in an Answer Card ("Lanjut", "Selesaikan Tugas") is the stock default Button, not one of these.
  */
 const nemuButtonVariants = cva("", {
   variants: {

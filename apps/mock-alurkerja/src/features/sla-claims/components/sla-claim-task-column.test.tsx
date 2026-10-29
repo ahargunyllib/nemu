@@ -50,7 +50,7 @@ async function renderColumn() {
     history: createMemoryHistory({ initialEntries: ["/sla-claims"] }),
   });
   render(<RouterProvider router={router} />);
-  return screen.findByRole("searchbox", { name: "Search tasks" });
+  return screen.findByRole("searchbox", { name: "Cari tugas" });
 }
 
 afterEach(cleanup);

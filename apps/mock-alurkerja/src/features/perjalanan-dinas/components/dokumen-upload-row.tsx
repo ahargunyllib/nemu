@@ -36,7 +36,7 @@ export default function DokumenUploadRow({
       )}
       <span className="font-medium">{label}</span>
       <span className="ml-auto truncate text-muted-foreground">
-        {namaFile ?? "Drag file or click to upload"}
+        {namaFile ?? "Seret file atau klik untuk mengunggah"}
       </span>
       {onFile && (
         <input

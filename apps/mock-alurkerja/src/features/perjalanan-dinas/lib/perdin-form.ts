@@ -9,7 +9,7 @@ import {
 } from "@nemu/contracts/process-instance";
 import z from "zod";
 
-// The form holds what the inputs hold (text, a picked file); Start Process converts it to the wire input.
+// The form holds what the inputs hold (text, a picked file); Mulai Proses converts it to the wire input.
 export const PERDIN_FORM_DEFAULTS = {
   jenisPerjalanan: "",
   kotaTujuan: "",

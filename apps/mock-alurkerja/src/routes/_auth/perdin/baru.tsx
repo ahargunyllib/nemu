@@ -41,7 +41,7 @@ function RouteComponent() {
               tone={PERJALANAN_DINAS.tone}
               className="size-7 rounded-lg text-xs"
             />
-            Start {PERJALANAN_DINAS.name}
+            Mulai {PERJALANAN_DINAS.name}
           </span>
         }
         actions={<StartProcessButton form={form} formId={FORM_ID} />}

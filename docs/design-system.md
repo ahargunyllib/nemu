@@ -31,7 +31,7 @@ The full amber scale is also available as `nemu-amber-50` … `nemu-amber-800`. 
 colours: body gradient amber 300 → 500, wings amber 100, white outline, white eyes; success body
 `#34D399` → `#059669` with badge `#047857`; warning body `#F87171` → `#DC2626`.
 
-The black main button in a card ("Lanjut", "Complete Task") is bg/inverse `#18181B`: the stock
+The black main button in a card ("Lanjut", "Selesaikan Tugas") is bg/inverse `#18181B`: the stock
 shadcn `Button` default variant.
 
 Every Nemu surface floating over the page (Composer, Answer Card, Kartu area, tooltips) casts the
@@ -151,7 +151,7 @@ way forward.
 - **Peringatan / Tidak ditemukan**: "Kamu belum masuk ke Demo App. …" with a "Masuk ke Demo App"
   link, or "Pertanyaan belum terjawab. …" with "Coba lagi". A target missing from the page is a
   warning sentence in the answer.
-- **Berhasil**: once the user presses Kirim, the answer says "Terkirim, pindah ke Verifikasi.
+- **Berhasil**: once the user presses Selesaikan Tugas, the answer says "Terkirim, pindah ke Verifikasi.
   ID tugas PJ-PD-2026-0042."
 
 ## Motion (Motion Kursor)
@@ -173,7 +173,7 @@ way forward.
   below it; then beside it. It never covers the active target or the next field still to fill.
   When the guide moves to the next step, card and mascot move to its target. An answer with no
   target (or a failure) puts the card in empty space, off the page's content, such as Beranda's
-  Up next.
+  Tugas berikutnya.
 - **Blok area**: the selection box Rina drags: a 1.5 px dashed `nemu-select` line (dash 5, gap 4),
   radius 4 px, a `nemu-select-fill` fill, and round amber (`nemu-ring`) corner handles. The rest of
   the page is never darkened, and the box is never filled black. The mascot sits as the cursor at

@@ -435,7 +435,7 @@ const k2ContractGuide = {
   steps: [
     { id: "open-crm", target: "link-crm-layanan", label: "Buka CRM Layanan" },
     { id: "open-contract", target: "tab-kontrak-adendum", label: "Buka Kontrak & Adendum" },
-    { id: "return-claim", target: "link-kembali-task-klaim", label: "Kembali ke task klaim" },
+    { id: "return-claim", target: "link-kembali-task-klaim", label: "Kembali ke tugas klaim" },
   ],
 };
 
@@ -450,7 +450,7 @@ export const k2SlaResponse = {
   status: "answer",
   answer: {
     ringkas: "SLA yang berlaku 99,50% berdasarkan ADD-2026-02.",
-    detail: "Saya arahkan ke CRM Layanan, Kontrak & Adendum, lalu kembali ke task klaim.",
+    detail: "Saya arahkan ke CRM Layanan, Kontrak & Adendum, lalu kembali ke tugas klaim.",
   },
   citations: [{ doc_id: "ADD-2026-02", judul: "Adendum SLA", pasal: "1" }],
   calc: [],
@@ -472,7 +472,7 @@ export const k2SlaReturnRequest = {
   elements: [
     {
       nemu_id: "link-kembali-task-klaim",
-      label: "Kembali ke task klaim",
+      label: "Kembali ke tugas klaim",
       role: "link",
       visible: true,
     },
@@ -486,7 +486,7 @@ export const k2SlaReturnResponse = {
       type: "click",
       target: "link-kembali-task-klaim",
       level: "jalan_sendiri",
-      label: "Kembali ke task klaim",
+      label: "Kembali ke tugas klaim",
     },
   ],
   guide: { ...k2ContractGuide, current_step: 3 },

@@ -11,13 +11,13 @@ describe("daysUntil", () => {
 });
 
 describe("matchesDueFilter", () => {
-  it("sorts late, today, and later Tasks into their filters, and All Tasks takes every one", () => {
+  it("sorts late, today, and later Tasks into their filters, and Semua tugas takes every one", () => {
     const filtersOf = (daysLeft: number) =>
-      (["Overdue", "Due Today", "Upcoming", "All Tasks"] as const).filter((filter) =>
+      (["Terlambat", "Hari ini", "Mendatang", "Semua tugas"] as const).filter((filter) =>
         matchesDueFilter(filter, daysLeft),
       );
-    expect(filtersOf(-1)).toEqual(["Overdue", "All Tasks"]);
-    expect(filtersOf(0)).toEqual(["Due Today", "All Tasks"]);
-    expect(filtersOf(2)).toEqual(["Upcoming", "All Tasks"]);
+    expect(filtersOf(-1)).toEqual(["Terlambat", "Semua tugas"]);
+    expect(filtersOf(0)).toEqual(["Hari ini", "Semua tugas"]);
+    expect(filtersOf(2)).toEqual(["Mendatang", "Semua tugas"]);
   });
 });

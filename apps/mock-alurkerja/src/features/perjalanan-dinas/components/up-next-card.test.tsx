@@ -94,10 +94,10 @@ describe("UpNextCard", () => {
     const pertanggungjawaban = await screen.findByRole("link", {
       name: "Pertanggungjawaban PD-2026-0042",
     });
-    expect(pertanggungjawaban.textContent).toContain("Nov 12");
-    expect(pertanggungjawaban.textContent).not.toContain("late");
+    expect(pertanggungjawaban.textContent).toContain("12 Nov");
+    expect(pertanggungjawaban.textContent).not.toContain("Terlambat");
     expect(
       screen.getByRole("link", { name: "Perbaiki pengajuan PD-2026-0043" }).textContent,
-    ).toContain("2 days late");
+    ).toContain("Terlambat 2 hari");
   });
 });
