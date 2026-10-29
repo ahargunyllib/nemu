@@ -27,8 +27,8 @@ export default function SlaClaimTaskList({
     return (
       <Empty className="border">
         <EmptyHeader>
-          <EmptyTitle>Tidak ada task klaim</EmptyTitle>
-          <EmptyDescription>Task klaim baru akan muncul di sini.</EmptyDescription>
+          <EmptyTitle>Tidak ada tugas klaim</EmptyTitle>
+          <EmptyDescription>Tugas klaim baru akan muncul di sini.</EmptyDescription>
         </EmptyHeader>
       </Empty>
     );

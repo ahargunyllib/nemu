@@ -9,7 +9,7 @@ export function useAdvanceSlaClaim(claimId: string) {
   const mutation = useMutation(
     orpc.advanceSlaClaimTask.mutationOptions({
       onSuccess(task) {
-        toast.success(`Task berpindah ke ${task.name}`);
+        toast.success(`Tugas berpindah ke ${task.name}`);
         void queryClient.invalidateQueries({ queryKey: orpc.getSlaClaim.key() });
         void queryClient.invalidateQueries({ queryKey: orpc.listSlaClaimTasks.key() });
       },
@@ -17,7 +17,7 @@ export function useAdvanceSlaClaim(claimId: string) {
   );
   const advance = () => mutation.mutate({ workspaceId: "W-TELKO", claimId });
   useDemoPageAction({
-    label: mutation.isPending ? "Memajukan task…" : "Majukan task klaim",
+    label: mutation.isPending ? "Memajukan tugas…" : "Majukan tugas klaim",
     nemuId: NEMU_IDS.demoPanel.advanceSlaClaim,
     run: advance,
   });

@@ -820,7 +820,7 @@ test("accountability guidance uses the final control label from the current page
     {
       ...momentThreeFollowUpRequest,
       elements: momentThreeFollowUpRequest.elements.map((element) =>
-        element.nemu_id === "button-kirim" ? { ...element, label: "Complete Task" } : element,
+        element.nemu_id === "button-kirim" ? { ...element, label: "Selesaikan Tugas" } : element,
       ),
     },
     {
@@ -845,7 +845,7 @@ test("accountability guidance uses the final control label from the current page
         receivedGuidance = input.workflowGuidance ?? [];
         return {
           status: "answer",
-          ringkas: "Lengkapi dokumen, lalu gunakan Complete Task.",
+          ringkas: "Lengkapi dokumen, lalu gunakan Selesaikan Tugas.",
           detail: "Kamu yang menyelesaikan task setelah memeriksa dokumen.",
           citationIds: ["sop-pd-01-section-4"],
           warnings: [],
@@ -856,7 +856,7 @@ test("accountability guidance uses the final control label from the current page
 
   assert.equal(response.status, "answer");
   assert.equal(
-    receivedGuidance.some((guidance) => guidance.includes("Complete Task")),
+    receivedGuidance.some((guidance) => guidance.includes("Selesaikan Tugas")),
     true,
   );
 });

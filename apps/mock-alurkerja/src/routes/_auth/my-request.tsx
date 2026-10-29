@@ -15,7 +15,7 @@ function RouteComponent() {
 
   return (
     <>
-      <PageHeading title="My Request" />
+      <PageHeading title="Pengajuan Saya" />
       {instances ? <RequestTable instances={instances} /> : <RequestTableSkeleton />}
     </>
   );

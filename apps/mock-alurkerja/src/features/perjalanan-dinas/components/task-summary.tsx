@@ -9,7 +9,7 @@ import type { ProcessInstanceView } from "@/features/perjalanan-dinas/types/proc
 import { orpc } from "@/shared/api/orpc";
 
 // Task dates are days on the demo clock, so they read in UTC (see `dayToDate`).
-const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" });
+const dateFormatter = new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeZone: "UTC" });
 
 /**
  * The task sheet's orange header: the process, the Task (or the State while no Task is open), the
@@ -31,18 +31,18 @@ export default function TaskSummary({
   const meta: [string, ReactNode][] = task
     ? [
         [
-          "Task Age",
+          "Umur tugas",
           ageDays == null ? (
             <Skeleton className="mt-1 h-4 w-12 bg-task-header-foreground/20" />
           ) : (
-            `${ageDays} ${ageDays === 1 ? "day" : "days"}`
+            `${ageDays} hari`
           ),
         ],
-        ["Created", dateFormatter.format(dayToDate(task.openedOn))],
-        ["Due Date", dateFormatter.format(dayToDate(task.dueOn))],
-        ["Assignee", assignee],
+        ["Dibuat", dateFormatter.format(dayToDate(task.openedOn))],
+        ["Tenggat", dateFormatter.format(dayToDate(task.dueOn))],
+        ["Pelaksana", assignee],
       ]
-    : [["Assignee", assignee]];
+    : [["Pelaksana", assignee]];
 
   return (
     <SheetHeader className="gap-2 bg-linear-to-r from-task-header-from via-task-header-via to-task-header-to px-6 pt-4 pb-4.5 text-task-header-foreground">

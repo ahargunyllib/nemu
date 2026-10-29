@@ -8,7 +8,7 @@ import { orpc } from "@/shared/api/orpc";
 
 export const Route = createFileRoute("/_auth/sla-claims/")({ component: SlaClaimsPage });
 
-/** The claim Tasks as My Task's column, with an empty-state panel beside it when there are none. */
+/** The claim Tasks as Tugas Saya's column, with an empty-state panel beside it when there are none. */
 function SlaClaimsPage() {
   const { data: claims } = useQuery(
     orpc.listSlaClaims.queryOptions({ input: { workspaceId: "W-TELKO" } }),

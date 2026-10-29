@@ -14,14 +14,14 @@ export function daysUntil(day: string, today: string): number {
   return Math.round((dayToDate(day).getTime() - dayToDate(today).getTime()) / DAY_MS);
 }
 
-export const DUE_FILTERS = ["Overdue", "Due Today", "Upcoming", "All Tasks"] as const;
+export const DUE_FILTERS = ["Terlambat", "Hari ini", "Mendatang", "Semua tugas"] as const;
 
 export type DueFilter = (typeof DUE_FILTERS)[number];
 
 /** Whether a Task `daysLeft` from its due day falls under `filter`. */
 export function matchesDueFilter(filter: DueFilter, daysLeft: number): boolean {
-  if (filter === "Overdue") return daysLeft < 0;
-  if (filter === "Due Today") return daysLeft === 0;
-  if (filter === "Upcoming") return daysLeft > 0;
+  if (filter === "Terlambat") return daysLeft < 0;
+  if (filter === "Hari ini") return daysLeft === 0;
+  if (filter === "Mendatang") return daysLeft > 0;
   return true;
 }

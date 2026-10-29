@@ -1,7 +1,7 @@
 import type { Box } from "../../../shared/types/box";
 import type { Viewport } from "./panel-placement";
 
-/** The page's cards (such as Beranda's Up next) and every element Nemu can point at. */
+/** The page's cards (such as Beranda's Tugas berikutnya) and every element Nemu can point at. */
 const CONTENT = '[data-slot="card"], [data-nemu-id]';
 
 /**

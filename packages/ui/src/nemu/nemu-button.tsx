@@ -5,14 +5,14 @@ import type { ComponentProps } from "react";
 
 /**
  * Nemu-branded looks layered on the stock shadcn Button, which stays untouched. The main action
- * in an Answer Card ("Lanjut", "Complete Task") is the stock default Button, not one of these.
+ * in an Answer Card ("Lanjut", "Selesaikan Tugas") is the stock default Button, not one of these.
  */
 const nemuButtonVariants = cva("", {
   variants: {
     tone: {
       /** "Isi" beside a value Nemu fills in: the nemu-amber 600 fill with white text. */
       solid: "bg-nemu text-nemu-foreground hover:bg-nemu-amber-700",
-      /** "Buka My Requests": amber outline pill. */
+      /** "Buka Pengajuan Saya": amber outline pill. */
       outline:
         "border-nemu-ring bg-transparent text-nemu-text hover:bg-nemu-subtle hover:text-nemu-text",
       /** "Rincian", "Tutup", "Lihat detail": amber underlined text. */

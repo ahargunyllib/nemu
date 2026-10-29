@@ -57,7 +57,7 @@ async function renderTaskList() {
     history: createMemoryHistory({ initialEntries: ["/my-task"] }),
   });
   render(<RouterProvider router={router} />);
-  return screen.findByRole("searchbox", { name: "Search tasks" });
+  return screen.findByRole("searchbox", { name: "Cari tugas" });
 }
 
 afterEach(cleanup);

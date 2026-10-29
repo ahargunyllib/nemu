@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_auth/perdin/task/$instanceId")({
   component: RouteComponent,
 });
 
-/** A Task opens as a sheet over My Task; closing it slides it out, then goes back. */
+/** A Task opens as a sheet over Tugas Saya; closing it slides it out, then goes back. */
 function RouteComponent() {
   const { instanceId } = Route.useParams();
   const navigate = Route.useNavigate();

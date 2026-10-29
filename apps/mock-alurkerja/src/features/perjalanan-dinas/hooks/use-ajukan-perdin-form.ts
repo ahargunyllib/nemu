@@ -10,7 +10,7 @@ import {
 } from "@/features/perjalanan-dinas/lib/perdin-form";
 import { orpc } from "@/shared/api/orpc";
 
-/** The Ajukan Perjalanan Dinas form: Start Process creates a Process Instance and opens My Request. */
+/** The Ajukan Perjalanan Dinas form: Mulai Proses creates a Process Instance and opens Pengajuan Saya. */
 export function useAjukanPerdinForm() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();

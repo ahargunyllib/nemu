@@ -121,13 +121,13 @@ describe("PertanggungjawabanTask", () => {
 
     const field = async (label: string) =>
       (await screen.findByText(label, { selector: "dt" })).nextElementSibling?.textContent;
-    await waitFor(async () => expect(await field("Task Age")).toBe("1 day"));
-    expect(await field("Created")).toBe("Nov 5, 2026");
-    expect(await field("Due Date")).toBe("Nov 12, 2026");
-    expect(await field("Assignee")).toBe("Rina");
+    await waitFor(async () => expect(await field("Umur tugas")).toBe("1 hari"));
+    expect(await field("Dibuat")).toBe("5 Nov 2026");
+    expect(await field("Tenggat")).toBe("12 Nov 2026");
+    expect(await field("Pelaksana")).toBe("Rina");
   });
 
-  test("Complete Task waits for the refetch after the last upload instead of refusing it", async () => {
+  test("Selesaikan Tugas waits for the refetch after the last upload instead of refusing it", async () => {
     const uploadedAt = new Date("2026-11-06");
     server.dokumen = [
       { jenis: "surat_tugas", namaFile: "surat-tugas.pdf", uploadedAt },
@@ -141,7 +141,7 @@ describe("PertanggungjawabanTask", () => {
         <TaskPage />
       </QueryClientProvider>,
     );
-    const kirim = await screen.findByRole("button", { name: "Complete Task" });
+    const kirim = await screen.findByRole("button", { name: "Selesaikan Tugas" });
 
     let releaseRefetch = () => {};
     server.refetchGate = new Promise((resolve) => {
@@ -183,12 +183,12 @@ describe("PertanggungjawabanTask", () => {
     );
     expect(await screen.findByLabelText("Unggah laporan perjalanan")).toBeTruthy();
 
-    fireEvent.click(screen.getByRole("button", { name: "Complete Task" }));
+    fireEvent.click(screen.getByRole("button", { name: "Selesaikan Tugas" }));
 
-    await screen.findByText("Completed");
+    await screen.findByText("Selesai");
     expect(screen.getByRole("heading", { name: /^Verifikasi/ })).toBeTruthy();
     expect(screen.queryByLabelText("Unggah laporan perjalanan")).toBeNull();
-    expect(screen.queryByRole("button", { name: "Complete Task" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Selesaikan Tugas" })).toBeNull();
     expect(screen.getByText("laporan-perjalanan-makassar.pdf")).toBeTruthy();
   });
 });

@@ -65,8 +65,8 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
 - **Cancel pending answers.** Closing the card or pressing Esc while Nemu is thinking aborts the
   content request and the matching background fetch. A completion that arrives after cancellation
   is ignored rather than replacing the closed UI.
-- **Konfirmasi.** A `confirm` action rings its target with its label (Momen 3: Kirim, "Kamu yang
-  mengirim"), and the extension never clicks it. On a task page (`/perdin/task/$instanceId`), once
+- **Konfirmasi.** A `confirm` action rings its target with its label (Momen 3: Selesaikan Tugas, "Kamu
+  yang mengirim"), and the extension never clicks it. On a task page (`/perdin/task/$instanceId`), once
   Rina presses it, the background reads `getProcessInstance` until the State moves and the Answer
   Card shows the task ID and the new State (Verifikasi). A `batas_pertanggungjawaban` calc entry
   shows as a formula line under Rincian.
@@ -144,8 +144,8 @@ checks:
   mismatch chip without overwriting the field, Isi ulang writes Rp447.000 again, and the Chat Log
   records that an Area Crop was attached;
 - Momen 3, five times in a row after a demo data reset: Nemu opens the Pertanggungjawaban task,
-  the follow-up rings both missing uploads and Kirim and names the 12 November 2026 deadline,
-  and after the script uploads the sample PDFs and presses Kirim, the card shows
+  the follow-up rings both missing uploads and Selesaikan Tugas and names the 12 November 2026 deadline,
+  and after the script uploads the sample PDFs and presses Selesaikan Tugas, the card shows
   PJ-PD-2026-0042 and Verifikasi;
 - the mascot sits 12 px below and to the right of the cursor, and clicking it opens the Composer;
 - on a fresh tab where only the mascot opened the Composer, an Area Crop fails with the hint to

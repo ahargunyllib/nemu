@@ -20,11 +20,11 @@ export default function FavoriteProcessesCard() {
     <Card size="sm">
       <CardHeader>
         <CardTitle className="flex items-center gap-1.5">
-          Favorite Processes
+          Proses Favorit
           <Star aria-hidden className="size-3.5 fill-current" />
         </CardTitle>
         <CardAction className="flex items-center text-xs text-muted-foreground">
-          All processes · {ALL_PROCESSES_COUNT}
+          Semua proses · {ALL_PROCESSES_COUNT}
           <ChevronRight aria-hidden className="size-3.5" />
         </CardAction>
       </CardHeader>

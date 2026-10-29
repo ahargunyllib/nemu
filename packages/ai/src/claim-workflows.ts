@@ -125,7 +125,7 @@ const SLA_STEPS = [
   {
     id: "return-claim",
     target: NEMU_IDS.slaClaim.returnToTask,
-    label: "Kembali ke task klaim",
+    label: "Kembali ke tugas klaim",
   },
 ] as const satisfies readonly NemuGuideStep[];
 

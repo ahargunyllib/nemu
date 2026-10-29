@@ -28,18 +28,18 @@ export const NEMU_IDS = {
     menuNocTickets: "menu-tiket-noc",
     menuBilling: "menu-billing",
   },
-  /** Favorite Processes on Beranda (`/`): each opens that process's start form. */
+  /** Proses Favorit on Beranda (`/`): each opens that process's start form. */
   favoriteProcess: {
     perjalananDinas: "favorite-perjalanan-dinas",
     pengajuanCuti: "favorite-pengajuan-cuti",
     reimbursement: "favorite-reimbursement",
   },
-  /** Task links, one per Task, on Beranda (`/`) and My Task (`/my-task`). */
+  /** Task links, one per Task, on Beranda (`/`) and Tugas Saya (`/my-task`). */
   task: {
     pertanggungjawaban: "task-pertanggungjawaban",
     isiRencana: "task-isi-rencana",
     revisi: "task-revisi",
-    /** "View all … tasks" under Up next on Beranda; opens My Task. */
+    /** "Lihat semua … tugas" under Tugas berikutnya on Beranda; opens Tugas Saya. */
     viewAll: "link-lihat-semua-task",
   },
   /** Task detail (`/perdin/task/$instanceId`). */

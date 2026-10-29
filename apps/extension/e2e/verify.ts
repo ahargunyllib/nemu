@@ -53,7 +53,7 @@ const TIMEOUT_MS = 15_000;
 const MAX_STRAY_PIXELS = 50;
 // Issue #8: Momen 1 must succeed five times out of five.
 const MOMEN_1_RUNS = 5;
-// Issue #10: so must Momen 3, from Beranda to Kirim.
+// Issue #10: so must Momen 3, from Beranda to Selesaikan Tugas.
 const MOMEN_3_RUNS = 5;
 const SAMPLE_DOCUMENTS = path.resolve(import.meta.dirname, "../../mock-alurkerja/sample-documents");
 const MISSING_UPLOADS = {
@@ -435,7 +435,7 @@ async function assertFixtureResponder(page: Page) {
 
 /** Beranda greets Rina by name in its page heading. */
 async function waitForBeranda(page: Page) {
-  await page.getByRole("heading", { level: 1, name: /^Good morning/ }).waitFor();
+  await page.getByRole("heading", { level: 1, name: /^Selamat pagi/ }).waitFor();
 }
 
 async function main() {
@@ -593,7 +593,7 @@ async function main() {
       "on the form, Momen 2 sends only the selected area, rings its targets one step at a time and the Answer Card avoids them",
       async () => {
         await page.goto(`${DEMO_APP_URL}/perdin/baru`);
-        await page.getByRole("heading", { name: "Start Perjalanan Dinas" }).waitFor();
+        await page.getByRole("heading", { name: "Mulai Perjalanan Dinas" }).waitFor();
         // The lodging fields render only while the form's Biaya tab is open.
         await page.getByRole("tab", { name: "Biaya" }).click();
         const guidedActions = momentTwoResponse.actions;
@@ -752,7 +752,7 @@ async function main() {
       async () => {
         await resetDemoData(page);
         await page.goto(`${DEMO_APP_URL}/perdin/baru`);
-        await page.getByRole("heading", { name: "Start Perjalanan Dinas" }).waitFor();
+        await page.getByRole("heading", { name: "Mulai Perjalanan Dinas" }).waitFor();
         await page.getByRole("tab", { name: "Biaya" }).click();
         await page.locator('[data-nemu-id="input-nominal-penginapan"]').waitFor();
 
@@ -835,7 +835,7 @@ async function main() {
     );
 
     await check(
-      `Momen 3 opens the task, rings the uploads then Kirim, then shows Verifikasi, ${MOMEN_3_RUNS} out of ${MOMEN_3_RUNS}`,
+      `Momen 3 opens the task, rings the uploads then Selesaikan Tugas, then shows Verifikasi, ${MOMEN_3_RUNS} out of ${MOMEN_3_RUNS}`,
       async () => {
         const overlay = page.locator("nemu-overlay");
         for (let run = 1; run <= MOMEN_3_RUNS; run++) {
@@ -868,10 +868,10 @@ async function main() {
           if (run === 1) {
             await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-3-task.png") });
           }
-          // Nemu never presses Kirim: the task is still open until Rina does.
+          // Nemu never presses Selesaikan Tugas: the task is still open until Rina does.
           await page.locator(`[data-nemu-id="button-kirim"]`).waitFor();
 
-          // Each upload moves the ring on by itself, ending on Kirim.
+          // Each upload moves the ring on by itself, ending on Selesaikan Tugas.
           for (const [index, [nemuId, file]] of Object.entries(MISSING_UPLOADS).entries()) {
             await page
               .locator(`[data-nemu-id="${nemuId}"]`)
@@ -905,7 +905,7 @@ async function main() {
         await page.getByRole("button", { name: /Masuk sebagai Dimas/ }).click();
         await waitForBeranda(page);
         // W-TELKO's own demo clock, not the W-TRAVEL day Rina's session just showed.
-        await page.getByText("My dashboard · Wednesday 14 October", { exact: true }).waitFor();
+        await page.getByText("Dasbor saya · Rabu, 14 Oktober", { exact: true }).waitFor();
 
         await page.locator('[data-nemu-id="task-klaim-klm-2610-0007"]').click();
         await page.waitForURL(`${DEMO_APP_URL}/sla-claims/KLM-2610-0007`);

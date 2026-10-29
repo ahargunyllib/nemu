@@ -152,8 +152,8 @@ describe("placePanel with no target", () => {
     expect(placement.left).toBe(VIEWPORT.width - width - 12);
   });
 
-  test("moves into empty space instead of covering Beranda's Up next", () => {
-    // Beranda at 1280×800: the top bar, Favorite Processes, Up next, and Performance.
+  test("moves into empty space instead of covering Beranda's Tugas berikutnya", () => {
+    // Beranda at 1280×800: the top bar, Proses Favorit, Tugas berikutnya, and Kinerja Saya.
     const content: Box[] = [
       { left: 232, top: 0, width: 1048, height: 56 },
       { left: 256, top: 155, width: 1000, height: 117 },

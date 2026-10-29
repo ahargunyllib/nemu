@@ -9,7 +9,7 @@ export const PROCESS_TONES = {
 
 export type ProcessTone = keyof typeof PROCESS_TONES;
 
-/** Number of processes AlurKerja lists under "All processes"; the demo opens only Perjalanan Dinas. */
+/** Number of processes AlurKerja lists under "Semua proses"; the demo opens only Perjalanan Dinas. */
 export const ALL_PROCESSES_COUNT = 6;
 
 export const PERJALANAN_DINAS = { code: "PD", name: "Perjalanan Dinas", tone: "orange" } as const;

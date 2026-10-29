@@ -7,7 +7,7 @@ import { TASK_NEMU_IDS } from "@/features/perjalanan-dinas/lib/tasks";
 import type { ProcessInstanceView } from "@/features/perjalanan-dinas/types/process-instance-view";
 
 /**
- * The My Tasks column: the heading, a search over the Tasks' labels and IDs, and one compact row
+ * The Tugas Saya column: the heading, a search over the Tasks' labels and IDs, and one compact row
  * per Task, each opening its task page.
  */
 export default function TaskList({ tasks }: { tasks: readonly ProcessInstanceView[] }) {
@@ -22,16 +22,16 @@ export default function TaskList({ tasks }: { tasks: readonly ProcessInstanceVie
 
   return (
     <div className="flex w-full max-w-68 flex-col gap-3">
-      <h1 className="font-heading text-[22px] leading-7 font-medium">My Tasks</h1>
+      <h1 className="font-heading text-[22px] leading-7 font-medium">Tugas Saya</h1>
       <Input
         type="search"
-        aria-label="Search tasks"
-        placeholder="Search tasks…"
+        aria-label="Cari tugas"
+        placeholder="Cari tugas…"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         className="h-8 border-transparent bg-muted text-[13px] leading-[18px] md:text-[13px]"
       />
-      {/* With no Tasks at all, My Task shows TaskPlaceholder beside the column instead. */}
+      {/* With no Tasks at all, Tugas Saya shows TaskPlaceholder beside the column instead. */}
       {withTask.length === 0 ? null : shown.length === 0 ? (
         <Empty className="border">
           <EmptyHeader>
@@ -42,7 +42,7 @@ export default function TaskList({ tasks }: { tasks: readonly ProcessInstanceVie
       ) : (
         <>
           <h2 className="text-[10.5px] leading-3.5 font-semibold tracking-[0.08em] text-muted-foreground uppercase">
-            Due date
+            Tenggat
           </h2>
           <ul className="flex flex-col gap-3">
             {shown.map(

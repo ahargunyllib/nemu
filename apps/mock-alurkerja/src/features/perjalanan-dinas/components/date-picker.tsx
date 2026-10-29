@@ -2,6 +2,7 @@ import { Button } from "@nemu/ui/components/button";
 import { Calendar } from "@nemu/ui/components/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@nemu/ui/components/popover";
 import { useState } from "react";
+import { id as localeId } from "react-day-picker/locale";
 
 import {
   formatHariTanggal,
@@ -9,7 +10,10 @@ import {
   toIsoDate,
 } from "@/features/perjalanan-dinas/lib/perdin-form";
 
-/** A YYYY-MM-DD date picked from a calendar; `notBefore` greys out the days before it. */
+/**
+ * A YYYY-MM-DD date picked from an Indonesian calendar ("Oktober 2026"); `notBefore` greys out the
+ * days before it.
+ */
 export default function DatePicker({
   id,
   nemuId,
@@ -46,6 +50,7 @@ export default function DatePicker({
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
+          locale={localeId}
           selected={selected}
           defaultMonth={selected ?? earliest}
           disabled={earliest && { before: earliest }}

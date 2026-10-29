@@ -14,7 +14,7 @@ import { orpc } from "@/shared/api/orpc";
 
 export const Route = createFileRoute("/_auth/sla-claims/$claimId")({ component: SlaClaimPage });
 
-/** A claim Task opens as a sheet beside the My Tasks column; closing it goes back to the column. */
+/** A claim Task opens as a sheet beside the Tugas Saya column; closing it goes back to the column. */
 function SlaClaimPage() {
   const { claimId } = Route.useParams();
   const navigate = Route.useNavigate();
@@ -66,14 +66,14 @@ function SlaClaimPage() {
           ) : (
             <>
               <SheetHeader className="flex-row items-center justify-between px-6 pt-4 pb-0">
-                <SheetTitle>Task klaim</SheetTitle>
+                <SheetTitle>Tugas klaim</SheetTitle>
                 <TaskSheetClose className="-mr-2" />
               </SheetHeader>
               <Empty className="m-6 border">
                 <EmptyHeader>
                   <EmptyTitle>Klaim tidak ditemukan</EmptyTitle>
                   <EmptyDescription>
-                    Tidak ada task klaim {claimId} untuk akun ini.
+                    Tidak ada tugas klaim {claimId} untuk akun ini.
                   </EmptyDescription>
                 </EmptyHeader>
               </Empty>

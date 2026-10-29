@@ -11,7 +11,7 @@ export function createQueryClient() {
   return new QueryClient({
     queryCache: new QueryCache({
       onError: (error, query) => {
-        toast.error(`Error: ${error.message}`, {
+        toast.error(`Galat: ${error.message}`, {
           action: {
             label: "retry",
             onClick: () => {

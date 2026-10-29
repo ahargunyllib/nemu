@@ -12,11 +12,11 @@ import { DOKUMEN_UPLOADS } from "@/features/perjalanan-dinas/lib/tasks";
 import type { ProcessInstanceView } from "@/features/perjalanan-dinas/types/process-instance-view";
 
 /** Tabs AlurKerja shows on a task that the demo has no content for. */
-const OTHER_TABS = ["Details", "Diagram", "History", "Discussion"] as const;
+const OTHER_TABS = ["Detail", "Diagram", "Riwayat", "Diskusi"] as const;
 
 /**
  * The Pertanggungjawaban task sheet: upload the trip documents, then the employee presses
- * Complete Task. Once sent (State Verifikasi) the documents stay listed, read-only.
+ * Selesaikan Tugas. Once sent (State Verifikasi) the documents stay listed, read-only.
  */
 export default function PertanggungjawabanTask({
   instance,
@@ -37,7 +37,7 @@ export default function PertanggungjawabanTask({
           disabled
           className="border-task-header-foreground/80 bg-transparent text-task-header-foreground"
         >
-          Delegate
+          Delegasikan
         </Button>
         {terbuka ? (
           // An upload stays pending until the refetch shows it, so this never checks stale data.
@@ -49,13 +49,13 @@ export default function PertanggungjawabanTask({
             className="bg-background text-foreground hover:bg-muted"
           >
             {isKirimPending && <Spinner />}
-            Complete Task
+            Selesaikan Tugas
           </Button>
         ) : (
           <span
             className={cn(buttonVariants({ variant: "outline" }), "bg-background text-foreground")}
           >
-            Completed
+            Selesai
             <CheckIcon data-icon="inline-end" />
           </span>
         )}
@@ -63,7 +63,7 @@ export default function PertanggungjawabanTask({
       <Tabs defaultValue="form" className="min-h-0 flex-1 gap-4 overflow-y-auto px-6 py-4">
         <TabsList className="self-center">
           <TabsTrigger value="form" className="px-4">
-            Form
+            Formulir
           </TabsTrigger>
           {OTHER_TABS.map((tab) => (
             <TabsTrigger key={tab} value={tab} disabled className="px-4">
