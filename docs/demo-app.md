@@ -151,9 +151,17 @@ The sheet's orange header (the Task sheet's App colours) names the process and
 stage ("Klaim Kompensasi SLA · Tahap 1 dari 6"; Surat Penolakan has no stage),
 the Task with its claim number, and Klaim diterima, Tenggat telaah, and
 Pelaksana. It holds **Delegasikan** (disabled) and **Selesaikan Tugas**
-(`button-kirim-klaim`, with a spinner while it advances); on Persetujuan the
-disabled **Setujui klaim** takes Selesaikan Tugas's place, and a finished
-claim shows "Selesai". The body holds the stage's fields.
+(`button-kirim-klaim`, with a spinner while it advances); on Persetujuan
+**Setujui klaim** (`button-setujui-klaim`) takes Selesaikan Tugas's place, and
+a finished claim shows "Selesai". The body holds the stage's fields; Credit
+Note, the last stage, adds the approved amount and who approved it.
+
+Persetujuan follows the route in MP-BILL-02: up to Rp500.000 Sari Wulandari
+(Supervisor Billing) approves; above it Sari, then Hendra Gunawan (Manajer
+Billing Operations). From Persetujuan the claim also shows in each approver's
+Klaim SLA, and **Setujui klaim** is enabled only for the approver whose turn it
+is. Dimas drafted the claim, so it stays disabled for him (SOP Pasal 8 ayat 2).
+The last approval moves the Task to Credit Note, which only Dimas completes.
 
 ## Process Instances
 
@@ -205,7 +213,9 @@ panel and highlights keep the content area.
 **Panel demo** plays the atasan, PPK, and bendahara: pick a
 Process Instance and press **Majukan State** to move it to the next State
 (Draf → … → Selesai; Revisi goes back to Diajukan). **Reset data demo** puts
-back the signed-in user's 3-Momen fixtures and deletes their other requests.
+back the signed-in user's 3-Momen fixtures and deletes their other requests. It
+also puts every Klaim SLA Task back at Registrasi Klaim with no approvals
+(`packages/api/src/modules/sla-claims/demo-seed.ts`), whoever presses it.
 
 A page can add a one-click shortcut above Panel demo with
 `useDemoPageAction`. On Ajukan Perjalanan Dinas, **Isi formulir demo** fills
@@ -234,15 +244,18 @@ result matches `demo-seed.ts`.
 
 ## Demo accounts
 
-A migration (`packages/db/src/migrations/*_seed-demo-accounts`) seeds both
-accounts, so they exist locally and after every deploy. The login page also has
-one-click buttons for them.
+Migrations seed the accounts (`*_seed-demo-accounts` for Rina and the
+Verifikator, `*_seed_telco_workspace` for Dimas, `*_seed_telco_approvers` for
+Sari and Hendra in `packages/db/src/migrations`), so they exist locally and
+after every deploy. The login page also has one-click buttons for them.
 
-| Account     | Email                   | Password                | Golongan | Role            |
-| ----------- | ----------------------- | ----------------------- | -------- | --------------- |
-| Rina        | `rina@nemu.demo`        | `rina-demo-2026`        | III/a    | pegawai         |
-| Verifikator | `verifikator@nemu.demo` | `verifikator-demo-2026` | III/c    | verifikator     |
-| Dimas       | `dimas@nemu.demo`       | `dimas-demo-2026`       | –        | billing_liaison |
+| Account     | Email                   | Password                | Golongan | Role                       |
+| ----------- | ----------------------- | ----------------------- | -------- | -------------------------- |
+| Rina        | `rina@nemu.demo`        | `rina-demo-2026`        | III/a    | pegawai                    |
+| Verifikator | `verifikator@nemu.demo` | `verifikator-demo-2026` | III/c    | verifikator                |
+| Dimas       | `dimas@nemu.demo`       | `dimas-demo-2026`       | –        | billing_liaison            |
+| Sari        | `sari@nemu.demo`        | `sari-demo-2026`        | –        | supervisor_billing         |
+| Hendra      | `hendra@nemu.demo`      | `hendra-demo-2026`      | –        | manajer_billing_operations |
 
 Rina's user id is `rina`, matching the fixtures in `@nemu/contracts/fixtures`.
 

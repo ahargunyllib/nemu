@@ -6,6 +6,7 @@ import {
 import type { AjukanPerjalananDinasInput } from "@nemu/contracts/process-instance";
 import { describe, expect, it } from "vite-plus/test";
 
+import type { SlaTaskRecord } from "../sla-claims/repository";
 import type {
   NewProcessDocumentRecord,
   NewProcessInstanceRecord,
@@ -89,7 +90,13 @@ function createFakes(existingIds: string[] = []) {
       ];
     },
   };
-  return { processInstances };
+  const slaClaims = {
+    tasks: [] as SlaTaskRecord[],
+    async replaceTasks(_workspaceId: string, tasks: readonly SlaTaskRecord[]) {
+      slaClaims.tasks = [...tasks];
+    },
+  };
+  return { processInstances, slaClaims };
 }
 
 /** Fakes holding the seeded 3-Momen fixtures, as after the seed migration. */
@@ -333,5 +340,32 @@ describe("resetDemo", () => {
     ).toEqual([{ id: "PD-2026-0042", state: "Pertanggungjawaban" }]);
     expect(await listMyProcessInstances(deps, "verifikator")).toHaveLength(1);
     expect(await loadProcessContext(deps, "rina")).toEqual(momentThreeRequest.process_context);
+  });
+
+  it("puts every Klaim SLA Task back at Registrasi Klaim with no approvals", async () => {
+    const deps = await createSeededFakes();
+    deps.slaClaims.tasks = deps.slaClaims.tasks.map((task) => ({
+      ...task,
+      name: "Credit Note",
+      approvedBy: ["U-102", "U-103"],
+    }));
+
+    await resetDemo(deps, "rina");
+
+    expect(
+      deps.slaClaims.tasks.map(({ claimId, name, status, approvedBy }) => ({
+        claimId,
+        name,
+        status,
+        approvedBy,
+      })),
+    ).toEqual(
+      ["KLM-2610-0007", "KLM-2610-0009", "KLM-2610-0011"].map((claimId) => ({
+        claimId,
+        name: "Registrasi Klaim",
+        status: "OPEN",
+        approvedBy: [],
+      })),
+    );
   });
 });

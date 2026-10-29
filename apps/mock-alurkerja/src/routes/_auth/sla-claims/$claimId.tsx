@@ -18,7 +18,6 @@ export const Route = createFileRoute("/_auth/sla-claims/$claimId")({ component: 
 function SlaClaimPage() {
   const { claimId } = Route.useParams();
   const navigate = Route.useNavigate();
-  const { user } = Route.useRouteContext();
   const [open, setOpen] = useState(true);
   const { data: claims } = useQuery(
     orpc.listSlaClaims.queryOptions({ input: { workspaceId: "W-TELKO" } }),
@@ -59,7 +58,7 @@ function SlaClaimPage() {
           ) : data ? (
             <SlaClaimTask
               detail={data}
-              assignee={user.name}
+              assignee={data.assignee}
               onAdvance={advance}
               advancing={advancing}
             />

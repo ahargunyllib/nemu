@@ -16,7 +16,7 @@ import SlaClaimTask, { type SlaClaimDetail } from "./sla-claim-task";
 
 function detail(
   name: string,
-  options: { timely?: boolean; missingTicketIds?: string[] } = {},
+  options: { timely?: boolean; missingTicketIds?: string[]; canApprove?: boolean } = {},
 ): SlaClaimDetail {
   return {
     claim: {
@@ -53,6 +53,9 @@ function detail(
       status: options.missingTicketIds?.length ? "PERLU_BUKTI" : "OPEN",
       reviewDueOn: "2026-10-15",
     },
+    assignee: "Dimas Pratama",
+    canAdvance: name !== "Persetujuan" && !options.canApprove,
+    canApprove: options.canApprove ?? false,
     summary: {
       cutoff: {
         period: options.timely === false ? "2026-08" : "2026-09",
@@ -66,7 +69,10 @@ function detail(
       compensationAmount: options.missingTicketIds?.length ? null : 579_167,
       missingTicketIds: options.missingTicketIds ?? [],
       excludedTicketIds: ["INC-2609-031"],
-      approvers: ["Sari Wulandari (Supervisor Billing)"],
+      approvers: [
+        "Sari Wulandari (Supervisor Billing)",
+        "Hendra Gunawan (Manajer Billing Operations)",
+      ],
     },
   };
 }
@@ -169,6 +175,48 @@ describe("SlaClaimTask", () => {
     expect(approve).toHaveProperty("disabled", true);
     expect(compensation).toHaveProperty("readOnly", false);
     expect(compensation).toHaveProperty("value", "");
+  });
+
+  test("lets the approver whose turn it is approve the claim", () => {
+    const onAdvance = vi.fn();
+    const { container } = renderTask(
+      <SlaClaimTask
+        assignee="Dimas Pratama"
+        detail={detail("Persetujuan", { canApprove: true })}
+        onAdvance={onAdvance}
+      />,
+    );
+    const approve = container.querySelector(`[data-nemu-id="${NEMU_IDS.slaClaim.approve}"]`);
+
+    expect(approve).toHaveProperty("disabled", false);
+    fireEvent.click(screen.getByRole("button", { name: "Setujui klaim" }));
+    expect(onAdvance).toHaveBeenCalledOnce();
+  });
+
+  test("keeps Selesaikan Tugas disabled for an approver viewing the Credit Note", () => {
+    const { container } = renderTask(
+      <SlaClaimTask
+        assignee="Dimas Pratama"
+        detail={{ ...detail("Credit Note"), canAdvance: false }}
+      />,
+    );
+
+    expect(container.querySelector(`[data-nemu-id="${NEMU_IDS.slaClaim.submit}"]`)).toHaveProperty(
+      "disabled",
+      true,
+    );
+  });
+
+  test("ends at the Credit Note with the approved amount and route", () => {
+    renderTask(<SlaClaimTask assignee="Dimas Pratama" detail={detail("Credit Note")} />);
+
+    expect(screen.getByText("Klaim Kompensasi SLA · Tahap 6 dari 6")).toBeTruthy();
+    expect(screen.getByText("Rp579.167")).toBeTruthy();
+    expect(
+      screen.getByText(
+        "Sari Wulandari (Supervisor Billing), Hendra Gunawan (Manajer Billing Operations)",
+      ),
+    ).toBeTruthy();
   });
 
   test("leaves the compensation amount to Nemu instead of printing it in the task", () => {

@@ -9,10 +9,15 @@ export function useAdvanceSlaClaim(claimId: string) {
   const mutation = useMutation(
     orpc.advanceSlaClaimTask.mutationOptions({
       onSuccess(task) {
-        toast.success(`Tugas berpindah ke ${task.name}`);
+        toast.success(
+          task.name === "Persetujuan" && task.approvedBy.length > 0
+            ? "Persetujuan dicatat, menunggu penyetuju berikutnya"
+            : `Tugas berpindah ke ${task.name}`,
+        );
         void queryClient.invalidateQueries({ queryKey: orpc.getSlaClaim.key() });
         void queryClient.invalidateQueries({ queryKey: orpc.listSlaClaimTasks.key() });
       },
+      onError: (error) => toast.error(error.message),
     }),
   );
   const advance = () => mutation.mutate({ workspaceId: "W-TELKO", claimId });

@@ -6,6 +6,7 @@ import {
   telcoService,
   telcoTask,
   telcoTicket,
+  telcoUser,
 } from "@nemu/db/schema/telco";
 
 export type SlaClaimRecord = typeof telcoClaim.$inferSelect;
@@ -14,10 +15,12 @@ export type SlaInvoiceRecord = typeof telcoInvoice.$inferSelect;
 export type SlaTicketRecord = typeof telcoTicket.$inferSelect;
 export type SlaApprovalRuleRecord = typeof telcoApprovalRule.$inferSelect;
 export type SlaTaskRecord = typeof telcoTask.$inferSelect;
+export type SlaUserRecord = typeof telcoUser.$inferSelect;
 
 export type SlaClaimRepository = {
-  listClaims(workspaceId: string, assigneeId: string): Promise<SlaClaimRecord[]>;
+  listClaims(workspaceId: string): Promise<SlaClaimRecord[]>;
   listTasks(workspaceId: string, assigneeId: string): Promise<SlaTaskRecord[]>;
+  listWorkspaceTasks(workspaceId: string): Promise<SlaTaskRecord[]>;
   findAssignedTaskByService(
     workspaceId: string,
     assigneeId: string,
@@ -34,27 +37,22 @@ export type SlaClaimRepository = {
   listTickets(workspaceId: string, serviceId: string, period: string): Promise<SlaTicketRecord[]>;
   listApprovalRules(workspaceId: string): Promise<SlaApprovalRuleRecord[]>;
   findTask(workspaceId: string, claimId: string): Promise<SlaTaskRecord | undefined>;
+  findUser(workspaceId: string, userId: string): Promise<SlaUserRecord | undefined>;
   updateTask(
     workspaceId: string,
     taskId: string,
-    update: Pick<SlaTaskRecord, "name" | "status">,
+    update: Pick<SlaTaskRecord, "name" | "status"> & Partial<Pick<SlaTaskRecord, "approvedBy">>,
   ): Promise<SlaTaskRecord | undefined>;
+  replaceTasks(workspaceId: string, tasks: readonly SlaTaskRecord[]): Promise<void>;
 };
 
 export function createSlaClaimRepository(db: Database): SlaClaimRepository {
   return {
-    listClaims(workspaceId, assigneeId) {
+    listClaims(workspaceId) {
       return db
-        .select({ ...getColumns(telcoClaim) })
+        .select()
         .from(telcoClaim)
-        .innerJoin(
-          telcoTask,
-          and(
-            eq(telcoTask.workspaceId, telcoClaim.workspaceId),
-            eq(telcoTask.claimId, telcoClaim.id),
-          ),
-        )
-        .where(and(eq(telcoClaim.workspaceId, workspaceId), eq(telcoTask.assigneeId, assigneeId)))
+        .where(eq(telcoClaim.workspaceId, workspaceId))
         .orderBy(telcoClaim.id);
     },
     listTasks(workspaceId, assigneeId) {
@@ -62,6 +60,13 @@ export function createSlaClaimRepository(db: Database): SlaClaimRepository {
         .select()
         .from(telcoTask)
         .where(and(eq(telcoTask.workspaceId, workspaceId), eq(telcoTask.assigneeId, assigneeId)))
+        .orderBy(telcoTask.createdAt, telcoTask.id);
+    },
+    listWorkspaceTasks(workspaceId) {
+      return db
+        .select()
+        .from(telcoTask)
+        .where(eq(telcoTask.workspaceId, workspaceId))
         .orderBy(telcoTask.createdAt, telcoTask.id);
     },
     async findAssignedTaskByService(workspaceId, assigneeId, serviceId) {
@@ -167,6 +172,14 @@ export function createSlaClaimRepository(db: Database): SlaClaimRepository {
         .limit(1);
       return record;
     },
+    async findUser(workspaceId, userId) {
+      const [record] = await db
+        .select()
+        .from(telcoUser)
+        .where(and(eq(telcoUser.workspaceId, workspaceId), eq(telcoUser.id, userId)))
+        .limit(1);
+      return record;
+    },
     async updateTask(workspaceId, taskId, update) {
       const [record] = await db
         .update(telcoTask)
@@ -174,6 +187,10 @@ export function createSlaClaimRepository(db: Database): SlaClaimRepository {
         .where(and(eq(telcoTask.workspaceId, workspaceId), eq(telcoTask.id, taskId)))
         .returning();
       return record;
+    },
+    async replaceTasks(workspaceId, tasks) {
+      await db.delete(telcoTask).where(eq(telcoTask.workspaceId, workspaceId));
+      if (tasks.length) await db.insert(telcoTask).values([...tasks]);
     },
   };
 }

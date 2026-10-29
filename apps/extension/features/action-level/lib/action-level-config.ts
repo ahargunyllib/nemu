@@ -38,6 +38,8 @@ export const ACTION_LEVELS: Partial<Record<NemuId, ActionLevel>> = {
   [NEMU_IDS.login.signInAsRina]: "dilarang",
   [NEMU_IDS.login.signInAsVerifikator]: "dilarang",
   [NEMU_IDS.login.signInAsDimas]: "dilarang",
+  [NEMU_IDS.login.signInAsSari]: "dilarang",
+  [NEMU_IDS.login.signInAsHendra]: "dilarang",
   [NEMU_IDS.shell.accountMenu]: "dilarang",
   [NEMU_IDS.shell.signOut]: "dilarang",
 };

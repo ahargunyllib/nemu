@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { workspace } from "./workspace";
@@ -119,6 +120,11 @@ export const telcoTask = sqliteTable(
     createdAt: text("created_at").notNull(),
     reviewDueOn: text("review_due_on"),
     status: text("status").notNull(),
+    /** The telco users who have approved the claim at Persetujuan, in route order. */
+    approvedBy: text("approved_by", { mode: "json" })
+      .$type<string[]>()
+      .notNull()
+      .default(sql`'[]'`),
   },
   (table) => [index("telco_task_workspaceId_idx").on(table.workspaceId, table.claimId)],
 );
