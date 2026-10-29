@@ -131,7 +131,7 @@ describe("PertanggungjawabanTask", () => {
     const uploadedAt = new Date("2026-11-06");
     server.dokumen = [
       { jenis: "surat_tugas", namaFile: "surat-tugas.pdf", uploadedAt },
-      { jenis: "boarding_pass_pergi", namaFile: "boarding-pass-pergi-cgk-upg.pdf", uploadedAt },
+      { jenis: "boarding_pass_pergi", namaFile: "boarding-pass-pergi-yia-upg.pdf", uploadedAt },
       { jenis: "laporan_perjalanan", namaFile: "laporan-perjalanan-makassar.pdf", uploadedAt },
     ];
     const toastSuccess = vi.spyOn(toast, "success");
@@ -148,10 +148,10 @@ describe("PertanggungjawabanTask", () => {
       releaseRefetch = resolve;
     });
     fireEvent.change(screen.getByLabelText("Unggah boarding pass pulang"), {
-      target: { files: [new File(["pdf"], "boarding-pass-pulang-upg-cgk.pdf")] },
+      target: { files: [new File(["pdf"], "boarding-pass-pulang-upg-yia.pdf")] },
     });
     await waitFor(() =>
-      expect(toastSuccess).toHaveBeenCalledWith("boarding-pass-pulang-upg-cgk.pdf terunggah"),
+      expect(toastSuccess).toHaveBeenCalledWith("boarding-pass-pulang-upg-yia.pdf terunggah"),
     );
 
     // The upload succeeded but the page still shows the old instance.
@@ -160,7 +160,7 @@ describe("PertanggungjawabanTask", () => {
     expect(server.kirim).not.toHaveBeenCalled();
 
     releaseRefetch();
-    await screen.findByText("boarding-pass-pulang-upg-cgk.pdf");
+    await screen.findByText("boarding-pass-pulang-upg-yia.pdf");
     await waitFor(() => expect(kirim).toHaveProperty("disabled", false));
     fireEvent.click(kirim);
 
@@ -172,8 +172,8 @@ describe("PertanggungjawabanTask", () => {
     const uploadedAt = new Date("2026-11-06");
     server.dokumen = [
       { jenis: "surat_tugas", namaFile: "surat-tugas.pdf", uploadedAt },
-      { jenis: "boarding_pass_pergi", namaFile: "boarding-pass-pergi-cgk-upg.pdf", uploadedAt },
-      { jenis: "boarding_pass_pulang", namaFile: "boarding-pass-pulang-upg-cgk.pdf", uploadedAt },
+      { jenis: "boarding_pass_pergi", namaFile: "boarding-pass-pergi-yia-upg.pdf", uploadedAt },
+      { jenis: "boarding_pass_pulang", namaFile: "boarding-pass-pulang-upg-yia.pdf", uploadedAt },
       { jenis: "laporan_perjalanan", namaFile: "laporan-perjalanan-makassar.pdf", uploadedAt },
     ];
     render(

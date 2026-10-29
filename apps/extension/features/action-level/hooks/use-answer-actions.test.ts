@@ -92,8 +92,8 @@ describe("useAnswerActions", () => {
       ),
     );
     expect(result.current.steps.map(({ target, label }) => [target, label])).toEqual([
-      [NEMU_IDS.pertanggungjawaban.uploadLaporanPerjalanan, "Unggah dokumen ini"],
-      [NEMU_IDS.pertanggungjawaban.uploadBoardingPassPulang, "Unggah dokumen ini"],
+      [NEMU_IDS.pertanggungjawaban.uploadLaporanPerjalanan, "Unggah laporan perjalanan"],
+      [NEMU_IDS.pertanggungjawaban.uploadBoardingPassPulang, "Unggah boarding pass pulang"],
       [NEMU_IDS.pertanggungjawaban.kirim, "Kamu yang mengirim"],
     ]);
     expect(result.current.cursor).toBeNull();

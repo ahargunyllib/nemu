@@ -1,7 +1,19 @@
 import { nemuResponseSchema } from "@nemu/contracts";
 import {
+  k2ApprovalRequest,
+  k2ApprovalResponse,
+  k2CompensationRequest,
+  k2CompensationResponse,
+  k2SlaContractRequest,
+  k2SlaContractResponse,
+  k2SlaRequest,
+  k2SlaResponse,
+  k2SlaReturnRequest,
+  k2SlaReturnResponse,
   momentOneRequest,
   momentOneResponse,
+  momentOneFollowUpRequest,
+  momentOneFollowUpResponse,
   momentThreeFollowUpRequest,
   momentThreeFollowUpResponse,
   momentThreeRequest,
@@ -16,9 +28,15 @@ import { findFixtureResponse } from "./fixture-responder";
 describe("fixture responder", () => {
   test.each([
     ["Momen 1", momentOneRequest, momentOneResponse],
+    ["Momen 1 follow-up", momentOneFollowUpRequest, momentOneFollowUpResponse],
     ["Momen 2", momentTwoRequest, momentTwoResponse],
     ["Momen 3", momentThreeRequest, momentThreeResponse],
     ["Momen 3 follow-up", momentThreeFollowUpRequest, momentThreeFollowUpResponse],
+    ["K2 SLA", k2SlaRequest, k2SlaResponse],
+    ["K2 SLA contract", k2SlaContractRequest, k2SlaContractResponse],
+    ["K2 SLA return", k2SlaReturnRequest, k2SlaReturnResponse],
+    ["K2 compensation", k2CompensationRequest, k2CompensationResponse],
+    ["K2 approval refusal", k2ApprovalRequest, k2ApprovalResponse],
   ])("answers the %s prompt with its fixture", (_name, request, response) => {
     expect(findFixtureResponse(request)).toEqual(response);
   });

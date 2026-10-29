@@ -1,0 +1,3 @@
+# Product requirements complete at the user boundary
+
+A contract, model response, repository adapter, or UI component can be independently correct while the requested product behavior is still unavailable. We therefore report PRD completion only when the complete producer-to-consumer path passes its observable acceptance scenario. Intermediate work remains valuable and tested, but is labelled partial until its downstream consumer exists. For Nemu, this means `fill` includes the AI decision, extension confirmation control, DOM update, and mismatch feedback; `guide` includes deterministic planning, cross-page continuation, and visible progress; workspace knowledge includes upload, indexing, active-version filtering, and runtime retrieval.

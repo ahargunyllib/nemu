@@ -2,7 +2,7 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 
 import type { Context } from "../../context";
-import { protectedProcedure } from "../../index";
+import { travelAdminProcedure } from "../../index";
 import { createReferenceTableRepository } from "./repository";
 import { listReferenceTables, readReferenceTable, uploadReferenceTable } from "./service";
 import { REFERENCE_TABLE_TYPES } from "./table-types";
@@ -12,7 +12,7 @@ function referenceTableDeps(context: Pick<Context, "db">) {
 }
 
 export const referenceTablesRouter = {
-  uploadReferenceTable: protectedProcedure
+  uploadReferenceTable: travelAdminProcedure
     .input(
       z.object({
         file: z
@@ -26,11 +26,11 @@ export const referenceTablesRouter = {
       return result.table;
     }),
 
-  listReferenceTables: protectedProcedure.handler(({ context }) =>
+  listReferenceTables: travelAdminProcedure.handler(({ context }) =>
     listReferenceTables(referenceTableDeps(context)),
   ),
 
-  getReferenceTable: protectedProcedure
+  getReferenceTable: travelAdminProcedure
     .input(z.object({ type: z.enum(REFERENCE_TABLE_TYPES) }))
     .handler(async ({ context, input }) => {
       const table = await readReferenceTable(referenceTableDeps(context), input.type);

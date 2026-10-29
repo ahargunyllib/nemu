@@ -14,6 +14,13 @@
  * `pnpm --filter extension verify`; add `-- --headed` to watch.
  */
 import {
+  k2ApprovalRequest,
+  k2ApprovalResponse,
+  k2CompensationRequest,
+  k2CompensationResponse,
+  k2SlaRequest,
+  k2SlaResponse,
+  momentOneFollowUpResponse,
   momentOneRequest,
   momentOneResponse,
   momentThreeFollowUpResponse,
@@ -50,7 +57,7 @@ const MOMEN_3_RUNS = 5;
 const SAMPLE_DOCUMENTS = path.resolve(import.meta.dirname, "../../mock-alurkerja/sample-documents");
 const MISSING_UPLOADS = {
   "upload-laporan-perjalanan": "laporan-perjalanan-makassar.pdf",
-  "upload-boarding-pass-pulang": "boarding-pass-pulang-upg-cgk.pdf",
+  "upload-boarding-pass-pulang": "boarding-pass-pulang-upg-yia.pdf",
 } as const;
 
 // The service worker's own extension API, which `worker.evaluate` callbacks run against.
@@ -427,8 +434,28 @@ async function main() {
             await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-1-clicking.png") });
           }
           await page.waitForURL(`${DEMO_APP_URL}/perdin/baru`);
-          await page.getByRole("button", { name: "Rincian", exact: true }).click();
-          await page.getByText("Rincian perkiraan biaya", { exact: false }).waitFor();
+          const overlay = page.locator("nemu-overlay");
+          const card = overlay
+            .locator('[data-slot="card"]')
+            .filter({ hasText: momentOneFollowUpResponse.answer.ringkas });
+          await card.waitFor();
+          await card.getByText("Langkah 1 dari 6").waitFor();
+          const firstStep = momentOneFollowUpResponse.actions[0];
+          if (!firstStep) throw new Error("momentOneFollowUpResponse has no first step");
+          await waitForScrollToSettle(page);
+          await eventually(async () => {
+            const target = page.locator(`[data-nemu-id="${firstStep.target}"]`).first();
+            await assertOnlyRing(overlay, firstStep.target, firstStep.label, await boxOf(target));
+          });
+          await card.getByRole("button", { name: "Langkah berikutnya" }).click();
+          await card.getByText("Langkah 2 dari 6").waitFor();
+          const [citation] = momentOneFollowUpResponse.citations;
+          if (citation) {
+            await card.getByRole("button", { name: citation.judul }).click();
+            if (citation.pasal) {
+              await card.getByText(`Pasal ${citation.pasal}`, { exact: false }).waitFor();
+            }
+          }
           if (run === 1) {
             await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-1-form.png") });
           }
@@ -444,15 +471,17 @@ async function main() {
         await page.getByRole("heading", { name: "Start Perjalanan Dinas" }).waitFor();
         // The lodging fields render only while the form's Biaya tab is open.
         await page.getByRole("tab", { name: "Biaya" }).click();
-        const highlights = momentTwoResponse.actions.filter(({ type }) => type === "highlight");
-        if (highlights.length === 0) throw new Error("momentTwoResponse has no highlight actions");
+        const guidedActions = momentTwoResponse.actions;
+        if (guidedActions.length === 0) {
+          throw new Error("momentTwoResponse has no guided actions");
+        }
 
         await openComposer(context, page);
         const composer = page.getByRole("textbox", { name: "Pertanyaan untuk Nemu" });
         await composer.fill(momentTwoRequest.prompt);
         const selection = await selectArea(
           page,
-          highlights.map(({ target }) => page.locator(`[data-nemu-id="${target}"]`).first()),
+          guidedActions.map(({ target }) => page.locator(`[data-nemu-id="${target}"]`).first()),
         );
 
         // The chip holds a crop of the selection alone, not of the whole viewport.
@@ -489,9 +518,9 @@ async function main() {
           await card.getByRole("list", { name: "Peringatan" }).getByText(warning).waitFor();
         }
 
-        // One ring at a time: check each step, then move on with the Answer Card's arrow.
-        for (const [index, { target, label }] of highlights.entries()) {
-          await card.getByText(`Langkah ${index + 1} dari ${highlights.length}`).waitFor();
+        // One ring at a time: selecting the first option advances to the confirmed fill.
+        for (const [index, { target, label }] of guidedActions.entries()) {
+          await card.getByText(`Langkah ${index + 1} dari ${guidedActions.length}`).waitFor();
           await waitForScrollToSettle(page);
           await eventually(async () => {
             // The panel around the card, which scrolls when it's shrunk to keep off the ring.
@@ -503,28 +532,48 @@ async function main() {
           await page.screenshot({
             path: path.join(SCREENSHOT_DIR, `momen-2-highlight-step-${index + 1}.png`),
           });
-          if (index < highlights.length - 1) {
-            await card.getByRole("button", { name: "Langkah berikutnya" }).click();
-          }
+          if (index === 0) await page.locator(`[data-nemu-id="${target}"]`).click();
         }
         for (const { judul, pasal } of momentTwoResponse.citations) {
           await card.getByRole("button", { name: judul }).click();
           if (pasal) await card.getByText(`Pasal ${pasal}`, { exact: false }).waitFor();
         }
 
-        // Arahkan only: Rina fills the lodging fields herself.
-        const [notHotel, amount] = highlights.map(({ target }) =>
+        // The amount stays untouched until Rina confirms the exact calculated value.
+        const [notHotel, amount] = guidedActions.map(({ target }) =>
           page.locator(`[data-nemu-id="${target}"]`).first(),
         );
-        if ((await notHotel?.getAttribute("aria-checked")) === "true") {
-          throw new Error("Nemu picked the lodging option");
+        if ((await notHotel?.getAttribute("aria-checked")) !== "true") {
+          throw new Error("the selected lodging option did not advance the guide");
         }
-        const amountValue = await amount?.evaluate((element) =>
+        const valueOfAmount = () =>
+          amount?.evaluate((element) =>
+            element instanceof HTMLInputElement
+              ? element.value
+              : element.querySelector("input")?.value,
+          );
+        if (await valueOfAmount()) throw new Error("Nemu filled before Rina confirmed");
+
+        await overlay.getByRole("button", { name: "Isi Rp447.000" }).click();
+        await eventually(async () => {
+          const amountValue = await valueOfAmount();
+          if (amountValue !== "447000") {
+            throw new Error(`the confirmed lodging amount is ${amountValue}, not 447000`);
+          }
+        });
+
+        const amountInput = amount?.locator("input");
+        if (!amountInput) throw new Error("the lodging amount input is missing");
+        await amountInput.fill("745000");
+        await overlay.getByText("Tidak sesuai hitungan Rp447.000", { exact: true }).waitFor();
+        const changedAmount = await amount?.evaluate((element) =>
           element instanceof HTMLInputElement
             ? element.value
             : element.querySelector("input")?.value,
         );
-        if (amountValue) throw new Error(`Nemu filled the lodging amount: ${amountValue}`);
+        if (changedAmount !== "745000") {
+          throw new Error(`the mismatch warning changed the field to ${changedAmount}`);
+        }
 
         const entry = await newestChatLogEntry(page);
         if (entry.prompt !== momentTwoRequest.prompt || !entry.hasAreaCrop) {
@@ -626,12 +675,15 @@ async function main() {
           await page.getByText(momentThreeResponse.answer.ringkas).waitFor();
           await page.waitForURL(`${DEMO_APP_URL}/perdin/task/PD-2026-0042`);
 
-          // The follow-up from the task page: its own answer, the deadline chip, three steps.
+          // The follow-up from the task page: its own answer, the deadline as a sentence, three steps.
           const card = overlay
             .locator('[data-slot="card"]')
             .filter({ hasText: momentThreeFollowUpResponse.answer.ringkas });
           await card.waitFor();
-          await card.getByText("Batas 12 November 2026").waitFor();
+          await card
+            .getByRole("region", { name: "Perhitungan" })
+            .getByText(/^Batas Pertanggungjawaban: .* = 12 November 2026\.$/)
+            .waitFor();
           const steps = momentThreeFollowUpResponse.actions;
           const ringStep = async (index: number) => {
             const step = steps[index];
@@ -672,6 +724,89 @@ async function main() {
           }
           await closeAnswerCard(page);
         }
+      },
+    );
+
+    await check(
+      "Dimas sees the persisted Telco clock and all three SLA-claim branches",
+      async () => {
+        await page.locator('[data-nemu-id="button-akun"]').click();
+        await page.locator('[data-nemu-id="menu-item-keluar"]').click();
+        await page.waitForURL(`${DEMO_APP_URL}/login`);
+        await page.getByRole("button", { name: /Masuk sebagai Dimas/ }).click();
+        await page.getByRole("heading", { name: "Beranda" }).waitFor();
+        await page.getByText("Hari ini 14 Oktober 2026", { exact: true }).waitFor();
+
+        await page.locator('[data-nemu-id="task-klaim-klm-2610-0007"]').click();
+        await page.waitForURL(`${DEMO_APP_URL}/sla-claims/KLM-2610-0007`);
+        for (const nemuId of [
+          "input-nomor-surat-klaim",
+          "input-service-id-klaim",
+          "input-periode-klaim",
+          "input-tanggal-terima-klaim",
+          "input-jam-diklaim",
+          "upload-surat-klaim",
+          "opt-klaim-tepat-waktu-ya",
+        ]) {
+          await page.locator(`[data-nemu-id="${nemuId}"]`).waitFor();
+        }
+        await page.locator('[data-nemu-id="button-kirim-klaim"]').click();
+        await page.getByRole("heading", { name: "Cocokkan Layanan & Kontrak" }).waitFor();
+        await ask(context, page, k2SlaRequest.prompt);
+        await page.getByText(k2SlaResponse.answer.ringkas, { exact: true }).waitFor();
+        // The three extension-owned guide clicks open CRM, reveal the contract, and return.
+        await page.waitForURL(`${DEMO_APP_URL}/sla-claims/KLM-2610-0007`);
+        await page.getByText("ADD-2026-02", { exact: false }).first().waitFor();
+        await closeAnswerCard(page);
+        await page.locator('[data-nemu-id="button-kirim-klaim"]').click();
+        await page.getByRole("heading", { name: "Telaah Tiket Gangguan" }).waitFor();
+        for (const nemuId of [
+          "row-tiket-inc-2609-014",
+          "row-tiket-inc-2609-015",
+          "row-tiket-inc-2609-031",
+          "row-tiket-inc-2609-047",
+        ]) {
+          await page.locator(`[data-nemu-id="${nemuId}"]`).waitFor();
+        }
+        await page.locator('[data-nemu-id="button-kirim-klaim"]').click();
+        await page.getByRole("heading", { name: "Susun Berita Acara" }).waitFor();
+        const amount = page.locator('[data-nemu-id="input-nominal-kompensasi"]');
+        if ((await amount.inputValue()) !== "") throw new Error("compensation starts prefilled");
+        await ask(context, page, k2CompensationRequest.prompt);
+        await page.getByText(k2CompensationResponse.answer.ringkas, { exact: true }).waitFor();
+        await page.getByRole("button", { name: "Isi Rp579.167" }).click();
+        if ((await amount.inputValue()) !== "579167") throw new Error("confirmed fill was not raw");
+        await amount.fill("1");
+        await page.getByText("Tidak sesuai hitungan Rp579.167", { exact: true }).waitFor();
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "k2-happy-compensation.png") });
+        await amount.fill("579167");
+        await closeAnswerCard(page);
+        await page.locator('[data-nemu-id="button-kirim-klaim"]').click();
+        const approval = page.locator('[data-nemu-id="button-setujui-klaim"]');
+        await approval.waitFor();
+        if (!(await approval.isDisabled()))
+          throw new Error("Billing Liaison can approve its own claim");
+        await ask(context, page, k2ApprovalRequest.prompt);
+        await page.getByText(k2ApprovalResponse.answer.ringkas, { exact: true }).waitFor();
+        if (!(await approval.isDisabled())) throw new Error("Nemu enabled self-approval");
+        await closeAnswerCard(page);
+
+        await page.goto(`${DEMO_APP_URL}/sla-claims/KLM-2610-0009`);
+        await page.locator('[data-nemu-id="button-kirim-klaim"]').click();
+        await page.locator('[data-nemu-id="button-kirim-klaim"]').click();
+        await page.getByRole("heading", { name: "Telaah Tiket Gangguan" }).waitFor();
+        await page.locator('[data-nemu-id="button-kirim-klaim"]').click();
+        await page.getByText("PERLU_BUKTI", { exact: true }).first().waitFor();
+        await page.locator('[data-nemu-id="button-minta-rca-inc-2609-058"]').waitFor();
+        if (await page.locator('[data-nemu-id="input-nominal-kompensasi"]').count()) {
+          throw new Error("missing-RCA claim exposes a final compensation input");
+        }
+
+        await page.goto(`${DEMO_APP_URL}/sla-claims/KLM-2610-0011`);
+        await page.locator('[data-nemu-id="button-kirim-klaim"]').click();
+        await page.getByRole("heading", { name: "Surat Penolakan" }).first().waitFor();
+        await page.locator('[data-nemu-id="link-template-penolakan"]').waitFor();
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, "k2-late-rejection.png") });
       },
     );
   } finally {

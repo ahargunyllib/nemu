@@ -1,0 +1,5 @@
+rca_id,tiket,penyebab,status,disahkan_oleh,tanggal_sah,uraian
+RCA-2609-07,INC-2609-014; INC-2609-015,PENYEDIA,DISAHKAN,Agus Setiawan,2026-09-05,Kabel FO feeder Cikarang putus terkena galian proyek jalan pukul 08.00. Penyambungan selesai dan layanan pulih pukul 22.00. Dua tiket berasal dari dua pelapor untuk gangguan yang sama.
+RCA-2609-12,INC-2609-031,DAYA_PELANGGAN,DISAHKAN,Agus Setiawan,2026-09-11,"Pemadaman listrik di kawasan gudang 00.00 sampai 06.00. UPS milik pelanggan habis daya, perangkat CPE mati. Jaringan penyedia normal selama periode itu."
+RCA-2609-19,INC-2609-047,PENYEDIA,DISAHKAN,Agus Setiawan,2026-09-22,Perangkat agregasi POP Cikarang hang setelah pembaruan firmware. Dipulihkan dengan rollback pukul 16.30.
+RCA-2609-09,INC-2609-022,PENYEDIA,DISAHKAN,Agus Setiawan,2026-09-08,Modul daya core router Jakarta Selatan rusak. Diganti dan pulih pukul 21.00.

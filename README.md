@@ -71,17 +71,20 @@ Drizzle, Cloudflare D1 and R2, Better Auth, WXT, Alchemy, Varlock, and Vite+.
    | Admin Workspace      | <http://localhost:3002>                                           |
    | Nemu Extension (dev) | built into `apps/extension/.output/chrome-mv3-dev`, load unpacked |
 
-4. Sign in to the Demo App with a seeded demo account (the login page has one-click buttons), then
+4. Sign in to the Demo App with a seeded demo account (Rina, the verifikator, or Dimas as Billing
+   Liaison; the login page has one-click buttons), then
    load the extension and press Ctrl+Shift+Space. See [apps/extension/README.md](apps/extension/README.md)
    for loading the extension and the Momen prompts to try.
 
 ### Local database
 
 `pnpm run dev` runs `alchemy dev`, which creates the local D1 database and applies the
-migrations, including the seeded demo accounts and 3-Momen fixtures. Its state lives in
+migrations, including the seeded demo accounts, 3-Momen fixtures, travel knowledge chunks, Reference
+Tables, and the isolated `W-TELKO` SLA-claim workspace. Its state lives in
 `packages/infra/.alchemy/`, so each checkout or git worktree gets its own database on its first
 run. Copy `apps/server/.env` into a new worktree before starting it. To reset the database, stop
-dev and delete `packages/infra/.alchemy/`.
+dev and delete `packages/infra/.alchemy/`. Telco evaluator files under
+`data/05_telco/06_test-case` are never indexed by the live AI responder.
 
 After changing the Drizzle schema, generate a migration:
 
@@ -112,7 +115,8 @@ Package-level commands worth knowing:
 - `pnpm --filter extension verify` checks the extension end to end in Playwright's Chromium,
   against `NEMU_RESPONDER=fixture pnpm run dev`.
 - `pnpm --filter @nemu/ai eval:offline` and `eval:live` evaluate the AI pipeline; see
-  [packages/ai/README.md](packages/ai/README.md).
+  [packages/ai/README.md](packages/ai/README.md). PRD acceptance evidence and remaining
+  environment-dependent checks are tracked in [docs/prd-traceability.md](docs/prd-traceability.md).
 
 ## Environment
 

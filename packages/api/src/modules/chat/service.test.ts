@@ -9,7 +9,7 @@ import { describe, expect, it } from "vite-plus/test";
 import type { NemuService } from "../../context";
 import { createFixtureNemuService } from "./fixture-responder";
 import type { ChatLogRepository, NewChatLogRecord } from "./repository";
-import { answerChat } from "./service";
+import { answerChat, resolveChatProcessContext } from "./service";
 
 const SIGNED_IN_USER = "user-rina";
 
@@ -97,7 +97,8 @@ describe("answerChat", () => {
   it("logs an invalid Responder reply as an error instead of returning it", async () => {
     const { deps, entries } = createFakes({
       async respond() {
-        return { ...momentOneResponse, status: "refuse" };
+        const { guide: _guide, ...reply } = momentOneResponse;
+        return { ...reply, status: "refuse" };
       },
     });
 
@@ -115,5 +116,92 @@ describe("answerChat", () => {
     await expect(answerChat(deps, momentOneRequest, SIGNED_IN_USER)).resolves.toEqual(
       momentOneResponse,
     );
+  });
+});
+
+describe("resolveChatProcessContext", () => {
+  it("derives a Telco claim context from the signed-in workspace and assigned route", async () => {
+    const context = await resolveChatProcessContext(
+      {
+        loadTravel: async () => undefined,
+        findSlaTaskByService: async () => undefined,
+        findSlaTaskByInvoice: async () => undefined,
+        listSlaTasks: async () => [
+          {
+            id: "T-0007-1",
+            workspaceId: "W-TELKO",
+            claimId: "KLM-2610-0007",
+            name: "Registrasi Klaim",
+            assigneeId: "U-101",
+            createdAt: "2026-10-08T14:20:00+07:00",
+            reviewDueOn: "2026-10-15",
+            status: "OPEN",
+          },
+        ],
+      },
+      { id: "U-101", workspaceId: "W-TELKO" },
+      "https://demo.example/sla-claims/KLM-2610-0007",
+    );
+
+    expect(context).toEqual({
+      instance_id: "KLM-2610-0007",
+      workspace: { id: "W-TELKO", domain: "telco_sla" },
+      active_task: "Registrasi Klaim",
+      status: "OPEN",
+      uploaded_documents: [],
+    });
+  });
+
+  it("rejects a Telco claim route not assigned to the signed-in user", async () => {
+    await expect(
+      resolveChatProcessContext(
+        {
+          loadTravel: async () => undefined,
+          findSlaTaskByService: async () => undefined,
+          findSlaTaskByInvoice: async () => undefined,
+          listSlaTasks: async () => [
+            {
+              id: "T-0007-1",
+              workspaceId: "W-TELKO",
+              claimId: "KLM-2610-0007",
+              name: "Registrasi Klaim",
+              assigneeId: "someone-else",
+              createdAt: "2026-10-08T14:20:00+07:00",
+              reviewDueOn: "2026-10-15",
+              status: "OPEN",
+            },
+          ],
+        },
+        { id: "U-101", workspaceId: "W-TELKO" },
+        "https://demo.example/sla-claims/KLM-2610-0007",
+      ),
+    ).rejects.toThrow("not assigned");
+  });
+
+  it("resolves CRM pages by their service instead of arbitrary task order", async () => {
+    const context = await resolveChatProcessContext(
+      {
+        loadTravel: async () => undefined,
+        listSlaTasks: async () => [],
+        findSlaTaskByService: async (_workspaceId, actorId, serviceId) =>
+          actorId === "U-101" && serviceId === "TN-ENT-003"
+            ? {
+                id: "T-0011-1",
+                workspaceId: "W-TELKO",
+                claimId: "KLM-2610-0011",
+                name: "Cocokkan Layanan & Kontrak",
+                assigneeId: "U-101",
+                createdAt: "2026-10-08T15:45:00+07:00",
+                reviewDueOn: null,
+                status: "OPEN",
+              }
+            : undefined,
+        findSlaTaskByInvoice: async () => undefined,
+      },
+      { id: "U-101", workspaceId: "W-TELKO" },
+      "https://demo.example/crm/TN-ENT-003",
+    );
+
+    expect(context?.instance_id).toBe("KLM-2610-0011");
   });
 });

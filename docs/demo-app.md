@@ -23,6 +23,11 @@ rounded, as in AlurKerja.
 | My Request              | `/my-request`              |
 | My Task                 | `/my-task`                 |
 | Task detail             | `/perdin/task/$instanceId` |
+| Klaim SLA               | `/sla-claims`              |
+| Task klaim SLA          | `/sla-claims/$claimId`     |
+| CRM Layanan             | `/crm/$serviceId`          |
+| Tiket NOC               | `/noc/$serviceId`          |
+| Billing                 | `/billing/$invoiceId`      |
 
 The Task detail page of a Pertanggungjawaban is the Pertanggungjawaban task page.
 
@@ -79,7 +84,9 @@ fields render:
 
 A picked date reads with its weekday ("Selasa, 3 Nov 2026"), and Lama
 perjalanan fills itself from the two dates ("3 hari · 2 malam"). Kota
-tujuan must name one of the Demo App's cities (`KOTA_TUJUAN`). Dasar penugasan
+tujuan must name one of the Demo App's cities (`KOTA_TUJUAN`). Moda
+transportasi offers only Pesawat and Kendaraan dinas, which fit the
+Yogyakarta–Makassar trip. Dasar penugasan
 picks one of the user's surat tugas, and its nomor is sent as `nomorSuratTugas`.
 Uang harian shows the SBM daily rate times the days for a luar kota trip.
 
@@ -137,7 +144,8 @@ The Pertanggungjawaban task page asks for four documents (surat tugas, boarding
 pass pergi and pulang, laporan perjalanan). Only the file name is stored, in
 `process_document`. Complete Task needs all four and moves the State to
 Verifikasi, then shows the task ID. Sample PDFs to upload are in
-`apps/mock-alurkerja/sample-documents/`.
+`apps/mock-alurkerja/sample-documents/`; the boarding passes are Yogyakarta
+(YIA) ↔ Makassar (UPG).
 
 ## Process endpoints
 
@@ -176,17 +184,23 @@ ST-090/2026) and attaches a stand-in `undangan-rapat-koordinasi.pdf`. It leaves
 Penginapan and Nominal penginapan empty, because in Momen 2 Rina asks Nemu how
 to fill them in.
 
-"Today" is the demo clock, `NEMU_DEMO_DATE` (2026-11-06), the same setting the
-AI counts from; Beranda and the task sheet read it through `getDemoClock`.
+"Today" comes from the signed-in user's workspace and is the same date the AI
+uses. `W-TRAVEL` uses 2026-11-06 and `W-TELKO` uses 2026-10-14; Beranda and the
+task sheet read it through `getDemoClock`. `NEMU_DEMO_DATE` remains the fallback
+when a workspace has no stored configuration.
 
 ## 3-Momen fixtures
 
 A migration (`packages/db/src/migrations/*_seed-demo-process-instances`) seeds
 Rina's `PD-2026-0042` to Makassar, 3–5 November 2026, in State
 Pertanggungjawaban with the surat tugas and boarding pass pergi uploaded, so
-the boarding pass pulang and laporan perjalanan are missing (Momen 3). The
-migration is generated from `packages/api/src/modules/process-instances/demo-seed.ts`;
-after changing it, run `UPDATE_DEMO_SEED=1 pnpm test`.
+the boarding pass pulang and laporan perjalanan are missing (Momen 3). That
+migration is already applied, so a change to
+`packages/api/src/modules/process-instances/demo-seed.ts` needs a new migration
+that updates the seeded rows, such as `*_correct_demo_boarding_pass` (create
+one with `pnpm exec drizzle-kit generate --custom --name <name>` in
+`packages/db`). `demo-seed.test.ts` replays every migration and checks the
+result matches `demo-seed.ts`.
 
 ## Demo accounts
 
@@ -194,10 +208,11 @@ A migration (`packages/db/src/migrations/*_seed-demo-accounts`) seeds both
 accounts, so they exist locally and after every deploy. The login page also has
 one-click buttons for them.
 
-| Account     | Email                   | Password                | Golongan | Role        |
-| ----------- | ----------------------- | ----------------------- | -------- | ----------- |
-| Rina        | `rina@nemu.demo`        | `rina-demo-2026`        | III/a    | pegawai     |
-| Verifikator | `verifikator@nemu.demo` | `verifikator-demo-2026` | III/c    | verifikator |
+| Account     | Email                   | Password                | Golongan | Role            |
+| ----------- | ----------------------- | ----------------------- | -------- | --------------- |
+| Rina        | `rina@nemu.demo`        | `rina-demo-2026`        | III/a    | pegawai         |
+| Verifikator | `verifikator@nemu.demo` | `verifikator-demo-2026` | III/c    | verifikator     |
+| Dimas       | `dimas@nemu.demo`       | `dimas-demo-2026`       | –        | billing_liaison |
 
 Rina's user id is `rina`, matching the fixtures in `@nemu/contracts/fixtures`.
 

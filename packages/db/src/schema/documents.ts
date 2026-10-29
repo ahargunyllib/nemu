@@ -7,6 +7,7 @@ export const knowledgeDocument = sqliteTable(
   "knowledge_document",
   {
     id: text("id").primaryKey(),
+    workspaceId: text("workspace_id").default("W-TRAVEL").notNull(),
     title: text("title").notNull(),
     version: text("version").notNull(),
     isActive: integer("is_active", { mode: "boolean" }).notNull(),
@@ -25,5 +26,24 @@ export const knowledgeDocument = sqliteTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("knowledge_document_createdAt_idx").on(table.createdAt)],
+  (table) => [
+    index("knowledge_document_workspaceId_idx").on(table.workspaceId),
+    index("knowledge_document_createdAt_idx").on(table.createdAt),
+  ],
+);
+
+export const knowledgeChunk = sqliteTable(
+  "knowledge_chunk",
+  {
+    id: text("id").primaryKey(),
+    documentId: text("document_id")
+      .notNull()
+      .references(() => knowledgeDocument.id, { onDelete: "cascade" }),
+    article: text("article"),
+    section: text("section"),
+    page: integer("page"),
+    sequence: integer("sequence").notNull(),
+    text: text("text").notNull(),
+  },
+  (table) => [index("knowledge_chunk_documentId_idx").on(table.documentId, table.sequence)],
 );
