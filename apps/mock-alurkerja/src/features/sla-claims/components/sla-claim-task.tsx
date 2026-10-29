@@ -19,8 +19,11 @@ import {
   TableHeader,
   TableRow,
 } from "@nemu/ui/components/table";
+import { Textarea } from "@nemu/ui/components/textarea";
 import { cn } from "@nemu/ui/lib/utils";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type Ticket = {
   id: string;
@@ -215,19 +218,21 @@ function ServiceMatch({ detail }: { detail: SlaClaimDetail }) {
           <dt className="text-muted-foreground">Abonemen sebelum PPN</dt>
           <dd>Rp{detail.context.invoice.monthlyFeeIdr.toLocaleString("id-ID")}</dd>
         </dl>
-        <a
-          href={`/crm/${detail.claim.serviceId}`}
+        <Link
+          to="/crm/$serviceId"
+          params={{ serviceId: detail.claim.serviceId }}
           data-nemu-id={NEMU_IDS.slaClaim.crmService}
           className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
         >
           Buka CRM Layanan
-        </a>
+        </Link>
       </CardContent>
     </Card>
   );
 }
 
 function TicketReview({ detail }: { detail: SlaClaimDetail }) {
+  const [rcaRequested, setRcaRequested] = useState(false);
   return (
     <Card>
       <CardHeader>
@@ -267,9 +272,14 @@ function TicketReview({ detail }: { detail: SlaClaimDetail }) {
                       <Button
                         size="sm"
                         variant="outline"
+                        disabled={rcaRequested}
                         data-nemu-id={NEMU_IDS.slaClaim.requestRcaInc2609058}
+                        onClick={() => {
+                          setRcaRequested(true);
+                          toast.success(`Permintaan RCA ${ticket.id} dikirim ke NOC`);
+                        }}
                       >
-                        Minta RCA
+                        {rcaRequested ? "RCA diminta" : "Minta RCA"}
                       </Button>
                     )}
                   </TableCell>
@@ -327,9 +337,6 @@ function Calculation({ detail }: { detail: SlaClaimDetail }) {
               onChange={(event) => setCompensationAmount(event.target.value)}
               data-nemu-id={NEMU_IDS.slaClaim.compensationAmount}
             />
-            <FieldDescription>
-              Hasil hitung Nemu: Rp{summary.compensationAmount.toLocaleString("id-ID")}
-            </FieldDescription>
           </Field>
         )}
       </CardContent>
@@ -337,7 +344,27 @@ function Calculation({ detail }: { detail: SlaClaimDetail }) {
   );
 }
 
+/** TPL-BILL-02, the late-claim rejection letter, filled in with the claim's values. */
+function rejectionLetter({ claim }: SlaClaimDetail): string {
+  const period = new Intl.DateTimeFormat("id-ID", {
+    month: "long",
+    year: "numeric",
+    timeZone: "Asia/Jakarta",
+  }).format(new Date(`${claim.period}-01T00:00:00+07:00`));
+  return [
+    `Nomor: TOL-SLA/${claim.id}`,
+    "",
+    `Kepada ${claim.customer},`,
+    "",
+    `Terima kasih atas surat klaim nomor ${claim.letterNumber} untuk layanan ${claim.serviceId} periode ${period}. Surat tersebut kami terima pada ${formatDate(claim.receivedAt)}, melewati batas pengajuan tanggal 15 bulan berikutnya sesuai Pasal 5 perjanjian layanan. Karena itu klaim belum dapat kami proses.`,
+    "",
+    "Hormat kami,",
+    "Supervisor Billing",
+  ].join("\n");
+}
+
 function Rejection({ detail }: { detail: SlaClaimDetail }) {
+  const [letter, setLetter] = useState(() => rejectionLetter(detail));
   return (
     <Card>
       <CardHeader>
@@ -349,13 +376,17 @@ function Rejection({ detail }: { detail: SlaClaimDetail }) {
           Klaim periode {detail.claim.period} melewati batas{" "}
           {formatDate(detail.summary.cutoff.deadline)} dan tidak dilanjutkan ke telaah tiket.
         </p>
-        <a
-          href="#template-penolakan"
-          data-nemu-id={NEMU_IDS.slaClaim.rejectionTemplate}
-          className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-        >
-          Buka template TPL-BILL-02
-        </a>
+        <Field>
+          <FieldLabel htmlFor="rejection-letter">Surat penolakan</FieldLabel>
+          <Textarea
+            id="rejection-letter"
+            rows={10}
+            value={letter}
+            onChange={(event) => setLetter(event.target.value)}
+            data-nemu-id={NEMU_IDS.slaClaim.rejectionTemplate}
+          />
+          <FieldDescription>Dari template TPL-BILL-02.</FieldDescription>
+        </Field>
       </CardContent>
     </Card>
   );

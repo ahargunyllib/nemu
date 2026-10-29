@@ -1,7 +1,14 @@
 // @vitest-environment happy-dom
 import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, test } from "vite-plus/test";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, test, vi } from "vite-plus/test";
+
+vi.mock("@tanstack/react-router", () => ({
+  Link: ({ to, params: _params, ...props }: { to: string; params?: object }) => (
+    <a href={to} {...props} />
+  ),
+}));
+vi.mock("sonner", () => ({ toast: { success: vi.fn() } }));
 
 import SlaClaimTask, { type SlaClaimDetail } from "./sla-claim-task";
 
@@ -100,15 +107,35 @@ describe("SlaClaimTask", () => {
     expect(screen.getByText(/Nominal belum dapat ditetapkan/)).toBeTruthy();
   });
 
-  test("renders the late-claim rejection branch and template link", () => {
+  test("asks NOC for the missing RCA once", () => {
+    const { container } = render(
+      <SlaClaimTask
+        detail={detail("Telaah Tiket Gangguan", { missingTicketIds: ["INC-2609-058"] })}
+      />,
+    );
+    const request = container.querySelector<HTMLButtonElement>(
+      `[data-nemu-id="${NEMU_IDS.slaClaim.requestRcaInc2609058}"]`,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Minta RCA" }));
+
+    expect(request?.textContent).toBe("RCA diminta");
+    expect(request).toHaveProperty("disabled", true);
+  });
+
+  test("drafts the late-claim rejection letter from TPL-BILL-02", () => {
     const { container } = render(
       <SlaClaimTask detail={detail("Surat Penolakan", { timely: false })} />,
     );
+    const letter = container.querySelector<HTMLTextAreaElement>(
+      `[data-nemu-id="${NEMU_IDS.slaClaim.rejectionTemplate}"]`,
+    );
 
-    expect(
-      container.querySelector(`[data-nemu-id="${NEMU_IDS.slaClaim.rejectionTemplate}"]`),
-    ).not.toBeNull();
     expect(screen.getByText(/melewati batas 15 September 2026/)).toBeTruthy();
+    expect(letter?.value).toContain("Nomor: TOL-SLA/KLM-2610-0007");
+    expect(letter?.value).toContain(
+      "surat klaim nomor ARN/IT/118/X/2026 untuk layanan TN-ENT-002 periode Agustus 2026",
+    );
   });
 
   test("keeps approval visible but disabled for the Billing Liaison", () => {
@@ -121,5 +148,11 @@ describe("SlaClaimTask", () => {
     expect(approve).toHaveProperty("disabled", true);
     expect(compensation).toHaveProperty("readOnly", false);
     expect(compensation).toHaveProperty("value", "");
+  });
+
+  test("leaves the compensation amount to Nemu instead of printing it in the task", () => {
+    render(<SlaClaimTask detail={detail("Susun Berita Acara")} />);
+
+    expect(screen.queryByText(/579\.167/)).toBeNull();
   });
 });
