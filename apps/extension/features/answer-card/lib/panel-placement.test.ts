@@ -35,6 +35,14 @@ describe("placePanel", () => {
     });
   });
 
+  test("keeps a panel wider than PANEL_WIDTH, such as one holding the Composer, on screen", () => {
+    const width = PANEL_WIDTH + 40;
+
+    const placement = placePanel({ x: 1270, y: 100 }, VIEWPORT, PANEL_HEIGHT, [], width);
+
+    expect(placement.left).toBe(VIEWPORT.width - width - 12);
+  });
+
   test("never covers a highlighted element", () => {
     // The cursor sits right on the highlighted option, as when Rina points at the lodging field.
     const highlighted: Box = { left: 300, top: 360, width: 240, height: 80 };

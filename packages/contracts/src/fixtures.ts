@@ -44,12 +44,12 @@ export const momentOneResponse = {
     id: "travel-request:create",
     steps: [
       { id: "travel-type", target: "select-jenis-perjalanan", label: "Pilih jenis perjalanan" },
+      { id: "destination-city", target: "select-kota-tujuan", label: "Pilih kota tujuan" },
       {
         id: "assignment-letter",
-        target: "input-nomor-surat-tugas",
-        label: "Isi nomor surat tugas",
+        target: "select-dasar-penugasan",
+        label: "Pilih dasar penugasan",
       },
-      { id: "destination-city", target: "select-kota-tujuan", label: "Pilih kota tujuan" },
       {
         id: "travel-purpose",
         target: "input-maksud-perjalanan",
@@ -80,14 +80,14 @@ export const momentOneFollowUpRequest = {
       visible: true,
     },
     {
-      nemu_id: "input-nomor-surat-tugas",
-      label: "Nomor surat tugas",
-      role: "textbox",
+      nemu_id: "select-kota-tujuan",
+      label: "Kota tujuan",
+      role: "combobox",
       visible: true,
     },
     {
-      nemu_id: "select-kota-tujuan",
-      label: "Kota tujuan",
+      nemu_id: "select-dasar-penugasan",
+      label: "Dasar penugasan",
       role: "combobox",
       visible: true,
     },
@@ -98,15 +98,9 @@ export const momentOneFollowUpRequest = {
       visible: true,
     },
     {
-      nemu_id: "input-tanggal-berangkat",
-      label: "Tanggal berangkat",
-      role: "textbox",
-      visible: true,
-    },
-    {
-      nemu_id: "input-tanggal-kembali",
-      label: "Tanggal kembali",
-      role: "textbox",
+      nemu_id: "tab-jadwal",
+      label: "2 Jadwal",
+      role: "tab",
       visible: true,
     },
   ],
@@ -117,7 +111,7 @@ export const momentOneFollowUpResponse = {
   answer: {
     ringkas: "Formulir sudah terbuka. Ikuti enam langkah yang disorot sebelum mengirim pengajuan.",
     detail:
-      "Isi jenis perjalanan, nomor surat tugas, kota tujuan, maksud perjalanan, serta tanggal berangkat dan kembali.",
+      "Isi jenis perjalanan, kota tujuan, dasar penugasan, dan maksud perjalanan, lalu buka tab Jadwal untuk tanggal berangkat dan kembali.",
   },
   citations: [
     { doc_id: "sop-pd-01", judul: "SOP-PD-01 Perjalanan Dinas", pasal: "Butir 4.1, 4.2" },
@@ -132,15 +126,15 @@ export const momentOneFollowUpResponse = {
     },
     {
       type: "highlight",
-      target: "input-nomor-surat-tugas",
-      level: "arahkan",
-      label: "Isi nomor surat tugas",
-    },
-    {
-      type: "highlight",
       target: "select-kota-tujuan",
       level: "arahkan",
       label: "Pilih kota tujuan",
+    },
+    {
+      type: "highlight",
+      target: "select-dasar-penugasan",
+      level: "arahkan",
+      label: "Pilih dasar penugasan",
     },
     {
       type: "highlight",
@@ -150,27 +144,21 @@ export const momentOneFollowUpResponse = {
     },
     {
       type: "highlight",
-      target: "input-tanggal-berangkat",
+      target: "tab-jadwal",
       level: "arahkan",
-      label: "Isi tanggal berangkat",
-    },
-    {
-      type: "highlight",
-      target: "input-tanggal-kembali",
-      level: "arahkan",
-      label: "Isi tanggal kembali",
+      label: "Buka tab Jadwal",
     },
   ],
   guide: {
     id: "travel-request:create",
     steps: [
       { id: "travel-type", target: "select-jenis-perjalanan", label: "Pilih jenis perjalanan" },
+      { id: "destination-city", target: "select-kota-tujuan", label: "Pilih kota tujuan" },
       {
         id: "assignment-letter",
-        target: "input-nomor-surat-tugas",
-        label: "Isi nomor surat tugas",
+        target: "select-dasar-penugasan",
+        label: "Pilih dasar penugasan",
       },
-      { id: "destination-city", target: "select-kota-tujuan", label: "Pilih kota tujuan" },
       {
         id: "travel-purpose",
         target: "input-maksud-perjalanan",

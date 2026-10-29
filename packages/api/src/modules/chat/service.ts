@@ -4,6 +4,7 @@ import {
   type ProcessContext,
   nemuResponseSchema,
 } from "@nemu/contracts";
+import { z } from "zod";
 
 import type { SlaTaskRecord } from "../sla-claims/repository";
 
@@ -112,7 +113,7 @@ export async function answerChat(
   } catch (error) {
     await record({
       status: "error",
-      result: error instanceof Error ? error.message : String(error),
+      result: describeError(error),
       citations: [],
       actions: [],
     });
@@ -126,6 +127,13 @@ export async function answerChat(
     actions: response.actions,
   });
   return response;
+}
+
+// Admins read this in the Chat Log, so a validation failure is listed issue by
+// issue instead of as the ZodError's raw JSON.
+function describeError(error: unknown): string {
+  if (error instanceof z.ZodError) return z.prettifyError(error);
+  return error instanceof Error ? error.message : String(error);
 }
 
 // A failed log write must not cost the user their answer.

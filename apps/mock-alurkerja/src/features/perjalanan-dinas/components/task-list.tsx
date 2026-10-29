@@ -1,57 +1,74 @@
-import { Badge } from "@nemu/ui/components/badge";
-import { buttonVariants } from "@nemu/ui/components/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@nemu/ui/components/empty";
-import { cn } from "@nemu/ui/lib/utils";
+import { Input } from "@nemu/ui/components/input";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
+import { useState } from "react";
 
-import { formatTanggal } from "@/shared/lib/format-tanggal";
 import { TASK_NEMU_IDS } from "@/features/perjalanan-dinas/lib/tasks";
 import type { ProcessInstanceView } from "@/features/perjalanan-dinas/types/process-instance-view";
 
+/**
+ * The My Tasks column: the heading, a search over the Tasks' labels and IDs, and one compact row
+ * per Task, each opening its task page.
+ */
 export default function TaskList({ tasks }: { tasks: readonly ProcessInstanceView[] }) {
-  if (tasks.length === 0) {
-    return (
-      <Empty className="border">
-        <EmptyHeader>
-          <EmptyTitle>Tidak ada tugas</EmptyTitle>
-          <EmptyDescription>Tugas baru akan muncul di sini.</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
-    );
-  }
+  const [query, setQuery] = useState("");
+  const withTask = tasks.filter((instance) => instance.activeTask);
+  const needle = query.trim().toLowerCase();
+  const shown = withTask.filter(
+    ({ id, activeTask }) =>
+      !needle ||
+      [activeTask?.label, activeTask?.id, id].some((text) => text?.toLowerCase().includes(needle)),
+  );
 
   return (
-    <ul className="divide-y border">
-      {tasks.map(
-        (instance) =>
-          instance.activeTask && (
-            <li key={instance.id}>
-              <Link
-                to="/perdin/task/$instanceId"
-                params={{ instanceId: instance.id }}
-                data-nemu-id={TASK_NEMU_IDS[instance.activeTask.key]}
-                aria-label={`${instance.activeTask.label} ${instance.id}`}
-                className={cn(
-                  buttonVariants({ variant: "ghost" }),
-                  "h-auto w-full justify-between gap-4 px-4 py-3",
-                )}
-              >
-                <span className="flex flex-col items-start gap-1 text-left">
-                  <span className="text-sm font-medium">{instance.activeTask.label}</span>
-                  <span className="text-muted-foreground">
-                    {instance.activeTask.id} · {instance.kotaTujuan} · kembali{" "}
-                    {formatTanggal(instance.tanggalKembali)}
-                  </span>
-                </span>
-                <span className="flex items-center gap-2">
-                  <Badge variant="secondary">{instance.state}</Badge>
-                  <ChevronRight />
-                </span>
-              </Link>
-            </li>
-          ),
+    <div className="flex w-full max-w-68 flex-col gap-3">
+      <h1 className="font-heading text-[22px] leading-7 font-medium">My Tasks</h1>
+      <Input
+        type="search"
+        aria-label="Search tasks"
+        placeholder="Search tasks…"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        className="h-8 border-transparent bg-muted text-[13px] leading-[18px] md:text-[13px]"
+      />
+      {/* With no Tasks at all, My Task shows TaskPlaceholder beside the column instead. */}
+      {withTask.length === 0 ? null : shown.length === 0 ? (
+        <Empty className="border">
+          <EmptyHeader>
+            <EmptyTitle>Tidak ada tugas yang cocok</EmptyTitle>
+            <EmptyDescription>Coba kata kunci lain.</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : (
+        <>
+          <h2 className="text-[10.5px] leading-3.5 font-semibold tracking-[0.08em] text-muted-foreground uppercase">
+            Due date
+          </h2>
+          <ul className="flex flex-col gap-3">
+            {shown.map(
+              ({ id, activeTask }) =>
+                activeTask && (
+                  <li key={id}>
+                    <Link
+                      to="/perdin/task/$instanceId"
+                      params={{ instanceId: id }}
+                      data-nemu-id={TASK_NEMU_IDS[activeTask.key]}
+                      aria-label={`${activeTask.label} ${id}`}
+                      className="flex flex-col rounded-xl bg-muted px-3 py-2.5 ring-1 ring-transparent transition-[background-color,box-shadow] outline-none hover:bg-background hover:shadow-sm hover:ring-border focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                    >
+                      <span className="text-[13px] leading-[18px] font-medium">
+                        {activeTask.label}
+                      </span>
+                      <span className="text-[11.5px] leading-[15px] text-muted-foreground">
+                        Perjalanan Dinas · {activeTask.id}
+                      </span>
+                    </Link>
+                  </li>
+                ),
+            )}
+          </ul>
+        </>
       )}
-    </ul>
+    </div>
   );
 }

@@ -51,6 +51,9 @@ pnpm --filter @nemu/ai eval:offline
 
 # Live, credit-consuming evaluation against real OpenRouter adapters
 OPENROUTER_API_KEY=... pnpm --filter @nemu/ai eval:live
+
+# Targeted live follow-up for previously failed Momen 2 and Momen 3 only
+OPENROUTER_API_KEY=... pnpm --filter @nemu/ai eval:live:failed
 ```
 
 The unit test suite uses mocked provider responses and never spends API credits. `eval:offline`
@@ -77,6 +80,10 @@ invokes `runNemu()` against the real OpenRouter Decisions API
 K1-03 is extension UI behavior and is not reported as an AI pass. The live evaluation reads the
 official test sets in `data/04_evaluasi` and public code-level K2 regression assertions. The
 supplied evaluator-only answer-key package is intentionally not tracked or indexed as knowledge.
+
+The targeted follow-up repeats only the Momen 2 and Momen 3 responses and their K1 checks, skipping
+Momen 1, K2, and the grounded-question, injection, out-of-domain, and vision suites. It writes
+`data/04_evaluasi/laporan_evaluasi_moments-2-3.json`, preserving the full-run evidence.
 
 ## Required server configuration
 

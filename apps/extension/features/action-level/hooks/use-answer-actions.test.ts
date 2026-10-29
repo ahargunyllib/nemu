@@ -51,7 +51,12 @@ describe("useAnswerActions", () => {
     );
 
     const result = renderActions(momentOneResponse.actions, momentOneRequest.elements);
-    await act(() => vi.advanceTimersByTimeAsync(MORPH_MS + MAX_MOVE_MS + 100));
+    await act(() => vi.advanceTimersByTimeAsync(MORPH_MS));
+    expect(result.current.cursor).toMatchObject({
+      step: "move",
+      destination: "Ajukan Perjalanan Dinas",
+    });
+    await act(() => vi.advanceTimersByTimeAsync(MAX_MOVE_MS + 100));
 
     expect(menu.clicked).toHaveBeenCalledOnce();
     expect(window.location.pathname).toBe("/perdin/baru");

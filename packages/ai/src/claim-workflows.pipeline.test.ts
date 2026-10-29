@@ -298,6 +298,7 @@ test("K2 prohibited approval cannot produce any action", async () => {
 
   assert.equal(response.status, "refuse");
   assert.deepEqual(response.actions, []);
+  assert.deepEqual(response.calc, []);
   assert.equal(
     response.citations.some((citation) => citation.pasal === "8 ayat (2)"),
     true,

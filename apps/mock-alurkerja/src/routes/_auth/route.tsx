@@ -1,11 +1,11 @@
+import { AppHeader } from "@nemu/ui/shell/app-header";
+import { AppShell } from "@nemu/ui/shell/app-shell";
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 
 import { authClient } from "@/features/auth/api/auth-client";
 import UserMenu from "@/features/auth/components/user-menu";
 import DemoDock from "@/features/demo/components/demo-dock";
-import DemoToday from "@/features/demo/components/demo-today";
 import SideMenu from "@/features/menu/components/side-menu";
-import Header from "@/shared/components/header";
 
 export const Route = createFileRoute("/_auth")({
   component: AuthLayout,
@@ -22,22 +22,22 @@ export const Route = createFileRoute("/_auth")({
 
 function AuthLayout() {
   const { user } = Route.useRouteContext();
+
   return (
     <DemoDock>
-      <div className="grid h-svh grid-rows-[auto_1fr]">
-        <Header>
-          <DemoToday />
-          <UserMenu />
-        </Header>
-        <div className="grid min-h-0 grid-cols-[14rem_1fr]">
-          <SideMenu workspaceId={user.workspaceId} />
-          <main className="overflow-y-auto p-6">
-            <div className="mx-auto max-w-4xl space-y-6">
-              <Outlet />
-            </div>
-          </main>
-        </div>
-      </div>
+      <AppShell
+        sidebar={<SideMenu footer={<UserMenu />} workspaceId={user.workspaceId} />}
+        header={
+          <AppHeader
+            start={
+              user.workspaceId === "W-TELKO" ? "Billing Operations" : "Satker Demo · Yogyakarta"
+            }
+            end={user.email}
+          />
+        }
+      >
+        <Outlet />
+      </AppShell>
     </DemoDock>
   );
 }

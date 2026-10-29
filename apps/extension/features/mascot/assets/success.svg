@@ -1,7 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- Placeholder: replace with the designer's success art. Green, happy, with a sparkle. -->
-  <circle cx="15" cy="18" r="12" fill="#22c55e"/>
-  <path d="M8.5 16q2.5-3 5 0M16.5 16q2.5-3 5 0" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M9 20.5h12q-6 7-12 0z" fill="#fff"/>
-  <path d="M27 1l1.2 2.8L31 5l-2.8 1.2L27 9l-1.2-2.8L23 5l2.8-1.2z" fill="#facc15"/>
+  <!-- Success: a green firefly with happy closed eyes and a dark green check badge. -->
+  <defs>
+    <linearGradient id="nemu-mascot-success-body" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#34D399"/>
+      <stop offset="1" stop-color="#059669"/>
+    </linearGradient>
+    <radialGradient id="nemu-mascot-success-glow">
+      <stop offset="0.4" stop-color="#34D399" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#34D399" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="16" cy="18" r="15" fill="url(#nemu-mascot-success-glow)"/>
+  <ellipse cx="8" cy="12" rx="6" ry="3.4" transform="rotate(18 8 12)" fill="#FFE7C7" stroke="#fff" stroke-width="0.8"/>
+  <ellipse cx="24" cy="12" rx="6" ry="3.4" transform="rotate(-18 24 12)" fill="#FFE7C7" stroke="#fff" stroke-width="0.8"/>
+  <circle cx="16" cy="18" r="8.5" fill="url(#nemu-mascot-success-body)" stroke="#fff" stroke-width="2.5"/>
+  <path d="M11.4 18.4l1.6-1.7 1.6 1.7M17.4 18.4l1.6-1.7 1.6 1.7" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="25" cy="25" r="4.6" fill="#047857" stroke="#fff" stroke-width="1.5"/>
+  <path d="M22.9 25.1l1.5 1.5 2.8-3" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

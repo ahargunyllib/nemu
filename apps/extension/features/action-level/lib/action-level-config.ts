@@ -25,6 +25,7 @@ export const ACTION_LEVELS: Partial<Record<NemuId, ActionLevel>> = {
   [NEMU_IDS.slaClaim.crmService]: "jalan_sendiri",
   [NEMU_IDS.slaClaim.crmContractTab]: "jalan_sendiri",
   [NEMU_IDS.slaClaim.returnToTask]: "jalan_sendiri",
+  [NEMU_IDS.favoriteProcess.perjalananDinas]: "jalan_sendiri",
 
   // Buttons that submit something: the user presses them.
   [NEMU_IDS.login.submit]: "konfirmasi",

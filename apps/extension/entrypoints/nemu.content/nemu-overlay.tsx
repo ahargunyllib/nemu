@@ -3,20 +3,22 @@ import { useRef, useState } from "react";
 
 import { useAnswerActions } from "../../features/action-level/hooks/use-answer-actions";
 import { AreaCropChip } from "../../features/area-crop/components/area-crop-chip";
+import { AreaOutline } from "../../features/area-crop/components/area-outline";
 import { AreaSelectLayer } from "../../features/area-crop/components/area-select-layer";
 import { useAreaCrop } from "../../features/area-crop/hooks/use-area-crop";
 import { AnswerCard } from "../../features/answer-card/components/answer-card";
 import { AnswerCardHeader } from "../../features/answer-card/components/answer-card-header";
-import { AnswerCardSkeleton } from "../../features/answer-card/components/answer-card-skeleton";
 import {
   ChatErrorCard,
   LoginRequiredCard,
 } from "../../features/answer-card/components/chat-notice-card";
 import { PANEL_WIDTH, placePanel } from "../../features/answer-card/lib/panel-placement";
+import { useCancelOnEscape } from "../../features/chat/hooks/use-cancel-on-escape";
 import { useClickFollowUp } from "../../features/chat/hooks/use-click-follow-up";
 import { useLocationFollowUp } from "../../features/chat/hooks/use-location-follow-up";
 import { useNemuChat } from "../../features/chat/hooks/use-nemu-chat";
-import { Composer } from "../../features/composer/components/composer";
+import { COMPOSER_WIDTH, Composer } from "../../features/composer/components/composer";
+import { ReadingPill } from "../../features/composer/components/reading-pill";
 import {
   type CursorPosition,
   useComposerShortcut,
@@ -36,15 +38,26 @@ import { ConfirmedStatus } from "../../features/process-status/components/confir
 import { useConfirmedStatus } from "../../features/process-status/hooks/use-confirmed-status";
 import { PageLayer } from "../../shared/components/page-layer";
 import { useElementHeight } from "../../shared/hooks/use-element-height";
+import type { Box } from "../../shared/types/box";
 
 const NO_ACTIONS: NemuAction[] = [];
 const NO_ELEMENTS: PageElement[] = [];
-/** Room around the panel inside its scroll box, so the scroll box doesn't clip the cards' shadow. */
-const SHADOW_ROOM = 16;
+/**
+ * Room around the panel inside its scroll box, so the scroll box doesn't clip the cards' shadow
+ * into a square box. shadow/float (`--nemu-shadow-float`, 0 16px 40px) reaches 40px to each side,
+ * 24px above, and 56px below.
+ */
+const SHADOW_ROOM = { top: 24, x: 40, bottom: 56 };
+/** The Composer keeps its own width, so the panel makes room for it even when it is wider. */
+const PANEL_ROOM = Math.max(PANEL_WIDTH, COMPOSER_WIDTH);
 
 export function NemuOverlay() {
   const [anchor, setAnchor] = useState<CursorPosition | null>(null);
   const [composerOpen, setComposerOpen] = useState(false);
+  /** The Blok area sent with the prompt Nemu is reading. */
+  const [readArea, setReadArea] = useState<Box | null>(null);
+  /** The Blok area while Rina drags it. */
+  const [draggedArea, setDraggedArea] = useState<Box | null>(null);
   const chat = useNemuChat();
   const area = useAreaCrop();
   const { state } = chat;
@@ -81,6 +94,14 @@ export function NemuOverlay() {
     if (state.kind === "idle") setAnchor(null);
   }
 
+  /** Sends a prompt from the Composer, on top of the panel or as Balas in the Answer Card. */
+  function submitComposer(prompt: string) {
+    setComposerOpen(false);
+    setReadArea(area.crop ? (area.selection ?? null) : null);
+    ask(prompt, area.crop);
+    area.clear();
+  }
+
   function close() {
     chat.reset();
     area.clear();
@@ -88,10 +109,14 @@ export function NemuOverlay() {
     setAnchor(null);
   }
 
-  const header =
-    state.kind === "idle" ? null : <AnswerCardHeader prompt={state.prompt} onClose={close} />;
+  // Esc while Membaca shows cancels the prompt. With the Composer open, Esc only closes it.
+  useCancelOnEscape(state.kind === "loading" && !composerOpen, close);
 
-  const pickingArea = area.state.kind === "selecting" || area.state.kind === "capturing";
+  const header = state.kind === "idle" ? null : <AnswerCardHeader onClose={close} />;
+  const areaChip = (area.state.kind === "attached" || area.state.kind === "failed") && (
+    <AreaCropChip state={area.state} onRemove={area.clear} />
+  );
+
   const placement =
     anchor &&
     placePanel(
@@ -99,21 +124,28 @@ export function NemuOverlay() {
       { width: window.innerWidth, height: window.innerHeight },
       panelHeight,
       highlight ? [highlightFootprint(highlight.box)] : [],
+      PANEL_ROOM,
     );
 
   // One font and text color for everything Nemu draws: highlights, the mascot (#6), and the panel.
-  // All of it is hidden while the viewport is captured, so an Area Crop shows only the page.
+  // All of it is hidden while the viewport is captured, so an Area Crop shows only the page. Its
+  // transitions go too: a Button's transition-all would keep it visible for the whole transition,
+  // so the mascot and the Composer's buttons ended up in the capture.
   return (
     <div
       ref={nemuRef}
       className={
         area.state.kind === "capturing"
-          ? "invisible font-sans text-foreground"
+          ? "invisible font-sans text-foreground **:transition-none"
           : "font-sans text-foreground"
       }
     >
       <PageLayer>
-        {highlight && <HighlightRing box={highlight.box} label={highlight.action.label} />}
+        {(composerOpen || state.kind === "response") && area.selection && (
+          <AreaOutline box={area.selection} />
+        )}
+        {state.kind === "loading" && readArea && <AreaOutline box={readArea} reading />}
+        {highlight && <HighlightRing box={highlight.box} action={highlight.action} />}
         {confirmedFill && <ConfirmedFillControl control={confirmedFill} />}
         {cursor && <NavigationCursor frame={cursor} />}
         <Mascot
@@ -133,44 +165,48 @@ export function NemuOverlay() {
           }}
           composerAnchor={composerOpen ? anchor : null}
           nemuCursor={cursor}
+          draggedArea={area.state.kind === "selecting" ? draggedArea : null}
           onOpenComposer={openComposer}
-          onCloseComposer={closeComposer}
         />
       </PageLayer>
       {placement && (
         <div
-          // Hidden, not unmounted, during area select mode so the Composer keeps its text.
+          // Stays up under the area select layer, where the Composer says how to drag a box. While
+          // Nemu's cursor is out it drops under the page layer, so it never covers the cursor, its
+          // tooltip, or the mascot riding along.
           className={
-            pickingArea ? "hidden" : "pointer-events-none fixed z-2147483647 overflow-y-auto"
+            cursor
+              ? "pointer-events-none fixed z-2147483645 overflow-y-auto"
+              : "pointer-events-none fixed z-2147483647 overflow-y-auto"
           }
           style={{
             ...placement,
-            width: PANEL_WIDTH + 2 * SHADOW_ROOM,
-            maxHeight: placement.maxHeight + 2 * SHADOW_ROOM,
-            margin: -SHADOW_ROOM,
-            padding: SHADOW_ROOM,
+            width: PANEL_ROOM + 2 * SHADOW_ROOM.x,
+            maxHeight: placement.maxHeight + SHADOW_ROOM.top + SHADOW_ROOM.bottom,
+            margin: `${-SHADOW_ROOM.top}px ${-SHADOW_ROOM.x}px ${-SHADOW_ROOM.bottom}px`,
+            padding: `${SHADOW_ROOM.top}px ${SHADOW_ROOM.x}px ${SHADOW_ROOM.bottom}px`,
           }}
         >
           {/* Measured inside the scroll box, so a panel shrunk to keep off a highlight still
               reports its full height. */}
-          <div ref={panelRef} className="pointer-events-auto flex flex-col gap-2">
+          <div
+            ref={panelRef}
+            className="pointer-events-auto flex flex-col gap-2"
+            style={{ width: PANEL_WIDTH }}
+          >
             {composerOpen && (
               <Composer
-                onSubmit={(prompt) => {
-                  setComposerOpen(false);
-                  ask(prompt, area.crop);
-                  area.clear();
-                }}
+                onSubmit={submitComposer}
                 onCancel={closeComposer}
                 onPickArea={area.start}
+                picking={area.state.kind === "selecting"}
                 boundary={nemuRef}
               >
-                {(area.state.kind === "attached" || area.state.kind === "failed") && (
-                  <AreaCropChip state={area.state} onRemove={area.clear} />
-                )}
+                {areaChip}
               </Composer>
             )}
-            {state.kind === "loading" && <AnswerCardSkeleton header={header} />}
+            {/* Membaca: in the Composer's place until the answer arrives. */}
+            {state.kind === "loading" && <ReadingPill />}
             {state.kind === "response" && (
               <AnswerCard
                 key={state.prompt}
@@ -183,7 +219,21 @@ export function NemuOverlay() {
                   ],
                 }}
                 header={header}
-                onReply={() => setComposerOpen(true)}
+                reply={
+                  // Balas: the same Composer inside the card, while none is open above it. A click
+                  // on the page only drops its Area Crop, so the answer stays while Rina acts.
+                  !composerOpen && (
+                    <Composer
+                      onSubmit={submitComposer}
+                      onCancel={area.clear}
+                      onPickArea={area.start}
+                      picking={area.state.kind === "selecting"}
+                      boundary={nemuRef}
+                    >
+                      {areaChip}
+                    </Composer>
+                  )
+                }
               >
                 <HighlightSteps
                   steps={steps}
@@ -211,7 +261,7 @@ export function NemuOverlay() {
         </div>
       )}
       {area.state.kind === "selecting" && (
-        <AreaSelectLayer onSelect={area.select} onCancel={area.clear} />
+        <AreaSelectLayer onSelect={area.select} onCancel={area.clear} onDrag={setDraggedArea} />
       )}
     </div>
   );

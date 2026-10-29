@@ -79,6 +79,24 @@ describe("useHighlights", () => {
     );
   });
 
+  test("Momen 2 rings one step at a time and moves on when the user does each one", async () => {
+    const option = renderTarget(notHotel.target);
+    const nominal = renderTarget(amount.target, "input");
+    const result = renderHighlights([notHotel, amount]);
+    await waitFor(() => expect(result.current.highlight?.action).toEqual(notHotel));
+
+    // Picking the option removes its ring and rings the nominal field instead.
+    act(() => option.element.click());
+    await waitFor(() => expect(result.current.highlight?.action).toEqual(amount));
+    expect(nominal.scrollIntoView).toHaveBeenCalledOnce();
+
+    // Filling in the last step leaves nothing ringed.
+    act(() => {
+      nominal.element.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    await waitFor(() => expect(result.current.highlight).toBeUndefined());
+  });
+
   test("the Momen 3 follow-up rings one step at a time, moving on as each upload is filled", async () => {
     const [laporan, boardingPass, kirim] = momentThreeFollowUpResponse.actions;
     if (!laporan || !boardingPass || !kirim) throw new Error("expected three Momen 3 actions");

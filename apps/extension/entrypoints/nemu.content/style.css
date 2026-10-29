@@ -1,1 +1,12 @@
 @import "@nemu/ui/globals.css";
+@import "@nemu/ui/nemu.css";
+
+/*
+ * Everything Nemu draws uses Plus Jakarta Sans (docs/design-system.md, "Typography"); the App keeps
+ * Figtree and Outfit. The faces are declared on the document by nemu-font.ts, since Chromium
+ * ignores @font-face inside a shadow root.
+ */
+@theme inline {
+  --font-sans: "Plus Jakarta Sans Variable", sans-serif;
+  --font-heading: "Plus Jakarta Sans Variable", sans-serif;
+}

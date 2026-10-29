@@ -7,8 +7,11 @@
  * because automation can't press the toolbar icon or the browser-level shortcut. Check the
  * shortcut itself by hand.
  *
- * Needs the dev stack in fixture mode (`NEMU_RESPONDER=fixture pnpm dev`), which also keeps
- * .output/chrome-mv3-dev built. Run `pnpm --filter extension verify`; add `-- --headed` to watch.
+ * Needs the dev stack in fixture mode (`NEMU_RESPONDER=fixture pnpm dev`). It first runs a
+ * production `wxt build` into .output/chrome-mv3 pointed at the local Nemu Service and loads that:
+ * the dev build in .output/chrome-mv3-dev registers its content script from the WXT dev server
+ * instead of the manifest, so under Playwright no overlay ever appears. Run
+ * `pnpm --filter extension verify`; add `-- --headed` to watch.
  */
 import {
   k2ApprovalRequest,
@@ -26,27 +29,27 @@ import {
   momentTwoRequest,
   momentTwoResponse,
 } from "@nemu/contracts/fixtures";
+import { execFileSync } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
 import path from "node:path";
 import { type BrowserContext, chromium, type Locator, type Page } from "playwright-core";
 import type { browser } from "wxt/browser";
 
+import { cropRegion } from "../features/area-crop/lib/area-crop.ts";
 import { OPEN_COMPOSER_MESSAGE } from "../features/composer/lib/open-composer-message.ts";
 import { RING_PADDING } from "../features/highlight/lib/highlight-targets.ts";
 import { CURSOR_OFFSET } from "../features/mascot/lib/mascot-position.ts";
 import { ALLOWED_ORIGINS, DEFAULT_SERVER_URL } from "../shared/lib/config.ts";
 
-const DEV_EXTENSION_DIR = path.resolve(import.meta.dirname, "../.output/chrome-mv3-dev");
-const PROD_EXTENSION_DIR = path.resolve(import.meta.dirname, "../.output/chrome-mv3");
-const EXTENSION_DIR = existsSync(path.join(DEV_EXTENSION_DIR, "manifest.json"))
-  ? DEV_EXTENSION_DIR
-  : PROD_EXTENSION_DIR;
+const EXTENSION_ROOT = path.resolve(import.meta.dirname, "..");
+const EXTENSION_DIR = path.join(EXTENSION_ROOT, ".output/chrome-mv3");
 const SCREENSHOT_DIR = path.resolve(import.meta.dirname, "../.output/verify");
 const [DEMO_APP_URL = ""] = ALLOWED_ORIGINS;
 // The Nemu Service's own origin is not on the allowlist, so it must get no overlay.
 const OUTSIDE_URL = DEFAULT_SERVER_URL;
 const TIMEOUT_MS = 15_000;
+/** Pixels an Area Crop may differ from the page by; the mascot and two Composer buttons were ~550. */
+const MAX_STRAY_PIXELS = 50;
 // Issue #8: Momen 1 must succeed five times out of five.
 const MOMEN_1_RUNS = 5;
 // Issue #10: so must Momen 3, from Beranda to Kirim.
@@ -91,6 +94,18 @@ async function ask(context: BrowserContext, page: Page, prompt: string) {
   await composer.press("Enter");
 }
 
+/** Drags `box` in area select mode, with a screenshot of the drag just before it is released. */
+async function dragArea(page: Page, box: Box, screenshot: string) {
+  await page.getByRole("button", { name: "Pilih area" }).click();
+  await page.getByRole("application", { name: "Pilih area" }).waitFor();
+  await page.mouse.move(box.x, box.y);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 5 });
+  await page.mouse.move(box.x + box.width, box.y + box.height, { steps: 5 });
+  await page.screenshot({ path: path.join(SCREENSHOT_DIR, screenshot) });
+  await page.mouse.up();
+}
+
 /** Drags a box over `targets` in area select mode, the way Rina selects the lodging field. */
 async function selectArea(page: Page, targets: Locator[]): Promise<Box> {
   await targets[0]?.scrollIntoViewIfNeeded();
@@ -100,16 +115,77 @@ async function selectArea(page: Page, targets: Locator[]): Promise<Box> {
   const top = Math.min(...boxes.map(({ y }) => y)) - margin;
   const right = Math.max(...boxes.map(({ x, width }) => x + width)) + margin;
   const bottom = Math.max(...boxes.map(({ y, height }) => y + height)) + margin;
+  const selection = { x: left, y: top, width: right - left, height: bottom - top };
+  await dragArea(page, selection, "momen-2-area-select.png");
+  return selection;
+}
 
-  await page.getByRole("button", { name: "Pilih area" }).click();
-  await page.getByRole("application", { name: "Pilih area" }).waitFor();
-  await page.mouse.move(left, top);
-  await page.mouse.down();
-  await page.mouse.move((left + right) / 2, (top + bottom) / 2, { steps: 5 });
-  await page.mouse.move(right, bottom, { steps: 5 });
-  await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-2-area-select.png") });
-  await page.mouse.up();
-  return { x: left, y: top, width: right - left, height: bottom - top };
+/**
+ * Compares the Area Crop with a screenshot of the same selection with Nemu's overlay taken out,
+ * so whatever Nemu drew that ended up in the crop fails the check.
+ */
+async function assertCropShowsOnlyPage(page: Page, cropUrl: string, selection: Box) {
+  // From inside the shadow root: WXT's `:host { all: initial !important }` beats any page style.
+  const overlay = page.locator("nemu-overlay");
+  await overlay.evaluate((host) => {
+    const style = document.createElement("style");
+    style.id = "verify-hide-nemu";
+    style.textContent = "* { visibility: hidden !important; transition: none !important; }";
+    host.shadowRoot?.append(style);
+  });
+  const clean = await page.screenshot();
+  await overlay.evaluate((host) => host.shadowRoot?.getElementById("verify-hide-nemu")?.remove());
+  // A PNG's IHDR holds its width and height at bytes 16 and 20.
+  const { source } = cropRegion(
+    { left: selection.x, top: selection.y, width: selection.width, height: selection.height },
+    await page.evaluate(() => ({ width: window.innerWidth, height: window.innerHeight })),
+    { width: clean.readUInt32BE(16), height: clean.readUInt32BE(20) },
+  );
+  const differing = await page.evaluate(
+    async ({ cropUrl, cleanUrl, source }) => {
+      async function decode(url: string) {
+        const image = new Image();
+        image.src = url;
+        await image.decode();
+        return image;
+      }
+      // Both drawn at the crop's own size, whatever scale either screenshot was taken at.
+      const crop = await decode(cropUrl);
+      const canvas = document.createElement("canvas");
+      canvas.width = crop.naturalWidth;
+      canvas.height = crop.naturalHeight;
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+      if (!context) throw new Error("no 2D canvas");
+      const { width, height } = canvas;
+      context.drawImage(crop, 0, 0);
+      const cropPixels = context.getImageData(0, 0, width, height).data;
+      const screenshot = await decode(cleanUrl);
+      context.drawImage(
+        screenshot,
+        source.left,
+        source.top,
+        source.width,
+        source.height,
+        0,
+        0,
+        width,
+        height,
+      );
+      const pagePixels = context.getImageData(0, 0, width, height).data;
+      let differing = 0;
+      for (let index = 0; index < cropPixels.length; index += 4) {
+        const channels = [0, 1, 2].map((channel) =>
+          Math.abs((cropPixels[index + channel] ?? 0) - (pagePixels[index + channel] ?? 0)),
+        );
+        if (Math.max(...channels) > 24) differing++;
+      }
+      return differing;
+    },
+    { cropUrl, cleanUrl: `data:image/png;base64,${clean.toString("base64")}`, source },
+  );
+  if (differing > MAX_STRAY_PIXELS) {
+    throw new Error(`the Area Crop shows Nemu's own UI: ${differing} pixels differ from the page`);
+  }
 }
 
 /** The newest Chat Log entry, read with Rina's Demo App session like the Admin Workspace does. */
@@ -129,7 +205,8 @@ async function newestChatLogEntry(page: Page): Promise<{ prompt: string; hasArea
 }
 
 async function closeAnswerCard(page: Page) {
-  await page.getByRole("button", { name: "Tutup" }).click();
+  // The header's ×, not the Tutup link of a notice card or Rincian's "Tutup rincian".
+  await page.getByRole("button", { name: "Tutup", exact: true }).first().click();
 }
 
 type Box = { x: number; y: number; width: number; height: number };
@@ -162,11 +239,18 @@ function sameBox(a: Box, b: Box): boolean {
 
 /** Checks that the overlay draws one ring, labelled `label`, around the target's box. */
 async function assertOnlyRing(overlay: Locator, target: string, label: string, targetBox: Box) {
-  // A ring's label is the only badge outside the Answer Card.
-  const rings = overlay.locator('[data-slot="badge"]:not([data-slot="card"] *)');
+  const rings = overlay.locator("[data-nemu-highlight]");
   if ((await rings.count()) !== 1) throw new Error(`${await rings.count()} rings, not one`);
-  if ((await rings.textContent()) !== label) throw new Error(`no "${label}" label on ${target}`);
-  if (!sameBox(await boxOf(rings.locator("..")), ringAround(targetBox))) {
+  // The label's text, without the mascot art beside it.
+  const text = await rings
+    .locator('[data-slot="badge"]')
+    .evaluate((badge) =>
+      Array.from(badge.childNodes, (node) =>
+        node instanceof Element && node.hasAttribute("aria-hidden") ? "" : node.textContent,
+      ).join(""),
+    );
+  if (text !== label) throw new Error(`no "${label}" label on ${target}`);
+  if (!sameBox(await boxOf(rings), ringAround(targetBox))) {
     throw new Error(`the "${label}" ring isn't around ${target}`);
   }
 }
@@ -204,13 +288,50 @@ async function eventually(assertion: () => Promise<void>) {
   }
 }
 
-async function main() {
-  if (!existsSync(path.join(EXTENSION_DIR, "manifest.json"))) {
-    throw new Error(`No extension build at ${EXTENSION_DIR}. Run the extension build first.`);
+/** Builds the extension as it ships, but calling the local Nemu Service. */
+function buildExtension() {
+  execFileSync("pnpm", ["exec", "wxt", "build"], {
+    cwd: EXTENSION_ROOT,
+    env: { ...process.env, WXT_SERVER_URL: DEFAULT_SERVER_URL },
+    stdio: ["ignore", "ignore", "inherit"],
+  });
+}
+
+/**
+ * Fails fast when the Nemu Service answers with the AI Responder: its answers never match the
+ * fixtures, so every Momen check would otherwise wait out its timeout on the reading card.
+ */
+async function assertFixtureResponder(page: Page) {
+  const { user_id: _userId, ...request } = momentOneRequest;
+  const body = await page.evaluate(
+    async ({ serverUrl, json }) => {
+      const response = await fetch(`${serverUrl}/rpc/nemuChat`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ json }),
+      });
+      return response.json();
+    },
+    { serverUrl: DEFAULT_SERVER_URL, json: request },
+  );
+  if (body.json?.answer?.ringkas !== momentOneResponse.answer.ringkas) {
+    throw new Error(
+      "the Nemu Service isn't answering from the fixtures. Restart it with NEMU_RESPONDER=fixture pnpm dev",
+    );
   }
+}
+
+/** Beranda greets Rina by name in its page heading. */
+async function waitForBeranda(page: Page) {
+  await page.getByRole("heading", { level: 1, name: /^Good morning/ }).waitFor();
+}
+
+async function main() {
   await assertReachable(DEMO_APP_URL);
   await assertReachable(OUTSIDE_URL);
   await mkdir(SCREENSHOT_DIR, { recursive: true });
+  buildExtension();
 
   const context = await chromium.launchPersistentContext("", {
     // The full Chromium build, not the headless shell, because the shell can't load extensions.
@@ -253,7 +374,8 @@ async function main() {
 
     await check("signed in, the Answer Card shows the answer and its citation", async () => {
       await page.getByRole("button", { name: /Masuk sebagai Rina/ }).click();
-      await page.getByRole("heading", { name: "Beranda" }).waitFor();
+      await waitForBeranda(page);
+      await assertFixtureResponder(page);
       await ask(context, page, momentOneRequest.prompt);
       await page.getByText(momentOneResponse.answer.ringkas).waitFor();
       const [citation] = momentOneResponse.citations;
@@ -271,7 +393,7 @@ async function main() {
       async () => {
         for (let run = 1; run <= MOMEN_1_RUNS; run++) {
           await page.goto(DEMO_APP_URL);
-          await page.getByRole("heading", { name: "Beranda" }).waitFor();
+          await waitForBeranda(page);
           await ask(context, page, momentOneRequest.prompt);
           await page.getByText(momentOneResponse.answer.ringkas).waitFor();
           // Morph (200 ms) and part of the move: the cursor is on its way to the menu.
@@ -314,7 +436,9 @@ async function main() {
       "on the form, Momen 2 sends only the selected area, rings its targets one step at a time and the Answer Card avoids them",
       async () => {
         await page.goto(`${DEMO_APP_URL}/perdin/baru`);
-        await page.getByRole("heading", { name: "Ajukan Perjalanan Dinas" }).waitFor();
+        await page.getByRole("heading", { name: "Start Perjalanan Dinas" }).waitFor();
+        // The lodging fields render only while the form's Biaya tab is open.
+        await page.getByRole("tab", { name: "Biaya" }).click();
         const guidedActions = momentTwoResponse.actions;
         if (guidedActions.length === 0) {
           throw new Error("momentTwoResponse has no guided actions");
@@ -349,6 +473,7 @@ async function main() {
             `the crop is ${cropWidth}×${cropHeight}, not the ${selection.width}×${selection.height} selection`,
           );
         }
+        await assertCropShowsOnlyPage(page, String(cropUrl), selection);
         await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-2-area-crop-chip.png") });
         await composer.press("Enter");
 
@@ -425,9 +550,26 @@ async function main() {
       },
     );
 
+    // Issue #121: the mascot and the Composer's buttons once showed up in the crop.
+    await check("an Area Crop shows only the page, never what Nemu draws over it", async () => {
+      await page.goto(DEMO_APP_URL);
+      await waitForBeranda(page);
+      await openComposer(context, page);
+      // Almost the whole viewport, so the Composer and the mascot are inside the selection.
+      const { width, height } = await page.evaluate(() => ({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      }));
+      const selection = { x: 4, y: 4, width: width - 8, height: height - 8 };
+      await dragArea(page, selection, "area-crop-viewport-select.png");
+      const chip = page.getByRole("img", { name: "Area Crop" });
+      await chip.waitFor();
+      await assertCropShowsOnlyPage(page, String(await chip.getAttribute("src")), selection);
+    });
+
     await check("the mascot follows the cursor and opens the Composer when clicked", async () => {
       await page.goto(DEMO_APP_URL);
-      await page.getByRole("heading", { name: "Beranda" }).waitFor();
+      await waitForBeranda(page);
       const mascot = page.getByRole("button", { name: "Tanya Nemu" });
       // The overlay starts listening for the cursor a moment after the page renders, and the mascot
       // has no place until it sees the cursor move, so keep moving until it shows up.
@@ -459,7 +601,7 @@ async function main() {
         for (let run = 1; run <= MOMEN_3_RUNS; run++) {
           await resetDemoData(page);
           await page.goto(DEMO_APP_URL);
-          await page.getByRole("heading", { name: "Beranda" }).waitFor();
+          await waitForBeranda(page);
           await ask(context, page, momentThreeRequest.prompt);
           await page.getByText(momentThreeResponse.answer.ringkas).waitFor();
           await page.waitForURL(`${DEMO_APP_URL}/perdin/task/PD-2026-0042`);
@@ -486,7 +628,7 @@ async function main() {
             await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-3-task.png") });
           }
           // Nemu never presses Kirim: the task is still open until Rina does.
-          await page.getByText("Dokumen pertanggungjawaban").waitFor();
+          await page.locator(`[data-nemu-id="button-kirim"]`).waitFor();
 
           // Each upload moves the ring on by itself, ending on Kirim.
           for (const [index, [nemuId, file]] of Object.entries(MISSING_UPLOADS).entries()) {
@@ -496,6 +638,9 @@ async function main() {
             // The file name under the field appears once the refetch shows the upload.
             await page.getByText(file, { exact: true }).waitFor();
             await ringStep(index + 1);
+          }
+          if (run === 1) {
+            await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-3-kirim.png") });
           }
           await page.locator('[data-nemu-id="button-kirim"]').click();
 

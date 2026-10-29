@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vite-plus/test";
 
 import {
+  atAreaCorner,
   besideComposer,
   besideCursor,
   CURSOR_OFFSET,
@@ -34,6 +35,16 @@ describe("besideCursor", () => {
       y: cursor.y - CURSOR_OFFSET - MASCOT_SIZE,
     });
     expect(covers(mascot, cursor)).toBe(false);
+  });
+});
+
+describe("atAreaCorner", () => {
+  test("sits beside the bottom-right corner of the box, clear of its handle", () => {
+    const area = { left: 40, top: 300, width: 520, height: 140 };
+    const mascot = atAreaCorner(area, VIEWPORT);
+
+    expect(mascot).toEqual({ x: 572, y: 452 });
+    expect(covers(mascot, { x: 560, y: 440 })).toBe(false);
   });
 });
 

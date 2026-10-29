@@ -39,12 +39,12 @@ const createGuideSteps = [
     label: "Pilih jenis perjalanan",
   },
   {
-    target: "input-nomor-surat-tugas",
-    label: "Isi nomor surat tugas",
-  },
-  {
     target: "select-kota-tujuan",
     label: "Pilih kota tujuan",
+  },
+  {
+    target: "select-dasar-penugasan",
+    label: "Pilih dasar penugasan",
   },
   {
     target: "input-maksud-perjalanan",

@@ -1,92 +1,64 @@
 import type { NemuResponse } from "@nemu/contracts";
-import { Badge } from "@nemu/ui/components/badge";
-import { Button } from "@nemu/ui/components/button";
-import { Card, CardContent, CardFooter } from "@nemu/ui/components/card";
-import { CalendarClockIcon, TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 
-import { pertanggungjawabanDeadline } from "../lib/calculation";
+import { copyableValue } from "../lib/calculation";
+import { asSentence } from "../lib/sentence";
+import { AnswerCardFrame } from "./answer-card-frame";
 import { CalculationBreakdown } from "./calculation-breakdown";
 import { CitationList } from "./citation-list";
-
-const STATUS_LABELS: Record<NemuResponse["status"], string | undefined> = {
-  answer: undefined,
-  clarify: "Nemu butuh info tambahan",
-  refuse: "Di luar cakupan Nemu",
-  error: "Nemu gagal menjawab",
-};
+import { CopyValue } from "./copy-value";
+import { TextLink } from "./text-link";
 
 type AnswerCardProps = {
   response: NemuResponse;
   header: React.ReactNode;
-  onReply: () => void;
-  /** What happened after the answer, such as the task's new status once the user pressed Kirim. */
+  /** What happened after the answer, such as the steps or the task's new status after Kirim. */
   children?: React.ReactNode;
+  /** Balas: the Composer pill, to ask again from the card. */
+  reply?: React.ReactNode;
 };
 
-export function AnswerCard({ response, header, onReply, children }: AnswerCardProps) {
+/**
+ * Jawaban teks: the answer as plain text, like a chatbot message, with its calculation and
+ * warnings as sentences, the computed value to copy, and its sources. "Rincian" opens the detail.
+ */
+export function AnswerCard({ response, header, children, reply }: AnswerCardProps) {
   const [detailOpen, setDetailOpen] = useState(false);
-  const statusLabel = STATUS_LABELS[response.status];
   const { detail } = response.answer;
-  const deadline = pertanggungjawabanDeadline(response.calc);
+  const value = copyableValue(response.calc);
+  const sources = [...new Set(response.calc.flatMap(({ sumber }) => (sumber ? [sumber] : [])))];
 
   return (
-    <Card size="sm" className="shadow-lg">
-      {header}
-      <CardContent className="flex flex-col gap-3">
-        {statusLabel && (
-          <p
-            className={
-              response.status === "error"
-                ? "font-medium text-destructive"
-                : "font-medium text-muted-foreground"
-            }
-          >
-            {statusLabel}
-          </p>
-        )}
-        <p className="text-sm">{response.answer.ringkas}</p>
-        {deadline && (
-          <Badge>
-            <CalendarClockIcon data-icon="inline-start" />
-            Batas {deadline}
-          </Badge>
-        )}
-        {detail && (
-          <div className="flex flex-col items-start gap-1">
-            <Button
-              aria-expanded={detailOpen}
-              size="xs"
-              variant="link"
-              className="px-0"
-              onClick={() => setDetailOpen(!detailOpen)}
-            >
-              {detailOpen ? "Sembunyikan detail" : "Lihat detail"}
-            </Button>
-            {detailOpen && <p className="whitespace-pre-line">{detail}</p>}
-          </div>
-        )}
-        <CalculationBreakdown calculations={response.calc} />
-        {children}
-        {response.warnings.length > 0 && (
-          <ul aria-label="Peringatan" className="flex flex-col gap-1">
-            {response.warnings.map((warning) => (
-              <li key={warning} className="flex items-start gap-1.5 text-destructive">
-                <TriangleAlertIcon className="mt-0.5 size-3.5 shrink-0" />
-                {warning}
-              </li>
-            ))}
-          </ul>
-        )}
-        <CitationList citations={response.citations} />
-      </CardContent>
-      {response.status === "clarify" && (
-        <CardFooter>
-          <Button size="sm" onClick={onReply}>
-            Jawab
-          </Button>
-        </CardFooter>
+    <AnswerCardFrame header={header} lead={<p>{response.answer.ringkas}</p>}>
+      <CalculationBreakdown calculations={response.calc} />
+      {response.warnings.length > 0 && (
+        <ul aria-label="Peringatan" className="flex flex-col gap-1">
+          {response.warnings.map((warning) => (
+            <li key={warning}>{asSentence(warning)}</li>
+          ))}
+        </ul>
       )}
-    </Card>
+      {value && <CopyValue value={value} />}
+      {children}
+      {detail && detailOpen && (
+        <div className="flex flex-col gap-1">
+          <p className="whitespace-pre-line">{detail}</p>
+          {sources.map((source) => (
+            <p key={source} className="text-muted-foreground">
+              Tarif: {source}
+            </p>
+          ))}
+        </div>
+      )}
+      {detail && (
+        <p>
+          <TextLink aria-expanded={detailOpen} onClick={() => setDetailOpen(!detailOpen)}>
+            {detailOpen ? "Tutup rincian" : "Rincian"}
+          </TextLink>
+        </p>
+      )}
+      <CitationList citations={response.citations} sources={sources} />
+      {reply}
+    </AnswerCardFrame>
   );
 }

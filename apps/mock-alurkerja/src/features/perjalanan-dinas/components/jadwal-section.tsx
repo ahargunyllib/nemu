@@ -1,58 +1,101 @@
 import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
-import { Field, FieldDescription, FieldError, FieldLabel } from "@nemu/ui/components/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@nemu/ui/components/field";
 import { Input } from "@nemu/ui/components/input";
 
-import PerdinFormSection from "@/features/perjalanan-dinas/components/perdin-form-section";
+import DatePicker from "@/features/perjalanan-dinas/components/date-picker";
+import OptionSelect from "@/features/perjalanan-dinas/components/option-select";
 import type { AjukanPerdinForm } from "@/features/perjalanan-dinas/hooks/use-ajukan-perdin-form";
-import { lamaPerjalanan } from "@/features/perjalanan-dinas/lib/perdin-form";
-
-const DATE_FIELDS = [
-  {
-    name: "tanggalBerangkat",
-    label: "Tanggal berangkat",
-    nemuId: NEMU_IDS.perdinForm.tanggalBerangkat,
-  },
-  { name: "tanggalKembali", label: "Tanggal kembali", nemuId: NEMU_IDS.perdinForm.tanggalKembali },
-] as const;
+import { usePerdinErrors } from "@/features/perjalanan-dinas/hooks/use-perdin-errors";
+import { lamaPerjalanan, modaTransportOptions } from "@/features/perjalanan-dinas/lib/perdin-form";
 
 export default function JadwalSection({ form }: { form: AjukanPerdinForm }) {
+  const errors = usePerdinErrors(form);
+
   return (
-    <PerdinFormSection title="B. Jadwal">
-      <div className="grid gap-4 sm:grid-cols-2">
-        {DATE_FIELDS.map(({ name, label, nemuId }) => (
-          <form.Field key={name} name={name}>
-            {(field) => (
-              <Field data-invalid={!field.state.meta.isValid}>
-                <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="date"
-                  data-nemu-id={nemuId}
-                  value={field.state.value}
-                  aria-invalid={!field.state.meta.isValid}
-                  onBlur={field.handleBlur}
-                  onChange={(event) => field.handleChange(event.target.value)}
-                />
-                <FieldError errors={field.state.meta.errors} />
-              </Field>
-            )}
+    <FieldGroup className="gap-3">
+      <form.Field name="tanggalBerangkat">
+        {(field) => {
+          return (
+            <Field data-invalid={Boolean(errors[field.name])} className="gap-1.5">
+              <FieldLabel htmlFor={field.name}>Tanggal berangkat</FieldLabel>
+              <DatePicker
+                id={field.name}
+                nemuId={NEMU_IDS.perdinForm.tanggalBerangkat}
+                value={field.state.value}
+                invalid={Boolean(errors[field.name])}
+                onChange={field.handleChange}
+              />
+              <FieldError>{errors[field.name]}</FieldError>
+            </Field>
+          );
+        }}
+      </form.Field>
+
+      <form.Subscribe selector={(state) => state.values.tanggalBerangkat}>
+        {(tanggalBerangkat) => (
+          <form.Field name="tanggalKembali">
+            {(field) => {
+              return (
+                <Field data-invalid={Boolean(errors[field.name])} className="gap-1.5">
+                  <FieldLabel htmlFor={field.name}>Tanggal kembali</FieldLabel>
+                  <DatePicker
+                    id={field.name}
+                    nemuId={NEMU_IDS.perdinForm.tanggalKembali}
+                    value={field.state.value}
+                    notBefore={tanggalBerangkat}
+                    invalid={Boolean(errors[field.name])}
+                    onChange={field.handleChange}
+                  />
+                  <FieldError>{errors[field.name]}</FieldError>
+                </Field>
+              );
+            }}
           </form.Field>
-        ))}
-      </div>
+        )}
+      </form.Subscribe>
+
       <form.Subscribe
         selector={(state) =>
           lamaPerjalanan(state.values.tanggalBerangkat, state.values.tanggalKembali)
         }
       >
         {(lama) => (
-          <FieldDescription>
-            {lama
-              ? `Lama perjalanan: ${lama.hari} hari, ${lama.malam} malam.`
-              : "Jumlah hari dihitung otomatis dari tanggal berangkat dan kembali."}
-          </FieldDescription>
+          <Field className="gap-1.5">
+            <FieldLabel htmlFor="lamaPerjalanan">Lama perjalanan</FieldLabel>
+            <Input
+              id="lamaPerjalanan"
+              readOnly
+              tabIndex={-1}
+              placeholder="Terisi otomatis"
+              value={lama ? `${lama.hari} hari · ${lama.malam} malam` : ""}
+            />
+          </Field>
         )}
       </form.Subscribe>
-    </PerdinFormSection>
+
+      <form.Subscribe selector={(state) => state.values.kotaTujuan}>
+        {(kotaTujuan) => (
+          <form.Field name="modaTransport">
+            {(field) => {
+              return (
+                <Field data-invalid={Boolean(errors[field.name])} className="gap-1.5">
+                  <FieldLabel htmlFor={field.name}>Moda transportasi</FieldLabel>
+                  <OptionSelect
+                    id={field.name}
+                    nemuId={NEMU_IDS.perdinForm.modaTransport}
+                    options={modaTransportOptions(kotaTujuan)}
+                    placeholder="Pilih moda"
+                    value={field.state.value}
+                    invalid={Boolean(errors[field.name])}
+                    onChange={field.handleChange}
+                  />
+                  <FieldError>{errors[field.name]}</FieldError>
+                </Field>
+              );
+            }}
+          </form.Field>
+        )}
+      </form.Subscribe>
+    </FieldGroup>
   );
 }

@@ -1,24 +1,21 @@
-import { Button } from "@nemu/ui/components/button";
-import { Card, CardContent, CardFooter } from "@nemu/ui/components/card";
+import { asSentence } from "../lib/sentence";
+import { AnswerCardFrame } from "./answer-card-frame";
+import { TextLink } from "./text-link";
 
 type ChatNoticeCardProps = {
   header: React.ReactNode;
-  title: string;
-  description: string;
-  children: React.ReactNode;
+  /** What happened, as plain text. */
+  message: React.ReactNode;
+  /** The way forward as a text link, such as "Coba lagi". */
+  children?: React.ReactNode;
 };
 
-/** A failure the Answer Card shows instead of an answer: not logged in, or the request failed. */
-export function ChatNoticeCard({ header, title, description, children }: ChatNoticeCardProps) {
+/** A card the Answer Card shows instead of an answer: not logged in, or the request failed. */
+export function ChatNoticeCard({ header, message, children }: ChatNoticeCardProps) {
   return (
-    <Card size="sm" role="alert" className="shadow-lg">
-      {header}
-      <CardContent className="flex flex-col gap-1">
-        <p className="font-medium text-destructive">{title}</p>
-        <p>{description}</p>
-      </CardContent>
-      <CardFooter className="gap-2">{children}</CardFooter>
-    </Card>
+    <AnswerCardFrame role="alert" header={header} lead={<p>{message}</p>}>
+      {children && <p>{children}</p>}
+    </AnswerCardFrame>
   );
 }
 
@@ -32,12 +29,11 @@ export function LoginRequiredCard({
   return (
     <ChatNoticeCard
       header={header}
-      title="Kamu belum masuk ke Demo App"
-      description="Nemu memakai akun Demo App-mu. Masuk dulu, lalu buka Nemu lagi."
+      message="Kamu belum masuk ke Demo App. Nemu memakai akun Demo App-mu, jadi masuk dulu, lalu buka Nemu lagi."
     >
-      <Button size="sm" render={<a href={loginUrl} />} nativeButton={false}>
+      <TextLink render={<a href={loginUrl} />} nativeButton={false}>
         Masuk ke Demo App
-      </Button>
+      </TextLink>
     </ChatNoticeCard>
   );
 }
@@ -52,10 +48,8 @@ export function ChatErrorCard({
   onRetry: () => void;
 }) {
   return (
-    <ChatNoticeCard header={header} title="Pertanyaan belum terjawab" description={message}>
-      <Button size="sm" variant="outline" onClick={onRetry}>
-        Coba lagi
-      </Button>
+    <ChatNoticeCard header={header} message={`Pertanyaan belum terjawab. ${asSentence(message)}`}>
+      <TextLink onClick={onRetry}>Coba lagi</TextLink>
     </ChatNoticeCard>
   );
 }

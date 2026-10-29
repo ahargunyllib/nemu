@@ -25,6 +25,14 @@ These rules apply to `apps/mock-alurkerja/src`, `apps/admin/src`, and
 - Vendored shadcn primitives live in `packages/ui/src/components` and are
   imported as `@nemu/ui/components/<name>`. App-specific components that
   compose them belong to a feature or to `shared/components/`.
+- Nemu-branded wrappers around those primitives that several features share
+  live in `packages/ui/src/nemu` and are imported as `@nemu/ui/nemu/<name>`;
+  their tokens are in `packages/ui/src/styles/nemu.css`. Never edit a vendored
+  primitive to brand it.
+- The signed-in layout the Demo App and the Admin Workspace share (`AppShell`,
+  `AppSidebar`, `AppHeader`, `PageHeading`, `AccountMenu`) lives in
+  `packages/ui/src/shell` and is imported as `@nemu/ui/shell/<name>`. Each app
+  fills it with its own menu items, account details, and pages.
 - Keep domain-specific reusable code inside its feature. For example, Action
   Level labels belong in that feature's `lib/`, not in `shared/`.
 - Shared code is a dependency leaf and must not import from `features/` or

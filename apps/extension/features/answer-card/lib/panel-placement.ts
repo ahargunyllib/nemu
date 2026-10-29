@@ -1,6 +1,6 @@
 import type { Box } from "../../../shared/types/box";
 
-export const PANEL_WIDTH = 384;
+export const PANEL_WIDTH = 280;
 const GAP = 12;
 
 export type Point = { x: number; y: number };
@@ -19,29 +19,31 @@ const MIN_HEIGHT = 160;
  * Places the panel beside the cursor, unless it would cover a highlighted area; then it moves to
  * the first viewport corner that covers none. When the panel is too tall for every spot, it takes
  * the spot with the most clear room and shrinks to it, scrolling, rather than covering a highlight.
- * Only when no spot has usable room does it cover, and then as little as possible.
+ * Only when no spot has usable room does it cover, and then as little as possible. `width` is
+ * PANEL_WIDTH unless something in the panel, such as the Composer, is wider.
  */
 export function placePanel(
   cursor: Point,
   viewport: Viewport,
   panelHeight: number,
   avoid: readonly Box[],
+  width = PANEL_WIDTH,
 ): PanelPlacement {
-  const preferred = besideCursor(cursor, viewport);
-  const candidates = [preferred, ...corners(viewport)];
+  const preferred = besideCursor(cursor, viewport, width);
+  const candidates = [preferred, ...corners(viewport, width)];
   let roomiest = preferred;
   let roomiestHeight = 0;
   let leastCovering = preferred;
   let leastOverlap = Number.POSITIVE_INFINITY;
 
   for (const candidate of candidates) {
-    const room = clearHeight(candidate, viewport, avoid);
+    const room = clearHeight(candidate, viewport, avoid, width);
     if (room >= Math.min(panelHeight, candidate.maxHeight)) return candidate;
     if (room > roomiestHeight) {
       roomiest = candidate;
       roomiestHeight = room;
     }
-    const box = panelBox(candidate, panelHeight, viewport);
+    const box = panelBox(candidate, panelHeight, viewport, width);
     const overlap = avoid.reduce((sum, area) => sum + overlapArea(box, area), 0);
     if (overlap < leastOverlap) {
       leastCovering = candidate;
@@ -52,14 +54,18 @@ export function placePanel(
 }
 
 /** How tall the panel can grow from its anchored edge before it reaches a highlighted area. */
-function clearHeight(placement: PanelPlacement, viewport: Viewport, avoid: readonly Box[]): number {
+function clearHeight(
+  placement: PanelPlacement,
+  viewport: Viewport,
+  avoid: readonly Box[],
+  width: number,
+): number {
   const growsDown = "top" in placement;
   const edge = growsDown ? placement.top : viewport.height - placement.bottom;
   let room = placement.maxHeight;
 
   for (const area of avoid) {
-    const beside =
-      area.left >= placement.left + PANEL_WIDTH || area.left + area.width <= placement.left;
+    const beside = area.left >= placement.left + width || area.left + area.width <= placement.left;
     const behind = growsDown ? area.top + area.height <= edge : area.top >= edge;
     if (beside || behind) continue;
     const distance = growsDown ? area.top - edge : edge - (area.top + area.height);
@@ -69,15 +75,15 @@ function clearHeight(placement: PanelPlacement, viewport: Viewport, avoid: reado
 }
 
 /** Below the cursor in the top half of the screen and above it in the bottom half. */
-function besideCursor({ x, y }: Point, viewport: Viewport): PanelPlacement {
-  const left = Math.max(GAP, Math.min(x + GAP, viewport.width - PANEL_WIDTH - GAP));
+function besideCursor({ x, y }: Point, viewport: Viewport, width: number): PanelPlacement {
+  const left = Math.max(GAP, Math.min(x + GAP, viewport.width - width - GAP));
   return y < viewport.height / 2
     ? { left, top: y + GAP, maxHeight: viewport.height - y - 2 * GAP }
     : { left, bottom: viewport.height - y + GAP, maxHeight: y - 2 * GAP };
 }
 
-function corners(viewport: Viewport): PanelPlacement[] {
-  const right = Math.max(GAP, viewport.width - PANEL_WIDTH - GAP);
+function corners(viewport: Viewport, width: number): PanelPlacement[] {
+  const right = Math.max(GAP, viewport.width - width - GAP);
   const maxHeight = viewport.height - 2 * GAP;
   return [
     { left: right, top: GAP, maxHeight },
@@ -87,10 +93,15 @@ function corners(viewport: Viewport): PanelPlacement[] {
   ];
 }
 
-function panelBox(placement: PanelPlacement, panelHeight: number, viewport: Viewport): Box {
+function panelBox(
+  placement: PanelPlacement,
+  panelHeight: number,
+  viewport: Viewport,
+  width: number,
+): Box {
   const height = Math.min(panelHeight, placement.maxHeight);
   const top = "top" in placement ? placement.top : viewport.height - placement.bottom - height;
-  return { left: placement.left, top, width: PANEL_WIDTH, height };
+  return { left: placement.left, top, width, height };
 }
 
 function overlapArea(a: Box, b: Box): number {

@@ -4,11 +4,17 @@ import type { Box } from "../../../shared/types/box";
 
 export type HighlightTarget = { action: NemuAction; element: HTMLElement };
 
-/** Space around the element for the outline, and above or below it for the action label. */
+/** Space around the element for the outline. */
 export const RING_PADDING = 4;
-export const LABEL_SPACE = 28;
-/** Room for a typical action label, which can be wider than a small target such as a radio. */
-const LABEL_WIDTH = 160;
+/** The action label pill: its height, and room for a typical label, which can be wider than a
+    small target such as a radio. */
+export const LABEL_HEIGHT = 26;
+const LABEL_WIDTH = 240;
+/** Space between the outline and a label beside it. */
+export const LABEL_GAP = 8;
+/** How far a label pinned to the outline's edge overlaps it, and its inset from the right end. */
+export const LABEL_OVERLAP = 8;
+export const LABEL_INSET = 12;
 
 /**
  * Finds the page element for each `highlight` and `confirm` action: a confirm is shown the same
@@ -53,12 +59,44 @@ export function missingTargetWarning(action: NemuAction): string {
   return `Nemu tidak menemukan "${action.label}" (${action.target}) di halaman ini.`;
 }
 
-/** The area a highlight draws on: the element, its outline, and its label on either side. */
-export function highlightFootprint(box: Box): Box {
-  return {
+export type LabelSide = "right" | "top" | "bottom";
+
+/**
+ * Where the action label sits: to the right of the outline, level with its top, so it covers none
+ * of the target. With no room on the right it falls back to the outline's top-right edge, or its
+ * bottom-right edge near the top of the viewport.
+ */
+export function labelSide(box: Box, viewportWidth: number): LabelSide {
+  const outlineRight = box.left + box.width + RING_PADDING;
+  if (outlineRight + LABEL_GAP + LABEL_WIDTH <= viewportWidth) return "right";
+  return box.top - RING_PADDING < LABEL_HEIGHT - LABEL_OVERLAP ? "bottom" : "top";
+}
+
+/** The area a highlight draws on: the element, its outline, and its label. */
+export function highlightFootprint(box: Box, viewportWidth = window.innerWidth): Box {
+  const outline = {
     left: box.left - RING_PADDING,
-    top: box.top - RING_PADDING - LABEL_SPACE,
-    width: Math.max(box.width + 2 * RING_PADDING, LABEL_WIDTH),
-    height: box.height + 2 * (RING_PADDING + LABEL_SPACE),
+    top: box.top - RING_PADDING,
+    width: box.width + 2 * RING_PADDING,
+    height: box.height + 2 * RING_PADDING,
+  };
+  const side = labelSide(box, viewportWidth);
+  if (side === "right") {
+    return {
+      ...outline,
+      width: outline.width + LABEL_GAP + LABEL_WIDTH,
+      height: Math.max(outline.height, LABEL_HEIGHT),
+    };
+  }
+
+  // The label's right end is LABEL_INSET in from the outline's, and it grows to the left.
+  const right = outline.left + outline.width;
+  const left = Math.min(outline.left, right - LABEL_INSET - LABEL_WIDTH);
+  const outside = LABEL_HEIGHT - LABEL_OVERLAP;
+  return {
+    left,
+    top: side === "top" ? outline.top - outside : outline.top,
+    width: right - left,
+    height: outline.height + outside,
   };
 }

@@ -9,7 +9,7 @@ import {
   nemuResponseSchema,
 } from "@nemu/contracts";
 
-import type { AnswerGenerator, NemuUserProfile } from "./openai.js";
+import type { AnswerGenerator, GeneratedAnswer, NemuUserProfile } from "./openai.js";
 import type { JevDecider, JevDecision } from "./jev.js";
 import { retrieveKnowledge, type KnowledgeChunk, type RankedKnowledgeChunk } from "./knowledge.js";
 import {
@@ -282,6 +282,33 @@ function activeClaimSourceId(
     throw new Error(`Missing active claim source at ${JSON.stringify(location)}`);
   }
   return chunk.id;
+}
+
+function enforceTrustedWorkflowAnswer(
+  generatedAnswer: GeneratedAnswer,
+  workflowScenario: TravelWorkflowScenario,
+  calculations: readonly Calculation[],
+): GeneratedAnswer {
+  if (workflowScenario !== "accommodation_guidance" || generatedAnswer.status !== "answer") {
+    return generatedAnswer;
+  }
+
+  const accommodation = calculations.find(
+    (calculation) => calculation.fungsi === "hitung_lumpsum_penginapan",
+  );
+  const rate = accommodation?.input.tarif;
+  const nights = accommodation?.input.malam;
+  const total = accommodation?.hasil;
+  if (typeof rate !== "number" || typeof nights !== "number" || typeof total !== "number") {
+    return generatedAnswer;
+  }
+
+  const rupiah = (value: number) => new Intl.NumberFormat("id-ID").format(value);
+  return {
+    ...generatedAnswer,
+    ringkas: `Pilih Tidak menginap di hotel, lalu isi Nominal penginapan Rp${rupiah(total)}.`,
+    detail: `Nominal hanya terisi setelah Anda menekan Isi atau mengetiknya sendiri. Perhitungannya 30% × Rp${rupiah(rate)} × ${nights} malam = Rp${rupiah(total)}.`,
+  };
 }
 
 function citationsFromSources(
@@ -657,7 +684,7 @@ export async function runNemu(
           "Persetujuan harus dilakukan oleh pejabat yang berwenang dan tidak boleh dilakukan oleh penyusun klaim sendiri.",
       },
       citations,
-      calc: toolResults.calculations,
+      calc: [],
       actions: [],
       warnings: claimOutput?.warnings ?? [],
       timing: {
@@ -672,7 +699,7 @@ export async function runNemu(
 
   const gptStartedAt = performance.now();
   try {
-    const generatedAnswer = await context.answerGenerator({
+    const modelAnswer = await context.answerGenerator({
       request,
       userProfile: context.userProfile,
       processContext: answerProcessContext,
@@ -682,6 +709,18 @@ export async function runNemu(
       decision: jevResult.decision,
       missingDocuments: toolResults.missingDocuments,
     });
+    validateGeneratedAnswer(
+      modelAnswer,
+      toolResults.calculations,
+      context.sbmRows,
+      request.prompt,
+      evidence,
+    );
+    const generatedAnswer = enforceTrustedWorkflowAnswer(
+      modelAnswer,
+      workflowScenario,
+      toolResults.calculations,
+    );
     validateGeneratedAnswer(
       generatedAnswer,
       toolResults.calculations,
@@ -738,7 +777,7 @@ export async function runNemu(
       status: generatedAnswer.status,
       answer: { ringkas: generatedAnswer.ringkas, detail: generatedAnswer.detail },
       citations,
-      calc: toolResults.calculations,
+      calc: generatedAnswer.status === "answer" ? toolResults.calculations : [],
       actions,
       ...(guide ? { guide } : {}),
       warnings: [...generatedAnswer.warnings, ...providerWarnings],

@@ -1,150 +1,162 @@
-# nemu
+# Nemu
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Router, Hono, ORPC, and more.
+Nemu is an AI guide in the browser. It walks an employee through a work process inside their
+organisation's web app and answers only from knowledge the admin manages. The MVP guides Rina
+through one Perjalanan Dinas (official work trip) on the Demo App, a fake AlurKerja.
 
-## Features
+Domain terms (Momen, Action Level, nemu_id, Answer Card, and the rest) are defined in
+[GLOSSARY.md](GLOSSARY.md).
 
-- **TypeScript** - For type safety and improved developer experience
-- **TanStack Router** - File-based routing with full type safety
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **Shared UI package** - shadcn/ui primitives live in `packages/ui`
-- **Hono** - Lightweight, performant server framework
-- **oRPC** - End-to-end type-safe APIs with OpenAPI integration
-- **workers** - Runtime environment
-- **Drizzle** - TypeScript-first ORM
-- **Cloudflare D1** - Database engine
-- **Authentication** - Better-Auth
-- **Vite+** - Unified Vite toolchain, workspace task runner, linting, and formatting
+## Products
 
-## Getting Started
+| Product         | Where                 | What it does                                                                                                       |
+| --------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Nemu Extension  | `apps/extension`      | Chrome extension: mascot, Composer, Area Crop, highlights, and navigation clicks, on allowlisted Demo App origins. |
+| Nemu Service    | `apps/server`         | Cloudflare Worker (Hono + oRPC): answers `nemuChat`, holds knowledge and Reference Tables, writes the Chat Log.    |
+| Admin Workspace | `apps/admin`          | Web console for knowledge documents, Reference Tables, and the Chat Log.                                           |
+| Demo App        | `apps/mock-alurkerja` | Fake AlurKerja where the three Momen of Rina's Perjalanan Dinas play out.                                          |
 
-First, install the dependencies:
+## Repository layout
 
-```bash
-pnpm install
+```
+nemu/
+├── apps/
+│   ├── admin/           # Admin Workspace (React + TanStack Router)
+│   ├── extension/       # Nemu Extension (WXT + React)
+│   ├── mock-alurkerja/  # Demo App (React + TanStack Router)
+│   └── server/          # Nemu Service entry point (Hono + oRPC on Workers)
+├── packages/
+│   ├── ai/              # runNemu: OpenRouter pipeline, retrieval, calculations, evals
+│   ├── api/             # Feature modules: procedure → service → repository
+│   ├── auth/            # Better Auth configuration
+│   ├── config/          # Shared TypeScript config
+│   ├── contracts/       # Wire schemas, nemu_ids, and Momen fixtures shared by every part
+│   ├── db/              # Drizzle schema and D1 migrations (including demo seeds)
+│   ├── infra/           # Alchemy stack: D1, R2, and the three Workers
+│   └── ui/              # Vendored shadcn components, AppShell, Nemu brand wrappers
+└── docs/                # ADRs, architecture guides, design system, Demo App reference
 ```
 
-## Database Setup
+Stack: TypeScript, React, TanStack Router, Tailwind CSS, shadcn/ui (`base-maia`), Hono, oRPC,
+Drizzle, Cloudflare D1 and R2, Better Auth, WXT, Alchemy, Varlock, and Vite+.
 
-This project uses Cloudflare D1 (SQLite) with Drizzle ORM.
+## Getting started
 
-Runtime database access uses the Cloudflare `DB` binding from `packages/infra/alchemy.run.ts`. If a local `DATABASE_URL` is present, it is only for database tooling.
+1. Install dependencies (this also generates each app's `src/env.ts` from its `.env.schema`):
 
-Alchemy provisions the D1 database and applies migrations during `deploy`. `pnpm run dev` does the same for the local D1 database, which includes the seeded demo accounts, travel knowledge chunks, reference tables, and isolated `W-TELKO` SLA-claim workspace. Telco evaluator files under `data/05_telco/06_test-case` are never indexed by the live AI responder.
+   ```bash
+   pnpm install
+   ```
 
-`alchemy dev` keeps its state in `packages/infra/.alchemy/` alongside the local database, while `deploy` keeps state in Cloudflare. Each checkout or git worktree therefore gets its own migrated local database on its first `pnpm run dev`, with no manual step. Copy `apps/server/.env` into a new worktree before starting it. To reset the local database, stop dev and delete `packages/infra/.alchemy/`.
+2. Create the server's env file and fill in the secrets:
 
-1. Generate migration files:
+   ```bash
+   cp apps/server/.env.example apps/server/.env
+   ```
+
+   To run without OpenRouter, set `NEMU_RESPONDER=fixture`. The server then answers only the
+   three Momen prompts from `@nemu/contracts/fixtures` and needs no `OPENROUTER_API_KEY`
+   ([ADR-0001](docs/adr/0001-chat-endpoint-behind-a-responder-seam.md)).
+
+3. Start everything:
+
+   ```bash
+   pnpm run dev
+   ```
+
+   | What                 | Where                                                             |
+   | -------------------- | ----------------------------------------------------------------- |
+   | Nemu Service         | <http://localhost:3000>                                           |
+   | Demo App             | <http://localhost:3001>                                           |
+   | Admin Workspace      | <http://localhost:3002>                                           |
+   | Nemu Extension (dev) | built into `apps/extension/.output/chrome-mv3-dev`, load unpacked |
+
+4. Sign in to the Demo App with a seeded demo account (Rina, the verifikator, or Dimas as Billing
+   Liaison; the login page has one-click buttons), then
+   load the extension and press Ctrl+Shift+Space. See [apps/extension/README.md](apps/extension/README.md)
+   for loading the extension and the Momen prompts to try.
+
+### Local database
+
+`pnpm run dev` runs `alchemy dev`, which creates the local D1 database and applies the
+migrations, including the seeded demo accounts, 3-Momen fixtures, travel knowledge chunks, Reference
+Tables, and the isolated `W-TELKO` SLA-claim workspace. Its state lives in
+`packages/infra/.alchemy/`, so each checkout or git worktree gets its own database on its first
+run. Copy `apps/server/.env` into a new worktree before starting it. To reset the database, stop
+dev and delete `packages/infra/.alchemy/`. Telco evaluator files under
+`data/05_telco/06_test-case` are never indexed by the live AI responder.
+
+After changing the Drizzle schema, generate a migration:
 
 ```bash
 pnpm run db:generate
 ```
 
-Then, run the development server:
+## Scripts
 
-```bash
-pnpm run dev
-```
+| Script                        | What it does                                               |
+| ----------------------------- | ---------------------------------------------------------- |
+| `pnpm run dev`                | Start the server, Demo App, Admin Workspace, and extension |
+| `pnpm run dev:mock-alurkerja` | Start only the Demo App                                    |
+| `pnpm run dev:admin`          | Start only the Admin Workspace                             |
+| `pnpm run build`              | Build every app                                            |
+| `pnpm run check`              | Vite+ format and lint checks plus workspace type checks    |
+| `pnpm run test`               | Run every package's tests                                  |
+| `pnpm run lint`               | Vite+ lint                                                 |
+| `pnpm run format`             | Vite+ format                                               |
+| `pnpm run db:generate`        | Generate a D1 migration from the Drizzle schema            |
+| `pnpm run env:generate`       | Regenerate `src/env.ts` after changing an `.env.schema`    |
+| `pnpm run deploy`             | Deploy your personal Alchemy stage                         |
+| `pnpm run destroy`            | Tear down your personal Alchemy stage                      |
+| `pnpm run hooks:setup`        | Install the Vite+ Git hooks                                |
 
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the Demo App.
-The API is running at [http://localhost:3000](http://localhost:3000).
+Package-level commands worth knowing:
 
-Sign in with a seeded demo account (Rina, the verifikator, or Dimas as Billing Liaison); see
-[docs/demo-app.md](docs/demo-app.md). PRD acceptance evidence and remaining environment-dependent
-checks are tracked in [docs/prd-traceability.md](docs/prd-traceability.md).
+- `pnpm --filter extension verify` checks the extension end to end in Playwright's Chromium,
+  against `NEMU_RESPONDER=fixture pnpm run dev`.
+- `pnpm --filter @nemu/ai eval:offline` and `eval:live` evaluate the AI pipeline; see
+  [packages/ai/README.md](packages/ai/README.md). PRD acceptance evidence and remaining
+  environment-dependent checks are tracked in [docs/prd-traceability.md](docs/prd-traceability.md).
 
-## UI Customization
+## Environment
 
-React web apps in this stack share shadcn/ui primitives through `packages/ui`.
-
-- Change design tokens and global styles in `packages/ui/src/styles/globals.css`
-- Update shared primitives in `packages/ui/src/components/*`
-- Adjust shadcn aliases or style config in `packages/ui/components.json` and `apps/mock-alurkerja/components.json`
-
-### Add more shared components
-
-Run this from the project root to add more primitives to the shared UI package:
-
-```bash
-npx shadcn@latest add accordion dialog popover sheet table -c packages/ui
-```
-
-Import shared components like this:
-
-```tsx
-import { Button } from "@nemu/ui/components/button";
-```
-
-### Add app-specific blocks
-
-If you want to add app-specific blocks instead of shared primitives, run the shadcn CLI from `apps/mock-alurkerja`.
-
-## Environment Configuration
-
-Each app owns its environment schema in `.env.schema`. Varlock generates `src/env.ts` during installation; run `pnpm run env:generate` after changing a schema. Commit schemas, and keep secrets in ignored env files or your deployment platform.
-
-Import the generated `ENV` accessor in application code. Shared database and auth packages receive configuration or initialized clients from the application. See [Varlock's monorepo guide](https://varlock.dev/guides/monorepos/).
-
-For Cloudflare, Alchemy loads and validates deployment inputs with `varlock/auto-load` in its Node/Bun deployment process. Worker code reads native bindings; web clients use the framework's public env API through `src/env.public.ts` where needed. Alchemy supplies resource URLs and managed database credentials. In-Worker Varlock protections are deferred until an official Alchemy integration is available; see [the non-Wrangler deployment guidance](https://varlock.dev/integrations/cloudflare/#non-wrangler-deploy-tools-alchemy-sst-pulumi).
-
-Bun's automatic env loading is disabled in `bunfig.toml`; the framework integration or server bootstrap loads Varlock. Node deployments must include Varlock and its dependencies alongside the app schema.
-
-Run standalone Node/Bun tools that use Varlock from the owning app directory so they load that app's schema and env files. `env:generate` only generates TypeScript files; it does not initialize environment values in a subsequent command.
+Each app owns its environment schema in `.env.schema`, and Varlock generates a typed `ENV`
+accessor in `src/env.ts`. Commit schemas; keep secrets in ignored env files or the deployment
+platform. Worker code reads Cloudflare bindings (the `DB` D1 database and the `documents` R2
+bucket) from `packages/infra/alchemy.run.ts`; Alchemy loads and validates deployment inputs with
+`varlock/auto-load`. Run standalone tools that use Varlock from the owning app's directory so they
+pick up that app's schema. See [Varlock's monorepo guide](https://varlock.dev/guides/monorepos/).
 
 ## Deployment
 
-### Alchemy
+Every push to `main` runs CI and then deploys the `prod` stage to Cloudflare:
 
-- Target: web on Cloudflare + server on Cloudflare
-- Configure provider accounts: `cd packages/infra && pnpm exec alchemy profile edit`
-- Dev: pnpm run dev
-- Deploy: pnpm run deploy
-- Destroy: pnpm run destroy
+| Product         | Production URL                                 |
+| --------------- | ---------------------------------------------- |
+| Nemu Service    | <https://nemu-api.ahargunyllib.dev>            |
+| Demo App        | <https://nemu-mock-alurkerja.ahargunyllib.dev> |
+| Admin Workspace | <https://nemu-admin.ahargunyllib.dev>          |
 
-`alchemy profile edit` stores the selected Axiom, Cloudflare, Neon, PlanetScale, and/or Prisma provider profiles under `~/.alchemy`; no provider-specific setup command is required by this scaffold.
+The same workflow rebuilds the extension against the production Nemu Service and replaces the zip
+on the [`extension-latest` release](https://github.com/ahargunyllib/nemu/releases/tag/extension-latest).
 
-Deploys are staged and default to a personal `dev_<username>` stage. For production, run the deploy with an explicit stage from `packages/infra`:
+To deploy by hand, configure provider accounts once with
+`cd packages/infra && pnpm exec alchemy profile edit`, then run `pnpm run deploy`. Manual deploys
+go to a personal `dev_<username>` stage on `workers.dev`. After a first deploy, set `CORS_ORIGIN`
+in `apps/server/.env` to the deployed Demo App and Admin Workspace origins, comma-separated, and
+deploy again.
 
-```bash
-cd packages/infra && pnpm exec alchemy deploy --stage production
-```
+## Contributing
 
-### Production origins
+`main` accepts changes only through pull requests: keep each one small and single-purpose, with a
+conventional-commit title. CI runs `pnpm run check` and `pnpm run test` on every pull request.
 
-- Required after the first deploy: set `CORS_ORIGIN` in `apps/server/.env` to the exact deployed Demo App and Admin Workspace origins, comma-separated, such as `https://app.example.com,https://admin.example.com`, then deploy the server again.
+Before changing code, read:
 
-## Git Hooks and Formatting
-
-- Optional native Vite+ hooks: `pnpm run hooks:setup`
-- Docs: [Vite+ commit hooks](https://viteplus.dev/guide/commit-hooks)
-- Run checks: `pnpm run check`
-
-## Project Structure
-
-```
-nemu/
-├── apps/
-│   ├── admin/          # Admin Workspace: admin console (React + TanStack Router)
-│   ├── mock-alurkerja/ # Demo App: fake AlurKerja frontend (React + TanStack Router)
-│   └── server/         # Backend API (Hono, ORPC)
-├── packages/
-│   ├── ui/             # Shared shadcn/ui components and styles
-│   ├── api/            # API layer / business logic
-│   ├── auth/           # Authentication configuration & logic
-│   └── db/             # Database schema & queries
-```
-
-## Available Scripts
-
-- `pnpm run dev`: Start all applications in development mode
-- `pnpm run build`: Build all applications
-- `pnpm run dev:mock-alurkerja`: Start only the Demo App
-- `pnpm run dev:admin`: Start only the Admin Workspace
-- `pnpm run dev:server`: Start only the server
-- `pnpm run check-types`: Check TypeScript types across all apps
-- `pnpm run db:generate`: Generate database client/types
-- `pnpm run check`: Run Vite+ format/lint checks and workspace TypeScript checks
-- `pnpm run lint`: Run Vite+ lint checks
-- `pnpm run format`: Run Vite+ formatting
-- `pnpm run staged`: Run Vite+ checks against staged files
-- `pnpm run hooks:setup`: Install Vite+ native Git hooks with `vp config`
+- [AGENTS.md](AGENTS.md): conventions for humans and agents alike
+- [docs/agents/backend-architecture.md](docs/agents/backend-architecture.md) and
+  [docs/agents/frontend-architecture.md](docs/agents/frontend-architecture.md)
+- [docs/agents/testing.md](docs/agents/testing.md)
+- [docs/design-system.md](docs/design-system.md): how Nemu surfaces look
+- [docs/demo-app.md](docs/demo-app.md): Demo App pages, fixtures, demo accounts, and nemu_ids
+- [docs/adr/](docs/adr/): architecture decisions

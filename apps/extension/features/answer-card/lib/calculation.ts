@@ -103,12 +103,27 @@ export function describeCalculation(calculation: Calculation): CalculationLine {
   };
 }
 
-/** The date in the answer's `batas_pertanggungjawaban` entry, formatted for the deadline chip. */
-export function pertanggungjawabanDeadline(
-  calculations: readonly Calculation[],
-): string | undefined {
-  const entry = calculations.find(({ fungsi }) => fungsi === "batas_pertanggungjawaban");
-  return typeof entry?.hasil === "string" && ISO_DATE.test(entry.hasil)
-    ? formatDate(entry.hasil)
-    : undefined;
+/**
+ * Results the user types into a form field as an amount, most wanted first, such as the
+ * Momen 2 lodging lumpsum ahead of the daily allowance. `lookup_sbm` is a rate the answer
+ * computes from, not an amount anyone fills in, so it is never offered.
+ */
+const AMOUNTS: readonly Calculation["fungsi"][] = ["hitung_lumpsum_penginapan", "uang_harian"];
+
+export type CopyableValue = {
+  /** As the card shows it: "Rp447.000". */
+  label: string;
+  /** As the form field takes it, digits only: "447000". */
+  text: string;
+};
+
+/** The amount the answer computed for the user to fill in, for the Salin nilai strip. */
+export function copyableValue(calculations: readonly Calculation[]): CopyableValue | undefined {
+  for (const fungsi of AMOUNTS) {
+    const entry = calculations.find((calculation) => calculation.fungsi === fungsi);
+    if (typeof entry?.hasil === "number") {
+      return { label: formatRupiah(entry.hasil), text: String(entry.hasil) };
+    }
+  }
+  return undefined;
 }

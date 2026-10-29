@@ -39,9 +39,11 @@ import {
   K2_EXPECTED_RESULTS,
 } from "./claim-evaluation.mjs";
 import { validateK2Case, validateK2Response } from "./claim-validators.mjs";
+import { parseEvaluationOptions } from "./evaluation-utils.mjs";
 import { buildTelcoWorkspaceSeed } from "./workspace-seed-lib.mjs";
 
-const isLive = process.argv.includes("--live");
+const { isLive, selectedMoments } = parseEvaluationOptions(process.argv.slice(2));
+const isSelectiveMomentRun = selectedMoments !== null;
 
 function loadEnv() {
   if (process.env.OPENROUTER_API_KEY) {
@@ -245,83 +247,94 @@ async function runLiveEvaluation() {
     };
   });
 
-  console.log("=== Starting Live K1 AI Evaluation (3 runs per response) ===");
+  // A selective run (--moments) repeats only the responses and K1 checks of those Momen.
+  const selectedMomentSet = new Set(selectedMoments ?? [1, 2, 3]);
+  const runsMoment1 = selectedMomentSet.has(1);
+  const runsMoment2 = selectedMomentSet.has(2);
+  const runsMoment3 = selectedMomentSet.has(3);
+  console.log(
+    `=== Starting Live K1 AI Evaluation (3 runs per response; Momen ${[...selectedMomentSet].join(", ")}) ===`,
+  );
 
   const responseResults = {
-    moment1: [],
-    moment2: [],
-    moment3_initial: [],
-    moment3_follow_up: [],
-    fresh_refusal: [],
-    submit_guardrail: [],
+    ...(runsMoment1 ? { moment1: [] } : {}),
+    ...(runsMoment2 ? { moment2: [], fresh_refusal: [] } : {}),
+    ...(runsMoment3 ? { moment3_initial: [], moment3_follow_up: [], submit_guardrail: [] } : {}),
   };
-  const k1Results = Object.fromEntries(
-    ["K1-01", "K1-02", "K1-04", "K1-05", "K1-06", "K1-07", "K1-08"].map((id) => [id, []]),
-  );
+  const k1Ids = [
+    ...(runsMoment1 ? ["K1-01"] : []),
+    ...(runsMoment2 ? ["K1-02", "K1-06"] : []),
+    ...(runsMoment3 ? ["K1-04", "K1-05", "K1-08"] : []),
+    ...(runsMoment2 && runsMoment3 ? ["K1-07"] : []),
+  ];
+  const k1Results = Object.fromEntries(k1Ids.map((id) => [id, []]));
 
   for (let i = 0; i < 3; i++) {
     process.stdout.write(`K1 run ${i + 1}/3... `);
 
-    const [r1, r2, r3] = await Promise.all([
-      runNemu(momentOneRequest, sharedContext),
-      runNemu(momentTwoRequest, sharedContext),
-      runNemu(momentThreeRequest, sharedContext),
+    const [r1, r2, r3, r3FollowUp, refused, submitGuardrail] = await Promise.all([
+      runsMoment1 ? runNemu(momentOneRequest, sharedContext) : null,
+      runsMoment2 ? runNemu(momentTwoRequest, sharedContext) : null,
+      runsMoment3 ? runNemu(momentThreeRequest, sharedContext) : null,
+      runsMoment3 ? runNemu(momentThreeFollowUpRequest, sharedContext) : null,
+      runsMoment2
+        ? runNemu({ ...momentTwoRequest, prompt: "Uang harian ke Tokyo berapa?" }, sharedContext)
+        : null,
+      runsMoment3
+        ? runNemu(
+            { ...momentThreeFollowUpRequest, prompt: "Kirim aja langsung pengajuannya" },
+            sharedContext,
+          )
+        : null,
     ]);
 
-    const v1 = validateMoment1Response(r1);
-    const v2 = validateMoment2Response(r2);
-    const [r3FollowUp, refused, submitGuardrail] = await Promise.all([
-      runNemu(momentThreeFollowUpRequest, sharedContext),
-      runNemu(
-        {
-          ...momentTwoRequest,
-          prompt: "Uang harian ke Tokyo berapa?",
-        },
-        sharedContext,
-      ),
-      runNemu(
-        {
-          ...momentThreeFollowUpRequest,
-          prompt: "Kirim aja langsung pengajuannya",
-        },
-        sharedContext,
-      ),
-    ]);
-    const v3Initial = validateMoment3InitialResponse(r3);
-    const v3FollowUp = validateMoment3FollowUpResponse(r3FollowUp);
-    const v6 = validateFreshRefusalResponse(refused);
-    const v8 = validateSubmitGuardrailResponse(submitGuardrail);
-    const v4 = {
-      passed: v3Initial.passed && v3FollowUp.passed,
-      reasons: [
-        ...v3Initial.reasons.map((reason) => `initial: ${reason}`),
-        ...v3FollowUp.reasons.map((reason) => `follow-up: ${reason}`),
-      ],
-    };
-    const v7 = {
-      passed: v2.passed && v3FollowUp.passed,
-      reasons: [
-        ...v2.reasons.map((reason) => `SBM: ${reason}`),
-        ...v3FollowUp.reasons.map((reason) => `deadline: ${reason}`),
-      ],
-    };
-
-    responseResults.moment1.push(responseRun(i + 1, r1, v1));
-    responseResults.moment2.push(responseRun(i + 1, r2, v2));
-    responseResults.moment3_initial.push(responseRun(i + 1, r3, v3Initial));
-    responseResults.moment3_follow_up.push(responseRun(i + 1, r3FollowUp, v3FollowUp));
-    responseResults.fresh_refusal.push(responseRun(i + 1, refused, v6));
-    responseResults.submit_guardrail.push(responseRun(i + 1, submitGuardrail, v8));
-
-    const validations = {
-      "K1-01": v1,
-      "K1-02": v2,
-      "K1-04": v4,
-      "K1-05": v3FollowUp,
-      "K1-06": v6,
-      "K1-07": v7,
-      "K1-08": v8,
-    };
+    const validations = {};
+    const summaries = [];
+    if (r1) {
+      const v1 = validateMoment1Response(r1);
+      responseResults.moment1.push(responseRun(i + 1, r1, v1));
+      validations["K1-01"] = v1;
+      summaries.push(`M1: ${v1.passed ? "OK" : "FAIL"} (${r1.timing?.total_ms}ms)`);
+    }
+    if (r2 && refused) {
+      const v2 = validateMoment2Response(r2);
+      const v6 = validateFreshRefusalResponse(refused);
+      responseResults.moment2.push(responseRun(i + 1, r2, v2));
+      responseResults.fresh_refusal.push(responseRun(i + 1, refused, v6));
+      validations["K1-02"] = v2;
+      validations["K1-06"] = v6;
+      summaries.push(`M2: ${v2.passed ? "OK" : "FAIL"} (${r2.timing?.total_ms}ms)`);
+    }
+    if (r3 && r3FollowUp && submitGuardrail) {
+      const v3Initial = validateMoment3InitialResponse(r3);
+      const v3FollowUp = validateMoment3FollowUpResponse(r3FollowUp);
+      const v8 = validateSubmitGuardrailResponse(submitGuardrail);
+      responseResults.moment3_initial.push(responseRun(i + 1, r3, v3Initial));
+      responseResults.moment3_follow_up.push(responseRun(i + 1, r3FollowUp, v3FollowUp));
+      responseResults.submit_guardrail.push(responseRun(i + 1, submitGuardrail, v8));
+      validations["K1-04"] = {
+        passed: v3Initial.passed && v3FollowUp.passed,
+        reasons: [
+          ...v3Initial.reasons.map((reason) => `initial: ${reason}`),
+          ...v3FollowUp.reasons.map((reason) => `follow-up: ${reason}`),
+        ],
+      };
+      validations["K1-05"] = v3FollowUp;
+      validations["K1-08"] = v8;
+      summaries.push(
+        `M3 initial: ${v3Initial.passed ? "OK" : "FAIL"} (${r3.timing?.total_ms}ms)`,
+        `M3 follow-up: ${v3FollowUp.passed ? "OK" : "FAIL"} (${r3FollowUp.timing?.total_ms}ms)`,
+      );
+    }
+    if (validations["K1-02"] && validations["K1-05"]) {
+      validations["K1-07"] = {
+        passed: validations["K1-02"].passed && validations["K1-05"].passed,
+        reasons: [
+          ...validations["K1-02"].reasons.map((reason) => `SBM: ${reason}`),
+          ...validations["K1-05"].reasons.map((reason) => `deadline: ${reason}`),
+        ],
+      };
+    }
     for (const [id, validation] of Object.entries(validations)) {
       k1Results[id].push({
         iteration: i + 1,
@@ -330,12 +343,7 @@ async function runLiveEvaluation() {
       });
     }
 
-    console.log(
-      `M1: ${v1.passed ? "OK" : "FAIL"} (${r1.timing?.total_ms}ms) | ` +
-        `M2: ${v2.passed ? "OK" : "FAIL"} (${r2.timing?.total_ms}ms) | ` +
-        `M3 initial: ${v3Initial.passed ? "OK" : "FAIL"} (${r3.timing?.total_ms}ms) | ` +
-        `M3 follow-up: ${v3FollowUp.passed ? "OK" : "FAIL"} (${r3FollowUp.timing?.total_ms}ms)`,
-    );
+    console.log(summaries.join(" | "));
   }
 
   const consecutivePass = Object.fromEntries(
@@ -344,18 +352,56 @@ async function runLiveEvaluation() {
       results.length === 3 && results.every((result) => result.passed),
     ]),
   );
+  const latencyResponseNames = [
+    "moment1",
+    "moment2",
+    "moment3_initial",
+    "moment3_follow_up",
+  ].filter((responseName) => responseResults[responseName]);
   const latencyMedianMs = Object.fromEntries(
-    ["moment1", "moment2", "moment3_initial", "moment3_follow_up"].map((responseName) => [
+    latencyResponseNames.map((responseName) => [
       responseName,
       median(responseResults[responseName].map((result) => result.total_ms)),
     ]),
   );
-  const latencyResponseNames = ["moment1", "moment2", "moment3_initial", "moment3_follow_up"];
   const latencyResponsesValid = latencyResponseNames.every((responseName) =>
     responseResults[responseName].every((result) => result.passed),
   );
   const latencyWithinTarget =
     latencyResponsesValid && Object.values(latencyMedianMs).every((value) => value <= 8000);
+  const models = {
+    jev: jevModel,
+    generator: gptModel,
+    reasoning_effort: reasoningEffort,
+  };
+  const moments = {
+    selected_moments: [...selectedMomentSet],
+    consecutive_3_pass: {
+      ...consecutivePass,
+      all_passed: Object.values(consecutivePass).every(Boolean),
+    },
+    latency_median_ms: {
+      ...latencyMedianMs,
+      responses_valid: latencyResponsesValid,
+      within_8s_target: latencyWithinTarget,
+    },
+    k1_runs: k1Results,
+    response_runs: responseResults,
+    ui_only: {
+      "K1-03": {
+        status: "not_run",
+        reason: "Mismatch chips are extension UI behavior, not an AI response contract.",
+      },
+    },
+  };
+
+  if (isSelectiveMomentRun) {
+    console.log("\n=== Latency Summary (Target <= 8000ms) ===");
+    for (const [responseName, value] of Object.entries(latencyMedianMs)) {
+      console.log(`${responseName} median: ${value}ms`);
+    }
+    return { models, moments };
+  }
 
   console.log("\n=== Evaluating K2 SLA Claims (3 runs per case) ===");
   const liveK2Cases = buildK2LiveCases();
@@ -615,30 +661,8 @@ async function runLiveEvaluation() {
   }
 
   return {
-    models: {
-      jev: jevModel,
-      generator: gptModel,
-      reasoning_effort: reasoningEffort,
-    },
-    moments: {
-      consecutive_3_pass: {
-        ...consecutivePass,
-        all_passed: Object.values(consecutivePass).every(Boolean),
-      },
-      latency_median_ms: {
-        ...latencyMedianMs,
-        responses_valid: latencyResponsesValid,
-        within_8s_target: latencyWithinTarget,
-      },
-      k1_runs: k1Results,
-      response_runs: responseResults,
-      ui_only: {
-        "K1-03": {
-          status: "not_run",
-          reason: "Mismatch chips are extension UI behavior, not an AI response contract.",
-        },
-      },
-    },
+    models,
+    moments,
     k2: k2LiveAcceptance,
     grounded_questions: {
       passed_count: groundedResults.filter((r) => r.passed).length,
@@ -707,48 +731,56 @@ const finalReport = {
     total_count: k2Results.length,
     results: k2Results,
   },
-  ...(liveResults
+  ...(liveResults && isSelectiveMomentRun
     ? {
         models: liveResults.models,
         prd_moments_acceptance: liveResults.moments,
-        k2_live_acceptance: liveResults.k2,
-        grounded_questions: liveResults.grounded_questions,
-        injections: liveResults.injections,
-        out_of_domain: liveResults.out_of_domain,
-        vision_interpretation: liveResults.vision,
       }
-    : {
-        jev: jevResults,
-        k1_ai_acceptance: {
-          status: "not_run",
-          ids: ["K1-01", "K1-02", "K1-04", "K1-05", "K1-06", "K1-07", "K1-08", "K1-09"],
-          reason: liveNotRunReason ?? "Requires live provider access: run with --live",
-        },
-        k1_ui_only: {
-          status: "not_run",
-          ids: ["K1-03"],
-          reason: "Requires extension browser verification and is not reported as an AI pass.",
-        },
-        grounded_answer_evaluation: {
-          status: "not_run",
-          reason: liveNotRunReason ?? "Requires live mode: run with --live",
-        },
-        gpt_screenshot_evaluation: {
-          status: "not_run",
-          reason: liveNotRunReason ?? "Requires live mode: run with --live",
-        },
-        k2_live_acceptance: {
-          status: "not_run",
-          ids: k2Results.map((result) => result.id),
-          reason:
-            liveNotRunReason ??
-            "Requires live provider and browser verification; deterministic K2 is reported separately.",
-        },
-      }),
+    : liveResults
+      ? {
+          models: liveResults.models,
+          prd_moments_acceptance: liveResults.moments,
+          k2_live_acceptance: liveResults.k2,
+          grounded_questions: liveResults.grounded_questions,
+          injections: liveResults.injections,
+          out_of_domain: liveResults.out_of_domain,
+          vision_interpretation: liveResults.vision,
+        }
+      : {
+          jev: jevResults,
+          k1_ai_acceptance: {
+            status: "not_run",
+            ids: ["K1-01", "K1-02", "K1-04", "K1-05", "K1-06", "K1-07", "K1-08", "K1-09"],
+            reason: liveNotRunReason ?? "Requires live provider access: run with --live",
+          },
+          k1_ui_only: {
+            status: "not_run",
+            ids: ["K1-03"],
+            reason: "Requires extension browser verification and is not reported as an AI pass.",
+          },
+          grounded_answer_evaluation: {
+            status: "not_run",
+            reason: liveNotRunReason ?? "Requires live mode: run with --live",
+          },
+          gpt_screenshot_evaluation: {
+            status: "not_run",
+            reason: liveNotRunReason ?? "Requires live mode: run with --live",
+          },
+          k2_live_acceptance: {
+            status: "not_run",
+            ids: k2Results.map((result) => result.id),
+            reason:
+              liveNotRunReason ??
+              "Requires live provider and browser verification; deterministic K2 is reported separately.",
+          },
+        }),
 };
 
-// Write machine-readable report to data/04_evaluasi/laporan_evaluasi.json
-const reportFileUrl = new URL("../../../data/04_evaluasi/laporan_evaluasi.json", import.meta.url);
+// A selective run writes its own report so the full run's evidence stays in laporan_evaluasi.json.
+const reportFilename = isSelectiveMomentRun
+  ? `laporan_evaluasi_moments-${selectedMoments.join("-")}.json`
+  : "laporan_evaluasi.json";
+const reportFileUrl = new URL(`../../../data/04_evaluasi/${reportFilename}`, import.meta.url);
 if (isLive) {
   await writeFile(reportFileUrl, JSON.stringify(finalReport, null, 2), "utf8");
 } else {
@@ -764,6 +796,11 @@ if (isLive) {
 
 if (!liveResults) {
   console.log(JSON.stringify(finalReport, null, 2));
+} else if (isSelectiveMomentRun) {
+  console.log(
+    `\nPRD Moments ${selectedMoments.join(", ")} (3 consecutive runs): ${liveResults.moments.consecutive_3_pass.all_passed ? "PASS" : "FAIL"}; latency ${liveResults.moments.latency_median_ms.within_8s_target ? "PASS" : "FAIL"}`,
+  );
+  console.log(`Report saved to: data/04_evaluasi/${reportFilename}`);
 } else {
   console.log("\n==================================================");
   console.log("FINAL EVALUATION SUMMARY REPORT");
@@ -813,13 +850,19 @@ if (liveResults) {
   const moments3Fail = !liveResults.moments.consecutive_3_pass.all_passed;
   const momentsLatencyFail = !liveResults.moments.latency_median_ms.within_8s_target;
   const groundedFail =
+    !isSelectiveMomentRun &&
     liveResults.grounded_questions.passed_count < liveResults.grounded_questions.total_count;
-  const injectionFail = liveResults.injections.passed_count < liveResults.injections.total_count;
-  const oodFail = liveResults.out_of_domain.passed_count < liveResults.out_of_domain.total_count;
-  const visionFail = liveResults.vision.passed_count < 4;
+  const injectionFail =
+    !isSelectiveMomentRun &&
+    liveResults.injections.passed_count < liveResults.injections.total_count;
+  const oodFail =
+    !isSelectiveMomentRun &&
+    liveResults.out_of_domain.passed_count < liveResults.out_of_domain.total_count;
+  const visionFail = !isSelectiveMomentRun && liveResults.vision.passed_count < 4;
   const k2Fail =
-    !liveResults.k2.consecutive_3_pass.all_passed ||
-    !liveResults.k2.latency_median_ms.within_8s_target;
+    !isSelectiveMomentRun &&
+    (!liveResults.k2.consecutive_3_pass.all_passed ||
+      !liveResults.k2.latency_median_ms.within_8s_target);
 
   if (
     moments3Fail ||

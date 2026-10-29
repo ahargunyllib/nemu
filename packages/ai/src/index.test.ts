@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  momentOneFollowUpRequest,
+  momentOneFollowUpResponse,
   momentOneRequest,
   momentThreeFollowUpRequest,
   momentThreeRequest,
@@ -421,6 +423,41 @@ test("Moment 2 never fills a hidden or missing nominal target", async () => {
   }
 });
 
+test("Moment 2 replaces an automatic-fill claim with trusted manual-entry guidance", async () => {
+  const response = await runNemu(momentTwoRequest, {
+    userProfile: DEMO_USER_PROFILE,
+    processContext: momentTwoRequest.process_context,
+    knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    sbmRows: DEMO_SBM_ROWS,
+    holidays: DEMO_HOLIDAYS_2026,
+    requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+    currentDate: "2026-11-06",
+    jevDecider: async () => ({
+      intent: "accommodation_question",
+      intentConfidence: 0.99,
+      withinDomainProbability: 0.99,
+      injectionProbability: 0,
+      requiredTool: "lookup_sbm_and_accommodation",
+      actionLevel: "arahkan",
+      actionConfidence: 0.99,
+      target: "opt-penginapan-tidak-hotel",
+      targetConfidence: 0.99,
+    }),
+    answerGenerator: async () => ({
+      status: "answer",
+      ringkas: "Pilih Tidak menginap di hotel. Nominal penginapan terisi otomatis Rp447.000.",
+      detail: "Perhitungannya 30 persen dari tarif hotel untuk dua malam.",
+      citationIds: [accommodationCitationId],
+      warnings: [],
+    }),
+  });
+
+  const answer = `${response.answer.ringkas} ${response.answer.detail}`;
+  assert.match(answer, /(?:isi|masukkan).+(?:manual|sendiri)/iu);
+  assert.doesNotMatch(answer, /(?:terisi|diisi)\s+(?:secara\s+)?otomatis/iu);
+  assert.match(answer, /447[.]000/u);
+});
+
 test("recognized start intent opens the safe menu even at low confidence", async () => {
   const jevDecider: JevDecider = async () => ({
     intent: "start_travel_request",
@@ -526,8 +563,8 @@ test("generic low-confidence actions remain highlights", async () => {
 test("start intent on the request form guides its six required fields in order", async () => {
   const targets = [
     NEMU_IDS.perdinForm.jenisPerjalanan,
-    NEMU_IDS.perdinForm.nomorSuratTugas,
     NEMU_IDS.perdinForm.kotaTujuan,
+    NEMU_IDS.perdinForm.dasarPenugasan,
     NEMU_IDS.perdinForm.maksud,
     NEMU_IDS.perdinForm.tanggalBerangkat,
     NEMU_IDS.perdinForm.tanggalKembali,
@@ -601,8 +638,8 @@ test("start intent on the request form guides its six required fields in order",
       level: "arahkan",
       label: [
         "Pilih jenis perjalanan",
-        "Isi nomor surat tugas",
         "Pilih kota tujuan",
+        "Pilih dasar penugasan",
         "Isi maksud perjalanan",
         "Isi tanggal berangkat",
         "Isi tanggal kembali",
@@ -615,6 +652,38 @@ test("start intent on the request form guides its six required fields in order",
     response.guide?.steps.map(({ target }) => target),
     targets,
   );
+});
+
+test("on the request form's first tab the guide points at the Jadwal tab for the dates", async () => {
+  const response = await runNemu(momentOneFollowUpRequest, {
+    userProfile: DEMO_USER_PROFILE,
+    knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    sbmRows: DEMO_SBM_ROWS,
+    holidays: [],
+    requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+    currentDate: "2026-10-17",
+    jevDecider: async () => ({
+      intent: "start_travel_request",
+      intentConfidence: 0.99,
+      withinDomainProbability: 0.99,
+      injectionProbability: 0,
+      requiredTool: "process_status",
+      actionLevel: "arahkan",
+      actionConfidence: 0.99,
+      target: NEMU_IDS.perdinForm.jenisPerjalanan,
+      targetConfidence: 0.99,
+    }),
+    answerGenerator: async (input) => ({
+      status: "answer",
+      ringkas: "Isi enam bagian awal formulir secara berurutan.",
+      detail: "Mulai dari jenis perjalanan sampai tanggal kembali.",
+      citationIds: [input.evidence[0]?.id ?? ""],
+      warnings: [],
+    }),
+  });
+
+  assert.deepEqual(response.actions, momentOneFollowUpResponse.actions);
+  assert.deepEqual(response.guide, momentOneFollowUpResponse.guide);
 });
 
 test("submit-like targets are always returned as confirmations", async () => {

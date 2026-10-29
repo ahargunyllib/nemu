@@ -2,6 +2,7 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 
+import type { Box } from "../../../shared/types/box";
 import { RESTING_MS } from "../../navigation-click/hooks/use-navigation-click";
 import type { Point } from "../lib/mascot-position";
 import type { MascotActivity } from "../lib/mascot-state";
@@ -23,28 +24,30 @@ const NOTHING: MascotActivity = {
 
 function renderMascot() {
   const onOpenComposer = vi.fn();
-  const onCloseComposer = vi.fn();
   const view = render(
     <Mascot
       activity={NOTHING}
       composerAnchor={null}
       nemuCursor={null}
       onOpenComposer={onOpenComposer}
-      onCloseComposer={onCloseComposer}
     />,
   );
-  function rerender(activity: Partial<MascotActivity>, composerAnchor: Point | null = null) {
+  function rerender(
+    activity: Partial<MascotActivity>,
+    composerAnchor: Point | null = null,
+    draggedArea: Box | null = null,
+  ) {
     view.rerender(
       <Mascot
         activity={{ ...NOTHING, ...activity }}
         composerAnchor={composerAnchor}
         nemuCursor={null}
+        draggedArea={draggedArea}
         onOpenComposer={onOpenComposer}
-        onCloseComposer={onCloseComposer}
       />,
     );
   }
-  return { onOpenComposer, onCloseComposer, rerender };
+  return { onOpenComposer, rerender };
 }
 
 function moveCursor(x: number, y: number) {
@@ -92,33 +95,27 @@ describe("Mascot", () => {
     expect(mascot()?.style.transform).toBe("translate(912px, 612px)");
   });
 
-  test("stays hidden until the Composer opens again", () => {
+  test("sits as the cursor at the bottom-right corner of a Blok area while it is dragged", () => {
     const { rerender } = renderMascot();
     moveCursor(400, 300);
+    const anchor = { x: 400, y: 300 };
+    rerender({ listening: true }, anchor);
+    const waiting = mascot()?.style.transform;
 
-    fireEvent.click(screen.getByRole("button", { name: "Sembunyikan maskot" }));
-    moveCursor(500, 400);
-    expect(mascot()).toBeNull();
+    rerender({ listening: true }, anchor, { left: 40, top: 300, width: 520, height: 140 });
+    expect(mascot()?.style.transform).toBe("translate(572px, 452px)");
 
-    rerender({ listening: true }, { x: 500, y: 400 });
-    expect(mascot()).not.toBeNull();
+    rerender({ listening: true }, anchor);
+    expect(mascot()?.style.transform).toBe(waiting);
   });
 
-  test("hiding it while the Composer is open closes the Composer and stays hidden", () => {
-    const { onCloseComposer, rerender } = renderMascot();
+  test("has no button but the mascot itself", () => {
+    renderMascot();
     moveCursor(400, 300);
-    rerender({ listening: true }, { x: 400, y: 300 });
 
-    fireEvent.click(screen.getByRole("button", { name: "Sembunyikan maskot" }));
-    expect(onCloseComposer).toHaveBeenCalledOnce();
-    expect(mascot()).toBeNull();
-
-    rerender({});
-    moveCursor(500, 400);
-    expect(mascot()).toBeNull();
-
-    rerender({ listening: true }, { x: 500, y: 400 });
-    expect(mascot()).not.toBeNull();
+    expect(
+      screen.getAllByRole("button").map((button) => button.getAttribute("aria-label")),
+    ).toEqual(["Tanya Nemu"]);
   });
 
   test("returns to idle 3 seconds after success", () => {

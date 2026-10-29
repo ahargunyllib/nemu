@@ -33,14 +33,14 @@ const CREATE_TRAVEL_STEPS = [
     label: "Pilih jenis perjalanan",
   },
   {
-    id: "assignment-letter",
-    target: NEMU_IDS.perdinForm.nomorSuratTugas,
-    label: "Isi nomor surat tugas",
-  },
-  {
     id: "destination-city",
     target: NEMU_IDS.perdinForm.kotaTujuan,
     label: "Pilih kota tujuan",
+  },
+  {
+    id: "assignment-letter",
+    target: NEMU_IDS.perdinForm.dasarPenugasan,
+    label: "Pilih dasar penugasan",
   },
   {
     id: "travel-purpose",
@@ -253,26 +253,40 @@ export function buildTravelWorkflowOutput({
 
   if (scenario === "travel_request_form_guidance") {
     const steps = [...CREATE_TRAVEL_STEPS];
+    const actions: NemuAction[] = actionsAllowed
+      ? steps.flatMap((step) =>
+          elementsById.has(step.target)
+            ? [
+                {
+                  type: "highlight" as const,
+                  target: step.target,
+                  level: "arahkan" as const,
+                  label: step.label,
+                },
+              ]
+            : [],
+        )
+      : [];
+    // The dates render only while the form's Jadwal tab is open, so point at the tab instead.
+    if (
+      actionsAllowed &&
+      !elementsById.has(NEMU_IDS.perdinForm.tanggalBerangkat) &&
+      elementsById.has(NEMU_IDS.perdinForm.tabJadwal)
+    ) {
+      actions.push({
+        type: "highlight",
+        target: NEMU_IDS.perdinForm.tabJadwal,
+        level: "arahkan",
+        label: "Buka tab Jadwal",
+      });
+    }
     return {
       guide: {
         id: "travel-request:create",
         steps,
         current_step: currentStep(steps, request),
       },
-      actions: actionsAllowed
-        ? steps.flatMap((step) =>
-            elementsById.has(step.target)
-              ? [
-                  {
-                    type: "highlight" as const,
-                    target: step.target,
-                    level: "arahkan" as const,
-                    label: step.label,
-                  },
-                ]
-              : [],
-          )
-        : [],
+      actions,
     };
   }
 

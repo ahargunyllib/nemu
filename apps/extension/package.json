@@ -17,6 +17,7 @@
     "verify": "node e2e/verify.ts"
   },
   "dependencies": {
+    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
     "@nemu/contracts": "workspace:*",
     "@nemu/ui": "workspace:*",
     "@orpc/client": "catalog:",

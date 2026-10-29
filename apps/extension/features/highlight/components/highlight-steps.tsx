@@ -9,42 +9,58 @@ type HighlightStepsProps = {
   onGoTo: (index: number) => void;
 };
 
-/** Which highlight the user is on, with buttons to step back and forth when there are several. */
+/**
+ * The highlighted steps as plain numbered text ("1. Pilih ini"), the current one in medium weight,
+ * with buttons to step back and forth when there are several. A server guide numbers the steps
+ * across pages, so its steps are listed instead of only this page's.
+ */
 export function HighlightSteps({ steps, guide, index, onGoTo }: HighlightStepsProps) {
   const step = steps[index];
   const canonicalIndex = guide
     ? Math.min(guide.current_step - 1 + index, guide.steps.length - 1)
     : index;
-  const canonicalStep = guide?.steps[canonicalIndex];
   const total = guide?.steps.length ?? steps.length;
   if (total < 2 || !step) return null;
 
   return (
-    <section aria-label="Langkah" className="flex items-center gap-2 bg-muted px-2 py-1.5">
-      <p className="min-w-0 flex-1">
-        <span className="text-muted-foreground">
+    <section aria-label="Langkah" className="flex flex-col gap-1">
+      <div className="flex items-center gap-1">
+        <p className="min-w-0 flex-1 text-muted-foreground">
           Langkah {canonicalIndex + 1} dari {total}
-        </span>{" "}
-        <span className="font-medium">{canonicalStep?.label ?? step.label}</span>
-      </p>
-      <Button
-        aria-label="Langkah sebelumnya"
-        size="icon-xs"
-        variant="outline"
-        disabled={index === 0}
-        onClick={() => onGoTo(index - 1)}
-      >
-        <ChevronLeftIcon />
-      </Button>
-      <Button
-        aria-label="Langkah berikutnya"
-        size="icon-xs"
-        variant="outline"
-        disabled={index === steps.length - 1}
-        onClick={() => onGoTo(index + 1)}
-      >
-        <ChevronRightIcon />
-      </Button>
+        </p>
+        <Button
+          aria-label="Langkah sebelumnya"
+          size="icon-xs"
+          variant="ghost"
+          disabled={index === 0}
+          onClick={() => onGoTo(index - 1)}
+        >
+          <ChevronLeftIcon />
+        </Button>
+        <Button
+          aria-label="Langkah berikutnya"
+          size="icon-xs"
+          variant="ghost"
+          disabled={index === steps.length - 1}
+          onClick={() => onGoTo(index + 1)}
+        >
+          <ChevronRightIcon />
+        </Button>
+      </div>
+      <ol className="flex flex-col">
+        {(guide?.steps ?? steps).map((item, position) => {
+          const current = position === canonicalIndex;
+          return (
+            <li
+              key={`${position}-${item.target}`}
+              aria-current={current ? "step" : undefined}
+              className={current ? "font-medium" : "text-muted-foreground"}
+            >
+              {position + 1}. {item.label}
+            </li>
+          );
+        })}
+      </ol>
     </section>
   );
 }

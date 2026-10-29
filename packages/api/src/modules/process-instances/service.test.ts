@@ -163,7 +163,7 @@ describe("listMyTasks", () => {
     const deps = await createSeededFakes();
     await ajukanPerjalananDinas(deps, "rina", { ...rinaToMakassar, kotaTujuan: "Denpasar" });
 
-    const tasks = await listMyTasks(deps, "rina");
+    const tasks = await listMyTasks(deps, "rina", "2026-11-06");
 
     expect(
       tasks.map(({ id, activeTask, tanggalKembali, dokumen }) => ({
@@ -179,6 +179,8 @@ describe("listMyTasks", () => {
           id: "PJ-PD-2026-0042",
           key: "pertanggungjawaban",
           label: "Pertanggungjawaban",
+          openedOn: "2026-11-05",
+          dueOn: "2026-11-12",
         },
         tanggalKembali: "2026-11-05",
         dokumen: ["surat_tugas", "boarding_pass_pergi"],
@@ -192,14 +194,14 @@ describe("listMyTasks", () => {
     for (const _ of ["Disetujui", "Berangkat", "Kembali"]) {
       await majukanState(deps, "rina", instance.id);
     }
-    expect(await listMyTasks(deps, "rina")).toEqual([]);
+    expect(await listMyTasks(deps, "rina", "2026-11-06")).toEqual([]);
 
     const advanced = await majukanState(deps, "rina", instance.id);
 
     expect(advanced).toMatchObject({ ok: true, value: { state: "Pertanggungjawaban" } });
-    expect((await listMyTasks(deps, "rina")).map((task) => task.activeTask?.key)).toEqual([
-      "pertanggungjawaban",
-    ]);
+    expect(
+      (await listMyTasks(deps, "rina", "2026-11-06")).map((task) => task.activeTask?.key),
+    ).toEqual(["pertanggungjawaban"]);
   });
 });
 
@@ -207,11 +209,11 @@ describe("getProcessInstance", () => {
   it("returns only the signed-in user's instance", async () => {
     const deps = await createSeededFakes();
 
-    expect(await getProcessInstance(deps, "rina", "PD-2026-0042")).toMatchObject({
+    expect(await getProcessInstance(deps, "rina", "PD-2026-0042", "2026-11-06")).toMatchObject({
       state: "Pertanggungjawaban",
       activeTask: { key: "pertanggungjawaban" },
     });
-    expect(await getProcessInstance(deps, "verifikator", "PD-2026-0042")).toBeNull();
+    expect(await getProcessInstance(deps, "verifikator", "PD-2026-0042", "2026-11-06")).toBeNull();
   });
 });
 
@@ -300,7 +302,7 @@ describe("Pertanggungjawaban", () => {
       ok: true,
       value: { taskId: "PJ-PD-2026-0042", instance: { state: "Verifikasi" } },
     });
-    expect(await listMyTasks(deps, "rina")).toEqual([]);
+    expect(await listMyTasks(deps, "rina", "2026-11-06")).toEqual([]);
   });
 
   it("accepts uploads only while the instance is in Pertanggungjawaban", async () => {

@@ -103,6 +103,7 @@ describe("answerChat", () => {
 
     await expect(answerChat(deps, momentOneRequest, SIGNED_IN_USER)).rejects.toThrow();
     expect(entries.map((entry) => entry.status)).toEqual(["error"]);
+    expect(entries[0]?.result).toBe("✖ refuse responses cannot contain actions\n  → at actions");
   });
 
   it("still answers when writing the Chat Log fails", async () => {

@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { PageHeading } from "@nemu/ui/shell/page-heading";
 import { createFileRoute } from "@tanstack/react-router";
 
 import RequestTable from "@/features/perjalanan-dinas/components/request-table";
@@ -14,7 +15,7 @@ function RouteComponent() {
 
   return (
     <>
-      <h1 className="text-lg font-semibold">My Request</h1>
+      <PageHeading title="My Request" />
       {instances ? <RequestTable instances={instances} /> : <RequestTableSkeleton />}
     </>
   );

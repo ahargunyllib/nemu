@@ -1,13 +1,14 @@
-import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
-import { buttonVariants } from "@nemu/ui/components/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@nemu/ui/components/empty";
-import { Skeleton } from "@nemu/ui/components/skeleton";
-import { cn } from "@nemu/ui/lib/utils";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@nemu/ui/components/sheet";
 import { useQuery } from "@tanstack/react-query";
-import { Link, createFileRoute } from "@tanstack/react-router";
-import { ChevronLeft } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 
 import PertanggungjawabanTask from "@/features/perjalanan-dinas/components/pertanggungjawaban-task";
+import TaskList from "@/features/perjalanan-dinas/components/task-list";
+import TaskListSkeleton from "@/features/perjalanan-dinas/components/task-list-skeleton";
+import TaskSheetClose from "@/features/perjalanan-dinas/components/task-sheet-close";
+import TaskSheetSkeleton from "@/features/perjalanan-dinas/components/task-sheet-skeleton";
 import TaskSummary from "@/features/perjalanan-dinas/components/task-summary";
 import { orpc } from "@/shared/api/orpc";
 
@@ -15,39 +16,57 @@ export const Route = createFileRoute("/_auth/perdin/task/$instanceId")({
   component: RouteComponent,
 });
 
+/** A Task opens as a sheet over My Task; closing it slides it out, then goes back. */
 function RouteComponent() {
   const { instanceId } = Route.useParams();
+  const navigate = Route.useNavigate();
+  const { user } = Route.useRouteContext();
+  const [open, setOpen] = useState(true);
+  const { data: tasks } = useQuery(orpc.listMyTasks.queryOptions());
   const { data: instance, isPending } = useQuery(
     orpc.getProcessInstance.queryOptions({ input: { instanceId }, retry: false }),
   );
 
   return (
     <>
-      <Link
-        to="/my-task"
-        data-nemu-id={NEMU_IDS.taskDetail.back}
-        className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "-ml-2")}
+      {tasks ? <TaskList tasks={tasks} /> : <TaskListSkeleton />}
+      {/* Non-modal so the Nemu overlay stays usable: a modal Sheet makes the rest of the page inert. */}
+      <Sheet
+        open={open}
+        modal={false}
+        onOpenChange={setOpen}
+        onOpenChangeComplete={(next) => {
+          if (!next) void navigate({ to: "/my-task" });
+        }}
       >
-        <ChevronLeft />
-        Kembali ke My Task
-      </Link>
-      {isPending ? (
-        <Skeleton className="h-48 w-full" />
-      ) : instance ? (
-        <>
-          <TaskSummary instance={instance} />
-          {(instance.state === "Pertanggungjawaban" || instance.state === "Verifikasi") && (
-            <PertanggungjawabanTask instance={instance} />
+        <SheetContent
+          showCloseButton={false}
+          className="gap-0 data-[side=right]:w-full data-[side=right]:sm:max-w-2xl"
+        >
+          {isPending ? (
+            <TaskSheetSkeleton />
+          ) : instance ? (
+            instance.state === "Pertanggungjawaban" || instance.state === "Verifikasi" ? (
+              <PertanggungjawabanTask instance={instance} assignee={user.name} />
+            ) : (
+              <TaskSummary instance={instance} assignee={user.name} />
+            )
+          ) : (
+            <>
+              <SheetHeader className="flex-row items-center justify-between px-6 pt-4 pb-0">
+                <SheetTitle>Tugas</SheetTitle>
+                <TaskSheetClose className="-mr-2" />
+              </SheetHeader>
+              <Empty className="m-6 border">
+                <EmptyHeader>
+                  <EmptyTitle>Tugas tidak ditemukan</EmptyTitle>
+                  <EmptyDescription>Tidak ada tugas {instanceId} untuk akun ini.</EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            </>
           )}
-        </>
-      ) : (
-        <Empty className="border">
-          <EmptyHeader>
-            <EmptyTitle>Tugas tidak ditemukan</EmptyTitle>
-            <EmptyDescription>Tidak ada tugas {instanceId} untuk akun ini.</EmptyDescription>
-          </EmptyHeader>
-        </Empty>
-      )}
+        </SheetContent>
+      </Sheet>
     </>
   );
 }

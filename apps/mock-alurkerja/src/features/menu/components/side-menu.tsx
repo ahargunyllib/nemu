@@ -1,42 +1,131 @@
-import { buttonVariants } from "@nemu/ui/components/button";
-import { cn } from "@nemu/ui/lib/utils";
-import { Link } from "@tanstack/react-router";
+import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
+import {
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuBadge,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@nemu/ui/components/sidebar";
+import { AppSidebar } from "@nemu/ui/shell/app-sidebar";
+import { useQuery } from "@tanstack/react-query";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { ChevronRightIcon } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { MENU_ITEMS, TELCO_MENU_ITEMS } from "@/features/menu/lib/menu-items";
+import { orpc } from "@/shared/api/orpc";
 
-export default function SideMenu({ workspaceId }: { workspaceId?: string | null }) {
-  if (workspaceId === "W-TELKO") {
+/**
+ * AlurKerja's dark side menu: Start a Process, the menus, and the signed-in user at the bottom.
+ * The W-TELKO workspace gets its SLA-claim menus instead.
+ */
+export default function SideMenu({
+  footer,
+  workspaceId,
+}: {
+  footer: ReactNode;
+  workspaceId?: string | null;
+}) {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const isTelco = workspaceId === "W-TELKO";
+  const { data: tasks } = useQuery(orpc.listMyTasks.queryOptions({ enabled: !isTelco }));
+
+  if (isTelco) {
     return (
-      <nav aria-label="Menu utama" className="flex flex-col gap-1 border-r p-2">
-        {TELCO_MENU_ITEMS.map(({ href, label, icon: Icon, nemuId }) => (
-          <a
-            key={href}
-            href={href}
-            data-nemu-id={nemuId}
-            className={cn(buttonVariants({ variant: "ghost" }), "justify-start")}
-          >
-            <Icon />
-            {label}
-          </a>
-        ))}
-      </nav>
+      <AppSidebar aria-label="Menu utama">
+        <SidebarContent>
+          <SidebarGroup className="px-3 pt-4.5 pb-0">
+            <SidebarMenu className="gap-0.75">
+              {TELCO_MENU_ITEMS.map(({ href, label, nemuId }) => (
+                <SidebarMenuItem key={href}>
+                  <SidebarMenuButton
+                    className="px-2.5"
+                    isActive={href === "/" ? pathname === "/" : pathname.startsWith(href)}
+                    data-nemu-id={nemuId}
+                    render={<a href={href} />}
+                  >
+                    <span className="flex-1 truncate">{label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarFooter className="px-3 pb-24">{footer}</SidebarFooter>
+      </AppSidebar>
     );
   }
+
   return (
-    <nav aria-label="Menu utama" className="flex flex-col gap-1 border-r p-2">
-      {MENU_ITEMS.map(({ to, label, icon: Icon, nemuId }) => (
-        <Link
-          key={to}
-          to={to}
-          data-nemu-id={nemuId}
-          activeOptions={{ exact: to === "/" }}
-          className={cn(buttonVariants({ variant: "ghost" }), "justify-start")}
-          activeProps={{ className: "bg-muted" }}
-        >
-          <Icon />
-          {label}
-        </Link>
-      ))}
-    </nav>
+    <AppSidebar aria-label="Menu utama">
+      <SidebarHeader className="px-3 pt-4.5 pb-0">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            {/* A blue-green-amber gradient ring: the gradient fills the pill, the inner span covers
+                all but its 1.5px edge. */}
+            <SidebarMenuButton
+              className="h-auto rounded-full bg-linear-to-r from-blue-500 via-emerald-500 to-amber-400 p-[1.5px] font-medium text-sidebar-foreground"
+              data-nemu-id={NEMU_IDS.shell.menuAjukanPerjalananDinas}
+              render={<Link to="/perdin/baru" />}
+            >
+              <span className="flex flex-1 items-center gap-2.5 rounded-full bg-sidebar py-2 pr-3.5 pl-2 transition-colors group-hover/menu-button:bg-sidebar-accent">
+                <span
+                  aria-hidden
+                  className="size-7 shrink-0 rounded-full bg-linear-to-br from-indigo-500 to-sky-400"
+                />
+                <span className="truncate">Start a Process</span>
+              </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+
+      <SidebarContent>
+        <SidebarGroup className="px-3 pt-3.5 pb-0">
+          <SidebarMenu className="gap-0.75">
+            {MENU_ITEMS.map(({ label, link, badge, submenu }) => {
+              const count = badge === "tasks" ? tasks?.length : badge;
+              const content = (
+                <>
+                  <span className="flex-1 truncate">{label}</span>
+                  {submenu && <ChevronRightIcon className="text-sidebar-foreground/45" />}
+                </>
+              );
+
+              return (
+                <SidebarMenuItem key={label}>
+                  {link ? (
+                    <SidebarMenuButton
+                      className="px-2.5"
+                      isActive={link.to === "/" ? pathname === "/" : pathname.startsWith(link.to)}
+                      data-nemu-id={link.nemuId}
+                      render={<Link to={link.to} />}
+                    >
+                      {content}
+                    </SidebarMenuButton>
+                  ) : (
+                    // AlurKerja shows these menus at full strength; the demo just has no page.
+                    <SidebarMenuButton className="px-2.5 disabled:opacity-100" disabled>
+                      {content}
+                    </SidebarMenuButton>
+                  )}
+                  {!!count && (
+                    <SidebarMenuBadge className="right-2.5 h-4 min-w-5 rounded-full bg-red-600 px-1.5 text-[11.5px] font-normal text-white peer-hover/menu-button:text-white peer-data-active/menu-button:text-white peer-data-[size=default]/menu-button:top-2.5">
+                      {count}
+                    </SidebarMenuBadge>
+                  )}
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+
+      {/* Bottom room for the demo dock, which floats over the end of the side menu. */}
+      <SidebarFooter className="px-3 pb-24">{footer}</SidebarFooter>
+    </AppSidebar>
   );
 }

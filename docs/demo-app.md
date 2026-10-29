@@ -31,9 +31,101 @@ rounded, as in AlurKerja.
 
 The Task detail page of a Pertanggungjawaban is the Pertanggungjawaban task page.
 
+### Shell
+
+Every signed-in page has AlurKerja's dark side menu: a **Start a Process** pill
+at the top (it opens Ajukan Perjalanan Dinas and keeps the old
+`menu-ajukan-perjalanan-dinas` id), then Home, My Tasks (with the Task count),
+Group Tasks, My Requests, Analytics, Master Data, and Business Processes, and
+the signed-in user at the bottom (name, jabatan, golongan; it opens the account
+menu). Group Tasks, Analytics, Master Data, and Business Processes are
+disabled, because the demo has no such pages, but they keep full strength as in
+AlurKerja. The menu items are text only: the Start a Process pill has a
+blue-green-amber gradient ring and dot, counts are red pills, and menus that
+open a submenu in AlurKerja (My Requests, Analytics, Master Data, Business
+Processes) end in a chevron. The side menu uses the `sidebar` tokens under a
+`dark` class, so it stays on the shared theme. The white top bar
+reads "Satker Demo · Yogyakarta" on the left and the user's email on the right.
+
+### Beranda
+
+Beranda is where Momen 1 starts. Under "My dashboard · <the demo clock's day>"
+and "Good morning, Rina." it shows three cards:
+
+- **Favorite Processes**: Perjalanan Dinas, Pengajuan Cuti, and Reimbursement
+  in one row, each with its coloured initials and its `favorite-*` id.
+  Perjalanan Dinas opens Ajukan Perjalanan Dinas; the other two only say they
+  are not in the demo.
+- **Up next**: the user's Tasks from `listMyTasks`, each with its `task-*` id,
+  and "View all … tasks" to My Task. A Task row shows the process initials, the
+  Task, the process, and when it is due: "Today", the due day ("Nov 12"), or how
+  late it is ("1 day late", in red), counted from the demo clock's day. The due
+  date is the task sheet's Due Date, which the Nemu Service sends with the Task:
+  Pertanggungjawaban opens on `tanggalKembali` and falls due on the batas
+  pertanggungjawaban, 5 working days later on the AI's own
+  `batas_pertanggungjawaban` and holidays; the other Tasks open on the demo
+  clock's day and get a week. The Overdue, Due Today, Upcoming, and All Tasks
+  chips count the Tasks and filter the list.
+- **My Performance**: static demo figures for the 30 days up to the demo clock's
+  day.
+
+### Ajukan Perjalanan Dinas
+
+The page is titled "Start Perjalanan Dinas". The form is one card with four
+pill tabs, each stacking its fields in one column, and only the open tab's
+fields render:
+
+| Tab              | Fields                                                                           |
+| ---------------- | -------------------------------------------------------------------------------- |
+| 1 Jenis & tujuan | Jenis perjalanan, Kota tujuan (typed), Dasar penugasan (surat tugas), Maksud     |
+| 2 Jadwal         | Tanggal berangkat and kembali (date pickers), Lama perjalanan, Moda transportasi |
+| 3 Biaya          | Tiket PP, Penginapan (two cards), Nominal penginapan, Uang harian                |
+| 4 Dokumen        | Undangan upload                                                                  |
+
+A picked date reads with its weekday ("Selasa, 3 Nov 2026"), and Lama
+perjalanan fills itself from the two dates ("3 hari · 2 malam"). Kota
+tujuan must name one of the Demo App's cities (`KOTA_TUJUAN`). Dasar penugasan
+picks one of the user's surat tugas, and its nomor is sent as `nomorSuratTugas`.
+Uang harian shows the SBM daily rate times the days for a luar kota trip.
+
+**Start Process** (top right, `button-kirim-pengajuan`) stays disabled until
+every field is valid. A field shows its error once touched, and a tab holding an
+error shows a red dot, so Rina can find it from any tab.
+
+### My Task
+
+My Task is a narrow column: the "My Tasks" heading, a **Search tasks…** box,
+a "Due date" label, and a compact row per Task (its label over "Perjalanan
+Dinas · <task ID>") that lifts to white on hover. Each row keeps its `task-*` id
+and opens the Task detail page. The search filters the rows by Task label, Task
+ID, or nomor pengajuan in the browser. When there are no Tasks at all, a
+"Tidak ada tugas" panel fills the rest of the page beside the column; otherwise
+nothing sits beside it.
+The Task detail page shows the same column behind its sheet.
+
+### Task detail
+
+A Task opens as the stock shadcn Sheet on the right of My Task, over a dimmed
+backdrop. It mounts already open, so it appears without sliding in. Closing it
+(the × with the `link-kembali-my-task` id, a click outside it, or Esc) slides it
+out and goes back to My Task. The Sheet is non-modal, so the page isn't inert and
+the Nemu Composer can take focus. The URL stays `/perdin/task/$instanceId`,
+which the extension reads.
+
+The sheet's orange header names the process (Perjalanan Dinas and the Task ID),
+the Task (or the State while no Task is open, e.g. Verifikasi) with the nomor
+pengajuan, and the trip (Tujuan, Berangkat, Kembali). Its colours are App
+tokens in the Demo App's `index.css`, not Nemu amber. On a Pertanggungjawaban
+it holds **Delegate** (disabled; not in the demo) and **Complete Task**
+(`button-kirim`), which becomes a "Completed" mark once sent. Of the tabs, only
+Form has content. Under "Unggah dokumen pertanggungjawaban" each document is a
+row: a dashed drop zone ("Drag file or click to upload") until it is uploaded,
+then a green check with its file name. The whole row is the file input and
+carries its `upload-*` id. After Complete Task the rows stay, read-only.
+
 ## Process Instances
 
-Kirim on Ajukan Perjalanan Dinas stores a Process Instance in the
+Start Process on Ajukan Perjalanan Dinas stores a Process Instance in the
 `process_instance` table in State Diajukan, numbered `PD-<year>-<NNNN>` by
 departure year. My Request lists the signed-in user's instances from the
 `listMyProcessInstances` procedure. The States and the form's wire schema live
@@ -48,8 +140,8 @@ Beranda and My Task list the Tasks from `listMyTasks`.
 
 The Pertanggungjawaban task page asks for four documents (surat tugas, boarding
 pass pergi and pulang, laporan perjalanan). Only the file name is stored, in
-`process_document`. Kirim needs all four and moves the State to Verifikasi,
-then shows the task ID. Sample PDFs to upload are in
+`process_document`. Complete Task needs all four and moves the State to
+Verifikasi, then shows the task ID. Sample PDFs to upload are in
 `apps/mock-alurkerja/sample-documents/`.
 
 ## Process endpoints
@@ -74,7 +166,8 @@ sends the instance as it is, so Momen 3 gets Pertanggungjawaban, return date
 
 The demo controls stay out of the AlurKerja header. They float as separate
 buttons at the bottom left of every signed-in page, over the end of the side
-menu, so the extension's panel and highlights keep the content area.
+menu (which leaves room for them under the signed-in user), so the extension's
+panel and highlights keep the content area.
 
 **Panel demo** plays the atasan, PPK, and bendahara: pick a
 Process Instance and press **Majukan State** to move it to the next State
@@ -83,14 +176,15 @@ back the signed-in user's 3-Momen fixtures and deletes their other requests.
 
 A page can add a one-click shortcut above Panel demo with
 `useDemoPageAction`. On Ajukan Perjalanan Dinas, **Isi formulir demo** fills
-Rina's Makassar trip (3–5 November 2026) and attaches a stand-in
-`undangan-rapat-koordinasi.pdf`. It leaves Penginapan and Nominal penginapan
-empty, because in Momen 2 Rina asks Nemu how to fill them in.
+every tab with Rina's Makassar trip (3–5 November 2026, surat tugas
+ST-090/2026) and attaches a stand-in `undangan-rapat-koordinasi.pdf`. It leaves
+Penginapan and Nominal penginapan empty, because in Momen 2 Rina asks Nemu how
+to fill them in.
 
 "Today" comes from the signed-in user's workspace and is the same date the AI
-uses. `W-TRAVEL` uses 2026-11-06 and `W-TELKO` uses 2026-10-14; the header shows
-it through `getDemoClock`. `NEMU_DEMO_DATE` remains the fallback when a workspace
-has no stored configuration.
+uses. `W-TRAVEL` uses 2026-11-06 and `W-TELKO` uses 2026-10-14; Beranda and the
+task sheet read it through `getDemoClock`. `NEMU_DEMO_DATE` remains the fallback
+when a workspace has no stored configuration.
 
 ## 3-Momen fixtures
 

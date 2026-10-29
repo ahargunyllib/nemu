@@ -20,10 +20,12 @@ function nextPaint(): Promise<void> {
 
 /**
  * Area select mode: Rina drags a box over the page, and the Area Crop of just that box is
- * attached to her next prompt until she removes it or sends it.
+ * attached to her next prompt until she removes it or sends it. `selection` is the attached box,
+ * so it can stay outlined on the page.
  */
 export function useAreaCrop(capture: (selection: Box) => Promise<string> = captureAreaCrop) {
   const [state, setState] = useState<AreaCropState>({ kind: "none" });
+  const [selection, setSelection] = useState<Box>();
 
   useEffect(() => {
     if (state.kind !== "capturing") return;
@@ -45,12 +47,16 @@ export function useAreaCrop(capture: (selection: Box) => Promise<string> = captu
   }, [state, capture]);
 
   const start = useCallback(() => setState({ kind: "selecting" }), []);
-  const select = useCallback((selection: Box) => setState({ kind: "capturing", selection }), []);
+  const select = useCallback((box: Box) => {
+    setSelection(box);
+    setState({ kind: "capturing", selection: box });
+  }, []);
   const clear = useCallback(() => setState({ kind: "none" }), []);
 
   return {
     state,
     crop: state.kind === "attached" ? state.crop : undefined,
+    selection: state.kind === "attached" ? selection : undefined,
     start,
     select,
     clear,

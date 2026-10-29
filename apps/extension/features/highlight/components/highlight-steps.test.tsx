@@ -29,7 +29,7 @@ describe("HighlightSteps", () => {
     render(<HighlightSteps steps={steps} guide={guide} index={0} onGoTo={vi.fn()} />);
 
     expect(screen.getByText(/Langkah 2 dari 2/)).toBeTruthy();
-    expect(screen.getByText("Pilih kota tujuan")).toBeTruthy();
+    expect(screen.getByText("2. Pilih kota tujuan")).toBeTruthy();
     expect(screen.queryByText("Local fallback label")).toBeNull();
   });
 });
