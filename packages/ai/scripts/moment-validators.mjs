@@ -36,27 +36,27 @@ function hasCitation(citations, expected) {
 const createGuideSteps = [
   {
     target: "select-jenis-perjalanan",
-    label: "Pilih jenis perjalanan",
+    label: "Pilih Dinas luar kota",
   },
   {
     target: "select-kota-tujuan",
-    label: "Pilih kota tujuan",
+    label: "Isi Makassar",
   },
   {
     target: "select-dasar-penugasan",
-    label: "Pilih dasar penugasan",
-  },
-  {
-    target: "input-maksud-perjalanan",
-    label: "Isi maksud perjalanan",
+    label: "Pilih ST-090/2026",
   },
   {
     target: "input-tanggal-berangkat",
-    label: "Isi tanggal berangkat",
+    label: "Pilih 3 Nov 2026",
   },
   {
     target: "input-tanggal-kembali",
-    label: "Isi tanggal kembali",
+    label: "Pilih 5 Nov 2026",
+  },
+  {
+    target: "select-moda-transport",
+    label: "Pilih Pesawat",
   },
 ];
 

@@ -36,6 +36,8 @@ Use a vendored overlay (Sheet, Dialog, Popover) with its stock behaviour: its ba
 
 Every vendored component must come from the `base-maia` style set in `packages/ui/components.json`: rounded corners (`rounded-2xl` to `rounded-4xl`) and `text-sm` body text. A component that looks off-style, such as one with sharp `rounded-none` corners or `text-xs/relaxed` text, was copied from another style. Re-add it with `shadcn add <name> --overwrite` from `packages/ui` instead of patching classes by hand. For example, `Dialog` and `Sheet` were re-added this way after the Upload document dialog rendered with sharp corners.
 
+A target label names the value Rina should pick or type whenever Nemu knows it, and names the field only when it doesn't (`docs/design-system.md`, "Label names the value"). For example, Momen 1's labels became "Pilih Dinas luar kota", "Isi Makassar", and "Pilih ST-090/2026" instead of "Pilih jenis perjalanan" and "Pilih kota tujuan" (#171).
+
 ### Demo-only controls
 
 Keep controls that exist only to run the demo out of the Demo App's AlurKerja chrome (header, side menu, page content), so the demo still looks like AlurKerja. Put them on the floating demo dock at the bottom left as separate buttons, not a joined bar that reads as tabs. For example, Panel demo moved from the header to the dock, and Ajukan Perjalanan Dinas adds **Isi formulir demo** there through `useDemoPageAction` (`docs/demo-app.md`).

@@ -565,9 +565,9 @@ test("start intent on the request form guides its six required fields in order",
     NEMU_IDS.perdinForm.jenisPerjalanan,
     NEMU_IDS.perdinForm.kotaTujuan,
     NEMU_IDS.perdinForm.dasarPenugasan,
-    NEMU_IDS.perdinForm.maksud,
     NEMU_IDS.perdinForm.tanggalBerangkat,
     NEMU_IDS.perdinForm.tanggalKembali,
+    NEMU_IDS.perdinForm.modaTransport,
   ] as const;
   const response = await runNemu(
     {
@@ -622,7 +622,7 @@ test("start intent on the request form guides its six required fields in order",
         return {
           status: "answer",
           ringkas: "Isi enam bagian awal formulir secara berurutan.",
-          detail: "Mulai dari jenis perjalanan sampai tanggal kembali.",
+          detail: "Mulai dari jenis perjalanan sampai moda transportasi.",
           citationIds: [citationId],
           warnings: [],
         };
@@ -638,11 +638,11 @@ test("start intent on the request form guides its six required fields in order",
       level: "arahkan",
       label: [
         "Pilih jenis perjalanan",
-        "Pilih kota tujuan",
-        "Pilih dasar penugasan",
-        "Isi maksud perjalanan",
-        "Isi tanggal berangkat",
-        "Isi tanggal kembali",
+        "Isi kota tujuan",
+        "Pilih surat tugas",
+        "Pilih tanggal berangkat",
+        "Pilih tanggal kembali",
+        "Pilih moda transportasi",
       ][index],
     })),
   );
@@ -676,7 +676,7 @@ test("on the request form's first tab the guide points at the Jadwal tab for the
     answerGenerator: async (input) => ({
       status: "answer",
       ringkas: "Isi enam bagian awal formulir secara berurutan.",
-      detail: "Mulai dari jenis perjalanan sampai tanggal kembali.",
+      detail: "Mulai dari jenis perjalanan sampai moda transportasi.",
       citationIds: [input.evidence[0]?.id ?? ""],
       warnings: [],
     }),
