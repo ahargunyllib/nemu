@@ -1,6 +1,8 @@
 // @vitest-environment happy-dom
 import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
+import { Sheet, SheetContent } from "@nemu/ui/components/sheet";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import type { ReactElement } from "react";
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 
 vi.mock("@tanstack/react-router", () => ({
@@ -69,11 +71,23 @@ function detail(
   };
 }
 
+/** The task renders inside its sheet, which portals to the body. */
+function renderTask(task: ReactElement) {
+  render(
+    <Sheet open modal={false}>
+      <SheetContent showCloseButton={false}>{task}</SheetContent>
+    </Sheet>,
+  );
+  return { container: document.body };
+}
+
 afterEach(cleanup);
 
 describe("SlaClaimTask", () => {
   test("renders every stable registration placeholder with the stored claim values", () => {
-    const { container } = render(<SlaClaimTask detail={detail("Registrasi Klaim")} />);
+    const { container } = renderTask(
+      <SlaClaimTask assignee="Dimas Pratama" detail={detail("Registrasi Klaim")} />,
+    );
 
     for (const id of [
       NEMU_IDS.slaClaim.letterNumber,
@@ -92,8 +106,9 @@ describe("SlaClaimTask", () => {
   });
 
   test("renders the missing-RCA branch without a final compensation amount", () => {
-    const { container } = render(
+    const { container } = renderTask(
       <SlaClaimTask
+        assignee="Dimas Pratama"
         detail={detail("Telaah Tiket Gangguan", { missingTicketIds: ["INC-2609-058"] })}
       />,
     );
@@ -108,8 +123,9 @@ describe("SlaClaimTask", () => {
   });
 
   test("asks NOC for the missing RCA once", () => {
-    const { container } = render(
+    const { container } = renderTask(
       <SlaClaimTask
+        assignee="Dimas Pratama"
         detail={detail("Telaah Tiket Gangguan", { missingTicketIds: ["INC-2609-058"] })}
       />,
     );
@@ -124,8 +140,11 @@ describe("SlaClaimTask", () => {
   });
 
   test("drafts the late-claim rejection letter from TPL-BILL-02", () => {
-    const { container } = render(
-      <SlaClaimTask detail={detail("Surat Penolakan", { timely: false })} />,
+    const { container } = renderTask(
+      <SlaClaimTask
+        assignee="Dimas Pratama"
+        detail={detail("Surat Penolakan", { timely: false })}
+      />,
     );
     const letter = container.querySelector<HTMLTextAreaElement>(
       `[data-nemu-id="${NEMU_IDS.slaClaim.rejectionTemplate}"]`,
@@ -139,7 +158,9 @@ describe("SlaClaimTask", () => {
   });
 
   test("keeps approval visible but disabled for the Billing Liaison", () => {
-    const { container } = render(<SlaClaimTask detail={detail("Persetujuan")} />);
+    const { container } = renderTask(
+      <SlaClaimTask assignee="Dimas Pratama" detail={detail("Persetujuan")} />,
+    );
     const approve = container.querySelector(`[data-nemu-id="${NEMU_IDS.slaClaim.approve}"]`);
     const compensation = container.querySelector<HTMLInputElement>(
       `[data-nemu-id="${NEMU_IDS.slaClaim.compensationAmount}"]`,
@@ -151,8 +172,29 @@ describe("SlaClaimTask", () => {
   });
 
   test("leaves the compensation amount to Nemu instead of printing it in the task", () => {
-    render(<SlaClaimTask detail={detail("Susun Berita Acara")} />);
+    renderTask(<SlaClaimTask assignee="Dimas Pratama" detail={detail("Susun Berita Acara")} />);
 
     expect(screen.queryByText(/579\.167/)).toBeNull();
+  });
+
+  test("heads the sheet with the stage, the claim's dates, and the assignee", () => {
+    renderTask(<SlaClaimTask assignee="Dimas Pratama" detail={detail("Registrasi Klaim")} />);
+
+    expect(screen.getByRole("heading", { name: "Registrasi Klaim #KLM-2610-0007" })).toBeTruthy();
+    expect(screen.getByText("Klaim Kompensasi SLA · Tahap 1 dari 6")).toBeTruthy();
+    expect(screen.getByText("8 Okt 2026")).toBeTruthy();
+    expect(screen.getByText("15 Okt 2026")).toBeTruthy();
+    expect(screen.getByText("Dimas Pratama")).toBeTruthy();
+  });
+
+  test("shows a spinner on Complete Task while the Task advances", () => {
+    const { container } = renderTask(
+      <SlaClaimTask assignee="Dimas Pratama" detail={detail("Registrasi Klaim")} advancing />,
+    );
+    const submit = container.querySelector(`[data-nemu-id="${NEMU_IDS.slaClaim.submit}"]`);
+
+    expect(submit).toHaveProperty("disabled", true);
+    expect(submit?.textContent).toBe("Complete Task");
+    expect(submit?.querySelector('[role="status"]')).not.toBeNull();
   });
 });

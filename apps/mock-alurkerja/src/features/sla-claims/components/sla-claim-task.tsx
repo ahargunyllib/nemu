@@ -3,7 +3,6 @@ import { Badge } from "@nemu/ui/components/badge";
 import { Button, buttonVariants } from "@nemu/ui/components/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -11,6 +10,7 @@ import {
 } from "@nemu/ui/components/card";
 import { Field, FieldDescription, FieldLabel } from "@nemu/ui/components/field";
 import { Input } from "@nemu/ui/components/input";
+import { Spinner } from "@nemu/ui/components/spinner";
 import {
   Table,
   TableBody,
@@ -22,8 +22,11 @@ import {
 import { Textarea } from "@nemu/ui/components/textarea";
 import { cn } from "@nemu/ui/lib/utils";
 import { Link } from "@tanstack/react-router";
+import { CheckIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+
+import SlaClaimTaskHeader from "@/features/sla-claims/components/sla-claim-task-header";
 
 type Ticket = {
   id: string;
@@ -392,12 +395,18 @@ function Rejection({ detail }: { detail: SlaClaimDetail }) {
   );
 }
 
+/**
+ * A claim Task in its sheet: the orange header with Delegate and Complete Task (or the disabled
+ * approval on Persetujuan), then the stage's fields.
+ */
 export default function SlaClaimTask({
   detail,
+  assignee,
   onAdvance,
   advancing = false,
 }: {
   detail: SlaClaimDetail;
+  assignee: string;
   onAdvance?: () => void;
   advancing?: boolean;
 }) {
@@ -405,38 +414,51 @@ export default function SlaClaimTask({
   const showCalculation = ["Susun Berita Acara", "Persetujuan", "Credit Note"].includes(task.name);
   return (
     <>
-      <Card>
-        <CardHeader>
-          <h1 className="font-heading text-lg font-semibold">{task.name}</h1>
-          <CardDescription>
-            {detail.claim.id} · {detail.claim.customer}
-          </CardDescription>
-          <CardAction>
-            <Badge variant={task.status === "PERLU_BUKTI" ? "destructive" : "secondary"}>
-              {task.status}
-            </Badge>
-          </CardAction>
-        </CardHeader>
-      </Card>
-      {task.name === "Registrasi Klaim" && <Registration detail={detail} />}
-      {task.name === "Cocokkan Layanan & Kontrak" && <ServiceMatch detail={detail} />}
-      {task.name === "Telaah Tiket Gangguan" && <TicketReview detail={detail} />}
-      {showCalculation && <Calculation detail={detail} />}
-      {task.name === "Surat Penolakan" && <Rejection detail={detail} />}
-      {task.name === "Persetujuan" && (
-        <Button disabled data-nemu-id={NEMU_IDS.slaClaim.approve}>
-          Setujui klaim
+      <SlaClaimTaskHeader detail={detail} assignee={assignee}>
+        <Button
+          variant="outline"
+          disabled
+          className="border-task-header-foreground/80 bg-transparent text-task-header-foreground"
+        >
+          Delegate
         </Button>
-      )}
-      {task.status !== "SELESAI" && task.name !== "Persetujuan" && (
-        <Button onClick={onAdvance} disabled={advancing} data-nemu-id={NEMU_IDS.slaClaim.submit}>
-          {advancing
-            ? "Memproses…"
-            : task.name === "Surat Penolakan"
-              ? "Kirim penolakan"
-              : "Kirim dan lanjutkan"}
-        </Button>
-      )}
+        {task.status === "SELESAI" ? (
+          <span
+            className={cn(buttonVariants({ variant: "outline" }), "bg-background text-foreground")}
+          >
+            Completed
+            <CheckIcon data-icon="inline-end" />
+          </span>
+        ) : task.name === "Persetujuan" ? (
+          // The Billing Liaison drafted this claim, so only the approvers may approve it.
+          <Button
+            variant="outline"
+            disabled
+            data-nemu-id={NEMU_IDS.slaClaim.approve}
+            className="bg-background text-foreground"
+          >
+            Setujui klaim
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            onClick={onAdvance}
+            disabled={advancing}
+            data-nemu-id={NEMU_IDS.slaClaim.submit}
+            className="bg-background text-foreground hover:bg-muted"
+          >
+            {advancing && <Spinner />}
+            Complete Task
+          </Button>
+        )}
+      </SlaClaimTaskHeader>
+      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-6 py-4">
+        {task.name === "Registrasi Klaim" && <Registration detail={detail} />}
+        {task.name === "Cocokkan Layanan & Kontrak" && <ServiceMatch detail={detail} />}
+        {task.name === "Telaah Tiket Gangguan" && <TicketReview detail={detail} />}
+        {showCalculation && <Calculation detail={detail} />}
+        {task.name === "Surat Penolakan" && <Rejection detail={detail} />}
+      </div>
     </>
   );
 }
