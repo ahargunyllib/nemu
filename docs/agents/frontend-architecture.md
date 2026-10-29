@@ -70,7 +70,11 @@ These rules apply to `apps/mock-alurkerja/src`, `apps/admin/src`, and
   helper files; code shared by several routes lives in the owning feature or in
   `shared/`.
 - Signed-in pages live under the pathless `_auth` layout, whose `beforeLoad` is
-  the session gate and redirects signed-out visitors to `/login`.
+  the session gate and redirects signed-out visitors to `/login`. The gate reads
+  the session kept by `ensureSession` and makes no request per navigation: while
+  a `beforeLoad` waits, the URL has changed but the old page is still on screen,
+  and the Nemu Extension reads that page as the new one. Sign-in and sign-out
+  call `forgetSession` before they navigate.
 - Compose concrete feature sections, hooks, and providers directly in the
   route. Do not create `*-page.tsx` files or a single `*Content`, `*View`, or
   similar page facade.

@@ -7,15 +7,14 @@ import {
 } from "@nemu/ui/components/card";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { authClient } from "@/features/auth/api/auth-client";
+import { ensureSession } from "@/features/auth/api/session";
 import DemoAccountButtons from "@/features/auth/components/demo-account-buttons";
 import SignInForm from "@/features/auth/components/sign-in-form";
 
 export const Route = createFileRoute("/login")({
   component: RouteComponent,
-  beforeLoad: async () => {
-    const session = await authClient.getSession();
-    if (session.data) {
+  beforeLoad: async ({ context }) => {
+    if (await ensureSession(context.queryClient)) {
       throw redirect({ to: "/" });
     }
   },
