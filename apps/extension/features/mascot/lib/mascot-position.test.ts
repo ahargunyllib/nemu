@@ -2,6 +2,7 @@ import { describe, expect, test } from "vite-plus/test";
 
 import {
   atAreaCorner,
+  atCardCorner,
   besideComposer,
   besideCursor,
   CURSOR_OFFSET,
@@ -45,6 +46,18 @@ describe("atAreaCorner", () => {
 
     expect(mascot).toEqual({ x: 572, y: 452 });
     expect(covers(mascot, { x: 560, y: 440 })).toBe(false);
+  });
+});
+
+describe("atCardCorner", () => {
+  test("sits on the card's top-left corner, reaching only into its rounded corner", () => {
+    const card = { left: 950, top: 40, width: 280, height: 220 };
+    const mascot = atCardCorner(card);
+
+    expect(covers(mascot, { x: card.left, y: card.top })).toBe(true);
+    // The card's text starts 12 px in from its top and 14 px from its left.
+    expect(mascot.x + MASCOT_SIZE).toBeLessThan(card.left + 14);
+    expect(mascot.y + MASCOT_SIZE).toBeLessThan(card.top + 12);
   });
 });
 

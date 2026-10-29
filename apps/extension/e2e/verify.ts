@@ -319,6 +319,33 @@ async function assertOnlyRing(overlay: Locator, target: string, label: string, t
   }
 }
 
+/**
+ * Issue #164: the whole Answer Card, its Composer included, is inside the viewport, with nothing cut
+ * off into a scroll, and it doesn't cover the active highlight.
+ */
+async function assertWholeCardBesideRing(page: Page, overlay: Locator, card: Locator) {
+  const viewport = page.viewportSize();
+  if (!viewport) throw new Error("the page has no viewport size");
+  const onScreen = (box: Box) =>
+    box.x >= 0 &&
+    box.y >= 0 &&
+    box.x + box.width <= viewport.width &&
+    box.y + box.height <= viewport.height;
+  const cardBox = await boxOf(card);
+  if (!onScreen(cardBox))
+    throw new Error(`the Answer Card runs off the viewport: ${JSON.stringify(cardBox)}`);
+  const composer = await boxOf(card.getByRole("textbox", { name: "Pertanyaan untuk Nemu" }));
+  if (!onScreen(composer)) throw new Error("the Answer Card's Composer runs off the viewport");
+  // The panel around the card scrolls once it is shrunk to keep off a ring.
+  const cutOff = await card
+    .locator("xpath=../..")
+    .evaluate((panel) => panel.scrollHeight > panel.clientHeight + 1);
+  if (cutOff) throw new Error("the Answer Card is cut off into a scroll");
+  if (overlaps(cardBox, await boxOf(overlay.locator("[data-nemu-highlight]")))) {
+    throw new Error("the Answer Card covers the active highlight");
+  }
+}
+
 /** Waits out the smooth scroll that brings the first highlight target into view. */
 async function waitForScrollToSettle(page: Page) {
   let last: number | undefined;
@@ -476,6 +503,7 @@ async function main() {
           if (await card.locator("ol").count()) {
             throw new Error("the Answer Card still lists the steps");
           }
+          await eventually(() => assertWholeCardBesideRing(page, overlay, card));
           if (run === 1) {
             await page.screenshot({ path: path.join(SCREENSHOT_DIR, "momen-1-form.png") });
           }

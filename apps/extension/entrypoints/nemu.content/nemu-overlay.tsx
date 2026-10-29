@@ -12,7 +12,8 @@ import {
   ChatErrorCard,
   LoginRequiredCard,
 } from "../../features/answer-card/components/chat-notice-card";
-import { PANEL_WIDTH, placePanel } from "../../features/answer-card/lib/panel-placement";
+import { pageContentBoxes } from "../../features/answer-card/lib/page-content";
+import { PANEL_WIDTH, panelBox, placePanel } from "../../features/answer-card/lib/panel-placement";
 import { useCancelOnEscape } from "../../features/chat/hooks/use-cancel-on-escape";
 import { useClickFollowUp } from "../../features/chat/hooks/use-click-follow-up";
 import { useLocationFollowUp } from "../../features/chat/hooks/use-location-follow-up";
@@ -118,15 +119,30 @@ export function NemuOverlay() {
     <AreaCropChip state={area.state} onRemove={area.clear} />
   );
 
+  // While a step is highlighted the panel hangs beside its target, clear of the next step's. A card
+  // with no target goes into empty space; the Composer and Membaca stay where the Composer opened.
+  const viewport = { width: window.innerWidth, height: window.innerHeight };
+  const showsCard =
+    state.kind === "response" || state.kind === "unauthorized" || state.kind === "error";
   const placement =
     anchor &&
-    placePanel(
-      anchor,
-      { width: window.innerWidth, height: window.innerHeight },
-      panelHeight,
-      highlight ? [highlightFootprint(highlight.box)] : [],
-      PANEL_ROOM,
-    );
+    (highlight
+      ? placePanel(
+          { target: highlightFootprint(highlight.box) },
+          viewport,
+          panelHeight,
+          highlight.next ? [highlight.next] : [],
+          PANEL_ROOM,
+        )
+      : placePanel(
+          { cursor: anchor },
+          viewport,
+          panelHeight,
+          showsCard ? pageContentBoxes(viewport) : [],
+          PANEL_ROOM,
+        ));
+  const guidingCard =
+    highlight && placement ? panelBox(placement, panelHeight, viewport, PANEL_WIDTH) : null;
 
   // One font and text color for everything Nemu draws: highlights, the mascot (#6), and the panel.
   // All of it is hidden while the viewport is captured, so an Area Crop shows only the page. Its
@@ -169,6 +185,7 @@ export function NemuOverlay() {
           composerAnchor={composerOpen ? anchor : null}
           nemuCursor={cursor}
           draggedArea={area.state.kind === "selecting" ? draggedArea : null}
+          guidingCard={guidingCard}
           onOpenComposer={openComposer}
         />
       </PageLayer>

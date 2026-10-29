@@ -167,6 +167,13 @@ way forward.
   "Membuka Perjalanan Dinas… [Esc]", naming the target. The Answer Card stays under the cursor,
   its tooltip, and the mascot while that cursor is on the page.
 - **Sorot guiding**: the target outlined with the "Pilih ini" label, the mascot waiting beside it.
+  The mascot flies to the active target and the Answer Card hangs off it, the mascot on the card's
+  top-left corner. The card sits right next to the target: just above it, its right end level with
+  the target's (where the label is), so it covers only rows already filled; with no room above,
+  below it; then beside it. It never covers the active target or the next field still to fill.
+  When the guide moves to the next step, card and mascot move to its target. An answer with no
+  target (or a failure) puts the card in empty space, off the page's content, such as Beranda's
+  Up next.
 - **Blok area**: the selection box Rina drags: a 1.5 px dashed `nemu-select` line (dash 5, gap 4),
   radius 4 px, a `nemu-select-fill` fill, and round amber (`nemu-ring`) corner handles. The rest of
   the page is never darkened, and the box is never filled black. The mascot sits as the cursor at

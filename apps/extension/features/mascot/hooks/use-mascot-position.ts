@@ -4,6 +4,7 @@ import type { Box } from "../../../shared/types/box";
 import type { CursorFrame } from "../../navigation-click/lib/navigation-click";
 import {
   atAreaCorner,
+  atCardCorner,
   besideComposer,
   besideCursor,
   FOLLOW_MS,
@@ -21,14 +22,16 @@ export type MascotPlacement = {
 
 /**
  * Where the mascot is and how long it takes to get there. It follows Rina's cursor, waits beside
- * the Composer while that is open, sits at the corner of a Blok area while Rina drags it, and rides
- * along with Nemu's cursor during a navigation click.
+ * the Composer while that is open, sits at the corner of a Blok area while Rina drags it, rides
+ * along with Nemu's cursor during a navigation click, and while a step is highlighted flies to the
+ * corner of the Answer Card beside the target.
  * It has no place until the cursor first moves on the page.
  */
 export function useMascotPosition(
   composerAnchor: Point | null,
   nemuCursor: CursorFrame | null,
   draggedArea: Box | null = null,
+  guidingCard: Box | null = null,
 ): MascotPlacement | null {
   const [followed, setFollowed] = useState<Followed | null>(null);
 
@@ -50,6 +53,8 @@ export function useMascotPosition(
     const viewport = { width: window.innerWidth, height: window.innerHeight };
     return { at: atAreaCorner(draggedArea, viewport), moveMs: 0 };
   }
+  // A Composer opened while a step is highlighted sits in that card, so the card comes first.
+  if (guidingCard) return { at: atCardCorner(guidingCard), moveMs: FOLLOW_MS };
   if (composerAnchor) return { at: besideComposer(composerAnchor), moveMs: FOLLOW_MS };
   if (nemuCursor) {
     const viewport = { width: window.innerWidth, height: window.innerHeight };
