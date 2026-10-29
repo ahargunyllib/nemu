@@ -188,6 +188,38 @@ async function assertCropShowsOnlyPage(page: Page, cropUrl: string, selection: B
   }
 }
 
+/**
+ * Holds back every `nemuChat` request by `delayMs`, the way the AI Responder takes seconds to
+ * answer, and records the nemu_ids each one carries: the Chat Log keeps no Element List.
+ */
+async function slowChatRequests(context: BrowserContext, delayMs: number) {
+  const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
+  type Scope = typeof globalThis & { nemuSent?: string[][]; nemuFetch?: typeof fetch };
+  await worker.evaluate((delay) => {
+    const scope = globalThis as Scope;
+    const original = scope.fetch;
+    scope.nemuSent = [];
+    scope.nemuFetch = original;
+    // The oRPC link fetches a `Request`, so its body is read from a clone.
+    scope.fetch = async (input, init) => {
+      if (input instanceof Request && input.url.endsWith("/rpc/nemuChat")) {
+        const { json } = await input.clone().json();
+        scope.nemuSent?.push(json.elements.map(({ nemu_id }: { nemu_id: string }) => nemu_id));
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+      return original(input, init);
+    };
+  }, delayMs);
+  return {
+    sent: () => worker.evaluate(() => (globalThis as Scope).nemuSent ?? []),
+    restore: () =>
+      worker.evaluate(() => {
+        const scope = globalThis as Scope;
+        if (scope.nemuFetch) scope.fetch = scope.nemuFetch;
+      }),
+  };
+}
+
 /** The newest Chat Log entry, read with Rina's Demo App session like the Admin Workspace does. */
 async function newestChatLogEntry(page: Page): Promise<{ prompt: string; hasAreaCrop: boolean }> {
   const body = await page.evaluate(async (serverUrl) => {
@@ -566,6 +598,43 @@ async function main() {
       await chip.waitFor();
       await assertCropShowsOnlyPage(page, String(await chip.getAttribute("src")), selection);
     });
+
+    await check(
+      "when the side menu takes Rina from the form to Beranda while Nemu is reading, Nemu asks again with Beranda's elements",
+      async () => {
+        await resetDemoData(page);
+        await page.goto(`${DEMO_APP_URL}/perdin/baru`);
+        await page.getByRole("heading", { name: "Start Perjalanan Dinas" }).waitFor();
+        await page.getByRole("tab", { name: "Biaya" }).click();
+        await page.locator('[data-nemu-id="input-nominal-penginapan"]').waitFor();
+
+        const chat = await slowChatRequests(context, 3_000);
+        try {
+          await ask(context, page, momentThreeRequest.prompt);
+          await page.getByText("Membaca", { exact: false }).waitFor();
+          await page.locator('[data-nemu-id="menu-beranda"]').click();
+          await waitForBeranda(page);
+          await page.getByText(momentThreeResponse.answer.ringkas).waitFor();
+
+          const [onForm = [], onBeranda = []] = await chat.sent();
+          if (!onForm.includes("tab-biaya")) throw new Error(`not asked on the form: ${onForm}`);
+          const stale = ["tab-biaya", "input-nominal-penginapan"].filter((id) =>
+            onBeranda.includes(id),
+          );
+          const missing = ["task-pertanggungjawaban", "link-lihat-semua-task"].filter(
+            (id) => !onBeranda.includes(id),
+          );
+          if (stale.length > 0 || missing.length > 0) {
+            throw new Error(`asked again with ${JSON.stringify(onBeranda)}, not Beranda's`);
+          }
+          await page.screenshot({ path: path.join(SCREENSHOT_DIR, "navigate-while-reading.png") });
+          await page.waitForURL(`${DEMO_APP_URL}/perdin/task/PD-2026-0042`);
+        } finally {
+          await chat.restore();
+        }
+        await closeAnswerCard(page);
+      },
+    );
 
     await check("the mascot follows the cursor and opens the Composer when clicked", async () => {
       await page.goto(DEMO_APP_URL);

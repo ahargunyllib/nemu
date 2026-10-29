@@ -1,6 +1,7 @@
 import type { PageElement } from "@nemu/contracts";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { collectSettledElementList } from "../../element-list/lib/settled-element-list";
 import { useGuideSession } from "../../guide/hooks/use-guide-session";
 import { sendChatRequest } from "../api/chat-messaging";
 import type { ChatResult } from "../lib/chat-message";
@@ -27,16 +28,17 @@ export function useNemuChat() {
   const guide = useGuideSession();
 
   const request = useCallback(
-    async (prompt: string, elements: PageElement[], screenshotCrop?: string) => {
+    async (prompt: string, elements: PageElement[], screenshotCrop?: string): Promise<void> => {
       const requestId = ++latestRequest.current;
       pendingRequest.current?.abort();
       const controller = new AbortController();
       pendingRequest.current = controller;
+      const url = window.location.href;
       setState({ kind: "loading", prompt, elements, screenshotCrop });
       const result = await sendChatRequest(
         {
           session_id: sessionId,
-          url: window.location.href,
+          url,
           prompt,
           elements,
           ...(screenshotCrop && { screenshot_crop: screenshotCrop }),
@@ -44,10 +46,17 @@ export function useNemuChat() {
         controller.signal,
       );
       if (pendingRequest.current === controller) pendingRequest.current = null;
-      if (result && requestId === latestRequest.current) {
-        guide.synchronize(prompt, result.kind === "response" ? result.response.guide : undefined);
-        setState({ ...result, prompt, elements, screenshotCrop });
+      if (!result || requestId !== latestRequest.current) return;
+
+      if (window.location.href !== url) {
+        // Rina went to another page while Nemu was reading, so the answer points at targets that
+        // are gone. Ask again with the page she is on now; the Area Crop shows the old one.
+        const current = await collectSettledElementList(controller.signal);
+        if (requestId === latestRequest.current) await request(prompt, current);
+        return;
       }
+      guide.synchronize(prompt, result.kind === "response" ? result.response.guide : undefined);
+      setState({ ...result, prompt, elements, screenshotCrop });
     },
     [guide.synchronize, sessionId],
   );
