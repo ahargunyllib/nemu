@@ -132,7 +132,9 @@ Rina's: Klaim SLA (`/sla-claims`) is the "My Tasks" column with **Search
 tasks…** and a "Tenggat" label, one compact row per Task ("Registrasi Klaim ·
 KLM-2610-0007" over "PT Arunika Retail · TN-ENT-002 · Sep 2026"), each with
 its `task-klaim-*` id. A Task opens at `/sla-claims/$claimId` as the same stock,
-non-modal Sheet beside that column, and closing it goes back to Klaim SLA.
+non-modal Sheet beside that column. Its × or Esc closes it and goes back to Klaim
+SLA, but a press outside it doesn't: Nemu's Answer Card sits outside the sheet,
+and pressing its **Isi** or × must leave the claim open.
 
 The sheet's orange header (the Task sheet's App colours) names the process and
 stage ("Klaim Kompensasi SLA · Tahap 1 dari 6"; Surat Penolakan has no stage),

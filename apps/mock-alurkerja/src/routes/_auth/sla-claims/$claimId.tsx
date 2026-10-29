@@ -38,10 +38,13 @@ function SlaClaimPage() {
       ) : (
         <TaskListSkeleton />
       )}
-      {/* Non-modal so the Nemu overlay stays usable: a modal Sheet makes the rest of the page inert. */}
+      {/* Non-modal so the Nemu overlay stays usable: a modal Sheet makes the rest of the page inert.
+          Nemu's Answer Card sits outside the sheet, so a press there (Isi, Tutup) must not close it:
+          the × and Esc do. */}
       <Sheet
         open={open}
         modal={false}
+        disablePointerDismissal
         onOpenChange={setOpen}
         onOpenChangeComplete={(next) => {
           if (!next) void navigate({ to: "/sla-claims" });
