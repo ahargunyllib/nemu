@@ -84,7 +84,9 @@ and "Selamat pagi, Rina." it shows three cards:
 
 The page is titled "Mulai Perjalanan Dinas". The form is one card with four
 pill tabs, each stacking its fields in one column, and only the open tab's
-fields render:
+fields render. The open tab is in the URL (`/perdin/baru?tab=jadwal`; the first
+tab when `tab` is missing), so opening another tab is a page change that Nemu's
+guide follows:
 
 | Tab              | Fields                                                                           |
 | ---------------- | -------------------------------------------------------------------------------- |

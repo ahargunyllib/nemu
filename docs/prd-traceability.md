@@ -7,10 +7,10 @@ fixture mode) has not been recorded against the case yet.
 
 | Case  | Automated evidence                                                                  | Current status                         |
 | ----- | ----------------------------------------------------------------------------------- | -------------------------------------- |
-| K1-01 | Moment validator, AI workflow tests, Playwright five-run guide check                | Partial — browser run pending          |
+| K1-01 | Moment validator, AI workflow tests, Playwright six-step walk from Beranda          | Verified in browser (fixtures)         |
 | K1-02 | Exact Rp447.000 validator, confirmed-fill and mismatch unit tests, Playwright check | Partial — browser run pending          |
 | K1-03 | Confirmed-fill mismatch tests and Playwright mismatch check                         | Partial — browser run pending          |
-| K1-04 | Cross-page continuation tests and Playwright five-run task guide                    | Partial — browser run pending          |
+| K1-04 | Cross-page continuation tests and Playwright five-run task guide                    | Verified in browser (fixtures)         |
 | K1-05 | Stored-data deadline integration and UI/AI deadline assertions                      | Partial — browser run pending          |
 | K1-06 | Fresh-response refusal validator and stale-output regression test                   | Verified offline; live/browser pending |
 | K1-07 | Exact PMK 113 citation validator and stored active-source integration               | Verified offline; live pending         |

@@ -14,8 +14,11 @@ import {
   k2SlaReturnResponse,
   k2TicketsRequest,
   k2TicketsResponse,
+  k1StartTravelRequest,
   momentOneFollowUpRequest,
   momentOneFollowUpResponse,
+  momentOneJadwalRequest,
+  momentOneJadwalResponse,
   momentOneRequest,
   momentOneResponse,
   momentThreeFollowUpRequest,
@@ -30,11 +33,22 @@ import type { NemuService } from "../../context";
 
 type Fixture = { request: NemuRequest; response: NemuResponse };
 
+// Momen 1 from Beranda, then on the form's first tab and on its Jadwal tab.
+const MOMEN_1_FIXTURES: readonly Fixture[] = [
+  { request: momentOneRequest, response: momentOneResponse },
+  { request: momentOneFollowUpRequest, response: momentOneFollowUpResponse },
+  { request: momentOneJadwalRequest, response: momentOneJadwalResponse },
+];
+
 // Order breaks ties: Momen 3 shares its prompt with its follow-up, and the
 // follow-up wins only when the request carries more of the follow-up's elements.
 const FIXTURES: readonly Fixture[] = [
-  { request: momentOneRequest, response: momentOneResponse },
-  { request: momentOneFollowUpRequest, response: momentOneFollowUpResponse },
+  ...MOMEN_1_FIXTURES,
+  // K1-01 asks Momen 1's question in other words, so it walks the same form.
+  ...MOMEN_1_FIXTURES.map(({ request, response }) => ({
+    request: { ...request, prompt: k1StartTravelRequest.prompt },
+    response,
+  })),
   { request: momentTwoRequest, response: momentTwoResponse },
   { request: momentThreeRequest, response: momentThreeResponse },
   { request: momentThreeFollowUpRequest, response: momentThreeFollowUpResponse },

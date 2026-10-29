@@ -34,7 +34,9 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   outline with the action label on a click-through page layer. The Answer Card hangs right next to
   the target with the mascot on its top-left corner: just above it, right-aligned with it, else
   below, else beside, never covering the target or the next step's. An answer with no target goes
-  into empty space, off the page's cards. A target missing from the page becomes a warning on the card. The
+  into empty space, off the page's cards. A step moves on when Rina fills or presses its target;
+  for a Select or a date picker, once the value she picks in its popup shows on the target. A
+  target missing from the page becomes a warning on the card. The
   Momen 2 prompt with `NEMU_RESPONDER=fixture` exercises it once the lodging form (#3) is on
   `/perdin/baru`.
 - **Navigation click (Jalan sendiri).** A `click` action runs only when its target is Jalan sendiri
@@ -135,6 +137,11 @@ checks:
 - Momen 1, five times in a row from Beranda: Nemu clicks Ajukan Perjalanan Dinas, the form opens,
   and the follow-up card says "Langkah 1 dari 6" without listing the steps, with its citation
   under Rincian;
+- K1-01 from Beranda ("Mau ajukan perjalanan dinas ke Makassar, mulai dari mana?"): the form
+  opens and the ring walks Jenis perjalanan, Kota tujuan, and Surat tugas, then the Jadwal tab,
+  where Nemu asks again and walks Tanggal berangkat, Tanggal kembali, and Moda transportasi
+  ("Langkah 1 dari 6" to "Langkah 6 dari 6"). Each step moves on after the script picks the
+  option or date in the Select's or date picker's popup;
 - on the Perjalanan Dinas form's Biaya tab, Momen 2: Rina drags a box over the lodging fields, the chip holds a
   crop of just that box (saved as `momen-2-area-crop-sent.png`), and the prompt goes out with it.
   The card shows the answer and warning, with the formula and the PMK 119/2023 Pasal 8 ayat (5)
