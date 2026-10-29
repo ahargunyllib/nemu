@@ -606,12 +606,15 @@ async function main() {
           await page.getByText(momentThreeResponse.answer.ringkas).waitFor();
           await page.waitForURL(`${DEMO_APP_URL}/perdin/task/PD-2026-0042`);
 
-          // The follow-up from the task page: its own answer, the deadline chip, three steps.
+          // The follow-up from the task page: its own answer, the deadline as a sentence, three steps.
           const card = overlay
             .locator('[data-slot="card"]')
             .filter({ hasText: momentThreeFollowUpResponse.answer.ringkas });
           await card.waitFor();
-          await card.getByText("Batas 12 November 2026").waitFor();
+          await card
+            .getByRole("region", { name: "Perhitungan" })
+            .getByText(/^Batas Pertanggungjawaban: .* = 12 November 2026\.$/)
+            .waitFor();
           const steps = momentThreeFollowUpResponse.actions;
           const ringStep = async (index: number) => {
             const step = steps[index];
