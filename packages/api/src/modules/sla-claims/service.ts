@@ -167,19 +167,30 @@ export function summarizeSlaClaim(context: SlaClaimContext): SlaClaimSummary {
   };
 }
 
+export class SlaClaimNotFoundError extends Error {}
+
+// An unknown claim and another assignee's claim fail the same way, before any
+// state check, so the response never reveals which claims exist.
+async function findAssignedTask(
+  repository: Pick<SlaClaimRepository, "findTask">,
+  workspaceId: string,
+  claimId: string,
+  actorId: string,
+): Promise<SlaTaskRecord> {
+  const task = await repository.findTask(workspaceId, claimId);
+  if (!task || task.assigneeId !== actorId) {
+    throw new SlaClaimNotFoundError(`Klaim SLA ${claimId} tidak ditemukan`);
+  }
+  return task;
+}
+
 export async function getSlaClaimDetail(
   repository: SlaClaimRepository,
   workspaceId: string,
   claimId: string,
   actorId: string,
 ) {
-  const task = requireRecord(
-    await repository.findTask(workspaceId, claimId),
-    `Task for SLA claim ${claimId} was not found`,
-  );
-  if (task.assigneeId !== actorId) {
-    throw new SlaClaimAccessError(`Claim ${claimId} is not assigned to user ${actorId}`);
-  }
+  const task = await findAssignedTask(repository, workspaceId, claimId, actorId);
   const [context, claimRecord] = await Promise.all([
     getSlaClaimContext(repository, workspaceId, claimId),
     repository.findClaim(workspaceId, claimId),
@@ -208,18 +219,13 @@ export async function advanceSlaClaimTask(
   claimId: string,
   actor: SlaClaimActor,
 ): Promise<SlaTaskRecord> {
-  const context = await getSlaClaimContext(repository, workspaceId, claimId);
-  const task = requireRecord(
-    await repository.findTask(workspaceId, claimId),
-    `Task for SLA claim ${claimId} was not found`,
-  );
+  const task = await findAssignedTask(repository, workspaceId, claimId, actor.id);
   if (task.name === "Persetujuan") {
     throw new SlaClaimAccessError(
       `Claim ${claimId} requires the dedicated approval workflow with stable approver identities`,
     );
-  } else if (task.assigneeId !== actor.id) {
-    throw new SlaClaimAccessError(`Claim ${claimId} is not assigned to user ${actor.id}`);
   }
+  const context = await getSlaClaimContext(repository, workspaceId, claimId);
   let name = NEXT_TASK.get(task.name) ?? task.name;
   let status = "OPEN";
 
