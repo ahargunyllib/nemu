@@ -109,6 +109,36 @@ describe("Mascot", () => {
     expect(mascot()?.style.transform).toBe(waiting);
   });
 
+  test("says it can be clicked once it stops for the cursor reaching for it", () => {
+    const { rerender } = renderMascot();
+    moveCursor(400, 300);
+    expect(screen.queryByRole("tooltip")).toBeNull();
+
+    moveCursor(408, 308);
+    moveCursor(428, 328);
+
+    expect(mascot()?.style.transform).toBe("translate(412px, 312px)");
+    expect(screen.getByRole("tooltip").textContent).toBe("Klik untuk tanya Nemu");
+    expect(
+      screen.getByRole("button", { name: "Tanya Nemu" }).getAttribute("aria-describedby"),
+    ).toBe(screen.getByRole("tooltip").id);
+
+    rerender({ listening: true }, { x: 428, y: 328 });
+    expect(screen.queryByRole("tooltip")).toBeNull();
+  });
+
+  test("drops the cue once the cursor heads away and the mascot follows again", () => {
+    renderMascot();
+    moveCursor(400, 300);
+    moveCursor(408, 308);
+    expect(screen.queryByRole("tooltip")).not.toBeNull();
+
+    moveCursor(380, 280);
+
+    expect(mascot()?.style.transform).toBe("translate(392px, 292px)");
+    expect(screen.queryByRole("tooltip")).toBeNull();
+  });
+
   test("has no button but the mascot itself", () => {
     renderMascot();
     moveCursor(400, 300);

@@ -72,10 +72,11 @@ describe("followCursor", () => {
     let mascot = resting;
     let previous = start;
     for (const cursor of moves) {
-      mascot = followCursor(mascot, previous, cursor, VIEWPORT);
+      const followed = followCursor(mascot, previous, cursor, VIEWPORT);
+      expect(followed).toEqual({ at: besideCursor(cursor, VIEWPORT), waiting: false });
+      expect(covers(followed.at, cursor)).toBe(false);
+      mascot = followed.at;
       previous = cursor;
-      expect(mascot).toEqual(besideCursor(cursor, VIEWPORT));
-      expect(covers(mascot, cursor)).toBe(false);
     }
   });
 
@@ -84,12 +85,38 @@ describe("followCursor", () => {
     const onIt = { x: resting.x + MASCOT_SIZE / 2, y: resting.y + MASCOT_SIZE / 2 };
 
     const afterCloser = followCursor(resting, start, closer, VIEWPORT);
-    expect(afterCloser).toEqual(resting);
-    expect(followCursor(afterCloser, closer, onIt, VIEWPORT)).toEqual(resting);
+    expect(afterCloser).toEqual({ at: resting, waiting: true });
+    expect(followCursor(afterCloser.at, closer, onIt, VIEWPORT)).toEqual({
+      at: resting,
+      waiting: true,
+    });
   });
 
-  test("moves on once the cursor heads away from it", () => {
+  test("keeps waiting while the cursor moves about on it, even away from its center", () => {
+    const onIt = { x: resting.x + MASCOT_SIZE / 2, y: resting.y + MASCOT_SIZE / 2 };
+    const nearItsEdge = { x: resting.x + 2, y: resting.y + 2 };
+
+    expect(followCursor(resting, onIt, nearItsEdge, VIEWPORT)).toEqual({
+      at: resting,
+      waiting: true,
+    });
+  });
+
+  test("moves on and stops waiting once the cursor heads away from it", () => {
+    const closer = { x: start.x + 8, y: start.y + 8 };
     const away = { x: start.x - 4, y: start.y - 4 };
-    expect(followCursor(resting, start, away, VIEWPORT)).toEqual(besideCursor(away, VIEWPORT));
+
+    expect(followCursor(resting, start, closer, VIEWPORT).waiting).toBe(true);
+    expect(followCursor(resting, closer, away, VIEWPORT)).toEqual({
+      at: besideCursor(away, VIEWPORT),
+      waiting: false,
+    });
+  });
+
+  test("does not wait before it has a place or the cursor has a previous point", () => {
+    expect(followCursor(null, null, start, VIEWPORT).waiting).toBe(false);
+    expect(followCursor(resting, null, { x: start.x + 8, y: start.y + 8 }, VIEWPORT).waiting).toBe(
+      false,
+    );
   });
 });

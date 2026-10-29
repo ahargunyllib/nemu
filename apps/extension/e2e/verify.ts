@@ -40,7 +40,7 @@ import { cropRegion } from "../features/area-crop/lib/area-crop.ts";
 import { describeCitation } from "../features/answer-card/lib/citation.ts";
 import { OPEN_COMPOSER_MESSAGE } from "../features/composer/lib/open-composer-message.ts";
 import { RING_PADDING } from "../features/highlight/lib/highlight-targets.ts";
-import { CURSOR_OFFSET } from "../features/mascot/lib/mascot-position.ts";
+import { CURSOR_OFFSET, MASCOT_SIZE } from "../features/mascot/lib/mascot-position.ts";
 import { ALLOWED_ORIGINS, DEFAULT_SERVER_URL } from "../shared/lib/config.ts";
 
 const EXTENSION_ROOT = path.resolve(import.meta.dirname, "..");
@@ -688,6 +688,12 @@ async function main() {
         }
       });
       await page.screenshot({ path: path.join(SCREENSHOT_DIR, "mascot-idle.png") });
+      // Issue #126: reaching for the mascot stops it and says it can be clicked.
+      const reach = CURSOR_OFFSET + MASCOT_SIZE / 2;
+      await page.mouse.move(600 + CURSOR_OFFSET / 2, 400 + CURSOR_OFFSET / 2);
+      await page.mouse.move(600 + reach, 400 + reach);
+      await page.getByRole("tooltip").getByText("Klik untuk tanya Nemu").waitFor();
+      await page.screenshot({ path: path.join(SCREENSHOT_DIR, "mascot-click-cue.png") });
       await mascot.click();
       await page.getByRole("textbox", { name: "Pertanyaan untuk Nemu" }).waitFor();
       await page.screenshot({ path: path.join(SCREENSHOT_DIR, "mascot-listening.png") });

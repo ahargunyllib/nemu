@@ -44,6 +44,9 @@ export function besideComposer(anchor: Point): Point {
   return { x: Math.max(0, anchor.x - reach), y: Math.max(0, anchor.y - reach) };
 }
 
+/** Where the mascot is while it follows the cursor, and whether it has stopped to be clicked. */
+export type Followed = { at: Point; waiting: boolean };
+
 /**
  * Where the mascot goes when the cursor moves from `previous` to `cursor`. It follows, except that
  * it waits while the cursor is on it or closing in on it, so Rina can catch it and click it.
@@ -53,9 +56,11 @@ export function followCursor(
   previous: Point | null,
   cursor: Point,
   viewport: Viewport,
-): Point {
-  if (mascot && previous && isReaching(mascot, previous, cursor)) return mascot;
-  return besideCursor(cursor, viewport);
+): Followed {
+  if (mascot && previous && isReaching(mascot, previous, cursor)) {
+    return { at: mascot, waiting: true };
+  }
+  return { at: besideCursor(cursor, viewport), waiting: false };
 }
 
 function isReaching(mascot: Point, previous: Point, cursor: Point): boolean {
