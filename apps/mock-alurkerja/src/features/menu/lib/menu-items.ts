@@ -1,4 +1,5 @@
 import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
+import { linkOptions } from "@tanstack/react-router";
 
 type MenuItem = {
   label: string;
@@ -28,10 +29,65 @@ export const MENU_ITEMS: readonly MenuItem[] = [
   { label: "Business Processes", submenu: true },
 ];
 
-export const TELCO_MENU_ITEMS = [
-  { href: "/", label: "Home", nemuId: NEMU_IDS.shell.menuBeranda },
-  { href: "/sla-claims", label: "Klaim SLA", nemuId: NEMU_IDS.shell.menuSlaClaims },
-  { href: "/crm/TN-ENT-002", label: "CRM Layanan", nemuId: NEMU_IDS.shell.menuCrmServices },
-  { href: "/noc/TN-ENT-002", label: "Tiket NOC", nemuId: NEMU_IDS.shell.menuNocTickets },
-  { href: "/billing/INV-2609-0042", label: "Billing", nemuId: NEMU_IDS.shell.menuBilling },
-] as const;
+/** The records of a claim that CRM Layanan, Tiket NOC, and Billing open. */
+type ClaimRecords = { id: string; serviceId: string; invoiceId: string };
+
+/**
+ * The claim the telco menus open records for: the one the page shows (its task, service, or
+ * invoice), else the first claim.
+ */
+export function claimInFocus<Claim extends ClaimRecords>(
+  claims: readonly Claim[],
+  pathname: string,
+): Claim | undefined {
+  const [, section, rawId] = pathname.split("/");
+  const id = rawId && decodeURIComponent(rawId);
+  return (
+    claims.find(
+      (claim) =>
+        (section === "sla-claims" && claim.id === id) ||
+        ((section === "crm" || section === "noc") && claim.serviceId === id) ||
+        (section === "billing" && claim.invoiceId === id),
+    ) ?? claims[0]
+  );
+}
+
+/**
+ * The W-TELKO side menu. CRM Layanan, Tiket NOC, and Billing open the records of `claim`; without
+ * one (still loading, or no claims) they have no link.
+ */
+export function telcoMenuItems(claim: ClaimRecords | undefined) {
+  return [
+    {
+      label: "Home",
+      section: "/",
+      nemuId: NEMU_IDS.shell.menuBeranda,
+      link: linkOptions({ to: "/" }),
+    },
+    {
+      label: "Klaim SLA",
+      section: "/sla-claims",
+      nemuId: NEMU_IDS.shell.menuSlaClaims,
+      link: linkOptions({ to: "/sla-claims" }),
+    },
+    {
+      label: "CRM Layanan",
+      section: "/crm",
+      nemuId: NEMU_IDS.shell.menuCrmServices,
+      link: claim && linkOptions({ to: "/crm/$serviceId", params: { serviceId: claim.serviceId } }),
+    },
+    {
+      label: "Tiket NOC",
+      section: "/noc",
+      nemuId: NEMU_IDS.shell.menuNocTickets,
+      link: claim && linkOptions({ to: "/noc/$serviceId", params: { serviceId: claim.serviceId } }),
+    },
+    {
+      label: "Billing",
+      section: "/billing",
+      nemuId: NEMU_IDS.shell.menuBilling,
+      link:
+        claim && linkOptions({ to: "/billing/$invoiceId", params: { invoiceId: claim.invoiceId } }),
+    },
+  ];
+}

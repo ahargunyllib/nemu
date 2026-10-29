@@ -15,7 +15,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronRightIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { MENU_ITEMS, TELCO_MENU_ITEMS } from "@/features/menu/lib/menu-items";
+import { MENU_ITEMS, claimInFocus, telcoMenuItems } from "@/features/menu/lib/menu-items";
 import { orpc } from "@/shared/api/orpc";
 
 /**
@@ -32,6 +32,9 @@ export default function SideMenu({
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isTelco = workspaceId === "W-TELKO";
   const { data: tasks } = useQuery(orpc.listMyTasks.queryOptions({ enabled: !isTelco }));
+  const { data: claims } = useQuery(
+    orpc.listSlaClaims.queryOptions({ input: { workspaceId: "W-TELKO" }, enabled: isTelco }),
+  );
 
   if (isTelco) {
     return (
@@ -39,18 +42,27 @@ export default function SideMenu({
         <SidebarContent>
           <SidebarGroup className="px-3 pt-4.5 pb-0">
             <SidebarMenu className="gap-0.75">
-              {TELCO_MENU_ITEMS.map(({ href, label, nemuId }) => (
-                <SidebarMenuItem key={href}>
-                  <SidebarMenuButton
-                    className="px-2.5"
-                    isActive={href === "/" ? pathname === "/" : pathname.startsWith(href)}
-                    data-nemu-id={nemuId}
-                    render={<a href={href} />}
-                  >
-                    <span className="flex-1 truncate">{label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {telcoMenuItems(claims && claimInFocus(claims, pathname)).map(
+                ({ label, section, nemuId, link }) => (
+                  <SidebarMenuItem key={label}>
+                    {link ? (
+                      <SidebarMenuButton
+                        className="px-2.5"
+                        isActive={section === "/" ? pathname === "/" : pathname.startsWith(section)}
+                        data-nemu-id={nemuId}
+                        render={<Link {...link} />}
+                      >
+                        <span className="flex-1 truncate">{label}</span>
+                      </SidebarMenuButton>
+                    ) : (
+                      // No claim to open records for yet.
+                      <SidebarMenuButton className="px-2.5" disabled>
+                        <span className="flex-1 truncate">{label}</span>
+                      </SidebarMenuButton>
+                    )}
+                  </SidebarMenuItem>
+                ),
+              )}
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
