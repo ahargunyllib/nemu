@@ -10,6 +10,7 @@ import {
   listSlaClaims,
   listSlaClaimTasks,
   SlaClaimAccessError,
+  SlaClaimNotFoundError,
 } from "./service";
 
 function repository(context: Pick<Context, "db">) {
@@ -54,6 +55,9 @@ export const slaClaimsRouter = {
           context.session.user.id,
         );
       } catch (error) {
+        if (error instanceof SlaClaimNotFoundError) {
+          throw new ORPCError("NOT_FOUND", { message: error.message });
+        }
         if (error instanceof SlaClaimAccessError) {
           throw new ORPCError("FORBIDDEN", { message: error.message });
         }
@@ -74,6 +78,9 @@ export const slaClaimsRouter = {
           id: context.session.user.id,
         });
       } catch (error) {
+        if (error instanceof SlaClaimNotFoundError) {
+          throw new ORPCError("NOT_FOUND", { message: error.message });
+        }
         if (error instanceof SlaClaimAccessError) {
           throw new ORPCError("FORBIDDEN", { message: error.message });
         }

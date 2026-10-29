@@ -6,6 +6,7 @@ import {
   getSlaClaimContext,
   getSlaClaimDetail,
   listSlaClaims,
+  SlaClaimNotFoundError,
   summarizeSlaClaim,
 } from "./service";
 
@@ -195,18 +196,47 @@ test("rejects a Billing Liaison advancing a claim through approval", async () =>
   ).rejects.toThrow("dedicated approval workflow");
 });
 
-test("rejects a user advancing another assignee's claim", async () => {
-  await expect(
-    advanceSlaClaimTask(repository(), "W-TELKO", "KLM-2610-0007", {
-      id: "someone-else",
-    }),
-  ).rejects.toThrow("not assigned");
-});
+function unknownClaim(): SlaClaimRepository {
+  const fake = repository();
+  fake.findClaim = async () => undefined;
+  fake.findTask = async () => undefined;
+  return fake;
+}
 
-test("rejects reading another assignee's claim detail", async () => {
-  await expect(
-    getSlaClaimDetail(repository(), "W-TELKO", "KLM-2610-0007", "someone-else"),
-  ).rejects.toThrow("not assigned");
+function otherAssigneesClaim(name = "Registrasi Klaim"): SlaClaimRepository {
+  const fake = repository();
+  fake.findTask = async () => ({
+    ...(await repository().findTask("W-TELKO", "KLM-2610-0007"))!,
+    name,
+    assigneeId: "U-202",
+  });
+  return fake;
+}
+
+const procedures = [
+  [
+    "reading",
+    (fake: SlaClaimRepository, claimId: string) =>
+      getSlaClaimDetail(fake, "W-TELKO", claimId, BILLING_LIAISON.id),
+  ],
+  [
+    "advancing",
+    (fake: SlaClaimRepository, claimId: string) =>
+      advanceSlaClaimTask(fake, "W-TELKO", claimId, BILLING_LIAISON),
+  ],
+] as const;
+
+test.each(
+  procedures.flatMap(([action, run]) => [
+    [action, "an unknown claim", run, unknownClaim()],
+    [action, "another assignee's claim", run, otherAssigneesClaim()],
+    [action, "another assignee's claim at Persetujuan", run, otherAssigneesClaim("Persetujuan")],
+  ]),
+)("hides %s %s behind the same not-found error", async (_action, _case, run, fake) => {
+  const result = run(fake, "KLM-2610-0007");
+
+  await expect(result).rejects.toBeInstanceOf(SlaClaimNotFoundError);
+  await expect(result).rejects.toThrow("Klaim SLA KLM-2610-0007 tidak ditemukan");
 });
 
 test("builds the plain AI claim context from repository facts", async () => {
