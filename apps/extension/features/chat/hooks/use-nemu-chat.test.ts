@@ -9,7 +9,7 @@ import {
   momentTwoRequest,
   momentTwoResponse,
 } from "@nemu/contracts/fixtures";
-import { act, cleanup, fireEvent, renderHook } from "@testing-library/react";
+import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 
 import { collectSettledElementList } from "../../element-list/lib/settled-element-list";
@@ -178,7 +178,7 @@ describe("useNemuChat", () => {
     });
   });
 
-  test("Escape aborts a pending answer and its late completion stays hidden", async () => {
+  test("cancel aborts a pending answer and its late completion stays hidden", async () => {
     let finish: ((result: Awaited<ReturnType<typeof sendChatRequest>>) => void) | undefined;
     let requestSignal: AbortSignal | undefined;
     send.mockImplementationOnce((_request, signal) => {
@@ -195,7 +195,7 @@ describe("useNemuChat", () => {
     });
     expect(result.current.state.kind).toBe("loading");
 
-    fireEvent.keyDown(window, { key: "Escape" });
+    act(() => result.current.cancel());
 
     expect(requestSignal?.aborted).toBe(true);
     expect(result.current.state.kind).toBe("idle");

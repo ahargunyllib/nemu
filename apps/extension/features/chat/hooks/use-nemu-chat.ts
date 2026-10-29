@@ -1,5 +1,5 @@
 import type { PageElement } from "@nemu/contracts";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { collectSettledElementList } from "../../element-list/lib/settled-element-list";
 import { useGuideSession } from "../../guide/hooks/use-guide-session";
@@ -98,15 +98,6 @@ export function useNemuChat() {
     guide.clear();
     setState({ kind: "idle" });
   }, [guide.clear]);
-
-  useEffect(() => {
-    if (state.kind !== "loading") return;
-    const cancelOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") cancel();
-    };
-    window.addEventListener("keydown", cancelOnEscape, { capture: true });
-    return () => window.removeEventListener("keydown", cancelOnEscape, { capture: true });
-  }, [cancel, state.kind]);
 
   return { state, guideSession: guide.session, send, followUp, cancel, reset: cancel };
 }
