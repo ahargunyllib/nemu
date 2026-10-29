@@ -14,8 +14,8 @@ The public entry point is:
 runNemu(request, context): Promise<NemuResponse>
 ```
 
-The package contains no Hono, oRPC, D1, or Chrome dependency. Shared wire schemas and the three
-rendering fixtures live in `@nemu/contracts`.
+The package contains no Hono, oRPC, D1, or Chrome dependency. Shared wire schemas and the Momen
+and K2 request/response fixtures live in `@nemu/contracts`.
 
 ## Response boundary
 
@@ -88,6 +88,7 @@ Momen 1, K2, and the grounded-question, injection, out-of-domain, and vision sui
 ## Required server configuration
 
 ```env
+NEMU_RESPONDER=ai
 OPENROUTER_API_KEY=
 OPENROUTER_GENERATOR_MODEL=openai/gpt-6.1-sol
 OPENROUTER_REASONING_EFFORT=low
@@ -96,6 +97,8 @@ NEMU_DEMO_DATE=2026-11-06
 ```
 
 The single OpenRouter credential stays in Worker bindings and is never returned to the extension.
+`NEMU_RESPONDER=fixture` answers from the `@nemu/contracts` fixtures instead and needs no OpenRouter
+key (ADR-0001).
 
 ## Current integration seam
 
@@ -107,14 +110,14 @@ exports. Those exports remain offline test and evaluation fixtures only.
 
 For a `telco_sla` process context, the server selects only `W-TELKO` chunks and loads the claim,
 service, invoice, tickets, task deadline, and approval rules from typed repositories. The browser
-context identifies the workspace and claim; it cannot override financial facts. Deterministic
+context identifies the Knowledge Workspace and claim; it cannot override financial facts. Deterministic
 workflow code merges incident intervals, enforces RCA evidence, calculates compensation, selects
 the stored approval route, and still leaves fill/submit/approve actions under the normal action
 levels.
 
 A fresh database receives the travel documents/chunks and reference tables through migrations.
 The knowledge migrations are deterministically generated from the approved travel registry and
-`data/05_telco/document_registry.json`. The telco seed creates workspace `W-TELKO`, six active
+`data/05_telco/document_registry.json`. The telco seed creates the `W-TELKO` Knowledge Workspace, six active
 v1.0 knowledge sources, the inactive v0.9 SOP, and typed claim/service/invoice/ticket/RCA/user/task
 rows. `data/05_telco/source_manifest.json` records local classifications for each imported file;
 private storage locators and upstream file IDs are intentionally excluded. Evaluation and test-case

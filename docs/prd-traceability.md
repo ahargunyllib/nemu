@@ -1,8 +1,9 @@
 # PRD acceptance traceability
 
 Status as of 29 October 2026. Per ADR-0003, deterministic and component evidence is reported
-separately from browser-complete acceptance. The sandbox cannot bind the local dev ports, so the
-authored Playwright checks remain pending execution in an unrestricted shell.
+separately from browser-complete acceptance. "Browser run pending" means the Playwright check in
+`apps/extension/e2e/verify.ts` (`pnpm --filter extension verify`, with the dev stack running in
+fixture mode) has not been recorded against the case yet.
 
 | Case  | Automated evidence                                                                  | Current status                         |
 | ----- | ----------------------------------------------------------------------------------- | -------------------------------------- |
@@ -14,7 +15,7 @@ authored Playwright checks remain pending execution in an unrestricted shell.
 | K1-06 | Fresh-response refusal validator and stale-output regression test                   | Verified offline; live/browser pending |
 | K1-07 | Exact PMK 113 citation validator and stored active-source integration               | Verified offline; live pending         |
 | K1-08 | Submit guardrail validator and no-click action tests                                | Verified offline; browser pending      |
-| K1-09 | Live evaluator records three-run medians per response                               | Not run — OpenRouter DNS unavailable   |
+| K1-09 | Live evaluator records three-run medians per response                               | Not run — needs `eval:live`            |
 | K2-01 | Registration action/guide/deadline/source validators and exact-ID component test    | Partial — browser run pending          |
 | K2-02 | Active v1 cutoff, day-15 calculation, and timely-option validators                  | Verified offline; live/browser pending |
 | K2-03 | 99.50% addendum and three-step CRM guide validators; CRM route                      | Partial — browser run pending          |
@@ -26,8 +27,10 @@ authored Playwright checks remain pending execution in an unrestricted shell.
 | K2-09 | Attachment-injection warning, verified 17.5-hour result, zero actions               | Verified offline; live/browser pending |
 | K2-10 | Self-approval refusal, exact sources, disabled UI, and zero actions                 | Verified offline; live/browser pending |
 
-The offline evaluator currently passes 6/6 deterministic K1 calculations and 10/10 K2 cases. The
-supplied evaluator-only answer-key package is intentionally not tracked or indexed. The last live
-attempt is recorded as `live_not_run` in `data/04_evaluasi/laporan_evaluasi.json` because
-`openrouter.ai` could not be resolved. The browser verifier builds successfully but stops before
-launch because `http://localhost:3001` cannot be served inside this sandbox.
+`data/04_evaluasi/laporan_evaluasi.json` is an offline run (`"mode": "offline"`, 29 October 2026):
+6/6 deterministic K1 calculations and 10/10 K2 deterministic cases pass. Every live-provider check
+(Jev, K1 AI acceptance, grounded answers, screenshots, K2 live) and the K1 UI-only checks are
+`not_run` in that report. Live results are not part of it: the earlier live Momen 2 and 3 run from
+18 October is kept in `laporan_evaluasi_moments-2-3.json`. Whether to produce a new live report is
+the AI owner's decision. The supplied evaluator-only answer-key package is intentionally not
+tracked or indexed.

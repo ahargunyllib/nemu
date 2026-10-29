@@ -80,7 +80,7 @@ Drizzle, Cloudflare D1 and R2, Better Auth, WXT, Alchemy, Varlock, and Vite+.
 
 `pnpm run dev` runs `alchemy dev`, which creates the local D1 database and applies the
 migrations, including the seeded demo accounts, 3-Momen fixtures, travel knowledge chunks, Reference
-Tables, and the isolated `W-TELKO` SLA-claim workspace. Its state lives in
+Tables, and the isolated `W-TELKO` Knowledge Workspace for Klaim SLA. Its state lives in
 `packages/infra/.alchemy/`, so each checkout or git worktree gets its own database on its first
 run. Copy `apps/server/.env` into a new worktree before starting it. To reset the database, stop
 dev and delete `packages/infra/.alchemy/`. Telco evaluator files under
