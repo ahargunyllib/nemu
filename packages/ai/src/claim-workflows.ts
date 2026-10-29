@@ -6,7 +6,7 @@ import type {
   NemuRequest,
   ProcessContext,
 } from "@nemu/contracts";
-import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
+import { NEMU_IDS, slaClaimDecisionNemuId } from "@nemu/contracts/nemu-ids";
 
 import type { JevDecision } from "./jev.js";
 import {
@@ -141,14 +141,6 @@ const TASK_TARGET_BY_CLAIM = new Map([
   ["KLM-2610-0011", NEMU_IDS.slaClaim.taskKlm26100011],
 ]);
 
-const DECISION_TARGET_BY_TICKET = new Map([
-  ["INC-2609-014", NEMU_IDS.slaClaim.decisionInc2609014],
-  ["INC-2609-015", NEMU_IDS.slaClaim.decisionInc2609015],
-  ["INC-2609-031", NEMU_IDS.slaClaim.decisionInc2609031],
-  ["INC-2609-047", NEMU_IDS.slaClaim.decisionInc2609047],
-  ["INC-2609-058", NEMU_IDS.slaClaim.decisionInc2609058],
-]);
-
 function currentStep(steps: readonly NemuGuideStep[], request: NemuRequest): number {
   const elementIds = new Set(request.elements.map((element) => element.nemu_id));
   const index = steps.findIndex((step) => elementIds.has(step.target));
@@ -277,7 +269,7 @@ export function resolveClaimWorkflowScenario(
   decision: JevDecision,
 ): ClaimWorkflowScenario | null {
   if (processContext?.workspace?.domain !== "telco_sla") return null;
-  if (decision.actionLevel === "dilarang" || /\b(setujui|approve)\b/iu.test(request.prompt)) {
+  if (decision.actionLevel === "dilarang") {
     return "prohibited_approval";
   }
   if (request.screenshot_crop && /durasi|berapa jam/iu.test(request.prompt)) {
@@ -297,7 +289,7 @@ export function resolveClaimWorkflowScenario(
     case "claim_approval":
       return "approval";
     default:
-      return null;
+      return /\b(setujui|approve)\b/iu.test(request.prompt) ? "prohibited_approval" : null;
   }
 }
 
@@ -450,20 +442,24 @@ export function executeClaimWorkflow({
     // Row by row in table order, each step names the Keputusan to pick, then merge the intervals.
     const excluded = new Set(tickets.excludedTicketIds);
     const decided = new Set([...tickets.countedTicketIds, ...tickets.excludedTicketIds]);
+    const listed = new Set(request.elements.map((element) => element.nemu_id));
     const steps: NemuGuideStep[] = claim.tickets.flatMap((ticket): NemuGuideStep[] => {
-      const target = DECISION_TARGET_BY_TICKET.get(ticket.id);
-      if (!target || !decided.has(ticket.id)) return [];
+      const target = slaClaimDecisionNemuId(ticket.id);
+      if (!listed.has(target) || !decided.has(ticket.id)) return [];
       const decision = excluded.has(ticket.id) ? "Dikecualikan" : "Dihitung";
       return [{ id: `decide-${ticket.id.toLowerCase()}`, target, label: `Pilih ${decision}` }];
     });
-    steps.push({
-      id: "merge-intervals",
-      target: NEMU_IDS.slaClaim.mergeIntervals,
-      label: "Gabungkan interval",
-    });
-    output.guide = guide("sla-claim:tickets", steps, request);
+    if (listed.has(NEMU_IDS.slaClaim.mergeIntervals)) {
+      steps.push({
+        id: "merge-intervals",
+        target: NEMU_IDS.slaClaim.mergeIntervals,
+        label: "Gabungkan interval",
+      });
+    }
+    if (steps.length > 0) {
+      output.guide = guide("sla-claim:tickets", steps, request);
+    }
     if (actionsAllowed) {
-      const listed = new Set(request.elements.map((element) => element.nemu_id));
       for (const step of steps) {
         if (listed.has(step.target)) {
           output.actions.push({

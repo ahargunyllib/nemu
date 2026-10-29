@@ -54,6 +54,8 @@ Co-locate tests with the source they protect and prioritize observable behavior.
 
 `main` accepts changes only through pull requests. Keep each pull request small and single-purpose, with a conventional-commit title.
 
+When the user names the branch for the work, use that exact branch name instead of inventing a variant. For example, workflow fixes requested for `fix/ai-workflows` stay on `fix/ai-workflows`.
+
 Don't name or link the external design file the design system was taken from in code, docs, commit messages, branch names, or PRs; refer to `docs/design-system.md` instead. For example, the Nemu brand token PR cites `docs/design-system.md`, not the design file.
 
 Don't add agent attribution: no `Co-Authored-By` trailers in commit messages and no "Generated with" lines in PR descriptions. Include this rule in briefs for any session or subagent you start.

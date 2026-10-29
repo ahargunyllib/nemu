@@ -10,6 +10,7 @@ import {
 } from "@nemu/contracts";
 
 import type { AnswerGenerator, GeneratedAnswer, NemuUserProfile } from "./openai.js";
+import { isConfirmActionTarget, isProhibitedActionTarget } from "./action-safety.js";
 import type { JevDecider, JevDecision } from "./jev.js";
 import { retrieveKnowledge, type KnowledgeChunk, type RankedKnowledgeChunk } from "./knowledge.js";
 import {
@@ -107,9 +108,6 @@ type ToolResults = {
   citationIds: string[];
   clarification?: string;
 };
-
-const CONFIRM_ACTION_PATTERN = /(?:^|\b)(kirim|submit)(?:\b|$)/iu;
-const PROHIBITED_ACTION_PATTERN = /(?:^|\b)(setuju|approve|hapus|delete|bayar|pay)(?:\b|$)/iu;
 
 function durationSince(startedAt: number): number {
   return Math.max(0, Math.round(performance.now() - startedAt));
@@ -381,20 +379,18 @@ function buildGenericActions(
     return [];
   }
 
-  const targetDescription = `${target.nemu_id} ${target.label}`;
-  if (PROHIBITED_ACTION_PATTERN.test(targetDescription)) {
+  if (isProhibitedActionTarget(target)) {
     return [];
   }
 
-  if (CONFIRM_ACTION_PATTERN.test(targetDescription) || decision.actionLevel === "konfirmasi") {
+  const confirmTarget = isConfirmActionTarget(target);
+  if (confirmTarget || decision.actionLevel === "konfirmasi") {
     return [
       {
         type: "confirm",
         target: target.nemu_id,
         level: "konfirmasi",
-        label: CONFIRM_ACTION_PATTERN.test(targetDescription)
-          ? "Kamu yang mengirim"
-          : "Kamu yang melakukan",
+        label: confirmTarget ? "Kamu yang mengirim" : "Kamu yang melakukan",
       },
     ];
   }
@@ -758,17 +754,18 @@ export async function runNemu(
           actionsAllowed,
         })
       : undefined;
+    const workflowActions = claimOutput?.actions ?? travelOutput?.actions;
     const actions =
       generatedAnswer.status === "answer"
-        ? (claimOutput?.actions ??
-          travelOutput?.actions ??
-          buildGenericActions(
-            jevResult.decision,
-            request,
-            thresholds.click,
-            injectionDetected,
-            jevResult.failed,
-          ))
+        ? workflowActions && workflowActions.length > 0
+          ? workflowActions
+          : buildGenericActions(
+              jevResult.decision,
+              request,
+              thresholds.click,
+              injectionDetected,
+              jevResult.failed,
+            )
         : [];
     const guide =
       generatedAnswer.status === "answer" ? (claimOutput?.guide ?? travelOutput?.guide) : undefined;

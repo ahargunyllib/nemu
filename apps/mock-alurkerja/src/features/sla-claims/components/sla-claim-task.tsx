@@ -1,4 +1,4 @@
-import { NEMU_IDS } from "@nemu/contracts/nemu-ids";
+import { NEMU_IDS, slaClaimDecisionNemuId, slaClaimTicketNemuId } from "@nemu/contracts/nemu-ids";
 import { Badge } from "@nemu/ui/components/badge";
 import { Button, buttonVariants } from "@nemu/ui/components/button";
 import {
@@ -99,22 +99,6 @@ export type SlaClaimDetail = {
     excludedTicketIds: string[];
     approvers: string[];
   };
-};
-
-const TICKET_NEMU_ID: Record<string, string> = {
-  "INC-2609-014": NEMU_IDS.slaClaim.ticketInc2609014,
-  "INC-2609-015": NEMU_IDS.slaClaim.ticketInc2609015,
-  "INC-2609-031": NEMU_IDS.slaClaim.ticketInc2609031,
-  "INC-2609-047": NEMU_IDS.slaClaim.ticketInc2609047,
-  "INC-2609-058": NEMU_IDS.slaClaim.ticketInc2609058,
-};
-
-const DECISION_NEMU_ID: Record<string, string> = {
-  "INC-2609-014": NEMU_IDS.slaClaim.decisionInc2609014,
-  "INC-2609-015": NEMU_IDS.slaClaim.decisionInc2609015,
-  "INC-2609-031": NEMU_IDS.slaClaim.decisionInc2609031,
-  "INC-2609-047": NEMU_IDS.slaClaim.decisionInc2609047,
-  "INC-2609-058": NEMU_IDS.slaClaim.decisionInc2609058,
 };
 
 function formatDate(value: string): string {
@@ -367,7 +351,7 @@ function TicketReview({ detail }: { detail: SlaClaimDetail }) {
             const decision = decisions[ticket.id];
             const interval = formatInterval(ticket.start, ticket.end);
             return (
-              <TableRow key={ticket.id} data-nemu-id={TICKET_NEMU_ID[ticket.id]}>
+              <TableRow key={ticket.id} data-nemu-id={slaClaimTicketNemuId(ticket.id)}>
                 <TableCell className="font-medium">{ticket.id}</TableCell>
                 <TableCell>
                   <div>{interval.days}</div>
@@ -406,7 +390,7 @@ function TicketReview({ detail }: { detail: SlaClaimDetail }) {
                     onValueChange={(next) => decide(ticket.id, next[0] as Decision | undefined)}
                     disabled={missing}
                     aria-label={`Keputusan ${ticket.id}`}
-                    data-nemu-id={DECISION_NEMU_ID[ticket.id]}
+                    data-nemu-id={slaClaimDecisionNemuId(ticket.id)}
                   >
                     <ToggleGroupItem value="dihitung">Dihitung</ToggleGroupItem>
                     <ToggleGroupItem value="dikecualikan">Dikecualikan</ToggleGroupItem>

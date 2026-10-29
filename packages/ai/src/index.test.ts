@@ -895,6 +895,49 @@ test("accountability guidance uses the final control label from the current page
   );
 });
 
+test("accountability workflow never confirms a final control with a prohibited page label", async () => {
+  const response = await runNemu(
+    {
+      ...momentThreeFollowUpRequest,
+      elements: momentThreeFollowUpRequest.elements.map((element) =>
+        element.nemu_id === "button-kirim" ? { ...element, label: "Setujui klaim" } : element,
+      ),
+    },
+    {
+      userProfile: DEMO_USER_PROFILE,
+      knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      sbmRows: DEMO_SBM_ROWS,
+      holidays: DEMO_HOLIDAYS_2026,
+      requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+      currentDate: "2026-11-06",
+      jevDecider: async () => ({
+        intent: "accountability_question",
+        intentConfidence: 0.99,
+        withinDomainProbability: 0.99,
+        injectionProbability: 0,
+        requiredTool: "accountability_deadline",
+        actionLevel: "arahkan",
+        actionConfidence: 0.99,
+        target: "button-kirim",
+        targetConfidence: 0.99,
+      }),
+      answerGenerator: async () => ({
+        status: "answer",
+        ringkas: "Periksa dokumen sebelum menyelesaikan tugas.",
+        detail: "Kontrol persetujuan tidak boleh dijalankan oleh Nemu.",
+        citationIds: ["sop-pd-01-section-4"],
+        warnings: [],
+      }),
+    },
+  );
+
+  assert.equal(response.status, "answer");
+  assert.equal(
+    response.actions.some((action) => action.target === "button-kirim"),
+    false,
+  );
+});
+
 test("workflow guidance includes missing accountability controls that are rendered off-screen", async () => {
   const response = await runNemu(
     {
@@ -1151,6 +1194,105 @@ test("Moment 3 initial page keeps the task-navigation click", async () => {
   ]);
   assert.equal(response.guide?.id, "travel-request:accountability");
   assert.equal(response.guide?.current_step, 1);
+});
+
+test("Moment 3 uses a bounded action label when the page label is at the request limit", async () => {
+  const response = await runNemu(
+    {
+      ...momentThreeRequest,
+      elements: momentThreeRequest.elements.map((element) =>
+        element.nemu_id === "task-pertanggungjawaban"
+          ? { ...element, label: "T".repeat(500) }
+          : element,
+      ),
+    },
+    {
+      userProfile: DEMO_USER_PROFILE,
+      knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      sbmRows: DEMO_SBM_ROWS,
+      holidays: DEMO_HOLIDAYS_2026,
+      requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+      currentDate: "2026-11-06",
+      jevDecider: async () => ({
+        intent: "accountability_question",
+        intentConfidence: 0.99,
+        withinDomainProbability: 0.99,
+        injectionProbability: 0,
+        requiredTool: "accountability_deadline",
+        actionLevel: "jalan_sendiri",
+        actionConfidence: 0.99,
+        target: "task-pertanggungjawaban",
+        targetConfidence: 0.99,
+      }),
+      answerGenerator: async () => ({
+        status: "answer",
+        ringkas: "Saya bukakan task Pertanggungjawaban.",
+        detail: "Lengkapi dokumen sebelum batas waktu.",
+        citationIds: ["sop-pd-01-section-4"],
+        warnings: [],
+      }),
+    },
+  );
+
+  assert.equal(response.status, "answer");
+  assert.equal(response.actions[0]?.label, "Buka Pertanggungjawaban");
+});
+
+test("an empty workflow action list falls back to the safe generic target", async () => {
+  const response = await runNemu(
+    {
+      ...momentThreeRequest,
+      elements: [
+        {
+          nemu_id: "task-pertanggungjawaban",
+          label: "Pertanggungjawaban",
+          role: "link",
+          visible: false,
+        },
+        {
+          nemu_id: "menu-beranda",
+          label: "Beranda",
+          role: "link",
+          visible: true,
+        },
+      ],
+    },
+    {
+      userProfile: DEMO_USER_PROFILE,
+      knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      sbmRows: DEMO_SBM_ROWS,
+      holidays: DEMO_HOLIDAYS_2026,
+      requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+      currentDate: "2026-11-06",
+      jevDecider: async () => ({
+        intent: "accountability_question",
+        intentConfidence: 0.99,
+        withinDomainProbability: 0.99,
+        injectionProbability: 0,
+        requiredTool: "accountability_deadline",
+        actionLevel: "jalan_sendiri",
+        actionConfidence: 0.99,
+        target: "menu-beranda",
+        targetConfidence: 0.99,
+      }),
+      answerGenerator: async () => ({
+        status: "answer",
+        ringkas: "Buka Beranda untuk melihat tugas yang tersedia.",
+        detail: "Task Pertanggungjawaban belum terlihat di halaman ini.",
+        citationIds: ["sop-pd-01-section-4"],
+        warnings: [],
+      }),
+    },
+  );
+
+  assert.deepEqual(response.actions, [
+    {
+      type: "click",
+      target: "menu-beranda",
+      level: "jalan_sendiri",
+      label: "Buka ini",
+    },
+  ]);
 });
 
 test("an unknown target never produces an action", async () => {

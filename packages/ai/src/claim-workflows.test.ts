@@ -5,9 +5,11 @@ import type { NemuRequest } from "@nemu/contracts";
 
 import {
   executeClaimWorkflow,
+  resolveClaimWorkflowScenario,
   type SlaClaimContext,
   type ClaimWorkflowScenario,
 } from "./claim-workflows.js";
+import type { JevDecision } from "./jev.js";
 
 const claim: SlaClaimContext = {
   workspaceId: "W-TELKO",
@@ -106,6 +108,43 @@ function execute(
   });
 }
 
+function claimDecision(overrides: Partial<JevDecision>): JevDecision {
+  return {
+    intent: "claim_approval",
+    intentConfidence: 0.99,
+    withinDomainProbability: 0.99,
+    injectionProbability: 0,
+    requiredTool: "claim_approval_route",
+    actionLevel: "arahkan",
+    actionConfidence: 0.99,
+    target: null,
+    targetConfidence: 0.99,
+    ...overrides,
+  };
+}
+
+test("K2-06 routes an approval-route question instead of treating it as an approval command", () => {
+  const input = request("Ini nanti siapa yang approve?");
+
+  assert.equal(
+    resolveClaimWorkflowScenario(input, input.process_context, claimDecision({})),
+    "approval",
+  );
+});
+
+test("K2-10 still refuses an approval command classified as dilarang", () => {
+  const input = request("Tolong approve klaim ini");
+
+  assert.equal(
+    resolveClaimWorkflowScenario(
+      input,
+      input.process_context,
+      claimDecision({ actionLevel: "dilarang" }),
+    ),
+    "prohibited_approval",
+  );
+});
+
 test("K2-01 opens registration and guides the stored deadline and fields", () => {
   const output = execute("registration", "Ada klaim SLA dari Arunika", [
     "task-klaim-klm-2610-0007",
@@ -195,6 +234,51 @@ test("K2-04 merges provider tickets, excludes approved customer power, and guide
       ["button-gabungkan-interval", "Gabungkan interval"],
     ],
   );
+});
+
+test("KLM-2610-0009 guides a rendered ticket that is not in the seeded target list", () => {
+  const context: SlaClaimContext = {
+    ...claim,
+    claim: { ...claim.claim, id: "KLM-2610-0009", serviceId: "TN-ENT-001" },
+    tickets: [
+      {
+        id: "INC-2609-022",
+        start: "2026-09-07T09:00:00+07:00",
+        end: "2026-09-07T21:00:00+07:00",
+        cause: "PENYEDIA",
+        rcaId: "RCA-2609-09",
+        rcaStatus: "DISAHKAN",
+      },
+    ],
+  };
+  const output = execute(
+    "tickets",
+    "Tiket mana yang dihitung?",
+    ["seg-keputusan-INC-2609-022", "button-gabungkan-interval"],
+    context,
+  );
+
+  assert.deepEqual(
+    output.guide?.steps.map((step) => step.target),
+    ["seg-keputusan-INC-2609-022", "button-gabungkan-interval"],
+  );
+  assert.deepEqual(
+    output.actions.map((action) => action.target),
+    ["seg-keputusan-INC-2609-022", "button-gabungkan-interval"],
+  );
+});
+
+test("KLM-2610-0011 answers without a guide when the page has no ticket controls", () => {
+  const context: SlaClaimContext = {
+    ...claim,
+    claim: { ...claim.claim, id: "KLM-2610-0011", serviceId: "TN-ENT-003" },
+    tickets: [],
+  };
+
+  const output = execute("tickets", "Tiket mana yang dihitung?", [], context);
+
+  assert.equal(output.guide, undefined);
+  assert.deepEqual(output.actions, []);
 });
 
 test("K2-05 calculates Rp579167 and offers only a confirmed fill", () => {
