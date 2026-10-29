@@ -29,6 +29,9 @@ export type DocumentRepository = {
   delete(workspaceId: string, id: string): Promise<DocumentRecord | undefined>;
 };
 
+// D1 binds at most 100 parameters per statement, and a chunk row binds one per column.
+const CHUNK_ROWS_PER_INSERT = Math.floor(100 / Object.keys(getColumns(knowledgeChunk)).length);
+
 export function createDocumentRepository(db: Database): DocumentRepository {
   return {
     async insert(record) {
@@ -75,20 +78,27 @@ export function createDocumentRepository(db: Database): DocumentRepository {
         .returning();
       return updated;
     },
-    replaceChunksAndSetReady(documentId, chunks, isActive) {
-      return db.transaction(async (tx) => {
-        await tx.delete(knowledgeChunk).where(eq(knowledgeChunk.documentId, documentId));
-        if (chunks.length > 0) await tx.insert(knowledgeChunk).values(chunks);
-        const [updated] = await tx
+    // D1 rejects BEGIN, so `db.transaction` can't run there; a batch is D1's atomic write.
+    async replaceChunksAndSetReady(documentId, chunks, isActive) {
+      const insertChunks = [];
+      for (let start = 0; start < chunks.length; start += CHUNK_ROWS_PER_INSERT) {
+        insertChunks.push(
+          db.insert(knowledgeChunk).values(chunks.slice(start, start + CHUNK_ROWS_PER_INSERT)),
+        );
+      }
+      const [[updated]] = await db.batch([
+        db
           .update(knowledgeDocument)
           .set({ status: "ready", failureReason: null, isActive })
           .where(eq(knowledgeDocument.id, documentId))
-          .returning();
-        if (!updated) {
-          throw new Error(`Knowledge document ${documentId} disappeared while indexing`);
-        }
-        return updated;
-      });
+          .returning(),
+        db.delete(knowledgeChunk).where(eq(knowledgeChunk.documentId, documentId)),
+        ...insertChunks,
+      ]);
+      if (!updated) {
+        throw new Error(`Knowledge document ${documentId} disappeared while indexing`);
+      }
+      return updated;
     },
     listActiveReadyChunks(workspaceId = "W-TRAVEL") {
       return db
