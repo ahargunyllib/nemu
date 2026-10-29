@@ -6,7 +6,11 @@ import type {
   NemuRequest,
   ProcessContext,
 } from "@nemu/contracts";
-import { NEMU_IDS, slaClaimDecisionNemuId } from "@nemu/contracts/nemu-ids";
+import {
+  NEMU_IDS,
+  slaClaimDecisionNemuId,
+  slaClaimRequestRcaNemuId,
+} from "@nemu/contracts/nemu-ids";
 
 import type { JevDecision } from "./jev.js";
 import {
@@ -487,16 +491,17 @@ export function executeClaimWorkflow({
         sumber: "SOP-KLAIM-SLA-01 Pasal 5 ayat (5)",
       });
       output.sourceLocations = [{ docId: "SOP-KLAIM-SLA-01-v1.0", article: "5 ayat (5)" }];
-      const requestRcaTarget = tickets.missingTicketIds.includes("INC-2609-058")
-        ? NEMU_IDS.slaClaim.requestRcaInc2609058
-        : undefined;
-      if (actionsAllowed && requestRcaTarget && visible.has(requestRcaTarget)) {
-        output.actions.push({
-          type: "highlight",
-          target: requestRcaTarget,
-          level: "arahkan",
-          label: "Minta RCA untuk INC-2609-058",
-        });
+      if (actionsAllowed) {
+        for (const ticketId of tickets.missingTicketIds) {
+          const requestRcaTarget = slaClaimRequestRcaNemuId(ticketId);
+          if (!visible.has(requestRcaTarget)) continue;
+          output.actions.push({
+            type: "highlight",
+            target: requestRcaTarget,
+            level: "arahkan",
+            label: `Minta RCA untuk ${ticketId}`,
+          });
+        }
       }
       output.guidance.push(
         `Do not state a final amount. Status is PERLU_BUKTI until RCA is approved for ${tickets.missingTicketIds.join(", ")}.`,

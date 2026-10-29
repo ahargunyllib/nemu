@@ -141,6 +141,10 @@ export function slaClaimDecisionNemuId(ticketId: string): string {
   return `seg-keputusan-${ticketId}`;
 }
 
+export function slaClaimRequestRcaNemuId(ticketId: string): string {
+  return `button-minta-rca-${ticketId.toLowerCase()}`;
+}
+
 type Values<T> = T[keyof T];
 
 export type NemuId = Values<{ [Page in keyof typeof NEMU_IDS]: Values<(typeof NEMU_IDS)[Page]> }>;

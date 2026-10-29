@@ -341,6 +341,44 @@ test("K2-07 suppresses final amount and directs the missing RCA request", () => 
   assert.equal(output.actions[0]?.target, "button-minta-rca-inc-2609-058");
 });
 
+test("missing RCA actions target every rendered ticket from workspace data", () => {
+  const missingRcaClaim: SlaClaimContext = {
+    ...claim,
+    tickets: [
+      {
+        id: "INC-2609-058",
+        start: "2026-09-25T10:00:00+07:00",
+        end: "2026-09-25T19:00:00+07:00",
+        cause: "BELUM_DIKETAHUI",
+        rcaId: null,
+        rcaStatus: "MENUNGGU",
+      },
+      {
+        id: "INC-2609-099",
+        start: "2026-09-26T10:00:00+07:00",
+        end: "2026-09-26T12:00:00+07:00",
+        cause: "BELUM_DIKETAHUI",
+        rcaId: null,
+        rcaStatus: "MENUNGGU",
+      },
+    ],
+  };
+  const output = execute(
+    "compensation",
+    "RCA mana yang perlu diminta?",
+    ["button-minta-rca-inc-2609-058", "button-minta-rca-inc-2609-099"],
+    missingRcaClaim,
+  );
+
+  assert.deepEqual(
+    output.actions.map((action) => [action.target, action.label]),
+    [
+      ["button-minta-rca-inc-2609-058", "Minta RCA untuk INC-2609-058"],
+      ["button-minta-rca-inc-2609-099", "Minta RCA untuk INC-2609-099"],
+    ],
+  );
+});
+
 test("K2-08 rejects a late claim and guides the rejection template", () => {
   const lateClaim: SlaClaimContext = {
     ...claim,

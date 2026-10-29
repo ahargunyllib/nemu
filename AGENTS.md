@@ -16,7 +16,7 @@ The Demo App (`apps/mock-alurkerja`) and the Nemu Extension use route-owned (or 
 
 ### End-to-end completion
 
-Treat a shared contract or provider response as an intermediate boundary, not a completed feature. A requirement is complete only when its producing service, consuming UI, and observable acceptance path all work together; keep partial layers explicitly marked as partial. For example, the confirmed `fill` action is complete only when the extension renders the user-controlled **Isi** action, applies its value after the click, and detects a later mismatch—not when the AI schema merely emits it. See ADR-0003.
+Treat a shared contract or provider response as an intermediate boundary, not a completed feature. A requirement is complete only when its producing service, consuming UI, and observable acceptance path all work together; keep partial layers explicitly marked as partial. When a target becomes data-derived, audit every action for that entity and cover a non-seeded value, not only the primary path. For example, a dynamic SLA ticket target covers both **Keputusan** and **Minta RCA** in the AI and Demo App, with a non-seeded ticket test. The confirmed `fill` action is complete only when the extension renders the user-controlled **Isi** action, applies its value after the click, and detects a later mismatch—not when the AI schema merely emits it. See ADR-0003.
 
 ### Third-party providers
 

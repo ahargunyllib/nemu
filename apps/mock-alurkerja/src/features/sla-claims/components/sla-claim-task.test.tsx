@@ -214,15 +214,15 @@ describe("SlaClaimTask", () => {
     expect(screen.getByText(/Nominal belum dapat ditetapkan/)).toBeTruthy();
   });
 
-  test("asks NOC for the missing RCA once", () => {
+  test("asks NOC once for a missing RCA outside the seeded ticket list", () => {
     const { container } = renderTask(
       <SlaClaimTask
         assignee="Dimas Pratama"
-        detail={detail("Telaah Tiket Gangguan", { missingTicketIds: ["INC-2609-058"] })}
+        detail={detail("Telaah Tiket Gangguan", { missingTicketIds: ["INC-2609-099"] })}
       />,
     );
     const request = container.querySelector<HTMLButtonElement>(
-      `[data-nemu-id="${NEMU_IDS.slaClaim.requestRcaInc2609058}"]`,
+      '[data-nemu-id="button-minta-rca-inc-2609-099"]',
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Minta RCA" }));

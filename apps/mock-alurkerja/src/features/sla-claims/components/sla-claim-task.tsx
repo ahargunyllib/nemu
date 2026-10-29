@@ -1,4 +1,9 @@
-import { NEMU_IDS, slaClaimDecisionNemuId, slaClaimTicketNemuId } from "@nemu/contracts/nemu-ids";
+import {
+  NEMU_IDS,
+  slaClaimDecisionNemuId,
+  slaClaimRequestRcaNemuId,
+  slaClaimTicketNemuId,
+} from "@nemu/contracts/nemu-ids";
 import { Badge } from "@nemu/ui/components/badge";
 import { Button, buttonVariants } from "@nemu/ui/components/button";
 import {
@@ -299,7 +304,9 @@ function formatInterval(start: string, end: string): { days: string; times: stri
  */
 function TicketReview({ detail }: { detail: SlaClaimDetail }) {
   const { claim, context, summary } = detail;
-  const [rcaRequested, setRcaRequested] = useState(false);
+  const [requestedRcaTicketIds, setRequestedRcaTicketIds] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
   const [countedMinutes, setCountedMinutes] = useState<number | null>(null);
 
@@ -350,6 +357,7 @@ function TicketReview({ detail }: { detail: SlaClaimDetail }) {
             const minutes = (Date.parse(ticket.end) - Date.parse(ticket.start)) / 60_000;
             const decision = decisions[ticket.id];
             const interval = formatInterval(ticket.start, ticket.end);
+            const rcaRequested = requestedRcaTicketIds.has(ticket.id);
             return (
               <TableRow key={ticket.id} data-nemu-id={slaClaimTicketNemuId(ticket.id)}>
                 <TableCell className="font-medium">{ticket.id}</TableCell>
@@ -365,14 +373,14 @@ function TicketReview({ detail }: { detail: SlaClaimDetail }) {
                     <Badge variant={missing ? "destructive" : "secondary"}>
                       {ticket.rcaStatus}
                     </Badge>
-                    {ticket.id === "INC-2609-058" && (
+                    {missing && (
                       <Button
                         size="sm"
                         variant="outline"
                         disabled={rcaRequested}
-                        data-nemu-id={NEMU_IDS.slaClaim.requestRcaInc2609058}
+                        data-nemu-id={slaClaimRequestRcaNemuId(ticket.id)}
                         onClick={() => {
-                          setRcaRequested(true);
+                          setRequestedRcaTicketIds((current) => new Set([...current, ticket.id]));
                           toast.success(`Permintaan RCA ${ticket.id} dikirim ke NOC`);
                         }}
                       >
