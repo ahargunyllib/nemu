@@ -28,9 +28,9 @@ import { useDemoPanel } from "@/features/demo/hooks/use-demo-panel";
  * Plays the atasan, PPK, and bendahara for the demo: Panel demo → Majukan State moves the
  * picked Process Instance to its next State in two clicks.
  */
-export default function DemoPanel() {
+export default function DemoPanel({ workspaceId }: { workspaceId?: string | null }) {
   const { instances, selected, pick, majukan, isMajukanPending, reset, isResetPending } =
-    useDemoPanel();
+    useDemoPanel(workspaceId);
 
   return (
     <Sheet>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { requireWorkspace, requireWorkspaceAdmin } from "./authorization";
+import { requireKnownWorkspace, requireWorkspace, requireWorkspaceAdmin } from "./authorization";
 
 describe("requireWorkspaceAdmin", () => {
   it("returns the authenticated workspace for an administrator", () => {
@@ -25,5 +25,15 @@ describe("requireWorkspace", () => {
       "Workspace W-TRAVEL access is required",
     );
     expect(requireWorkspace("W-TRAVEL", "W-TRAVEL")).toBe("W-TRAVEL");
+  });
+});
+
+describe("requireKnownWorkspace", () => {
+  it("accepts the workspaces Nemu serves and rejects any other value", () => {
+    expect(requireKnownWorkspace("W-TRAVEL")).toBe("W-TRAVEL");
+    expect(requireKnownWorkspace("W-TELKO")).toBe("W-TELKO");
+    expect(() => requireKnownWorkspace("W-TEST")).toThrow(
+      "Workspace W-TEST is not a Nemu workspace",
+    );
   });
 });

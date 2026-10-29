@@ -5,7 +5,7 @@ import {
 } from "@nemu/contracts/process-instance";
 import { ORPCError } from "@orpc/server";
 
-import { protectedProcedure } from "../../index";
+import { protectedProcedure, travelProcedure } from "../../index";
 import {
   type ProcessResult,
   ajukanPerjalananDinas,
@@ -25,21 +25,21 @@ function unwrap<T>(result: ProcessResult<T>): T {
 }
 
 export const processInstancesRouter = {
-  ajukanPerjalananDinas: protectedProcedure
+  ajukanPerjalananDinas: travelProcedure
     .input(ajukanPerjalananDinasInputSchema)
     .handler(({ context, input }) =>
       ajukanPerjalananDinas(createProcessInstanceDeps(context.db), context.session.user.id, input),
     ),
 
-  listMyProcessInstances: protectedProcedure.handler(({ context }) =>
+  listMyProcessInstances: travelProcedure.handler(({ context }) =>
     listMyProcessInstances(createProcessInstanceDeps(context.db), context.session.user.id),
   ),
 
-  listMyTasks: protectedProcedure.handler(({ context }) =>
+  listMyTasks: travelProcedure.handler(({ context }) =>
     listMyTasks(createProcessInstanceDeps(context.db), context.session.user.id, context.demoDate),
   ),
 
-  getProcessInstance: protectedProcedure
+  getProcessInstance: travelProcedure
     .input(processInstanceIdInputSchema)
     .handler(async ({ context, input }) => {
       const instance = await getProcessInstance(
@@ -56,7 +56,7 @@ export const processInstancesRouter = {
       return instance;
     }),
 
-  unggahDokumenPertanggungjawaban: protectedProcedure
+  unggahDokumenPertanggungjawaban: travelProcedure
     .input(unggahDokumenInputSchema)
     .handler(async ({ context, input }) =>
       unwrap(
@@ -68,7 +68,7 @@ export const processInstancesRouter = {
       ),
     ),
 
-  kirimPertanggungjawaban: protectedProcedure
+  kirimPertanggungjawaban: travelProcedure
     .input(processInstanceIdInputSchema)
     .handler(async ({ context, input }) =>
       unwrap(
@@ -80,7 +80,7 @@ export const processInstancesRouter = {
       ),
     ),
 
-  majukanState: protectedProcedure
+  majukanState: travelProcedure
     .input(processInstanceIdInputSchema)
     .handler(async ({ context, input }) =>
       unwrap(
@@ -92,6 +92,7 @@ export const processInstancesRouter = {
       ),
     ),
 
+  // Reset demo and the demo clock serve every workspace's Demo App, not only Perjalanan Dinas.
   resetDemo: protectedProcedure.handler(({ context }) =>
     resetDemo(createProcessInstanceDeps(context.db), context.session.user.id),
   ),

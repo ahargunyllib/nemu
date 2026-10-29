@@ -58,6 +58,10 @@ oRPC procedure -> service -> repository -> Drizzle / D1
 - Every user-facing procedure uses `protectedProcedure` and takes the user id
   from `context.session`, never from the request body. `publicProcedure` is for
   health checks and deliberately public reads.
+- A procedure that serves one Knowledge Workspace's process uses that
+  workspace's gate (`travelProcedure`, `telcoProcedure`, `travelAdminProcedure`)
+  so other workspaces get FORBIDDEN. Compare workspaces through `WORKSPACES` in
+  `packages/api/src/workspace-ids.ts`, never string literals.
 
 ## Cloudflare lifecycle
 

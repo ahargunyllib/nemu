@@ -9,7 +9,7 @@ import { describe, expect, it } from "vite-plus/test";
 import type { NemuService } from "../../context";
 import { createFixtureNemuService } from "./fixture-responder";
 import type { ChatLogRepository, NewChatLogRecord } from "./repository";
-import { answerChat, resolveChatProcessContext } from "./service";
+import { answerChat, answerNemuChat, resolveChatProcessContext } from "./service";
 
 const SIGNED_IN_USER = "user-rina";
 
@@ -116,6 +116,40 @@ describe("answerChat", () => {
     await expect(answerChat(deps, momentOneRequest, SIGNED_IN_USER)).resolves.toEqual(
       momentOneResponse,
     );
+  });
+});
+
+describe("answerNemuChat", () => {
+  it("answers with the signed-in user's process context instead of the extension's", async () => {
+    const received: Parameters<NemuService["respond"]>[0][] = [];
+    const { deps } = createFakes({
+      async respond(request) {
+        received.push(request);
+        return momentTwoResponse;
+      },
+    });
+    const travelContext = { ...momentTwoRequest.process_context!, instance_id: "PD-SERVER" };
+    const loaded: string[][] = [];
+
+    await answerNemuChat(
+      {
+        ...deps,
+        processContexts: {
+          loadTravel: async (actorId, pageUrl) => {
+            loaded.push([actorId, pageUrl]);
+            return travelContext;
+          },
+          listSlaTasks: async () => [],
+          findSlaTaskByService: async () => undefined,
+          findSlaTaskByInvoice: async () => undefined,
+        },
+      },
+      momentTwoRequest,
+      { id: SIGNED_IN_USER, workspaceId: "W-TRAVEL" },
+    );
+
+    expect(loaded).toEqual([[SIGNED_IN_USER, momentTwoRequest.url]]);
+    expect(received[0]?.process_context).toEqual(travelContext);
   });
 });
 

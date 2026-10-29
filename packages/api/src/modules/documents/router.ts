@@ -39,7 +39,7 @@ export const documentsRouter = {
     .handler(({ context, input }) =>
       uploadDocument(documentDeps(context), {
         ...input,
-        workspaceId: context.session.user.workspaceId as "W-TRAVEL" | "W-TELKO",
+        workspaceId: context.session.user.workspaceId,
       }),
     ),
 

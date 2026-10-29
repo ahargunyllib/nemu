@@ -10,9 +10,10 @@ import { createDocumentRepository } from "@nemu/api/modules/documents/repository
 import { createReferenceTableRepository } from "@nemu/api/modules/reference-tables/repository";
 import { createSlaClaimRepository } from "@nemu/api/modules/sla-claims/repository";
 import { getSlaClaimContext } from "@nemu/api/modules/sla-claims/service";
+import { createWorkspaceRepository } from "@nemu/api/modules/workspaces/repository";
+import { getDemoDate } from "@nemu/api/modules/workspaces/service";
 import { createAuth as createConfiguredAuth } from "@nemu/auth";
-import { type Database, createDb, eq } from "@nemu/db";
-import { workspace } from "@nemu/db/schema/workspace";
+import { type Database, createDb } from "@nemu/db";
 
 const REASONING_EFFORTS = ["low", "medium", "high", "xhigh", "max"] as const;
 
@@ -36,17 +37,8 @@ export function getDb(): Database {
   return createDb(ENV);
 }
 
-export async function getWorkspaceDemoDate(
-  db: Database,
-  workspaceId: string,
-  fallback = ENV.NEMU_DEMO_DATE,
-): Promise<string> {
-  const [record] = await db
-    .select({ demoDate: workspace.demoDate })
-    .from(workspace)
-    .where(eq(workspace.id, workspaceId))
-    .limit(1);
-  return record?.demoDate ?? fallback;
+export function getWorkspaceDemoDate(db: Database, workspaceId: string): Promise<string> {
+  return getDemoDate(createWorkspaceRepository(db), workspaceId, ENV.NEMU_DEMO_DATE);
 }
 export async function createAuth(database?: Database) {
   return createConfiguredAuth(ENV, database ?? (await getDb()));

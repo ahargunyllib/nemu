@@ -24,7 +24,7 @@ function AuthLayout() {
   const { user } = Route.useRouteContext();
 
   return (
-    <DemoDock>
+    <DemoDock workspaceId={user.workspaceId}>
       <AppShell
         sidebar={<SideMenu footer={<UserMenu />} workspaceId={user.workspaceId} />}
         header={
