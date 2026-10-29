@@ -15,8 +15,8 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   with `visible: false` so Nemu can still point at them.
 - **Area Crop.** The crop button in the Composer starts area select mode: Rina drags a box over
   the page, Nemu hides its own overlay, and the background screenshots the viewport
-  (`captureVisibleTab`, authorized by `activeTab` after the toolbar action or shortcut; host access
-  is limited to the configured Demo App origins). The content script cuts out just the box (longest side at most
+  (`captureVisibleTab`, which is why the manifest asks for `<all_urls>`; the background still
+  captures allowlisted tabs only). The content script cuts out just the box (longest side at most
   1280 px) and shows it as a removable chip in the Composer. It goes with the next prompt as
   `screenshot_crop`, and the full screenshot never leaves the tab. The Nemu Service never stores
   the image: the Chat Log only notes that one was attached.
