@@ -125,6 +125,23 @@ row: a dashed drop zone ("Drag file or click to upload") until it is uploaded,
 then a green check with its file name. The whole row is the file input and
 carries its `upload-*` id. After Complete Task the rows stay, read-only.
 
+### Klaim SLA
+
+Dimas's workspace (`W-TELKO`) lists his claim Tasks the way My Task lists
+Rina's: Klaim SLA (`/sla-claims`) is the "My Tasks" column with **Search
+tasks…** and a "Tenggat" label, one compact row per Task ("Registrasi Klaim ·
+KLM-2610-0007" over "PT Arunika Retail · TN-ENT-002 · Sep 2026"), each with
+its `task-klaim-*` id. A Task opens at `/sla-claims/$claimId` as the same stock,
+non-modal Sheet beside that column, and closing it goes back to Klaim SLA.
+
+The sheet's orange header (the Task sheet's App colours) names the process and
+stage ("Klaim Kompensasi SLA · Tahap 1 dari 6"; Surat Penolakan has no stage),
+the Task with its claim number, and Klaim diterima, Tenggat telaah, and
+Assignee. It holds **Delegate** (disabled) and **Complete Task**
+(`button-kirim-klaim`, with a spinner while it advances); on Persetujuan the
+disabled **Setujui klaim** takes Complete Task's place, and a finished claim
+shows "Completed". The body holds the stage's fields.
+
 ## Process Instances
 
 Start Process on Ajukan Perjalanan Dinas stores a Process Instance in the
