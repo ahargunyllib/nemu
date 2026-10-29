@@ -17,6 +17,9 @@ type MascotProps = {
   nemuCursor: CursorFrame | null;
   /** The Blok area while Rina drags it: the mascot sits as the cursor at its bottom-right corner. */
   draggedArea?: Box | null;
+  /** The Answer Card beside the highlighted target, while a step is highlighted: the mascot sits on
+      its top-left corner. */
+  guidingCard?: Box | null;
   onOpenComposer: (position: Point) => void;
 };
 
@@ -33,10 +36,11 @@ export function Mascot({
   composerAnchor,
   nemuCursor,
   draggedArea = null,
+  guidingCard = null,
   onOpenComposer,
 }: MascotProps) {
   const state = useMascotState(activity);
-  const placement = useMascotPosition(composerAnchor, nemuCursor, draggedArea);
+  const placement = useMascotPosition(composerAnchor, nemuCursor, draggedArea, guidingCard);
   const cueId = useId();
   if (!placement) return null;
 

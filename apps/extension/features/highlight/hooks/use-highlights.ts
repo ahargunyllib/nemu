@@ -9,7 +9,8 @@ import {
   type HighlightTarget,
 } from "../lib/highlight-targets";
 
-export type TrackedHighlight = { action: NemuAction; box: Box };
+/** The current step's target box, and the next step's while it is on the page. */
+export type TrackedHighlight = { action: NemuAction; box: Box; next?: Box };
 
 type Targets = { found: HighlightTarget[]; missing: NemuAction[] };
 
@@ -34,6 +35,8 @@ export function useHighlights(actions: readonly NemuAction[]) {
 
   const { found } = targets;
   const current = found[stepIndex];
+  // The field still to fill after this one, which the Answer Card keeps off too.
+  const nextElement = found[stepIndex + 1]?.element;
 
   useEffect(() => {
     if (!current) {
@@ -48,10 +51,11 @@ export function useHighlights(actions: readonly NemuAction[]) {
     let lastBox: string | undefined;
     function track() {
       const box = element.isConnected ? boxOf(element) : undefined;
-      const key = JSON.stringify(box);
+      const next = nextElement?.isConnected ? boxOf(nextElement) : undefined;
+      const key = JSON.stringify([box, next]);
       if (key !== lastBox) {
         lastBox = key;
-        setHighlight(box && { action, box });
+        setHighlight(box && { action, box, next });
       }
       frame = requestAnimationFrame(track);
     }
@@ -71,7 +75,7 @@ export function useHighlights(actions: readonly NemuAction[]) {
       element.removeEventListener("change", advance);
       element.removeEventListener("click", advance);
     };
-  }, [current]);
+  }, [current, nextElement]);
 
   return {
     /** The current step's ring, once its target is on the page. */

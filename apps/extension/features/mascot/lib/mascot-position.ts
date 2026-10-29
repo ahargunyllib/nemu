@@ -13,6 +13,11 @@ export const REACH = 16;
 export const HIDE_BUTTON_OVERHANG = 12;
 /** How long the mascot takes to catch up with the cursor. */
 export const FOLLOW_MS = 150;
+/**
+ * How far the mascot reaches out of the Answer Card's top-left corner while a step is highlighted.
+ * The rest of it, 10 px each way, sits on the card's rounded corner, clear of the card's text.
+ */
+export const CARD_CORNER_REACH = MASCOT_SIZE - 10;
 
 /**
  * The mascot's top-left corner beside a cursor: 12 px below and to the right, or on the other side
@@ -46,6 +51,14 @@ export function besideComposer(anchor: Point): Point {
 
 /** Where the mascot is while it follows the cursor, and whether it has stopped to be clicked. */
 export type Followed = { at: Point; waiting: boolean };
+
+/**
+ * Where the mascot sits while a step is highlighted: on the top-left corner of the Answer Card,
+ * which hangs right next to the target.
+ */
+export function atCardCorner(card: Box): Point {
+  return { x: card.left - CARD_CORNER_REACH, y: card.top - CARD_CORNER_REACH };
+}
 
 /**
  * Where the mascot goes when the cursor moves from `previous` to `cursor`. It follows, except that

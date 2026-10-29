@@ -21,8 +21,10 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   `screenshot_crop`, and the full screenshot never leaves the tab. The Nemu Service never stores
   the image: the Chat Log only notes that one was attached.
 - **Highlight (Arahkan).** A `highlight` action scrolls to its target and draws a pulsing amber
-  outline with the action label on a click-through page layer; the Answer Card moves aside so it
-  never covers a highlight. A target missing from the page becomes a warning on the card. The
+  outline with the action label on a click-through page layer. The Answer Card hangs right next to
+  the target with the mascot on its top-left corner: just above it, right-aligned with it, else
+  below, else beside, never covering the target or the next step's. An answer with no target goes
+  into empty space, off the page's cards. A target missing from the page becomes a warning on the card. The
   Momen 2 prompt with `NEMU_RESPONDER=fixture` exercises it once the lodging form (#3) is on
   `/perdin/baru`.
 - **Navigation click (Jalan sendiri).** A `click` action runs only when its target is Jalan sendiri
@@ -35,8 +37,9 @@ cursor, and the answer from `nemuChat` comes back as an Answer Card.
   list a new id there to let Nemu click it.
 - **Mascot.** A 32 px mascot follows the cursor 12 px below and to the right of its tip (flipping
   sides at the viewport's edge), so it never sits on what Rina is about to click. It waits when
-  the cursor closes in on it, so it can be clicked to open the Composer. It waits beside the Composer while that is open and rides along
-  with Nemu's cursor during a navigation click. Its seven states follow what Nemu is doing: idle,
+  the cursor closes in on it, so it can be clicked to open the Composer. It waits beside the Composer while that is open, rides along
+  with Nemu's cursor during a navigation click, and while a step is highlighted sits on the Answer
+  Card's top-left corner beside the target. Its seven states follow what Nemu is doing: idle,
   listening (Composer open), thinking (after Kirim), guiding (highlights) or clicking, then
   success (the click opened the page) or warning (a failed request, missing target, or click that
   changed nothing). Results rest after 3 s, and Esc returns it to idle. Under
