@@ -73,16 +73,16 @@ e. Daftar Pengeluaran Riil bila bukti transportasi atau penginapan tidak diperol
 
 | No | Langkah | Pelaku | Menu |
 |---|---|---|---|
-| 1 | Terbitkan surat tugas | Kepala Balai | My Task |
+| 1 | Terbitkan surat tugas | Kepala Balai | Tugas Saya |
 | 2 | Buat pengajuan, pilih jenis perjalanan dan surat tugas | Pelaksana SPD | Ajukan Perjalanan Dinas |
 | 3 | Isi jadwal, biaya, dokumen, lalu kirim | Pelaksana SPD | Form pengajuan |
-| 4 | Setujui pengajuan | Atasan langsung | My Task |
-| 5 | Uji biaya terhadap SBM, setujui | PPK | My Task |
-| 6 | Bayar uang muka (bila diminta) | Bendahara | My Task |
-| 7 | Geotagging empat titik | Pelaksana SPD | My Request, detail perjalanan |
-| 8 | Kirim pertanggungjawaban | Pelaksana SPD | My Task, task Pertanggungjawaban |
-| 9 | Periksa kelengkapan | Verifikator | My Task |
-| 10 | Hitung rampung dan bayar atau tagih selisih | PPK dan Bendahara | My Task |
+| 4 | Setujui pengajuan | Atasan langsung | Tugas Saya |
+| 5 | Uji biaya terhadap SBM, setujui | PPK | Tugas Saya |
+| 6 | Bayar uang muka (bila diminta) | Bendahara | Tugas Saya |
+| 7 | Geotagging empat titik | Pelaksana SPD | Pengajuan Saya, detail perjalanan |
+| 8 | Kirim pertanggungjawaban | Pelaksana SPD | Tugas Saya, task Pertanggungjawaban |
+| 9 | Periksa kelengkapan | Verifikator | Tugas Saya |
+| 10 | Hitung rampung dan bayar atau tagih selisih | PPK dan Bendahara | Tugas Saya |
 
 ## Lampiran: format laporan perjalanan dinas
 
