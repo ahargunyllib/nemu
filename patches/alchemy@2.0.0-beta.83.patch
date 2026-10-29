@@ -1,0 +1,139 @@
+diff --git a/lib/Cloudflare/D1/Database.js b/lib/Cloudflare/D1/Database.js
+index d52601d81574312ef59f300d209b1ca84b276a0d..b497de18ca25ee3fc8f39de0fa02d2f61a2fa6f8 100644
+--- a/lib/Cloudflare/D1/Database.js
++++ b/lib/Cloudflare/D1/Database.js
+@@ -19,7 +19,7 @@ import { generateLocalId, LOCAL_PROVIDERS_URL, localRuntimeServices } from "../L
+ import { makeD1MigrationExecutor } from "./ApplyMigrations.js";
+ import { cloneDatabase } from "./CloneDatabase.js";
+ import { importD1Database } from "./ImportDatabase.js";
+-import { withLocalD1Executor } from "./LocalD1Gateway.js";
++import { withLocalD1Executor, withLocalD1MigrationExecutor } from "./LocalD1Gateway.js";
+ export const isDatabase = (value) => isResourceOfType(value, "Cloudflare.D1Database");
+ /**
+  * A Cloudflare D1 serverless SQL database built on SQLite.
+@@ -438,7 +438,7 @@ export const ProviderLocal = () => RpcProvider.effect(Database, LOCAL_PROVIDERS_
+                 ? yield* runMigrations({
+                     input: migrationsInput,
+                     stamped: stampedOf(output),
+-                    withExecutor: (apply) => withLocalD1Executor(databaseId, (executor) => apply(makeD1MigrationExecutor(executor))).pipe(Effect.provideContext(runtimeContext)),
++                    withExecutor: (apply) => withLocalD1MigrationExecutor(databaseId, apply).pipe(Effect.provideContext(runtimeContext)),
+                 })
+                 : undefined;
+             // Sync imports — locally an import file is just multi-statement
+diff --git a/lib/Cloudflare/D1/LocalD1Gateway.js b/lib/Cloudflare/D1/LocalD1Gateway.js
+index 945b13dd3d68650f4e2692ac719264af4aefb966..7f14c11d482309b955f2af1f6bda0e6c53966c4a 100644
+--- a/lib/Cloudflare/D1/LocalD1Gateway.js
++++ b/lib/Cloudflare/D1/LocalD1Gateway.js
+@@ -25,6 +25,8 @@ import { open } from "@alchemy.run/cloudflare-runtime/core/platform-proxy";
+ import * as Data from "effect/Data";
+ import * as Effect from "effect/Effect";
+ import { gatewayName, localGatewayRuntime } from "../LocalGateway.js";
++import { MigrationError } from "../../SQL/Migrations/index.js";
++import { makeD1MigrationExecutor } from "./ApplyMigrations.js";
+ export { localGatewayRuntime as localD1GatewayRuntime };
+ export class LocalD1QueryError extends Data.TaggedError("LocalD1QueryError") {
+ }
+@@ -97,4 +99,24 @@ export const withLocalD1Query = (databaseId, use) => Effect.scoped(Effect.gen(fu
+  * {@link D1SqlExecutor} contract.
+  */
+ export const withLocalD1Executor = (databaseId, use) => withLocalD1Query(databaseId, (query) => use((sql) => query({ sql })));
++/**
++ * Migration executor for the local simulator. Unlike the cloud executor, a
++ * migration's statements go to the Durable Object as a batch (one
++ * transaction, one `exec()` per statement) instead of one joined string:
++ * workerd caps a single `exec()` at 100,000 bytes of SQL, so a large seed
++ * migration fails with SQLITE_TOOBIG once joined. Comment-only statements
++ * are dropped: alone, workerd rejects them as containing no statement.
++ */
++export const withLocalD1MigrationExecutor = (databaseId, use) => withLocalD1Query(databaseId, (query) => use({
++    ...makeD1MigrationExecutor((sql) => query({ sql })),
++    batch: (statements) => query({
++        batch: statements
++            .map((statement) => statement.trim())
++            .filter((statement) => statement.replace(/^\s*--.*$/gm, "").trim().length > 0)
++            .map((sql) => ({ sql })),
++    }).pipe(Effect.asVoid, Effect.mapError((cause) => new MigrationError({
++        message: `D1 migration batch failed: ${String(cause)}`,
++        cause,
++    }))),
++}));
+ //# sourceMappingURL=LocalD1Gateway.js.map
+\ No newline at end of file
+diff --git a/src/Cloudflare/D1/Database.ts b/src/Cloudflare/D1/Database.ts
+index 53fade1c1209cf63c6e7c6f1b786b955c2718374..b8515b014470c228df8e4e9d0687504c944611ff 100644
+--- a/src/Cloudflare/D1/Database.ts
++++ b/src/Cloudflare/D1/Database.ts
+@@ -28,7 +28,7 @@ import type { Providers } from "../Providers.ts";
+ import { makeD1MigrationExecutor } from "./ApplyMigrations.ts";
+ import { cloneDatabase } from "./CloneDatabase.ts";
+ import { importD1Database } from "./ImportDatabase.ts";
+-import { withLocalD1Executor } from "./LocalD1Gateway.ts";
++import { withLocalD1Executor, withLocalD1MigrationExecutor } from "./LocalD1Gateway.ts";
+ 
+ export const isDatabase = (value: unknown): value is Database =>
+   isResourceOfType(value, "Cloudflare.D1Database");
+@@ -616,9 +616,9 @@ export const ProviderLocal = () =>
+                 input: migrationsInput,
+                 stamped: stampedOf(output),
+                 withExecutor: (apply) =>
+-                  withLocalD1Executor(databaseId, (executor) =>
+-                    apply(makeD1MigrationExecutor(executor)),
+-                  ).pipe(Effect.provideContext(runtimeContext)),
++                  withLocalD1MigrationExecutor(databaseId, apply).pipe(
++                    Effect.provideContext(runtimeContext),
++                  ),
+               })
+             : undefined;
+ 
+diff --git a/src/Cloudflare/D1/LocalD1Gateway.ts b/src/Cloudflare/D1/LocalD1Gateway.ts
+index 086f223ce60c8bd14a333acdf1c1672cfc0e51fd..2568f95ab5c4f948ec1d87d30bb120b08718dfd8 100644
+--- a/src/Cloudflare/D1/LocalD1Gateway.ts
++++ b/src/Cloudflare/D1/LocalD1Gateway.ts
+@@ -26,7 +26,8 @@ import type { BindingHook } from "@alchemy.run/cloudflare-runtime/core/PluginCon
+ import * as Data from "effect/Data";
+ import * as Effect from "effect/Effect";
+ import { gatewayName, localGatewayRuntime } from "../LocalGateway.ts";
+-import type { D1QueryResult, D1SqlExecutor } from "./ApplyMigrations.ts";
++import { MigrationError, type SqlExecutor } from "../../SQL/Migrations/index.ts";
++import { makeD1MigrationExecutor, type D1QueryResult, type D1SqlExecutor } from "./ApplyMigrations.ts";
+ 
+ export { localGatewayRuntime as localD1GatewayRuntime };
+ 
+@@ -146,3 +147,37 @@ export const withLocalD1Executor = <A, E, R>(
+   databaseId: string,
+   use: (executor: D1SqlExecutor<LocalD1QueryError>) => Effect.Effect<A, E, R>,
+ ) => withLocalD1Query(databaseId, (query) => use((sql) => query({ sql })));
++
++/**
++ * Migration executor for the local simulator. Unlike the cloud executor, a
++ * migration's statements go to the Durable Object as a batch (one
++ * transaction, one `exec()` per statement) instead of one joined string:
++ * workerd caps a single `exec()` at 100,000 bytes of SQL, so a large seed
++ * migration fails with SQLITE_TOOBIG once joined. Comment-only statements
++ * are dropped: alone, workerd rejects them as containing no statement.
++ */
++export const withLocalD1MigrationExecutor = <A, E, R>(
++  databaseId: string,
++  use: (executor: SqlExecutor) => Effect.Effect<A, E, R>,
++) =>
++  withLocalD1Query(databaseId, (query) =>
++    use({
++      ...makeD1MigrationExecutor((sql) => query({ sql })),
++      batch: (statements) =>
++        query({
++          batch: statements
++            .map((statement) => statement.trim())
++            .filter((statement) => statement.replace(/^\s*--.*$/gm, "").trim().length > 0)
++            .map((sql) => ({ sql })),
++        }).pipe(
++          Effect.asVoid,
++          Effect.mapError(
++            (cause) =>
++              new MigrationError({
++                message: `D1 migration batch failed: ${String(cause)}`,
++                cause,
++              }),
++          ),
++        ),
++    }),
++  );
