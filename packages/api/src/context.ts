@@ -2,6 +2,8 @@ import type { Session } from "@nemu/auth";
 import type { NemuRequest, NemuResponse } from "@nemu/contracts";
 import type { Database } from "@nemu/db";
 
+import type { WorkspaceId } from "./workspace-ids";
+
 export type NemuService = {
   respond(request: NemuRequest, authenticatedUserId: string): Promise<NemuResponse>;
 };
@@ -23,7 +25,7 @@ export type Context = {
 };
 
 export type AuthenticatedSession = Session & {
-  user: Session["user"] & { role: string; workspaceId: string };
+  user: Session["user"] & { role: string; workspaceId: WorkspaceId };
 };
 
 /** The context of a `protectedProcedure`: the session and authorization fields are always there. */

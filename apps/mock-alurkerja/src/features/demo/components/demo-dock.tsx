@@ -9,7 +9,13 @@ import { type DemoPageAction, DemoDockContext } from "@/features/demo/contexts/d
  * over the end of the side menu, for the current page's one-click action and the demo panel.
  * Both are light outline pills, so they read on the dark side menu.
  */
-export default function DemoDock({ children }: { children: ReactNode }) {
+export default function DemoDock({
+  children,
+  workspaceId,
+}: {
+  children: ReactNode;
+  workspaceId?: string | null;
+}) {
   const [pageAction, setPageAction] = useState<DemoPageAction | null>(null);
   const context = useMemo(() => ({ setPageAction }), []);
 
@@ -28,7 +34,7 @@ export default function DemoDock({ children }: { children: ReactNode }) {
             {pageAction.label}
           </Button>
         )}
-        <DemoPanel />
+        <DemoPanel workspaceId={workspaceId} />
       </div>
     </DemoDockContext.Provider>
   );

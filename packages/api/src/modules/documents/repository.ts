@@ -25,7 +25,7 @@ export type DocumentRepository = {
     chunks: NewKnowledgeChunkRecord[],
     isActive: boolean,
   ): Promise<DocumentRecord>;
-  listActiveReadyChunks(workspaceId?: string): Promise<ActiveKnowledgeChunkRecord[]>;
+  listActiveReadyChunks(workspaceId: string): Promise<ActiveKnowledgeChunkRecord[]>;
   delete(workspaceId: string, id: string): Promise<DocumentRecord | undefined>;
 };
 
@@ -100,7 +100,7 @@ export function createDocumentRepository(db: Database): DocumentRepository {
       }
       return updated;
     },
-    listActiveReadyChunks(workspaceId = "W-TRAVEL") {
+    listActiveReadyChunks(workspaceId) {
       return db
         .select({
           ...getColumns(knowledgeChunk),

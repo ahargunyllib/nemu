@@ -1,11 +1,7 @@
 import type { DocumentFileStore } from "../../context";
+import type { WorkspaceId } from "../../workspace-ids";
 import { indexMarkdownDocument } from "./indexing";
-import type {
-  ActiveKnowledgeChunkRecord,
-  DocumentRecord,
-  DocumentRepository,
-  NewKnowledgeChunkRecord,
-} from "./repository";
+import type { DocumentRecord, DocumentRepository, NewKnowledgeChunkRecord } from "./repository";
 
 export type DocumentFormat = "pdf" | "md";
 export const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
@@ -21,7 +17,7 @@ export type DocumentDeps = {
 };
 
 export type UploadDocumentInput = {
-  workspaceId?: "W-TRAVEL" | "W-TELKO";
+  workspaceId: WorkspaceId;
   title: string;
   version: string;
   isActive: boolean;
@@ -55,7 +51,7 @@ export function inspectDocumentFile(format: DocumentFormat, bytes: ArrayBuffer):
 
 export async function uploadDocument(
   { documents, files }: DocumentDeps,
-  { workspaceId = "W-TRAVEL", title, version, isActive, file }: UploadDocumentInput,
+  { workspaceId, title, version, isActive, file }: UploadDocumentInput,
 ): Promise<DocumentRecord> {
   const format = documentFormatOf(file.name);
   if (!format) {
@@ -156,12 +152,6 @@ export function setDocumentActive(
   isActive: boolean,
 ) {
   return documents.setActive(workspaceId, id, isActive);
-}
-
-export function listActiveKnowledgeChunks({
-  documents,
-}: Pick<DocumentDeps, "documents">): Promise<ActiveKnowledgeChunkRecord[]> {
-  return documents.listActiveReadyChunks();
 }
 
 // Removes the row first so Nemu stops answering from the document even if the

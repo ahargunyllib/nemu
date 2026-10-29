@@ -6,9 +6,8 @@ import {
 } from "@nemu/contracts";
 import { z } from "zod";
 
-import type { SlaTaskRecord } from "../sla-claims/repository";
-
 import type { NemuService } from "../../context";
+import { WORKSPACES } from "../../workspace-ids";
 import type { ChatLogRepository, NewChatLogRecord } from "./repository";
 
 export type ChatDeps = {
@@ -20,19 +19,23 @@ export const CHAT_LOG_LIMIT = 200;
 
 type ChatActor = { id: string; workspaceId: string };
 
-type ChatProcessContextDeps = {
-  loadTravel(): Promise<ProcessContext | undefined>;
-  listSlaTasks(workspaceId: string): Promise<SlaTaskRecord[]>;
+/** The part of a Klaim SLA Task that chat reads to build the process context. */
+export type ChatSlaTask = { claimId: string; assigneeId: string; name: string; status: string };
+
+/** Where chat reads the signed-in user's process: Perjalanan Dinas or their Klaim SLA Tasks. */
+export type ChatProcessContextDeps = {
+  loadTravel(actorId: string, pageUrl: string): Promise<ProcessContext | undefined>;
+  listSlaTasks(workspaceId: string, actorId: string): Promise<ChatSlaTask[]>;
   findSlaTaskByService(
     workspaceId: string,
     actorId: string,
     serviceId: string,
-  ): Promise<SlaTaskRecord | undefined>;
+  ): Promise<ChatSlaTask | undefined>;
   findSlaTaskByInvoice(
     workspaceId: string,
     actorId: string,
     invoiceId: string,
-  ): Promise<SlaTaskRecord | undefined>;
+  ): Promise<ChatSlaTask | undefined>;
 };
 
 function claimIdFromUrl(pageUrl: string): string | undefined {
@@ -56,9 +59,9 @@ export async function resolveChatProcessContext(
   actor: ChatActor,
   pageUrl: string,
 ): Promise<ProcessContext | undefined> {
-  if (actor.workspaceId !== "W-TELKO") return deps.loadTravel();
+  if (actor.workspaceId !== WORKSPACES.telco) return deps.loadTravel(actor.id, pageUrl);
 
-  const tasks = await deps.listSlaTasks(actor.workspaceId);
+  const tasks = await deps.listSlaTasks(actor.workspaceId, actor.id);
   const routeClaimId = claimIdFromUrl(pageUrl);
   const operationalRecord = operationalRecordFromUrl(pageUrl);
   const task = routeClaimId
@@ -81,6 +84,16 @@ export async function resolveChatProcessContext(
     status: task.status,
     uploaded_documents: [],
   };
+}
+
+// The process context comes from the Demo App's data, never from the extension.
+export async function answerNemuChat(
+  deps: ChatDeps & { processContexts: ChatProcessContextDeps },
+  request: NemuRequest,
+  actor: ChatActor,
+): Promise<NemuResponse> {
+  const processContext = await resolveChatProcessContext(deps.processContexts, actor, request.url);
+  return answerChat(deps, { ...request, process_context: processContext }, actor.id);
 }
 
 type ChatOutcome = Pick<NewChatLogRecord, "status" | "result" | "citations" | "actions">;
