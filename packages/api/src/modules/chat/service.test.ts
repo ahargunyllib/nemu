@@ -97,7 +97,8 @@ describe("answerChat", () => {
   it("logs an invalid Responder reply as an error instead of returning it", async () => {
     const { deps, entries } = createFakes({
       async respond() {
-        return { ...momentOneResponse, status: "refuse" };
+        const { guide: _guide, ...reply } = momentOneResponse;
+        return { ...reply, status: "refuse" };
       },
     });
 

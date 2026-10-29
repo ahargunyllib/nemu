@@ -1349,39 +1349,6 @@ test("missing SBM lookup input asks one clarification without calling GPT", asyn
   assert.equal(answerGeneratorCalled, false);
 });
 
-test("untrusted rupiah amounts from GPT are rejected", async () => {
-  const response = await runNemu(momentTwoRequest, {
-    userProfile: DEMO_USER_PROFILE,
-    processContext: momentTwoRequest.process_context,
-    knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
-    sbmRows: DEMO_SBM_ROWS,
-    holidays: [],
-    requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
-    currentDate: "2026-10-17",
-    jevDecider: async () => ({
-      intent: "accommodation_question",
-      intentConfidence: 0.99,
-      withinDomainProbability: 0.99,
-      injectionProbability: 0,
-      requiredTool: "lookup_sbm_and_accommodation",
-      actionLevel: "arahkan",
-      actionConfidence: 0.99,
-      target: "opt-penginapan-tidak-hotel",
-      targetConfidence: 0.99,
-    }),
-    answerGenerator: async () => ({
-      status: "answer",
-      ringkas: "Nominalnya Rp999.000.",
-      detail: "Nilai ini tidak berasal dari hasil hitung.",
-      citationIds: [accommodationCitationId],
-      warnings: [],
-    }),
-  });
-
-  assert.equal(response.status, "error");
-  assert.deepEqual(response.actions, []);
-});
-
 test("missing or inactive deterministic tool provenance returns the safe error response", async () => {
   const inactiveCitationId = DEMO_KNOWLEDGE_CHUNKS.find((chunk) => !chunk.active)?.id;
   assert.ok(inactiveCitationId);
@@ -1424,6 +1391,39 @@ test("missing or inactive deterministic tool provenance returns the safe error r
     assert.deepEqual(response.calc, []);
     assert.deepEqual(response.actions, []);
   }
+});
+
+test("untrusted rupiah amounts from GPT are rejected", async () => {
+  const response = await runNemu(momentTwoRequest, {
+    userProfile: DEMO_USER_PROFILE,
+    processContext: momentTwoRequest.process_context,
+    knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    sbmRows: DEMO_SBM_ROWS,
+    holidays: [],
+    requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
+    currentDate: "2026-10-17",
+    jevDecider: async () => ({
+      intent: "accommodation_question",
+      intentConfidence: 0.99,
+      withinDomainProbability: 0.99,
+      injectionProbability: 0,
+      requiredTool: "lookup_sbm_and_accommodation",
+      actionLevel: "arahkan",
+      actionConfidence: 0.99,
+      target: "opt-penginapan-tidak-hotel",
+      targetConfidence: 0.99,
+    }),
+    answerGenerator: async () => ({
+      status: "answer",
+      ringkas: "Nominalnya Rp999.000.",
+      detail: "Nilai ini tidak berasal dari hasil hitung.",
+      citationIds: [accommodationCitationId],
+      warnings: [],
+    }),
+  });
+
+  assert.equal(response.status, "error");
+  assert.deepEqual(response.actions, []);
 });
 
 test("a screenshot-only question receives active evidence for vision interpretation", async () => {

@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsc -b",
     "check-types": "tsc -b",
-    "test": "tsc -b && node --test dist/nemu-ids.test.js dist/nemu-response.test.js dist/process-instance.test.js"
+    "test": "tsc -b && node --test dist/nemu-ids.test.js dist/process-instance.test.js dist/nemu-response.test.js"
   },
   "dependencies": {
     "zod": "catalog:"

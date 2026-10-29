@@ -188,6 +188,13 @@ export const nemuResponseSchema = z
   })
   .strict()
   .superRefine((response, context) => {
+    if (response.status !== "answer" && response.guide) {
+      context.addIssue({
+        code: "custom",
+        message: `${response.status} responses cannot contain a guide`,
+        path: ["guide"],
+      });
+    }
     if ((response.status === "refuse" || response.status === "error") && response.actions.length) {
       context.addIssue({
         code: "custom",

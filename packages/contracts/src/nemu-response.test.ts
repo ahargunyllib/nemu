@@ -76,6 +76,19 @@ test("rejects guide progress beyond the step list", () => {
   assert.equal(result.success, false);
 });
 
+test("rejects a guide on clarify, refuse, or error responses", () => {
+  for (const status of ["clarify", "refuse", "error"] as const) {
+    const result = nemuResponseSchema.safeParse({ ...responseWithGuide(guide), status });
+
+    assert.equal(result.success, false, status);
+    assert.deepEqual(
+      result.error?.issues.map((issue) => issue.path),
+      [["guide"]],
+      status,
+    );
+  }
+});
+
 test("keeps legacy process context valid and accepts an optional workspace discriminator", () => {
   const legacy = { instance_id: "PD-2026-0001", uploaded_documents: [] };
   assert.equal(processContextSchema.safeParse(legacy).success, true);
