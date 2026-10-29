@@ -84,7 +84,9 @@ fields render:
 
 A picked date reads with its weekday ("Selasa, 3 Nov 2026"), and Lama
 perjalanan fills itself from the two dates ("3 hari · 2 malam"). Kota
-tujuan must name one of the Demo App's cities (`KOTA_TUJUAN`). Dasar penugasan
+tujuan must name one of the Demo App's cities (`KOTA_TUJUAN`). Moda
+transportasi offers only Pesawat and Kendaraan dinas, which fit the
+Yogyakarta–Makassar trip. Dasar penugasan
 picks one of the user's surat tugas, and its nomor is sent as `nomorSuratTugas`.
 Uang harian shows the SBM daily rate times the days for a luar kota trip.
 
@@ -142,7 +144,8 @@ The Pertanggungjawaban task page asks for four documents (surat tugas, boarding
 pass pergi and pulang, laporan perjalanan). Only the file name is stored, in
 `process_document`. Complete Task needs all four and moves the State to
 Verifikasi, then shows the task ID. Sample PDFs to upload are in
-`apps/mock-alurkerja/sample-documents/`.
+`apps/mock-alurkerja/sample-documents/`; the boarding passes are Yogyakarta
+(YIA) ↔ Makassar (UPG).
 
 ## Process endpoints
 
@@ -191,9 +194,13 @@ when a workspace has no stored configuration.
 A migration (`packages/db/src/migrations/*_seed-demo-process-instances`) seeds
 Rina's `PD-2026-0042` to Makassar, 3–5 November 2026, in State
 Pertanggungjawaban with the surat tugas and boarding pass pergi uploaded, so
-the boarding pass pulang and laporan perjalanan are missing (Momen 3). The
-migration is generated from `packages/api/src/modules/process-instances/demo-seed.ts`;
-after changing it, run `UPDATE_DEMO_SEED=1 pnpm test`.
+the boarding pass pulang and laporan perjalanan are missing (Momen 3). That
+migration is already applied, so a change to
+`packages/api/src/modules/process-instances/demo-seed.ts` needs a new migration
+that updates the seeded rows, such as `*_correct_demo_boarding_pass` (create
+one with `pnpm exec drizzle-kit generate --custom --name <name>` in
+`packages/db`). `demo-seed.test.ts` replays every migration and checks the
+result matches `demo-seed.ts`.
 
 ## Demo accounts
 
