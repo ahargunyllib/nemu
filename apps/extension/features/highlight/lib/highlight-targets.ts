@@ -2,7 +2,10 @@ import type { NemuAction } from "@nemu/contracts";
 
 import type { Box } from "../../../shared/types/box";
 
-export type HighlightTarget = { action: NemuAction; element: HTMLElement };
+/** A highlighted step and its place among the answer's steps, counting any missing from the page. */
+export type HighlightStep = { action: NemuAction; position: number };
+
+export type HighlightTarget = HighlightStep & { element: HTMLElement };
 
 /** Space around the element for the outline. */
 export const RING_PADDING = 4;
@@ -19,7 +22,8 @@ export const LABEL_INSET = 12;
 /**
  * Finds the page element for each `highlight` and `confirm` action: a confirm is shown the same
  * way, a ring with its label, and the user presses it. A target missing from the page is reported
- * back, never thrown, so Nemu can warn about it.
+ * back, never thrown, so Nemu can warn about it; each found target keeps its position, so the steps
+ * after a missing one still line up with the guide.
  */
 export function findHighlightTargets(
   actions: readonly NemuAction[],
@@ -28,11 +32,11 @@ export function findHighlightTargets(
   const found: HighlightTarget[] = [];
   const missing: NemuAction[] = [];
 
-  for (const action of actions) {
-    if (action.type === "click") continue;
+  const steps = actions.filter((action) => action.type !== "click");
+  for (const [position, action] of steps.entries()) {
     // The contract limits a nemu_id to [a-zA-Z0-9:_-], so it is safe inside a quoted selector.
     const element = root.querySelector<HTMLElement>(`[data-nemu-id="${action.target}"]`);
-    if (element) found.push({ action, element });
+    if (element) found.push({ action, element, position });
     else missing.push(action);
   }
   return { found, missing };
