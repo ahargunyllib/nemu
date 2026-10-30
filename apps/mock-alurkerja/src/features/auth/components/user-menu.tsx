@@ -10,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 
 import { authClient } from "@/features/auth/api/auth-client";
+import { forgetSession } from "@/features/auth/api/session";
 import { JABATAN_LABELS } from "@/features/auth/lib/demo-accounts";
 
 /** The signed-in user at the bottom of the side menu; it opens the account menu. */
@@ -42,6 +43,8 @@ export default function UserMenu() {
                 // Drop the signed-out account's data, such as its workspace's demo clock, so the
                 // next account to sign in never sees it.
                 onSuccess: async () => {
+                  // Before navigating, or the login page would still find the kept session.
+                  forgetSession(queryClient);
                   await navigate({ to: "/login" });
                   queryClient.clear();
                 },
