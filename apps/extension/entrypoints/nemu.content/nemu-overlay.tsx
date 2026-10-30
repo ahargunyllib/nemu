@@ -64,12 +64,13 @@ export function NemuOverlay() {
   const area = useAreaCrop();
   const { state } = chat;
   const actions = state.kind === "response" ? state.response.actions : NO_ACTIONS;
-  const { highlight, steps, stepIndex, missing, warnings, cursor, outcome, clicked } =
+  const { highlight, steps, stepIndex, missing, warnings, cursor, outcome, clicked, clickedFrom } =
     useAnswerActions(actions, state.kind === "response" ? state.elements : NO_ELEMENTS, anchor);
   const confirmedFills = useConfirmedFill(actions, highlight);
   // A guide continues from the settled page opened by its navigation click.
   useClickFollowUp(
     clicked,
+    clickedFrom,
     state.kind === "response" ? state.response.guide : undefined,
     chat.followUp,
   );

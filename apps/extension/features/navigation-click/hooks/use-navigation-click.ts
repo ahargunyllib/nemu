@@ -1,6 +1,7 @@
 import type { NemuAction, PageElement } from "@nemu/contracts";
 import { useEffect, useRef, useState } from "react";
 
+import { pageNemuIds } from "../../element-list/lib/settled-element-list";
 import {
   clickDestination,
   type ClickOutcome,
@@ -12,9 +13,14 @@ import {
 /** How long the mascot shows success or warning before it rests again (#6). */
 export const RESTING_MS = 3_000;
 
-type NavigationClickState = { cursor: CursorFrame | null; outcome: ClickOutcome | null };
+type NavigationClickState = {
+  cursor: CursorFrame | null;
+  outcome: ClickOutcome | null;
+  /** The nemu_ids (`pageNemuIds`) of the page the click was made on. */
+  leaving: string;
+};
 
-const IDLE: NavigationClickState = { cursor: null, outcome: null };
+const IDLE: NavigationClickState = { cursor: null, outcome: null, leaving: "" };
 
 /**
  * Runs one `click` action, already cleared by the Action Levels, starting the cursor at `start`.
@@ -44,6 +50,7 @@ export function useNavigationClick(
     let disposed = false;
     let restTimer: ReturnType<typeof setTimeout> | undefined;
     const destination = clickDestination(action, elementListRef.current);
+    const leaving = pageNemuIds();
 
     function stopOnEscape(event: KeyboardEvent) {
       if (event.key === "Escape") controller.abort();
@@ -59,13 +66,13 @@ export function useNavigationClick(
       onFrame: (frame) => {
         if (disposed) return;
         const cursor = frame.mascot === "clicking" ? { ...frame, destination } : frame;
-        setState({ cursor, outcome: null });
+        setState({ cursor, outcome: null, leaving });
       },
     }).then((outcome) => {
       window.removeEventListener("keydown", stopOnEscape, { capture: true });
       if (disposed) return;
       if (outcome === "stopped") {
-        setState({ cursor: null, outcome });
+        setState({ cursor: null, outcome, leaving });
         return;
       }
       setState((current) => ({ ...current, outcome }));

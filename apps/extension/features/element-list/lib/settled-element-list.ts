@@ -8,24 +8,35 @@ export const SETTLE_MS = 300;
 export const SETTLE_TIMEOUT_MS = 3_000;
 const POLL_MS = 50;
 
+type SettleOptions = {
+  /**
+   * The nemu_ids (from `pageNemuIds`) of the page Rina is leaving. The new page settles only once
+   * its ids differ: a host SPA can change the URL while it still shows the old page, and that
+   * page's list would answer from the wrong page.
+   */
+  leaving?: string;
+  root?: Document;
+};
+
 /**
  * Collects the Element List once a page a click opened has finished loading: no `Skeleton` is
- * showing and the same nemu_ids have been on the page for `SETTLE_MS`. A page still loading its
- * data would otherwise send a list without the elements the answer needs.
+ * showing, the page is no longer the one being left, and the same nemu_ids have been on the page
+ * for `SETTLE_MS`. A page still loading its data would otherwise send a list without the elements
+ * the answer needs.
  */
 export async function collectSettledElementList(
   signal: AbortSignal,
-  root: Document = document,
+  { leaving, root = document }: SettleOptions = {},
 ): Promise<PageElement[]> {
   let last = "";
   let stableSince = Date.now();
 
   for (const startedAt = Date.now(); Date.now() - startedAt < SETTLE_TIMEOUT_MS;) {
-    const ids = nemuIdsOf(root);
+    const ids = pageNemuIds(root);
     if (ids !== last) {
       last = ids;
       stableSince = Date.now();
-    } else if (!isLoading(root) && Date.now() - stableSince >= SETTLE_MS) {
+    } else if (ids !== leaving && !isLoading(root) && Date.now() - stableSince >= SETTLE_MS) {
       break;
     }
     await new Promise((resolve) => setTimeout(resolve, POLL_MS));
@@ -34,7 +45,8 @@ export async function collectSettledElementList(
   return collectElementList(root);
 }
 
-function nemuIdsOf(root: Document): string {
+/** The page's nemu_ids in document order, as one comparable string. */
+export function pageNemuIds(root: Document = document): string {
   return Array.from(root.querySelectorAll<HTMLElement>("[data-nemu-id]"), (element) => {
     return element.dataset.nemuId ?? "";
   }).join(" ");

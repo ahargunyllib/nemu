@@ -8,6 +8,7 @@ const collector = vi.hoisted(() => vi.fn(async () => []));
 
 vi.mock("../../element-list/lib/settled-element-list", () => ({
   collectSettledElementList: collector,
+  pageNemuIds: () => document.body.dataset.page ?? "",
 }));
 
 beforeEach(() => {
@@ -39,6 +40,18 @@ describe("useLocationFollowUp", () => {
 
     expect(collector).toHaveBeenCalledOnce();
     expect(followUp).toHaveBeenCalledWith([]);
+  });
+
+  test("waits for the page it left to be replaced, not just for the new URL", async () => {
+    document.body.dataset.page = "task-klaim";
+    renderHook(() => useLocationFollowUp(session, vi.fn()));
+    await act(() => vi.advanceTimersByTimeAsync(200));
+
+    window.history.pushState(null, "", "/crm/TN-ENT-002");
+    await act(() => vi.advanceTimersByTimeAsync(200));
+
+    expect(collector).toHaveBeenCalledWith(expect.any(AbortSignal), { leaving: "task-klaim" });
+    delete document.body.dataset.page;
   });
 
   test("does nothing when there is no active guide", async () => {
