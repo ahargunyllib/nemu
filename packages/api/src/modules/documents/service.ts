@@ -1,6 +1,6 @@
 import type { DocumentFileStore } from "../../context";
 import type { WorkspaceId } from "../../workspace-ids";
-import { indexMarkdownDocument } from "./indexing";
+import { indexMarkdownDocument, pdfToMarkdown } from "./indexing";
 import type { DocumentRecord, DocumentRepository, NewKnowledgeChunkRecord } from "./repository";
 
 export type DocumentFormat = "pdf" | "md";
@@ -31,8 +31,7 @@ export function documentFormatOf(fileName: string): DocumentFormat | null {
   return null;
 }
 
-// Performs the cheap format checks before Markdown indexing. PDF validity is checked here too,
-// but PDF indexing stays explicitly unsupported rather than exposing an unindexed ready document.
+// Performs the cheap format checks before indexing.
 export function inspectDocumentFile(format: DocumentFormat, bytes: ArrayBuffer): string | null {
   if (bytes.byteLength === 0) return "The file is empty.";
 
@@ -68,12 +67,13 @@ export async function uploadDocument(
 
   let failureReason = inspectDocumentFile(format, bytes);
   let chunks: NewKnowledgeChunkRecord[] = [];
-  if (!failureReason && format === "md") {
+  if (!failureReason) {
     try {
-      chunks = indexMarkdownDocument(
-        { id, title, version },
-        new TextDecoder("utf-8", { fatal: true, ignoreBOM: false }).decode(bytes),
-      );
+      const markdown =
+        format === "pdf"
+          ? await pdfToMarkdown(bytes)
+          : new TextDecoder("utf-8", { fatal: true, ignoreBOM: false }).decode(bytes);
+      chunks = indexMarkdownDocument({ id, title, version }, markdown);
     } catch (error) {
       failureReason = error instanceof Error ? error.message : "The document could not be indexed.";
     }
@@ -87,10 +87,6 @@ export async function uploadDocument(
       console.error("Storing knowledge document file failed", error);
       failureReason = "The file could not be stored.";
     }
-  }
-
-  if (!failureReason && format === "pdf") {
-    failureReason = "PDF indexing is not supported yet.";
   }
 
   let document: DocumentRecord;
