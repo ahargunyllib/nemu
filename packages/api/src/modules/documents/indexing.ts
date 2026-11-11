@@ -1,4 +1,5 @@
 import { chunkKnowledgeDocument } from "@nemu/ai/chunking";
+import { extractText } from "unpdf";
 
 import type { NewKnowledgeChunkRecord } from "./repository";
 
@@ -34,4 +35,18 @@ export function indexMarkdownDocument(
     sequence,
     text: chunk.text,
   }));
+}
+
+/**
+ * Reads a PDF's text layer as Markdown, marking each page the way the knowledge sources do
+ * (`[Halaman N]`) so chunks keep their page numbers. A scanned PDF has no text layer.
+ */
+export async function pdfToMarkdown(bytes: ArrayBuffer): Promise<string> {
+  const { text } = await extractText(new Uint8Array(bytes.slice(0)), { mergePages: false });
+  if (!text.some((page) => page.trim())) {
+    throw new Error(
+      "The PDF has no text layer. Scanned PDFs need OCR, which is not supported yet.",
+    );
+  }
+  return text.map((page, index) => `[Halaman ${index + 1}]\n\n${page.trim()}`).join("\n\n");
 }

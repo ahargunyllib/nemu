@@ -4,6 +4,7 @@ import { basename, join } from "node:path";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 import type { DocumentFileStore } from "../../context";
+import { buildTextPdf } from "../../testing/pdf";
 import type { DocumentRecord, DocumentRepository, KnowledgeChunkRecord } from "./repository";
 import {
   MAX_DOCUMENT_BYTES,
@@ -164,22 +165,47 @@ describe("uploadDocument", () => {
     expect(await deps.documents.listActiveReadyChunks("W-TRAVEL")).toHaveLength(0);
   });
 
-  it("stores a valid PDF attachment while marking retrieval indexing unsupported", async () => {
+  it("indexes a PDF's text layer with the page and article each chunk came from", async () => {
     const { deps, objects } = createFakes();
+    const pdf = buildTextPdf([
+      [
+        "PERATURAN MENTERI KEUANGAN",
+        "Pasal 1",
+        "Dalam Peraturan Menteri ini yang dimaksud dengan:",
+      ],
+      ["Pasal 34", "(1) Pelaksana SPD mempertanggungjawabkan paling lambat 5 hari kerja."],
+    ]);
 
     const document = await uploadDocument(
       deps,
-      upload(new File(["%PDF-1.7\n..."], "PMK.pdf", { type: "application/pdf" })),
+      upload(new File([await pdf.arrayBuffer()], "PMK.pdf", { type: "application/pdf" })),
     );
 
-    expect(document).toMatchObject({
-      status: "failed",
-      format: "pdf",
-      failureReason: "PDF indexing is not supported yet.",
-    });
+    expect(document).toMatchObject({ status: "ready", format: "pdf", failureReason: null });
     expect(objects.size).toBe(1);
-    const stored = await readDocumentFile(deps, "W-TRAVEL", document.id);
-    expect(new TextDecoder().decode(stored?.body)).toBe("%PDF-1.7\n...");
+    const chunks = await deps.documents.listActiveReadyChunks("W-TRAVEL");
+    expect(chunks.map(({ page, article }) => [page, article])).toEqual([
+      [1, null],
+      [1, "1"],
+      [2, "34"],
+      [2, "34 ayat (1)"],
+    ]);
+    expect(chunks.at(-1)?.text).toContain("paling lambat 5 hari kerja");
+  });
+
+  it("records a scanned PDF without a text layer as failed", async () => {
+    const { deps, objects } = createFakes();
+    const pdf = buildTextPdf([[]]);
+
+    const document = await uploadDocument(
+      deps,
+      upload(new File([await pdf.arrayBuffer()], "scan.pdf", { type: "application/pdf" })),
+    );
+
+    expect(document).toMatchObject({ status: "failed", isActive: false });
+    expect(document.failureReason).toMatch(/no text layer.*OCR/u);
+    expect(objects.size).toBe(0);
+    expect(await deps.documents.listActiveReadyChunks("W-TRAVEL")).toHaveLength(0);
   });
 
   it("records a file that is not a real PDF as failed without storing it", async () => {

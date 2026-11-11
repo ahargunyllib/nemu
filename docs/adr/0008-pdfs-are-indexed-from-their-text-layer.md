@@ -1,0 +1,3 @@
+# PDFs are indexed from their text layer
+
+An uploaded PDF is indexed like Markdown: `unpdf` reads each page's text layer inside the Worker, the pages are joined with the same `[Halaman N]` markers the knowledge sources use, and the Markdown chunker splits them, so chunks keep their page, Pasal and ayat. This replaces the "PDF indexing is not supported" failure from ADR-0006. A PDF with no text layer (a scan) fails with a message that OCR is not supported; OCR would need a paid provider, which is wired in only once the user chooses one. Extraction runs inside the upload request, so a very large PDF can exceed the Worker's CPU limit; moving indexing to a queue is the next step if that happens.

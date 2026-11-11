@@ -132,6 +132,6 @@ Regenerate it after an approved source change with:
 pnpm --filter @nemu/ai seed:generate
 ```
 
-Admin-uploaded Markdown is indexed into the same `knowledge_document`/`knowledge_chunk` storage.
-Deactivating a document removes its chunks from the next request. PDF indexing deliberately fails
-with an explicit unsupported message until a provider is selected.
+Admin-uploaded Markdown and PDFs are indexed into the same `knowledge_document`/`knowledge_chunk`
+storage; a PDF is read from its text layer page by page (ADR-0008), and a scanned PDF fails with an
+explicit OCR-unsupported message. Deactivating a document removes its chunks from the next request.

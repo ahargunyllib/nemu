@@ -26,7 +26,8 @@ export default function DocumentUploadDialog() {
         <DialogHeader>
           <DialogTitle>Upload document</DialogTitle>
           <DialogDescription>
-            Add a knowledge document as PDF or Markdown. Nemu answers only from active documents.
+            Add a knowledge document as PDF or Markdown. Nemu answers only from active documents,
+            and a scanned PDF without a text layer can't be indexed.
           </DialogDescription>
         </DialogHeader>
         <DocumentUploadForm onUploaded={() => setOpen(false)}>
