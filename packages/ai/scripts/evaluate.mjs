@@ -249,8 +249,9 @@ async function runLiveEvaluation() {
       docId: document.id,
       title: document.title,
       version: document.version,
-      article: chunk.article ?? undefined,
-      section: chunk.section ?? undefined,
+      // As the server's toKnowledgeChunks does: a section heading stands in for a missing article,
+      // which is how the matrix and template sources ("Bagian 1. …", "TPL-BILL-02") resolve.
+      article: chunk.article ?? chunk.section ?? undefined,
       page: chunk.page ?? undefined,
       active: document.isActive,
       text: chunk.text,
