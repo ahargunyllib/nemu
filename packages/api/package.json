@@ -19,6 +19,7 @@
     "@orpc/openapi": "catalog:",
     "@orpc/server": "catalog:",
     "@orpc/zod": "catalog:",
+    "unpdf": "1.9.1",
     "zod": "catalog:"
   },
   "devDependencies": {
