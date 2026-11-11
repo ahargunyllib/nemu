@@ -46,7 +46,7 @@ one-follow-up-per-question limit.
 # Unit tests with mocked providers (offline, zero credits)
 pnpm --filter @nemu/ai test
 
-# Offline deterministic calculations evaluation (offline, zero credits)
+# Offline calculations, K2, and retrieval evaluation (offline, zero credits)
 pnpm --filter @nemu/ai eval:offline
 
 # Live, credit-consuming evaluation against real OpenRouter adapters
@@ -58,10 +58,13 @@ OPENROUTER_API_KEY=... pnpm --filter @nemu/ai eval:live:failed
 
 The unit test suite uses mocked provider responses and never spends API credits. `eval:offline`
 validates the six deterministic K1 calculations plus all ten evaluator-only K2 workflow cases and
-explicitly marks live-only checks as not run. `eval:live` first probes OpenRouter; unavailable DNS
-or networking is recorded as `live_not_run` rather than as a model failure. When reachable it
-invokes `runNemu()` against the real OpenRouter Decisions API
-(`typesafe/jev-1.13`) and Responses API (`openai/gpt-6.1-sol`), verifying:
+explicitly marks live-only checks as not run. It also scores keyword retrieval for the 20 official
+grounded questions against the chunks labelled in `scripts/retrieval-evaluation.mjs` (hit rate at
+1/3/5 and MRR) and fails below `RETRIEVAL_FLOOR`. CI runs it on every pull request.
+
+`eval:live` first probes OpenRouter; unavailable DNS or networking is recorded as `live_not_run`
+rather than as a model failure. When reachable it invokes `runNemu()` against the real OpenRouter
+Decisions API (`typesafe/jev-1.13`) and Responses API (`openai/gpt-6.1-sol`), verifying:
 
 - the AI-observable K1-01, K1-02, and K1-04 through K1-08 response requirements
 - three consecutive valid responses for each K1 flow

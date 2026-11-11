@@ -10,6 +10,7 @@ import {
   createJevDecider,
   createOpenRouterAnswerGenerator,
   lookupSbm,
+  retrieveKnowledge,
   runNemu,
 } from "../dist/index.js";
 import {
@@ -40,6 +41,11 @@ import {
 } from "./claim-evaluation.mjs";
 import { validateK2Case, validateK2Response } from "./claim-validators.mjs";
 import { parseEvaluationOptions } from "./evaluation-utils.mjs";
+import {
+  evaluateRetrieval,
+  RETRIEVAL_FLOOR,
+  RETRIEVAL_GOLD_CHUNKS,
+} from "./retrieval-evaluation.mjs";
 import { buildTelcoWorkspaceSeed } from "./workspace-seed-lib.mjs";
 
 const { isLive, selectedMoments } = parseEvaluationOptions(process.argv.slice(2));
@@ -702,6 +708,13 @@ const k2Results = Object.entries(buildK2EvaluationOutputs()).map(([id, output]) 
   return { id, ...validation };
 });
 
+const retrievalResults = evaluateRetrieval(decisionCases, RETRIEVAL_GOLD_CHUNKS, (question) =>
+  retrieveKnowledge(DEMO_KNOWLEDGE_CHUNKS, question, 5),
+);
+const retrievalFailure = Object.entries(RETRIEVAL_FLOOR).some(
+  ([metric, floor]) => retrievalResults[metric] < floor,
+);
+
 let liveResults = null;
 let jevResults = { status: "skipped", reason: "offline mode" };
 let liveNotRunReason = null;
@@ -731,6 +744,7 @@ const finalReport = {
     total_count: k2Results.length,
     results: k2Results,
   },
+  retrieval: { floor: RETRIEVAL_FLOOR, passed: !retrievalFailure, ...retrievalResults },
   ...(liveResults && isSelectiveMomentRun
     ? {
         models: liveResults.models,
@@ -877,6 +891,6 @@ if (liveResults) {
   }
 }
 
-if (calculationFailure || k2Failure || liveFailure) {
+if (calculationFailure || k2Failure || retrievalFailure || liveFailure) {
   process.exitCode = 1;
 }
