@@ -16,10 +16,10 @@ import { retrieveKnowledge, type KnowledgeChunk, type RankedKnowledgeChunk } fro
 import {
   executeClaimWorkflow,
   resolveClaimWorkflowScenario,
-  type ClaimSourceLocation,
   type ClaimWorkflowOutput,
   type SlaClaimContext,
 } from "./claim-workflows.js";
+import type { RuleSourceCitations, RuleSourceKey } from "./sources.js";
 import {
   calculateAccommodationLumpSum,
   calculateAccountabilityDeadline,
@@ -54,7 +54,6 @@ export type {
 } from "./claim-tools.js";
 export { executeClaimWorkflow, resolveClaimWorkflowScenario } from "./claim-workflows.js";
 export type {
-  ClaimSourceLocation,
   ClaimWorkflowFacts,
   ClaimWorkflowOutput,
   ClaimWorkflowScenario,
@@ -65,6 +64,15 @@ export type {
 export { createJevDecider } from "./jev.js";
 export type { JevDecider, JevDecision, JevDecisionInput } from "./jev.js";
 export { retrieveKnowledge } from "./knowledge.js";
+export {
+  defaultRuleSourceLocations,
+  isRuleSourceKey,
+  resolveRuleSources,
+  resolveSourceLocation,
+  RULE_SOURCES,
+  ruleSourceKeysFor,
+} from "./sources.js";
+export type { RuleSourceCitations, RuleSourceKey, SourceLocation } from "./sources.js";
 export type { KnowledgeChunk, RankedKnowledgeChunk } from "./knowledge.js";
 export { createOpenRouterAnswerGenerator } from "./openai.js";
 export type {
@@ -89,6 +97,7 @@ export type NemuContext = {
   processContext?: ProcessContext;
   slaClaim?: SlaClaimContext;
   knowledgeChunks: readonly KnowledgeChunk[];
+  ruleSources: RuleSourceCitations;
   sbmRows: readonly SbmRow[];
   holidays: readonly string[];
   requiredDocuments: readonly string[];
@@ -186,7 +195,7 @@ function runDeterministicTools(
       hasil: sbmRow.value,
       sumber: sbmRow.source,
     });
-    results.citationIds.push(sbmRow.sourceCitationId);
+    results.citationIds.push(ruleSourceCitation(context, "travel.sbm_lodging"));
     const dailyAllowanceRow = lookupSbm(
       context.sbmRows,
       province,
@@ -201,20 +210,14 @@ function runDeterministicTools(
         hasil: dailyAllowanceRow.value * days,
         sumber: dailyAllowanceRow.source,
       });
-      results.citationIds.push(dailyAllowanceRow.sourceCitationId);
+      results.citationIds.push(ruleSourceCitation(context, "travel.sbm_daily_allowance"));
     }
 
     results.calculations.push({
       ...calculateAccommodationLumpSum(sbmRow.value, nights),
       sumber: sbmRow.source,
     });
-    results.citationIds.push(
-      activeKnowledgeChunkId(context.knowledgeChunks, {
-        docId: "pmk-119-2023",
-        page: 6,
-        article: "8 ayat (5)",
-      }),
-    );
+    results.citationIds.push(ruleSourceCitation(context, "travel.accommodation_lump_sum"));
   }
 
   if (requiredTool === "accountability_deadline") {
@@ -226,13 +229,7 @@ function runDeterministicTools(
 
     const deadline = calculateAccountabilityDeadline(returnDate, context.holidays);
     results.calculations.push(deadline);
-    results.citationIds.push(
-      activeKnowledgeChunkId(context.knowledgeChunks, {
-        docId: "pmk-113-2012",
-        page: 9,
-        article: "34 ayat (1)",
-      }),
-    );
+    results.citationIds.push(ruleSourceCitation(context, "travel.accountability_deadline"));
     if (typeof deadline.hasil === "string") {
       results.calculations.push(
         calculateRemainingWorkingDays(context.currentDate, deadline.hasil, context.holidays),
@@ -247,39 +244,12 @@ function runDeterministicTools(
   return results;
 }
 
-function activeKnowledgeChunkId(
-  chunks: readonly KnowledgeChunk[],
-  location: { docId: string; page: number; article: string },
-): string {
-  const chunk = chunks.find(
-    (candidate) =>
-      candidate.active &&
-      candidate.docId === location.docId &&
-      candidate.page === location.page &&
-      candidate.article === location.article,
-  );
-  if (!chunk) {
-    throw new Error(`Missing active tool source at ${JSON.stringify(location)}`);
+function ruleSourceCitation(context: NemuContext, key: RuleSourceKey): string {
+  const chunkId = context.ruleSources[key];
+  if (!chunkId) {
+    throw new Error(`Rule source ${key} matches no active knowledge chunk`);
   }
-  return chunk.id;
-}
-
-function activeClaimSourceId(
-  chunks: readonly KnowledgeChunk[],
-  location: ClaimSourceLocation,
-): string {
-  const chunk = chunks.find(
-    (candidate) =>
-      candidate.active &&
-      candidate.docId === location.docId &&
-      (candidate.article === location.article ||
-        candidate.article?.startsWith(`${location.article}.`) ||
-        candidate.article?.startsWith(`${location.article} `)),
-  );
-  if (!chunk) {
-    throw new Error(`Missing active claim source at ${JSON.stringify(location)}`);
-  }
-  return chunk.id;
+  return chunkId;
 }
 
 function enforceTrustedWorkflowAnswer(
@@ -641,9 +611,7 @@ export async function runNemu(
       });
       toolResults.calculations.push(...claimOutput.calculations);
       toolResults.citationIds.push(
-        ...claimOutput.sourceLocations.map((location) =>
-          activeClaimSourceId(context.knowledgeChunks, location),
-        ),
+        ...claimOutput.sourceKeys.map((key) => ruleSourceCitation(context, key)),
       );
     }
   } catch {

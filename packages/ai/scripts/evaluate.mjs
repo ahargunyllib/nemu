@@ -9,7 +9,9 @@ import {
   checkHotelRate,
   createJevDecider,
   createOpenRouterAnswerGenerator,
+  defaultRuleSourceLocations,
   lookupSbm,
+  resolveRuleSources,
   retrieveKnowledge,
   runNemu,
 } from "../dist/index.js";
@@ -17,6 +19,7 @@ import {
   DEMO_HOLIDAYS_2026,
   DEMO_KNOWLEDGE_CHUNKS,
   DEMO_REQUIRED_DOCUMENTS,
+  DEMO_RULE_SOURCES,
   DEMO_SBM_ROWS,
   DEMO_USER_PROFILE,
 } from "../dist/demo.js";
@@ -226,6 +229,7 @@ async function runLiveEvaluation() {
   const sharedContext = {
     userProfile: DEMO_USER_PROFILE,
     knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    ruleSources: DEMO_RULE_SOURCES,
     sbmRows: DEMO_SBM_ROWS,
     holidays: DEMO_HOLIDAYS_2026,
     requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -427,6 +431,10 @@ async function runLiveEvaluation() {
             },
             slaClaim: testCase.claim,
             knowledgeChunks: telcoKnowledgeChunks,
+            ruleSources: resolveRuleSources(
+              telcoKnowledgeChunks,
+              defaultRuleSourceLocations("W-TELKO"),
+            ),
             sbmRows: [],
             holidays: [],
             requiredDocuments: [],

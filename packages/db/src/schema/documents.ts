@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 // Metadata for a knowledge document the admin uploads in the Admin Workspace.
 // The file itself lives in the DOCUMENTS R2 bucket under `storageKey`.
@@ -46,4 +46,24 @@ export const knowledgeChunk = sqliteTable(
     text: text("text").notNull(),
   },
   (table) => [index("knowledge_chunk_documentId_idx").on(table.documentId, table.sequence)],
+);
+
+// Where an admin points a deterministic rule's citation. A rule without a row cites its default
+// location from RULE_SOURCES in @nemu/ai.
+export const ruleSource = sqliteTable(
+  "rule_source",
+  {
+    workspaceId: text("workspace_id").notNull(),
+    key: text("key").notNull(),
+    documentId: text("document_id")
+      .notNull()
+      .references(() => knowledgeDocument.id, { onDelete: "cascade" }),
+    article: text("article"),
+    page: integer("page"),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.workspaceId, table.key] })],
 );

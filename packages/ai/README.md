@@ -107,9 +107,10 @@ key (ADR-0001).
 
 The live server builds a fresh runtime snapshot from database repositories for every request:
 the authenticated user's profile, active ready knowledge chunks, all five reference tables,
-holidays, and the Demo App's authoritative Process Instance context. Missing profile fields,
-tables, or active regulatory citations fail clearly; the server never falls back to the `DEMO_*`
-exports. Those exports remain offline test and evaluation fixtures only.
+holidays, the Demo App's authoritative Process Instance context, and the active chunk each Rule
+Source resolves to (ADR-0007). Missing profile fields or tables fail clearly, and a calculation
+whose Rule Source resolves to no active chunk returns the safe error; the server never falls back
+to the `DEMO_*` exports. Those exports remain offline test and evaluation fixtures only.
 
 For a `telco_sla` process context, the server selects only `W-TELKO` chunks and loads the claim,
 service, invoice, tickets, task deadline, and approval rules from typed repositories. The browser

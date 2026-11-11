@@ -24,6 +24,10 @@ _Avoid_: Tiruan App, AlurKerja App, web app
 The set of knowledge, Reference Tables, process data and users Nemu answers from for one case: `W-TRAVEL` (Perjalanan Dinas) or `W-TELKO` (Klaim SLA). A signed-in user belongs to one, and the Nemu Service reads only that one's data.
 _Avoid_: workspace (alone), tenant
 
+**Rule Source**:
+The document location (document, article or section, page) that a deterministic rule such as an SBM lookup or a claim cutoff cites. Each rule has a default; an admin can point it at a newer document.
+_Avoid_: citation mapping, source binding
+
 **AlurKerja tenant**:
 An organisation's own instance of the real AlurKerja SaaS. Out of scope for the MVP.
 _Avoid_: workspace

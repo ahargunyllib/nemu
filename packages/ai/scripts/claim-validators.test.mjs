@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { buildK2EvaluationOutputs, K2_EXPECTED_RESULTS } from "./claim-evaluation.mjs";
+import { RULE_SOURCES } from "../dist/sources.js";
 import { validateK2Case, validateK2Response } from "./claim-validators.mjs";
 
 const expected = K2_EXPECTED_RESULTS;
@@ -55,11 +56,13 @@ for (const [id, output] of Object.entries(buildK2EvaluationOutputs())) {
     const response = {
       status: id === "K2-10" ? "refuse" : "answer",
       answer: { ringkas: output.guidance.join(" ") || "Hasil klaim SLA." },
-      citations: output.sourceLocations.map((location) => ({
-        doc_id: location.docId,
-        judul: location.docId,
-        pasal: location.article,
-      })),
+      citations: output.sourceKeys
+        .map((key) => RULE_SOURCES[key].defaultLocation)
+        .map((location) => ({
+          doc_id: location.docId,
+          judul: location.docId,
+          pasal: location.article,
+        })),
       calc: output.calculations,
       actions: output.actions,
       ...(output.guide ? { guide: output.guide } : {}),

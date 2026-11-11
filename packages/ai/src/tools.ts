@@ -8,7 +8,6 @@ export type SbmRow = {
   grade: string;
   value: number;
   source: string;
-  sourceCitationId: string;
 };
 
 export type HotelRateCheck = {

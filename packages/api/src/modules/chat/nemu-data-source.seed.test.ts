@@ -140,6 +140,11 @@ function createSqliteDataSource(database: DatabaseSync) {
         };
       },
     },
+    ruleSources: {
+      async list() {
+        return [];
+      },
+    },
     currentDate: () => "2026-11-06",
   });
 }

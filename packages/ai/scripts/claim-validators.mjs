@@ -1,7 +1,13 @@
 import { isDeepStrictEqual } from "node:util";
 
+import { RULE_SOURCES } from "../dist/sources.js";
+
+function sourceLocations(output) {
+  return output.sourceKeys.map((key) => RULE_SOURCES[key].defaultLocation);
+}
+
 function source(output, docId, article) {
-  return output.sourceLocations.some(
+  return sourceLocations(output).some(
     (location) => location.docId === docId && location.article === article,
   );
 }
@@ -56,7 +62,7 @@ export function validateK2Case(id, output, expectedResults) {
           reason: "missing active cutoff source",
         },
         {
-          ok: !output.sourceLocations.some((item) => item.docId.endsWith("v0.9")),
+          ok: !sourceLocations(output).some((item) => item.docId.endsWith("v0.9")),
           reason: "inactive SOP cited",
         },
       ]);
