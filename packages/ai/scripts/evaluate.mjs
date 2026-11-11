@@ -642,6 +642,8 @@ async function runLiveEvaluation() {
       body: JSON.stringify({
         model: gptModel,
         reasoning: { effort: reasoningEffort },
+        // The production generator's cap; without one OpenRouter reserves 65,536 tokens per request.
+        max_output_tokens: 2_000,
         input: [
           {
             role: "user",
@@ -670,6 +672,7 @@ async function runLiveEvaluation() {
       name: c.name,
       passed,
       answer_snippet: answer.slice(0, 120),
+      ...(res.ok ? {} : { error: `HTTP ${res.status}: ${JSON.stringify(json).slice(0, 200)}` }),
     });
     console.log(`${c.id} (${c.name}): ${passed ? "PASS" : "FAIL"}`);
   }
