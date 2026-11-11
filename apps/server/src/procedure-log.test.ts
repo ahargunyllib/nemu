@@ -2,12 +2,13 @@ import { ORPCError } from "@orpc/server";
 import { createRequestLogger, initLogger } from "evlog";
 import { describe, expect, it, vi } from "vite-plus/test";
 
-import { recordProcedureError } from "./procedure-errors";
+import { recordProcedureError, recordProcedureName } from "./procedure-log";
 
 initLogger({ silent: true });
 
 function emitAfter(error: unknown) {
-  const log = createRequestLogger({ method: "POST", path: "/rpc/nemuChat" });
+  const log = createRequestLogger({ method: "POST", path: "/rpc/documents/upload" });
+  recordProcedureName(() => log, ["documents", "upload"]);
   recordProcedureError(() => log, error);
   return log.emit({ status: 500 });
 }
@@ -19,6 +20,7 @@ describe("recordProcedureError", () => {
     );
 
     expect(event).toMatchObject({
+      operation: "documents.upload",
       level: "error",
       error: { message: "Provider request failed with HTTP 402: Insufficient credits" },
     });

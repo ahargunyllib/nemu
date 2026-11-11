@@ -13,7 +13,7 @@ import { cors } from "hono/cors";
 
 import { createContext } from "./context";
 import { ENV } from "./env.server";
-import { recordProcedureError } from "./procedure-errors";
+import { recordProcedureError, recordProcedureName } from "./procedure-log";
 import { createAuth } from "./services";
 
 // Workers Logs indexes objects and maps console.error to the error level; the
@@ -23,6 +23,16 @@ initWorkersLogger({
 });
 
 const logProcedureError = (error: unknown) => recordProcedureError(useLogger, error);
+const nameProcedure = ({
+  path,
+  next,
+}: {
+  path: readonly string[];
+  next: () => Promise<unknown>;
+}) => {
+  recordProcedureName(useLogger, path);
+  return next();
+};
 
 const identifyUser = createAuthMiddleware((await createAuth()) as BetterAuthInstance, {
   exclude: ["/api/auth/**"],
@@ -56,10 +66,12 @@ export const apiHandler = new OpenAPIHandler(appRouter, {
     }),
   ],
   interceptors: [onError(logProcedureError)],
+  clientInterceptors: [nameProcedure],
 });
 
 export const rpcHandler = new RPCHandler(appRouter, {
   interceptors: [onError(logProcedureError)],
+  clientInterceptors: [nameProcedure],
 });
 
 app.use("/*", async (c, next) => {
