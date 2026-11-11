@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-29T01:45:27.341Z",
+  "generated_at": "2026-11-10T18:28:50.659Z",
   "source": "data/04_evaluasi from the team Drive package, version 1.0",
   "mode": "offline",
   "calculations": {
@@ -168,6 +168,240 @@
         "id": "K2-10",
         "passed": true,
         "reasons": []
+      }
+    ]
+  },
+  "retrieval": {
+    "floor": {
+      "hit_at_5": 1,
+      "mrr": 0.7
+    },
+    "passed": true,
+    "total_count": 20,
+    "hit_at_1": 0.55,
+    "hit_at_3": 0.8,
+    "hit_at_5": 1,
+    "mrr": 0.703,
+    "results": [
+      {
+        "id": "Q01",
+        "rank": 4,
+        "retrieved": [
+          "pmk-32-2025-page-15",
+          "pmk-32-2025-page-19",
+          "pmk-32-2025-page-85",
+          "sop-pd-01-section-4",
+          "pmk-32-2025-page-86"
+        ]
+      },
+      {
+        "id": "Q02",
+        "rank": 1,
+        "retrieved": [
+          "sop-pd-01-section-4",
+          "panduan-app-section-2",
+          "pmk-32-2025-page-54",
+          "pmk-113-2012-page-4-pasal-8-ayat-4",
+          "pmk-119-2023-page-6-pasal-8-ayat-4"
+        ]
+      },
+      {
+        "id": "Q03",
+        "rank": 1,
+        "retrieved": [
+          "pmk-32-2025-page-15",
+          "pmk-32-2025-page-19",
+          "pmk-32-2025-page-85",
+          "pmk-32-2025-page-53",
+          "sop-pd-01-section-4"
+        ]
+      },
+      {
+        "id": "Q04",
+        "rank": 1,
+        "retrieved": [
+          "pmk-32-2025-page-19",
+          "pmk-32-2025-page-15",
+          "pmk-32-2025-page-85",
+          "sop-pd-01-section-4",
+          "pmk-113-2012-page-8-pasal-29-ayat-2"
+        ]
+      },
+      {
+        "id": "Q05",
+        "rank": 1,
+        "retrieved": [
+          "sop-pd-01-section-4",
+          "pmk-113-2012-page-6-pasal-25-ayat-3",
+          "pmk-119-2023-page-8-pasal-27-ayat-4",
+          "pmk-119-2023-page-10-pasal-36d",
+          "panduan-app-section-3"
+        ]
+      },
+      {
+        "id": "Q06",
+        "rank": 1,
+        "retrieved": [
+          "sop-pd-01-section-4",
+          "panduan-app-section-3",
+          "pmk-113-2012-page-9-pasal-34-ayat-4",
+          "sop-pd-01-section-5",
+          "pmk-113-2012-page-9-pasal-34-ayat-2"
+        ]
+      },
+      {
+        "id": "Q07",
+        "rank": 5,
+        "retrieved": [
+          "panduan-app-section-3",
+          "sop-pd-01-section-4",
+          "pmk-32-2025-page-107",
+          "pmk-113-2012-page-9-pasal-34-ayat-2",
+          "pmk-119-2023-page-11-pasal-36d"
+        ]
+      },
+      {
+        "id": "Q08",
+        "rank": 5,
+        "retrieved": [
+          "pmk-32-2025-page-15",
+          "pmk-32-2025-page-19",
+          "pmk-32-2025-page-85",
+          "pmk-32-2025-page-86",
+          "pmk-119-2023-page-10-pasal-36c"
+        ]
+      },
+      {
+        "id": "Q09",
+        "rank": 1,
+        "retrieved": [
+          "sop-pd-01-section-4",
+          "sop-pd-01-section-5",
+          "panduan-app-section-1",
+          "panduan-app-section-3",
+          "pmk-113-2012-page-5-pasal-13-ayat-2"
+        ]
+      },
+      {
+        "id": "Q10",
+        "rank": 1,
+        "retrieved": [
+          "sop-pd-01-section-4",
+          "pmk-113-2012-page-8-pasal-27-ayat-2",
+          "pmk-119-2023-page-7-pasal-27-ayat-2",
+          "pmk-119-2023-page-9-pasal-36a-ayat-6",
+          "pmk-113-2012-page-2-pasal-1"
+        ]
+      },
+      {
+        "id": "Q11",
+        "rank": 4,
+        "retrieved": [
+          "sop-pd-01-section-4",
+          "pmk-113-2012-page-5-pasal-10-ayat-5",
+          "pmk-113-2012-page-4-pasal-10-ayat-5",
+          "pmk-113-2012-page-6-pasal-25-ayat-2",
+          "pmk-32-2025-page-53"
+        ]
+      },
+      {
+        "id": "Q12",
+        "rank": 1,
+        "retrieved": [
+          "sop-pd-01-section-4",
+          "pmk-32-2025-page-107",
+          "pmk-113-2012-page-8-pasal-33-ayat-2",
+          "pmk-32-2025-page-86",
+          "pmk-32-2025-document"
+        ]
+      },
+      {
+        "id": "Q13",
+        "rank": 2,
+        "retrieved": [
+          "sop-pd-01-section-4",
+          "pmk-32-2025-page-15",
+          "pmk-32-2025-page-53",
+          "pmk-119-2023-page-10-pasal-36c",
+          "pmk-113-2012-page-2-pasal-1"
+        ]
+      },
+      {
+        "id": "Q14",
+        "rank": 3,
+        "retrieved": [
+          "pmk-32-2025-page-107",
+          "sop-pd-01-section-4",
+          "pmk-119-2023-page-5-pasal-8-ayat-3",
+          "pmk-113-2012-page-4-pasal-10-ayat-5",
+          "pmk-113-2012-page-2-pasal-1"
+        ]
+      },
+      {
+        "id": "Q15",
+        "rank": 1,
+        "retrieved": [
+          "pmk-119-2023-page-6-pasal-8-ayat-3b",
+          "sop-pd-01-section-4",
+          "pmk-119-2023-page-3-pasal-1",
+          "pmk-113-2012-page-2-pasal-1",
+          "pmk-119-2023-page-9-pasal-36c"
+        ]
+      },
+      {
+        "id": "Q16",
+        "rank": 1,
+        "retrieved": [
+          "pmk-32-2025-document",
+          "pmk-32-2025-page-1",
+          "pmk-32-2025-page-2-pasal-1",
+          "pmk-32-2025-page-4",
+          "pmk-32-2025-page-62"
+        ]
+      },
+      {
+        "id": "Q17",
+        "rank": 2,
+        "retrieved": [
+          "sop-pd-01-section-4",
+          "sop-pd-01-section-3",
+          "panduan-app-section-1",
+          "sop-pd-01-section-5",
+          "panduan-app-section-2"
+        ]
+      },
+      {
+        "id": "Q18",
+        "rank": 2,
+        "retrieved": [
+          "pmk-32-2025-page-107",
+          "sop-pd-01-section-4",
+          "pmk-32-2025-page-86",
+          "pmk-32-2025-page-15",
+          "pmk-32-2025-page-19"
+        ]
+      },
+      {
+        "id": "Q19",
+        "rank": 1,
+        "retrieved": [
+          "pmk-32-2025-page-19",
+          "pmk-32-2025-page-15",
+          "pmk-32-2025-page-85",
+          "pmk-32-2025-page-86",
+          "panduan-app-section-2"
+        ]
+      },
+      {
+        "id": "Q20",
+        "rank": 3,
+        "retrieved": [
+          "pmk-113-2012-page-2-pasal-1",
+          "pmk-119-2023-page-3-pasal-1",
+          "pmk-113-2012-page-9-pasal-34-ayat-3",
+          "pmk-119-2023-page-11-pasal-36d",
+          "pmk-113-2012-page-9-pasal-34-ayat-2"
+        ]
       }
     ]
   },
