@@ -1849,3 +1849,37 @@ test("the OpenRouter Decisions adapter sends one Jev evaluation and parses confi
   assert.equal(decision.target, "menu-ajukan-perjalanan-dinas");
   assert.equal(decision.targetConfidence, 0.98);
 });
+
+test("an OpenRouter failure keeps the provider's reason in the error", async () => {
+  const decider = createJevDecider({
+    apiKey: "test-key",
+    model: "typesafe/jev-1.13",
+    fetchImplementation: async () =>
+      new Response(JSON.stringify({ error: { code: 402, message: "Insufficient credits" } }), {
+        status: 402,
+        headers: { "Content-Type": "application/json" },
+      }),
+  });
+
+  await assert.rejects(
+    decider({ prompt: momentOneRequest.prompt, url: momentOneRequest.url, elements: [] }),
+    new Error("Provider request failed with HTTP 402: Insufficient credits"),
+  );
+});
+
+test("an OpenRouter request that runs past its timeout says it timed out", async () => {
+  const decider = createJevDecider({
+    apiKey: "test-key",
+    model: "typesafe/jev-1.13",
+    timeoutMs: 5,
+    fetchImplementation: (_input, init) =>
+      new Promise((_resolve, reject) => {
+        init?.signal?.addEventListener("abort", () => reject(init.signal?.reason));
+      }),
+  });
+
+  await assert.rejects(
+    decider({ prompt: momentOneRequest.prompt, url: momentOneRequest.url, elements: [] }),
+    /Provider request timed out after 5ms/u,
+  );
+});

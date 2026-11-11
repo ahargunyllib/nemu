@@ -69,6 +69,10 @@ oRPC procedure -> service -> repository -> Drizzle / D1
 - Pass non-critical work (logging, delivery, callbacks) to the Worker's
   `waitUntil`, and handle and log its rejection.
 - Every promise is either awaited or passed to `waitUntil`.
+- Each request emits one evlog wide event to Workers Logs. A procedure's thrown
+  error is attached to it by the `onError` interceptor in `apps/server`, so let
+  errors propagate instead of logging them in the feature. A feature that also
+  records failures for admins (the Chat Log) does so and rethrows.
 
 ## Configuration and deployment
 

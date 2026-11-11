@@ -29,6 +29,19 @@ async function readBoundedText(response: Response, maxBytes: number): Promise<st
   return parts.join("");
 }
 
+// OpenRouter reports why a request failed as `{ error: { message } }`; keep that
+// reason so the Chat Log and Worker logs say more than the status code.
+function providerErrorDetail(responseText: string): string | undefined {
+  try {
+    const body = JSON.parse(responseText) as { error?: { message?: unknown } | string };
+    const message = typeof body.error === "string" ? body.error : body.error?.message;
+    if (typeof message === "string" && message.trim()) return message.trim();
+  } catch {
+    // Not JSON; fall back to the raw text below.
+  }
+  return responseText.trim().slice(0, 300) || undefined;
+}
+
 export async function fetchJson(
   url: string,
   init: RequestInit,
@@ -39,18 +52,31 @@ export async function fetchJson(
   } = {},
 ): Promise<unknown> {
   const fetchImplementation = options.fetchImplementation ?? fetch;
+  const timeoutMs = options.timeoutMs ?? 15_000;
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), options.timeoutMs ?? 15_000);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetchImplementation(url, { ...init, signal: controller.signal });
-    const responseText = await readBoundedText(
-      response,
-      options.maxResponseBytes ?? DEFAULT_MAX_RESPONSE_BYTES,
-    );
+    let response: Response;
+    let responseText: string;
+    try {
+      response = await fetchImplementation(url, { ...init, signal: controller.signal });
+      responseText = await readBoundedText(
+        response,
+        options.maxResponseBytes ?? DEFAULT_MAX_RESPONSE_BYTES,
+      );
+    } catch (error) {
+      if (controller.signal.aborted) {
+        throw new Error(`Provider request timed out after ${timeoutMs}ms`, { cause: error });
+      }
+      throw error;
+    }
 
     if (!response.ok) {
-      throw new Error(`Provider request failed with HTTP ${response.status}`);
+      const detail = providerErrorDetail(responseText);
+      throw new Error(
+        `Provider request failed with HTTP ${response.status}${detail ? `: ${detail}` : ""}`,
+      );
     }
 
     try {

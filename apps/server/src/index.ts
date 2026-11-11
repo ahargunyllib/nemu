@@ -5,19 +5,34 @@ import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
-import { initLogger } from "evlog";
 import { createAuthMiddleware, type BetterAuthInstance } from "evlog/better-auth";
-import { evlog, type EvlogVariables } from "evlog/hono";
+import { evlog, useLogger, type EvlogVariables } from "evlog/hono";
+import { initWorkersLogger } from "evlog/workers";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 
 import { createContext } from "./context";
 import { ENV } from "./env.server";
+import { recordProcedureError, recordProcedureName } from "./procedure-log";
 import { createAuth } from "./services";
 
-initLogger({
+// Workers Logs indexes objects and maps console.error to the error level; the
+// default logger prints colored text at info level, so errors were hard to find.
+initWorkersLogger({
   env: { service: "nemu-server" },
 });
+
+const logProcedureError = (error: unknown) => recordProcedureError(useLogger, error);
+const nameProcedure = ({
+  path,
+  next,
+}: {
+  path: readonly string[];
+  next: () => Promise<unknown>;
+}) => {
+  recordProcedureName(useLogger, path);
+  return next();
+};
 
 const identifyUser = createAuthMiddleware((await createAuth()) as BetterAuthInstance, {
   exclude: ["/api/auth/**"],
@@ -50,19 +65,13 @@ export const apiHandler = new OpenAPIHandler(appRouter, {
       schemaConverters: [new ZodToJsonSchemaConverter()],
     }),
   ],
-  interceptors: [
-    onError((error) => {
-      console.error(error);
-    }),
-  ],
+  interceptors: [onError(logProcedureError)],
+  clientInterceptors: [nameProcedure],
 });
 
 export const rpcHandler = new RPCHandler(appRouter, {
-  interceptors: [
-    onError((error) => {
-      console.error(error);
-    }),
-  ],
+  interceptors: [onError(logProcedureError)],
+  clientInterceptors: [nameProcedure],
 });
 
 app.use("/*", async (c, next) => {
