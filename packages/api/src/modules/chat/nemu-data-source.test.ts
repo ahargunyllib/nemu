@@ -153,6 +153,11 @@ function createDeps(): NemuRuntimeDataDeps {
           : undefined;
       },
     },
+    ruleSources: {
+      async list() {
+        return [];
+      },
+    },
     currentDate: () => "2026-11-06",
   };
 }
@@ -224,6 +229,7 @@ describe("Nemu runtime data source", () => {
     expect(snapshot.sbmRows).toEqual([]);
     expect(snapshot.holidays).toEqual([]);
     expect(snapshot.knowledgeChunks[0]?.article).toBe("2 ayat (1)");
+    expect(snapshot.ruleSources["telco.claim_cutoff"]).toBe("sop-claim-2-1");
   });
 
   test("loads the signed-in user's profile, active chunks, process context, and current date", async () => {
@@ -246,7 +252,7 @@ describe("Nemu runtime data source", () => {
     });
   });
 
-  test("adapts uploaded SBM tables and resolves every row to an active knowledge citation", async () => {
+  test("adapts uploaded SBM tables and resolves their rule sources to active chunks", async () => {
     const snapshot = await createNemuRuntimeDataSource(createDeps()).load("rina", request);
 
     expect(snapshot.sbmRows).toContainEqual({
@@ -255,7 +261,6 @@ describe("Nemu runtime data source", () => {
       grade: "III",
       value: 745_000,
       source: "PMK 32/2025 Lampiran I angka 30, hlm. 19",
-      sourceCitationId: "pmk32-page-19",
     });
     expect(snapshot.sbmRows).toContainEqual({
       province: "SULAWESI SELATAN",
@@ -263,7 +268,6 @@ describe("Nemu runtime data source", () => {
       grade: "*",
       value: 430_000,
       source: "PMK 32/2025 Lampiran I angka 28.1, hlm. 15",
-      sourceCitationId: "pmk32-page-15",
     });
     expect(snapshot.sbmRows).toContainEqual({
       province: "YOGYAKARTA - MAKASSAR",
@@ -271,24 +275,61 @@ describe("Nemu runtime data source", () => {
       grade: "ekonomi",
       value: 3_893_000,
       source: "PMK 32/2025 Lampiran II angka 17",
-      sourceCitationId: "pmk32-page-86",
     });
+    expect(snapshot.ruleSources["travel.sbm_lodging"]).toBe("pmk32-page-19");
+    expect(snapshot.ruleSources["travel.sbm_daily_allowance"]).toBe("pmk32-page-15");
     expect(snapshot.holidays).toEqual(["2026-11-10"]);
     expect(snapshot.requiredDocuments).toEqual(REQUIRED_ACCOUNTABILITY_DOCUMENTS);
   });
 
-  test("refuses a table citation after its active source document is deactivated", async () => {
+  test("drops a rule source once its cited chunk is no longer active", async () => {
     const deps = createDeps();
     let chunks = activeChunks;
     deps.documents.listActiveReadyChunks = async () => chunks;
     const source = createNemuRuntimeDataSource(deps);
 
-    expect((await source.load("rina", request)).knowledgeChunks).toHaveLength(4);
-    chunks = activeChunks.slice(0, 3);
-
-    await expect(source.load("rina", request)).rejects.toThrow(
-      "No active knowledge citation matches PMK 32/2025 page 86",
+    expect((await source.load("rina", request)).ruleSources["travel.sbm_lodging"]).toBe(
+      "pmk32-page-19",
     );
+    chunks = activeChunks.filter((chunk) => chunk.page !== 19);
+
+    const snapshot = await source.load("rina", request);
+    expect(snapshot.ruleSources["travel.sbm_lodging"]).toBeUndefined();
+    expect(snapshot.ruleSources["travel.sbm_daily_allowance"]).toBe("pmk32-page-15");
+  });
+
+  test("cites an uploaded document an admin chose as a rule source", async () => {
+    const uploadedId = "6f1d2c9e-0b7a-4f3e-9a51-2d8c4b7e1a30";
+    const deps = createDeps();
+    deps.documents.listActiveReadyChunks = async () => [
+      ...activeChunks,
+      {
+        id: `${uploadedId}-page-21`,
+        documentId: uploadedId,
+        documentTitle: "PMK 39 Tahun 2026 SBM TA 2027",
+        documentVersion: "TA 2027",
+        article: null,
+        section: null,
+        page: 21,
+        sequence: 0,
+        text: "Satuan biaya penginapan perjalanan dinas dalam negeri TA 2027.",
+      },
+    ];
+    deps.ruleSources.list = async (workspaceId) => [
+      {
+        workspaceId,
+        key: "travel.sbm_lodging",
+        documentId: uploadedId,
+        article: null,
+        page: 21,
+        updatedAt: new Date("2026-11-11T00:00:00Z"),
+      },
+    ];
+
+    const snapshot = await createNemuRuntimeDataSource(deps).load("rina", request);
+
+    expect(snapshot.ruleSources["travel.sbm_lodging"]).toBe(`${uploadedId}-page-21`);
+    expect(snapshot.ruleSources["travel.sbm_daily_allowance"]).toBe("pmk32-page-15");
   });
 
   test("reflects a reference-table update in the next request", async () => {

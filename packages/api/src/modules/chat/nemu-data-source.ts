@@ -1,15 +1,19 @@
-import type { KnowledgeChunk, NemuUserProfile, SbmRow, SlaClaimContext } from "@nemu/ai";
+import type { NemuUserProfile, RuleSourceCitations, SbmRow, SlaClaimContext } from "@nemu/ai";
+import type { KnowledgeChunk } from "@nemu/ai";
 import type { NemuRequest, NemuResponse, ProcessContext } from "@nemu/contracts";
 
 import type { NemuService } from "../../context";
 import { WORKSPACES } from "../../workspace-ids";
 
-import type { ActiveKnowledgeChunkRecord, DocumentRepository } from "../documents/repository";
+import { toKnowledgeChunks } from "../documents/knowledge-chunks";
+import type { DocumentRepository } from "../documents/repository";
 import type {
   ReferenceTableRecord,
   ReferenceTableRepository,
 } from "../reference-tables/repository";
 import { REFERENCE_TABLE_TYPES, type ReferenceTableType } from "../reference-tables/table-types";
+import type { RuleSourceRepository } from "../rule-sources/repository";
+import { resolveWorkspaceRuleSources } from "../rule-sources/service";
 
 export const REQUIRED_ACCOUNTABILITY_DOCUMENTS: readonly string[] = [
   "surat_tugas",
@@ -30,6 +34,7 @@ export type NemuRuntimeSnapshot = {
   userProfile: NemuUserProfile;
   processContext?: ProcessContext;
   knowledgeChunks: readonly KnowledgeChunk[];
+  ruleSources: RuleSourceCitations;
   sbmRows: readonly SbmRow[];
   holidays: readonly string[];
   requiredDocuments: readonly string[];
@@ -61,6 +66,7 @@ export type NemuRuntimeDataDeps = {
   profiles: { findById(userId: string): Promise<NemuProfileRecord | undefined> };
   documents: Pick<DocumentRepository, "listActiveReadyChunks">;
   tables: Pick<ReferenceTableRepository, "findByType">;
+  ruleSources: Pick<RuleSourceRepository, "list">;
   slaClaims?: {
     loadContext(workspaceId: string, claimId: string): Promise<SlaClaimContext>;
   };
@@ -85,55 +91,11 @@ function numberValue(row: StoredRow, column: string, table: ReferenceTableType):
   return value;
 }
 
-function normalize(value: string): string {
-  return value
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/gu, "")
-    .toLocaleLowerCase("id-ID")
-    .replace(/[^a-z0-9]+/gu, " ")
-    .trim();
-}
-
-function citationForPmk32(chunks: readonly ActiveKnowledgeChunkRecord[], page: number): string {
-  const chunk = chunks.find((candidate) => {
-    const title = normalize(candidate.documentTitle);
-    return title.includes("pmk 32") && title.includes("2025") && candidate.page === page;
-  });
-  if (!chunk) {
-    throw new Error(`No active knowledge citation matches PMK 32/2025 page ${page}`);
-  }
-  return chunk.id;
-}
-
-function adaptKnowledgeChunks(chunks: readonly ActiveKnowledgeChunkRecord[]): KnowledgeChunk[] {
-  return chunks.map((chunk) => ({
-    id: chunk.id,
-    docId: chunk.documentId,
-    title: chunk.documentTitle,
-    version: chunk.documentVersion,
-    ...((chunk.article ?? chunk.section)
-      ? { article: chunk.article ?? chunk.section ?? undefined }
-      : {}),
-    ...(chunk.page === null ? {} : { page: chunk.page }),
-    active: true,
-    text: chunk.text,
-  }));
-}
-
-function adaptSbmRows(
-  tables: ReadonlyMap<ReferenceTableType, ReferenceTableRecord>,
-  chunks: readonly ActiveKnowledgeChunkRecord[],
-): SbmRow[] {
+function adaptSbmRows(tables: ReadonlyMap<ReferenceTableType, ReferenceTableRecord>): SbmRow[] {
   const dailyType = "sbm2026_uang_harian_dalam_negeri";
   const lodgingType = "sbm2026_penginapan_dalam_negeri";
   const ticketType = "sbm2026_tiket_pesawat_pp_dalam_negeri";
   const transportType = "sbm2026_transport_terminal_bandara";
-  const sourceByPage = new Map([
-    [15, citationForPmk32(chunks, 15)],
-    [19, citationForPmk32(chunks, 19)],
-    [85, citationForPmk32(chunks, 85)],
-    [86, citationForPmk32(chunks, 86)],
-  ]);
 
   const daily = tables.get(dailyType)?.rows.flatMap((row): SbmRow[] => [
     {
@@ -142,7 +104,6 @@ function adaptSbmRows(
       grade: "*",
       value: numberValue(row, "luar_kota", dailyType),
       source: stringValue(row, "sumber", dailyType),
-      sourceCitationId: sourceByPage.get(15)!,
     },
   ]);
   const lodging = tables.get(lodgingType)?.rows.flatMap((row): SbmRow[] => {
@@ -152,7 +113,6 @@ function adaptSbmRows(
       province,
       component: "hotel" as const,
       source,
-      sourceCitationId: sourceByPage.get(19)!,
     };
     return [
       { ...common, grade: "IV", value: numberValue(row, "eselon_III_golongan_IV", lodgingType) },
@@ -169,7 +129,6 @@ function adaptSbmRows(
       province,
       component: "tiket_pesawat" as const,
       source: "PMK 32/2025 Lampiran II angka 17",
-      sourceCitationId: sourceByPage.get(86)!,
     };
     return [
       { ...common, grade: "bisnis", value: numberValue(row, "bisnis_pp", ticketType) },
@@ -183,7 +142,6 @@ function adaptSbmRows(
       grade: "*",
       value: numberValue(row, "besaran_per_orang_per_kali", transportType),
       source: stringValue(row, "sumber", transportType),
-      sourceCitationId: sourceByPage.get(85)!,
     },
   ]);
 
@@ -222,15 +180,18 @@ export function createNemuRuntimeDataSource(deps: NemuRuntimeDataDeps): NemuRunt
         if (!deps.slaClaims) {
           throw new Error("SLA claim data source is not configured");
         }
-        const [profile, chunks, slaClaim] = await Promise.all([
+        const [profile, chunks, ruleSources, slaClaim] = await Promise.all([
           deps.profiles.findById(userId),
           deps.documents.listActiveReadyChunks(workspaceId),
+          deps.ruleSources.list(workspaceId),
           deps.slaClaims.loadContext(workspaceId, request.process_context!.instance_id),
         ]);
+        const knowledgeChunks = toKnowledgeChunks(chunks);
         return {
           userProfile: requireProfile(profile, userId),
           processContext: request.process_context,
-          knowledgeChunks: adaptKnowledgeChunks(chunks),
+          knowledgeChunks,
+          ruleSources: resolveWorkspaceRuleSources(workspaceId, ruleSources, knowledgeChunks),
           sbmRows: [],
           holidays: [],
           requiredDocuments: [],
@@ -238,9 +199,10 @@ export function createNemuRuntimeDataSource(deps: NemuRuntimeDataDeps): NemuRunt
           slaClaim,
         };
       }
-      const [profile, chunks, ...storedTables] = await Promise.all([
+      const [profile, chunks, ruleSources, ...storedTables] = await Promise.all([
         deps.profiles.findById(userId),
         deps.documents.listActiveReadyChunks(workspaceId),
+        deps.ruleSources.list(workspaceId),
         ...REFERENCE_TABLE_TYPES.map((type) => deps.tables.findByType(type)),
       ]);
       const tables = new Map<ReferenceTableType, ReferenceTableRecord>();
@@ -249,6 +211,7 @@ export function createNemuRuntimeDataSource(deps: NemuRuntimeDataDeps): NemuRunt
         if (!table) throw new Error(`Missing required reference table: ${type}`);
         tables.set(type, table);
       }
+      const knowledgeChunks = toKnowledgeChunks(chunks);
       const holidayType = "kalender_libur_2026";
       const holidays = tables
         .get(holidayType)!
@@ -257,8 +220,9 @@ export function createNemuRuntimeDataSource(deps: NemuRuntimeDataDeps): NemuRunt
       return {
         userProfile: requireProfile(profile, userId),
         processContext: request.process_context,
-        knowledgeChunks: adaptKnowledgeChunks(chunks),
-        sbmRows: adaptSbmRows(tables, chunks),
+        knowledgeChunks,
+        ruleSources: resolveWorkspaceRuleSources(workspaceId, ruleSources, knowledgeChunks),
+        sbmRows: adaptSbmRows(tables),
         holidays,
         requiredDocuments: REQUIRED_ACCOUNTABILITY_DOCUMENTS,
         currentDate: await deps.currentDate(workspaceId),

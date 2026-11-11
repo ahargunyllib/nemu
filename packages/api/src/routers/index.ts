@@ -5,6 +5,7 @@ import { documentsRouter } from "../modules/documents/router";
 import { healthRouter } from "../modules/health/router";
 import { processInstancesRouter } from "../modules/process-instances/router";
 import { referenceTablesRouter } from "../modules/reference-tables/router";
+import { ruleSourcesRouter } from "../modules/rule-sources/router";
 import { slaClaimsRouter } from "../modules/sla-claims/router";
 
 export const appRouter = {
@@ -12,6 +13,7 @@ export const appRouter = {
   ...chatRouter,
   ...documentsRouter,
   ...referenceTablesRouter,
+  ...ruleSourcesRouter,
   ...processInstancesRouter,
   ...slaClaimsRouter,
 };

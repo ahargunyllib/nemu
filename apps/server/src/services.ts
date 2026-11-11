@@ -8,6 +8,7 @@ import {
 import { createNemuProfileRepository } from "@nemu/api/modules/chat/profile-repository";
 import { createDocumentRepository } from "@nemu/api/modules/documents/repository";
 import { createReferenceTableRepository } from "@nemu/api/modules/reference-tables/repository";
+import { createRuleSourceRepository } from "@nemu/api/modules/rule-sources/repository";
 import { createSlaClaimRepository } from "@nemu/api/modules/sla-claims/repository";
 import { getSlaClaimContext } from "@nemu/api/modules/sla-claims/service";
 import { createWorkspaceRepository } from "@nemu/api/modules/workspaces/repository";
@@ -87,6 +88,7 @@ function createAiNemuService(db: Database): NemuService {
     profiles: createNemuProfileRepository(db),
     documents: createDocumentRepository(db),
     tables: createReferenceTableRepository(db),
+    ruleSources: createRuleSourceRepository(db),
     slaClaims: {
       loadContext: (workspaceId, claimId) => getSlaClaimContext(slaClaims, workspaceId, claimId),
     },

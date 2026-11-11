@@ -35,7 +35,6 @@ const sbmRows = [
       grade: "IV",
       value: Number(row.eselon_III_golongan_IV),
       source: row.sumber,
-      sourceCitationId: "pmk-32-2025-page-19",
     },
     {
       province: row.provinsi,
@@ -43,7 +42,6 @@ const sbmRows = [
       grade: "III",
       value: Number(row.eselon_IV_golongan_III_II_I),
       source: row.sumber,
-      sourceCitationId: "pmk-32-2025-page-19",
     },
   ]),
   ...dailyAllowanceRows.map((row) => ({
@@ -52,7 +50,6 @@ const sbmRows = [
     grade: "*",
     value: Number(row.luar_kota),
     source: row.sumber,
-    sourceCitationId: "pmk-32-2025-page-15",
   })),
   ...ticketRows.flatMap((row) => [
     {
@@ -61,7 +58,6 @@ const sbmRows = [
       grade: "bisnis",
       value: Number(row.bisnis_pp),
       source: "PMK 32/2025 Lampiran II angka 17",
-      sourceCitationId: "pmk-32-2025-page-86",
     },
     {
       province: `${row.kota_asal} - ${row.kota_tujuan}`,
@@ -69,7 +65,6 @@ const sbmRows = [
       grade: "ekonomi",
       value: Number(row.ekonomi_pp),
       source: "PMK 32/2025 Lampiran II angka 17",
-      sourceCitationId: "pmk-32-2025-page-86",
     },
   ]),
   ...airportTransportRows.map((row) => ({
@@ -78,7 +73,6 @@ const sbmRows = [
     grade: "*",
     value: Number(row.besaran_per_orang_per_kali),
     source: row.sumber,
-    sourceCitationId: "pmk-32-2025-page-85",
   })),
 ];
 

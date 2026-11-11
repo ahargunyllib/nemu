@@ -4,6 +4,8 @@ import test from "node:test";
 import type { NemuRequest } from "@nemu/contracts";
 
 import {
+  defaultRuleSourceLocations,
+  resolveRuleSources,
   runNemu,
   type AnswerGenerator,
   type JevDecision,
@@ -196,6 +198,7 @@ test("K2 compensation reaches the response boundary with active exact citations"
     processContext: request("x", []).process_context,
     slaClaim: claim,
     knowledgeChunks: knowledge,
+    ruleSources: resolveRuleSources(knowledge, defaultRuleSourceLocations("W-TELKO")),
     sbmRows: [],
     holidays: [],
     requiredDocuments: [],
@@ -224,6 +227,7 @@ test("K2 cutoff cites v1 and never retrieves the inactive day-10 SOP", async () 
     userProfile,
     slaClaim: claim,
     knowledgeChunks: knowledge,
+    ruleSources: resolveRuleSources(knowledge, defaultRuleSourceLocations("W-TELKO")),
     sbmRows: [],
     holidays: [],
     requiredDocuments: [],
@@ -260,6 +264,7 @@ test("K2 missing RCA suppresses compensation at the full response boundary", asy
         ],
       },
       knowledgeChunks: knowledge,
+      ruleSources: resolveRuleSources(knowledge, defaultRuleSourceLocations("W-TELKO")),
       sbmRows: [],
       holidays: [],
       requiredDocuments: [],
@@ -282,6 +287,7 @@ test("K2 prohibited approval cannot produce any action", async () => {
     userProfile,
     slaClaim: claim,
     knowledgeChunks: knowledge,
+    ruleSources: resolveRuleSources(knowledge, defaultRuleSourceLocations("W-TELKO")),
     sbmRows: [],
     holidays: [],
     requiredDocuments: [],

@@ -4,6 +4,7 @@ import {
   GENERATED_SBM_ROWS,
 } from "./demo.generated.js";
 import type { NemuUserProfile } from "./openai.js";
+import { defaultRuleSourceLocations, resolveRuleSources } from "./sources.js";
 
 // Offline test/evaluation fixtures only. The production server loads the equivalent
 // profile, active chunks, reference tables, and holidays from database repositories.
@@ -16,6 +17,10 @@ export const DEMO_USER_PROFILE: NemuUserProfile = {
 };
 
 export const DEMO_KNOWLEDGE_CHUNKS = GENERATED_KNOWLEDGE_CHUNKS;
+export const DEMO_RULE_SOURCES = resolveRuleSources(
+  GENERATED_KNOWLEDGE_CHUNKS,
+  defaultRuleSourceLocations("W-TRAVEL"),
+);
 export const DEMO_SBM_ROWS = GENERATED_SBM_ROWS;
 export const DEMO_HOLIDAYS_2026 = GENERATED_HOLIDAYS_2026;
 

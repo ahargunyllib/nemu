@@ -156,9 +156,7 @@ test("K2-01 opens registration and guides the stored deadline and fields", () =>
   assert.equal(output.guide?.steps.length, 8);
   assert.equal(output.guide?.steps.at(-1)?.target, "button-kirim-klaim");
   assert.equal(output.facts.reviewDueOn, "2026-10-15");
-  assert.deepEqual(output.sourceLocations, [
-    { docId: "SOP-KLAIM-SLA-01-v1.0", article: "2 ayat (3)" },
-  ]);
+  assert.deepEqual(output.sourceKeys, ["telco.review_deadline"]);
 });
 
 test("K2-01 starts the open registration at Tanggal klaim diterima with a confirmed fill", () => {
@@ -200,7 +198,7 @@ test("K2-02 uses the 15th-day rule and highlights timely yes", () => {
   assert.equal(output.facts.cutoff?.deadline, "2026-10-15");
   assert.equal(output.facts.cutoff?.timely, true);
   assert.equal(output.actions[0]?.target, "opt-klaim-tepat-waktu-ya");
-  assert.equal(output.sourceLocations[0]?.article, "2 ayat (1)");
+  assert.equal(output.sourceKeys[0], "telco.claim_cutoff");
 });
 
 test("K2-03 guides CRM and returns the approved 99.50 percent addendum", () => {
@@ -209,7 +207,7 @@ test("K2-03 guides CRM and returns the approved 99.50 percent addendum", () => {
   assert.equal(output.facts.slaBasisPoints, 9_950);
   assert.equal(output.actions[0]?.type, "click");
   assert.equal(output.guide?.steps.length, 3);
-  assert.deepEqual(output.sourceLocations, [{ docId: "ADD-2026-02", article: "1" }]);
+  assert.deepEqual(output.sourceKeys, ["telco.sla_target"]);
 });
 
 test("K2-04 merges provider tickets, excludes approved customer power, and guides each Keputusan", () => {
@@ -295,10 +293,7 @@ test("K2-05 calculates Rp579167 and offers only a confirmed fill", () => {
       value: "579167",
     },
   ]);
-  assert.deepEqual(output.sourceLocations, [
-    { docId: "KON-2026-01", article: "4" },
-    { docId: "ADD-2026-02", article: "1" },
-  ]);
+  assert.deepEqual(output.sourceKeys, ["telco.compensation_formula", "telco.sla_target"]);
 });
 
 test("K2-06 selects both stored approvers above Rp500000", () => {
@@ -308,9 +303,7 @@ test("K2-06 selects both stored approvers above Rp500000", () => {
     "Sari Wulandari (Supervisor Billing)",
     "Hendra Gunawan (Manajer Billing Operations)",
   ]);
-  assert.deepEqual(output.sourceLocations, [
-    { docId: "MP-BILL-02-v1.0", article: "Bagian 1. Rute persetujuan" },
-  ]);
+  assert.deepEqual(output.sourceKeys, ["telco.approval_route"]);
 });
 
 test("K2-07 suppresses final amount and directs the missing RCA request", () => {
@@ -416,8 +409,5 @@ test("K2-10 never acts as an approver", () => {
   assert.equal(output.actions.length, 0);
   assert.equal(output.guide, undefined);
   assert.match(output.guidance.join(" "), /must refuse/iu);
-  assert.deepEqual(output.sourceLocations, [
-    { docId: "SOP-KLAIM-SLA-01-v1.0", article: "8 ayat (2)" },
-    { docId: "MP-BILL-02-v1.0", article: "Bagian 3. Ketentuan" },
-  ]);
+  assert.deepEqual(output.sourceKeys, ["telco.no_self_approval", "telco.approval_rules"]);
 });

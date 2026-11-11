@@ -18,6 +18,7 @@ import {
   DEMO_HOLIDAYS_2026,
   DEMO_KNOWLEDGE_CHUNKS,
   DEMO_REQUIRED_DOCUMENTS,
+  DEMO_RULE_SOURCES,
   DEMO_SBM_ROWS,
   DEMO_USER_PROFILE,
 } from "./demo.js";
@@ -28,8 +29,10 @@ import {
   checkHotelRate,
   createJevDecider,
   createOpenRouterAnswerGenerator,
+  defaultRuleSourceLocations,
   findMissingDocuments,
   lookupSbm,
+  resolveRuleSources,
   retrieveKnowledge,
   runNemu,
   type AnswerGenerator,
@@ -180,6 +183,7 @@ test("Moment 1 ignores an unrelated active process and opens a new request", asy
     userProfile: DEMO_USER_PROFILE,
     processContext: momentThreeRequest.process_context,
     knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    ruleSources: DEMO_RULE_SOURCES,
     sbmRows: DEMO_SBM_ROWS,
     holidays: DEMO_HOLIDAYS_2026,
     requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -245,6 +249,7 @@ test("Moment 1 takes precedence when other workflow controls are also visible", 
     const response = await runNemu(request, {
       userProfile: DEMO_USER_PROFILE,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: DEMO_HOLIDAYS_2026,
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -317,6 +322,7 @@ test("Moment 2 uses trusted workflow context when Jev returns a non-ideal decisi
     userProfile: DEMO_USER_PROFILE,
     processContext: momentTwoRequest.process_context,
     knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    ruleSources: DEMO_RULE_SOURCES,
     sbmRows: DEMO_SBM_ROWS,
     holidays: DEMO_HOLIDAYS_2026,
     requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -394,6 +400,7 @@ test("Moment 2 never fills a hidden or missing nominal target", async () => {
     const response = await runNemu(request, {
       userProfile: DEMO_USER_PROFILE,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: DEMO_HOLIDAYS_2026,
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -430,6 +437,7 @@ test("Moment 2 replaces an automatic-fill claim with trusted manual-entry guidan
     userProfile: DEMO_USER_PROFILE,
     processContext: momentTwoRequest.process_context,
     knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    ruleSources: DEMO_RULE_SOURCES,
     sbmRows: DEMO_SBM_ROWS,
     holidays: DEMO_HOLIDAYS_2026,
     requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -497,6 +505,7 @@ test("recognized start intent opens the safe menu even at low confidence", async
     {
       userProfile: DEMO_USER_PROFILE,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: [],
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -534,6 +543,7 @@ test("generic low-confidence actions remain highlights", async () => {
     {
       userProfile: DEMO_USER_PROFILE,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: [],
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -599,6 +609,7 @@ test("start intent on the request form guides its six required fields in order",
     {
       userProfile: DEMO_USER_PROFILE,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: [],
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -660,6 +671,7 @@ test("on the request form's first tab the guide points at the Jadwal tab for the
   const response = await runNemu(momentOneFollowUpRequest, {
     userProfile: DEMO_USER_PROFILE,
     knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    ruleSources: DEMO_RULE_SOURCES,
     sbmRows: DEMO_SBM_ROWS,
     holidays: [],
     requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -692,6 +704,7 @@ test("on the request form's Jadwal tab the guide goes on from the departure date
   const response = await runNemu(momentOneJadwalRequest, {
     userProfile: DEMO_USER_PROFILE,
     knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    ruleSources: DEMO_RULE_SOURCES,
     sbmRows: DEMO_SBM_ROWS,
     holidays: [],
     requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -750,6 +763,7 @@ test("submit-like targets are always returned as confirmations", async () => {
     {
       userProfile: DEMO_USER_PROFILE,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: [],
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -773,6 +787,7 @@ test("Moment 3 follow-up uses trusted workflow context when Jev returns a non-id
   const response = await runNemu(momentThreeFollowUpRequest, {
     userProfile: DEMO_USER_PROFILE,
     knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    ruleSources: DEMO_RULE_SOURCES,
     sbmRows: DEMO_SBM_ROWS,
     holidays: DEMO_HOLIDAYS_2026,
     requiredDocuments: [
@@ -860,6 +875,7 @@ test("accountability guidance uses the final control label from the current page
     {
       userProfile: DEMO_USER_PROFILE,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: DEMO_HOLIDAYS_2026,
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -906,6 +922,7 @@ test("accountability workflow never confirms a final control with a prohibited p
     {
       userProfile: DEMO_USER_PROFILE,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: DEMO_HOLIDAYS_2026,
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -958,6 +975,7 @@ test("workflow guidance includes missing accountability controls that are render
     {
       userProfile: DEMO_USER_PROFILE,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: DEMO_HOLIDAYS_2026,
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -1003,6 +1021,7 @@ test("prompt injection suppresses deterministic workflow actions", async () => {
   const response = await runNemu(momentThreeFollowUpRequest, {
     userProfile: DEMO_USER_PROFILE,
     knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    ruleSources: DEMO_RULE_SOURCES,
     sbmRows: DEMO_SBM_ROWS,
     holidays: DEMO_HOLIDAYS_2026,
     requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -1038,6 +1057,7 @@ test("dilarang decisions suppress deterministic workflow actions", async () => {
   const response = await runNemu(momentThreeFollowUpRequest, {
     userProfile: DEMO_USER_PROFILE,
     knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    ruleSources: DEMO_RULE_SOURCES,
     sbmRows: DEMO_SBM_ROWS,
     holidays: DEMO_HOLIDAYS_2026,
     requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -1069,6 +1089,7 @@ test("a failed Jev safety check suppresses deterministic workflow actions", asyn
   const response = await runNemu(momentThreeFollowUpRequest, {
     userProfile: DEMO_USER_PROFILE,
     knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    ruleSources: DEMO_RULE_SOURCES,
     sbmRows: DEMO_SBM_ROWS,
     holidays: DEMO_HOLIDAYS_2026,
     requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -1119,6 +1140,7 @@ test("Moment 3 highlights every visible missing accountability upload", async ()
     {
       userProfile: DEMO_USER_PROFILE,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: DEMO_HOLIDAYS_2026,
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -1160,6 +1182,7 @@ test("Moment 3 initial page keeps the task-navigation click", async () => {
   const response = await runNemu(momentThreeRequest, {
     userProfile: DEMO_USER_PROFILE,
     knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    ruleSources: DEMO_RULE_SOURCES,
     sbmRows: DEMO_SBM_ROWS,
     holidays: DEMO_HOLIDAYS_2026,
     requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -1209,6 +1232,7 @@ test("Moment 3 uses a bounded action label when the page label is at the request
     {
       userProfile: DEMO_USER_PROFILE,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: DEMO_HOLIDAYS_2026,
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -1260,6 +1284,7 @@ test("an empty workflow action list falls back to the safe generic target", asyn
     {
       userProfile: DEMO_USER_PROFILE,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: DEMO_HOLIDAYS_2026,
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -1306,6 +1331,7 @@ test("an unknown target never produces an action", async () => {
     {
       userProfile: DEMO_USER_PROFILE,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: [],
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -1352,6 +1378,7 @@ test("detected prompt injection disables every proposed action", async () => {
     {
       userProfile: DEMO_USER_PROFILE,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: [],
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -1396,6 +1423,7 @@ test("out-of-domain requests are refused without calling GPT", async () => {
     {
       userProfile: DEMO_USER_PROFILE,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: [],
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -1426,6 +1454,7 @@ test("a refused second request never inherits the first response's derived data"
   const sharedContext = {
     userProfile: DEMO_USER_PROFILE,
     knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    ruleSources: DEMO_RULE_SOURCES,
     sbmRows: DEMO_SBM_ROWS,
     holidays: DEMO_HOLIDAYS_2026,
     requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -1499,6 +1528,7 @@ test("missing SBM lookup input asks one clarification without calling GPT", asyn
   const response = await runNemu(request, {
     userProfile: DEMO_USER_PROFILE,
     knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    ruleSources: DEMO_RULE_SOURCES,
     sbmRows: DEMO_SBM_ROWS,
     holidays: [],
     requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -1526,19 +1556,19 @@ test("missing SBM lookup input asks one clarification without calling GPT", asyn
 });
 
 test("missing or inactive deterministic tool provenance returns the safe error response", async () => {
-  const inactiveCitationId = DEMO_KNOWLEDGE_CHUNKS.find((chunk) => !chunk.active)?.id;
-  assert.ok(inactiveCitationId);
+  const { "travel.sbm_lodging": _, ...withoutLodgingSource } = DEMO_RULE_SOURCES;
+  const inactiveLodgingSource = resolveRuleSources(DEMO_KNOWLEDGE_CHUNKS, {
+    ...defaultRuleSourceLocations("W-TRAVEL"),
+    "travel.sbm_lodging": { docId: "pmk-54-2026", page: 1 },
+  });
 
-  for (const sourceCitationId of ["missing-tool-source", inactiveCitationId]) {
+  for (const ruleSources of [withoutLodgingSource, inactiveLodgingSource]) {
     const response = await runNemu(momentTwoRequest, {
       userProfile: DEMO_USER_PROFILE,
       processContext: momentTwoRequest.process_context,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
-      sbmRows: DEMO_SBM_ROWS.map((row) =>
-        row.component === "hotel" && row.province === "SULAWESI SELATAN" && row.grade === "III"
-          ? { ...row, sourceCitationId }
-          : row,
-      ),
+      ruleSources,
+      sbmRows: DEMO_SBM_ROWS,
       holidays: [],
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
       currentDate: "2026-10-17",
@@ -1574,6 +1604,7 @@ test("untrusted rupiah amounts from GPT are rejected", async () => {
     userProfile: DEMO_USER_PROFILE,
     processContext: momentTwoRequest.process_context,
     knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+    ruleSources: DEMO_RULE_SOURCES,
     sbmRows: DEMO_SBM_ROWS,
     holidays: [],
     requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -1609,6 +1640,7 @@ test("a refusal on the lodging page carries no SBM calculations", async () => {
       userProfile: DEMO_USER_PROFILE,
       processContext: momentTwoRequest.process_context,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: [],
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,
@@ -1647,6 +1679,7 @@ test("a screenshot-only question receives active evidence for vision interpretat
       userProfile: DEMO_USER_PROFILE,
       processContext: momentTwoRequest.process_context,
       knowledgeChunks: DEMO_KNOWLEDGE_CHUNKS,
+      ruleSources: DEMO_RULE_SOURCES,
       sbmRows: DEMO_SBM_ROWS,
       holidays: [],
       requiredDocuments: DEMO_REQUIRED_DOCUMENTS,

@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import DocumentList from "@/features/documents/components/document-list";
 import DocumentUploadDialog from "@/features/documents/components/document-upload-dialog";
+import RuleSourceList from "@/features/rule-sources/components/rule-source-list";
 
 export const Route = createFileRoute("/_auth/documents")({
   component: RouteComponent,
@@ -18,6 +19,7 @@ function RouteComponent() {
         actions={<DocumentUploadDialog />}
       />
       <DocumentList />
+      <RuleSourceList />
     </>
   );
 }
