@@ -87,23 +87,28 @@ export async function resolveChatProcessContext(
 }
 
 // The process context comes from the Demo App's data, never from the extension.
+// Resolving it runs inside answerChat so a failure there still gets a Chat Log entry.
 export async function answerNemuChat(
   deps: ChatDeps & { processContexts: ChatProcessContextDeps },
   request: NemuRequest,
   actor: ChatActor,
 ): Promise<NemuResponse> {
-  const processContext = await resolveChatProcessContext(deps.processContexts, actor, request.url);
-  return answerChat(deps, { ...request, process_context: processContext }, actor.id);
+  return answerChat(deps, request, actor.id, async () => ({
+    ...request,
+    process_context: await resolveChatProcessContext(deps.processContexts, actor, request.url),
+  }));
 }
 
 type ChatOutcome = Pick<NewChatLogRecord, "status" | "result" | "citations" | "actions">;
 
 // Hands the request to the Responder as the signed-in user and writes one Chat Log
-// entry for it, including when the Responder fails or returns an invalid response.
+// entry for it, including when preparing the request fails, the Responder fails,
+// or it returns an invalid response.
 export async function answerChat(
   { nemu, chatLog }: ChatDeps,
   request: NemuRequest,
   userId: string,
+  prepare: () => Promise<NemuRequest> = async () => request,
 ): Promise<NemuResponse> {
   const startedAt = Date.now();
   const record = (outcome: ChatOutcome) =>
@@ -120,8 +125,9 @@ export async function answerChat(
 
   let response: NemuResponse;
   try {
+    const prepared = await prepare();
     response = nemuResponseSchema.parse(
-      await nemu.respond({ ...request, user_id: userId }, userId),
+      await nemu.respond({ ...prepared, user_id: userId }, userId),
     );
   } catch (error) {
     await record({

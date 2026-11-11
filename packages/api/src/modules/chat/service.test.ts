@@ -151,6 +151,32 @@ describe("answerNemuChat", () => {
     expect(loaded).toEqual([[SIGNED_IN_USER, momentTwoRequest.url]]);
     expect(received[0]?.process_context).toEqual(travelContext);
   });
+  it("writes an error entry when the process context cannot be read, then rethrows", async () => {
+    const { deps, entries } = createFakes();
+
+    await expect(
+      answerNemuChat(
+        {
+          ...deps,
+          processContexts: {
+            loadTravel: async () => undefined,
+            listSlaTasks: async () => [],
+            findSlaTaskByService: async () => undefined,
+            findSlaTaskByInvoice: async () => undefined,
+          },
+        },
+        { ...momentOneRequest, url: "https://demo.test/sla-claims/KLM-404" },
+        { id: SIGNED_IN_USER, workspaceId: "W-TELKO" },
+      ),
+    ).rejects.toThrow("SLA claim KLM-404 is not assigned");
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({
+      userId: SIGNED_IN_USER,
+      prompt: momentOneRequest.prompt,
+      status: "error",
+      result: `SLA claim KLM-404 is not assigned to user ${SIGNED_IN_USER}`,
+    });
+  });
 });
 
 describe("resolveChatProcessContext", () => {
