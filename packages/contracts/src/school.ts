@@ -222,7 +222,7 @@ export const screenElementSchema = z
   })
   .strict();
 
-/** What the screen-reader sends: never input values, nothing at all when a password field shows. */
+/** What the extension reads from the page when Nemu is called: never input values, nothing at all when a password field shows. */
 export const screenSnapshotSchema = z
   .object({
     title: z.string().max(500),
