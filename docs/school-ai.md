@@ -1,6 +1,8 @@
-# Nemu v2.2 school AI: integration guide
+# Nemu school AI: integration guide
 
-The AI side of Nemu v2.2 (AlurSekolah) as built for the MVP. It is for the fullstack side: what to call, in what order, and what you must enforce. The design is in `docs/AI_TECHNICAL_PRD.md`; the decisions are ADR-0009 to ADR-0012.
+> **PRD v2.3 (25 Nov) moved Nemu to a Chrome/Edge extension only.** This guide covers what is built (PR #192) with v2.3 adjustments. The F2-08, any-BPMN, F4 quiz and BPMN-export work still to come is planned in `docs/AI_TECHNICAL_PRD.md` §3–§8.
+
+The AI side of Nemu (AlurSekolah) as built for the MVP. It is for the fullstack side: what to call, in what order, and what you must enforce. The design is in `docs/AI_TECHNICAL_PRD.md`; the decisions are ADR-0009 to ADR-0012.
 
 Everything here runs on the synthetic school **SDIT Nusantara**. Replace the synthetic pieces listed at the end once the official `data-uji-mvp-v2` files are in hand.
 
@@ -72,13 +74,19 @@ All are oRPC procedures on the Nemu Service, gated to `W-SEKOLAH` sessions. Type
 
 ### F2: "Nemu, ini kenapa?"
 
-1. On F8 key-down, call `readActiveWindow()` from `@nemu/ai/desktop/reader` (below) while the teacher is still talking.
+1. When the teacher holds Ctrl+Space, the extension builds a page snapshot (`ScreenSnapshot` in `@nemu/contracts/school`):
+   - the page's title and URL, visible error and status texts, and controls with their accessible names and boxes;
+   - never input values, and `blocked: true` with no text when a password field is on the page;
+   - `screenshotBase64` stays `null`, because v2.3 reads the DOM.
 2. `helpExplain({snapshot, question: transcript})`:
-   - `matched`: the bubble shows `sentence`; **Kenapa?** shows `why`; **Sumber** opens `citation` (document, page, point).
-   - If `canSelfFix`, point at the element in `snapshot.elements` whose `name` is `guidedTarget`.
-   - Else open `waDraft` in WhatsApp with the snapshot's screenshot on the clipboard. **The teacher presses Kirim.**
+   - `matched`: the bubble shows `sentence`; **Kenapa?** shows `why`; **Sumber** opens `citation`.
+   - If `canSelfFix`, point at the element in `snapshot.elements` whose `name` is `guidedTarget` (way 2).
+   - Else open `https://web.whatsapp.com/send?phone=<waDraft.phone>&text=<waDraft.text>`, text only, no screenshot. **The teacher presses Kirim.**
    - `not_in_guide`: speak `sentence`; offer `waDraft` to the operator.
-   - `blocked`: a password is on screen; nothing was sent.
+   - `blocked`: a password is on the page; nothing was sent.
+3. Coming in v2.3:
+   - matching against the kamus **table** (WS-05) instead of PDF chunks;
+   - `explainMissingGrade` for "nilai tidak muncul" (F2-08: API check, BPMN trace, parent reply).
 
 ### F3: processes and recorded procedures
 
@@ -121,30 +129,6 @@ return c.body(null, 200);
 
 The same `messageId` enqueued twice (Meta retries) is one job. Don't reply in WhatsApp: each reply beyond the free tier costs about Rp357.
 
-## Screen reader (desktop main process)
-
-The code lives in `packages/ai/src/desktop/`. It is not a separate package: adding a workspace package made pnpm re-resolve peers and broke `mock-alurkerja`'s type-check. The Worker never imports it.
-
-```ts
-import { createScreenReader } from "@nemu/ai/desktop/reader";
-import { startUiaHost } from "@nemu/ai/desktop/windows-uia";
-import { createElectronCapture } from "@nemu/ai/desktop/electron";
-import { desktopCapturer, screen } from "electron";
-
-const uia = startUiaHost(); // one PowerShell host for the app's lifetime
-const reader = createScreenReader({
-  foregroundWindow: () => yourForegroundWindow(), // { title, bounds, processName } e.g. via get-windows
-  capture: createElectronCapture({ desktopCapturer, screen }),
-  accessibleText: () => uia.read(),
-  pageText: () => extensionBridge.getPageText(), // visible alerts and labels, never input values
-});
-// on F8 key-down:
-const snapshotPromise = reader.readActiveWindow();
-```
-
-- The overlay window must use `setContentProtection(true)`, so the dot and bubble never appear in the capture.
-- A password field (UIA `IsPassword` or `input[type=password]`) or a login/OTP title blocks the capture entirely.
-
 ## What the executor must enforce
 
 The AI never emits a press of Simpan, Kirim, Ajukan or Hapus: those are `human` steps or `requiresHumanAction`. The executor must refuse them independently (F0-08):
@@ -157,9 +141,9 @@ The AI never emits a press of Simpan, Kirim, Ajukan or Hapus: those are `human` 
 
 | Piece                                  | Where                                                                                    | Replace with                                                                                                                                                                    |
 | -------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Teacher profile, roster, contacts, KKM | `createDemoSchoolDirectory()` in `packages/api/src/modules/school/directory.ts`          | The AlurSekolah login data (L-02); implement the same `SchoolDirectory` port                                                                                                    |
+| Teacher profile, roster, contacts, KKM | `createDemoSchoolDirectory()` in `packages/api/src/modules/school/directory.ts`          | v2.3: teachers and contacts from the workspace (WS-06); roster and KKM from AlurSekolah API v1 (`/siswa`, `/nilai/rekap`); same `SchoolDirectory` port                          |
 | SOP Penilaian, Kamus Kendala           | Seed migration, documents `sop-penilaian-sdit-nusantara`, `kamus-kendala-sdit-nusantara` | Upload the official PDFs in Admin → Documents. Then re-point the four `school.*` Rule Sources at the new SOP (Admin → Documents → Rule Sources) and deactivate the seeded ones. |
-| Izin BPMN                              | `packages/ai/src/school/fixtures/pengajuan-izin-guru.bpmn` (tests only)                  | Upload `F3-1_pengajuan-izin-guru.bpmn`                                                                                                                                          |
+| Izin BPMN                              | `packages/ai/src/school/fixtures/pengajuan-izin-guru.bpmn` (tests only)                  | v2.3 dropped the leave case; use the SPP and tahfidz BPMN files from Javan when they arrive                                                                                     |
 | F1 eval truth                          | Synthetic page                                                                           | `pnpm --filter @nemu/ai eval:school -- --live --photo <F1-1 photo> --truth <truth.json>`                                                                                        |
 
 ## Known limits
@@ -167,4 +151,4 @@ The AI never emits a press of Simpan, Kirim, Ajukan or Hapus: those are `human` 
 - No live model call has been made yet (expired key). Prompts and schemas are tested against recorded shapes only.
 - Photo jobs are polled, not pushed (ADR-0011).
 - With OpenRouter TTS the word highlight is estimated, so it can drift by a few hundred ms (ADR-0012).
-- Windows UI Automation was written for Windows and unit-tested by its parser only; run it once on the demo laptop.
+- The desktop screen reader (Windows UI Automation, Electron capture) was removed in v2.3; the extension reads the page instead.
