@@ -115,3 +115,25 @@ _Avoid_: root cause, cause report
 **PERLU_BUKTI**:
 The result of a Klaim SLA calculation while an RCA is not yet approved: Nemu shows no final amount and asks for the RCA instead.
 _Avoid_: pending, unknown
+
+## Sekolah domain (Nemu v2.2)
+
+**W-SEKOLAH**:
+The Knowledge Workspace for Nemu v2.2 on AlurSekolah: the fictional SDIT Nusantara, with Bu Siti (teacher) and Pak Rizal (operator). See `docs/school-ai.md`.
+_Avoid_: school tenant
+
+**Photo Job**:
+One grade-book photo waiting to be read for a teacher, from WhatsApp or an upload. It lives in the `inbox` bucket until the teacher saves, at most a day.
+_Avoid_: upload, ticket
+
+**Verification Question**:
+One screen asking the teacher about a doubtful digit, a name spelled differently from the roster, or an S/I/A cell. Its options are never pre-selected.
+_Avoid_: confirmation, review
+
+**Kamus Kendala**:
+The school's error dictionary: what an error message means, whose fault it is, and who fixes it. Nemu answers "ini kenapa?" only from it.
+_Avoid_: FAQ, error list
+
+**Recorded Procedure**:
+Steps an operator recorded once ("cara Pak Rizal"), with demo values turned into parameters. Replayed without a model; save, send and submit steps stay the teacher's.
+_Avoid_: macro, script

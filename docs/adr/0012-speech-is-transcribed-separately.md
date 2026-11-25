@@ -1,0 +1,5 @@
+# Speech is transcribed as its own step, and TTS goes through OpenRouter
+
+The teacher's audio is transcribed with an OpenRouter speech-to-text model before any other call, because the bubble must show what Nemu heard (F0-04) and voice controls such as "berhenti" are matched in code on that text. Nemu's reply is spoken through OpenRouter's speech endpoint when a TTS model is configured; it returns audio only, so word timings for the highlight are estimated from the text and the client rescales them to the real audio length. With no TTS model configured, the client speaks the same text with the local OS voice (Microsoft Andika or Damayanti). Azure AI Speech, which returns exact word boundaries, is a separate paid provider and stays unwired until the team chooses it; Edge TTS is an unofficial endpoint against Microsoft's consumer terms and is not used.
+
+The defaults are Microsoft MAI models on OpenRouter: `microsoft/mai-transcribe-2` for speech-to-text (better on casual, mixed Indonesian–English speech than whisper, at about $0.10 per hour) and `microsoft/mai-voice-2.1-flash` with the `id-ID-Harper` voice for TTS, so speech needs no account beyond OpenRouter.
