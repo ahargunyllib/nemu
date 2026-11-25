@@ -1,7 +1,9 @@
+import type { SchoolAi } from "@nemu/ai/school/runtime";
 import type { Session } from "@nemu/auth";
 import type { NemuRequest, NemuResponse } from "@nemu/contracts";
 import type { Database } from "@nemu/db";
 
+import type { SchoolDirectory } from "./modules/school/directory";
 import type { WorkspaceId } from "./workspace-ids";
 
 export type NemuService = {
@@ -15,11 +17,24 @@ export type DocumentFileStore = {
   delete(key: string): Promise<void>;
 };
 
+// Short-lived photo jobs (R2 in the Worker with a 1-day lifecycle rule, a fake in tests).
+export type InboxFileStore = DocumentFileStore & {
+  list(prefix: string): Promise<string[]>;
+};
+
+/** Nemu v2.2 school services: the model seam (ADR-0001), the teacher directory, and the photo inbox. */
+export type SchoolServices = {
+  ai: SchoolAi;
+  directory: SchoolDirectory;
+  inbox: InboxFileStore;
+};
+
 export type Context = {
   session: Session | null;
   db: Database;
   nemu: NemuService;
   documentFiles: DocumentFileStore;
+  school: SchoolServices;
   /** Workspace-owned demo date (YYYY-MM-DD), shared by the Demo App and the AI. */
   demoDate: string;
 };

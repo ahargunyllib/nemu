@@ -4,12 +4,13 @@ import type { KnowledgeChunk } from "./knowledge.js";
 export type SourceLocation = { docId: string; article?: string; page?: number };
 
 type RuleSourceDefinition = {
-  workspaceId: "W-TRAVEL" | "W-TELKO";
+  workspaceId: "W-TRAVEL" | "W-TELKO" | "W-SEKOLAH";
   label: string;
   defaultLocation: SourceLocation;
 };
 
 const SOP_SLA = "SOP-KLAIM-SLA-01-v1.0";
+const SOP_PENILAIAN = "sop-penilaian-sdit-nusantara";
 
 /**
  * The document location each deterministic rule cites. The default points at the seeded
@@ -100,6 +101,26 @@ export const RULE_SOURCES = {
     workspaceId: "W-TELKO",
     label: "No approving your own claim",
     defaultLocation: { docId: SOP_SLA, article: "8 ayat (2)" },
+  },
+  "school.kkm": {
+    workspaceId: "W-SEKOLAH",
+    label: "KKM (remedial below it)",
+    defaultLocation: { docId: SOP_PENILAIAN, page: 2, article: "3.2" },
+  },
+  "school.remedial_cap": {
+    workspaceId: "W-SEKOLAH",
+    label: "Remedial limits",
+    defaultLocation: { docId: SOP_PENILAIAN, page: 2, article: "3.3" },
+  },
+  "school.input_deadline": {
+    workspaceId: "W-SEKOLAH",
+    label: "Grade input deadline",
+    defaultLocation: { docId: SOP_PENILAIAN, page: 3, article: "4.1" },
+  },
+  "school.absence_blank": {
+    workspaceId: "W-SEKOLAH",
+    label: "Absent students are left blank, not 0",
+    defaultLocation: { docId: SOP_PENILAIAN, page: 3, article: "4.3" },
   },
 } as const satisfies Record<string, RuleSourceDefinition>;
 

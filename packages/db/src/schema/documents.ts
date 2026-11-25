@@ -13,7 +13,7 @@ export const knowledgeDocument = sqliteTable(
     isActive: integer("is_active", { mode: "boolean" }).notNull(),
     status: text("status", { enum: ["ready", "failed"] }).notNull(),
     failureReason: text("failure_reason"),
-    format: text("format", { enum: ["pdf", "md"] }).notNull(),
+    format: text("format", { enum: ["pdf", "md", "bpmn", "procedure"] }).notNull(),
     fileName: text("file_name").notNull(),
     contentType: text("content_type").notNull(),
     sizeBytes: integer("size_bytes").notNull(),

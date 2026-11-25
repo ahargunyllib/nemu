@@ -1,14 +1,16 @@
 import type { DocumentFileStore } from "../../context";
 import type { WorkspaceId } from "../../workspace-ids";
-import { indexMarkdownDocument, pdfToMarkdown } from "./indexing";
+import { indexBpmnDocument, indexMarkdownDocument, pdfToMarkdown } from "./indexing";
 import type { DocumentRecord, DocumentRepository, NewKnowledgeChunkRecord } from "./repository";
 
-export type DocumentFormat = "pdf" | "md";
+/** What an admin can upload. "procedure" documents are created from recordings, not uploaded. */
+export type DocumentFormat = "pdf" | "md" | "bpmn";
 export const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
 
 const CONTENT_TYPES: Record<DocumentFormat, string> = {
   pdf: "application/pdf",
   md: "text/markdown; charset=utf-8",
+  bpmn: "application/xml; charset=utf-8",
 };
 
 export type DocumentDeps = {
@@ -28,6 +30,7 @@ export function documentFormatOf(fileName: string): DocumentFormat | null {
   const name = fileName.toLowerCase();
   if (name.endsWith(".pdf")) return "pdf";
   if (name.endsWith(".md") || name.endsWith(".markdown")) return "md";
+  if (name.endsWith(".bpmn") || name.endsWith(".bpmn20.xml")) return "bpmn";
   return null;
 }
 
@@ -42,9 +45,16 @@ export function inspectDocumentFile(format: DocumentFormat, bytes: ArrayBuffer):
 
   try {
     const text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: false }).decode(bytes);
+    if (format === "bpmn") {
+      return /<([a-z0-9]+:)?definitions[\s>]/iu.test(text)
+        ? null
+        : "The file is not a BPMN 2.0 XML file.";
+    }
     return text.trim() ? null : "The Markdown file has no content.";
   } catch {
-    return "The Markdown file is not valid UTF-8 text.";
+    return format === "bpmn"
+      ? "The BPMN file is not valid UTF-8 text."
+      : "The Markdown file is not valid UTF-8 text.";
   }
 }
 
@@ -69,11 +79,18 @@ export async function uploadDocument(
   let chunks: NewKnowledgeChunkRecord[] = [];
   if (!failureReason) {
     try {
-      const markdown =
-        format === "pdf"
-          ? await pdfToMarkdown(bytes)
-          : new TextDecoder("utf-8", { fatal: true, ignoreBOM: false }).decode(bytes);
-      chunks = indexMarkdownDocument({ id, title, version }, markdown);
+      if (format === "bpmn") {
+        chunks = await indexBpmnDocument(
+          { id, title, version },
+          new TextDecoder("utf-8").decode(bytes),
+        );
+      } else {
+        const markdown =
+          format === "pdf"
+            ? await pdfToMarkdown(bytes)
+            : new TextDecoder("utf-8", { fatal: true, ignoreBOM: false }).decode(bytes);
+        chunks = indexMarkdownDocument({ id, title, version }, markdown);
+      }
     } catch (error) {
       failureReason = error instanceof Error ? error.message : "The document could not be indexed.";
     }
