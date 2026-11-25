@@ -12,7 +12,7 @@ function helpDeps(context: AuthenticatedContext) {
 }
 
 export const helpRouter = {
-  /** F2: the screen-reader's snapshot (+ what the teacher said) → whose fault, who fixes it, WhatsApp draft. */
+  /** F2: the extension's page snapshot (+ what the teacher said) → whose fault, who fixes it, WhatsApp draft. */
   helpExplain: schoolProcedure
     .input(
       z.object({ snapshot: screenSnapshotSchema, question: z.string().trim().max(500).nullable() }),
