@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic stand-in for data-uji F3-1_pengajuan-izin-guru.bpmn (SDIT Nusantara, fictional).
+     Camunda 7 dialect, the format AlurKerja Studio is expected to export. Replace with the official file. -->
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  id="Definitions_IzinGuru" targetNamespace="http://alurkerja.com/bpmn">
+  <bpmn:collaboration id="Collab_IzinGuru">
+    <bpmn:participant id="Participant_Sekolah" name="SDIT Nusantara" processRef="Process_IzinGuru" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_IzinGuru" name="Pengajuan Izin Guru" isExecutable="true">
+    <bpmn:documentation>Alur pengajuan izin tidak masuk bagi guru SDIT Nusantara.</bpmn:documentation>
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Guru" name="Guru">
+        <bpmn:flowNodeRef>Start_Izin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_IsiFormIzin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_SuratDokter</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_UnggahSuratDokter</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Gabung</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Kepsek" name="Kepala Sekolah">
+        <bpmn:flowNodeRef>Task_PersetujuanKepsek</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Izin</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_Izin" name="Guru perlu izin">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_IsiFormIzin" name="Isi Form Izin" camunda:candidateGroups="guru">
+      <bpmn:documentation>Guru mengisi jenis izin, tanggal mulai, dan lama izin, lalu menekan Ajukan.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="jenis_izin" label="Jenis izin" type="enum">
+            <camunda:value id="sakit" name="Sakit (guru sendiri)" />
+            <camunda:value id="keperluan_keluarga" name="Keperluan keluarga" />
+            <camunda:value id="dinas_luar" name="Dinas luar" />
+            <camunda:value id="lainnya" name="Lainnya" />
+            <camunda:validation><camunda:constraint name="required" /></camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="tanggal_mulai" label="Tanggal" type="date">
+            <camunda:validation><camunda:constraint name="required" /></camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="lama_hari" label="Lama izin (hari)" type="long" defaultValue="1">
+            <camunda:validation><camunda:constraint name="required" /></camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="keterangan" label="Keterangan" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_SuratDokter" name="Perlu surat dokter?" default="Flow_TanpaSurat">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_PerluSurat</bpmn:outgoing>
+      <bpmn:outgoing>Flow_TanpaSurat</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_PerluSurat" name="Sakit lebih dari 1 hari" sourceRef="Gateway_SuratDokter" targetRef="Task_UnggahSuratDokter">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${jenis_izin == 'sakit' &amp;&amp; lama_hari &gt; 1}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_TanpaSurat" name="Tanpa surat dokter" sourceRef="Gateway_SuratDokter" targetRef="Gateway_Gabung" />
+    <bpmn:userTask id="Task_UnggahSuratDokter" name="Unggah Surat Dokter" camunda:candidateGroups="guru">
+      <bpmn:documentation>Izin sakit lebih dari 1 hari wajib melampirkan surat dokter.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="surat_dokter" label="Surat dokter" type="string">
+            <camunda:validation><camunda:constraint name="required" /></camunda:validation>
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_PerluSurat</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_Gabung">
+      <bpmn:incoming>Flow_TanpaSurat</bpmn:incoming>
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_PersetujuanKepsek" name="Persetujuan Kepala Sekolah" camunda:candidateGroups="kepsek">
+      <bpmn:documentation>Kepala sekolah menyetujui atau menolak izin.</bpmn:documentation>
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="End_Izin" name="Izin diputuskan">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="Start_Izin" targetRef="Task_IsiFormIzin" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_IsiFormIzin" targetRef="Gateway_SuratDokter" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_UnggahSuratDokter" targetRef="Gateway_Gabung" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Gateway_Gabung" targetRef="Task_PersetujuanKepsek" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_PersetujuanKepsek" targetRef="End_Izin" />
+  </bpmn:process>
+</bpmn:definitions>
