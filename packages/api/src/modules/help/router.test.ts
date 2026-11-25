@@ -1,0 +1,74 @@
+import { call } from "@orpc/server";
+import { describe, expect, it } from "vite-plus/test";
+
+import { createSchoolContext } from "../../testing/school";
+import { speechRouter } from "../speech/router";
+import { helpRouter } from "./router";
+
+const SNAPSHOT = {
+  title: "Ruang GTK - Pengelolaan Kinerja",
+  url: "https://ruang.gtk.example/kinerja",
+  texts: ["Data Perencanaan (SKP) belum bisa diajukan karena RHK atasan belum tersedia."],
+  elements: [],
+  screenshotBase64: null,
+  blocked: false,
+  blockedReason: null,
+};
+
+describe("F2 and school questions through the API (seeded kamus and SOP)", () => {
+  it("explains a kamus error with the fixer from the teacher's profile and a WhatsApp draft", async () => {
+    const context = await createSchoolContext();
+    const result = await call(
+      helpRouter.helpExplain,
+      { snapshot: SNAPSHOT, question: "Nemu, ini kenapa?" },
+      { context },
+    );
+    expect(result).toMatchObject({
+      status: "matched",
+      sentence: "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Ahmad (kepsek).",
+      citation: { docId: "kamus-kendala-sdit-nusantara", article: "K-01" },
+      waDraft: { phone: "6281200000001" },
+    });
+  });
+
+  it("answers the KKM from the SOP with page and point, and abstains on what the SOP doesn't cover", async () => {
+    const context = await createSchoolContext();
+    const kkm = await call(helpRouter.helpAsk, { question: "KKM nilai berapa?" }, { context });
+    expect(kkm).toMatchObject({
+      status: "answered",
+      citations: [{ docId: "sop-penilaian-sdit-nusantara", page: 2, article: "3.2" }],
+    });
+    await expect(
+      call(helpRouter.helpAsk, { question: "Cuti melahirkan berapa bulan?" }, { context }),
+    ).resolves.toEqual({
+      status: "not_in_guide",
+      answer: "Belum ada di panduan sekolah.",
+    });
+  });
+
+  it("'berhenti' is a control, recognized without the model", async () => {
+    const context = await createSchoolContext();
+    await expect(
+      call(helpRouter.helpRoute, { utterance: "berhenti" }, { context }),
+    ).resolves.toEqual({ kind: "control", control: "berhenti" });
+  });
+
+  it("speech: transcript for the bubble, and text + timings for the local voice when no TTS is configured", async () => {
+    const context = await createSchoolContext();
+    await expect(
+      call(speechRouter.speechTranscribe, { audioBase64: "UklGRg==", format: "wav" }, { context }),
+    ).resolves.toEqual({
+      text: "masukkan nilai UTS Matematika 4B",
+    });
+    const speech = await call(
+      speechRouter.speechSynthesize,
+      { text: "Silakan Ibu tekan Simpan." },
+      { context },
+    );
+    expect(speech).toMatchObject({
+      audioBase64: "",
+      text: "Silakan Ibu tekan Simpan.",
+      timing: "estimated",
+    });
+  });
+});

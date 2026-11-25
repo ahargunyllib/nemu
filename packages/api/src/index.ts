@@ -61,6 +61,14 @@ export const travelProcedure = protectedProcedure.use(requireWorkspaceAccess(WOR
 /** Klaim SLA procedures: only W-TELKO users reach them. */
 export const telcoProcedure = protectedProcedure.use(requireWorkspaceAccess(WORKSPACES.telco));
 
+/** Nemu v2.2 school procedures (AlurSekolah): only W-SEKOLAH users reach them. */
+export const schoolProcedure = protectedProcedure.use(requireWorkspaceAccess(WORKSPACES.school));
+
+/** School procedures for the operator (workspace admin), such as saving a recorded procedure. */
+export const schoolAdminProcedure = workspaceAdminProcedure.use(
+  requireWorkspaceAccess(WORKSPACES.school),
+);
+
 // The current reference-table schema contains travel-only SBM, city, and holiday data.
 export const travelAdminProcedure = workspaceAdminProcedure.use(
   requireWorkspaceAccess(WORKSPACES.travel),

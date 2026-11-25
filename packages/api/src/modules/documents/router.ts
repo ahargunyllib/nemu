@@ -27,7 +27,10 @@ const uploadDocumentInputSchema = z.object({
   isActive: z.boolean(),
   file: z
     .instanceof(File)
-    .refine((file) => documentFormatOf(file.name) !== null, "Upload a PDF or Markdown (.md) file")
+    .refine(
+      (file) => documentFormatOf(file.name) !== null,
+      "Upload a PDF, Markdown (.md) or BPMN (.bpmn) file",
+    )
     .refine((file) => file.size <= MAX_DOCUMENT_BYTES, "Upload a file no larger than 10 MB"),
 });
 

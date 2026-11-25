@@ -2,6 +2,7 @@
 export const WORKSPACES = {
   travel: "W-TRAVEL",
   telco: "W-TELKO",
+  school: "W-SEKOLAH",
 } as const;
 
 export type WorkspaceId = (typeof WORKSPACES)[keyof typeof WORKSPACES];

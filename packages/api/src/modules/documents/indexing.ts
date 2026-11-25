@@ -1,4 +1,5 @@
 import { chunkKnowledgeDocument } from "@nemu/ai/chunking";
+import { bpmnKnowledgeTexts, importBpmn } from "@nemu/ai/school/bpmn/graph";
 import { extractText } from "unpdf";
 
 import type { NewKnowledgeChunkRecord } from "./repository";
@@ -49,4 +50,26 @@ export async function pdfToMarkdown(bytes: ArrayBuffer): Promise<string> {
     );
   }
   return text.map((page, index) => `[Halaman ${index + 1}]\n\n${page.trim()}`).join("\n\n");
+}
+
+/**
+ * A BPMN process (F3-03) is indexed as one chunk per task or gateway, so answers and steps can cite
+ * "Pengajuan Izin Guru › Isi Form Izin". The XML itself stays in storage for the BPMN walk.
+ */
+export async function indexBpmnDocument(
+  document: IndexableDocument,
+  xml: string,
+): Promise<NewKnowledgeChunkRecord[]> {
+  const graph = await importBpmn(xml);
+  const texts = bpmnKnowledgeTexts(graph);
+  if (texts.length === 0) throw new Error("The BPMN process has no tasks.");
+  return texts.map((item, sequence) => ({
+    id: `${document.id}-task-${sequence + 1}`,
+    documentId: document.id,
+    article: item.article,
+    section: graph.name,
+    page: null,
+    sequence,
+    text: item.text,
+  }));
 }
