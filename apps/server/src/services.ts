@@ -1,5 +1,11 @@
 import { createJevDecider, createOpenRouterAnswerGenerator, runNemu } from "@nemu/ai";
-import type { DocumentFileStore, NemuService } from "@nemu/api/context";
+import { createFixtureSchoolAi, createSchoolAi, type SchoolAi } from "@nemu/ai/school/runtime";
+import type {
+  DocumentFileStore,
+  InboxFileStore,
+  NemuService,
+  SchoolServices,
+} from "@nemu/api/context";
 import { createFixtureNemuService } from "@nemu/api/modules/chat/fixture-responder";
 import {
   createNemuRuntimeDataSource,
@@ -9,6 +15,7 @@ import { createNemuProfileRepository } from "@nemu/api/modules/chat/profile-repo
 import { createDocumentRepository } from "@nemu/api/modules/documents/repository";
 import { createReferenceTableRepository } from "@nemu/api/modules/reference-tables/repository";
 import { createRuleSourceRepository } from "@nemu/api/modules/rule-sources/repository";
+import { createDemoSchoolDirectory } from "@nemu/api/modules/school/directory";
 import { createSlaClaimRepository } from "@nemu/api/modules/sla-claims/repository";
 import { getSlaClaimContext } from "@nemu/api/modules/sla-claims/service";
 import { createWorkspaceRepository } from "@nemu/api/modules/workspaces/repository";
@@ -103,4 +110,76 @@ function createAiNemuService(db: Database): NemuService {
       });
     },
   });
+}
+
+function createInboxFileStore(): InboxFileStore {
+  return {
+    async put(key, body, contentType) {
+      await ENV.INBOX.put(key, body, { httpMetadata: { contentType } });
+    },
+    async get(key) {
+      const object = await ENV.INBOX.get(key);
+      return object ? object.arrayBuffer() : null;
+    },
+    async delete(key) {
+      await ENV.INBOX.delete(key);
+    },
+    async list(prefix) {
+      const keys: string[] = [];
+      let cursor: string | undefined;
+      do {
+        const page = await ENV.INBOX.list({ prefix, cursor });
+        keys.push(...page.objects.map((object) => object.key));
+        cursor = page.truncated ? page.cursor : undefined;
+      } while (cursor);
+      return keys;
+    },
+  };
+}
+
+// Without a key every model-backed school call fails clearly; deterministic ones still work.
+function createKeylessSchoolAi(): SchoolAi {
+  const missing = async (): Promise<never> => {
+    throw new Error("OPENROUTER_API_KEY is not set; set it or use NEMU_RESPONDER=fixture");
+  };
+  return {
+    readGradePhoto: missing,
+    parseGradeExcel: (input) => createFixtureSchoolAi().parseGradeExcel(input),
+    explainError: missing,
+    answerGrounded: missing,
+    extractSlots: missing,
+    compileProcedure: missing,
+    transcribe: missing,
+    synthesize: missing,
+  };
+}
+
+function createSchoolAiFromEnv(): SchoolAi {
+  if (ENV.NEMU_RESPONDER === "fixture") return createFixtureSchoolAi();
+  if (!ENV.OPENROUTER_API_KEY) return createKeylessSchoolAi();
+  return createSchoolAi({
+    apiKey: ENV.OPENROUTER_API_KEY,
+    zdr: String(ENV.OPENROUTER_ZDR) === "true",
+    models: {
+      readA: ENV.OPENROUTER_SCHOOL_READ_A_MODEL,
+      readB: ENV.OPENROUTER_SCHOOL_READ_B_MODEL,
+      reread: ENV.OPENROUTER_SCHOOL_REREAD_MODEL,
+      text: ENV.OPENROUTER_SCHOOL_TEXT_MODEL,
+      transcription: ENV.OPENROUTER_STT_MODEL,
+      speech: ENV.OPENROUTER_TTS_MODEL ?? "",
+      speechVoice: ENV.OPENROUTER_TTS_VOICE ?? "",
+    },
+  });
+}
+
+/**
+ * Nemu v2.2 school services. The directory is the synthetic SDIT Nusantara until the AlurSekolah
+ * login (L-02) supplies real teacher profiles and rosters.
+ */
+export function createSchoolServices(): SchoolServices {
+  return {
+    ai: createSchoolAiFromEnv(),
+    directory: createDemoSchoolDirectory(),
+    inbox: createInboxFileStore(),
+  };
 }

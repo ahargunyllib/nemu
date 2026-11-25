@@ -6,6 +6,7 @@ import {
   createAuth,
   createDocumentFileStore,
   createNemuService,
+  createSchoolServices,
   getDb,
   getWorkspaceDemoDate,
 } from "./services";
@@ -27,6 +28,7 @@ export async function createContext({ context }: CreateContextOptions): Promise<
     session,
     nemu: createNemuService(db),
     documentFiles: createDocumentFileStore(),
+    school: createSchoolServices(),
     demoDate: await getWorkspaceDemoDate(db, workspaceId),
   };
 }
