@@ -5,6 +5,8 @@ import { currentSiteConfig } from "../features/allowed-sites/api/site-config";
 import { syncAddedSiteScripts } from "../features/allowed-sites/api/site-scripts";
 import { identifyTeacher } from "../features/identity/api/identify-teacher";
 import { askNemu } from "../features/nemu-button/api/ask-nemu";
+import { cancelRecording, startRecording } from "../features/voice/api/microphone";
+import { synthesizeSentence, transcribeRecording } from "../features/voice/api/speech";
 import { isNemuMessage, type NemuMessage } from "../shared/lib/messages";
 
 async function handle(message: NemuMessage, senderUrl: string | undefined) {
@@ -17,6 +19,14 @@ async function handle(message: NemuMessage, senderUrl: string | undefined) {
       return identifyTeacher(message.pageEmail);
     case "nemu:ask":
       return askNemu(message);
+    case "nemu:listen-start":
+      return startRecording();
+    case "nemu:listen-stop":
+      return transcribeRecording(message.pageEmail);
+    case "nemu:listen-cancel":
+      return cancelRecording();
+    case "nemu:speak":
+      return synthesizeSentence(message.pageEmail, message.text);
   }
 }
 
@@ -42,6 +52,8 @@ export default defineBackground(() => {
   browser.runtime.onStartup.addListener(syncScripts);
   browser.runtime.onInstalled.addListener(({ reason }) => {
     syncScripts();
-    if (reason === "install") void browser.runtime.openOptionsPage();
+    // The welcome page asks for the microphone once and leads on to the settings page.
+    if (reason === "install")
+      void browser.tabs.create({ url: browser.runtime.getURL("/welcome.html") });
   });
 });

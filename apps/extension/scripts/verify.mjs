@@ -1,6 +1,7 @@
-// Loads a production build of the extension into Playwright's Chromium and checks #199 end to
-// end: the install code, the Nemu button on allowed sites only, identity from the page email, and
-// a typed question answered through helpRoute. Needs `NEMU_RESPONDER=fixture pnpm dev` running.
+// Loads a production build of the extension into Playwright's Chromium and checks #199 and #200 end
+// to end: the install code, the Nemu button on allowed sites only, identity from the page email, a
+// typed question answered through helpRoute, and holding Ctrl + Space (or the Nemu button) to talk
+// with a fake microphone. Needs `NEMU_RESPONDER=fixture pnpm dev` running.
 // Screenshots go to .output/verify/. Every URL can be overridden, e.g. to use the deployed mocks:
 //   MOCK_ALURSEKOLAH_URL=https://nemu-alursekolah.ahargunyllib.dev/ pnpm --filter extension verify
 import { execFileSync } from "node:child_process";
@@ -35,6 +36,11 @@ async function check(name, run) {
     console.log(`✔ ${name}`);
   } catch (error) {
     failed = true;
+    // What each open tab showed when the check failed.
+    for (const [index, open] of context.pages().entries())
+      await open
+        .screenshot({ path: join(shots, `failed-${name.slice(0, 24)}-${index}.png`) })
+        .catch(() => undefined);
     console.log(`✘ ${name}\n  ${error instanceof Error ? error.message.split("\n")[0] : error}`);
   }
 }
@@ -46,7 +52,13 @@ const context = await chromium.launchPersistentContext(mkdtempSync(join(tmpdir()
   headless: !HEADED,
   channel: "chromium",
   viewport: { width: 1280, height: 800 },
-  args: [`--disable-extensions-except=${extension}`, `--load-extension=${extension}`],
+  args: [
+    `--disable-extensions-except=${extension}`,
+    `--load-extension=${extension}`,
+    // A fake microphone that plays a tone, with its permission prompt answered "Izinkan".
+    "--use-fake-ui-for-media-stream",
+    "--use-fake-device-for-media-stream",
+  ],
 });
 const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
 const extensionId = new URL(worker.url()).host;
@@ -104,6 +116,55 @@ await check(
     await page.screenshot({ path: join(shots, "answer.png") });
   },
 );
+
+await check("the welcome page asks for the microphone once", async () => {
+  const welcome = await context.newPage();
+  await welcome.goto(`chrome-extension://${extensionId}/welcome.html`);
+  // The fake-UI flag may have granted it already; otherwise the button asks.
+  const allow = welcome.getByRole("button", { name: "Izinkan mikrofon" });
+  const ready = welcome.getByText("Mikrofon siap.", { exact: false });
+  await allow.or(ready).first().waitFor();
+  if (await allow.isVisible()) await allow.click();
+  await ready.waitFor();
+  await welcome.screenshot({ path: join(shots, "welcome.png"), fullPage: true });
+  await welcome.close();
+});
+
+// The fixture school AI hears "masukkan nilai UTS Matematika 4B" whatever the microphone gives.
+const HEARD = "masukkan nilai UTS Matematika 4B";
+const heardBubble = (target) => overlay(target).getByRole("region", { name: "Yang Nemu dengar" });
+
+await check(
+  "holding Ctrl + Space shows Nemu mendengar…, then what Nemu heard, then speaks the answer",
+  async () => {
+    await page.bringToFront();
+    await page.locator("body").click({ position: { x: 5, y: 5 } });
+    await page.keyboard.down("Control");
+    await page.keyboard.down("Space");
+    await overlay(page).getByText("Nemu mendengar…").waitFor({ timeout: 5_000 });
+    await page.waitForTimeout(1_000);
+    await page.screenshot({ path: join(shots, "listening.png") });
+    await page.keyboard.up("Space");
+    await page.keyboard.up("Control");
+    await heardBubble(page).getByText(HEARD).waitFor({ timeout: 15_000 });
+    await bubble(page).getByText("Nemu belum bisa mengisi nilai").waitFor({ timeout: 15_000 });
+    await bubble(page).locator("[data-nemu-spoken]").first().waitFor({ timeout: 5_000 });
+    await page.waitForTimeout(1_200);
+    await page.screenshot({ path: join(shots, "speaking.png") });
+  },
+);
+
+await check("pressing and holding the Nemu button talks too", async () => {
+  await page.keyboard.press("Escape");
+  const box = await nemuButton(page).boundingBox();
+  expect(box, "the Nemu button has no box");
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await overlay(page).getByText("Nemu mendengar…").waitFor({ timeout: 5_000 });
+  await page.waitForTimeout(800);
+  await page.mouse.up();
+  await heardBubble(page).getByText(HEARD).waitFor({ timeout: 15_000 });
+});
 
 await check("switching to an unregistered account shows the operator to contact", async () => {
   await signIn("rizal.operator");

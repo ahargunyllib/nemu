@@ -30,8 +30,26 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
 - **Answers.** The background sends the question to `helpRoute`. Questions about school rules go to
   `helpAsk`, "ini kenapa?" to `helpExplain` with the page's visible text (never input values, and
   nothing while a password field shows), and "berhenti" closes the bubble. Grade entry and
-  processes say they aren't available from the type box yet: voice is #200 and the executor #202. The "Tahan Ctrl + Spasi untuk bicara" hint is shown, but holding the
-  keys does nothing until #200.
+  processes say they aren't available yet: that is the executor, #202.
+- **Talking (#200).** Hold **Ctrl + Spasi** on an allowed page, or press and hold the Nemu button,
+  and speak: Nemu shows a red dot and "Nemu mendengar…". On release the recording goes to
+  `speechTranscribe` as 16 kHz mono WAV, the heard text shows in a small bubble, and then it goes
+  to `helpRoute` like a typed question. The microphone runs in an offscreen document
+  (`entrypoints/offscreen`), so its permission belongs to the extension: the welcome page that
+  opens after install asks for it once, and a hold without it opens that page again. Holds under
+  300 ms send nothing; recordings stop at 15 s. The combination will come from WS-08 (#212); until
+  then it is `TALK_SHORTCUT` in `features/voice/lib/talk-shortcut.ts`.
+- **Nemu's voice (#200).** Nemu speaks the first sentence of every answer through
+  `speechSynthesize`, and the Gelembung Jawab marks the word being spoken. Estimated timings are
+  rescaled to the real audio length. When the service sends no audio (the fixture responder, or no
+  TTS model), or the page refuses to play it, the local `id-ID` voice speaks at 0.85×. Clicking the text, or saying
+  "ulangi", repeats it; opening **Kenapa?** or **Sumber** reads that text aloud.
+- **Short commands (F0-15).** Holding the combination while Nemu speaks or works pauses it and
+  listens for "pelan", "ulangi", "ajari saya", "lanjut" or "berhenti". They go out on
+  `voiceCommands` (`features/voice/stores/voice-commands.ts`) as `pause`, then one `command` or
+  `resume`. Nemu's voice handles them already; the executor (#202) subscribes there and calls
+  `voiceCommands.setWorking(true)` while it runs steps. While only the voice was speaking, anything
+  that isn't a short command is a new question.
 - **Display types (#201).** Everything Nemu shows is one of the five display types from
   `@nemu/ui/nemu/*`, one at a time (`docs/design-system.md`). An answer is a Gelembung Jawab
   whose sources sit behind its **Sumber** link. In a dev build, `?pratinjau-nemu` on an allowed
@@ -56,10 +74,12 @@ new zip and click the reload icon on the extension card.
    `OPENROUTER_API_KEY` (`docs/school-ai.md`).
 2. Load the extension unpacked: open `chrome://extensions` (or `edge://extensions`), turn on
    **Developer mode**, click **Load unpacked**, and pick `apps/extension/.output/chrome-mv3-dev`.
-3. The settings page opens on install. Enter `NEMU-SDITN-2026` and press **Simpan**.
+3. The welcome page opens on install. Press **Izinkan mikrofon**, then **Buka pengaturan Nemu**,
+   enter `NEMU-SDITN-2026` and press **Simpan**.
 4. Open <http://localhost:3003>, sign in as `siti.aminah` (password `nemu-uji-2026`), click the
-   Nemu button, and ask "KKM nilai berapa?". Sign in as `rizal.operator` to see the unregistered
-   message.
+   Nemu button, and ask "KKM nilai berapa?". Hold Ctrl + Spasi and speak to talk instead; the
+   fixture responder always hears "masukkan nilai UTS Matematika 4B". Sign in as `rizal.operator`
+   to see the unregistered message.
 
 In dev the extension calls `http://localhost:3000`. Set `WXT_SERVER_URL` to point it at another
 Nemu Service; the host permission follows it. `wxt build` and `wxt zip` fail without it, so a
@@ -77,13 +97,16 @@ extension against `http://localhost:3000`, loads it into Playwright's Chromium, 
 - the settings page refuses an unknown install code and keeps `NEMU-SDITN-2026`;
 - the Nemu button and its hint show on the mock AlurSekolah;
 - Bu Siti's "KKM nilai berapa?" comes back as a Gelembung Jawab whose Sumber link shows the SOP;
+- the welcome page has the microphone (a fake one, with the prompt answered for it);
+- holding Ctrl + Spasi shows "Nemu mendengar…", then the heard text, then the answer with its
+  spoken word highlighted; pressing and holding the Nemu button does the same;
 - signing in as `rizal.operator` shows "Akun ini belum didaftarkan. Hubungi Pak Rizal.", and
   signing in as `dewi.lestari` brings the type box back;
 - Ruang GTK shows the Nemu button and asks as the last AlurSekolah account;
 - e-Rapor gets no Nemu button (WS-1 (a)).
 
 It prints one line per check, exits non-zero on a failure, and saves screenshots to
-`.output/verify/`. Add `-- --headed` to watch it. `NEMU_SERVER_URL`, `MOCK_ALURSEKOLAH_URL`,
+`.output/verify/` (each open tab is saved too when a check fails). Add `-- --headed` to watch it. `NEMU_SERVER_URL`, `MOCK_ALURSEKOLAH_URL`,
 `MOCK_RUANG_GTK_URL` and `MOCK_ERAPOR_URL` point it elsewhere, such as the deployed mocks. If
 Playwright's Chromium isn't installed yet, run
 `pnpm --filter extension exec playwright-core install chromium` once.

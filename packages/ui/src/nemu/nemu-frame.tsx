@@ -112,18 +112,21 @@ export function NemuStatusHeader({ status }: { status: NemuStatus }) {
 
 /**
  * Nemu's one sentence at 24 px. While Nemu's voice reads it (#200), the word it is on is marked
- * with a tint and a thick underline.
+ * with a tint and a thick underline; with `onRepeat`, clicking it says it again.
  */
 export function NemuSentence({
   sentence,
   highlightedWord,
+  onRepeat,
 }: {
   sentence: string;
   highlightedWord?: number;
+  /** Makes the sentence a button that says it again. */
+  onRepeat?: () => void;
 }) {
   let word = -1;
-  return (
-    <p className="text-2xl leading-8 font-medium">
+  const words = (
+    <>
       {sentence.split(/(\s+)/u).map((part, index) => {
         if (part.trim() === "") return <Fragment key={index}>{part}</Fragment>;
         word += 1;
@@ -139,7 +142,18 @@ export function NemuSentence({
           <Fragment key={index}>{part}</Fragment>
         );
       })}
-    </p>
+    </>
+  );
+  if (!onRepeat) return <p className="text-2xl leading-8 font-medium">{words}</p>;
+  return (
+    <button
+      type="button"
+      onClick={onRepeat}
+      title="Klik untuk mendengar lagi"
+      className="cursor-pointer text-left text-2xl leading-8 font-medium"
+    >
+      {words}
+    </button>
   );
 }
 

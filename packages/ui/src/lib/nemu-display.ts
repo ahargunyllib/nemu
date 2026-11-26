@@ -54,6 +54,8 @@ export type GelembungJawabProps = BubbleBase & {
   notes?: NemuNotes;
   action?: { label: string; onSelect: () => void };
   onClose?: () => void;
+  /** Clicking the sentence asks Nemu's voice to say it again (#200). */
+  onRepeat?: () => void;
 };
 
 export type NemuChoice = { id: string; label: string; risky?: boolean };

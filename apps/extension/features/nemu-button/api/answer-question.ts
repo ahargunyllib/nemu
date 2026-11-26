@@ -5,13 +5,13 @@ import {
   type AskResult,
   fromExplanation,
   fromGroundedAnswer,
-  NOT_FROM_TYPING_YET,
+  NOT_AVAILABLE_YET,
 } from "../lib/answer";
 
 /**
  * A typed question goes to `helpRoute` first (docs/school-ai.md). Questions about the school's
  * rules go to `helpAsk`, "kenapa" to `helpExplain` with what the page shows, and a voice control
- * closes the bubble. Grade entry and processes wait for #200 and #202.
+ * closes the bubble. Grade entry and processes wait for the executor (#202).
  */
 export async function answerQuestion(
   client: Pick<NemuServiceClient, "helpRoute" | "helpAsk" | "helpExplain">,
@@ -28,6 +28,6 @@ export async function answerQuestion(
       return fromGroundedAnswer(await client.helpAsk({ question }));
     case "input_nilai":
     case "proses":
-      return { kind: "notice", text: NOT_FROM_TYPING_YET };
+      return { kind: "notice", text: NOT_AVAILABLE_YET };
   }
 }

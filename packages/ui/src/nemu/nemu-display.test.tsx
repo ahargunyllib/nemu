@@ -86,6 +86,21 @@ describe("Gelembung Jawab", () => {
     expect(onRead).toHaveBeenLastCalledWith("Sumber: SOP Penilaian SDIT Nusantara · hlm. 2");
   });
 
+  test("says its sentence again when the sentence is clicked", () => {
+    const onRepeat = vi.fn();
+    render(
+      <GelembungJawab
+        sentence="KKM semua mata pelajaran adalah 75."
+        highlightedWord={1}
+        onRepeat={onRepeat}
+      />,
+    );
+    const sentence = screen.getByRole("button", { name: "KKM semua mata pelajaran adalah 75." });
+    expect(sentence.querySelector("[data-nemu-spoken]")?.textContent).toBe("semua");
+    fireEvent.click(sentence);
+    expect(onRepeat).toHaveBeenCalledOnce();
+  });
+
   test("runs its one action", () => {
     const onSelect = vi.fn();
     render(

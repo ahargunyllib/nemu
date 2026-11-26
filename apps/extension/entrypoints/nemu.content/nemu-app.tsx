@@ -11,11 +11,21 @@ import type { IdentityResult } from "../../features/identity/lib/identity";
 import { AskBox } from "../../features/nemu-button/components/ask-box";
 import { NemuButton } from "../../features/nemu-button/components/nemu-button";
 import { type AskState, useAsk } from "../../features/nemu-button/hooks/use-ask";
+import { HeardBubble, ListeningBubble } from "../../features/voice/components/talk-bubbles";
+import { useTalk } from "../../features/voice/hooks/use-talk";
+import { useVoice, type VoiceState } from "../../features/voice/hooks/use-voice";
+import type { TalkState } from "../../features/voice/lib/talk-machine";
+import { shortcutKeys, TALK_SHORTCUT } from "../../features/voice/lib/talk-shortcut";
+import { spokenWordIn } from "../../features/voice/lib/word-timing";
+import { voiceCommands } from "../../features/voice/stores/voice-commands";
+
+const SHORTCUT_KEYS = shortcutKeys(TALK_SHORTCUT);
 
 /**
- * Everything Nemu draws on an allowed page (WS-03): the Nemu button and, once it is clicked, the
- * type box under the Gelembung Jawab. Who Nemu helps follows the account signed in on the page.
- * Only one of the five display types shows at a time (PRD §6.2).
+ * Everything Nemu draws on an allowed page (WS-03): the Nemu button and, once it is clicked or the
+ * talk combination is held, the panel above it. Who Nemu helps follows the account signed in on
+ * the page. Only one of the five display types shows at a time (PRD §6.2), and Nemu speaks the
+ * main sentence of every answer.
  */
 export function NemuApp() {
   const pageEmail = usePageEmail();
@@ -24,9 +34,55 @@ export function NemuApp() {
   const close = useCallback(() => setOpen(false), []);
   const { state, ask, reset } = useAsk(pageEmail, close);
   const preview = useDisplayPreview();
+  const { voice, working, speak, repeat, stop } = useVoice(pageEmail);
+  const talk = useTalk({
+    pageEmail,
+    shortcut: TALK_SHORTCUT,
+    enabled: identity?.status === "registered",
+    isWorking: () => working || voiceCommands.isWorking(),
+    onStart: () => setOpen(true),
+    onQuestion: (question) => void ask(question),
+  });
+  const { dismiss } = talk;
+
+  const askTyped = useCallback(
+    (question: string) => {
+      dismiss();
+      void ask(question);
+    },
+    [dismiss, ask],
+  );
+
+  const dismissAll = useCallback(() => {
+    reset();
+    dismiss();
+    stop();
+  }, [reset, dismiss, stop]);
 
   // Another account signed in: the previous teacher's answer goes (ID-04).
-  useEffect(reset, [identity, reset]);
+  useEffect(dismissAll, [identity, dismissAll]);
+
+  // Nemu speaks the main sentence of each answer (F0-05).
+  useEffect(() => {
+    if (state.status === "answered") void speak(state.result.text);
+  }, [state, speak]);
+
+  // Closing Nemu silences it.
+  useEffect(() => {
+    if (!open) stop();
+  }, [open, stop]);
+
+  // "berhenti" closes Nemu, as it does when typed.
+  useEffect(
+    () =>
+      voiceCommands.subscribe((event) => {
+        if (event.type === "command" && event.command === "berhenti") {
+          dismissAll();
+          close();
+        }
+      }),
+    [dismissAll, close],
+  );
 
   return (
     <>
@@ -43,12 +99,28 @@ export function NemuApp() {
         ) : (
           open && (
             <div className="pointer-events-auto flex flex-col items-end gap-2">
-              <NemuPanel identity={identity} state={state} onAsk={ask} onDismiss={reset} />
+              <NemuPanel
+                identity={identity}
+                state={state}
+                talk={talk.state}
+                heard={talk.heard}
+                voice={voice}
+                onAsk={askTyped}
+                onRepeat={repeat}
+                onRead={(text) => void speak(text)}
+                onDismiss={dismissAll}
+              />
             </div>
           )
         )}
         <div className="pointer-events-auto">
-          <NemuButton open={open} onToggle={() => setOpen((current) => !current)} />
+          <NemuButton
+            open={open}
+            shortcutKeys={SHORTCUT_KEYS}
+            onToggle={() => setOpen((current) => !current)}
+            onHoldStart={talk.press}
+            onHoldEnd={talk.release}
+          />
         </div>
       </div>
       {PREVIEW_ENABLED && (
@@ -67,24 +139,52 @@ export function NemuApp() {
 type NemuPanelProps = {
   identity: IdentityResult | null;
   state: AskState;
+  talk: TalkState;
+  heard: string | null;
+  voice: VoiceState | null;
   onAsk: (question: string) => void;
+  onRepeat: () => void;
+  onRead: (text: string) => void;
   onDismiss: () => void;
 };
 
-function NemuPanel({ identity, state, onAsk, onDismiss }: NemuPanelProps) {
+/** One display at a time: a talk failure, else the answer (or its Skeleton). */
+function NemuPanel({
+  identity,
+  state,
+  talk,
+  heard,
+  voice,
+  onAsk,
+  onRepeat,
+  onRead,
+  onDismiss,
+}: NemuPanelProps) {
   if (!identity) return <GelembungJawabSkeleton />;
   // ID-02: an unregistered or signed-out account gets the reason instead of the type box.
   if (identity.status !== "registered") return <GelembungJawab sentence={identity.message} />;
   return (
     <>
-      {state.status === "asking" && <GelembungJawabSkeleton />}
-      {state.status === "answered" && (
-        <GelembungJawab
-          sentence={state.result.text}
-          notes={state.result.kind === "answer" ? { sumber: state.result.sources } : undefined}
-          onClose={onDismiss}
-        />
+      {talk.phase === "transcribing" && <HeardBubble text={null} />}
+      {heard !== null && <HeardBubble text={heard} />}
+      {talk.phase === "failed" ? (
+        <GelembungJawab sentence={talk.message} onClose={onDismiss} />
+      ) : (
+        <>
+          {state.status === "asking" && <GelembungJawabSkeleton />}
+          {state.status === "answered" && (
+            <GelembungJawab
+              sentence={state.result.text}
+              highlightedWord={spokenWordIn(state.result.text, voice)}
+              notes={state.result.kind === "answer" ? { sumber: state.result.sources } : undefined}
+              onRead={onRead}
+              onRepeat={onRepeat}
+              onClose={onDismiss}
+            />
+          )}
+        </>
       )}
+      {talk.phase === "listening" && <ListeningBubble />}
       <AskBox pending={state.status === "asking"} onAsk={onAsk} />
     </>
   );

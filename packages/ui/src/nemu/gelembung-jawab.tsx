@@ -17,6 +17,7 @@ export function GelembungJawab({
   action,
   onRead,
   onClose,
+  onRepeat,
 }: GelembungJawabProps) {
   return (
     <NemuBubble
@@ -28,7 +29,7 @@ export function GelembungJawab({
       className={cn(onClose && "[&_[data-nemu-status]]:mr-16")}
     >
       <div className={cn(onClose && !status && "pr-10")}>
-        <NemuSentence sentence={sentence} highlightedWord={highlightedWord} />
+        <NemuSentence sentence={sentence} highlightedWord={highlightedWord} onRepeat={onRepeat} />
       </div>
       {notes && <NemuNoteLinks notes={notes} onRead={onRead} />}
       {action && (
