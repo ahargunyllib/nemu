@@ -14,10 +14,17 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { SparklesIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { NAV_GROUPS } from "@/features/workspace/lib/nav-items";
+import { navGroupsFor } from "@/features/workspace/lib/nav-items";
+import { homePath } from "@/features/workspace/lib/roles";
 
-/** The Admin Workspace's dark side menu: the workspace, its sections, and the admin at the bottom. */
-export default function WorkspaceSidebar({ footer }: { footer: ReactNode }) {
+/** The Admin Workspace's dark side menu: the sections the admin's role sees, and the admin at the bottom. */
+export default function WorkspaceSidebar({
+  role,
+  footer,
+}: {
+  role: string | null | undefined;
+  footer: ReactNode;
+}) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
 
   return (
@@ -25,7 +32,7 @@ export default function WorkspaceSidebar({ footer }: { footer: ReactNode }) {
       <SidebarHeader className="p-3">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" render={<Link to="/dashboard" />}>
+            <SidebarMenuButton size="lg" render={<Link to={homePath(role)} />}>
               <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground">
                 <SparklesIcon className="size-4" />
               </div>
@@ -39,7 +46,7 @@ export default function WorkspaceSidebar({ footer }: { footer: ReactNode }) {
       </SidebarHeader>
 
       <SidebarContent>
-        {NAV_GROUPS.map((group) => (
+        {navGroupsFor(role).map((group) => (
           <SidebarGroup key={group.label}>
             <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
             <SidebarMenu>

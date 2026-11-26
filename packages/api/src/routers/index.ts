@@ -10,6 +10,7 @@ import { processInstancesRouter } from "../modules/process-instances/router";
 import { processesRouter } from "../modules/processes/router";
 import { referenceTablesRouter } from "../modules/reference-tables/router";
 import { ruleSourcesRouter } from "../modules/rule-sources/router";
+import { schoolRouter } from "../modules/school/router";
 import { slaClaimsRouter } from "../modules/sla-claims/router";
 import { speechRouter } from "../modules/speech/router";
 
@@ -26,6 +27,7 @@ export const appRouter = {
   ...helpRouter,
   ...processesRouter,
   ...speechRouter,
+  ...schoolRouter,
 };
 export type AppRouter = typeof appRouter;
 export type AppRouterClient = RouterClient<typeof appRouter>;

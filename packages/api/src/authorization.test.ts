@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { requireKnownWorkspace, requireWorkspace, requireWorkspaceAdmin } from "./authorization";
+import {
+  requireFullAdmin,
+  requireKnownWorkspace,
+  requireWorkspace,
+  requireWorkspaceAdmin,
+} from "./authorization";
 
 describe("requireWorkspaceAdmin", () => {
   it("returns the authenticated workspace for an administrator", () => {
@@ -16,6 +21,23 @@ describe("requireWorkspaceAdmin", () => {
     expect(() =>
       requireWorkspaceAdmin({ id: "U-101", role: "billing_liaison", workspaceId: "W-TELKO" }),
     ).toThrow("Workspace administrator access is required");
+  });
+});
+
+describe("school roles", () => {
+  const operator = { id: "rizal", role: "operator", workspaceId: "W-SEKOLAH" };
+  const adminJavan = { id: "javan", role: "admin", workspaceId: "W-SEKOLAH" };
+
+  it("lets a school operator administer its own workspace", () => {
+    expect(requireWorkspaceAdmin(operator)).toBe("W-SEKOLAH");
+  });
+
+  it("keeps Admin Javan's pages from the operator and from teachers", () => {
+    expect(requireFullAdmin(adminJavan)).toBe("W-SEKOLAH");
+    expect(() => requireFullAdmin(operator)).toThrow("Admin Javan access is required");
+    expect(() => requireFullAdmin({ id: "siti", role: "guru", workspaceId: "W-SEKOLAH" })).toThrow(
+      "Admin Javan access is required",
+    );
   });
 });
 

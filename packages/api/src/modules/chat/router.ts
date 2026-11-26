@@ -1,7 +1,7 @@
 import { nemuRequestSchema } from "@nemu/contracts";
 
 import type { Context } from "../../context";
-import { protectedProcedure, workspaceAdminProcedure } from "../../index";
+import { fullAdminProcedure, protectedProcedure } from "../../index";
 import { createChatProcessContextDeps } from "./process-context-deps";
 import { createChatLogRepository } from "./repository";
 import { answerNemuChat, listChatLog } from "./service";
@@ -21,7 +21,7 @@ export const chatRouter = {
       ),
     ),
 
-  listChatLog: workspaceAdminProcedure.handler(({ context }) =>
+  listChatLog: fullAdminProcedure.handler(({ context }) =>
     listChatLog(chatDeps(context), context.session.user.workspaceId),
   ),
 };

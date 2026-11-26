@@ -13,8 +13,16 @@ The backend both other Nemu parts talk to: answers chat requests, holds knowledg
 _Avoid_: layanan, backend, API
 
 **Admin Workspace**:
-The web console where an admin manages documents, tables, domains, action rules and user profiles.
+The web console where Admin Javan and school operators manage knowledge, teachers and settings.
 _Avoid_: workspace (alone), dashboard
+
+**Admin Javan**:
+The `admin` role: Javan's staff, who see every page and every school in the Admin Workspace.
+_Avoid_: superadmin
+
+**Operator**:
+The `operator` role: a school's administrator, tied to one school's Knowledge Workspace. Sees only that school's knowledge, Kamus Kendala, Uji jawaban and Teachers & contacts pages. Also the contact teachers are sent to for account and class problems.
+_Avoid_: school admin
 
 **Knowledge Workspace**:
 The set of knowledge, Reference Tables, process data and users Nemu answers from for one case: `W-SEKOLAH`, or the legacy `W-TRAVEL` and `W-TELKO`. A signed-in user belongs to one, and the Nemu Service reads only that one's data.
@@ -29,6 +37,10 @@ _Avoid_: citation mapping, source binding
 **W-SEKOLAH**:
 The Knowledge Workspace for Nemu on AlurSekolah: the fictional SDIT Nusantara, with Bu Siti (teacher) and Pak Rizal (operator). See `docs/school-ai.md`.
 _Avoid_: school tenant
+
+**Teachers & contacts (WS-06)**:
+The school's teacher registry: name, AlurSekolah email, WhatsApp number, classes and subjects, plus one contact per role (operator, kepala sekolah, bagian keuangan). The extension recognises a teacher by the email, the WhatsApp bot by the number. Backs the `SchoolDirectory` port.
+_Avoid_: user profiles, guru list
 
 **Photo Job**:
 One grade-book photo waiting to be read for a teacher, from WhatsApp or an upload. It lives in the `inbox` bucket until the teacher saves, at most a day.

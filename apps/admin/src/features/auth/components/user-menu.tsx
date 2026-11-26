@@ -9,6 +9,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { LogOutIcon } from "lucide-react";
 
 import { authClient } from "@/features/auth/api/auth-client";
+import { roleLabel } from "@/features/workspace/lib/roles";
 
 /** The signed-in admin at the bottom of the side menu; it opens the account menu. */
 export default function UserMenu() {
@@ -17,10 +18,10 @@ export default function UserMenu() {
 
   if (isPending || !session) return <AccountMenuSkeleton />;
 
-  const { name, email } = session.user;
+  const { name, email, role } = session.user;
 
   return (
-    <AccountMenu name={name} detail="Admin" aria-label={`Account menu for ${name}`}>
+    <AccountMenu name={name} detail={roleLabel(role)} aria-label={`Account menu for ${name}`}>
       <DropdownMenuGroup>
         <DropdownMenuLabel>{email}</DropdownMenuLabel>
         <DropdownMenuSeparator />
