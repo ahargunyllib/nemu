@@ -25,15 +25,15 @@ step says otherwise.
 
 In Cloudflare DNS for `ahargunyllib.dev`, add an `A` record:
 
-| Type | Name         | Content    | Proxy status |
-| ---- | ------------ | ---------- | ------------ |
-| A    | `moodle-uji` | the VPS IP | **DNS only** |
+| Type | Name          | Content    | Proxy status |
+| ---- | ------------- | ---------- | ------------ |
+| A    | `nemu-moodle` | the VPS IP | **DNS only** |
 
 Keep it **DNS only** (grey cloud). Caddy gets its own certificate from Let's Encrypt, and the
 Cloudflare proxy gets in the way of that. Check it from your laptop; it should print the VPS IP:
 
 ```bash
-dig +short moodle-uji.ahargunyllib.dev
+dig +short nemu-moodle.ahargunyllib.dev
 ```
 
 ### 3. Install Docker
@@ -85,13 +85,13 @@ openssl rand -base64 24   # run once for POSTGRES_PASSWORD, once for MOODLE_ADMI
 nano .env
 ```
 
-| Variable                | Value                                                            |
-| ----------------------- | ---------------------------------------------------------------- |
-| `MOODLE_DOMAIN`         | `moodle-uji.ahargunyllib.dev` (no `https://`, no trailing slash) |
-| `POSTGRES_PASSWORD`     | a generated password                                             |
-| `MOODLE_ADMIN_USERNAME` | `admin`                                                          |
-| `MOODLE_ADMIN_PASSWORD` | a generated password; keep it in the team's password manager     |
-| `TEACHER_PASSWORD`      | the password testers use for `siti.aminah`; share it with them   |
+| Variable                | Value                                                             |
+| ----------------------- | ----------------------------------------------------------------- |
+| `MOODLE_DOMAIN`         | `nemu-moodle.ahargunyllib.dev` (no `https://`, no trailing slash) |
+| `POSTGRES_PASSWORD`     | a generated password                                              |
+| `MOODLE_ADMIN_USERNAME` | `admin`                                                           |
+| `MOODLE_ADMIN_PASSWORD` | a generated password; keep it in the team's password manager      |
+| `TEACHER_PASSWORD`      | the password testers use for `siti.aminah`; share it with them    |
 
 Set `POSTGRES_PASSWORD` and the admin account before the first start. Moodle stores them on its
 first install, so changing them in `.env` afterwards doesn't change the site.
@@ -106,7 +106,7 @@ docker compose logs -f moodle
 If Compose warns that a variable "is not set", stop (`docker compose down`) and fill it in `.env`
 first. The first start installs Moodle into Postgres. Wait until the log shows `run: nginx`,
 `run: php` and `run: cron`, about 3 to 5 minutes, then press Ctrl+C (the containers keep running). Open
-`https://moodle-uji.ahargunyllib.dev`: it shows "Masuk ke situs" once step 8 has run, or the
+`https://nemu-moodle.ahargunyllib.dev`: it shows "Masuk ke situs" once step 8 has run, or the
 English login page before that.
 
 ### 8. Prepare the test course
