@@ -1,16 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { DEMO_KNOWLEDGE_CHUNKS } from "../dist/demo.js";
-import {
-  defaultRuleSourceLocations,
-  resolveRuleSources,
-  resolveSourceLocation,
-  ruleSourceKeysFor,
-} from "../dist/sources.js";
-import { buildTelcoWorkspaceSeed } from "./workspace-seed-lib.mjs";
-
-const dataRoot = new URL("../../../data/", import.meta.url);
+import { resolveRuleSources, resolveSourceLocation } from "../dist/sources.js";
 
 function chunk(id, fields) {
   return { id, docId: "doc", title: "Doc", version: "1", active: true, text: id, ...fields };
@@ -38,35 +29,4 @@ test("a location never resolves to an inactive document or another document", ()
     resolveRuleSources(chunks, { "travel.sbm_lodging": { docId: "doc", article: "1" } }),
     {},
   );
-});
-
-test("every travel rule source resolves against the seeded travel knowledge", () => {
-  const citations = resolveRuleSources(
-    DEMO_KNOWLEDGE_CHUNKS,
-    defaultRuleSourceLocations("W-TRAVEL"),
-  );
-
-  assert.deepEqual(Object.keys(citations).sort(), ruleSourceKeysFor("W-TRAVEL").sort());
-});
-
-test("every telco rule source resolves against the seeded telco knowledge", async () => {
-  const seed = await buildTelcoWorkspaceSeed(dataRoot);
-  const documents = new Map(seed.documents.map((document) => [document.id, document]));
-  const chunks = seed.chunks.map((stored) => {
-    const document = documents.get(stored.documentId);
-    return {
-      id: stored.id,
-      docId: stored.documentId,
-      title: document.title,
-      version: document.version,
-      article: stored.article ?? stored.section ?? undefined,
-      page: stored.page ?? undefined,
-      active: document.isActive,
-      text: stored.text,
-    };
-  });
-
-  const citations = resolveRuleSources(chunks, defaultRuleSourceLocations("W-TELKO"));
-
-  assert.deepEqual(Object.keys(citations).sort(), ruleSourceKeysFor("W-TELKO").sort());
 });

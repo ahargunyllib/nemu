@@ -45,9 +45,6 @@ export const server = Cloudflare.Worker("server", {
     OPENROUTER_API_KEY: Config.Redacted("OPENROUTER_API_KEY").pipe(
       Config.withDefault(Redacted.make("")),
     ),
-    OPENROUTER_GENERATOR_MODEL: Config.String("OPENROUTER_GENERATOR_MODEL"),
-    OPENROUTER_REASONING_EFFORT: Config.String("OPENROUTER_REASONING_EFFORT"),
-    OPENROUTER_JEV_MODEL: Config.String("OPENROUTER_JEV_MODEL"),
     NEMU_DEMO_DATE: Config.String("NEMU_DEMO_DATE"),
     OPENROUTER_SCHOOL_READ_A_MODEL: Config.String("OPENROUTER_SCHOOL_READ_A_MODEL").pipe(
       Config.withDefault("google/gemini-4-hydrogen"),

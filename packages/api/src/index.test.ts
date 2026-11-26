@@ -2,7 +2,7 @@ import { call } from "@orpc/server";
 import { describe, expect, it } from "vite-plus/test";
 
 import type { Context } from "./context";
-import { protectedProcedure, telcoProcedure, workspaceAdminProcedure } from "./index";
+import { protectedProcedure, travelAdminProcedure, workspaceAdminProcedure } from "./index";
 
 function contextFor(role: string, workspaceId: string): Context {
   return { session: { session: {}, user: { id: "user", role, workspaceId } } } as Context;
@@ -45,15 +45,18 @@ describe("workspaceAdminProcedure", () => {
   });
 });
 
-describe("telcoProcedure", () => {
-  it("rejects a W-TRAVEL user", async () => {
-    const telco = telcoProcedure.handler(() => "reached");
+describe("travelAdminProcedure", () => {
+  it("keeps the travel Reference Tables to W-TRAVEL administrators", async () => {
+    const tables = travelAdminProcedure.handler(() => "reached");
 
     await expect(
-      call(telco, undefined, { context: contextFor("pegawai", "W-TRAVEL") }),
-    ).rejects.toMatchObject({ code: "FORBIDDEN", message: "Workspace W-TELKO access is required" });
+      call(tables, undefined, { context: contextFor("operator", "W-SEKOLAH") }),
+    ).rejects.toMatchObject({
+      code: "FORBIDDEN",
+      message: "Workspace W-TRAVEL access is required",
+    });
     await expect(
-      call(telco, undefined, { context: contextFor("pegawai", "W-TELKO") }),
+      call(tables, undefined, { context: contextFor("verifikator", "W-TRAVEL") }),
     ).resolves.toBe("reached");
   });
 });

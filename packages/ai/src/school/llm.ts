@@ -55,7 +55,7 @@ function toResponsesContent(content: readonly LlmContent[]): Array<Record<string
 }
 
 /**
- * Structured calls through OpenRouter's Responses API, the same endpoint `nemuChat` uses.
+ * Structured calls through OpenRouter's Responses API.
  * Data collection is always denied; prompts and outputs are never logged by Nemu.
  */
 export function createOpenRouterJsonCaller(config: OpenRouterJsonCallerConfig): JsonCall {

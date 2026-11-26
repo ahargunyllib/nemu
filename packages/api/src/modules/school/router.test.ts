@@ -2,7 +2,6 @@ import { call } from "@orpc/server";
 import { describe, expect, it } from "vite-plus/test";
 
 import { createSchoolContext } from "../../testing/school";
-import { chatRouter } from "../chat/router";
 import { schoolRouter } from "./router";
 
 const OPERATOR = { id: "rizal", role: "operator", workspaceId: "W-SEKOLAH" };
@@ -119,12 +118,9 @@ describe("workspace roles", () => {
     });
   });
 
-  it("keeps an operator to its school's pages: no school list, no Chat Log", async () => {
+  it("keeps an operator to its school's pages: no school list", async () => {
     const context = await createSchoolContext(OPERATOR);
     await expect(call(schoolRouter.listSchools, undefined, { context })).rejects.toMatchObject({
-      code: "FORBIDDEN",
-    });
-    await expect(call(chatRouter.listChatLog, undefined, { context })).rejects.toMatchObject({
       code: "FORBIDDEN",
     });
   });

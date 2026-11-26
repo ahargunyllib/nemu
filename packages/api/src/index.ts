@@ -65,7 +65,7 @@ const requireFullAdminRole = o.middleware(async ({ context, next }) => {
   return next({ context: authenticated });
 });
 
-/** Pages only Admin Javan sees (WS-01 school list, Chat Log); a school operator gets FORBIDDEN. */
+/** Pages only Admin Javan sees (WS-01 school list); a school operator gets FORBIDDEN. */
 export const fullAdminProcedure = publicProcedure.use(requireFullAdminRole);
 
 function requireWorkspaceAccess(workspaceId: WorkspaceId) {
@@ -75,12 +75,6 @@ function requireWorkspaceAccess(workspaceId: WorkspaceId) {
     return next();
   });
 }
-
-/** Perjalanan Dinas procedures: only W-TRAVEL users reach them. */
-export const travelProcedure = protectedProcedure.use(requireWorkspaceAccess(WORKSPACES.travel));
-
-/** Klaim SLA procedures: only W-TELKO users reach them. */
-export const telcoProcedure = protectedProcedure.use(requireWorkspaceAccess(WORKSPACES.telco));
 
 async function requireInstalledSchool(context: Context): Promise<InstalledSchool> {
   const school = await installedSchool(

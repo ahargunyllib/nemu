@@ -14,7 +14,7 @@ export function requireWorkspaceAdmin(user: WorkspaceUser): string {
   return user.workspaceId;
 }
 
-/** For pages outside a school operator's scope: the school list, the Chat Log, integrations. */
+/** For pages outside a school operator's scope: the school list, integrations. */
 export function requireFullAdmin(user: WorkspaceUser): string {
   if (!FULL_ADMIN_ROLES.has(user.role)) {
     throw new Error(`Admin Javan access is required for user ${user.id}`);

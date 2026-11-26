@@ -1,19 +1,16 @@
 # Testing
 
-Tests protect business behavior: contracts, Action Level enforcement,
-calculations, citations, and the Nemu pipeline.
+Tests protect business behavior: contracts, authorization and identity,
+grade rules and calculations, citations, and the school AI.
 
 ## Placement
 
 - Co-locate a test with its owner as `*.test.ts` or `*.test.tsx`, and run the
   suite with `pnpm test`.
 - `packages/ai` tests use `node:test` against mocked provider responses and
-  never spend OpenRouter credits. Extend `packages/ai/src/index.test.ts` for
-  pipeline behavior instead of mocking the pipeline's own internals.
-- Build requests from `@nemu/contracts/fixtures` so tests and the fixture
-  responder (ADR-0001) share one source of example traffic.
-- The official evaluation files in `data/04_evaluasi` feed the eval scripts
-  only; never index them as knowledge or copy them into fixtures.
+  never spend OpenRouter credits. Feature tests in `packages/api` run against
+  `createFixtureSchoolAi` (ADR-0001) and a migrated in-memory D1
+  (`packages/api/src/testing`), so they exercise the real seeds.
 - Satisfy the types in tests with narrowing or matchers rather than casts or
   weaker assertions.
 
@@ -22,7 +19,7 @@ calculations, citations, and the Nemu pipeline.
 Write or retain a test when it verifies at least one of these:
 
 - a business contract or validation rule;
-- an authorization, Action Level, or data-integrity policy;
+- an authorization, identity, or data-integrity policy;
 - a non-trivial calculation, policy matrix, or state transition;
 - an important failure, recovery, or regression path.
 

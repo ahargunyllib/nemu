@@ -8,7 +8,6 @@ import { ENV } from "./env.server";
 import {
   createAuth,
   createDocumentFileStore,
-  createNemuService,
   createSchoolServices,
   getDb,
   getWorkspaceDemoDate,
@@ -32,11 +31,10 @@ export async function createContext({ context }: CreateContextOptions): Promise<
   ).api.getSession({
     headers: context.req.raw.headers,
   });
-  const workspaceId = session?.user.workspaceId ?? WORKSPACES.travel;
+  const workspaceId = session?.user.workspaceId ?? WORKSPACES.school;
   return {
     db,
     session,
-    nemu: createNemuService(db),
     documentFiles: createDocumentFileStore(),
     school: createSchoolServices(db),
     demoDate: await getWorkspaceDemoDate(db, workspaceId),
