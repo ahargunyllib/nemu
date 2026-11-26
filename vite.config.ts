@@ -43,6 +43,9 @@ export default defineConfig({
       ".alchemy/**",
       ".wrangler/**",
       "**/.wrangler/**",
+      // Ported from the test-data mocks; kept as written so they diff cleanly against the originals.
+      "apps/mock-alursekolah/public/**",
+      "apps/mock-portals/**",
     ],
     singleQuote: false,
     semi: true,
