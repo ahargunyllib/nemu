@@ -1,6 +1,12 @@
 import { describe, expect, test } from "vite-plus/test";
 
-import { estimateWords, mainSentence, rescaleWords, wordIndexAt } from "./word-timing";
+import {
+  estimateWords,
+  mainSentence,
+  rescaleWords,
+  spokenWordIn,
+  wordIndexAt,
+} from "./word-timing";
 
 const words = [
   { text: "Silakan", offsetMs: 0, durationMs: 400 },
@@ -62,5 +68,22 @@ describe("estimateWords", () => {
     expect(estimated.map((word) => word.text)).toEqual(["Ya,", "tekan", "Simpan."]);
     expect(estimated[1]!.offsetMs).toBe(240 + 180);
     expect(durationMs).toBeGreaterThan(estimated[2]!.offsetMs + estimated[2]!.durationMs);
+  });
+});
+
+describe("spokenWordIn", () => {
+  const answer = "KKM seluruh mata pelajaran adalah 75. Nilai di bawahnya ikut remedial.";
+  const sentence = "KKM seluruh mata pelajaran adalah 75.";
+
+  test("marks the voice's word while it reads this bubble's sentence", () => {
+    expect(spokenWordIn(answer, { sentence, activeIndex: 3 })).toBe(3);
+  });
+
+  test("marks nothing between words, before the voice starts, or for another sentence", () => {
+    expect(spokenWordIn(answer, { sentence, activeIndex: -1 })).toBeUndefined();
+    expect(spokenWordIn(answer, null)).toBeUndefined();
+    expect(
+      spokenWordIn(answer, { sentence: "Sumber: SOP Penilaian.", activeIndex: 0 }),
+    ).toBeUndefined();
   });
 });

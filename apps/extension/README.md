@@ -30,7 +30,7 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
 - **Answers.** The background sends the question to `helpRoute`. Questions about school rules go to
   `helpAsk`, "ini kenapa?" to `helpExplain` with the page's visible text (never input values, and
   nothing while a password field shows), and "berhenti" closes the bubble. Grade entry and
-  processes say they aren't available yet: the five display types are #201 and the executor #202.
+  processes say they aren't available yet: that is the executor, #202.
 - **Talking (#200).** Hold **Ctrl + Spasi** on an allowed page, or press and hold the Nemu button,
   and speak: Nemu shows a red dot and "Nemu mendengar…". On release the recording goes to
   `speechTranscribe` as 16 kHz mono WAV, the heard text shows in a small bubble, and then it goes
@@ -40,16 +40,21 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   300 ms send nothing; recordings stop at 15 s. The combination will come from WS-08 (#212); until
   then it is `TALK_SHORTCUT` in `features/voice/lib/talk-shortcut.ts`.
 - **Nemu's voice (#200).** Nemu speaks the first sentence of every answer through
-  `speechSynthesize`, highlighting the word being spoken. Estimated timings are rescaled to the real
-  audio length. When the service sends no audio (the fixture responder, or no TTS model), or the
-  page refuses to play it, the local `id-ID` voice speaks at 0.85×. Clicking the text, or saying
-  "ulangi", repeats it.
+  `speechSynthesize`, and the Gelembung Jawab marks the word being spoken. Estimated timings are
+  rescaled to the real audio length. When the service sends no audio (the fixture responder, or no
+  TTS model), or the page refuses to play it, the local `id-ID` voice speaks at 0.85×. Clicking the text, or saying
+  "ulangi", repeats it; opening **Kenapa?** or **Sumber** reads that text aloud.
 - **Short commands (F0-15).** Holding the combination while Nemu speaks or works pauses it and
   listens for "pelan", "ulangi", "ajari saya", "lanjut" or "berhenti". They go out on
   `voiceCommands` (`features/voice/stores/voice-commands.ts`) as `pause`, then one `command` or
   `resume`. Nemu's voice handles them already; the executor (#202) subscribes there and calls
   `voiceCommands.setWorking(true)` while it runs steps. While only the voice was speaking, anything
   that isn't a short command is a new question.
+- **Display types (#201).** Everything Nemu shows is one of the five display types from
+  `@nemu/ui/nemu/*`, one at a time (`docs/design-system.md`). An answer is a Gelembung Jawab
+  whose sources sit behind its **Sumber** link. In a dev build, `?pratinjau-nemu` on an allowed
+  page (`http://localhost:3003/?pratinjau-nemu#/nilai`) adds a dock at the bottom left that shows
+  all five and moves the Nemu cursor between two fields, without the AI.
 - **Contract.** Request and response schemas come from `@nemu/contracts/extension` and
   `@nemu/contracts/school`. Only the background calls the Nemu Service.
 
@@ -91,7 +96,7 @@ extension against `http://localhost:3000`, loads it into Playwright's Chromium, 
 
 - the settings page refuses an unknown install code and keeps `NEMU-SDITN-2026`;
 - the Nemu button and its hint show on the mock AlurSekolah;
-- Bu Siti's "KKM nilai berapa?" comes back as a Gelembung Jawab with the SOP as its source;
+- Bu Siti's "KKM nilai berapa?" comes back as a Gelembung Jawab whose Sumber link shows the SOP;
 - the welcome page has the microphone (a fake one, with the prompt answered for it);
 - holding Ctrl + Spasi shows "Nemu mendengar…", then the heard text, then the answer with its
   spoken word highlighted; pressing and holding the Nemu button does the same;

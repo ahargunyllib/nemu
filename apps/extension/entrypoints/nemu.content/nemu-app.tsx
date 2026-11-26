@@ -1,21 +1,22 @@
+import { GelembungJawab, GelembungJawabSkeleton } from "@nemu/ui/nemu/gelembung-jawab";
+import { NemuStage } from "@nemu/ui/nemu/nemu-stage";
 import { useCallback, useEffect, useState } from "react";
 
+import { DisplayPreviewDock } from "../../features/display-preview/components/display-preview-dock";
+import { useDisplayPreview } from "../../features/display-preview/hooks/use-display-preview";
+import { PREVIEW_ENABLED } from "../../features/display-preview/lib/preview-scenes";
 import { useIdentity } from "../../features/identity/hooks/use-identity";
 import { usePageEmail } from "../../features/identity/hooks/use-page-email";
 import type { IdentityResult } from "../../features/identity/lib/identity";
-import {
-  AnswerBubble,
-  AnswerBubbleSkeleton,
-} from "../../features/nemu-button/components/answer-bubble";
 import { AskBox } from "../../features/nemu-button/components/ask-box";
 import { NemuButton } from "../../features/nemu-button/components/nemu-button";
 import { type AskState, useAsk } from "../../features/nemu-button/hooks/use-ask";
-import { SpokenText } from "../../features/voice/components/spoken-text";
 import { HeardBubble, ListeningBubble } from "../../features/voice/components/talk-bubbles";
 import { useTalk } from "../../features/voice/hooks/use-talk";
 import { useVoice, type VoiceState } from "../../features/voice/hooks/use-voice";
 import type { TalkState } from "../../features/voice/lib/talk-machine";
 import { shortcutKeys, TALK_SHORTCUT } from "../../features/voice/lib/talk-shortcut";
+import { spokenWordIn } from "../../features/voice/lib/word-timing";
 import { voiceCommands } from "../../features/voice/stores/voice-commands";
 
 const SHORTCUT_KEYS = shortcutKeys(TALK_SHORTCUT);
@@ -23,7 +24,8 @@ const SHORTCUT_KEYS = shortcutKeys(TALK_SHORTCUT);
 /**
  * Everything Nemu draws on an allowed page (WS-03): the Nemu button and, once it is clicked or the
  * talk combination is held, the panel above it. Who Nemu helps follows the account signed in on
- * the page; Nemu speaks the main sentence of every answer.
+ * the page. Only one of the five display types shows at a time (PRD §6.2), and Nemu speaks the
+ * main sentence of every answer.
  */
 export function NemuApp() {
   const pageEmail = usePageEmail();
@@ -31,6 +33,7 @@ export function NemuApp() {
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
   const { state, ask, reset } = useAsk(pageEmail, close);
+  const preview = useDisplayPreview();
   const { voice, working, speak, repeat, stop } = useVoice(pageEmail);
   const talk = useTalk({
     pageEmail,
@@ -41,6 +44,7 @@ export function NemuApp() {
     onQuestion: (question) => void ask(question),
   });
   const { dismiss } = talk;
+
   const askTyped = useCallback(
     (question: string) => {
       dismiss();
@@ -81,36 +85,54 @@ export function NemuApp() {
   );
 
   return (
-    <div
-      className="pointer-events-none fixed right-6 bottom-6 z-[2147483647] flex flex-col items-end gap-3 font-sans"
-      onKeyDown={(event) => {
-        if (event.key === "Escape") close();
-      }}
-    >
-      {open && (
-        <div className="pointer-events-auto flex flex-col items-end gap-2">
-          <NemuPanel
-            identity={identity}
-            state={state}
-            talk={talk.state}
-            heard={talk.heard}
-            voice={voice}
-            onAsk={askTyped}
-            onRepeat={repeat}
-            onDismiss={dismissAll}
+    <>
+      <div
+        className="pointer-events-none fixed right-6 bottom-6 z-[2147483647] flex flex-col items-end gap-3 font-sans"
+        onKeyDown={(event) => {
+          if (event.key === "Escape") close();
+        }}
+      >
+        {preview.display ? (
+          <div className="pointer-events-auto">
+            <NemuStage display={preview.display} target={preview.target} />
+          </div>
+        ) : (
+          open && (
+            <div className="pointer-events-auto flex flex-col items-end gap-2">
+              <NemuPanel
+                identity={identity}
+                state={state}
+                talk={talk.state}
+                heard={talk.heard}
+                voice={voice}
+                onAsk={askTyped}
+                onRepeat={repeat}
+                onRead={(text) => void speak(text)}
+                onDismiss={dismissAll}
+              />
+            </div>
+          )
+        )}
+        <div className="pointer-events-auto">
+          <NemuButton
+            open={open}
+            shortcutKeys={SHORTCUT_KEYS}
+            onToggle={() => setOpen((current) => !current)}
+            onHoldStart={talk.press}
+            onHoldEnd={talk.release}
           />
         </div>
-      )}
-      <div className="pointer-events-auto">
-        <NemuButton
-          open={open}
-          shortcutKeys={SHORTCUT_KEYS}
-          onToggle={() => setOpen((current) => !current)}
-          onHoldStart={talk.press}
-          onHoldEnd={talk.release}
-        />
       </div>
-    </div>
+      {PREVIEW_ENABLED && (
+        <DisplayPreviewDock
+          onShow={(scene) => {
+            close();
+            void preview.show(scene);
+          }}
+          onClose={preview.close}
+        />
+      )}
+    </>
   );
 }
 
@@ -122,9 +144,11 @@ type NemuPanelProps = {
   voice: VoiceState | null;
   onAsk: (question: string) => void;
   onRepeat: () => void;
+  onRead: (text: string) => void;
   onDismiss: () => void;
 };
 
+/** One display at a time: a talk failure, else the answer (or its Skeleton). */
 function NemuPanel({
   identity,
   state,
@@ -133,26 +157,33 @@ function NemuPanel({
   voice,
   onAsk,
   onRepeat,
+  onRead,
   onDismiss,
 }: NemuPanelProps) {
-  if (!identity) return <AnswerBubbleSkeleton />;
+  if (!identity) return <GelembungJawabSkeleton />;
   // ID-02: an unregistered or signed-out account gets the reason instead of the type box.
-  if (identity.status !== "registered") return <AnswerBubble text={identity.message} />;
+  if (identity.status !== "registered") return <GelembungJawab sentence={identity.message} />;
   return (
     <>
       {talk.phase === "transcribing" && <HeardBubble text={null} />}
       {heard !== null && <HeardBubble text={heard} />}
-      {state.status === "asking" && <AnswerBubbleSkeleton />}
-      {state.status === "answered" && (
-        <AnswerBubble
-          text={state.result.text}
-          sources={state.result.kind === "answer" ? state.result.sources : []}
-          onClose={onDismiss}
-        >
-          <SpokenText text={state.result.text} voice={voice} onRepeat={onRepeat} />
-        </AnswerBubble>
+      {talk.phase === "failed" ? (
+        <GelembungJawab sentence={talk.message} onClose={onDismiss} />
+      ) : (
+        <>
+          {state.status === "asking" && <GelembungJawabSkeleton />}
+          {state.status === "answered" && (
+            <GelembungJawab
+              sentence={state.result.text}
+              highlightedWord={spokenWordIn(state.result.text, voice)}
+              notes={state.result.kind === "answer" ? { sumber: state.result.sources } : undefined}
+              onRead={onRead}
+              onRepeat={onRepeat}
+              onClose={onDismiss}
+            />
+          )}
+        </>
       )}
-      {talk.phase === "failed" && <AnswerBubble text={talk.message} onClose={onDismiss} />}
       {talk.phase === "listening" && <ListeningBubble />}
       <AskBox pending={state.status === "asking"} onAsk={onAsk} />
     </>

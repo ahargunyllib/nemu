@@ -24,9 +24,33 @@ _Avoid_: whitelist, allowlist (in UI copy)
 The dark orange round button at the bottom right of an allowed website. Clicking it opens the type box; holding Ctrl + Spasi talks to Nemu instead.
 _Avoid_: launcher, FAB, mascot
 
+**Display type**:
+One of the five fixed shapes everything Nemu shows takes (PRD §6.2): Gelembung Kerja, Gelembung Tunjuk, Gelembung Jawab, Kartu Pilih, Kartu Info. Only one shows at a time.
+_Avoid_: popup, modal, widget
+
+**Gelembung Kerja**:
+The bubble while Nemu works: a status header with a progress bar ("Nemu mengisi · 13 dari 32"), one sentence, and always Pelan and Berhenti.
+_Avoid_: progress toast
+
+**Gelembung Tunjuk**:
+The bubble for the teacher's turn: one sentence beside the field or button the Nemu cursor points at, no buttons, at most one link.
+_Avoid_: tooltip, hint
+
 **Gelembung Jawab**:
-The answer bubble above the Nemu button: Nemu's sentence and its sources, or why Nemu can't help yet.
+The answer bubble: Nemu's sentence with the Kenapa?, Sumber and Lihat ringkasan links and at most one action button, or why Nemu can't help yet. Above the Nemu button when it is about no page element.
 _Avoid_: answer card, chat bubble, toast
+
+**Kartu Pilih**:
+The card for a decision: one question and two or three equal big buttons, nothing pre-selected; a risky choice carries ⚠ and sits under the safe one.
+_Avoid_: dialog, confirm, prompt
+
+**Kartu Info**:
+The card for something to read, such as the Catatan langkah: a title, a short list and one Tutup.
+_Avoid_: modal, summary dialog
+
+**Nemu cursor**:
+The small dark orange dot that glides (about 0.6 s) to the next page element, rings it, and only then lets the bubble speak (F0-16). Clicks go through it.
+_Avoid_: pointer, mascot cursor
 
 **Admin Workspace**:
 The web console where Admin Javan and school operators manage knowledge, teachers and settings.

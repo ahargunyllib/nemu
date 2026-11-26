@@ -33,6 +33,12 @@
   --nemu-ring: var(--nemu-amber-500);
   /* nemu/accent-glow: mascot glow, loading shimmer. */
   --nemu-glow: var(--nemu-amber-400);
+  /*
+   * Nemu's dark orange for the five display types (PRD §6.2 asks for 7:1): the fill of their one
+   * action button, their links, and their status header text. White on it is 9.6:1.
+   */
+  --nemu-strong: var(--nemu-amber-800);
+  --nemu-strong-foreground: #ffffff;
 
   /* bg/success, text/success: "Kamu yang mengirim" label, success Answer Card. */
   --nemu-success: #10b981;
@@ -72,6 +78,8 @@
   --color-nemu-subtle-foreground: var(--nemu-subtle-foreground);
   --color-nemu-ring: var(--nemu-ring);
   --color-nemu-glow: var(--nemu-glow);
+  --color-nemu-strong: var(--nemu-strong);
+  --color-nemu-strong-foreground: var(--nemu-strong-foreground);
   --color-nemu-success: var(--nemu-success);
   --color-nemu-success-foreground: var(--nemu-success-foreground);
   --color-nemu-success-subtle: var(--nemu-success-subtle);

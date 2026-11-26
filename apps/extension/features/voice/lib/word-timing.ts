@@ -67,3 +67,15 @@ export function estimateWords(text: string): { words: SpokenWord[]; durationMs: 
   }
   return { words, durationMs: offset };
 }
+
+/**
+ * The word to mark in a bubble's sentence: the voice's current word while it reads that bubble's
+ * main sentence (a prefix of the sentence, so the word counts line up), otherwise none.
+ */
+export function spokenWordIn(
+  text: string,
+  voice: { sentence: string; activeIndex: number } | null,
+): number | undefined {
+  if (!voice || voice.activeIndex < 0 || voice.sentence !== mainSentence(text)) return undefined;
+  return voice.activeIndex;
+}

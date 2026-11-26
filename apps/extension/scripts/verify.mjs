@@ -109,9 +109,9 @@ await check(
     await openNemu(page);
     await overlay(page).getByLabel("Pertanyaan untuk Nemu").fill("KKM nilai berapa?");
     await overlay(page).getByRole("button", { name: "Kirim" }).click();
-    await bubble(page).getByText("SOP Penilaian SDIT Nusantara", { exact: false }).waitFor({
-      timeout: 15_000,
-    });
+    // The source is behind the Sumber link (#201): read only once it is clicked.
+    await bubble(page).getByRole("button", { name: "Sumber" }).click({ timeout: 15_000 });
+    await bubble(page).getByText("SOP Penilaian SDIT Nusantara", { exact: false }).waitFor();
     expect((await bubble(page).innerText()).includes("75"), "the answer doesn't name the KKM");
     await page.screenshot({ path: join(shots, "answer.png") });
   },
@@ -148,7 +148,7 @@ await check(
     await page.keyboard.up("Control");
     await heardBubble(page).getByText(HEARD).waitFor({ timeout: 15_000 });
     await bubble(page).getByText("Nemu belum bisa mengisi nilai").waitFor({ timeout: 15_000 });
-    await bubble(page).locator("[aria-current='true']").first().waitFor({ timeout: 5_000 });
+    await bubble(page).locator("[data-nemu-spoken]").first().waitFor({ timeout: 5_000 });
     await page.waitForTimeout(1_200);
     await page.screenshot({ path: join(shots, "speaking.png") });
   },
