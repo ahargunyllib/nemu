@@ -1,0 +1,4 @@
+username,password,firstname,lastname,email,idnumber,course1,role1
+siswa.aisyah,Nemu-uji-2026!,Aisyah Putri,Wijaya,siswa.aisyah@nemu-uji.example,4101,4A-UJI,student
+siswa.bagas,Nemu-uji-2026!,Bagas,Pratama,siswa.bagas@nemu-uji.example,4104,4A-UJI,student
+siswa.citra,Nemu-uji-2026!,Citra,Lestari,siswa.citra@nemu-uji.example,4105,4A-UJI,student

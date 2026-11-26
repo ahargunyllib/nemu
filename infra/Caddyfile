@@ -1,0 +1,3 @@
+{$MOODLE_DOMAIN} {
+	reverse_proxy moodle:8080
+}

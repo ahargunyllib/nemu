@@ -10,6 +10,10 @@ When the user corrects an implementation, design choice, or workflow, apply the 
 
 The Nemu Service is a modular monolith: `apps/server` composes it, and feature modules in `packages/api` run procedure → service → repository. Follow `docs/agents/backend-architecture.md` for placement, request flow, authentication, Cloudflare lifecycle, configuration, and audit rules.
 
+### Infrastructure
+
+`packages/infra` is the Alchemy stack for what runs on Cloudflare. Anything self-hosted outside Cloudflare goes directly in the top-level `infra/` (Compose file, Caddyfile, setup scripts), with a README a teammate can deploy from, not in a subfolder per host. For example, the team VPS stack (Moodle test site, later `wa-bot`) moved from `packages/infra/vps` to `infra/vps`, then up to `infra/`.
+
 ### Frontend architecture
 
 The Admin Workspace and the Nemu Extension use route-owned (or entrypoint-owned) page composition and responsibility-based feature slices. Follow `docs/agents/frontend-architecture.md` for placement, composition, search validation, and audit rules.
