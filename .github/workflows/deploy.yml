@@ -28,6 +28,7 @@ jobs:
       BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       WA_BOT_SECRET: ${{ secrets.WA_BOT_SECRET }}
+      INTEGRATION_SECRETS_KEY: ${{ secrets.INTEGRATION_SECRETS_KEY }}
       CORS_ORIGIN: ${{ vars.CORS_ORIGIN }}
     steps:
       - uses: actions/checkout@v7

@@ -1,6 +1,7 @@
 import {
   FileTextIcon,
   GlobeIcon,
+  KeyRoundIcon,
   LayoutDashboardIcon,
   type LucideIcon,
   SchoolIcon,
@@ -11,7 +12,7 @@ import {
 
 import { isFullAdmin } from "@/features/workspace/lib/roles";
 
-type NavPath = "/dashboard" | "/documents" | "/tables" | "/schools" | "/teachers";
+type NavPath = "/dashboard" | "/documents" | "/tables" | "/schools" | "/teachers" | "/integrations";
 
 export type NavItem = {
   label: string;
@@ -48,6 +49,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Configuration",
     items: [
+      { to: "/integrations", label: "Integrasi", icon: KeyRoundIcon, adminOnly: true },
       { label: "Domains", icon: GlobeIcon, comingSoon: true, adminOnly: true },
       { label: "Action Rules", icon: ShieldCheckIcon, comingSoon: true, adminOnly: true },
     ],

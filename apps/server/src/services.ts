@@ -1,5 +1,8 @@
 import { createFixtureSchoolAi, createSchoolAi, type SchoolAi } from "@nemu/ai/school/runtime";
 import type { DocumentFileStore, InboxFileStore, SchoolServices } from "@nemu/api/context";
+import { createStoredAlurSekolahConnector } from "@nemu/api/modules/alursekolah/connector";
+import { createSecretCipher, type SecretCipher } from "@nemu/api/modules/integrations/cipher";
+import { createIntegrationSecretRepository } from "@nemu/api/modules/integrations/repository";
 import { createRegistrySchoolDirectory } from "@nemu/api/modules/school/registry-directory";
 import { createSchoolRepository } from "@nemu/api/modules/school/repository";
 import { createWorkspaceRepository } from "@nemu/api/modules/workspaces/repository";
@@ -95,11 +98,23 @@ function createSchoolAiFromEnv(): SchoolAi {
   });
 }
 
-/** Nemu school services. The directory reads the teachers and contacts registered in WS-06. */
+/** WS-07 settings are sealed with this; an empty INTEGRATION_SECRETS_KEY fails every save and read clearly. */
+export function createIntegrationSecretCipher(): SecretCipher {
+  return createSecretCipher(ENV.INTEGRATION_SECRETS_KEY ?? "");
+}
+
+/**
+ * Nemu school services. The directory reads the teachers and contacts registered in WS-06;
+ * AlurSekolah is reached with the base URL and key Admin Javan stored in WS-07.
+ */
 export function createSchoolServices(db: Database): SchoolServices {
   return {
     ai: createSchoolAiFromEnv(),
     directory: createRegistrySchoolDirectory(createSchoolRepository(db)),
     inbox: createInboxFileStore(),
+    alurSekolah: createStoredAlurSekolahConnector({
+      secrets: createIntegrationSecretRepository(db),
+      cipher: createIntegrationSecretCipher(),
+    }),
   };
 }

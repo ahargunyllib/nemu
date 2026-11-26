@@ -16,6 +16,7 @@ import type {
   VerificationPlan,
 } from "@nemu/contracts/school";
 
+import type { AlurSekolahClient, AlurSekolahNilai } from "../alursekolah/client";
 import type { DocumentRepository } from "../documents/repository";
 import type { RuleSourceRepository } from "../rule-sources/repository";
 import type { SchoolDirectory } from "../school/directory";
@@ -87,6 +88,65 @@ export async function finalizeGrades(
 
 export function readback(entries: GradeEntry[], saved: ReadbackRow[]): ReadbackResult {
   return diffReadback(entries, saved);
+}
+
+/** Assessment names Nemu parses (F1-05) that AlurSekolah's `jenis` spells differently. */
+const JENIS_ALIASES: Record<string, string> = { UH: "Harian", PTS: "UTS", PAS: "UAS" };
+
+async function nilaiForAssessment(
+  alurSekolah: Pick<AlurSekolahClient, "nilai">,
+  filter: { kelas: string; mapel: string; semester?: string },
+  assessment: string,
+): Promise<AlurSekolahNilai[]> {
+  const exact = await alurSekolah.nilai({ ...filter, jenis: assessment });
+  const alias = JENIS_ALIASES[assessment.split(/\s+/u)[0]!.toUpperCase()];
+  if (exact.data.length || !alias) return exact.data;
+  return (await alurSekolah.nilai({ ...filter, jenis: alias })).data;
+}
+
+/**
+ * F1-10 from AlurSekolah API v1 instead of a scraped Rekap Nilai: `/nilai` for the class, subject
+ * and assessment, and `/siswa` for the class roster, so a student without a stored grade reads as
+ * empty rather than missing. With several rows for one student, the newest wins.
+ */
+export async function readbackFromAlurSekolah(
+  alurSekolah: Pick<AlurSekolahClient, "nilai" | "siswa">,
+  input: {
+    entries: GradeEntry[];
+    className: string;
+    subject: string;
+    assessment: string;
+    semester?: string | null;
+  },
+): Promise<ReadbackResult> {
+  const filter = {
+    kelas: input.className,
+    mapel: input.subject,
+    ...(input.semester ? { semester: input.semester } : {}),
+  };
+  const [roster, nilai] = await Promise.all([
+    alurSekolah.siswa({ kelas: input.className }),
+    nilaiForAssessment(alurSekolah, filter, input.assessment),
+  ]);
+  const newest = new Map<string, AlurSekolahNilai>();
+  for (const row of nilai) {
+    const current = newest.get(row.nis);
+    const isNewer =
+      !current ||
+      (row.tanggal ?? "").localeCompare(current.tanggal ?? "") > 0 ||
+      ((row.tanggal ?? "") === (current.tanggal ?? "") && row.id > current.id);
+    if (isNewer) newest.set(row.nis, row);
+  }
+  const saved: ReadbackRow[] = roster.data.map((student) => ({
+    name: student.nama,
+    value: newest.has(student.nis) ? String(newest.get(student.nis)!.skor) : "",
+  }));
+  const rosterNis = new Set(roster.data.map((student) => student.nis));
+  for (const row of newest.values()) {
+    if (!rosterNis.has(row.nis))
+      saved.push({ name: row.nama_siswa ?? row.nis, value: String(row.skor) });
+  }
+  return diffReadback(input.entries, saved);
 }
 
 export type GuidedLine = { sentence: string; ok: boolean | null };
