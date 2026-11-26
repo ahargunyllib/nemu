@@ -26,7 +26,7 @@ describe("mock page", () => {
     const body = await (await createMock().page("/sekolah")).json();
 
     expect(body).toMatchObject({
-      akun: { "siti.aminah": { email: "siti.aminah@sdit-nusantara.example" } },
+      akun: { "siti.aminah": { email: "siti.aminah@sditnusantara.sch.id" } },
     });
   });
 

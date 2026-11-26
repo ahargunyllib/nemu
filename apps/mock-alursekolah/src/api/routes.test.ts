@@ -63,7 +63,7 @@ describe("AlurSekolah read API", () => {
           skor: 80,
           tanggal: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
           catatan: "",
-          guru: "siti.aminah@sdit-nusantara.example",
+          guru: "siti.aminah@sditnusantara.sch.id",
         },
         expect.objectContaining({ nama_siswa: "Budi Santoso", skor: 62 }),
       ],
@@ -178,7 +178,7 @@ describe("AlurSekolah read API", () => {
 
     expect(body).toEqual({
       data: {
-        email: "rizal.operator@sdit-nusantara.example",
+        email: "rizal.operator@sditnusantara.sch.id",
         nama: "Rizal Pratama",
         aktif: true,
         kelas: ["4A", "4B", "5A"],
@@ -245,7 +245,7 @@ describe("AlurSekolah read API", () => {
           ayat: 30,
           nilai: 88.4,
           label: "Al-Mulk, ayat 1-30 (utuh)",
-          guru: "siti.aminah@sdit-nusantara.example",
+          guru: "siti.aminah@sditnusantara.sch.id",
         },
       ],
     });

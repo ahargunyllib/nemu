@@ -23,7 +23,7 @@ export const AKUN: Readonly<Record<string, Akun>> = {
   // IPAS 4A SENGAJA belum ditugaskan ke Bu Siti (kasus uji F2-2).
   "siti.aminah": {
     nama: "Siti Aminah, S.Pd.",
-    email: "siti.aminah@sdit-nusantara.example",
+    email: "siti.aminah@sditnusantara.sch.id",
     peran: "guru",
     wali: "4A",
     kelas: ["4A", "4B"],
@@ -33,7 +33,7 @@ export const AKUN: Readonly<Record<string, Akun>> = {
   },
   "dewi.lestari": {
     nama: "Dewi Lestari, S.Pd.",
-    email: "dewi.lestari@sdit-nusantara.example",
+    email: "dewi.lestari@sditnusantara.sch.id",
     peran: "guru",
     wali: "5A",
     kelas: ["5A"],
@@ -42,7 +42,7 @@ export const AKUN: Readonly<Record<string, Akun>> = {
   },
   "rizal.operator": {
     nama: "Rizal Pratama",
-    email: "rizal.operator@sdit-nusantara.example",
+    email: "rizal.operator@sditnusantara.sch.id",
     peran: "operator",
     kelas: ["4A", "4B", "5A"],
     tugas: "semua",

@@ -11,11 +11,11 @@ All data is synthetic (SDIT Nusantara). Students come from `01_profil-sekolah/` 
 
 Password for every account: `nemu-uji-2026`.
 
-| Username         | Email                                   | Role     | Assignments                                                    |
-| ---------------- | --------------------------------------- | -------- | -------------------------------------------------------------- |
-| `siti.aminah`    | `siti.aminah@sdit-nusantara.example`    | guru     | 4A: Bahasa Inggris, Tahfidz · 4B: Matematika, Bahasa Indonesia |
-| `dewi.lestari`   | `dewi.lestari@sdit-nusantara.example`   | guru     | 5A: Bahasa Indonesia                                           |
-| `rizal.operator` | `rizal.operator@sdit-nusantara.example` | operator | all classes                                                    |
+| Username         | Email                                 | Role     | Assignments                                                    |
+| ---------------- | ------------------------------------- | -------- | -------------------------------------------------------------- |
+| `siti.aminah`    | `siti.aminah@sditnusantara.sch.id`    | guru     | 4A: Bahasa Inggris, Tahfidz · 4B: Matematika, Bahasa Indonesia |
+| `dewi.lestari`   | `dewi.lestari@sditnusantara.sch.id`   | guru     | 5A: Bahasa Indonesia                                           |
+| `rizal.operator` | `rizal.operator@sditnusantara.sch.id` | operator | all classes                                                    |
 
 IPAS 4A is deliberately not assigned to Bu Siti: Nilai › 4A › IPAS › Tampilkan Siswa shows
 "Anda belum ditugaskan mengampu IPAS di kelas 4A" (test F2-2). The signed-in email is on Profil
