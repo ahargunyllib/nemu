@@ -1,7 +1,7 @@
 # Frontend Architecture
 
-These rules apply to `apps/mock-alurkerja/src`, `apps/admin/src`, and
-`apps/extension` (the Nemu Extension). Shared UI primitives live in
+These rules apply to `apps/admin/src` and `apps/extension` (the Nemu
+Extension), and to any mock app added under `apps/`. Shared UI primitives live in
 `packages/ui`.
 
 ## Source layout
@@ -29,7 +29,7 @@ These rules apply to `apps/mock-alurkerja/src`, `apps/admin/src`, and
   live in `packages/ui/src/nemu` and are imported as `@nemu/ui/nemu/<name>`;
   their tokens are in `packages/ui/src/styles/nemu.css`. Never edit a vendored
   primitive to brand it.
-- The signed-in layout the Demo App and the Admin Workspace share (`AppShell`,
+- The shared signed-in layout (`AppShell`,
   `AppSidebar`, `AppHeader`, `PageHeading`, `AccountMenu`) lives in
   `packages/ui/src/shell` and is imported as `@nemu/ui/shell/<name>`. Each app
   fills it with its own menu items, account details, and pages.
@@ -81,13 +81,6 @@ These rules apply to `apps/mock-alurkerja/src`, `apps/admin/src`, and
 - Preserve route-level lazy boundaries. Do not import a multi-page feature
   barrel.
 
-## Demo App elements
-
-- Every interactive element in the Demo App has a `data-nemu-id` taken from
-  `NEMU_IDS` in `@nemu/contracts/nemu-ids` and a clear accessible label
-  (visible text or `aria-label`). Register a new id there before rendering it,
-  and never rename one. See `docs/demo-app.md`.
-
 ## React composition and state
 
 - Split feature UI into cohesive sections and controls. Move deterministic
@@ -117,20 +110,20 @@ Run these checks after frontend architecture changes:
 
 ```bash
 # Responsibility placement.
-find apps/mock-alurkerja/src apps/admin/src apps/extension -path '*/node_modules' -prune -o -type f -path '*/components/*.ts' -print
-find apps/mock-alurkerja/src apps/admin/src apps/extension -path '*/node_modules' -prune -o -type d \( -name model -o -name ui -o -name utils \) -print
-rg -l '^export (function|const) use[A-Z]' apps/mock-alurkerja/src apps/admin/src apps/extension -g '*.ts' -g '*.tsx' | rg -v '/hooks/'
-rg -l '\bcreateContext\b' apps/mock-alurkerja/src apps/admin/src apps/extension -g '*.ts' -g '*.tsx' | rg -v '/contexts/'
+find apps/admin/src apps/extension -path '*/node_modules' -prune -o -type f -path '*/components/*.ts' -print
+find apps/admin/src apps/extension -path '*/node_modules' -prune -o -type d \( -name model -o -name ui -o -name utils \) -print
+rg -l '^export (function|const) use[A-Z]' apps/admin/src apps/extension -g '*.ts' -g '*.tsx' | rg -v '/hooks/'
+rg -l '\bcreateContext\b' apps/admin/src apps/extension -g '*.ts' -g '*.tsx' | rg -v '/contexts/'
 
 # No page facades or app-local barrels.
-find apps/mock-alurkerja/src apps/admin/src apps/extension -path '*/node_modules' -prune -o -type f \( -name '*-page.tsx' -o -name index.ts \) -print
+find apps/admin/src apps/extension -path '*/node_modules' -prune -o -type f \( -name '*-page.tsx' -o -name index.ts \) -print
 
 # Route concerns stay out of features; shared remains a dependency leaf.
-rg -n '\b(createFileRoute|validateSearch|loaderDeps|beforeLoad|getRouteApi)\b' apps/mock-alurkerja/src/features apps/admin/src/features
-rg -n '@/features/|@/routes/' apps/mock-alurkerja/src/shared apps/admin/src/shared
+rg -n '\b(createFileRoute|validateSearch|loaderDeps|beforeLoad|getRouteApi)\b' apps/admin/src/features
+rg -n '@/features/|@/routes/' apps/admin/src/shared
 
 # Review search usage against Zod validators in routes.
-rg -n '\b(useSearch|validateSearch|loaderDeps)\b' apps/mock-alurkerja/src apps/admin/src -g '!routeTree.gen.ts'
+rg -n '\b(useSearch|validateSearch|loaderDeps)\b' apps/admin/src -g '!routeTree.gen.ts'
 
 pnpm check
 pnpm build

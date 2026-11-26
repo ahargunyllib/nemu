@@ -1,11 +1,11 @@
 # Nemu
 
-Nemu is an AI guide in the browser that walks an employee through a work process inside their organisation's web app, answering only from knowledge the admin manages. The MVP guides two cases on a fake AlurKerja app: a Perjalanan Dinas and a Klaim SLA.
+Nemu is an AI companion in the browser that does school administration together with a teacher, on the AlurSekolah, Moodle and government pages she already uses, answering only from knowledge the school and Javan manage. Terms from the first MVP, a guide on a fake AlurKerja app, are under "Legacy" below.
 
 ## Products
 
 **Nemu Extension**:
-The Chrome extension the employee uses: mascot, composer, area crop, highlight and navigation clicks, active only on allowlisted domains.
+The Chrome and Edge extension the teacher uses: it reads and fills the page in front of her, active only on allowed websites.
 _Avoid_: plugin, overlay
 
 **Nemu Service**:
@@ -16,23 +16,41 @@ _Avoid_: layanan, backend, API
 The web console where an admin manages documents, tables, domains, action rules and user profiles.
 _Avoid_: workspace (alone), dashboard
 
-**Demo App**:
-Our fake AlurKerja App, the only place Nemu runs in the MVP. It is not the real AlurKerja. Its UI is in Indonesian, so Nemu can quote its labels.
-_Avoid_: Tiruan App, AlurKerja App, web app
-
 **Knowledge Workspace**:
-The set of knowledge, Reference Tables, process data and users Nemu answers from for one case: `W-TRAVEL` (Perjalanan Dinas) or `W-TELKO` (Klaim SLA). A signed-in user belongs to one, and the Nemu Service reads only that one's data.
+The set of knowledge, Reference Tables, process data and users Nemu answers from for one case: `W-SEKOLAH`, or the legacy `W-TRAVEL` and `W-TELKO`. A signed-in user belongs to one, and the Nemu Service reads only that one's data.
 _Avoid_: workspace (alone), tenant
 
 **Rule Source**:
-The document location (document, article or section, page) that a deterministic rule such as an SBM lookup or a claim cutoff cites. Each rule has a default; an admin can point it at a newer document.
+The document location (document, article or section, page) that a deterministic rule such as the KKM or an SBM lookup cites. Each rule has a default; an admin can point it at a newer document.
 _Avoid_: citation mapping, source binding
 
-**AlurKerja tenant**:
-An organisation's own instance of the real AlurKerja SaaS. Out of scope for the MVP.
-_Avoid_: workspace
+## Sekolah domain
 
-## Guiding
+**W-SEKOLAH**:
+The Knowledge Workspace for Nemu on AlurSekolah: the fictional SDIT Nusantara, with Bu Siti (teacher) and Pak Rizal (operator). See `docs/school-ai.md`.
+_Avoid_: school tenant
+
+**Photo Job**:
+One grade-book photo waiting to be read for a teacher, from WhatsApp or an upload. It lives in the `inbox` bucket until the teacher saves, at most a day.
+_Avoid_: upload, ticket
+
+**Verification Question**:
+One screen asking the teacher about a doubtful digit, a name spelled differently from the roster, or an S/I/A cell. Its options are never pre-selected.
+_Avoid_: confirmation, review
+
+**Kamus Kendala**:
+The school's error dictionary: what an error message means, whose fault it is, and who fixes it. Nemu answers "ini kenapa?" only from it.
+_Avoid_: FAQ, error list
+
+**Recorded Procedure**:
+Steps an operator recorded once ("cara Pak Rizal"), with demo values turned into parameters. Replayed without a model; save, send and submit steps stay the teacher's.
+_Avoid_: macro, script
+
+## Legacy: the AlurKerja MVP
+
+These terms describe the first MVP, a guide for an employee on a fake AlurKerja app (the Demo App, now removed). Their code stays until the extension moves onto the school procedures, then leaves with it.
+
+### Guiding
 
 **Momen**:
 One of the three demo moments in Rina's Perjalanan Dinas: start the request (1), fill the lodging field (2), after returning home (3).
@@ -43,7 +61,7 @@ How far Nemu may act on an element: **Jalan sendiri** (Nemu clicks), **Arahkan**
 _Avoid_: permission, mode
 
 **nemu_id**:
-The stable identifier the Demo App puts on every interactive element so Nemu can target it.
+The stable identifier the Demo App put on every interactive element so Nemu can target it.
 _Avoid_: selector, element id
 
 **Element List**:
@@ -68,7 +86,7 @@ _Avoid_: chat box
 The audit record of every chat request (time, user, prompt, sources, actions, result), shown to the admin in the Admin Workspace. It notes whether an Area Crop was attached but never stores the image.
 _Avoid_: chat history, transcript
 
-## Perjalanan Dinas domain
+### Perjalanan Dinas domain
 
 **Perjalanan Dinas**:
 An official work trip, governed by PMK 113/2012 jo. PMK 119/2023.
@@ -93,15 +111,15 @@ The post-trip accountability submission, due within 5 working days after return.
 _Avoid_: reimbursement, laporan
 
 **Process Instance**:
-One employee's Perjalanan Dinas running in the Demo App, with a single current **State** (Draf → Diajukan → Disetujui → Berangkat → Kembali → Pertanggungjawaban → Verifikasi → Selesai, or Revisi).
+One employee's Perjalanan Dinas, with a single current **State** (Draf → Diajukan → Disetujui → Berangkat → Kembali → Pertanggungjawaban → Verifikasi → Selesai, or Revisi).
 
 **Task**:
 The work item a Process Instance currently asks of the employee (e.g. fill the plan, submit Pertanggungjawaban); derived from its State.
 
-## Klaim SLA domain
+### Klaim SLA domain
 
 **Klaim SLA**:
-A corporate customer's claim for compensation after an internet outage beyond its contracted SLA, reviewed under SOP-KLAIM-SLA-01 and settled as a credit note on the next invoice, never as cash. The second case of the MVP, in the `W-TELKO` Knowledge Workspace.
+A corporate customer's claim for compensation after an internet outage beyond its contracted SLA, reviewed under SOP-KLAIM-SLA-01 and settled as a credit note on the next invoice, never as cash. The second case of the first MVP, in the `W-TELKO` Knowledge Workspace.
 _Avoid_: refund, complaint
 
 **Billing Liaison**:
@@ -115,25 +133,3 @@ _Avoid_: root cause, cause report
 **PERLU_BUKTI**:
 The result of a Klaim SLA calculation while an RCA is not yet approved: Nemu shows no final amount and asks for the RCA instead.
 _Avoid_: pending, unknown
-
-## Sekolah domain (Nemu v2.2)
-
-**W-SEKOLAH**:
-The Knowledge Workspace for Nemu v2.2 on AlurSekolah: the fictional SDIT Nusantara, with Bu Siti (teacher) and Pak Rizal (operator). See `docs/school-ai.md`.
-_Avoid_: school tenant
-
-**Photo Job**:
-One grade-book photo waiting to be read for a teacher, from WhatsApp or an upload. It lives in the `inbox` bucket until the teacher saves, at most a day.
-_Avoid_: upload, ticket
-
-**Verification Question**:
-One screen asking the teacher about a doubtful digit, a name spelled differently from the roster, or an S/I/A cell. Its options are never pre-selected.
-_Avoid_: confirmation, review
-
-**Kamus Kendala**:
-The school's error dictionary: what an error message means, whose fault it is, and who fixes it. Nemu answers "ini kenapa?" only from it.
-_Avoid_: FAQ, error list
-
-**Recorded Procedure**:
-Steps an operator recorded once ("cara Pak Rizal"), with demo values turned into parameters. Replayed without a model; save, send and submit steps stay the teacher's.
-_Avoid_: macro, script

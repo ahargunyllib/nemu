@@ -95,21 +95,6 @@ export default Alchemy.Stack(
   },
   Effect.gen(function* () {
     const serverWorker = yield* server;
-    const webWorker = yield* Cloudflare.Website.Vite("web", {
-      rootDir: "../../apps/mock-alurkerja",
-      domain: isProd ? "nemu-mock-alurkerja.ahargunyllib.dev" : undefined,
-      assets: {
-        htmlHandling: "auto-trailing-slash",
-        notFoundHandling: "single-page-application",
-      },
-      env: {
-        VITE_SERVER_URL: serverWorker.url.as<string>(),
-      },
-      dev: {
-        port: 3001,
-      },
-    });
-
     const adminWorker = yield* Cloudflare.Website.Vite("admin", {
       rootDir: "../../apps/admin",
       domain: isProd ? "nemu-admin.ahargunyllib.dev" : undefined,
@@ -126,7 +111,6 @@ export default Alchemy.Stack(
     });
 
     return {
-      web: webWorker.url,
       admin: adminWorker.url,
       server: serverWorker.url,
     };
