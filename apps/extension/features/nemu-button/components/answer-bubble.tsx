@@ -35,18 +35,21 @@ function BubbleFrame({ label, onClose, children }: BubbleFrameProps) {
   );
 }
 
+/** `children` replaces the plain text, e.g. with the spoken text and its word highlight. */
 export function AnswerBubble({
   text,
   sources = [],
   onClose,
+  children,
 }: {
   text: string;
   sources?: readonly string[];
   onClose?: () => void;
+  children?: ReactNode;
 }) {
   return (
     <BubbleFrame label="Jawaban Nemu" onClose={onClose}>
-      <p className="whitespace-pre-line">{text}</p>
+      {children ?? <p className="whitespace-pre-line">{text}</p>}
       {sources.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {sources.map((source) => (

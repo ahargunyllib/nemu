@@ -1,7 +1,7 @@
 import type { CommandRoute } from "@nemu/contracts/school";
 import { describe, expect, test, vi } from "vite-plus/test";
 
-import { NOT_FROM_TYPING_YET } from "../lib/answer";
+import { NOT_AVAILABLE_YET } from "../lib/answer";
 import { answerQuestion } from "./answer-question";
 
 const SNAPSHOT = {
@@ -81,7 +81,7 @@ describe("answerQuestion", () => {
     const grades = fakeClient({ kind: "intent", intent: "input_nilai", processName: null });
     await expect(answerQuestion(grades, "masukkan nilai UTS 4B", SNAPSHOT)).resolves.toEqual({
       kind: "notice",
-      text: NOT_FROM_TYPING_YET,
+      text: NOT_AVAILABLE_YET,
     });
     expect(grades.helpAsk).not.toHaveBeenCalled();
 

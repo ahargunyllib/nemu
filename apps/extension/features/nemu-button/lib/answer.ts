@@ -9,9 +9,9 @@ export type AskResult =
   | { kind: "notice"; text: string }
   | { kind: "stop" };
 
-/** Grade entry and process runs start from voice and the executor (#200, #202), not the type box. */
-export const NOT_FROM_TYPING_YET =
-  "Nemu belum bisa mengerjakan ini dari kotak ketik. Coba tanyakan aturan sekolah, misalnya “KKM berapa?”";
+/** Grade entry and process runs wait for the executor (#202), whether typed or spoken. */
+export const NOT_AVAILABLE_YET =
+  "Nemu belum bisa mengisi nilai atau menjalankan proses. Coba tanyakan aturan sekolah, misalnya “KKM berapa?”";
 
 /** "SOP Penilaian SDIT Nusantara · hlm. 2 · 3.2" */
 export function sourceLabel(citation: SourceCitation): string {

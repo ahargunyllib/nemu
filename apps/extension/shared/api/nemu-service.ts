@@ -8,6 +8,8 @@ import type {
   GroundedAnswer,
   HelpExplanation,
   ScreenSnapshot,
+  SpeechSynthesis,
+  Transcript,
 } from "@nemu/contracts/school";
 import { type Client, createORPCClient, ORPCError } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
@@ -23,6 +25,8 @@ export type NemuServiceClient = {
   helpRoute: Call<{ utterance: string }, CommandRoute>;
   helpAsk: Call<{ question: string }, GroundedAnswer>;
   helpExplain: Call<{ snapshot: ScreenSnapshot; question: string | null }, HelpExplanation>;
+  speechTranscribe: Call<{ audioBase64: string; format: "wav" | "webm" }, Transcript>;
+  speechSynthesize: Call<{ text: string }, SpeechSynthesis>;
 };
 
 export type ExtensionCredentials = { installCode: string; email?: string | null };
