@@ -8,7 +8,7 @@ import { MAX_PHOTO_BYTES, ackJob, enqueuePhoto, jobPhoto, listJobs, processJob }
 const jobIdSchema = z.object({ jobId: z.string().min(1).max(80) });
 
 export const inboxRouter = {
-  /** A photo from the laptop or the QR upload page (the WhatsApp webhook calls `enqueuePhoto` directly). */
+  /** A photo from the laptop or the QR upload page (WhatsApp photos come through `waBotPhoto`). */
   inboxUploadPhoto: schoolProcedure
     .input(
       z.object({

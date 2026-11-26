@@ -23,3 +23,23 @@ jobs:
         run: pnpm run test
       - name: Offline evaluation (calculations, K2, retrieval)
         run: pnpm --filter @nemu/ai eval:offline
+
+  wa-bot:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/wa-bot
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: apps/wa-bot/go.mod
+          cache-dependency-path: apps/wa-bot/go.sum
+      - name: Format
+        run: test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
+      - name: Vet
+        run: go vet ./...
+      - name: Test
+        run: go test -race ./...
+      - name: Build the image
+        run: docker build -t wa-bot .

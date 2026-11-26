@@ -84,6 +84,16 @@ export const schoolAdminProcedure = workspaceAdminProcedure.use(
   requireWorkspaceAccess(WORKSPACES.school),
 );
 
+/** Procedures only the WhatsApp bot calls, with its shared secret instead of a user session. */
+export const waBotProcedure = publicProcedure.use(async ({ context, next }) => {
+  if (context.internalCaller !== "wa-bot") {
+    throw new ORPCError("UNAUTHORIZED", {
+      message: "Send the wa-bot shared secret (WA_BOT_SECRET) as a Bearer token",
+    });
+  }
+  return next();
+});
+
 // The current reference-table schema contains travel-only SBM, city, and holiday data.
 export const travelAdminProcedure = workspaceAdminProcedure.use(
   requireWorkspaceAccess(WORKSPACES.travel),
