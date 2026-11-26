@@ -5,11 +5,14 @@ import type { TeacherProfile } from "@nemu/ai/school/profile";
 /**
  * Who the signed-in teacher is, their classes and rosters, and the school's grade settings (L-02).
  * The fullstack side owns where this comes from (AlurSekolah login or API); the AI modules only
- * read it through this port. The demo directory serves the synthetic SDIT Nusantara.
+ * read it through this port. The Nemu Service backs it with WS-06 (`createRegistrySchoolDirectory`);
+ * the demo directory serves the synthetic SDIT Nusantara to tests.
  */
 export type SchoolDirectory = {
   teacherForUser(userId: string): Promise<TeacherProfile | null>;
   teacherByPhone(phone: string): Promise<TeacherProfile | null>;
+  /** The teacher signed in to AlurSekolah with this email (#199: identity without login). */
+  teacherByEmail(email: string): Promise<TeacherProfile | null>;
   roster(teacherId: string, className: string): Promise<RosterStudent[]>;
   /** KKM and other numbers the SOP sets; each is cited through a Rule Source. */
   gradeConfig(teacherId: string): Promise<{ kkm: number }>;
@@ -21,7 +24,7 @@ export function normalizePhone(phone: string): string {
 }
 
 export function createDemoSchoolDirectory(
-  teachers: readonly TeacherProfile[] = [BU_SITI],
+  teachers: readonly (TeacherProfile & { email?: string })[] = [BU_SITI],
   rosters = DEMO_ROSTERS,
 ): SchoolDirectory {
   return {
@@ -31,6 +34,10 @@ export function createDemoSchoolDirectory(
     async teacherByPhone(phone) {
       const wanted = normalizePhone(phone);
       return teachers.find((teacher) => normalizePhone(teacher.phone) === wanted) ?? null;
+    },
+    async teacherByEmail(email) {
+      const wanted = email.trim().toLowerCase();
+      return teachers.find((teacher) => teacher.email?.toLowerCase() === wanted) ?? null;
     },
     async roster(teacherId, className) {
       const teacher = teachers.find((item) => item.teacherId === teacherId);

@@ -13,12 +13,13 @@ Everything here runs on the synthetic school **SDIT Nusantara**. Replace the syn
 
 The OpenRouter key in `apps/server/.env` had **expired** on 25 Nov 2026 (HTTP 401), so nothing live was run. Renew it before live testing.
 
-Accounts (seeded by `packages/db/src/migrations/20261125120000_seed_school_workspace`, workspace `W-SEKOLAH`, demo date Tuesday 1 Dec 2026):
+Accounts (seeded by `packages/db/src/migrations/20261125120000_seed_school_workspace` and `20261126080000_seed_school_directory`, workspace `W-SEKOLAH`, demo date Tuesday 1 Dec 2026):
 
-| Who                         | Email             | Password          | Role                                                        |
-| --------------------------- | ----------------- | ----------------- | ----------------------------------------------------------- |
-| Bu Siti (teacher, class 4B) | `siti@nemu.demo`  | `siti-demo-2026`  | `guru`                                                      |
-| Pak Rizal (operator)        | `rizal@nemu.demo` | `rizal-demo-2026` | `admin` (can upload documents, compile and save procedures) |
+| Who                             | Email             | Password          | Role                                                             |
+| ------------------------------- | ----------------- | ----------------- | ---------------------------------------------------------------- |
+| Bu Siti (teacher, classes 4A/B) | `siti@nemu.demo`  | `siti-demo-2026`  | `guru`                                                           |
+| Pak Rizal (operator)            | `rizal@nemu.demo` | `rizal-demo-2026` | `operator` (uploads documents, saves procedures, manages WS-06)  |
+| Admin Javan                     | `javan@nemu.demo` | `javan-demo-2026` | `admin` (every page, including the school list and the Chat Log) |
 
 ## Procedures
 
@@ -106,9 +107,8 @@ Look up the sender **before** downloading the media, and drop unknown numbers (F
 
 ```ts
 import { enqueuePhoto, teacherForSender } from "@nemu/api/modules/inbox/service";
-import { createDemoSchoolDirectory } from "@nemu/api/modules/school/directory";
 
-// inside the Meta webhook route, after verifying X-Hub-Signature-256:
+// `directory` is `context.school.directory`: WS-06 in D1 (`createRegistrySchoolDirectory`).
 const teacher = await teacherForSender(directory, message.from);
 if (!teacher) return c.body(null, 200); // unknown number: never download
 const bytes = await downloadWhatsAppMedia(message.image.id); // your Graph API call (URL expires in 5 min)
@@ -155,12 +155,12 @@ The AI never emits a press of Simpan, Kirim, Ajukan or Hapus: those are `human` 
 
 ## Synthetic pieces to replace
 
-| Piece                                  | Where                                                                                    | Replace with                                                                                                                                                                    |
-| -------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Teacher profile, roster, contacts, KKM | `createDemoSchoolDirectory()` in `packages/api/src/modules/school/directory.ts`          | The AlurSekolah login data (L-02); implement the same `SchoolDirectory` port                                                                                                    |
-| SOP Penilaian, Kamus Kendala           | Seed migration, documents `sop-penilaian-sdit-nusantara`, `kamus-kendala-sdit-nusantara` | Upload the official PDFs in Admin → Documents. Then re-point the four `school.*` Rule Sources at the new SOP (Admin → Documents → Rule Sources) and deactivate the seeded ones. |
-| Izin BPMN                              | `packages/ai/src/school/fixtures/pengajuan-izin-guru.bpmn` (tests only)                  | Upload `F3-1_pengajuan-izin-guru.bpmn`                                                                                                                                          |
-| F1 eval truth                          | Synthetic page                                                                           | `pnpm --filter @nemu/ai eval:school -- --live --photo <F1-1 photo> --truth <truth.json>`                                                                                        |
+| Piece                                  | Where                                                                                                                                                          | Replace with                                                                                                                                                                    |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Teacher profile, roster, contacts, KKM | Done: WS-06 in D1 (`createRegistrySchoolDirectory`), seeded from `profil-sekolah.json` and `daftar-siswa-*.csv`; `createDemoSchoolDirectory()` stays for tests | Rosters from the AlurSekolah `/siswa` read (#204) once the school's key is set                                                                                                  |
+| SOP Penilaian, Kamus Kendala           | Seed migration, documents `sop-penilaian-sdit-nusantara`, `kamus-kendala-sdit-nusantara`                                                                       | Upload the official PDFs in Admin → Documents. Then re-point the four `school.*` Rule Sources at the new SOP (Admin → Documents → Rule Sources) and deactivate the seeded ones. |
+| Izin BPMN                              | `packages/ai/src/school/fixtures/pengajuan-izin-guru.bpmn` (tests only)                                                                                        | Upload `F3-1_pengajuan-izin-guru.bpmn`                                                                                                                                          |
+| F1 eval truth                          | Synthetic page                                                                                                                                                 | `pnpm --filter @nemu/ai eval:school -- --live --photo <F1-1 photo> --truth <truth.json>`                                                                                        |
 
 ## Known limits
 

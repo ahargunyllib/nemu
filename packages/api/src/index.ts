@@ -1,7 +1,12 @@
 import { ORPCError, os } from "@orpc/server";
 
 import type { AuthenticatedContext, Context } from "./context";
-import { requireKnownWorkspace, requireWorkspace, requireWorkspaceAdmin } from "./authorization";
+import {
+  requireFullAdmin,
+  requireKnownWorkspace,
+  requireWorkspace,
+  requireWorkspaceAdmin,
+} from "./authorization";
 import { WORKSPACES, type WorkspaceId } from "./workspace-ids";
 
 export const o = os.$context<Context>();
@@ -45,7 +50,17 @@ const requireAdmin = o.middleware(async ({ context, next }) => {
   return next({ context: authenticated });
 });
 
+/** Admin Workspace pages for a workspace's administrators, school operators included. */
 export const workspaceAdminProcedure = publicProcedure.use(requireAdmin);
+
+const requireFullAdminRole = o.middleware(async ({ context, next }) => {
+  const authenticated = authenticate(context);
+  forbidUnless(() => requireFullAdmin(authenticated.session.user));
+  return next({ context: authenticated });
+});
+
+/** Pages only Admin Javan sees (WS-01 school list, Chat Log); a school operator gets FORBIDDEN. */
+export const fullAdminProcedure = publicProcedure.use(requireFullAdminRole);
 
 function requireWorkspaceAccess(workspaceId: WorkspaceId) {
   return o.middleware(async ({ context, next }) => {
@@ -64,7 +79,7 @@ export const telcoProcedure = protectedProcedure.use(requireWorkspaceAccess(WORK
 /** Nemu v2.2 school procedures (AlurSekolah): only W-SEKOLAH users reach them. */
 export const schoolProcedure = protectedProcedure.use(requireWorkspaceAccess(WORKSPACES.school));
 
-/** School procedures for the operator (workspace admin), such as saving a recorded procedure. */
+/** School procedures for the operator or Admin Javan: saving a recorded procedure, WS-06. */
 export const schoolAdminProcedure = workspaceAdminProcedure.use(
   requireWorkspaceAccess(WORKSPACES.school),
 );

@@ -28,7 +28,7 @@ export async function createContext({ context }: CreateContextOptions): Promise<
     session,
     nemu: createNemuService(db),
     documentFiles: createDocumentFileStore(),
-    school: createSchoolServices(),
+    school: createSchoolServices(db),
     demoDate: await getWorkspaceDemoDate(db, workspaceId),
   };
 }

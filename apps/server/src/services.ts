@@ -15,7 +15,8 @@ import { createNemuProfileRepository } from "@nemu/api/modules/chat/profile-repo
 import { createDocumentRepository } from "@nemu/api/modules/documents/repository";
 import { createReferenceTableRepository } from "@nemu/api/modules/reference-tables/repository";
 import { createRuleSourceRepository } from "@nemu/api/modules/rule-sources/repository";
-import { createDemoSchoolDirectory } from "@nemu/api/modules/school/directory";
+import { createRegistrySchoolDirectory } from "@nemu/api/modules/school/registry-directory";
+import { createSchoolRepository } from "@nemu/api/modules/school/repository";
 import { createSlaClaimRepository } from "@nemu/api/modules/sla-claims/repository";
 import { getSlaClaimContext } from "@nemu/api/modules/sla-claims/service";
 import { createWorkspaceRepository } from "@nemu/api/modules/workspaces/repository";
@@ -172,14 +173,11 @@ function createSchoolAiFromEnv(): SchoolAi {
   });
 }
 
-/**
- * Nemu v2.2 school services. The directory is the synthetic SDIT Nusantara until the AlurSekolah
- * login (L-02) supplies real teacher profiles and rosters.
- */
-export function createSchoolServices(): SchoolServices {
+/** Nemu school services. The directory reads the teachers and contacts registered in WS-06. */
+export function createSchoolServices(db: Database): SchoolServices {
   return {
     ai: createSchoolAiFromEnv(),
-    directory: createDemoSchoolDirectory(),
+    directory: createRegistrySchoolDirectory(createSchoolRepository(db)),
     inbox: createInboxFileStore(),
   };
 }
