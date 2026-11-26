@@ -30,9 +30,13 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
 - **Answers.** The background sends the question to `helpRoute`. Questions about school rules go to
   `helpAsk`, "ini kenapa?" to `helpExplain` with the page's visible text (never input values, and
   nothing while a password field shows), and "berhenti" closes the bubble. Grade entry and
-  processes say they aren't available from the type box yet: voice is #200, the five display types
-  #201, and the executor #202. The "Tahan Ctrl + Spasi untuk bicara" hint is shown, but holding the
+  processes say they aren't available from the type box yet: voice is #200 and the executor #202. The "Tahan Ctrl + Spasi untuk bicara" hint is shown, but holding the
   keys does nothing until #200.
+- **Display types (#201).** Everything Nemu shows is one of the five display types from
+  `@nemu/ui/nemu/*`, one at a time (`docs/design-system.md`). An answer is a Gelembung Jawab
+  whose sources sit behind its **Sumber** link. In a dev build, `?pratinjau-nemu` on an allowed
+  page (`http://localhost:3003/?pratinjau-nemu#/nilai`) adds a dock at the bottom left that shows
+  all five and moves the Nemu cursor between two fields, without the AI.
 - **Contract.** Request and response schemas come from `@nemu/contracts/extension` and
   `@nemu/contracts/school`. Only the background calls the Nemu Service.
 
@@ -72,7 +76,7 @@ extension against `http://localhost:3000`, loads it into Playwright's Chromium, 
 
 - the settings page refuses an unknown install code and keeps `NEMU-SDITN-2026`;
 - the Nemu button and its hint show on the mock AlurSekolah;
-- Bu Siti's "KKM nilai berapa?" comes back as a Gelembung Jawab with the SOP as its source;
+- Bu Siti's "KKM nilai berapa?" comes back as a Gelembung Jawab whose Sumber link shows the SOP;
 - signing in as `rizal.operator` shows "Akun ini belum didaftarkan. Hubungi Pak Rizal.", and
   signing in as `dewi.lestari` brings the type box back;
 - Ruang GTK shows the Nemu button and asks as the last AlurSekolah account;
