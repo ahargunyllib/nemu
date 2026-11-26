@@ -71,8 +71,8 @@ The repo is public, so a sparse clone fetches only this folder:
 ```bash
 git clone --depth 1 --filter=blob:none --sparse https://github.com/ahargunyllib/nemu.git
 cd nemu
-git sparse-checkout set infra/vps
-cd infra/vps
+git sparse-checkout set infra
+cd infra
 ```
 
 Later updates are `git pull` in the same folder.

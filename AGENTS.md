@@ -12,7 +12,7 @@ The Nemu Service is a modular monolith: `apps/server` composes it, and feature m
 
 ### Infrastructure
 
-`packages/infra` is the Alchemy stack for what runs on Cloudflare. Anything self-hosted outside Cloudflare goes under the top-level `infra/`, one folder per host, with its own README that a teammate can deploy from. For example, the Docker Compose stack for the team VPS (Moodle test site, later `wa-bot`) moved from `packages/infra/vps` to `infra/vps`.
+`packages/infra` is the Alchemy stack for what runs on Cloudflare. Anything self-hosted outside Cloudflare goes directly in the top-level `infra/` (Compose file, Caddyfile, setup scripts), with a README a teammate can deploy from, not in a subfolder per host. For example, the team VPS stack (Moodle test site, later `wa-bot`) moved from `packages/infra/vps` to `infra/vps`, then up to `infra/`.
 
 ### Frontend architecture
 
