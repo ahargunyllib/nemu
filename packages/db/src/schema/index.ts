@@ -4,3 +4,4 @@ export * from "./reference-tables";
 export * from "./workspace";
 export * from "./school";
 export * from "./extension";
+export * from "./integrations";

@@ -25,28 +25,29 @@ Accounts (seeded by `packages/db/src/migrations/20261125120000_seed_school_works
 
 All are oRPC procedures on the Nemu Service, open to a `W-SEKOLAH` session or to the Nemu Extension with the school's install code and a registered teacher's page email (ADR-0015). Types are in `@nemu/contracts/school`.
 
-| Procedure                                       | Input → output                                                                                                               | PRD         |
-| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `helpRoute`                                     | transcript → `{kind: "control", control}` or `{kind: "intent", intent: input_nilai \| kenapa \| proses \| tanya \| unknown}` | F0-06       |
-| `gradesParseCommand`                            | "masukkan nilai UTS Matematika 4B" → `{className, subject, assessment}` or one question                                      | F1-05       |
-| `inboxUploadPhoto`                              | photo file → `InboxJob` (queued)                                                                                             | F1-01       |
-| `inboxJobs`                                     | → this teacher's jobs, newest first (poll every few seconds while Nemu is open)                                              | F1-01       |
-| `inboxProcess`                                  | `{jobId, className, assessment}` → `InboxJob` with `reading` and `verification` (≤ 60 s)                                     | F1-03/04/06 |
-| `inboxPhoto`                                    | `{jobId}` → the photo, for crops                                                                                             | W5          |
-| `inboxAck`                                      | `{jobId}` → deletes the photo and job                                                                                        | §8 privacy  |
-| `gradesParseExcel`                              | Excel file + class + assessment → `reading` + `verification`                                                                 | F1-02       |
-| `gradesFinalize`                                | `{reading, answers}` → entries with `remedial`, summary, citations; or `needs_source` / `unresolved`                         | F1-06/07    |
-| `gradesReadback`                                | `{entries, saved}` (Rekap Nilai rows) → `{match, mismatches, sentence}`                                                      | F1-10       |
-| `gradesGuidedLine`                              | `{entries, studentId, typed}` → "Ketik 77 untuk Budi." / "Di buku 77, Bu."                                                   | F1-11       |
-| `helpExplain`                                   | `{snapshot, question}` → bubble sentence, `why`, `citation`, `fixer`, `waDraft`, `guidedTarget`                              | F2          |
-| `helpAsk`                                       | question → answer with verified citations, or "Belum ada di panduan sekolah."                                                | F3-04/07    |
-| `processList`, `processXml`                     | active BPMN processes; the XML for the viewer                                                                                | F3-03/06    |
-| `processPlan`                                   | `{documentId, text, answering, slots, stepIndex}` → one step: `fill` \| `ask` \| `human` \| `done`                           | F3-09       |
-| `procedureCompile` (admin)                      | recorded events + narration → `Procedure` for review                                                                         | F3-01       |
-| `procedureSave` (admin)                         | reviewed `Procedure` → knowledge document (activate/deactivate in Documents)                                                 | F3-02/05    |
-| `procedureList`, `procedureGet`, `procedureRun` | steps with values filled in; stop at `requiresHumanAction`                                                                   | F3-01       |
-| `speechTranscribe`                              | 16 kHz mono audio (base64) → text to show in the bubble                                                                      | F0-04       |
-| `speechSynthesize`                              | sentence → audio + word timings, or `audioBase64: ""` (use the local OS voice)                                               | F0-05       |
+| Procedure                                       | Input → output                                                                                                                      | PRD         |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `helpRoute`                                     | transcript → `{kind: "control", control}` or `{kind: "intent", intent: input_nilai \| kenapa \| proses \| tanya \| unknown}`        | F0-06       |
+| `gradesParseCommand`                            | "masukkan nilai UTS Matematika 4B" → `{className, subject, assessment}` or one question                                             | F1-05       |
+| `inboxUploadPhoto`                              | photo file → `InboxJob` (queued)                                                                                                    | F1-01       |
+| `inboxJobs`                                     | → this teacher's jobs, newest first (poll every few seconds while Nemu is open)                                                     | F1-01       |
+| `inboxProcess`                                  | `{jobId, className, assessment}` → `InboxJob` with `reading` and `verification` (≤ 60 s)                                            | F1-03/04/06 |
+| `inboxPhoto`                                    | `{jobId}` → the photo, for crops                                                                                                    | W5          |
+| `inboxAck`                                      | `{jobId}` → deletes the photo and job                                                                                               | §8 privacy  |
+| `gradesParseExcel`                              | Excel file + class + assessment → `reading` + `verification`                                                                        | F1-02       |
+| `gradesFinalize`                                | `{reading, answers}` → entries with `remedial`, summary, citations; or `needs_source` / `unresolved`                                | F1-06/07    |
+| `gradesReadbackAlurSekolah`                     | `{entries, className, subject, assessment, semester?}` → reads `/api/v1/nilai` with the WS-07 key → `{match, mismatches, sentence}` | F1-10       |
+| `gradesReadback`                                | `{entries, saved}` (scraped Rekap Nilai rows) → `{match, mismatches, sentence}`; fallback when AlurSekolah isn't connected          | F1-10       |
+| `gradesGuidedLine`                              | `{entries, studentId, typed}` → "Ketik 77 untuk Budi." / "Di buku 77, Bu."                                                          | F1-11       |
+| `helpExplain`                                   | `{snapshot, question}` → bubble sentence, `why`, `citation`, `fixer`, `waDraft`, `guidedTarget`                                     | F2          |
+| `helpAsk`                                       | question → answer with verified citations, or "Belum ada di panduan sekolah."                                                       | F3-04/07    |
+| `processList`, `processXml`                     | active BPMN processes; the XML for the viewer                                                                                       | F3-03/06    |
+| `processPlan`                                   | `{documentId, text, answering, slots, stepIndex}` → one step: `fill` \| `ask` \| `human` \| `done`                                  | F3-09       |
+| `procedureCompile` (admin)                      | recorded events + narration → `Procedure` for review                                                                                | F3-01       |
+| `procedureSave` (admin)                         | reviewed `Procedure` → knowledge document (activate/deactivate in Documents)                                                        | F3-02/05    |
+| `procedureList`, `procedureGet`, `procedureRun` | steps with values filled in; stop at `requiresHumanAction`                                                                          | F3-01       |
+| `speechTranscribe`                              | 16 kHz mono audio (base64) → text to show in the bubble                                                                             | F0-04       |
+| `speechSynthesize`                              | sentence → audio + word timings, or `audioBase64: ""` (use the local OS voice)                                                      | F0-05       |
 
 `.bpmn` files are now accepted by the existing `uploadDocument` (Admin Workspace → Documents); the admin UI's file picker may need `.bpmn` added to its accept list.
 
@@ -68,7 +69,9 @@ All are oRPC procedures on the Nemu Service, open to a `W-SEKOLAH` session or to
    - `ok`: `entries` (one per student: `value`, `status`, `remedial`), `summarySentence` for **Lihat ringkasan**, `citations` (rule key → knowledge chunk id) for **Sumber**.
    - `needs_source`: the SOP isn't active or its Rule Sources aren't pointed at it (see below).
 5. Fill AlurSekolah with the extension from `entries` (blank for `S/I/A/blank`; "remedial" note where `remedial`). Point at **Simpan**; the teacher presses it.
-6. After the save, scrape Rekap Nilai into `{name, value}[]` and call `gradesReadback`; speak `sentence`. Then `inboxAck`.
+6. After the save, call `gradesReadbackAlurSekolah` with the entries, class, subject and assessment; speak `sentence`. Then `inboxAck`.
+   - The Nemu Service reads `/api/v1/nilai` (and `/siswa` for the roster) with the key Admin Javan stored in WS-07; the extension never sees it. A student with no stored grade reads as `kosong`; `UH` also matches AlurSekolah's `Harian`.
+   - `PRECONDITION_FAILED`: AlurSekolah isn't connected in WS-07 yet; fall back to scraping Rekap Nilai into `{name, value}[]` for `gradesReadback`. `BAD_GATEWAY`: AlurSekolah refused the key or didn't answer; the message says which.
 7. Guided mode (F1-11): for each student `gradesGuidedLine(typed: null)` → speak; on blur `gradesGuidedLine(typed)` → speak if `ok` is false.
 
 ### F2: "Nemu, ini kenapa?"

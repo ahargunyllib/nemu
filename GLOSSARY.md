@@ -58,6 +58,10 @@ _Avoid_: school tenant
 The school's teacher registry: name, AlurSekolah email, WhatsApp number, classes and subjects, plus one contact per role (operator, kepala sekolah, bagian keuangan). The extension recognises a teacher by the email, the WhatsApp bot by the number. Backs the `SchoolDirectory` port.
 _Avoid_: user profiles, guru list
 
+**Integrations (WS-07)**:
+Admin Javan's page for a school's integration settings: the AlurSekolah API base URL and key, the Moodle URL and token, and the Nemu WhatsApp number. Values are stored encrypted and never shown again, only "terpasang · …last 4" (ADR-0014). The AlurSekolah base URL decides whether Nemu reads the mock or the school's real tenant.
+_Avoid_: credentials page, API settings
+
 **Photo Job**:
 One grade-book photo waiting to be read for a teacher, from WhatsApp or an upload. It lives in the `inbox` bucket until the teacher saves, at most a day.
 _Avoid_: upload, ticket

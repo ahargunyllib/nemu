@@ -8,6 +8,7 @@ import { ENV } from "./env.server";
 import {
   createAuth,
   createDocumentFileStore,
+  createIntegrationSecretCipher,
   createSchoolServices,
   getDb,
   getWorkspaceDemoDate,
@@ -37,6 +38,7 @@ export async function createContext({ context }: CreateContextOptions): Promise<
     session,
     documentFiles: createDocumentFileStore(),
     school: createSchoolServices(db),
+    secretCipher: createIntegrationSecretCipher(),
     demoDate: await getWorkspaceDemoDate(db, workspaceId),
     internalCaller: await internalCallerFor(context.req.raw.headers, {
       waBot: ENV.WA_BOT_SECRET,

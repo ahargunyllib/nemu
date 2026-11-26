@@ -71,6 +71,11 @@ export const server = Cloudflare.Worker("server", {
     // Shared with apps/wa-bot on the team VPS. Optional so the Worker deploys without it; while it's
     // empty the wa-bot endpoints refuse every call.
     WA_BOT_SECRET: Config.Redacted("WA_BOT_SECRET").pipe(Config.withDefault(Redacted.make(""))),
+    // Encrypts WS-07 integration settings in D1. Optional so the Worker deploys without it; while
+    // it's empty WS-07 can't save, and AlurSekolah reads fail with a clear message.
+    INTEGRATION_SECRETS_KEY: Config.Redacted("INTEGRATION_SECRETS_KEY").pipe(
+      Config.withDefault(Redacted.make("")),
+    ),
   },
   dev: {
     port: 3000,
