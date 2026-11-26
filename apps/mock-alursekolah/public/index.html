@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AlurSekolah Tiruan</title>
+<style>
+  :root { --ink:#1f2933; --muted:#5f6b76; --line:#d5dade; --bg:#ffffff; --side:#f3f4f6; --head:#2d3e50; --accent:#2d3e50; --ok:#e7f4ea; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family: Arial, Helvetica, sans-serif; color:var(--ink); background:var(--bg); font-size:16px; }
+  header { background:var(--head); color:#fff; padding:14px 24px; display:flex; justify-content:space-between; align-items:center; }
+  header b { font-size:20px; }
+  .banner { background:#fff8e1; border-bottom:1px solid #e6c766; padding:6px 24px; font-size:13px; }
+  .wrap { display:flex; min-height:calc(100vh - 90px); }
+  nav { width:220px; background:var(--side); padding:16px 0; }
+  nav a { display:block; padding:10px 24px; color:var(--ink); text-decoration:none; }
+  nav a.active { font-weight:bold; background:#e5e7eb; }
+  .akun { padding:0 24px 12px; margin-bottom:8px; border-bottom:1px solid var(--line); font-size:14px; }
+  .akun span { display:block; color:var(--muted); word-break:break-all; }
+  main { flex:1; padding:24px 32px; max-width:1100px; }
+  h1 { font-size:24px; margin:0 0 16px; }
+  label { display:block; font-weight:bold; margin:12px 0 4px; }
+  select, input[type=text], input[type=password], input[type=date], input[type=number], textarea { font-size:16px; padding:8px; border:1px solid #9aa5b1; border-radius:4px; min-width:240px; }
+  button { font-size:16px; padding:10px 18px; border-radius:4px; border:1px solid var(--accent); background:var(--accent); color:#fff; cursor:pointer; margin-top:16px; }
+  button.secondary { background:#fff; color:var(--accent); }
+  table { border-collapse:collapse; width:100%; margin-top:16px; }
+  th, td { border:1px solid var(--line); padding:6px 8px; text-align:left; }
+  td input { width:90px; min-width:0; }
+  td input.catatan { width:200px; }
+  .row { display:flex; gap:24px; flex-wrap:wrap; }
+  .toast { background:var(--ok); border:1px solid #7fb38a; padding:12px; margin-top:16px; }
+  .note { color:var(--muted); font-size:14px; }
+  dialog { border:1px solid #333; border-radius:6px; padding:24px; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+<header><b>AlurSekolah (tiruan)</b><span id="who">Belum masuk</span></header>
+<div class="banner">TIRUAN UNTUK UJI NEMU. Bukan AlurSekolah asli. Data sintetis SDIT Nusantara. Nilai dan setoran tersimpan di server tiruan, sama di semua browser.</div>
+<div class="wrap">
+  <nav id="nav" class="hidden" aria-label="Menu utama">
+    <div id="menu-akun" class="akun"><b id="menu-nama"></b><span id="menu-email"></span></div>
+    <a href="#/beranda" id="menu-beranda">Beranda</a>
+    <a href="#/nilai" id="menu-nilai">Nilai</a>
+    <a href="#/rekap" id="menu-rekap">Rekap Nilai</a>
+    <a href="#/tahfidz" id="menu-alquran">Al-Quran</a>
+    <a href="#/profil" id="menu-profil">Profil</a>
+    <a href="#/keluar" id="menu-keluar">Keluar</a>
+  </nav>
+  <main id="app"></main>
+</div>
+<dialog id="konfirmasi"><p id="konfirmasi-teks"></p><button id="ya-simpan">Ya, simpan</button> <button class="secondary" id="batal-simpan">Batal</button></dialog>
+<script>
+// Akun, murid, mapel, dan surah datang dari Worker (src/data/). Nilai dan setoran disimpan di Worker,
+// jadi semua browser melihat data yang sama. localStorage hanya menyimpan akun yang sedang masuk.
+let USERS = {}, SEKOLAH = {}, MAPEL = [], SURAH = [], SISWA = {};
+function ditugaskan(u, k, m) { return u.tugas === "semua" || ((u.tugas[k] || []).includes(m)); }
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem("as_" + k)); return v === null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem("as_" + k, JSON.stringify(v)); } catch (e) {} }
+};
+async function server(path, body, method) {
+  const res = await fetch("/_mock" + path, body === undefined ? {} : {method: method || "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || "Gagal menghubungi server. Coba lagi.");
+  return data;
+}
+const $ = s => document.querySelector(s);
+const app = $("#app");
+function me() { return USERS[store.get("user", "")]; }
+function gagal(sel, e) { $(sel).innerHTML = `<p class="note" role="alert">${e.message}</p>`; }
+
+function viewLogin() {
+  $("#nav").classList.add("hidden"); $("#who").textContent = "Belum masuk";
+  app.innerHTML = `<h1>Masuk</h1>
+    <label for="username">Nama pengguna</label><input type="text" id="username" autocomplete="username">
+    <label for="password">Kata sandi</label><input type="password" id="password" autocomplete="current-password">
+    <div><button id="btn-masuk">Masuk</button></div>
+    <p class="note">Akun uji: siti.aminah, dewi.lestari, rizal.operator. Kata sandi: nemu-uji-2026</p>
+    <p id="login-error" class="note"></p>`;
+  $("#btn-masuk").onclick = async () => {
+    const u = $("#username").value.trim();
+    try { await server("/masuk", {username: u, password: $("#password").value}); store.set("user", u); location.hash = "#/beranda"; route(); }
+    catch (e) { $("#login-error").textContent = e.message; }
+  };
+}
+function viewBeranda() {
+  const u = me();
+  app.innerHTML = `<h1>Beranda</h1><p>Selamat datang, ${u.nama}.</p><p>${SEKOLAH.nama}, tahun ajaran 2026/2027, semester ganjil.</p>
+  ${u.wali ? `<p>Wali kelas: <b>${u.wali}</b></p>` : ""}`;
+}
+function viewProfil() {
+  const u = me();
+  app.innerHTML = `<h1>Profil</h1><table id="tabel-profil">
+  <tr><th>Nama</th><td>${u.nama}</td></tr><tr><th>Email</th><td id="profil-email">${u.email}</td></tr><tr><th>Peran</th><td>${u.peran}</td></tr>
+  <tr><th>NIP</th><td>${u.nip || "-"}</td></tr><tr><th>Nomor WhatsApp</th><td>${u.wa}</td></tr>
+  <tr><th>Kelas</th><td>${u.kelas.join(", ")}</td></tr><tr><th>Penugasan mapel</th><td>${u.tugas === "semua" ? "Semua (operator)" : Object.entries(u.tugas).map(([k, m]) => k + ": " + m.join(", ")).join("; ")}</td></tr>
+  <tr><th>Kepala sekolah</th><td>${SEKOLAH.kepsek}</td></tr><tr><th>Operator</th><td>${SEKOLAH.operator}</td></tr></table>
+  <button class="secondary" id="btn-reset">Reset semua data uji</button>`;
+  $("#btn-reset").onclick = async () => {
+    if (!confirm("Hapus semua nilai dan setoran uji untuk semua pengguna?")) return;
+    try { await server("/reset", {}); alert("Data uji direset."); } catch (e) { alert(e.message); }
+  };
+}
+function viewNilai() {
+  const u = me();
+  app.innerHTML = `<h1>Isi nilai kelas</h1><div class="row">
+    <div><label for="pilih-kelas">Kelas</label><select id="pilih-kelas"><option value="">Pilih kelas</option>${u.kelas.map(k => `<option>${k}</option>`).join("")}</select></div>
+    <div><label for="pilih-mapel">Mata Pelajaran</label><select id="pilih-mapel"><option value="">Pilih mata pelajaran</option>${MAPEL.map(m => `<option>${m}</option>`).join("")}</select></div>
+    <div><label for="pilih-jenis">Jenis Penilaian</label><select id="pilih-jenis"><option value="">Pilih jenis</option><option>Harian</option><option>UTS</option><option>UAS</option></select></div></div>
+    <button id="btn-tampilkan">Tampilkan Siswa</button><div id="area-tabel"></div>`;
+  $("#btn-tampilkan").onclick = async () => {
+    const k = $("#pilih-kelas").value, m = $("#pilih-mapel").value, j = $("#pilih-jenis").value;
+    if (!k || !m || !j) { $("#area-tabel").innerHTML = `<p class="note">Pilih kelas, mata pelajaran, dan jenis penilaian dulu.</p>`; return; }
+    if (!ditugaskan(u, k, m)) { $("#area-tabel").innerHTML = `<div role="alert" style="margin-top:16px;border:1px solid #c62828;background:#fdecea;padding:12px 16px"><b style="color:#b71c1c">Tidak dapat menampilkan siswa</b><br>Anda belum ditugaskan mengampu ${m} di kelas ${k}. Hubungi admin sekolah.</div>`; return; }
+    let saved;
+    try { saved = (await server("/nilai"))[`${k}|${m}|${j}`] || {}; } catch (e) { return gagal("#area-tabel", e); }
+    $("#area-tabel").innerHTML = `<table id="tabel-nilai"><thead><tr><th>No</th><th>Nama Siswa</th><th>Nilai</th><th>Catatan</th></tr></thead><tbody>
+      ${SISWA[k].map((n, i) => `<tr><td>${i + 1}</td><td>${n}</td>
+      <td><input type="number" min="0" max="100" aria-label="Nilai ${n}" data-nama="${n}" class="nilai" value="${saved[n] ? saved[n].nilai : ""}"></td>
+      <td><input type="text" aria-label="Catatan ${n}" data-nama="${n}" class="catatan" value="${saved[n] ? saved[n].catatan : ""}"></td></tr>`).join("")}
+      </tbody></table><button id="btn-simpan">Simpan</button><div id="hasil"></div>`;
+    $("#btn-simpan").onclick = () => {
+      const terisi = [...document.querySelectorAll("input.nilai")].filter(x => x.value !== "").length;
+      $("#konfirmasi-teks").textContent = `Simpan nilai untuk semua siswa? ${terisi} dari ${SISWA[k].length} nilai terisi.`;
+      $("#konfirmasi").showModal();
+      $("#ya-simpan").onclick = async () => {
+        const baris = [...document.querySelectorAll("#tabel-nilai tbody tr")].map(tr => ({
+          nama: tr.querySelector("input.nilai").dataset.nama, nilai: tr.querySelector("input.nilai").value, catatan: tr.querySelector("input.catatan").value
+        }));
+        $("#konfirmasi").close();
+        try { await server("/nilai", {username: store.get("user", ""), kelas: k, mapel: m, jenis: j, baris}, "PUT"); }
+        catch (e) { return gagal("#hasil", e); }
+        $("#hasil").innerHTML = `<div class="toast" role="status">Nilai tersimpan. ${terisi} nilai ${m} ${j} kelas ${k}.</div>`;
+      };
+      $("#batal-simpan").onclick = () => $("#konfirmasi").close();
+    };
+  };
+}
+async function viewRekap() {
+  app.innerHTML = `<h1>Rekap Nilai</h1>`;
+  let all;
+  try { all = await server("/nilai"); } catch (e) { app.innerHTML += `<p class="note" role="alert">${e.message}</p>`; return; }
+  const keys = Object.keys(all);
+  app.innerHTML = `<h1>Rekap Nilai</h1>` + (keys.length ? keys.map(key => {
+    const [k, m, j] = key.split("|");
+    return `<h2 style="font-size:18px">${m} - ${j} - Kelas ${k}</h2><table class="tabel-rekap"><tr><th>Nama</th><th>Nilai</th><th>Catatan</th></tr>
+    ${Object.entries(all[key]).map(([n, v]) => `<tr><td>${n}</td><td>${v.nilai}</td><td>${v.catatan}</td></tr>`).join("")}</table>`;
+  }).join("") : `<p class="note">Belum ada nilai tersimpan.</p>`);
+}
+async function viewTahfidz() {
+  const u = me();
+  const kelasAQ = u.tugas === "semua" ? u.kelas : u.kelas.filter(k => ditugaskan(u, k, "Tahfidz"));
+  let riwayat = [];
+  try { riwayat = await server("/tahfidz"); } catch (e) { riwayat = []; }
+  app.innerHTML = `<h1>Al-Quran › Tahfidz</h1><p class="note">Form ini mengikuti proses BPMN "Catat Hafalan Tahfidz" (kasus uji F3-1).</p>
+    <div class="row"><div><label for="tf-kelas">Kelas</label><select id="tf-kelas"><option value="">Pilih kelas</option>${kelasAQ.map(k => `<option>${k}</option>`).join("")}</select></div></div>
+    <div><button id="btn-setoran-baru">Setoran baru</button> <button class="secondary" id="btn-ujian-baru">Ujian baru</button></div>
+    <div id="tf-area"></div>
+    <h2 style="font-size:18px;margin-top:32px">Riwayat</h2>
+    <table id="tabel-riwayat-tahfidz"><tr><th>Tanggal</th><th>Jenis</th><th>Murid</th><th>Surah / ujian</th><th>Ayat</th><th>F</th><th>T</th><th>Tj</th><th>A</th><th>Nilai</th></tr>
+    ${riwayat.map(x => `<tr><td>${x.tanggal}</td><td>${x.jenis}</td><td>${x.murid}</td><td>${x.surah || x.jenis_ujian || ""}</td><td>${x.ayat_dari || ""}${x.ayat_sampai ? "–" + x.ayat_sampai : ""}</td><td>${x.fashohah}</td><td>${x.tartil}</td><td>${x.tajwid}</td><td>${x.adab}</td><td>${x.nilai}</td></tr>`).join("")}</table>`;
+  const pilihKelas = () => { const k = $("#tf-kelas").value; if (!k) { $("#tf-area").innerHTML = `<p class="note">Pilih kelas dulu.</p>`; } return k; };
+  $("#btn-setoran-baru").onclick = () => {
+    const k = pilihKelas(); if (!k) return;
+    const opsi = `<option value="">Pilih surah</option>` + SURAH.map(x => `<option>${x}</option>`).join("");
+    const sk = (f, n) => `<input type="number" min="0" max="100" class="tf-${f}" aria-label="${f[0].toUpperCase() + f.slice(1)} ${n}" style="width:70px">`;
+    $("#tf-area").innerHTML = `<h2 style="font-size:20px">Setoran baru · kelas ${k}</h2>
+      <label for="tanggal_setoran">Tanggal setoran</label><input type="date" id="tanggal_setoran">
+      <p class="note">Baris murid yang tidak setor dibiarkan kosong. Ayat dikosongkan berarti semua ayat. Skor dikosongkan berarti belum dinilai. Bobot: Fashohah 30%, Tartil 30%, Tajwid 30%, Adab 10%.</p>
+      <table id="tabel-setoran"><thead><tr><th>Murid</th><th>Surah</th><th>Dari ayat</th><th>Sampai ayat</th><th>Fashohah</th><th>Tartil</th><th>Tajwid</th><th>Adab</th><th>Catatan</th></tr></thead><tbody>
+      ${SISWA[k].map(n => `<tr data-murid="${n}"><td>${n}</td><td><select class="tf-surah" aria-label="Surah ${n}">${opsi}</select></td>
+        <td><input type="number" min="1" class="tf-ayat_dari" aria-label="Dari ayat ${n}" style="width:70px"></td><td><input type="number" min="1" class="tf-ayat_sampai" aria-label="Sampai ayat ${n}" style="width:70px"></td>
+        <td>${sk("fashohah", n)}</td><td>${sk("tartil", n)}</td><td>${sk("tajwid", n)}</td><td>${sk("adab", n)}</td><td><input type="text" class="tf-catatan catatan" aria-label="Catatan ${n}"></td></tr>`).join("")}
+      </tbody></table><button id="btn-simpan-setoran">Simpan setoran</button><div id="tf-hasil"></div>`;
+    $("#btn-simpan-setoran").onclick = () => {
+      const tgl = $("#tanggal_setoran").value;
+      const baris = [...document.querySelectorAll("#tabel-setoran tbody tr")].map(tr => {
+        const g = f => tr.querySelector(".tf-" + f).value;
+        return {jenis: "Setoran", tanggal: tgl, murid: tr.dataset.murid, surah: g("surah"), ayat_dari: g("ayat_dari"), ayat_sampai: g("ayat_sampai"), fashohah: g("fashohah"), tartil: g("tartil"), tajwid: g("tajwid"), adab: g("adab"), catatan: g("catatan")};
+      }).filter(r => r.surah);
+      if (!tgl) { $("#tf-hasil").innerHTML = `<p class="note">Tanggal setoran wajib diisi.</p>`; return; }
+      if (!baris.length) { $("#tf-hasil").innerHTML = `<p class="note">Belum ada murid yang diisi.</p>`; return; }
+      $("#konfirmasi-teks").textContent = `Simpan setoran ${baris.length} murid kelas ${k}? Hasil langsung terlihat orang tua.`;
+      $("#konfirmasi").showModal();
+      $("#ya-simpan").onclick = async () => {
+        $("#konfirmasi").close();
+        try { await server("/tahfidz", {username: store.get("user", ""), kelas: k, baris}); }
+        catch (e) { return gagal("#tf-hasil", e); }
+        await viewTahfidz();
+        $("#tf-area").innerHTML = `<div class="toast" role="status">Setoran tersimpan untuk ${baris.length} murid kelas ${k}.</div>`;
+      };
+      $("#batal-simpan").onclick = () => $("#konfirmasi").close();
+    };
+  };
+  $("#btn-ujian-baru").onclick = () => {
+    const k = pilihKelas(); if (!k) return;
+    $("#tf-area").innerHTML = `<h2 style="font-size:20px">Ujian baru · kelas ${k}</h2>
+      <label for="uj-murid">Murid</label><select id="uj-murid"><option value="">Pilih murid</option>${SISWA[k].map(n => `<option>${n}</option>`).join("")}</select>
+      <label for="uj-jenis">Jenis ujian</label><select id="uj-jenis"><option value="">Pilih jenis ujian</option><option>Ujian Juz 30</option><option>Ujian Juz 29</option></select>
+      <label for="uj-tanggal">Tanggal ujian</label><input type="date" id="uj-tanggal">
+      <div class="row">${["Fashohah", "Tartil", "Tajwid", "Adab"].map(f => `<div><label for="uj-${f.toLowerCase()}">${f}</label><input type="number" min="0" max="100" id="uj-${f.toLowerCase()}" style="min-width:0;width:100px"></div>`).join("")}</div>
+      <button id="btn-simpan-ujian">Simpan ujian</button><div id="tf-hasil"></div>`;
+    $("#btn-simpan-ujian").onclick = async () => {
+      const r = {jenis: "Ujian", tanggal: $("#uj-tanggal").value, murid: $("#uj-murid").value, jenis_ujian: $("#uj-jenis").value, fashohah: $("#uj-fashohah").value, tartil: $("#uj-tartil").value, tajwid: $("#uj-tajwid").value, adab: $("#uj-adab").value};
+      if (!r.murid || !r.jenis_ujian || !r.tanggal) { $("#tf-hasil").innerHTML = `<p class="note">Murid, jenis ujian, dan tanggal wajib diisi.</p>`; return; }
+      let tersimpan;
+      try { tersimpan = (await server("/tahfidz", {username: store.get("user", ""), kelas: k, baris: [r]})).baris[0]; }
+      catch (e) { return gagal("#tf-hasil", e); }
+      await viewTahfidz();
+      $("#tf-area").innerHTML = `<div class="toast" role="status">Ujian ${r.murid} tersimpan. Nilai ${tersimpan.nilai}.</div>`;
+    };
+  };
+}
+function route() {
+  const h = location.hash || "#/beranda";
+  if (h === "#/keluar") { store.set("user", ""); location.hash = "#/masuk"; }
+  if (!me()) return viewLogin();
+  $("#nav").classList.remove("hidden"); $("#who").textContent = me().nama;
+  $("#menu-nama").textContent = me().nama; $("#menu-email").textContent = me().email;
+  document.querySelectorAll("nav a").forEach(a => a.classList.toggle("active", a.getAttribute("href") === h));
+  ({"#/nilai": viewNilai, "#/rekap": viewRekap, "#/tahfidz": viewTahfidz, "#/profil": viewProfil}[h] || viewBeranda)();
+}
+server("/sekolah").then(d => {
+  USERS = d.akun; SEKOLAH = d.sekolah; MAPEL = d.mapel; SURAH = d.surah; SISWA = d.siswa;
+  window.addEventListener("hashchange", route); route();
+}).catch(e => { app.innerHTML = `<h1>Tidak dapat memuat</h1><p class="note" role="alert">${e.message}</p>`; });
+</script>
+</body>
+</html>

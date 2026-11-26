@@ -12,11 +12,13 @@ The last AlurKerja version is tagged `v1-alurkerja`.
 
 ## Products
 
-| Product         | Where            | What it does                                                                                                       |
-| --------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Nemu Extension  | `apps/extension` | Chrome extension. Still the AlurKerja guide (Composer, Answer Card, highlights) until it moves to AlurSekolah.     |
-| Nemu Service    | `apps/server`    | Cloudflare Worker (Hono + oRPC): the school procedures (`docs/school-ai.md`), `nemuChat`, knowledge, the Chat Log. |
-| Admin Workspace | `apps/admin`     | Web console for knowledge documents, Reference Tables, Rule Sources, and the Chat Log.                             |
+| Product          | Where                   | What it does                                                                                                                        |
+| ---------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Nemu Extension   | `apps/extension`        | Chrome extension. Still the AlurKerja guide (Composer, Answer Card, highlights) until it moves to AlurSekolah.                      |
+| Nemu Service     | `apps/server`           | Cloudflare Worker (Hono + oRPC): the school procedures (`docs/school-ai.md`), `nemuChat`, knowledge, the Chat Log.                  |
+| Admin Workspace  | `apps/admin`            | Web console for knowledge documents, Reference Tables, Rule Sources, and the Chat Log.                                              |
+| Mock AlurSekolah | `apps/mock-alursekolah` | Fake AlurSekolah the extension runs on, with a read API shaped like AlurSekolah API v1 ([README](apps/mock-alursekolah/README.md)). |
+| Mock portals     | `apps/mock-portals`     | Static Ruang GTK (F2-3) and e-Rapor (WS-1, not allowed) pages.                                                                      |
 
 ## Repository layout
 
@@ -25,6 +27,8 @@ nemu/
 ├── apps/
 │   ├── admin/           # Admin Workspace (React + TanStack Router)
 │   ├── extension/       # Nemu Extension (WXT + React)
+│   ├── mock-alursekolah/ # Mock AlurSekolah page + read API (Worker + its own D1)
+│   ├── mock-portals/    # Static Ruang GTK and e-Rapor mocks
 │   └── server/          # Nemu Service entry point (Hono + oRPC on Workers)
 ├── packages/
 │   ├── ai/              # School AI (school/) and the legacy runNemu pipeline, retrieval, evals
@@ -69,12 +73,14 @@ Drizzle, Cloudflare D1 and R2, Better Auth, WXT, Alchemy, Varlock, and Vite+.
    | -------------------- | ----------------------------------------------------------------- |
    | Nemu Service         | <http://localhost:3000>                                           |
    | Admin Workspace      | <http://localhost:3002>                                           |
+   | Mock AlurSekolah     | <http://localhost:3003>                                           |
+   | Mock Ruang GTK       | <http://localhost:3004>                                           |
+   | Mock e-Rapor         | <http://localhost:3005>                                           |
    | Nemu Extension (dev) | built into `apps/extension/.output/chrome-mv3-dev`, load unpacked |
 
 4. Sign in to the Admin Workspace with a seeded account. The school accounts (Bu Siti, Pak Rizal)
-   and how to call the school procedures are in [docs/school-ai.md](docs/school-ai.md). The
-   extension has no site to run on until the mock AlurSekolah lands
-   ([#196](https://github.com/ahargunyllib/nemu/issues/196)).
+   and how to call the school procedures are in [docs/school-ai.md](docs/school-ai.md). The mock
+   AlurSekolah accounts are in [apps/mock-alursekolah/README.md](apps/mock-alursekolah/README.md).
 
 ### Local database
 

@@ -82,6 +82,48 @@ export const server = Cloudflare.Worker("server", {
 
 export type ServerEnv = Cloudflare.InferEnv<typeof server>;
 
+// Mock AlurSekolah (#196): the page the extension runs on until the school's test tenant exists,
+// plus a read API shaped like AlurSekolah API v1. Its data is a separate fake system, so it has its
+// own database instead of tables in the Nemu Service's.
+export const mockAlurSekolahDb = Cloudflare.D1.Database("mock-alursekolah-db", {
+  migrations: "../../apps/mock-alursekolah/migrations",
+});
+
+export const mockAlurSekolah = Cloudflare.Worker("mock-alursekolah", {
+  main: "../../apps/mock-alursekolah/src/worker.ts",
+  assets: "../../apps/mock-alursekolah/public",
+  domain: isProd ? "nemu-alursekolah.ahargunyllib.dev" : undefined,
+  env: {
+    DB: mockAlurSekolahDb,
+    // The school API key the Nemu Service stores in WS-07. Synthetic data only, so a known
+    // default keeps dev stages working without extra setup.
+    API_KEY: Config.Redacted("MOCK_ALURSEKOLAH_API_KEY").pipe(
+      Config.withDefault(Redacted.make("as_uji_sdit_nusantara_2026")),
+    ),
+  },
+  dev: {
+    port: 3003,
+  },
+});
+
+// Static government-portal mocks on their own hostnames: Ruang GTK is an allowed site (F2-3);
+// e-Rapor is deliberately left off the allowed list (WS-1 case a).
+export const mockRuangGtk = Cloudflare.Worker("mock-ruang-gtk", {
+  assets: "../../apps/mock-portals/ruang-gtk",
+  domain: isProd ? "nemu-ruang-gtk.ahargunyllib.dev" : undefined,
+  dev: {
+    port: 3004,
+  },
+});
+
+export const mockErapor = Cloudflare.Worker("mock-erapor", {
+  assets: "../../apps/mock-portals/erapor",
+  domain: isProd ? "nemu-erapor.ahargunyllib.dev" : undefined,
+  dev: {
+    port: 3005,
+  },
+});
+
 export default Alchemy.Stack(
   "nemu",
   {
@@ -113,9 +155,16 @@ export default Alchemy.Stack(
       },
     });
 
+    const mockAlurSekolahWorker = yield* mockAlurSekolah;
+    const mockRuangGtkWorker = yield* mockRuangGtk;
+    const mockEraporWorker = yield* mockErapor;
+
     return {
       admin: adminWorker.url,
       server: serverWorker.url,
+      mockAlurSekolah: mockAlurSekolahWorker.url,
+      mockRuangGtk: mockRuangGtkWorker.url,
+      mockErapor: mockEraporWorker.url,
     };
   }),
 );
