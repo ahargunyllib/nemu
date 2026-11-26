@@ -30,7 +30,7 @@ async function readBoundedText(response: Response, maxBytes: number): Promise<st
 }
 
 // OpenRouter reports why a request failed as `{ error: { message } }`; keep that
-// reason so the Chat Log and Worker logs say more than the status code.
+// reason so Worker logs say more than the status code.
 function providerErrorDetail(responseText: string): string | undefined {
   try {
     const body = JSON.parse(responseText) as { error?: { message?: unknown } | string };

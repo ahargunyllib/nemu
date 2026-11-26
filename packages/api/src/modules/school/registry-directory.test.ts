@@ -37,8 +37,12 @@ describe("SchoolDirectory backed by WS-06", () => {
     const { directory } = await setup();
 
     await expect(
-      directory.teacherByEmail(" Siti.Aminah@sditnusantara.sch.id "),
+      directory.teacherByEmail("W-SEKOLAH", " Siti.Aminah@sditnusantara.sch.id "),
     ).resolves.toMatchObject({ teacherId: "siti" });
+    // Another school's install code doesn't reach this school's teachers.
+    await expect(
+      directory.teacherByEmail("W-TELKO", "siti.aminah@sditnusantara.sch.id"),
+    ).resolves.toBeNull();
     await expect(teacherForSender(directory, "+62 812-0000-1004")).resolves.toMatchObject({
       teacherId: "dewi",
     });

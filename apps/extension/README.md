@@ -1,181 +1,85 @@
 # Nemu Extension
 
-The Chrome extension Rina uses on the Demo App: Ctrl+Shift+Space opens the Composer beside the
-cursor, and the answer from `nemuChat` comes back as an Answer Card.
+The Chrome and Edge extension teachers use on AlurSekolah, Moodle and government portals. On the
+school's allowed websites it shows the Nemu button at the bottom right; a typed question goes to
+the Nemu Service and the answer comes back as a Gelembung Jawab.
 
-- **Allowlist.** The content script runs only on the Demo App origins in
-  `shared/lib/config.ts`. Other pages get no overlay and send nothing to the Nemu Service.
-- **No login of its own.** The background service worker calls `nemuChat` with
-  `credentials: "include"`, so the Demo App's better-auth session cookie goes along. The server
-  takes the user from that session; the extension never sends `user_id`. Signed out, the card asks
-  Rina to log in to the Demo App.
-- **Contract.** Request and response schemas come from `@nemu/contracts`.
-- **Element List.** Every prompt carries the page's rendered elements that have a
-  `data-nemu-id` (at most 150, under 50 KB, never an input's value). Off-screen ones are sent
-  with `visible: false` so Nemu can still point at them.
-- **Area Crop.** The crop button in the Composer starts area select mode: Rina drags a box over
-  the page, Nemu hides its own overlay, and the background screenshots the viewport
-  (`captureVisibleTab`, allowlisted tabs only). The content script cuts out just the box (longest
-  side at most 1280 px) and shows it as a removable chip in the Composer. It goes with the next
-  prompt as `screenshot_crop`, and the full screenshot never leaves the tab. The Nemu Service never
-  stores the image: the Chat Log only notes that one was attached.
-- **Permissions.** The manifest asks for `activeTab` and host permissions on the Nemu Service and
-  the Demo App origins only, never `<all_urls>`, so Chrome doesn't warn about "all websites" at
-  install (ADR-0004). The catch: `captureVisibleTab` works only once the toolbar icon or
-  Ctrl+Shift+Space has fired the action on that tab (until it navigates away). Opened only from
-  the mascot, or in Arc, the Area Crop fails and the chip tells Rina to open Nemu from the toolbar
-  icon or the shortcut.
-- **Toolbar popup.** On a page outside the allowlist the toolbar icon (and the shortcut) opens a
-  popup instead: "Nemu aktif di AlurKerja", with **Buka AlurKerja** opening the Demo App that
-  goes with `WXT_SERVER_URL` (the local one for a local service). It's the manifest's default
-  popup; the background clears it on Demo App tabs, so the action fires there and opens the
-  Composer.
-- **Highlight (Arahkan).** A `highlight` action scrolls to its target and draws a pulsing amber
-  outline with the action label on a click-through page layer. The Answer Card hangs right next to
-  the target with the mascot on its top-left corner: just above it, right-aligned with it, else
-  below, else beside, never covering the target or the next step's. An answer with no target goes
-  into empty space, off the page's cards. A step moves on when Rina fills or presses its target;
-  for a Select or a date picker, once the value she picks in its popup shows on the target. A
-  target missing from the page becomes a warning on the card. The
-  Momen 2 prompt with `NEMU_RESPONDER=fixture` exercises it once the lodging form (#3) is on
-  `/perdin/baru`.
-- **Navigation click (Jalan sendiri).** A `click` action runs only when its target is Jalan sendiri
-  in the bundled Action Level config (`features/action-level/lib/action-level-config.ts`,
-  ADR-0002) and was in the Element List sent with the prompt; any other click becomes a highlight.
-  The cursor morphs from where Rina opened the Composer (200 ms), moves to the target (400–800 ms),
-  clicks, and waits up to 2 s for a new URL or a new nemu_id on the page. Esc before the click
-  lands stops it. A stopped click, a missing target, or a click that changed nothing falls back to
-  a highlight, and the cursor shows a warning. Ids missing from the config count as Arahkan, so
-  list a new id there to let Nemu click it.
-- **Mascot.** A 32 px mascot follows the cursor 12 px below and to the right of its tip (flipping
-  sides at the viewport's edge), so it never sits on what Rina is about to click. It waits when
-  the cursor closes in on it, so it can be clicked to open the Composer. It waits beside the Composer while that is open, rides along
-  with Nemu's cursor during a navigation click, and while a step is highlighted sits on the Answer
-  Card's top-left corner beside the target. Its seven states follow what Nemu is doing: idle,
-  listening (Composer open), thinking (after Kirim), guiding (highlights) or clicking, then
-  success (the click opened the page) or warning (a failed request, missing target, or click that
-  changed nothing). Results rest after 3 s, and Esc returns it to idle. Under
-  prefers-reduced-motion it jumps instead of gliding and doesn't animate. The art in
-  `features/mascot/assets/` is placeholder SVG: replace each file under the same name with the
-  final art.
-- **Follow-up on the new page.** A navigation click with a server `guide` asks the same question
-  again after it lands:
-  once the new page has no `Skeleton` and its nemu_ids hold still for 300 ms (3 s at most), the
-  extension sends the prompt with that page's Element List. It reserves each guide/page/step
-  signature once, so a repeated render cannot loop. Momen 1 continues on the form and Momen 3 on
-  its task page; fixture mode tells their initial and follow-up requests apart by Element List.
-- **Cancel pending answers.** Closing the card or pressing Esc while Nemu is thinking aborts the
-  content request and the matching background fetch. A completion that arrives after cancellation
-  is ignored rather than replacing the closed UI.
-- **Konfirmasi.** A `confirm` action rings its target with its label (Momen 3: Selesaikan Tugas, "Kamu
-  yang mengirim"), and the extension never clicks it. On a task page (`/perdin/task/$instanceId`), once
-  Rina presses it, the background reads `getProcessInstance` until the State moves and the Answer
-  Card shows the task ID and the new State (Verifikasi). A `batas_pertanggungjawaban` calc entry
-  shows as a formula line under Rincian.
-- **Confirmed fill.** A `fill` action never changes a field immediately. While its step is ringed,
-  the Answer Card shows the value with an **Isi** button in place of Salin; only Rina pressing it
-  applies the raw contract value to the exact target and dispatches normal input/change events.
-  A "Sesuai" chip then sits at the field's right end. If she later enters a different value, Nemu
-  leaves it untouched and the chip says "Tidak sesuai hitungan Rp447.000 · Isi ulang", where
-  Isi ulang applies the value again.
-- **Shortcut.** Ctrl+Shift+Space is bound to the extension's action (`_execute_action`, shown
-  as "Activate the extension"), the same as clicking the Nemu toolbar icon. It's not a page key
-  listener because macOS, the browser, or another app can take the keys before the page sees
-  them, and not a custom command because Arc never fires those. If the shortcut does nothing,
-  something else owns the combo: rebind it at `chrome://extensions/shortcuts`
-  (`arc://extensions/shortcuts` in Arc), or click the toolbar icon. A changed default only
-  applies to a fresh install, so remove and re-load the extension to pick it up.
+- **One MV3 build** for Chrome and Edge (`pnpm --filter extension build`, or `build:edge` for an
+  Edge-named output). Both load it unpacked.
+- **Install code (ADR-0015).** The toolbar icon opens the settings page, where the school operator
+  enters the school's install code once. The demo school, SDIT Nusantara, uses `NEMU-SDITN-2026`.
+  The Nemu Service refuses extension requests without a known code.
+- **Identity without login (ADR-0015).** Nemu reads the email of the account signed in on the
+  AlurSekolah page and sends it with every request; the Nemu Service matches it against the
+  school's Teachers & contacts (WS-06). An unregistered account gets "Akun ini belum didaftarkan.
+  Hubungi Pak Rizal." (the school's own operator). The page is read again whenever it changes, so
+  signing in as someone else switches who Nemu helps. Sites without an AlurSekolah account (Ruang
+  GTK, Moodle) ask as the last account seen on AlurSekolah.
+- **Email readers.** `features/identity/lib/page-email-readers.ts` has one reader per site: the
+  mock AlurSekolah reads `#menu-email` / `#profil-email`. **The reader for Javan's AlurSekolah
+  tenant is a placeholder**: it takes the first email in the page's header or account area until
+  the tenant's markup is known. Replace it with the tenant's own selectors.
+- **Permissions and WS-03 (ADR-0016).** `host_permissions` cover `*.alursekolah.id`, the mock
+  AlurSekolah and Ruang GTK, the Moodle test site, `web.whatsapp.com`, `http://localhost/*` and the
+  Nemu Service. Inside them, the school's WS-03 list from the Nemu Service (`extensionConfig`)
+  decides: the content script asks the background first and, off the list, shows and reads
+  nothing (e-Rapor is off it on purpose: test WS-1 (a)). The list is read again at most once a
+  minute, so a change needs no update. A site the school adds outside the known ones shows
+  **Izinkan** on the settings page, which asks Chrome for it (`optional_host_permissions`); the
+  background then runs the content script there too.
+- **Answers.** The background sends the question to `helpRoute`. Questions about school rules go to
+  `helpAsk`, "ini kenapa?" to `helpExplain` with the page's visible text (never input values, and
+  nothing while a password field shows), and "berhenti" closes the bubble. Grade entry and
+  processes say they aren't available from the type box yet: voice is #200, the five display types
+  #201, and the executor #202. The "Tahan Ctrl + Spasi untuk bicara" hint is shown, but holding the
+  keys does nothing until #200.
+- **Contract.** Request and response schemas come from `@nemu/contracts/extension` and
+  `@nemu/contracts/school`. Only the background calls the Nemu Service.
 
 ## Install the latest build
 
 Every deploy from `main` rebuilds the extension against the production Nemu Service and replaces
 the zip on the `extension-latest` release:
 <https://github.com/ahargunyllib/nemu/releases/download/extension-latest/nemu-extension-chrome.zip>.
-Unzip it, then load the folder unpacked as in step 2 below. To update, replace the folder's
-contents with the new zip and click the reload icon on the extension card. The build's version is
-`0.1.<run number>`: the extension card shows it, and the release notes name the matching commit.
-A local build stays `0.0.0`.
+Unzip it and load the folder unpacked as below. To update, replace the folder's contents with the
+new zip and click the reload icon on the extension card.
 
 ## Run it
 
-1. Start everything with `pnpm dev`: the server on :3000, the Demo App on :3001, and the
-   extension's dev build, which rebuilds on change into `apps/extension/.output/chrome-mv3-dev`.
-   `pnpm dev` doesn't open a browser, so it works without Chrome installed.
-   To skip OpenRouter, set `NEMU_RESPONDER=fixture` in `apps/server/.env` (or prefix the command:
-   `NEMU_RESPONDER=fixture pnpm dev`); the server then answers only the three Momen prompts from
-   `@nemu/contracts/fixtures` and needs no `OPENROUTER_API_KEY`.
-2. Load the extension unpacked in any Chromium browser:
-   - **Chrome**: open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**.
-   - **Arc**: open `arc://extensions`, turn on **Developer mode**, click **Load unpacked**.
+1. Start everything with `NEMU_RESPONDER=fixture pnpm dev`: the Nemu Service on :3000, the mock
+   AlurSekolah on :3003, Ruang GTK on :3004, e-Rapor on :3005, and the extension's dev build in
+   `apps/extension/.output/chrome-mv3-dev`. The fixture responder answers offline, without
+   `OPENROUTER_API_KEY` (`docs/school-ai.md`).
+2. Load the extension unpacked: open `chrome://extensions` (or `edge://extensions`), turn on
+   **Developer mode**, click **Load unpacked**, and pick `apps/extension/.output/chrome-mv3-dev`.
+3. The settings page opens on install. Enter `NEMU-SDITN-2026` and press **Simpan**.
+4. Open <http://localhost:3003>, sign in as `siti.aminah` (password `nemu-uji-2026`), click the
+   Nemu button, and ask "KKM nilai berapa?". Sign in as `rizal.operator` to see the unregistered
+   message.
 
-   Pick `apps/extension/.output/chrome-mv3-dev`. For a production-style build instead, run
-   `pnpm --filter extension build` and load `apps/extension/.output/chrome-mv3`.
-
-3. Log in to the Demo App at <http://localhost:3001> (the login page has demo-account buttons),
-   press Ctrl+Shift+Space (Ctrl on macOS too, not Cmd) or click the Nemu toolbar icon, and ask
-   one of the Momen prompts:
-   - "Saya dapat tugas rapat ke Makassar 3 hari, mulai dari mana?"
-   - "Saya menginap di rumah saudara, ini diisi apa?"
-   - "Saya sudah pulang kemarin, sekarang apa?"
-
-After code changes in dev mode, the dev build reloads itself; if the overlay doesn't update,
-click the reload icon on the extension card and refresh the Demo App tab.
-
-## Check it in a real browser
-
-With `NEMU_RESPONDER=fixture pnpm dev` running, `pnpm --filter extension verify` runs a
-production build into `.output/chrome-mv3` that calls `http://localhost:3000`, loads it into
-Playwright's Chromium, and checks it. It doesn't use the dev build: that one registers its content
-script from the WXT dev server instead of the manifest, so under Playwright no overlay appears.
-It stops early if the Nemu Service answers with the AI Responder instead of the fixtures. The
-checks:
-
-- a page outside the allowlist gets no overlay, its toolbar icon shows the popup (saved as
-  `toolbar-popup.png`) whose Buka AlurKerja opens the Demo App, and a Demo App tab has no popup;
-- signed out, the card asks Rina to log in;
-- signed in as Rina, the Momen 1 prompt comes back as an Answer Card;
-- Momen 1, five times in a row from Beranda: Nemu clicks Ajukan Perjalanan Dinas, the form opens,
-  and the follow-up card says "Langkah 1 dari 6" without listing the steps, with its citation
-  under Rincian;
-- K1-01 from Beranda ("Mau ajukan perjalanan dinas ke Makassar, mulai dari mana?"): the form
-  opens and the ring walks Jenis perjalanan, Kota tujuan, and Surat tugas, then the Jadwal tab,
-  where Nemu asks again and walks Tanggal berangkat, Tanggal kembali, and Moda transportasi
-  ("Langkah 1 dari 6" to "Langkah 6 dari 6"). Each step moves on after the script picks the
-  option or date in the Select's or date picker's popup;
-- on the Perjalanan Dinas form's Biaya tab, Momen 2: Rina drags a box over the lodging fields, the chip holds a
-  crop of just that box (saved as `momen-2-area-crop-sent.png`), and the prompt goes out with it.
-  The card shows the answer and warning, with the formula and the PMK 119/2023 Pasal 8 ayat (5)
-  citation under Rincian, rings each lodging field with its action label, and keeps off both
-  fields. The amount stays empty until the script presses the card's Isi Rp447.000 (there is no
-  Salin and no Isi outside the card), then shows Sesuai; changing it to Rp745.000 produces the
-  mismatch chip without overwriting the field, Isi ulang writes Rp447.000 again, and the Chat Log
-  records that an Area Crop was attached;
-- Momen 3, five times in a row after a demo data reset: Nemu opens the Pertanggungjawaban task,
-  the follow-up rings both missing uploads and Selesaikan Tugas and names the 12 November 2026 deadline,
-  and after the script uploads the sample PDFs and presses Selesaikan Tugas, the card shows
-  PJ-PD-2026-0042 and Verifikasi;
-- the mascot sits 12 px below and to the right of the cursor, and clicking it opens the Composer;
-- on a fresh tab where only the mascot opened the Composer, an Area Crop fails with the hint to
-  open Nemu from the toolbar icon or Ctrl+Shift+Space (saved as `area-crop-no-tab-access.png`);
-- after switching to Dimas, the header shows the persisted 14 October 2026 Telco clock and the
-  script exercises the happy-path calculation, missing-RCA `PERLU_BUKTI` branch, late rejection,
-  CRM handoff, exact placeholder IDs, Rp579.167 value, and disabled self-approval control;
-- Sari, then Hendra, approve KLM-2610-0007 with Setujui klaim, which moves it to Credit Note,
-  and Reset data demo as Dimas puts all three claims back at Registrasi Klaim.
-
-It prints one line per check, exits non-zero on a failure, and saves screenshots to
-`.output/verify/`. Add `-- --headed` to watch it. The script opens the Composer by pressing the
-toolbar icon through CDP (`Extensions.triggerAction`, enabled by
-`--enable-unsafe-extension-debugging`), so the tab gets the same `activeTab` grant a real click
-gives. Automation can't press the browser-level shortcut: check Ctrl+Shift+Space by hand when you
-change the shortcut or the manifest. If Playwright's Chromium isn't installed yet, run
-`pnpm --filter extension exec playwright-core install chromium` once.
-
-In dev, the extension calls `http://localhost:3000` by default. Set `WXT_SERVER_URL` (in
-`apps/extension/.env` or the shell) to point it at another Nemu Service; the manifest's host
-permission follows it. `wxt build` and `wxt zip` fail without it, so a production build never
-ships pointing at localhost:
+In dev the extension calls `http://localhost:3000`. Set `WXT_SERVER_URL` to point it at another
+Nemu Service; the host permission follows it. `wxt build` and `wxt zip` fail without it, so a
+production build never ships pointing at localhost:
 
 ```bash
 WXT_SERVER_URL=https://nemu-api.ahargunyllib.dev pnpm --filter extension build
 ```
+
+## Check it in a real browser
+
+With `NEMU_RESPONDER=fixture pnpm dev` running, `pnpm --filter extension verify` builds the
+extension against `http://localhost:3000`, loads it into Playwright's Chromium, and checks:
+
+- the settings page refuses an unknown install code and keeps `NEMU-SDITN-2026`;
+- the Nemu button and its hint show on the mock AlurSekolah;
+- Bu Siti's "KKM nilai berapa?" comes back as a Gelembung Jawab with the SOP as its source;
+- signing in as `rizal.operator` shows "Akun ini belum didaftarkan. Hubungi Pak Rizal.", and
+  signing in as `dewi.lestari` brings the type box back;
+- Ruang GTK shows the Nemu button and asks as the last AlurSekolah account;
+- e-Rapor gets no Nemu button (WS-1 (a)).
+
+It prints one line per check, exits non-zero on a failure, and saves screenshots to
+`.output/verify/`. Add `-- --headed` to watch it. `NEMU_SERVER_URL`, `MOCK_ALURSEKOLAH_URL`,
+`MOCK_RUANG_GTK_URL` and `MOCK_ERAPOR_URL` point it elsewhere, such as the deployed mocks. If
+Playwright's Chromium isn't installed yet, run
+`pnpm --filter extension exec playwright-core install chromium` once.

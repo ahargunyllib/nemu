@@ -5,18 +5,16 @@ the teacher on the AlurSekolah, Moodle and government pages she already uses, an
 knowledge the school and Javan manage. The MVP plan (PRD v2.3) is tracked in
 [#194](https://github.com/ahargunyllib/nemu/issues/194).
 
-The repo is moving from the first MVP, a guide on a fake AlurKerja app. Its Demo App is removed;
-the chat pipeline, Perjalanan Dinas and Klaim SLA code stay until the extension runs on the school
-procedures. Domain terms, including the legacy ones, are defined in [GLOSSARY.md](GLOSSARY.md).
-The last AlurKerja version is tagged `v1-alurkerja`.
+The first MVP, a guide on a fake AlurKerja app, is removed; its last version is tagged
+`v1-alurkerja`. Domain terms are defined in [GLOSSARY.md](GLOSSARY.md).
 
 ## Products
 
 | Product          | Where                   | What it does                                                                                                                        |
 | ---------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Nemu Extension   | `apps/extension`        | Chrome extension. Still the AlurKerja guide (Composer, Answer Card, highlights) until it moves to AlurSekolah.                      |
-| Nemu Service     | `apps/server`           | Cloudflare Worker (Hono + oRPC): the school procedures (`docs/school-ai.md`), `nemuChat`, knowledge, the Chat Log.                  |
-| Admin Workspace  | `apps/admin`            | Web console for knowledge documents, Reference Tables, Rule Sources, and the Chat Log.                                              |
+| Nemu Extension   | `apps/extension`        | Chrome/Edge extension: the Nemu button on the school's allowed websites ([README](apps/extension/README.md)).                       |
+| Nemu Service     | `apps/server`           | Cloudflare Worker (Hono + oRPC): the school procedures (`docs/school-ai.md`), knowledge, schools and teachers.                      |
+| Admin Workspace  | `apps/admin`            | Web console for schools, teachers, knowledge documents, Reference Tables, and Rule Sources.                                         |
 | Mock AlurSekolah | `apps/mock-alursekolah` | Fake AlurSekolah the extension runs on, with a read API shaped like AlurSekolah API v1 ([README](apps/mock-alursekolah/README.md)). |
 | Mock portals     | `apps/mock-portals`     | Static Ruang GTK (F2-3) and e-Rapor (WS-1, not allowed) pages.                                                                      |
 
@@ -31,11 +29,11 @@ nemu/
 │   ├── mock-portals/    # Static Ruang GTK and e-Rapor mocks
 │   └── server/          # Nemu Service entry point (Hono + oRPC on Workers)
 ├── packages/
-│   ├── ai/              # School AI (school/) and the legacy runNemu pipeline, retrieval, evals
+│   ├── ai/              # School AI (school/), knowledge retrieval, Rule Sources
 │   ├── api/             # Feature modules: procedure → service → repository
 │   ├── auth/            # Better Auth configuration
 │   ├── config/          # Shared TypeScript config
-│   ├── contracts/       # Wire schemas, nemu_ids, and Momen fixtures shared by every part
+│   ├── contracts/       # Wire schemas shared by the extension, server, and admin
 │   ├── db/              # Drizzle schema and D1 migrations (including demo seeds)
 │   ├── infra/           # Alchemy stack: D1, R2, and the Workers
 │   └── ui/              # Vendored shadcn components, AppShell, Nemu brand wrappers
@@ -59,7 +57,7 @@ Drizzle, Cloudflare D1 and R2, Better Auth, WXT, Alchemy, Varlock, and Vite+.
    cp apps/server/.env.example apps/server/.env
    ```
 
-   To run without OpenRouter, set `NEMU_RESPONDER=fixture`. The server then answers from fixtures
+   To run without OpenRouter, set `NEMU_RESPONDER=fixture`. The server then answers offline
    and needs no `OPENROUTER_API_KEY`
    ([ADR-0001](docs/adr/0001-chat-endpoint-behind-a-responder-seam.md), `docs/school-ai.md`).
 
@@ -85,12 +83,10 @@ Drizzle, Cloudflare D1 and R2, Better Auth, WXT, Alchemy, Varlock, and Vite+.
 ### Local database
 
 `pnpm run dev` runs `alchemy dev`, which creates the local D1 database and applies the
-migrations, including the seeded accounts, the `W-SEKOLAH` school workspace, and the legacy
-Perjalanan Dinas and Klaim SLA data. Its state lives in
+migrations, including the seeded accounts and the `W-SEKOLAH` school workspace. Its state lives in
 `packages/infra/.alchemy/`, so each checkout or git worktree gets its own database on its first
 run. Copy `apps/server/.env` into a new worktree before starting it. To reset the database, stop
-dev and delete `packages/infra/.alchemy/`. Telco evaluator files under
-`data/05_telco/06_test-case` are never indexed by the live AI responder.
+dev and delete `packages/infra/.alchemy/`.
 
 After changing the Drizzle schema, generate a migration:
 
@@ -117,8 +113,8 @@ pnpm run db:generate
 
 Package-level commands worth knowing:
 
-- `pnpm --filter @nemu/ai eval:school` evaluates the school AI; `eval:offline` and `eval:live`
-  evaluate the legacy AlurKerja pipeline. See [packages/ai/README.md](packages/ai/README.md).
+- `pnpm --filter @nemu/ai eval:school` evaluates the school AI. See
+  [packages/ai/README.md](packages/ai/README.md).
 
 ## Environment
 

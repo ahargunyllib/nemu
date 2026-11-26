@@ -3,7 +3,6 @@ import {
   GlobeIcon,
   LayoutDashboardIcon,
   type LucideIcon,
-  MessagesSquareIcon,
   SchoolIcon,
   ShieldCheckIcon,
   TableIcon,
@@ -12,7 +11,7 @@ import {
 
 import { isFullAdmin } from "@/features/workspace/lib/roles";
 
-type NavPath = "/dashboard" | "/chat-log" | "/documents" | "/tables" | "/schools" | "/teachers";
+type NavPath = "/dashboard" | "/documents" | "/tables" | "/schools" | "/teachers";
 
 export type NavItem = {
   label: string;
@@ -30,10 +29,7 @@ export type NavGroup = {
 export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Overview",
-    items: [
-      { to: "/dashboard", label: "Dashboard", icon: LayoutDashboardIcon, adminOnly: true },
-      { to: "/chat-log", label: "Chat Log", icon: MessagesSquareIcon, adminOnly: true },
-    ],
+    items: [{ to: "/dashboard", label: "Dashboard", icon: LayoutDashboardIcon, adminOnly: true }],
   },
   {
     label: "Sekolah",

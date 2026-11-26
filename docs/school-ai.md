@@ -15,15 +15,15 @@ The OpenRouter key in `apps/server/.env` had **expired** on 25 Nov 2026 (HTTP 40
 
 Accounts (seeded by `packages/db/src/migrations/20261125120000_seed_school_workspace` and `20261126080000_seed_school_directory`, workspace `W-SEKOLAH`, demo date Tuesday 1 Dec 2026):
 
-| Who                             | Email             | Password          | Role                                                             |
-| ------------------------------- | ----------------- | ----------------- | ---------------------------------------------------------------- |
-| Bu Siti (teacher, classes 4A/B) | `siti@nemu.demo`  | `siti-demo-2026`  | `guru`                                                           |
-| Pak Rizal (operator)            | `rizal@nemu.demo` | `rizal-demo-2026` | `operator` (uploads documents, saves procedures, manages WS-06)  |
-| Admin Javan                     | `javan@nemu.demo` | `javan-demo-2026` | `admin` (every page, including the school list and the Chat Log) |
+| Who                             | Email             | Password          | Role                                                            |
+| ------------------------------- | ----------------- | ----------------- | --------------------------------------------------------------- |
+| Bu Siti (teacher, classes 4A/B) | `siti@nemu.demo`  | `siti-demo-2026`  | `guru`                                                          |
+| Pak Rizal (operator)            | `rizal@nemu.demo` | `rizal-demo-2026` | `operator` (uploads documents, saves procedures, manages WS-06) |
+| Admin Javan                     | `javan@nemu.demo` | `javan-demo-2026` | `admin` (every page, including the school list)                 |
 
 ## Procedures
 
-All are oRPC procedures on the Nemu Service, gated to `W-SEKOLAH` sessions. Types are in `@nemu/contracts/school`.
+All are oRPC procedures on the Nemu Service, open to a `W-SEKOLAH` session or to the Nemu Extension with the school's install code and a registered teacher's page email (ADR-0015). Types are in `@nemu/contracts/school`.
 
 | Procedure                                       | Input → output                                                                                                               | PRD         |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------- |

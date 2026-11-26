@@ -41,11 +41,6 @@ export async function createSchoolContext(
   return {
     db,
     session: { session: {}, user } as unknown as Context["session"],
-    nemu: {
-      respond: async () => {
-        throw new Error("not used");
-      },
-    },
     documentFiles: createMemoryFileStore(),
     school: { ai, directory: createDemoSchoolDirectory(), inbox: createMemoryFileStore() },
     demoDate: "2026-12-01",

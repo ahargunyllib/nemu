@@ -28,8 +28,9 @@ export function createRegistrySchoolDirectory(school: SchoolRepository): SchoolD
     async teacherByPhone(phone) {
       return profile(await school.findTeacher({ phone: normalizePhone(phone) }));
     },
-    async teacherByEmail(email) {
-      return profile(await school.findTeacher({ email: email.trim().toLowerCase() }));
+    async teacherByEmail(workspaceId, email) {
+      const teacher = await school.findTeacher({ email: email.trim().toLowerCase() });
+      return profile(teacher?.workspaceId === workspaceId ? teacher : undefined);
     },
     async roster(teacherId, className) {
       const teacher = await school.findTeacher({ id: teacherId });

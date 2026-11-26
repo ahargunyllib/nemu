@@ -1,20 +1,20 @@
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "wxt";
 
-import { ALLOWED_MATCHES, DEFAULT_SERVER_URL } from "./shared/lib/config";
+import { DEFAULT_SERVER_URL, KNOWN_SITE_MATCHES, OPTIONAL_SITE_MATCHES } from "./shared/lib/config";
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   modules: ["@wxt-dev/module-react"],
   // Don't auto-launch a browser in dev: it needs Chrome installed, and `pnpm dev` dies without it.
-  // Load .output/chrome-mv3-dev unpacked in any Chromium browser instead.
+  // Load .output/chrome-mv3-dev unpacked in Chrome or Edge instead.
   webExt: { disabled: true },
   vite: () => ({
     plugins: [tailwindcss()],
   }),
   hooks: {
-    // A production build without it would call localhost, so every chat fails with "Failed to
-    // fetch". The check lives here because `wxt prepare` (postinstall) resolves the manifest too.
+    // A production build without it would call localhost, so every request fails. The check lives
+    // here because `wxt prepare` (postinstall) resolves the manifest too.
     "build:before": (wxt) => {
       if (wxt.config.mode === "production" && !process.env.WXT_SERVER_URL)
         throw new Error(
@@ -22,33 +22,28 @@ export default defineConfig({
         );
     },
   },
-  // WXT loads .env files before calling this, so WXT_SERVER_URL is set here too.
+  // WXT loads .env files before calling this, so WXT_SERVER_URL is set here too. One MV3 manifest
+  // serves Chrome and Edge (both Chromium), so the same build loads unpacked in either.
   manifest: () => ({
     name: "Nemu",
     // The extension-latest release job sets this per run, so a tester can read which build they
     // have in chrome://extensions. Local builds keep package.json's 0.0.0.
     version: process.env.WXT_EXTENSION_VERSION,
-    description: "Pemandu Perjalanan Dinas di Demo App.",
-    // Only the Nemu Service and the Demo App, so Chrome doesn't warn "read and change all your data
-    // on all websites" at install (ADR-0004). The trade-off: `captureVisibleTab` for the Area Crop
-    // needs `<all_urls>` or an `activeTab` grant, and a Demo App host permission isn't enough.
-    // `activeTab` is granted only when the toolbar icon or the shortcut fires the action on that
-    // tab, until it navigates away. Opening the Composer from the mascot grants nothing, and Arc
-    // fires the action without a tab, so there the Area Crop fails with a hint to use the icon.
-    permissions: ["activeTab"],
+    description: "Nemu membantu guru di AlurSekolah, Moodle, dan portal pemerintah.",
+    // `storage` keeps the install code; `scripting` runs Nemu on sites granted later (ADR-0016).
+    permissions: ["storage", "scripting"],
+    // Known sites are granted at install; inside them the school's WS-03 list decides where the
+    // Nemu button appears. Other sites are asked for from the settings page.
     host_permissions: [
       `${new URL(process.env.WXT_SERVER_URL || DEFAULT_SERVER_URL).origin}/*`,
-      ...ALLOWED_MATCHES,
+      ...KNOWN_SITE_MATCHES,
     ],
-    // The shortcut and the toolbar icon both trigger the action, which opens the Composer on
-    // Demo App tabs and the popup (entrypoints/popup) everywhere else. It's bound to the built-in
-    // `_execute_action` command because Arc never fires custom commands. The browser handles the
-    // keys before the page sees them, and users can rebind them at chrome://extensions/shortcuts
-    // (arc://extensions/shortcuts in Arc).
-    commands: {
-      _execute_action: {
-        suggested_key: { default: "Ctrl+Shift+Space", mac: "MacCtrl+Shift+Space" },
-      },
-    },
+    optional_host_permissions: [...OPTIONAL_SITE_MATCHES],
+    // The content script's stylesheet, for sites granted later that the manifest's script misses.
+    web_accessible_resources: [
+      { resources: ["content-scripts/nemu.css"], matches: [...OPTIONAL_SITE_MATCHES] },
+    ],
+    // The toolbar icon opens the settings page (entrypoints/options).
+    action: { default_title: "Pengaturan Nemu" },
   }),
 });

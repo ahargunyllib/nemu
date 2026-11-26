@@ -21,8 +21,6 @@ jobs:
         run: pnpm run check
       - name: Test
         run: pnpm run test
-      - name: Offline evaluation (calculations, K2, retrieval)
-        run: pnpm --filter @nemu/ai eval:offline
 
   wa-bot:
     runs-on: ubuntu-latest
