@@ -13,6 +13,7 @@ import { ruleSourcesRouter } from "../modules/rule-sources/router";
 import { schoolRouter } from "../modules/school/router";
 import { slaClaimsRouter } from "../modules/sla-claims/router";
 import { speechRouter } from "../modules/speech/router";
+import { waBotRouter } from "../modules/wa-bot/router";
 
 export const appRouter = {
   ...healthRouter,
@@ -28,6 +29,7 @@ export const appRouter = {
   ...processesRouter,
   ...speechRouter,
   ...schoolRouter,
+  ...waBotRouter,
 };
 export type AppRouter = typeof appRouter;
 export type AppRouterClient = RouterClient<typeof appRouter>;

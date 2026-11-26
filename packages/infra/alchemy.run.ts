@@ -71,6 +71,9 @@ export const server = Cloudflare.Worker("server", {
       Config.withDefault("id-ID-Harper:MAI-Voice-2.1-Flash"),
     ),
     OPENROUTER_ZDR: Config.String("OPENROUTER_ZDR").pipe(Config.withDefault("false")),
+    // Shared with apps/wa-bot on the team VPS. Optional so the Worker deploys without it; while it's
+    // empty the wa-bot endpoints refuse every call.
+    WA_BOT_SECRET: Config.Redacted("WA_BOT_SECRET").pipe(Config.withDefault(Redacted.make(""))),
   },
   dev: {
     port: 3000,

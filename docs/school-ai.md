@@ -55,7 +55,7 @@ All are oRPC procedures on the Nemu Service, gated to `W-SEKOLAH` sessions. Type
 ### F1: grade book to AlurSekolah
 
 1. `helpRoute` → `input_nilai`, then `gradesParseCommand`. Speak `question` if it returns `ask`.
-2. Photo arrives: from the WhatsApp webhook (below) or `inboxUploadPhoto`. Poll `inboxJobs`; when a job is `queued`, call `inboxProcess` with the class and assessment.
+2. Photo arrives: from WhatsApp (`apps/wa-bot`, below) or `inboxUploadPhoto`. Poll `inboxJobs`; when a job is `queued`, call `inboxProcess` with the class and assessment.
    - `reshoot`: speak `message` ("Fotonya belum terbaca jelas…").
    - `failed`: speak `message`; the error is also in Workers Logs.
 3. W5: show `verification.questions` one per screen.
@@ -101,25 +101,14 @@ All are oRPC procedures on the Nemu Service, gated to `W-SEKOLAH` sessions. Type
 - `speechSynthesize(sentence)`. With `timing: "estimated"`, scale every `offsetMs` and `durationMs` by `audio.duration * 1000 / estimatedDurationMs` once the audio loads.
 - With `audioBase64: ""`, speak `text` with `speechSynthesis` (Windows: Microsoft Andika `id-ID`) at `rate = 0.85` and use the same `words`.
 
-## WhatsApp webhook (fullstack side)
+## WhatsApp photos (`apps/wa-bot`)
 
-Look up the sender **before** downloading the media, and drop unknown numbers (F1-01):
+The Nemu number is linked with whatsmeow in `apps/wa-bot` on the team VPS (ADR-0013), not the Meta webhook. It calls two procedures in `packages/api/src/modules/wa-bot` over the OpenAPI handler, with `Authorization: Bearer <WA_BOT_SECRET>`:
 
-```ts
-import { enqueuePhoto, teacherForSender } from "@nemu/api/modules/inbox/service";
+- `POST /api-reference/wa-bot/sender` `{phone}` → `{registered}`, asked **before** downloading the media. Unknown numbers are ignored (F1-01).
+- `POST /api-reference/wa-bot/photos`, multipart `phone`, `messageId`, `photo` → `{status: "queued", jobId}` or `{status: "unknown_sender" | "not_an_image" | "too_large"}`. It runs `teacherForSender` again (it reads WS-06 through `context.school.directory`, `createRegistrySchoolDirectory`), then `enqueuePhoto` with `source: "whatsapp"`. The same `messageId` twice is one job.
 
-// `directory` is `context.school.directory`: WS-06 in D1 (`createRegistrySchoolDirectory`).
-const teacher = await teacherForSender(directory, message.from);
-if (!teacher) return c.body(null, 200); // unknown number: never download
-const bytes = await downloadWhatsAppMedia(message.image.id); // your Graph API call (URL expires in 5 min)
-await enqueuePhoto(
-  { store: inboxStore },
-  { teacherId: teacher.teacherId, source: "whatsapp", bytes, messageId: message.id },
-);
-return c.body(null, 200);
-```
-
-The same `messageId` enqueued twice (Meta retries) is one job. Don't reply in WhatsApp: each reply beyond the free tier costs about Rp357.
+Deploy and linking the number: `infra/README.md`.
 
 ## Screen reader (desktop main process)
 

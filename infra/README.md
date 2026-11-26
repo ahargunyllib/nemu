@@ -1,13 +1,15 @@
 # Team VPS
 
 Docker Compose for what Nemu runs outside Cloudflare: the Moodle test site for the F4 test cases
-(PRD v2.3 §8), and later `wa-bot` (#203).
+(PRD v2.3 §8), and `wa-bot`, which takes grade-book photos teachers send to the Nemu WhatsApp
+number (F1-01, #203).
 
-| Service    | Image                         | Why                                                              |
-| ---------- | ----------------------------- | ---------------------------------------------------------------- |
-| `caddy`    | `caddy:2.11.9-alpine`         | HTTPS for `MOODLE_DOMAIN`, certificates renewed automatically    |
-| `postgres` | `postgres:17-alpine`          | Moodle's database                                                |
-| `moodle`   | `erseco/alpine-moodle:v5.3.1` | Moodle 5.3 LTS, pinned so the import pages don't change mid-test |
+| Service    | Image                         | Why                                                                  |
+| ---------- | ----------------------------- | -------------------------------------------------------------------- |
+| `caddy`    | `caddy:2.11.9-alpine`         | HTTPS for `MOODLE_DOMAIN`, certificates renewed automatically        |
+| `postgres` | `postgres:17-alpine`          | Moodle's database                                                    |
+| `moodle`   | `erseco/alpine-moodle:v5.3.1` | Moodle 5.3 LTS, pinned so the import pages don't change mid-test     |
+| `wa-bot`   | built from `apps/wa-bot`      | The Nemu WhatsApp number; hands teachers' photos to the Nemu Service |
 
 ## Deploy guide
 
@@ -66,12 +68,13 @@ may already listen on 80 or 443 (`sudo ss -ltnp | grep -E ':80|:443'` prints not
 
 ### 5. Get this folder onto the VPS
 
-The repo is public, so a sparse clone fetches only this folder:
+The repo is public, so a sparse clone fetches only this folder and the `wa-bot` source Compose
+builds:
 
 ```bash
 git clone --depth 1 --filter=blob:none --sparse https://github.com/ahargunyllib/nemu.git
 cd nemu
-git sparse-checkout set infra
+git sparse-checkout set infra apps/wa-bot
 cd infra
 ```
 
@@ -85,13 +88,15 @@ openssl rand -base64 24   # run once for POSTGRES_PASSWORD, once for MOODLE_ADMI
 nano .env
 ```
 
-| Variable                | Value                                                             |
-| ----------------------- | ----------------------------------------------------------------- |
-| `MOODLE_DOMAIN`         | `nemu-moodle.ahargunyllib.dev` (no `https://`, no trailing slash) |
-| `POSTGRES_PASSWORD`     | a generated password                                              |
-| `MOODLE_ADMIN_USERNAME` | `admin`                                                           |
-| `MOODLE_ADMIN_PASSWORD` | a generated password; keep it in the team's password manager      |
-| `TEACHER_PASSWORD`      | the password testers use for `siti.aminah`; share it with them    |
+| Variable                | Value                                                               |
+| ----------------------- | ------------------------------------------------------------------- |
+| `MOODLE_DOMAIN`         | `nemu-moodle.ahargunyllib.dev` (no `https://`, no trailing slash)   |
+| `POSTGRES_PASSWORD`     | a generated password                                                |
+| `MOODLE_ADMIN_USERNAME` | `admin`                                                             |
+| `MOODLE_ADMIN_PASSWORD` | a generated password; keep it in the team's password manager        |
+| `TEACHER_PASSWORD`      | the password testers use for `siti.aminah`; share it with them      |
+| `NEMU_SERVER_URL`       | `https://nemu-api.ahargunyllib.dev`                                 |
+| `WA_BOT_SECRET`         | the Worker's `WA_BOT_SECRET`; see [wa-bot](#wa-bot-whatsapp-photos) |
 
 Set `POSTGRES_PASSWORD` and the admin account before the first start. Moodle stores them on its
 first install, so changing them in `.env` afterwards doesn't change the site.
@@ -103,7 +108,8 @@ docker compose up -d
 docker compose logs -f moodle
 ```
 
-If Compose warns that a variable "is not set", stop (`docker compose down`) and fill it in `.env`
+This also builds and starts `wa-bot`; link its number with the [wa-bot](#wa-bot-whatsapp-photos)
+steps. If Compose warns that a variable "is not set", stop (`docker compose down`) and fill it in `.env`
 first. The first start installs Moodle into Postgres. Wait until the log shows `run: nginx`,
 `run: php` and `run: cron`, about 3 to 5 minutes, then press Ctrl+C (the containers keep running). Open
 `https://nemu-moodle.ahargunyllib.dev`: it shows "Masuk ke situs" once step 8 has run, or the
@@ -151,22 +157,83 @@ docker compose exec postgres psql -U moodle -d moodle
 Share with the team: the URL, `siti.aminah` with `TEACHER_PASSWORD`, and the student accounts
 from `setup/akun-siswa-uji.csv`. The admin password stays in the password manager.
 
+## wa-bot (WhatsApp photos)
+
+`wa-bot` is linked to the Nemu WhatsApp number like WhatsApp Web. When a registered teacher sends a
+photo, it reads the message, hands the photo to the Nemu Service, deletes it, and replies; the
+photo then shows as a card in AlurSekolah. Photos from numbers that aren't registered teachers are
+ignored: no read receipt, no download, no reply. It only makes outgoing connections, so it needs no
+domain or open port.
+
+It uses whatsmeow, an unofficial client, so WhatsApp may ban the number. Use a separate number
+bought for Nemu, never someone's personal one. The bot answers one message at a time with
+pauses, like a person.
+
+### 1. Share a secret with the Nemu Service
+
+Generate one secret and put the same value in two places:
+
+```bash
+openssl rand -base64 32
+```
+
+- The GitHub repository secret `WA_BOT_SECRET` (Settings › Secrets and variables › Actions), then
+  rerun the **Deploy** workflow so the Worker gets it. Until it has one, the Worker refuses every
+  call from the bot.
+- `WA_BOT_SECRET` in `.env` on the VPS, with `NEMU_SERVER_URL` set to the Nemu Service.
+
+### 2. Link the number
+
+Have the phone with the Nemu number at hand, then:
+
+```bash
+docker compose up -d --build wa-bot
+docker compose logs -f wa-bot
+```
+
+The log prints a QR code. On the phone, open WhatsApp › **Perangkat tertaut** › **Tautkan
+perangkat** and scan it. A new code appears every minute or so; if they run out, the bot restarts and
+prints more. The log says `number linked`, then `connected to WhatsApp` and `waiting for photos`.
+Press Ctrl+C (the bot keeps running).
+
+The session lives in the `wa_bot_data` volume, so restarts and updates don't need a new scan.
+
+### 3. Check it
+
+1. The teacher's number must be registered in Nemu (WS-06, #198).
+2. From that phone, send a photo of a grade-book page to the Nemu number. Within about 20 seconds
+   it shows as read, the bot types, and replies "Fotonya sudah diterima Nemu…".
+3. `docker compose logs wa-bot` shows `photo handed over` with `outcome=queued`.
+4. From a number that isn't registered, send a photo: it stays unread and the log says
+   `ignored a photo from an unregistered number`.
+
+### If something goes wrong
+
+- **`missing configuration: set …`:** fill that variable in `.env`, then `docker compose up -d wa-bot`.
+- **`hand-off failed` with `401 Unauthorized`:** the secrets differ, or the Worker hasn't been
+  redeployed since the GitHub secret was set.
+- **`the number was unlinked from WhatsApp`:** someone removed the linked device on the phone, or
+  WhatsApp logged it out. The bot restarts and prints a new QR code; scan it as in step 2.
+- **To link a different number:** `docker compose rm -sf wa-bot`, then
+  `docker volume rm nemu-vps_wa_bot_data`, then step 2.
+
 ## Running it
 
 | Task                       | Command                                                                               |
 | -------------------------- | ------------------------------------------------------------------------------------- |
 | Status                     | `docker compose ps`                                                                   |
-| Logs                       | `docker compose logs -f moodle` (or `caddy`, `postgres`)                              |
+| Logs                       | `docker compose logs -f moodle` (or `caddy`, `postgres`, `wa-bot`)                    |
 | Stop / start               | `docker compose down` / `docker compose up -d` (data is kept)                         |
-| Pull a change to this repo | `git pull`, then `docker compose up -d`                                               |
+| Pull a change to this repo | `git pull`, then `docker compose up -d --build`                                       |
 | Moodle CLI                 | `docker compose exec moodle php admin/cli/cfg.php --name=lang` (from `/var/www/html`) |
 | Back up the database       | `docker compose exec postgres pg_dump -U moodle moodle > moodle-$(date +%F).sql`      |
 
-Everything lives in named volumes (`postgres_data`, `moodledata`, `moodlehtml`, and Caddy's
-certificates).
+Everything lives in named volumes (`postgres_data`, `moodledata`, `moodlehtml`, `wa_bot_data`,
+and Caddy's certificates).
 
 - **After a test changes a quiz:** delete the quiz in Moodle and redo its part of step 9.
-- **To start over completely:** `docker compose down -v` deletes all data, then repeat steps 7 to 9.
+- **To start over completely:** `docker compose down -v` deletes all data (and unlinks the WhatsApp
+  number), then repeat steps 7 to 9 and link the number again.
 
 ## Troubleshooting
 

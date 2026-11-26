@@ -1,4 +1,4 @@
-# The team VPS: the Moodle test site for F4 (#197). wa-bot joins this file in #203.
+# The team VPS: the Moodle test site for F4 (#197) and wa-bot, the WhatsApp photo intake (#203).
 name: nemu-vps
 
 services:
@@ -60,9 +60,24 @@ services:
       postgres:
         condition: service_healthy
 
+  wa-bot:
+    # Only makes outgoing connections (WhatsApp and the Nemu Service), so Caddy has no route for it.
+    build: ../apps/wa-bot
+    restart: unless-stopped
+    environment:
+      NEMU_SERVER_URL: ${NEMU_SERVER_URL}
+      WA_BOT_SECRET: ${WA_BOT_SECRET}
+    volumes:
+      # The linked WhatsApp session. Deleting this volume unlinks the number.
+      - wa_bot_data:/data
+    # Photos wait here between download and hand-off, in memory, never on the VPS disk (F1-12).
+    tmpfs:
+      - /tmp
+
 volumes:
   caddy_data:
   caddy_config:
   postgres_data:
   moodledata:
   moodlehtml:
+  wa_bot_data:

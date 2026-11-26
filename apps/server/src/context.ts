@@ -1,7 +1,9 @@
 import type { Context as ApiContext } from "@nemu/api/context";
+import { internalCallerFor } from "@nemu/api/internal-caller";
 import { WORKSPACES } from "@nemu/api/workspace-ids";
 import type { Context as HonoContext } from "hono";
 
+import { ENV } from "./env.server";
 import {
   createAuth,
   createDocumentFileStore,
@@ -30,6 +32,9 @@ export async function createContext({ context }: CreateContextOptions): Promise<
     documentFiles: createDocumentFileStore(),
     school: createSchoolServices(db),
     demoDate: await getWorkspaceDemoDate(db, workspaceId),
+    internalCaller: await internalCallerFor(context.req.raw.headers, {
+      waBot: ENV.WA_BOT_SECRET,
+    }),
   };
 }
 
