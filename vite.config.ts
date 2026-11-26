@@ -5,9 +5,6 @@ export default defineConfig({
     ignorePatterns: [
       "node_modules/**",
       "**/node_modules/**",
-      "apps/mock-alurkerja/dist/**",
-      "apps/mock-alurkerja/.tanstack/**",
-      "apps/mock-alurkerja/src/routeTree.gen.ts",
       "apps/admin/dist/**",
       "apps/admin/.tanstack/**",
       "apps/admin/src/routeTree.gen.ts",
@@ -32,9 +29,6 @@ export default defineConfig({
     ignorePatterns: [
       "node_modules/**",
       "**/node_modules/**",
-      "apps/mock-alurkerja/dist/**",
-      "apps/mock-alurkerja/.tanstack/**",
-      "apps/mock-alurkerja/src/routeTree.gen.ts",
       "apps/admin/dist/**",
       "apps/admin/.tanstack/**",
       "apps/admin/src/routeTree.gen.ts",
