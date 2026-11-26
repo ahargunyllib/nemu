@@ -90,7 +90,7 @@ async function requireInstalledSchool(context: Context): Promise<InstalledSchool
   return school;
 }
 
-/** Nemu Extension requests that need only the school's install code (ADR-0014). */
+/** Nemu Extension requests that need only the school's install code (ADR-0015). */
 export const extensionProcedure = publicProcedure.use(async ({ context, next }) =>
   next({ context: { installedSchool: await requireInstalledSchool(context) } }),
 );
@@ -127,7 +127,7 @@ async function extensionCaller(context: Context): Promise<SchoolCaller> {
 
 /**
  * Nemu school procedures (AlurSekolah). A W-SEKOLAH session reaches them, and so does the Nemu
- * Extension with a valid install code and the email of a registered teacher (ADR-0014).
+ * Extension with a valid install code and the email of a registered teacher (ADR-0015).
  */
 export const schoolProcedure = publicProcedure.use(async ({ context, next }) => {
   if (context.extension) return next({ context: { caller: await extensionCaller(context) } });

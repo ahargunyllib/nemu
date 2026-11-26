@@ -60,7 +60,7 @@ jobs:
         run: |
           notes="Version ${WXT_EXTENSION_VERSION}, built from ${GITHUB_SHA} against ${WXT_SERVER_URL}.
 
-          Install: unzip, open chrome://extensions (arc://extensions in Arc), turn on Developer mode, click Load unpacked, and pick the unzipped folder. To update, replace the folder's contents and click the reload icon on the extension card."
+          Install: unzip, open chrome://extensions (edge://extensions in Edge), turn on Developer mode, click Load unpacked, and pick the unzipped folder. To update, replace the folder's contents and click the reload icon on the extension card."
           if gh release view extension-latest > /dev/null 2>&1; then
             gh release edit extension-latest --notes "$notes"
           else

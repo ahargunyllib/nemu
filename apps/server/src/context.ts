@@ -17,7 +17,7 @@ export type CreateContextOptions = {
   context: HonoContext;
 };
 
-/** The Nemu Extension's install code and page email (ADR-0014), when the request carries either. */
+/** The Nemu Extension's install code and page email (ADR-0015), when the request carries either. */
 function extensionCredentials(headers: Headers): ApiContext["extension"] {
   const installCode = headers.get(EXTENSION_HEADERS.installCode);
   const email = headers.get(EXTENSION_HEADERS.email);

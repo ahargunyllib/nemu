@@ -5,7 +5,7 @@ import { workspace } from "@nemu/db/schema/workspace";
 
 export type InstalledSchool = { workspaceId: string; name: string };
 
-/** The install codes (ADR-0014) and the WS-03 allowed websites (ADR-0015) of each school. */
+/** The install codes (ADR-0015) and the WS-03 allowed websites (ADR-0016) of each school. */
 export type ExtensionRepository = {
   schoolForInstallCode(code: string): Promise<InstalledSchool | undefined>;
   listAllowedSites(workspaceId: string): Promise<AllowedSite[]>;

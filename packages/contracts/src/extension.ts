@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /**
- * What the Nemu Extension sends with every request instead of a login (ADR-0014): the school's
+ * What the Nemu Extension sends with every request instead of a login (ADR-0015): the school's
  * install code from its settings page, and the email of the account signed in on the page.
  */
 export const EXTENSION_HEADERS = {

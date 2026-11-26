@@ -9,7 +9,7 @@ const createdAt = () =>
     .notNull();
 
 // The code a school operator types into the Nemu Extension's settings once. The Nemu Service takes
-// extension requests only with a valid one, and it tells which school they come from (ADR-0014).
+// extension requests only with a valid one, and it tells which school they come from (ADR-0015).
 export const schoolInstallCode = sqliteTable(
   "school_install_code",
   {
@@ -22,7 +22,7 @@ export const schoolInstallCode = sqliteTable(
   (table) => [uniqueIndex("school_install_code_workspace_unique").on(table.workspaceId)],
 );
 
-// WS-03: the websites where the Nemu button and page reading run, per school (ADR-0015).
+// WS-03: the websites where the Nemu button and page reading run, per school (ADR-0016).
 // `pattern` is a host, `*.`-wildcard host, or either with a port (see `siteMatches`).
 export const allowedSite = sqliteTable(
   "allowed_site",

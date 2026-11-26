@@ -6,7 +6,7 @@ import { createSchoolRepository } from "../school/repository";
 import { createExtensionRepository } from "./repository";
 import { identifyTeacher, toIdentity } from "./service";
 
-/** What the Nemu Extension reads before it shows anything on a page (ADR-0014, ADR-0015). */
+/** What the Nemu Extension reads before it shows anything on a page (ADR-0015, ADR-0016). */
 export const extensionRouter = {
   /** The settings page checks the install code with it; the background reads the WS-03 list. */
   extensionConfig: extensionProcedure

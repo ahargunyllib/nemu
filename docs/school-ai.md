@@ -23,7 +23,7 @@ Accounts (seeded by `packages/db/src/migrations/20261125120000_seed_school_works
 
 ## Procedures
 
-All are oRPC procedures on the Nemu Service, gated to `W-SEKOLAH` sessions. Types are in `@nemu/contracts/school`.
+All are oRPC procedures on the Nemu Service, open to a `W-SEKOLAH` session or to the Nemu Extension with the school's install code and a registered teacher's page email (ADR-0015). Types are in `@nemu/contracts/school`.
 
 | Procedure                                       | Input → output                                                                                                               | PRD         |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------- |

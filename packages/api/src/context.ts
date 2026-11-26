@@ -25,7 +25,7 @@ export type SchoolServices = {
   inbox: InboxFileStore;
 };
 
-/** What the Nemu Extension sends instead of a session (ADR-0014); null for every other caller. */
+/** What the Nemu Extension sends instead of a session (ADR-0015); null for every other caller. */
 export type ExtensionCredentials = { installCode: string | null; email: string | null };
 
 export type Context = {

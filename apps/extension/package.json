@@ -2,18 +2,18 @@
   "name": "extension",
   "version": "0.0.0",
   "private": true,
-  "description": "Nemu Extension: the Composer and Answer Card on the Demo App",
+  "description": "Nemu Extension: the Nemu button on the school's allowed websites, for Chrome and Edge",
   "type": "module",
   "scripts": {
     "dev": "wxt --port 5555",
-    "dev:firefox": "wxt -b firefox",
+    "dev:edge": "wxt -b edge --port 5556",
     "build": "wxt build",
-    "build:firefox": "wxt build -b firefox",
+    "build:edge": "wxt build -b edge",
     "zip": "wxt zip",
-    "zip:firefox": "wxt zip -b firefox",
     "postinstall": "wxt prepare",
     "check-types": "tsc --noEmit",
-    "test": "vp test run"
+    "test": "vp test run",
+    "verify": "node scripts/verify.mjs"
   },
   "dependencies": {
     "@fontsource-variable/plus-jakarta-sans": "^5.3.0",

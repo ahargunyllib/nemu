@@ -13,7 +13,7 @@ const BU_SITI = "siti.aminah@sditnusantara.sch.id";
 // Registered in the mock AlurSekolah as the operator, but not a teacher in WS-06.
 const PAK_RIZAL = "rizal.operator@sditnusantara.sch.id";
 
-/** A request from the Nemu Extension: no session, only what it sends as headers (ADR-0014). */
+/** A request from the Nemu Extension: no session, only what it sends as headers (ADR-0015). */
 async function fromExtension(extension: ExtensionCredentials) {
   const context = await createSchoolContext();
   const directory = createRegistrySchoolDirectory(createSchoolRepository(context.db));
@@ -29,7 +29,7 @@ async function refusal(promise: Promise<unknown>) {
   return { code: error.code, message: error.message, data: error.data };
 }
 
-describe("extension install code (ADR-0014) and WS-03 list (ADR-0015)", () => {
+describe("extension install code (ADR-0015) and WS-03 list (ADR-0016)", () => {
   it("gives the school and its allowed websites for a valid code, however it was typed", async () => {
     const context = await fromExtension({ installCode: " nemu-sditn-2026 ", email: null });
     const config = await call(extensionRouter.extensionConfig, undefined, { context });

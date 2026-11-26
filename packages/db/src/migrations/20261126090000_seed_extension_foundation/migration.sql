@@ -1,5 +1,5 @@
 -- The Nemu Extension for SDIT Nusantara (W-SEKOLAH): the install code the school operator types
--- into the extension's settings (ADR-0014), and the WS-03 allowed websites (ADR-0015). The code is
+-- into the extension's settings (ADR-0015), and the WS-03 allowed websites (ADR-0016). The code is
 -- synthetic and documented in apps/extension/README.md. e-Rapor is left off on purpose: WS-1 (a)
 -- expects no Nemu button there.
 --> statement-breakpoint
