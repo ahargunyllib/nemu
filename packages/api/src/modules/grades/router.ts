@@ -7,16 +7,15 @@ import {
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 
-import type { AuthenticatedContext } from "../../context";
+import type { Context } from "../../context";
 import { schoolProcedure } from "../../index";
 import { createDocumentRepository } from "../documents/repository";
 import { createRuleSourceRepository } from "../rule-sources/repository";
-import { requireTeacher } from "../school/teacher";
 import { finalizeGrades, guidedLine, parseCommand, parseExcel, readback } from "./service";
 
 const MAX_EXCEL_BYTES = 5 * 1024 * 1024;
 
-function gradesDeps(context: AuthenticatedContext) {
+function gradesDeps(context: Pick<Context, "db" | "school" | "documentFiles">) {
   return {
     ai: context.school.ai,
     directory: context.school.directory,
@@ -30,7 +29,7 @@ export const gradesRouter = {
   gradesParseCommand: schoolProcedure
     .input(z.object({ utterance: z.string().trim().min(1).max(500) }))
     .handler(async ({ context, input }) => {
-      const teacher = await requireTeacher(context.school.directory, context.session.user.id);
+      const teacher = await context.caller.requireTeacher();
       return parseCommand(teacher, input.utterance);
     }),
 
@@ -50,7 +49,7 @@ export const gradesRouter = {
       }),
     )
     .handler(async ({ context, input }) => {
-      const teacher = await requireTeacher(context.school.directory, context.session.user.id);
+      const teacher = await context.caller.requireTeacher();
       const bytes = new Uint8Array(await input.file.arrayBuffer());
       return parseExcel(gradesDeps(context), teacher, {
         className: input.className,
@@ -68,8 +67,8 @@ export const gradesRouter = {
       }),
     )
     .handler(async ({ context, input }) => {
-      const teacher = await requireTeacher(context.school.directory, context.session.user.id);
-      return finalizeGrades(gradesDeps(context), teacher, context.session.user.workspaceId, input);
+      const teacher = await context.caller.requireTeacher();
+      return finalizeGrades(gradesDeps(context), teacher, context.caller.workspaceId, input);
     }),
 
   /** F1-10: compare Rekap Nilai (scraped by the extension) with what the teacher verified. */
@@ -92,7 +91,7 @@ export const gradesRouter = {
       }),
     )
     .handler(async ({ context, input }) => {
-      const teacher = await requireTeacher(context.school.directory, context.session.user.id);
+      const teacher = await context.caller.requireTeacher();
       const line = guidedLine(teacher, input.entries, input.studentId, input.typed);
       if (!line) throw new ORPCError("NOT_FOUND", { message: "Student not in these entries" });
       return line;

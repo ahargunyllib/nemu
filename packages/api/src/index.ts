@@ -1,3 +1,5 @@
+import type { TeacherProfile } from "@nemu/ai/school/profile";
+import { EXTENSION_REFUSALS } from "@nemu/contracts/extension";
 import { ORPCError, os } from "@orpc/server";
 
 import type { AuthenticatedContext, Context } from "./context";
@@ -7,6 +9,10 @@ import {
   requireWorkspace,
   requireWorkspaceAdmin,
 } from "./authorization";
+import { createExtensionRepository, type InstalledSchool } from "./modules/extension/repository";
+import { identifyTeacher, installedSchool } from "./modules/extension/service";
+import { createSchoolRepository } from "./modules/school/repository";
+import { requireTeacher } from "./modules/school/teacher";
 import { WORKSPACES, type WorkspaceId } from "./workspace-ids";
 
 export const o = os.$context<Context>();
@@ -76,8 +82,69 @@ export const travelProcedure = protectedProcedure.use(requireWorkspaceAccess(WOR
 /** Klaim SLA procedures: only W-TELKO users reach them. */
 export const telcoProcedure = protectedProcedure.use(requireWorkspaceAccess(WORKSPACES.telco));
 
-/** Nemu v2.2 school procedures (AlurSekolah): only W-SEKOLAH users reach them. */
-export const schoolProcedure = protectedProcedure.use(requireWorkspaceAccess(WORKSPACES.school));
+async function requireInstalledSchool(context: Context): Promise<InstalledSchool> {
+  const school = await installedSchool(
+    createExtensionRepository(context.db),
+    context.extension?.installCode,
+  );
+  if (!school) {
+    throw new ORPCError("UNAUTHORIZED", {
+      message: "Kode pemasangan sekolah tidak dikenal. Periksa lagi di pengaturan Nemu.",
+      data: { reason: EXTENSION_REFUSALS.invalidInstallCode },
+    });
+  }
+  return school;
+}
+
+/** Nemu Extension requests that need only the school's install code (ADR-0014). */
+export const extensionProcedure = publicProcedure.use(async ({ context, next }) =>
+  next({ context: { installedSchool: await requireInstalledSchool(context) } }),
+);
+
+/** Who is calling a school procedure, whichever way they proved it. */
+export type SchoolCaller = {
+  workspaceId: string;
+  /** The caller's WS-06 teacher profile, or FORBIDDEN for an account without one. */
+  requireTeacher(): Promise<TeacherProfile>;
+};
+
+async function extensionCaller(context: Context): Promise<SchoolCaller> {
+  const school = await requireInstalledSchool(context);
+  const email = context.extension?.email?.trim();
+  if (!email) {
+    throw new ORPCError("UNAUTHORIZED", {
+      message: "Masuk ke AlurSekolah dulu, supaya Nemu tahu siapa yang memakai.",
+      data: { reason: EXTENSION_REFUSALS.missingEmail },
+    });
+  }
+  const identity = await identifyTeacher(
+    { directory: context.school.directory, school: createSchoolRepository(context.db) },
+    school,
+    email,
+  );
+  if ("message" in identity) {
+    throw new ORPCError("FORBIDDEN", {
+      message: identity.message,
+      data: { reason: EXTENSION_REFUSALS.unregistered },
+    });
+  }
+  return { workspaceId: school.workspaceId, requireTeacher: async () => identity.teacher };
+}
+
+/**
+ * Nemu school procedures (AlurSekolah). A W-SEKOLAH session reaches them, and so does the Nemu
+ * Extension with a valid install code and the email of a registered teacher (ADR-0014).
+ */
+export const schoolProcedure = publicProcedure.use(async ({ context, next }) => {
+  if (context.extension) return next({ context: { caller: await extensionCaller(context) } });
+  const { session } = authenticate(context);
+  forbidUnless(() => requireWorkspace(session.user.workspaceId, WORKSPACES.school));
+  const caller: SchoolCaller = {
+    workspaceId: session.user.workspaceId,
+    requireTeacher: () => requireTeacher(context.school.directory, session.user.id),
+  };
+  return next({ context: { caller } });
+});
 
 /** School procedures for the operator or Admin Javan: saving a recorded procedure, WS-06. */
 export const schoolAdminProcedure = workspaceAdminProcedure.use(

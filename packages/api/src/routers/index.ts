@@ -2,6 +2,7 @@ import type { RouterClient } from "@orpc/server";
 
 import { chatRouter } from "../modules/chat/router";
 import { documentsRouter } from "../modules/documents/router";
+import { extensionRouter } from "../modules/extension/router";
 import { gradesRouter } from "../modules/grades/router";
 import { healthRouter } from "../modules/health/router";
 import { helpRouter } from "../modules/help/router";
@@ -30,6 +31,7 @@ export const appRouter = {
   ...speechRouter,
   ...schoolRouter,
   ...waBotRouter,
+  ...extensionRouter,
 };
 export type AppRouter = typeof appRouter;
 export type AppRouterClient = RouterClient<typeof appRouter>;

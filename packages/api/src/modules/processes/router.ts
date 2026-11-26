@@ -6,10 +6,9 @@ import {
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 
-import type { AuthenticatedContext } from "../../context";
+import type { Context } from "../../context";
 import { schoolAdminProcedure, schoolProcedure } from "../../index";
 import { createDocumentRepository } from "../documents/repository";
-import { requireTeacher } from "../school/teacher";
 import {
   compileRecording,
   getProcedure,
@@ -21,7 +20,7 @@ import {
   saveProcedure,
 } from "./service";
 
-function processDeps(context: AuthenticatedContext) {
+function processDeps(context: Pick<Context, "db" | "school" | "documentFiles">) {
   return {
     ai: context.school.ai,
     documents: createDocumentRepository(context.db),
@@ -35,14 +34,14 @@ const slotValueSchema = z.union([z.string().max(500), z.number(), z.boolean(), z
 export const processesRouter = {
   /** Active BPMN processes (uploaded as .bpmn in Admin → Documents). */
   processList: schoolProcedure.handler(({ context }) =>
-    listProcesses(processDeps(context), context.session.user.workspaceId),
+    listProcesses(processDeps(context), context.caller.workspaceId),
   ),
 
   /** The BPMN XML for the viewer (W9: highlight `activeTaskId`). */
   processXml: schoolProcedure.input(documentIdSchema).handler(async ({ context, input }) => {
     const xml = await processXml(
       processDeps(context),
-      context.session.user.workspaceId,
+      context.caller.workspaceId,
       input.documentId,
     );
     if (xml === null) throw new ORPCError("NOT_FOUND", { message: "Process not found" });
@@ -63,11 +62,11 @@ export const processesRouter = {
       }),
     )
     .handler(async ({ context, input }) => {
-      const teacher = await requireTeacher(context.school.directory, context.session.user.id);
+      const teacher = await context.caller.requireTeacher();
       const plan = await planProcess(
         processDeps(context),
         teacher,
-        context.session.user.workspaceId,
+        context.caller.workspaceId,
         context.demoDate,
         input,
       );
@@ -101,13 +100,13 @@ export const processesRouter = {
     ),
 
   procedureList: schoolProcedure.handler(({ context }) =>
-    listProcedures(processDeps(context), context.session.user.workspaceId),
+    listProcedures(processDeps(context), context.caller.workspaceId),
   ),
 
   procedureGet: schoolProcedure.input(documentIdSchema).handler(async ({ context, input }) => {
     const procedure = await getProcedure(
       processDeps(context),
-      context.session.user.workspaceId,
+      context.caller.workspaceId,
       input.documentId,
     );
     if (!procedure) throw new ORPCError("NOT_FOUND", { message: "Procedure not found" });
@@ -120,7 +119,7 @@ export const processesRouter = {
     .handler(async ({ context, input }) => {
       const run = await runProcedure(
         processDeps(context),
-        context.session.user.workspaceId,
+        context.caller.workspaceId,
         input.documentId,
         input.values,
       );

@@ -6,3 +6,4 @@ export * from "./chat-log";
 export * from "./workspace";
 export * from "./telco";
 export * from "./school";
+export * from "./extension";

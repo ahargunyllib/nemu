@@ -11,8 +11,8 @@ import type { TeacherProfile } from "@nemu/ai/school/profile";
 export type SchoolDirectory = {
   teacherForUser(userId: string): Promise<TeacherProfile | null>;
   teacherByPhone(phone: string): Promise<TeacherProfile | null>;
-  /** The teacher signed in to AlurSekolah with this email (#199: identity without login). */
-  teacherByEmail(email: string): Promise<TeacherProfile | null>;
+  /** The school's teacher signed in to AlurSekolah with this email (ADR-0014: identity without login). */
+  teacherByEmail(workspaceId: string, email: string): Promise<TeacherProfile | null>;
   roster(teacherId: string, className: string): Promise<RosterStudent[]>;
   /** KKM and other numbers the SOP sets; each is cited through a Rule Source. */
   gradeConfig(teacherId: string): Promise<{ kkm: number }>;
@@ -35,7 +35,7 @@ export function createDemoSchoolDirectory(
       const wanted = normalizePhone(phone);
       return teachers.find((teacher) => normalizePhone(teacher.phone) === wanted) ?? null;
     },
-    async teacherByEmail(email) {
+    async teacherByEmail(_workspaceId, email) {
       const wanted = email.trim().toLowerCase();
       return teachers.find((teacher) => teacher.email?.toLowerCase() === wanted) ?? null;
     },

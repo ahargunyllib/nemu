@@ -30,6 +30,9 @@ export type SchoolServices = {
   inbox: InboxFileStore;
 };
 
+/** What the Nemu Extension sends instead of a session (ADR-0014); null for every other caller. */
+export type ExtensionCredentials = { installCode: string | null; email: string | null };
+
 export type Context = {
   session: Session | null;
   db: Database;
@@ -40,6 +43,8 @@ export type Context = {
   demoDate: string;
   /** Set when an internal service (the WhatsApp bot) sent its shared secret; see `internal-caller.ts`. */
   internalCaller?: InternalCaller | null;
+  /** Set when the request carries the extension's install code or page email headers. */
+  extension?: ExtensionCredentials | null;
 };
 
 export type AuthenticatedSession = Session & {
