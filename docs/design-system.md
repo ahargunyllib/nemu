@@ -1,7 +1,7 @@
 # Nemu design system (extension)
 
-What the Nemu Extension should look like: colour, type, the mascot, the Composer, the three
-answer levels, and motion.
+What the Nemu Extension should look like: colour, type, the mascot, the Composer, the five
+display types and the Nemu cursor, the three answer levels, and motion.
 
 ## Colour
 
@@ -106,6 +106,57 @@ When the tab can't be captured because Nemu wasn't opened from the toolbar icon 
 "Area belum bisa diambil di tab ini." in `destructive` and, in `muted-foreground`, "Buka Nemu dari
 ikon Nemu di toolbar atau Ctrl+Shift+Space, lalu pilih area lagi.", the keys as a subtle
 `NemuBadge`.
+
+## The five display types (PRD §6.2)
+
+Everything Nemu shows the teacher is one of five fixed shapes, and only one shows at a time, so a
+teacher who rarely uses a computer learns them once. They are built once in `packages/ui/src/nemu/`
+(`gelembung-kerja`, `gelembung-tunjuk`, `gelembung-jawab`, `kartu-pilih`, `kartu-info`) from the
+stock `Card`, `Button` and `Progress`, and their data is the `NemuDisplay` union in
+`@nemu/ui/lib/nemu-display`. `NemuStage` draws the one current display; the extension renders it in
+the page's Shadow DOM.
+
+| Type                 | When                   | Shape                                                                                                 |
+| -------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Gelembung Kerja**  | Nemu is working        | Status header with a progress bar, one sentence, always **[Pelan] [Berhenti]**                        |
+| **Gelembung Tunjuk** | The teacher's turn     | One sentence beside the field or button the cursor points at. No buttons, at most one link            |
+| **Gelembung Jawab**  | An answer or a problem | One sentence, the **Kenapa?**, **Sumber** and **Lihat ringkasan** links, at most one action button, × |
+| **Kartu Pilih**      | A decision             | One question, 2–3 equal stacked big buttons, nothing pre-selected or focused                          |
+| **Kartu Info**       | Something to read      | A title, a short list, one **[Tutup]**                                                                |
+
+- **Gelembung** (bubble): white, `rounded-3xl`, a 2 px `nemu` edge, 420 px wide. **Kartu** (card):
+  the stock card, 400 px wide, with an 8 px `nemu` band along its top.
+- **Sizes**: the sentence is 24 px (medium), card text 20 px, links 18 px, the header 18 px. Every
+  button and link is at least 44 px tall; the big buttons are 48 px with 20 px text.
+- **Contrast ≥ 7:1**: text is `foreground` on white, or `nemu-strong` (amber 800, Nemu's dark
+  orange) on white or `nemu-subtle`. The one action button in a Gelembung Jawab is a `nemu-strong`
+  fill with white text (9.6:1); the main button in a Kartu is the stock black default. The lighter
+  `nemu` (5.0:1) is only for edges, the progress bar, the cursor and the target ring.
+- **Colour is never the only signal**: the header carries an icon and words (pencil "Nemu
+  mengisi · 13 dari 32", alert "Belum tersimpan", check "Tersimpan"); a risky choice carries a ⚠
+  icon (and "Berisiko" for screen readers); the spoken word is tinted and underlined.
+- **Header**: what Nemu is doing or whether the page is saved, on `nemu-subtle`. It is never read
+  aloud: Nemu says only the sentence (`spokenText`), the question of a Kartu Pilih, or the title
+  of a Kartu Info.
+- **Links**: Kenapa?, Sumber and Lihat ringkasan are small underlined `nemu-strong` links. What is
+  behind them shows in a `nemu-subtle` box and is read (`onRead`) only once the teacher clicks.
+- **Kartu Pilih**: a risky choice gets ⚠ and goes under the safe one, whatever order it was given
+  in. All choices share one look.
+- **Spoken word** (#200): `highlightedWord` marks the word Nemu's voice is on.
+
+**The Nemu cursor** (F0-16): a 20 px `nemu` dot with a white edge and the Float shadow, click-through
+(`pointer-events: none`). Before a display about a page element appears, the cursor glides there
+in 0.6 s (from where it last stood, or the Nemu button the first time) and rests just right of
+the element, level with its middle. Then the element gets the Sorot arahkan ring and only then
+does the display appear and Nemu speak. The bubble sits on the free side of the cursor: right of
+it, below-right, below, above-right, above, or left of the element, the first that fits in the
+window and covers none of the page's own controls (the field being filled and the ones after it).
+A display about no element (an answer to a typed question, most Kartu) sits above the Nemu button.
+
+**Preview**: in a dev build, open an allowed page with `?pratinjau-nemu` (for example
+`http://localhost:3003/?pratinjau-nemu#/nilai` on the mock AlurSekolah). A dock at the bottom left
+shows each type with sample content; **Gerak kursor** moves the cursor between Kelas and
+Tampilkan Siswa.
 
 ## Answers: three levels (Tingkat)
 
