@@ -79,6 +79,7 @@ function liveAi() {
       readA: "",
       readB: "",
       reread: "",
+      script: "",
       text: process.env.OPENROUTER_SCHOOL_TEXT_MODEL ?? "anthropic/claude-haiku-5.5",
       transcription: "",
       speech: "",
