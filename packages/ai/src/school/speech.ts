@@ -34,7 +34,13 @@ export const SCHOOL_GLOSSARY = [
   "Rekap Nilai",
   "Simpan",
   "Ajukan",
+  "Moodle",
+  "kuis",
+  "IPAS",
 ];
+
+/** Javanese words teachers mix into commands (F0-2), so the recognizer keeps them as said. */
+export const SPOKEN_JAVANESE = ["tulung", "isiake", "nilaine", "ora metu", "nggih", "piye"];
 
 export type OpenRouterTranscriberConfig = {
   apiKey: string;
@@ -55,7 +61,7 @@ export function createOpenRouterTranscriber(config: OpenRouterTranscriberConfig)
           model: config.model,
           input_audio: { data: audio.base64, format: audio.format },
           language: "id",
-          prompt: `Percakapan guru dengan asisten Nemu. Istilah: ${SCHOOL_GLOSSARY.join(", ")}.`,
+          prompt: `Percakapan guru dengan asisten Nemu, kadang campur bahasa Jawa (${SPOKEN_JAVANESE.join(", ")}). Istilah: ${SCHOOL_GLOSSARY.join(", ")}.`,
           provider: { data_collection: "deny", ...(config.zdr ? { zdr: true } : {}) },
         }),
       },

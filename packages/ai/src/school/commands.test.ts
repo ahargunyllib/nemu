@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { matchVoiceControl, parseGradeCommand, routeCommand } from "./commands.js";
+import {
+  matchVoiceControl,
+  normalizeUtterance,
+  parseGradeCommand,
+  quizCommand,
+  routeCommand,
+} from "./commands.js";
+import { commandIntent, F0_2_COMMANDS, intentMatches } from "./fixtures/f0-2-commands.js";
 import { BU_SITI } from "./fixtures/sdit-nusantara.js";
 
 test("voice controls are recognized in code, before any model", () => {
@@ -13,6 +20,73 @@ test("voice controls are recognized in code, before any model", () => {
   assert.equal(matchVoiceControl("ulangi"), "ulangi");
   assert.equal(matchVoiceControl("ajari saya"), "ajari_saya");
   assert.equal(matchVoiceControl("masukkan nilai UTS"), null);
+});
+
+test("every F0-15 control is matched, with the words around it that change nothing", () => {
+  for (const [words, control] of [
+    ["Pelan", "pelan"],
+    ["Nemu, pelan-pelan ya", "pelan"],
+    ["lebih pelan dong", "pelan"],
+    ["Nemu, tolong ulangi ya.", "ulangi"],
+    ["sekali lagi, nggih", "ulangi"],
+    ["Ajari saya, Nemu", "ajari_saya"],
+    ["ajarin saya dong", "ajari_saya"],
+    ["Lanjutkan saja", "lanjut"],
+    ["Mangga lanjut", "lanjut"],
+    ["Berhenti dulu, Nemu", "berhenti"],
+  ] as const)
+    assert.equal(matchVoiceControl(words), control, words);
+  // A control word inside a request is the request, not the control.
+  for (const words of [
+    "Ajari saya ngisi nilai sendiri, ya.",
+    "Ulangi pertanyaan saya tentang KKM",
+    "Terus kenapa nilainya tidak muncul?",
+    "Pelan-pelan saja isi nilai 4B",
+  ])
+    assert.equal(matchVoiceControl(words), null, words);
+});
+
+test("spoken Javanese and recognizer slips become the Indonesian the rules read", () => {
+  assert.equal(
+    normalizeUtterance("Nemu, tulung isiake nilai UTS Matematika 4A."),
+    "nemu tolong isi nilai uts matematika 4a.",
+  );
+  assert.equal(normalizeUtterance("nilaine Aisyah kok ora metu"), "nilai aisyah kok tidak muncul");
+  assert.equal(normalizeUtterance("kelas papat a, U T S"), "kelas 4a uts");
+  assert.equal(normalizeUtterance("empat B"), "4b");
+});
+
+for (const { no, sentence, expected, variants } of F0_2_COMMANDS) {
+  test(`F0-2 no. ${no}: "${sentence}" and how a recognizer may write it`, () => {
+    for (const words of [sentence, ...variants]) {
+      const actual = commandIntent(words);
+      assert.ok(intentMatches(actual, expected), `${words} → ${JSON.stringify(actual)}`);
+    }
+  });
+}
+
+test("F0-2: at least 8 of the 10 sentences pass as text (here all 10)", () => {
+  const correct = F0_2_COMMANDS.filter(({ sentence, expected }) =>
+    intentMatches(commandIntent(sentence), expected),
+  ).length;
+  assert.equal(correct, 10);
+});
+
+test("the extension's own quiz commands are told apart, and grades for a quiz stay F1's", () => {
+  assert.equal(quizCommand("Nemu, tolong cek kuis ini."), "quiz-check");
+  assert.equal(quizCommand("check this quiz"), "quiz-check");
+  assert.equal(quizCommand("ganti ulangan IPAS minggu lalu"), "quiz-delete");
+  assert.equal(quizCommand("naskah soal ini jadikan kuis di Moodle ya"), "quiz-import");
+  assert.equal(
+    quizCommand(
+      "Nemu, masukkan kuis dari naskah ini ke Moodle. Buka Senin 30 November, tutup Kamis 3 Desember.",
+    ),
+    "quiz-import",
+  );
+  assert.equal(quizCommand("masukkan nilai kuis IPAS 4A"), null);
+  assert.equal(quizCommand("Kuis IPAS dibuka kapan?"), null);
+  assert.equal(quizCommand("Kenapa soal di Moodle tidak muncul?"), null);
+  assert.equal(quizCommand("Bagaimana cara menghapus nilai?"), null);
 });
 
 test("commands are routed to the right feature", () => {
@@ -73,4 +147,21 @@ test("a missing part becomes one short question", () => {
     question: "Nilai kelas berapa, Bu?",
   });
   assert.equal(parseGradeCommand("masukkan nilai Matematika 4B", BU_SITI).status, "ask");
+  // A class she named that isn't hers is asked about, not swapped for her only class.
+  assert.equal(parseGradeCommand("masukkan nilai UTS Matematika 4A", BU_SITI).status, "ask");
+});
+
+test("asking to be taught starts the grade fill in cara 2 (F1-11)", () => {
+  assert.deepEqual(parseGradeCommand("Ajari saya ngisi nilai UTS Matematika 4B", BU_SITI), {
+    status: "ok",
+    className: "4B",
+    subject: "Matematika",
+    assessment: "UTS",
+    cara: 2,
+  });
+  assert.deepEqual(routeCommand("Ajari saya ngisi nilai sendiri, ya."), {
+    kind: "intent",
+    intent: "input_nilai",
+    processName: null,
+  });
 });
