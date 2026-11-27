@@ -53,7 +53,7 @@ export const server = Cloudflare.Worker("server", {
       Config.withDefault("openai/gpt-6.1-terra"),
     ),
     OPENROUTER_SCHOOL_REREAD_MODEL: Config.String("OPENROUTER_SCHOOL_REREAD_MODEL").pipe(
-      Config.withDefault("google/gemini-4-hydrogen"),
+      Config.withDefault("openai/gpt-6.2-sol"),
     ),
     OPENROUTER_SCHOOL_TEXT_MODEL: Config.String("OPENROUTER_SCHOOL_TEXT_MODEL").pipe(
       Config.withDefault("anthropic/claude-haiku-5.5"),
