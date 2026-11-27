@@ -26,6 +26,8 @@ export type ProcessFlow = {
   source: string;
   target: string;
   condition: { language: ConditionLanguage; body: string } | null;
+  /** The flow's own documentation: what it means in plain words ("SPP belum lunas saat …"). */
+  documentation: string;
 };
 
 export type ProcessNodeKind =
@@ -47,6 +49,11 @@ export type ProcessNode = {
   candidateGroups: string[];
   assignee: string | null;
   formFields: FormField[];
+  /**
+   * F3-19: the page the task is done on, when the BPMN says so: Camunda's `formKey`, or a
+   * `halaman` / `page` / `link` property ("Al-Quran › Setoran baru", a URL or a menu path).
+   */
+  link: string | null;
   incoming: string[];
   outgoing: string[];
   defaultFlow: string | null;
@@ -86,7 +93,7 @@ function kindOf(type: string): ProcessNodeKind {
   if (type === "bpmn:ExclusiveGateway") return "exclusiveGateway";
   if (type === "bpmn:ParallelGateway") return "parallelGateway";
   if (type === "bpmn:InclusiveGateway") return "inclusiveGateway";
-  if (/Task$/u.test(type) || type === "bpmn:SubProcess" || type === "bpmn:CallActivity")
+  if (type.endsWith("Task") || type === "bpmn:SubProcess" || type === "bpmn:CallActivity")
     return "task";
   return "other";
 }
@@ -153,6 +160,24 @@ function formFieldsOf(element: Element): FormField[] {
   return fields;
 }
 
+const LINK_PROPERTIES = new Set(["halaman", "page", "link", "url"]);
+
+/** The task link: `camunda:formKey`, else a `camunda:property` named halaman, page, link or url. */
+function linkOf(element: Element): string | null {
+  const formKey = text(element.formKey).trim();
+  if (formKey) return formKey;
+  const extension = element.extensionElements as Element | undefined;
+  for (const value of asArray(extension?.values)) {
+    if (value.$type !== "camunda:Properties") continue;
+    for (const property of asArray(value.values)) {
+      const name = text(property.name).trim().toLowerCase();
+      const found = text(property.value).trim();
+      if (LINK_PROPERTIES.has(name) && found) return found;
+    }
+  }
+  return null;
+}
+
 function conditionOf(flow: Element): ProcessFlow["condition"] {
   const expression = flow.conditionExpression as Element | undefined;
   const body = text(expression?.body).trim();
@@ -196,6 +221,7 @@ export async function importBpmn(xml: string): Promise<ProcessGraph> {
         source: text((element.sourceRef as Element | undefined)?.id),
         target: text((element.targetRef as Element | undefined)?.id),
         condition: conditionOf(element),
+        documentation: documentationOf(element),
       };
       continue;
     }
@@ -215,6 +241,7 @@ export async function importBpmn(xml: string): Promise<ProcessGraph> {
         : [],
       assignee: text(element.assignee) || null,
       formFields: formFieldsOf(element),
+      link: linkOf(element),
       incoming: asArray(element.incoming).map((flow) => text(flow.id)),
       outgoing: asArray(element.outgoing).map((flow) => text(flow.id)),
       defaultFlow: text((element.default as Element | undefined)?.id) || null,

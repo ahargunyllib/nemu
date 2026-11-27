@@ -1,4 +1,10 @@
 import type {
+  QuizJudgeInput,
+  QuizJudgement,
+  QuizScriptInput,
+  QuizScriptResult,
+} from "@nemu/contracts/quiz";
+import type {
   GroundedAnswer,
   HelpExplanation,
   Procedure,
@@ -8,8 +14,23 @@ import type {
 
 import { retrieveKnowledge } from "../knowledge.js";
 import type { SlotValue } from "./bpmn/conditions.js";
+import {
+  matchFieldLabels,
+  matchFields,
+  type FieldMatch,
+  type FieldToMatch,
+} from "./bpmn/fields.js";
+import {
+  assembleFormPhoto,
+  readFormPhoto,
+  type FormPhotoInput,
+  type FormPhotoReading,
+} from "./bpmn/form-photo.js";
+import type { ProcessGraph } from "./bpmn/graph.js";
 import { extractSlots, resolveWeekday, slotSpecs, type ExtractSlotsInput } from "./bpmn/plan.js";
-import { F1_READ_A, F1_READ_B, F1_REREAD } from "./fixtures/f1-photo.js";
+import { F1_DOUBTFUL, F1_REREAD, f1Page } from "./fixtures/f1-photo.js";
+import { F4_2_READING, F4_2_SCRIPT_SHA256 } from "./fixtures/f4-2-script.js";
+import { fixtureFormPhoto } from "./fixtures/form-photo.js";
 import {
   parseGradeExcel,
   type ParseGradeExcelInput,
@@ -26,14 +47,25 @@ import {
   verifyGroundedAnswer,
   type AnswerGroundedInput,
 } from "./grounding.js";
-import { explainError, resolveHelp, type ExplainErrorInput } from "./help.js";
+import { explainError, pageLines, resolveHelp, type ExplainErrorInput } from "./help.js";
 import { createOpenRouterJsonCaller, type JsonCall, type JsonCallRequest } from "./llm.js";
+import {
+  documentationSymptoms,
+  draftPhrasing,
+  explainProcess,
+  keywordSymptomMatch,
+  matchSymptom,
+  suggestSymptoms,
+  type ExplainProcessInput,
+  type SymptomCandidate,
+} from "./process-help.js";
 import {
   assembleProcedure,
   cleanRecording,
   compileProcedure,
   type CompileProcedureInput,
 } from "./procedures.js";
+import { fileBytes, readQuizScript } from "./quiz/script.js";
 import {
   createOpenRouterSynthesizer,
   createOpenRouterTranscriber,
@@ -50,8 +82,34 @@ export type SchoolAi = {
   parseGradeExcel(input: ParseGradeExcelInput): Promise<ParseGradeExcelResult>;
   explainError(input: ExplainErrorInput): Promise<HelpExplanation>;
   answerGrounded(input: AnswerGroundedInput): Promise<GroundedAnswer>;
+  /** F3-11: on BPMN upload, the symptoms a user sees at each task and end event, by element id. */
+  suggestSymptoms(input: { graph: ProcessGraph }): Promise<Record<string, string[]>>;
+  /** F3-12: the stored symptom the teacher's words describe, or null (F3-14). */
+  matchSymptom(input: {
+    question: string;
+    candidates: readonly SymptomCandidate[];
+  }): Promise<SymptomCandidate | null>;
+  /** F2-08 / F3-12..13: cause, way back, who helps and the parent reply; null if the walk fails. */
+  explainProcess(input: ExplainProcessInput): Promise<HelpExplanation | null>;
   extractSlots(input: ExtractSlotsInput): Promise<Record<string, SlotValue>>;
+  /** F3-16: a photo read against a BPMN task's fields; unreadable values become questions. */
+  readFormPhoto(input: FormPhotoInput): Promise<FormPhotoReading>;
+  /** F3-17: each BPMN form field → the page label it is, or null. */
+  matchFields(input: {
+    fields: readonly FieldToMatch[];
+    pageLabels: readonly string[];
+  }): Promise<FieldMatch>;
   compileProcedure(input: CompileProcedureInput): Promise<Procedure>;
+  /**
+   * F4-01: quiz checks that need judgement beyond the extension's DOM rules (#218), e.g. whether
+   * a question suits the class. None are built yet, so both runtimes answer with no problems.
+   */
+  judgeQuiz(input: QuizJudgeInput): Promise<QuizJudgement>;
+  /**
+   * F4-03 (#219): the teacher's script (PDF, Word or photo) read into a quiz draft. Parts it
+   * can't read come back as questions for her, in the shape of F1's photo questions.
+   */
+  readQuizScript(input: QuizScriptInput): Promise<QuizScriptResult>;
   transcribe(audio: AudioInput): Promise<Transcript>;
   /** Audio plus word timings; `audioBase64` is "" when the client must use its local voice. */
   synthesize(text: string): Promise<SpeechSynthesis>;
@@ -110,8 +168,17 @@ export function createSchoolAi(config: SchoolAiConfig): SchoolAi {
     parseGradeExcel: (input) => parseGradeExcel({ mapHeaders: text }, input),
     explainError: (input) => explainError({ llm: text }, input),
     answerGrounded: (input) => answerGrounded({ llm: text }, input),
+    suggestSymptoms: (input) => suggestSymptoms({ llm: text }, input),
+    matchSymptom: (input) => matchSymptom({ llm: text }, input),
+    explainProcess: (input) => explainProcess({ llm: text }, input),
     extractSlots: (input) => extractSlots(text, input),
+    readFormPhoto: (input) => readFormPhoto(readers.readA, input),
+    matchFields: (input) => matchFields({ llm: text }, input),
     compileProcedure: (input) => compileProcedure({ llm: text }, input),
+    // #218 (Zahra): a model call goes here once a judgement check is agreed with SE.
+    judgeQuiz: async () => ({ problems: [] }),
+    // #219 (Zahra): the vision reader also takes the PDF itself (`input_file`).
+    readQuizScript: (input) => readQuizScript({ llm: readers.readA }, input),
     transcribe: createOpenRouterTranscriber({
       apiKey: config.apiKey,
       model: config.models.transcription,
@@ -140,29 +207,30 @@ const FAMILY = /\b(anak|suami|istri|ibu saya|bapak saya|orang tua|keluarga|mertu
  * simple rules. The real pipelines still run around these answers, so the shapes are real.
  */
 export function createFixtureSchoolAi(): SchoolAi {
-  const photoReaders = {
-    readA: codeCall(() => F1_READ_A),
-    readB: codeCall(() => F1_READ_B),
+  // The page is written for the class the teacher named, so its names follow that roster.
+  const photoReaders = (roster: ReadGradePhotoInput["roster"]) => ({
+    readA: codeCall(() => f1Page(true, F1_DOUBTFUL, roster)),
+    readB: codeCall(() => f1Page(false, {}, roster)),
     reread: codeCall((request) => {
       const ids = [...requestText(request).matchAll(/id=(\d+)/gu)].map((match) => match[1]!);
       return { cells: ids.map((id) => ({ id, value: F1_REREAD[id] ?? "?" })) };
     }),
-  };
+  });
 
   return {
-    readGradePhoto: (input) => readGradePhoto(photoReaders, input),
+    readGradePhoto: (input) => readGradePhoto(photoReaders(input.roster), input),
     parseGradeExcel: (input) => parseGradeExcel({}, input),
 
     async explainError(input) {
-      if (input.snapshot.blocked) return explainError({ llm: codeCall(() => ({})) }, input);
       const words = (text: string) =>
         normalizeForQuote(text)
           .replace(/[^\p{L}\p{N}]+/gu, " ")
           .trim();
-      const screen = words([input.snapshot.title, ...input.snapshot.texts].join(" "));
+      const screen = words(pageLines(input.snapshot).join(" "));
       const entry = input.kamus.find((chunk) => {
-        const quoted = chunk.text.match(/"([^"]+)"/u)?.[1];
-        return chunk.active && !!quoted && screen.includes(words(quoted).slice(0, 40));
+        // A message with placeholders ("mengampu [mapel] di kelas [kelas]") matches up to the first.
+        const quoted = chunk.text.match(/"([^"]+)"/u)?.[1]?.split(/[[…]/u)[0];
+        return chunk.active && !!quoted?.trim() && screen.includes(words(quoted).slice(0, 40));
       });
       const sentences = entry?.text.split(/(?<=\.)\s+/u) ?? [];
       const fixerSentence =
@@ -177,14 +245,17 @@ export function createFixtureSchoolAi(): SchoolAi {
       return resolveHelp(
         {
           status: entry ? "matched" : "not_in_guide",
-          error_text: input.snapshot.texts[0] ?? "",
+          error_text: input.snapshot.alerts[0] ?? "",
           chunk_id: entry?.id ?? null,
           quote: fixerSentence.replace(/\.$/u, "") || null,
           teacher_fault: false,
           fixer_role: role,
           can_self_fix: role === "guru",
+          // "… menekan tombol Sinkro Ruang GTK, lalu …" → "Sinkro Ruang GTK".
           guided_target:
-            role === "guru" ? (fixerSentence.match(/tombol (\w+)/u)?.[1] ?? null) : null,
+            role === "guru"
+              ? (fixerSentence.match(/tombol (.+?)(?=,|\.| lalu\b| di\b|$)/u)?.[1] ?? null)
+              : null,
           why: entry ? sentences.slice(1).join(" ") : "",
           app_name: entry?.text.match(/^K-\d+ ([^:]+):/u)?.[1] ?? "aplikasi",
         },
@@ -202,7 +273,10 @@ export function createFixtureSchoolAi(): SchoolAi {
       const top = context[0];
       if (!top || top.score < 1)
         return { status: "not_in_guide", answer: "Belum ada di panduan sekolah." };
+      // A guide section starts with its Markdown heading; the answer is the first sentence under it.
       const quote = top.text
+        .replace(/^#{1,6}\s.*$/gmu, "")
+        .trim()
         .split(/(?<=\.)\s+/u)[0]!
         .replace(/^\d+(\.\d+)*\s+/u, "")
         .replace(/\.$/u, "");
@@ -215,6 +289,26 @@ export function createFixtureSchoolAi(): SchoolAi {
         context,
       );
     },
+
+    // Symptoms from the elements' own documentation, matching by shared words, drafts as written.
+    suggestSymptoms: (input) =>
+      suggestSymptoms(
+        {
+          llm: codeCall(() => ({
+            elements: Object.entries(documentationSymptoms(input.graph)).map(
+              ([element_id, symptoms]) => ({ element_id, symptoms }),
+            ),
+          })),
+        },
+        input,
+      ),
+    matchSymptom: (input) =>
+      matchSymptom(
+        { llm: codeCall(() => ({ index: keywordSymptomMatch(input.question, input.candidates) })) },
+        input,
+      ),
+    explainProcess: (input) =>
+      explainProcess({ llm: codeCall((request) => draftPhrasing(requestText(request))) }, input),
 
     async extractSlots(input) {
       return extractSlots(
@@ -234,9 +328,16 @@ export function createFixtureSchoolAi(): SchoolAi {
                   null;
             } else if (field?.type === "date") {
               answer[name] = resolveWeekday(text, input.today);
-            } else if (field?.type === "long") {
+            } else if (field?.type === "long" && /\b(hari|lama)\b/iu.test(field.label)) {
               const days = text.match(/(\d+)\s*hari/u)?.[1];
               answer[name] = days ? Number(days) : resolveWeekday(text, input.today) ? 1 : null;
+            } else if (field && /\bkelas\b/iu.test(field.label)) {
+              // "… 4A hari ini": a class the way schools write one.
+              answer[name] =
+                text
+                  .match(/\b(\d{1,2}\s?[a-f])\b/iu)?.[1]
+                  ?.replace(/\s/gu, "")
+                  .toUpperCase() ?? null;
             }
           }
           return answer;
@@ -245,32 +346,62 @@ export function createFixtureSchoolAi(): SchoolAi {
       );
     },
 
+    // The test photo carries its own reading (fixtures/form-photo.ts); the rest is the real code.
+    async readFormPhoto(input) {
+      return assembleFormPhoto(input, fixtureFormPhoto(input.image.dataUrl));
+    },
+    async matchFields(input) {
+      return matchFieldLabels(input.fields, input.pageLabels);
+    },
+
+    // Every recorded value is a parameter (demo values change each time); the label names it.
     async compileProcedure(input) {
       const drafts = cleanRecording(input.events);
-      const parameters = drafts.flatMap((draft) =>
-        draft.action === "select" && draft.value
-          ? [
-              {
-                name: draft.label.toLowerCase().replace(/[^a-z0-9]+/gu, "_"),
-                label: draft.label,
-                question: `${draft.label} apa?`,
-                example: draft.value,
-              },
-            ]
-          : [],
-      );
+      const nameOf = (label: string) =>
+        label
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/gu, "_")
+          .replace(/^_+|_+$/gu, "");
+      const valued = (draft: (typeof drafts)[number]) =>
+        (draft.action === "select" || draft.action === "fill") && !!draft.value;
+      const parameters = drafts.filter(valued).map((draft) => ({
+        name: nameOf(draft.label),
+        label: draft.label,
+        question: /^\d+$/u.test(draft.value ?? "")
+          ? `${draft.label} berapa?`
+          : `${draft.label} apa?`,
+        example: draft.value ?? "",
+      }));
       return assembleProcedure(input.title, drafts, {
         title: input.title,
         parameters,
         steps: drafts.map((draft, index) => ({
           index,
-          value_template:
-            draft.action === "select" && draft.value
-              ? `{{${draft.label.toLowerCase().replace(/[^a-z0-9]+/gu, "_")}}}`
-              : null,
+          value_template: valued(draft) ? `{{${nameOf(draft.label)}}}` : null,
           instruction: "",
         })),
       });
+    },
+
+    // The DOM rules find everything F4-1 needs; the offline runtime adds no judgement.
+    async judgeQuiz() {
+      return { problems: [] };
+    },
+
+    // Richard's F4-2 script reads as its own words; any other file reads as no questions.
+    async readQuizScript(input) {
+      const digest = await crypto.subtle.digest(
+        "SHA-256",
+        fileBytes(input.file.dataUrl) as BufferSource,
+      );
+      const hex = [...new Uint8Array(digest)]
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+      const reading =
+        hex === F4_2_SCRIPT_SHA256
+          ? F4_2_READING
+          : { readable: false, title: null, subject: null, class_name: null, questions: [] };
+      return readQuizScript({ llm: codeCall(() => reading) }, input);
     },
 
     async transcribe() {

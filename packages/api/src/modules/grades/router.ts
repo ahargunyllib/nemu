@@ -7,16 +7,25 @@ import {
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 
-import type { AuthenticatedContext } from "../../context";
+import type { Context } from "../../context";
 import { schoolProcedure } from "../../index";
+import { AlurSekolahError } from "../alursekolah/client";
+import { AlurSekolahNotConfiguredError } from "../alursekolah/connector";
+import { MissingSecretKeyError } from "../integrations/cipher";
 import { createDocumentRepository } from "../documents/repository";
 import { createRuleSourceRepository } from "../rule-sources/repository";
-import { requireTeacher } from "../school/teacher";
-import { finalizeGrades, guidedLine, parseCommand, parseExcel, readback } from "./service";
+import {
+  finalizeGrades,
+  guidedLine,
+  parseCommand,
+  parseExcel,
+  readback,
+  readbackFromAlurSekolah,
+} from "./service";
 
 const MAX_EXCEL_BYTES = 5 * 1024 * 1024;
 
-function gradesDeps(context: AuthenticatedContext) {
+function gradesDeps(context: Pick<Context, "db" | "school" | "documentFiles">) {
   return {
     ai: context.school.ai,
     directory: context.school.directory,
@@ -30,7 +39,7 @@ export const gradesRouter = {
   gradesParseCommand: schoolProcedure
     .input(z.object({ utterance: z.string().trim().min(1).max(500) }))
     .handler(async ({ context, input }) => {
-      const teacher = await requireTeacher(context.school.directory, context.session.user.id);
+      const teacher = await context.caller.requireTeacher();
       return parseCommand(teacher, input.utterance);
     }),
 
@@ -50,7 +59,7 @@ export const gradesRouter = {
       }),
     )
     .handler(async ({ context, input }) => {
-      const teacher = await requireTeacher(context.school.directory, context.session.user.id);
+      const teacher = await context.caller.requireTeacher();
       const bytes = new Uint8Array(await input.file.arrayBuffer());
       return parseExcel(gradesDeps(context), teacher, {
         className: input.className,
@@ -68,11 +77,50 @@ export const gradesRouter = {
       }),
     )
     .handler(async ({ context, input }) => {
-      const teacher = await requireTeacher(context.school.directory, context.session.user.id);
-      return finalizeGrades(gradesDeps(context), teacher, context.session.user.workspaceId, input);
+      const teacher = await context.caller.requireTeacher();
+      return finalizeGrades(gradesDeps(context), teacher, context.caller.workspaceId, input);
     }),
 
-  /** F1-10: compare Rekap Nilai (scraped by the extension) with what the teacher verified. */
+  /**
+   * F1-10: after the teacher presses Simpan, read the stored grades back from AlurSekolah API v1
+   * (`/nilai`, with the school's WS-07 key) and compare them with what the teacher verified.
+   */
+  gradesReadbackAlurSekolah: schoolProcedure
+    .input(
+      z.object({
+        entries: z.array(gradeEntrySchema).max(100),
+        className: z.string().trim().min(1).max(20),
+        subject: z.string().trim().min(1).max(60),
+        assessment: z.string().trim().min(1).max(40),
+        semester: z.string().trim().max(40).nullish(),
+      }),
+    )
+    .handler(async ({ context, input }) => {
+      const teacher = await context.caller.requireTeacher();
+      const className = input.className.toUpperCase();
+      if (!teacher.classes.some((item) => item.toUpperCase() === className)) {
+        throw new ORPCError("FORBIDDEN", {
+          message: `Kelas ${className} bukan kelas ${teacher.honorific} ${teacher.name}`,
+        });
+      }
+      try {
+        const alurSekolah = await context.school.alurSekolah(context.caller.workspaceId);
+        return await readbackFromAlurSekolah(alurSekolah, { ...input, className });
+      } catch (error) {
+        if (
+          error instanceof AlurSekolahNotConfiguredError ||
+          error instanceof MissingSecretKeyError
+        ) {
+          throw new ORPCError("PRECONDITION_FAILED", { message: error.message, cause: error });
+        }
+        if (error instanceof AlurSekolahError) {
+          throw new ORPCError("BAD_GATEWAY", { message: error.message, cause: error });
+        }
+        throw error;
+      }
+    }),
+
+  /** F1-10 fallback: compare a Rekap Nilai the extension scraped with what the teacher verified. */
   gradesReadback: schoolProcedure
     .input(
       z.object({
@@ -92,7 +140,7 @@ export const gradesRouter = {
       }),
     )
     .handler(async ({ context, input }) => {
-      const teacher = await requireTeacher(context.school.directory, context.session.user.id);
+      const teacher = await context.caller.requireTeacher();
       const line = guidedLine(teacher, input.entries, input.studentId, input.typed);
       if (!line) throw new ORPCError("NOT_FOUND", { message: "Student not in these entries" });
       return line;

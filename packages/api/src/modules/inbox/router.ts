@@ -2,13 +2,12 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 
 import { schoolProcedure } from "../../index";
-import { requireTeacher } from "../school/teacher";
 import { MAX_PHOTO_BYTES, ackJob, enqueuePhoto, jobPhoto, listJobs, processJob } from "./service";
 
 const jobIdSchema = z.object({ jobId: z.string().min(1).max(80) });
 
 export const inboxRouter = {
-  /** A photo from the laptop or the QR upload page (the WhatsApp webhook calls `enqueuePhoto` directly). */
+  /** A photo from the laptop or the QR upload page (WhatsApp photos come through `waBotPhoto`). */
   inboxUploadPhoto: schoolProcedure
     .input(
       z.object({
@@ -18,7 +17,7 @@ export const inboxRouter = {
       }),
     )
     .handler(async ({ context, input }) => {
-      const teacher = await requireTeacher(context.school.directory, context.session.user.id);
+      const teacher = await context.caller.requireTeacher();
       const result = await enqueuePhoto(
         { store: context.school.inbox },
         {
@@ -38,7 +37,7 @@ export const inboxRouter = {
 
   /** Jobs waiting for this teacher, newest first. The laptop polls this while Nemu is open. */
   inboxJobs: schoolProcedure.handler(async ({ context }) => {
-    const teacher = await requireTeacher(context.school.directory, context.session.user.id);
+    const teacher = await context.caller.requireTeacher();
     return listJobs({ store: context.school.inbox }, teacher.teacherId);
   }),
 
@@ -51,7 +50,7 @@ export const inboxRouter = {
       }),
     )
     .handler(async ({ context, input }) => {
-      const teacher = await requireTeacher(context.school.directory, context.session.user.id);
+      const teacher = await context.caller.requireTeacher();
       const job = await processJob(
         { store: context.school.inbox, ai: context.school.ai, directory: context.school.directory },
         { teacherId: teacher.teacherId, ...input },
@@ -61,7 +60,7 @@ export const inboxRouter = {
     }),
 
   inboxPhoto: schoolProcedure.input(jobIdSchema).handler(async ({ context, input }) => {
-    const teacher = await requireTeacher(context.school.directory, context.session.user.id);
+    const teacher = await context.caller.requireTeacher();
     const photo = await jobPhoto({ store: context.school.inbox }, teacher.teacherId, input.jobId);
     if (!photo) throw new ORPCError("NOT_FOUND", { message: "Photo not found" });
     return new File([photo.body], "photo", { type: photo.contentType });
@@ -69,7 +68,7 @@ export const inboxRouter = {
 
   /** After the teacher saved (or cancelled): delete the photo and its job. */
   inboxAck: schoolProcedure.input(jobIdSchema).handler(async ({ context, input }) => {
-    const teacher = await requireTeacher(context.school.directory, context.session.user.id);
+    const teacher = await context.caller.requireTeacher();
     return {
       deleted: await ackJob({ store: context.school.inbox }, teacher.teacherId, input.jobId),
     };

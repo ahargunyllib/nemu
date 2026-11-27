@@ -1,0 +1,83 @@
+# The team VPS: the Moodle test site for F4 (#197) and wa-bot, the WhatsApp photo intake (#203).
+name: nemu-vps
+
+services:
+  caddy:
+    image: caddy:2.11.9-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      MOODLE_DOMAIN: ${MOODLE_DOMAIN:?set MOODLE_DOMAIN in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - moodle
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: moodle
+      POSTGRES_USER: moodle
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U moodle -d moodle"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  moodle:
+    # Moodle 5.3 LTS, pinned to one release so the Bank soal › Impor pages stay the same (PRD §12).
+    image: erseco/alpine-moodle:v5.3.1
+    restart: unless-stopped
+    environment:
+      SITE_URL: https://${MOODLE_DOMAIN}
+      SSLPROXY: "true"
+      DB_TYPE: pgsql
+      DB_HOST: postgres
+      DB_NAME: moodle
+      DB_USER: moodle
+      DB_PASS: ${POSTGRES_PASSWORD}
+      # The image passes this to the installer unquoted, so no spaces.
+      MOODLE_SITENAME: Moodle-uji-Nemu
+      MOODLE_USERNAME: ${MOODLE_ADMIN_USERNAME:?set MOODLE_ADMIN_USERNAME in .env}
+      MOODLE_PASSWORD: ${MOODLE_ADMIN_PASSWORD}
+      MOODLE_EMAIL: admin@nemu-uji.example
+      # Synthetic accounts only: no outgoing mail.
+      SMTP_HOST: ""
+      MOODLE_MAIL_NOREPLY_ADDRESS: ""
+      MOODLE_MAIL_PREFIX: ""
+    volumes:
+      - moodledata:/var/www/moodledata
+      - moodlehtml:/var/www/html
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  wa-bot:
+    # Only makes outgoing connections (WhatsApp and the Nemu Service), so Caddy has no route for it.
+    build: ../apps/wa-bot
+    restart: unless-stopped
+    environment:
+      NEMU_SERVER_URL: ${NEMU_SERVER_URL}
+      WA_BOT_SECRET: ${WA_BOT_SECRET}
+    volumes:
+      # The linked WhatsApp session. Deleting this volume unlinks the number.
+      - wa_bot_data:/data
+    # Photos wait here between download and hand-off, in memory, never on the VPS disk (F1-12).
+    tmpfs:
+      - /tmp
+
+volumes:
+  caddy_data:
+  caddy_config:
+  postgres_data:
+  moodledata:
+  moodlehtml:
+  wa_bot_data:

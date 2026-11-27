@@ -14,15 +14,17 @@ These rules apply to the Nemu Service: `apps/server`, `packages/api`,
   `modules/<feature>/`; do not create global `controllers/`, `services/`, or
   `repositories/` layers. `routers/index.ts` only merges the feature routers
   into `appRouter`.
-- `packages/ai` is the AI pipeline (`runNemu`) and stays free of Hono, oRPC,
-  D1, and Chrome dependencies. The API reaches it only through the
-  `NemuService` seam in the context (ADR-0001).
+- `packages/ai` is the school AI (`src/school`, `docs/school-ai.md`) and stays
+  free of Hono, oRPC, D1, and Chrome dependencies. The API reaches its
+  model-backed parts only through the `SchoolAi` seam in the context
+  (`context.school.ai`, ADR-0001), so tests and `NEMU_RESPONDER=fixture` use
+  the offline fixture instead.
 - `packages/db` owns the Drizzle schema, one file per feature under
   `src/schema/`, and the generated migrations. `packages/auth` owns the Better
   Auth configuration.
-- Wire schemas shared with the Nemu Extension and the Demo App live in
+- Wire schemas shared with the Nemu Extension and the Admin Workspace live in
   `@nemu/contracts`. A procedure's input and output schemas come from there
-  whenever a client other than the Demo App calls it.
+  whenever a client outside the Nemu Service calls it.
 - Keep provider-specific adapters close to their owner. OpenRouter adapters
   belong to `packages/ai`; anything else a single feature calls belongs to that
   feature's module.
@@ -46,8 +48,8 @@ oRPC procedure -> service -> repository -> Drizzle / D1
   repository for a single obvious query.
 - Small modules may omit `service.ts` or `repository.ts` when the procedure is
   already thin. Layers are earned by responsibility, not required
-  ceremonially. For example, `nemuChat` only validates, injects the
-  authenticated user id, and calls `context.nemu.respond`.
+  ceremonially. For example, `helpRoute` only validates, takes the caller's
+  workspace, and calls its service.
 - Domain and provider failures become `ORPCError` only in the procedure or a
   shared interceptor.
 
@@ -58,9 +60,9 @@ oRPC procedure -> service -> repository -> Drizzle / D1
 - Every user-facing procedure uses `protectedProcedure` and takes the user id
   from `context.session`, never from the request body. `publicProcedure` is for
   health checks and deliberately public reads.
-- A procedure that serves one Knowledge Workspace's process uses that
-  workspace's gate (`travelProcedure`, `telcoProcedure`, `travelAdminProcedure`)
-  so other workspaces get FORBIDDEN. Compare workspaces through `WORKSPACES` in
+- A procedure that serves one Knowledge Workspace uses that workspace's gate
+  (`schoolProcedure`, `schoolAdminProcedure`, `travelAdminProcedure`) so other
+  workspaces get FORBIDDEN. Compare workspaces through `WORKSPACES` in
   `packages/api/src/workspace-ids.ts`, never string literals.
 
 ## Cloudflare lifecycle
@@ -72,14 +74,14 @@ oRPC procedure -> service -> repository -> Drizzle / D1
 - Each request emits one evlog wide event to Workers Logs. A procedure's thrown
   error is attached to it by the `onError` interceptor in `apps/server`, so let
   errors propagate instead of logging them in the feature. A feature that also
-  records failures for admins (the Chat Log) does so and rethrows.
+  records failures for admins does so and rethrows.
 
 ## Configuration and deployment
 
 - `packages/infra/alchemy.run.ts` declares every Worker binding and value.
   `Config.Redacted` is for secrets, `Config.String` for plain values.
 - Each app reads its environment only through its generated `ENV` module
-  (`apps/server/src/env.server.ts`, `apps/mock-alurkerja/src/env.public.ts`). When adding a
+  (`apps/server/src/env.server.ts`, `apps/admin/src/env.public.ts`). When adding a
   value, declare it in that app's `.env.schema` and in `alchemy.run.ts`, then
   run `pnpm env:generate`.
 - Schema changes go through `pnpm db:generate`; commit the generated migration

@@ -52,7 +52,7 @@ app.use(
   cors({
     origin: parseOrigins(ENV.CORS_ORIGIN),
     allowMethods: ["GET", "POST", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization"],
+    allowHeaders: ["Content-Type", "Authorization", "X-Nemu-Install-Code", "X-Nemu-Email"],
     credentials: true,
   }),
 );

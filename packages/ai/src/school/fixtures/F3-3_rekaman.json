@@ -1,0 +1,303 @@
+{
+  "title": "Catat ujian tahfidz",
+  "recordedBy": "Pak Rizal",
+  "events": [
+    {
+      "t": 1200,
+      "type": "click",
+      "url": "http://localhost:3003/#/beranda",
+      "locator": {
+        "role": "link",
+        "name": "Al-Quran",
+        "label": "Al-Quran",
+        "placeholder": null,
+        "css": "#menu-alquran",
+        "relX": null,
+        "relY": null
+      },
+      "value": null
+    },
+    {
+      "t": 2400,
+      "type": "change",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "combobox",
+        "name": "Kelas",
+        "label": "Kelas",
+        "placeholder": null,
+        "css": "#tf-kelas",
+        "relX": null,
+        "relY": null
+      },
+      "value": "4A"
+    },
+    {
+      "t": 3600,
+      "type": "click",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "button",
+        "name": "Ujian baru",
+        "label": "Ujian baru",
+        "placeholder": null,
+        "css": "#btn-ujian-baru",
+        "relX": null,
+        "relY": null
+      },
+      "value": null
+    },
+    {
+      "t": 4800,
+      "type": "change",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "combobox",
+        "name": "Murid",
+        "label": "Murid",
+        "placeholder": null,
+        "css": "#uj-murid",
+        "relX": null,
+        "relY": null
+      },
+      "value": "Aisyah Putri Wijaya"
+    },
+    {
+      "t": 6000,
+      "type": "change",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "combobox",
+        "name": "Jenis ujian",
+        "label": "Jenis ujian",
+        "placeholder": null,
+        "css": "#uj-jenis",
+        "relX": null,
+        "relY": null
+      },
+      "value": "Ujian Juz 30"
+    },
+    {
+      "t": 7200,
+      "type": "input",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "textbox",
+        "name": "Tanggal ujian",
+        "label": "Tanggal ujian",
+        "placeholder": null,
+        "css": "#uj-tanggal",
+        "relX": null,
+        "relY": null
+      },
+      "value": "2026-12-01"
+    },
+    {
+      "t": 8400,
+      "type": "click",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "textbox",
+        "name": "Fashohah",
+        "label": "Fashohah",
+        "placeholder": null,
+        "css": "#uj-fashohah",
+        "relX": null,
+        "relY": null
+      },
+      "value": null
+    },
+    {
+      "t": 9600,
+      "type": "input",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "textbox",
+        "name": "Fashohah",
+        "label": "Fashohah",
+        "placeholder": null,
+        "css": "#uj-fashohah",
+        "relX": null,
+        "relY": null
+      },
+      "value": "9"
+    },
+    {
+      "t": 10800,
+      "type": "input",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "textbox",
+        "name": "Fashohah",
+        "label": "Fashohah",
+        "placeholder": null,
+        "css": "#uj-fashohah",
+        "relX": null,
+        "relY": null
+      },
+      "value": "90"
+    },
+    {
+      "t": 12000,
+      "type": "click",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "textbox",
+        "name": "Tartil",
+        "label": "Tartil",
+        "placeholder": null,
+        "css": "#uj-tartil",
+        "relX": null,
+        "relY": null
+      },
+      "value": null
+    },
+    {
+      "t": 13200,
+      "type": "input",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "textbox",
+        "name": "Tartil",
+        "label": "Tartil",
+        "placeholder": null,
+        "css": "#uj-tartil",
+        "relX": null,
+        "relY": null
+      },
+      "value": "8"
+    },
+    {
+      "t": 14400,
+      "type": "input",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "textbox",
+        "name": "Tartil",
+        "label": "Tartil",
+        "placeholder": null,
+        "css": "#uj-tartil",
+        "relX": null,
+        "relY": null
+      },
+      "value": "88"
+    },
+    {
+      "t": 15600,
+      "type": "click",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "textbox",
+        "name": "Tajwid",
+        "label": "Tajwid",
+        "placeholder": null,
+        "css": "#uj-tajwid",
+        "relX": null,
+        "relY": null
+      },
+      "value": null
+    },
+    {
+      "t": 16800,
+      "type": "input",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "textbox",
+        "name": "Tajwid",
+        "label": "Tajwid",
+        "placeholder": null,
+        "css": "#uj-tajwid",
+        "relX": null,
+        "relY": null
+      },
+      "value": "8"
+    },
+    {
+      "t": 18000,
+      "type": "input",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "textbox",
+        "name": "Tajwid",
+        "label": "Tajwid",
+        "placeholder": null,
+        "css": "#uj-tajwid",
+        "relX": null,
+        "relY": null
+      },
+      "value": "85"
+    },
+    {
+      "t": 19200,
+      "type": "click",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "textbox",
+        "name": "Adab",
+        "label": "Adab",
+        "placeholder": null,
+        "css": "#uj-adab",
+        "relX": null,
+        "relY": null
+      },
+      "value": null
+    },
+    {
+      "t": 20400,
+      "type": "input",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "textbox",
+        "name": "Adab",
+        "label": "Adab",
+        "placeholder": null,
+        "css": "#uj-adab",
+        "relX": null,
+        "relY": null
+      },
+      "value": "9"
+    },
+    {
+      "t": 21600,
+      "type": "input",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "textbox",
+        "name": "Adab",
+        "label": "Adab",
+        "placeholder": null,
+        "css": "#uj-adab",
+        "relX": null,
+        "relY": null
+      },
+      "value": "95"
+    },
+    {
+      "t": 22800,
+      "type": "click",
+      "url": "http://localhost:3003/#/tahfidz",
+      "locator": {
+        "role": "button",
+        "name": "Simpan ujian",
+        "label": "Simpan ujian",
+        "placeholder": null,
+        "css": "#btn-simpan-ujian",
+        "relX": null,
+        "relY": null
+      },
+      "value": null
+    }
+  ],
+  "narration": [
+    {
+      "start": 2000,
+      "end": 4500,
+      "text": "Pilih kelas sesuai kelas yang diajar."
+    },
+    {
+      "start": 8000,
+      "end": 11000,
+      "text": "Lalu pilih murid yang ujian, misalnya Aisyah."
+    }
+  ]
+}

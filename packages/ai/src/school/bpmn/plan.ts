@@ -1,4 +1,10 @@
-import type { BpmnPlan, BpmnStep } from "@nemu/contracts/school";
+import type {
+  BpmnPlan,
+  BpmnStep,
+  FormTable,
+  ProcessPageSource,
+  ProcessPlanTask,
+} from "@nemu/contracts/school";
 
 import type { JsonCall } from "../llm.js";
 import { conditionVariables, evaluateCondition, juelToJexl, type SlotValue } from "./conditions.js";
@@ -78,11 +84,16 @@ export function isTeacherNode(node: ProcessNode, teacherLanes: readonly string[]
 
 export type SlotSpec = { name: string; field: FormField | null };
 
-/** Slots the teacher can supply: teacher-task fields (not uploads) plus gateway variables. */
+/**
+ * Slots the teacher can supply: teacher-task fields (not uploads), the start form's fields (the
+ * teacher starts the process, e.g. "setoran" or "ujian"), plus gateway variables.
+ */
 export function slotSpecs(graph: ProcessGraph, teacherLanes: readonly string[]): SlotSpec[] {
   const specs = new Map<string, SlotSpec>();
   for (const node of Object.values(graph.nodes)) {
-    if (node.kind !== "task" || !isTeacherNode(node, teacherLanes)) continue;
+    const teacher =
+      node.kind === "startEvent" || (node.kind === "task" && isTeacherNode(node, teacherLanes));
+    if (!teacher) continue;
     for (const field of node.formFields)
       if (field.type !== "file") specs.set(field.id, { name: field.id, field });
   }
@@ -215,25 +226,159 @@ function fillSentence(field: FormField, value: SlotValue): string {
   return `Isi ${field.label.toLowerCase()}: ${shown}.`;
 }
 
+/** "… lalu menekan Simpan setoran." → "Simpan setoran": the button that ends the teacher's task. */
+export function taskAction(node: ProcessNode): string {
+  const match = node.documentation.match(
+    /\b(?:menekan|tekan|klik|mengklik|memencet)\s+(?:tombol\s+)?["“]?([^".,;:”\n]+)/iu,
+  );
+  return match?.[1]?.trim() || "Ajukan";
+}
+
+const SYSTEM_TYPES = new Set([
+  "bpmn:ServiceTask",
+  "bpmn:ScriptTask",
+  "bpmn:SendTask",
+  "bpmn:BusinessRuleTask",
+]);
+
+/** A task the system does by itself (F3-18): a service or script task, or one in a "Sistem" lane. */
+export function isSystemNode(node: ProcessNode): boolean {
+  return SYSTEM_TYPES.has(node.bpmnType) || /\b(sistem|system)\b/iu.test(node.lane ?? "");
+}
+
+function lowerFirst(text: string): string {
+  return text.charAt(0).toLocaleLowerCase("id-ID") + text.slice(1);
+}
+
+/** The first sentence of a task's documentation without its "lalu menekan …" tail. */
+function plainTask(node: ProcessNode): string {
+  const first = node.documentation.split(/(?<=\.)\s+/u)[0]?.trim() ?? "";
+  const clause = first.replace(/,?\s+lalu\b.*$/iu, "").replace(/\.$/u, "");
+  return clause ? `${clause}.` : `${node.name}.`;
+}
+
+/** Who does a task that isn't the teacher's: its lane, else "Sistem" or its group. */
+function whoDoes(node: ProcessNode): string {
+  if (node.lane) return node.lane;
+  if (isSystemNode(node)) return "Sistem";
+  return node.candidateGroups[0] ?? "Petugas lain";
+}
+
+export type TaskPage = { page: string; source: ProcessPageSource };
+
 export type PlanBpmnInput = {
   graph: ProcessGraph;
   slots: Readonly<Record<string, SlotValue>>;
   stepIndex: number;
   honorific: "Bu" | "Pak";
   teacherLanes?: readonly string[];
+  /**
+   * F3-16: the repeating part of a teacher task's form, read from a photo and checked by the
+   * teacher. Its columns become one `rows` step instead of one question per field.
+   */
+  table?: FormTable | null;
+  /** F3-19: each teacher task's page (task link, WS-04 mapping or a recording), by task id. */
+  pages?: Readonly<Record<string, TaskPage>>;
 };
+
+/**
+ * F3-18: the tasks after the teacher's part, which Nemu only announces. Walks on from `from`,
+ * taking a gateway's branch from its condition when the slots decide it, else its default.
+ */
+export function announcementsFrom(
+  graph: ProcessGraph,
+  from: string | null,
+  slots: Readonly<Record<string, SlotValue>>,
+  teacherLanes: readonly string[],
+): string[] {
+  const announced: string[] = [];
+  const visited = new Set<string>();
+  let current = from ? graph.nodes[from] : undefined;
+  while (current && !visited.has(current.id)) {
+    visited.add(current.id);
+    const node: ProcessNode = current;
+    if (node.kind === "task" && (!isTeacherNode(node, teacherLanes) || isSystemNode(node)))
+      announced.push(`${whoDoes(node)}: ${lowerFirst(node.name)}.`);
+    if (node.kind === "endEvent") break;
+    let next: string | undefined = node.outgoing[0];
+    if (node.kind === "exclusiveGateway" && node.outgoing.length > 1) {
+      next =
+        node.outgoing.find((flowId) => {
+          const condition = graph.flows[flowId]?.condition;
+          if (!condition || flowId === node.defaultFlow) return false;
+          const outcome = evaluateCondition(condition, slots);
+          return "result" in outcome && outcome.result;
+        }) ??
+        node.defaultFlow ??
+        node.outgoing[0];
+    }
+    const flow = next ? graph.flows[next] : undefined;
+    current = flow ? graph.nodes[flow.target] : undefined;
+  }
+  return announced;
+}
+
+/**
+ * F3-15: what Nemu shows before it does anything, in 2–6 plain steps: for each teacher task its
+ * page, what it is (the task's own documentation) and the button only the teacher presses; then
+ * the other roles' and the system's tasks (F3-18). Nothing here knows any one process.
+ */
+export function overviewLines(input: {
+  graph: ProcessGraph;
+  tasks: readonly ProcessPlanTask[];
+  announcements: readonly string[];
+  honorific: "Bu" | "Pak";
+}): string[] {
+  const lines: string[] = [];
+  for (const task of input.tasks) {
+    const node = input.graph.nodes[task.taskId];
+    if (task.page) lines.push(`Buka ${task.page}.`);
+    if (node) lines.push(plainTask(node));
+    const address = input.honorific === "Bu" ? "Ibu" : "Bapak";
+    lines.push(`${address} sendiri yang menekan ${task.action}; Nemu berhenti sebelum itu.`);
+  }
+  const room = Math.max(1, 6 - lines.length);
+  if (input.announcements.length) {
+    const [first, ...rest] = input.announcements;
+    const after = [`Sesudah itu, ${first}`, ...rest];
+    lines.push(
+      ...(after.length <= room
+        ? after
+        : [...after.slice(0, room - 1), after.slice(room - 1).join(" ")]),
+    );
+  }
+  if (lines.length < 2) lines.push(`Proses ${input.graph.name} selesai di sini.`);
+  return lines.slice(0, 6);
+}
 
 /** Pure: walks the graph with the slots so far and returns the step at `stepIndex`. */
 export function planBpmnStep(input: PlanBpmnInput): BpmnPlan {
   const teacherLanes = input.teacherLanes ?? ["Guru"];
   const specs = new Map(slotSpecs(input.graph, teacherLanes).map((spec) => [spec.name, spec]));
   const slots: Record<string, SlotValue> = { ...input.slots };
+  const table = input.table ?? null;
+  const tableFields = new Set([
+    ...(table?.columns ?? []),
+    ...(table?.keyField ? [table.keyField] : []),
+  ]);
   const steps: BpmnStep[] = [];
   const path: string[] = [];
+  const tasks: ProcessPlanTask[] = [];
   let because: string | null = null;
-  let lastTeacherTask: string | null = null;
+  let lastTeacherTask: ProcessNode | null = null;
   let firstFillIndex: number | null = null;
+  let stoppedAt: string | null = null;
 
+  const pressStep = (): BpmnStep | null => {
+    if (!lastTeacherTask) return null;
+    const action = taskAction(lastTeacherTask);
+    return {
+      kind: "human",
+      taskId: lastTeacherTask.id,
+      action,
+      sentence: `Silakan ${input.honorific} tekan ${action}.`,
+    };
+  };
   const finish = (step: BpmnStep): BpmnPlan => {
     steps.push(step);
     return result();
@@ -247,6 +392,7 @@ export function planBpmnStep(input: PlanBpmnInput): BpmnPlan {
     const last = steps.length - 1;
     const index = steps[last]?.kind === "ask" ? last : Math.min(Math.max(0, input.stepIndex), last);
     const step = steps[index]!;
+    const announcements = announcementsFrom(input.graph, stoppedAt, slots, teacherLanes);
     return {
       processId: input.graph.id,
       processName: input.graph.name,
@@ -256,7 +402,28 @@ export function planBpmnStep(input: PlanBpmnInput): BpmnPlan {
       step,
       stepIndex: index,
       stepCount: steps.filter((item) => item.kind !== "done").length,
+      steps,
+      overview: overviewLines({
+        graph: input.graph,
+        tasks,
+        announcements,
+        honorific: input.honorific,
+      }),
+      tasks,
+      announcements,
     };
+  };
+
+  const missing = (value: SlotValue | undefined) =>
+    value === undefined || value === null || value === "";
+  const askFor = (taskId: string, name: string): BpmnPlan => {
+    stoppedAt = taskId;
+    return finish({
+      kind: "ask",
+      taskId,
+      slot: name,
+      question: questionFor(specs.get(name), name, input.honorific),
+    });
   };
 
   const visited = new Set<string>();
@@ -266,23 +433,41 @@ export function planBpmnStep(input: PlanBpmnInput): BpmnPlan {
     path.push(current.id);
     const node: ProcessNode = current;
 
+    // The start form is the teacher's too: what kind of process this is, for the gateways.
+    if (node.kind === "startEvent") {
+      for (const field of node.formFields) {
+        if (missing(slots[field.id]) && field.defaultValue !== null)
+          slots[field.id] = field.defaultValue;
+        if (missing(slots[field.id]) && field.required && field.type !== "file")
+          return askFor(node.id, field.id);
+      }
+    }
+
     if (node.kind === "task") {
-      if (!isTeacherNode(node, teacherLanes)) {
-        if (lastTeacherTask) {
-          steps.push({
-            kind: "human",
-            taskId: lastTeacherTask,
-            action: "Ajukan",
-            sentence: `Silakan ${input.honorific} tekan Ajukan.`,
-          });
-        }
+      if (!isTeacherNode(node, teacherLanes) || isSystemNode(node)) {
+        stoppedAt = node.id;
+        const press = pressStep();
+        if (press) steps.push(press);
+        const action = lastTeacherTask ? taskAction(lastTeacherTask) : "Ajukan";
         return finish({
           kind: "done",
           taskId: node.id,
-          sentence: `Setelah diajukan, lanjut ke ${node.name}.`,
+          sentence:
+            action === "Ajukan"
+              ? `Setelah diajukan, lanjut ke ${node.name}.`
+              : `Setelah ${input.honorific} menekan ${action}, lanjut ke ${node.name}.`,
         });
       }
-      lastTeacherTask = node.id;
+      lastTeacherTask = node;
+      const page = input.pages?.[node.id];
+      tasks.push({
+        taskId: node.id,
+        name: node.name,
+        page: page?.page ?? null,
+        pageSource: page?.source ?? null,
+        action: taskAction(node),
+      });
+      let rowsDone = false;
       for (const field of node.formFields) {
         if (field.type === "file") {
           steps.push({
@@ -293,40 +478,54 @@ export function planBpmnStep(input: PlanBpmnInput): BpmnPlan {
           });
           continue;
         }
+        if (tableFields.has(field.id) && table) {
+          if (rowsDone) continue;
+          rowsDone = true;
+          const columns = node.formFields
+            .filter((item) => table.columns.includes(item.id))
+            .map((item) => ({ fieldId: item.id, label: item.label }));
+          if (!columns.length) continue;
+          firstFillIndex ??= steps.length;
+          steps.push({
+            kind: "rows",
+            taskId: node.id,
+            keyField: table.keyField,
+            columns,
+            rows: table.rows,
+            sentence: `Isi ${table.rows.length} baris: ${columns.map((column) => column.label.toLowerCase()).join(", ")}.`,
+          });
+          continue;
+        }
         let value = slots[field.id];
-        if ((value === undefined || value === null) && field.defaultValue !== null) {
+        if (missing(value) && field.defaultValue !== null) {
           value = field.type === "long" ? Number(field.defaultValue) : field.defaultValue;
           slots[field.id] = value;
         }
-        if (value === undefined || value === null || value === "") {
+        if (missing(value)) {
           if (!field.required) continue;
-          return finish({
-            kind: "ask",
-            taskId: node.id,
-            slot: field.id,
-            question: questionFor(specs.get(field.id), field.id, input.honorific),
-          });
+          return askFor(node.id, field.id);
         }
         firstFillIndex ??= steps.length;
         steps.push({
           kind: "fill",
           taskId: node.id,
-          fields: [{ fieldId: field.id, label: field.label, value: String(value) }],
-          sentence: fillSentence(field, value),
+          // A choice is filled by the option the page shows; a date stays YYYY-MM-DD.
+          fields: [
+            {
+              fieldId: field.id,
+              label: field.label,
+              value: field.type === "enum" ? displayValue(field, value!) : String(value),
+            },
+          ],
+          sentence: fillSentence(field, value!),
           because: null,
         });
       }
     }
 
     if (node.kind === "endEvent") {
-      if (lastTeacherTask) {
-        steps.push({
-          kind: "human",
-          taskId: lastTeacherTask,
-          action: "Ajukan",
-          sentence: `Silakan ${input.honorific} tekan Ajukan.`,
-        });
-      }
+      const press = pressStep();
+      if (press) steps.push(press);
       return finish({ kind: "done", taskId: node.id, sentence: "Selesai." });
     }
 
@@ -336,15 +535,7 @@ export function planBpmnStep(input: PlanBpmnInput): BpmnPlan {
         const flow = input.graph.flows[flowId];
         if (!flow?.condition || flowId === node.defaultFlow) continue;
         const outcome = evaluateCondition(flow.condition, slots);
-        if ("missing" in outcome) {
-          const name = outcome.missing[0]!;
-          return finish({
-            kind: "ask",
-            taskId: node.id,
-            slot: name,
-            question: questionFor(specs.get(name), name, input.honorific),
-          });
-        }
+        if ("missing" in outcome) return askFor(node.id, outcome.missing[0]!);
         if ("result" in outcome && outcome.result) {
           nextFlowId = flowId;
           break;

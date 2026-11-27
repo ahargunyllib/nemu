@@ -1,6 +1,10 @@
+import type { SchoolAi } from "@nemu/ai/school/runtime";
+
 import type { DocumentFileStore } from "../../context";
 import type { WorkspaceId } from "../../workspace-ids";
+import type { CatalogRepository } from "./catalog-repository";
 import { indexBpmnDocument, indexMarkdownDocument, pdfToMarkdown } from "./indexing";
+import { bpmnProcessElements } from "./process-elements";
 import type { DocumentRecord, DocumentRepository, NewKnowledgeChunkRecord } from "./repository";
 
 /** What an admin can upload. "procedure" documents are created from recordings, not uploaded. */
@@ -16,6 +20,10 @@ const CONTENT_TYPES: Record<DocumentFormat, string> = {
 export type DocumentDeps = {
   documents: DocumentRepository;
   files: DocumentFileStore;
+  /** Stores a BPMN's tasks and end events for the WS-04 editor; left out where none is needed. */
+  catalog?: Pick<CatalogRepository, "replaceProcessElements">;
+  /** F3-11: suggests each element's symptoms on BPMN upload; without it they start empty. */
+  symptoms?: Pick<SchoolAi, "suggestSymptoms">;
 };
 
 export type UploadDocumentInput = {
@@ -24,6 +32,12 @@ export type UploadDocumentInput = {
   version: string;
   isActive: boolean;
   file: File;
+  /** WS-04: the allowed websites (ids) it applies to; empty for every site. */
+  siteIds?: string[];
+  /** WS-02: the package it belongs to, or none for the school's own knowledge. */
+  packageId?: string | null;
+  /** The uploader's user id. */
+  createdBy?: string;
 };
 
 export function documentFormatOf(fileName: string): DocumentFormat | null {
@@ -59,8 +73,17 @@ export function inspectDocumentFile(format: DocumentFormat, bytes: ArrayBuffer):
 }
 
 export async function uploadDocument(
-  { documents, files }: DocumentDeps,
-  { workspaceId, title, version, isActive, file }: UploadDocumentInput,
+  { documents, files, catalog, symptoms }: DocumentDeps,
+  {
+    workspaceId,
+    title,
+    version,
+    isActive,
+    file,
+    siteIds = [],
+    packageId = null,
+    createdBy,
+  }: UploadDocumentInput,
 ): Promise<DocumentRecord> {
   const format = documentFormatOf(file.name);
   if (!format) {
@@ -121,6 +144,10 @@ export async function uploadDocument(
       contentType,
       sizeBytes: bytes.byteLength,
       storageKey,
+      siteIds,
+      packageId,
+      createdBy: createdBy ?? null,
+      changedBy: createdBy ?? null,
     });
   } catch (error) {
     if (validAttachment && failureReason !== "The file could not be stored.") {
@@ -135,7 +162,12 @@ export async function uploadDocument(
   if (failureReason) return document;
 
   try {
-    return await documents.replaceChunksAndSetReady(document.id, chunks, isActive);
+    const ready = await documents.replaceChunksAndSetReady(document.id, chunks, isActive);
+    if (format === "bpmn" && catalog) {
+      const xml = new TextDecoder("utf-8").decode(bytes);
+      await catalog.replaceProcessElements(id, await bpmnProcessElements(id, xml, symptoms));
+    }
+    return ready;
   } catch (error) {
     console.error("Indexing knowledge document failed", error);
     try {
@@ -154,17 +186,14 @@ export async function uploadDocument(
   }
 }
 
-export function listDocuments({ documents }: Pick<DocumentDeps, "documents">, workspaceId: string) {
-  return documents.list(workspaceId);
-}
-
 export function setDocumentActive(
   { documents }: Pick<DocumentDeps, "documents">,
   workspaceId: string,
   id: string,
   isActive: boolean,
+  changedBy?: string,
 ) {
-  return documents.setActive(workspaceId, id, isActive);
+  return documents.setActive(workspaceId, id, isActive, changedBy);
 }
 
 // Removes the row first so Nemu stops answering from the document even if the

@@ -1,7 +1,10 @@
 import { fetchJson } from "../http.js";
 
-/** One part of a model input: text, or an image as a data URL. */
-export type LlmContent = { type: "text"; text: string } | { type: "image"; dataUrl: string };
+/** One part of a model input: text, an image, or a document (a PDF script, F4-03) as a data URL. */
+export type LlmContent =
+  | { type: "text"; text: string }
+  | { type: "image"; dataUrl: string }
+  | { type: "file"; dataUrl: string; filename: string };
 
 export type JsonCallRequest<T> = {
   instructions: string;
@@ -50,12 +53,14 @@ function toResponsesContent(content: readonly LlmContent[]): Array<Record<string
   return content.map((part) =>
     part.type === "text"
       ? { type: "input_text", text: part.text }
-      : { type: "input_image", image_url: part.dataUrl, detail: "high" },
+      : part.type === "file"
+        ? { type: "input_file", filename: part.filename, file_data: part.dataUrl }
+        : { type: "input_image", image_url: part.dataUrl, detail: "high" },
   );
 }
 
 /**
- * Structured calls through OpenRouter's Responses API, the same endpoint `nemuChat` uses.
+ * Structured calls through OpenRouter's Responses API.
  * Data collection is always denied; prompts and outputs are never logged by Nemu.
  */
 export function createOpenRouterJsonCaller(config: OpenRouterJsonCallerConfig): JsonCall {

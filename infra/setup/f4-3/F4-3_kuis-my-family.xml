@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DATA UJI SINTETIS Nemu F4-3. Kuis kecil untuk disiapkan lalu dikerjakan 3 akun siswa uji. -->
+<quiz>
+  <question type="category">
+    <category><text>$course$/top/Bahasa Inggris 4A/Latihan My Family</text></category>
+    <info format="html"><text></text></info>
+  </question>
+  <question type="multichoice">
+    <name><text>MF 01</text></name>
+    <questiontext format="html"><text><![CDATA[<p>I ____ two brothers.</p>]]></text></questiontext>
+    <defaultgrade>1.0000000</defaultgrade><penalty>0.3333333</penalty><hidden>0</hidden>
+    <single>true</single><shuffleanswers>false</shuffleanswers><answernumbering>abc</answernumbering>
+    <answer fraction="100" format="html"><text><![CDATA[<p>have</p>]]></text></answer>
+    <answer fraction="0" format="html"><text><![CDATA[<p>has</p>]]></text></answer>
+  </question>
+  <question type="multichoice">
+    <name><text>MF 02</text></name>
+    <questiontext format="html"><text><![CDATA[<p>My mother ____ a red bag.</p>]]></text></questiontext>
+    <defaultgrade>1.0000000</defaultgrade><penalty>0.3333333</penalty><hidden>0</hidden>
+    <single>true</single><shuffleanswers>false</shuffleanswers><answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html"><text><![CDATA[<p>have</p>]]></text></answer>
+    <answer fraction="100" format="html"><text><![CDATA[<p>has</p>]]></text></answer>
+  </question>
+  <question type="multichoice">
+    <name><text>MF 03</text></name>
+    <questiontext format="html"><text><![CDATA[<p>We ____ a small cat at home.</p>]]></text></questiontext>
+    <defaultgrade>1.0000000</defaultgrade><penalty>0.3333333</penalty><hidden>0</hidden>
+    <single>true</single><shuffleanswers>false</shuffleanswers><answernumbering>abc</answernumbering>
+    <answer fraction="100" format="html"><text><![CDATA[<p>have</p>]]></text></answer>
+    <answer fraction="0" format="html"><text><![CDATA[<p>has</p>]]></text></answer>
+  </question>
+  <question type="multichoice">
+    <name><text>MF 04</text></name>
+    <questiontext format="html"><text><![CDATA[<p>My grandfather ____ white hair.</p>]]></text></questiontext>
+    <defaultgrade>1.0000000</defaultgrade><penalty>0.3333333</penalty><hidden>0</hidden>
+    <single>true</single><shuffleanswers>false</shuffleanswers><answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html"><text><![CDATA[<p>have</p>]]></text></answer>
+    <answer fraction="100" format="html"><text><![CDATA[<p>has</p>]]></text></answer>
+  </question>
+  <question type="multichoice">
+    <name><text>MF 05</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Siti and Budi ____ a new baby sister.</p>]]></text></questiontext>
+    <defaultgrade>1.0000000</defaultgrade><penalty>0.3333333</penalty><hidden>0</hidden>
+    <single>true</single><shuffleanswers>false</shuffleanswers><answernumbering>abc</answernumbering>
+    <answer fraction="100" format="html"><text><![CDATA[<p>have</p>]]></text></answer>
+    <answer fraction="0" format="html"><text><![CDATA[<p>has</p>]]></text></answer>
+  </question>
+</quiz>

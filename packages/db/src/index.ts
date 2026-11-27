@@ -10,4 +10,4 @@ export function createDb(env: DatabaseConfig) {
 export type Database = ReturnType<typeof createDb>;
 
 // Query operators for repositories outside this package, so they share one drizzle-orm instance.
-export { and, desc, eq, getColumns, inArray, like } from "drizzle-orm";
+export { and, asc, count, desc, eq, getColumns, inArray, isNull, like, or } from "drizzle-orm";

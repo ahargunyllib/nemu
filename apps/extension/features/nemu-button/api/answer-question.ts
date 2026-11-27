@@ -1,0 +1,60 @@
+import type { PageSnapshot } from "@nemu/contracts/school";
+
+import type { NemuServiceClient } from "../../../shared/api/nemu-service";
+import { fromExplanation, PASSWORD_ON_SCREEN } from "../../ini-kenapa/lib/explanation";
+import {
+  type AskResult,
+  fromGroundedAnswer,
+  isQuizCheckCommand,
+  isQuizDeleteCommand,
+  isQuizImportCommand,
+  NOT_AVAILABLE_YET,
+  recordCommand,
+} from "../lib/answer";
+
+/**
+ * A typed or spoken question goes to `helpRoute` first (docs/school-ai.md). Questions about the
+ * school's rules go to `helpAsk`, "kenapa" to `helpExplain` with what the page shows plus a
+ * viewport screenshot, and a voice control closes the bubble. `snapshot` is null while a password
+ * field is on screen: then "kenapa" reads and sends nothing (F2-07). Grade entry goes to F1
+ * (#207); a process the school uploaded as BPMN to F3 (#213); checking a Moodle quiz to F4 (#209),
+ * deleting one to F4-06 (#211), and putting the teacher's script into Moodle as a quiz to F4-03
+ * (#210).
+ */
+export async function answerQuestion(
+  client: Pick<NemuServiceClient, "helpRoute" | "helpAsk" | "helpExplain">,
+  question: string,
+  snapshot: PageSnapshot | null,
+  captureScreenshot: () => Promise<string | null> = async () => null,
+): Promise<AskResult> {
+  // "Rekam cara …" is the extension's own command; nothing is sent for it.
+  const recordTitle = recordCommand(question);
+  if (recordTitle !== null) return { kind: "record", title: recordTitle };
+  // Deleting a quiz: Nemu counts who took it and warns; she presses Hapus (F4-06, #211).
+  if (isQuizDeleteCommand(question)) return { kind: "quiz-delete", utterance: question };
+  // "Masukkan kuis dari naskah ini" is put into Moodle by the extension (F4-03, #210).
+  if (isQuizImportCommand(question)) return { kind: "quiz-import", utterance: question };
+  // "Nemu, tolong cek kuis ini" is checked in the page itself (F4-01, #209).
+  if (isQuizCheckCommand(question)) return { kind: "quiz-check", utterance: question };
+  const route = await client.helpRoute({ utterance: question });
+  if (route.kind === "control") return { kind: "stop" };
+  switch (route.intent) {
+    case "kenapa": {
+      if (!snapshot) return { kind: "notice", text: PASSWORD_ON_SCREEN };
+      const screenshotBase64 = await captureScreenshot();
+      return fromExplanation(
+        await client.helpExplain({ snapshot: { ...snapshot, screenshotBase64 }, question }),
+      );
+    }
+    case "tanya":
+    case "unknown":
+      return fromGroundedAnswer(await client.helpAsk({ question }));
+    case "input_nilai":
+      // F1 (#207) takes it from here: the class, subject and assessment, then the photo.
+      return { kind: "grades", utterance: question };
+    case "proses":
+      return route.processName
+        ? { kind: "process", utterance: question, processName: route.processName }
+        : { kind: "notice", text: NOT_AVAILABLE_YET };
+  }
+}

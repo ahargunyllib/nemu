@@ -1,7 +1,11 @@
 import { call } from "@orpc/server";
 import { describe, expect, it } from "vite-plus/test";
 
-import { createSchoolContext } from "../../testing/school";
+import { CLASS_4B } from "@nemu/ai/school/fixtures/sdit-nusantara";
+import type { GradeEntry } from "@nemu/contracts/school";
+
+import { type FakeNilai, createFakeAlurSekolah } from "../../testing/alursekolah";
+import { connectAlurSekolah, createSchoolContext } from "../../testing/school";
 import { createDocumentRepository } from "../documents/repository";
 import { inboxRouter } from "../inbox/router";
 import { gradesRouter } from "./router";
@@ -167,6 +171,118 @@ describe("F1 through the API (offline AI, seeded SDIT Nusantara)", () => {
     ).rejects.toMatchObject({
       code: "FORBIDDEN",
       message: "This account has no teacher profile at the school",
+    });
+  });
+});
+
+describe("F1-10 read-back from AlurSekolah API v1", () => {
+  const students = CLASS_4B.slice(0, 4).map((student, index) => ({
+    ...student,
+    nis: String(2001 + index),
+  }));
+  const entries: GradeEntry[] = students.map((student, index) => ({
+    studentId: student.studentId,
+    name: student.name,
+    value: index === 3 ? null : 70 + index,
+    status: index === 3 ? "S" : "value",
+    remedial: false,
+  }));
+  const nilai = (index: number, skor: number, extra: Partial<FakeNilai> = {}): FakeNilai => ({
+    id: index + 1,
+    nis: students[index]!.nis,
+    nama_siswa: students[index]!.name,
+    kelas: "4B",
+    semester: "2026/2027 Ganjil",
+    mapel: "Matematika",
+    jenis: "UTS",
+    skor,
+    tanggal: "2026-12-01",
+    ...extra,
+  });
+  const siswa = students.map((student) => ({ nis: student.nis, nama: student.name, kelas: "4B" }));
+  const readback = (
+    context: Awaited<ReturnType<typeof createSchoolContext>>,
+    input: Partial<{ className: string; assessment: string }> = {},
+  ) =>
+    call(
+      gradesRouter.gradesReadbackAlurSekolah,
+      { entries, className: "4B", subject: "Matematika", assessment: "UTS", ...input },
+      { context },
+    );
+
+  it("reads /nilai for the class, subject and assessment and finds it matches the book", async () => {
+    // The sick student (S) has no stored grade: AlurSekolah leaves empty cells out of /nilai.
+    const fake = createFakeAlurSekolah({
+      siswa,
+      nilai: [nilai(0, 70), nilai(1, 71), nilai(2, 72), nilai(0, 99, { mapel: "IPA" })],
+    });
+    const context = await createSchoolContext(undefined, undefined, fake);
+    await connectAlurSekolah(context);
+
+    await expect(readback(context, { className: "4b" })).resolves.toEqual({
+      match: true,
+      mismatches: [],
+      sentence: "Sudah saya cek, sama dengan buku.",
+    });
+    const asked = fake.requests.map(({ url }) => url.pathname + decodeURIComponent(url.search));
+    expect(asked).toContain("/api/v1/nilai?kelas=4B&mapel=Matematika&jenis=UTS");
+    expect(asked).toContain("/api/v1/siswa?kelas=4B");
+  });
+
+  it("names a wrong or missing grade, and takes a student's newest row", async () => {
+    const fake = createFakeAlurSekolah({
+      siswa,
+      nilai: [
+        nilai(0, 70),
+        nilai(1, 17),
+        nilai(2, 50, { tanggal: "2026-11-30" }),
+        { ...nilai(2, 72), id: 9 },
+      ],
+    });
+    const context = await createSchoolContext(undefined, undefined, fake);
+    await connectAlurSekolah(context);
+    const result = await readback(context);
+    expect(result.match).toBe(false);
+    expect(result.mismatches).toEqual([
+      { studentId: students[1]!.studentId, name: students[1]!.name, expected: "71", saved: "17" },
+    ]);
+
+    fake.nilai.splice(1, 1);
+    expect((await readback(context)).mismatches).toEqual([
+      {
+        studentId: students[1]!.studentId,
+        name: students[1]!.name,
+        expected: "71",
+        saved: "kosong",
+      },
+    ]);
+  });
+
+  it("finds UH grades stored under AlurSekolah's Harian", async () => {
+    const fake = createFakeAlurSekolah({
+      siswa,
+      nilai: [0, 1, 2].map((index) => nilai(index, 70 + index, { jenis: "Harian" })),
+    });
+    const context = await createSchoolContext(undefined, undefined, fake);
+    await connectAlurSekolah(context);
+    await expect(readback(context, { assessment: "UH 1" })).resolves.toMatchObject({ match: true });
+  });
+
+  it("explains what is missing: no WS-07 settings, a refused key, a class that isn't hers", async () => {
+    const context = await createSchoolContext();
+    await expect(readback(context)).rejects.toMatchObject({
+      code: "PRECONDITION_FAILED",
+      message: expect.stringMatching(/AlurSekolah belum dihubungkan/u),
+    });
+
+    await connectAlurSekolah(context, { apiKey: "as_dicabut_0000" });
+    await expect(readback(context)).rejects.toMatchObject({
+      code: "BAD_GATEWAY",
+      message: expect.stringMatching(/HTTP 401/u),
+    });
+
+    await expect(readback(context, { className: "5A" })).rejects.toMatchObject({
+      code: "FORBIDDEN",
     });
   });
 });

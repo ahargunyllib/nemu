@@ -8,30 +8,57 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@nemu/ui/components/dialog";
-import { UploadIcon } from "lucide-react";
+import { CopyPlusIcon, UploadIcon } from "lucide-react";
 import { useState } from "react";
 
+import type { DocumentScope } from "@/features/documents/api/list-documents";
 import DocumentUploadForm from "@/features/documents/components/document-upload-form";
 
-export default function DocumentUploadDialog() {
+/**
+ * Uploads knowledge into the school's own list or the AlurSekolah package. With `nextVersionOf`,
+ * it uploads the next version of that title, inactive until it has been tried.
+ */
+export default function DocumentUploadDialog({
+  packageId = null,
+  nextVersionOf,
+}: {
+  packageId?: DocumentScope;
+  nextVersionOf?: string;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button />}>
-        <UploadIcon />
-        Upload document
-      </DialogTrigger>
+      {nextVersionOf ? (
+        <DialogTrigger
+          render={
+            <Button variant="ghost" size="icon-sm" aria-label={`Versi baru ${nextVersionOf}`} />
+          }
+        >
+          <CopyPlusIcon />
+        </DialogTrigger>
+      ) : (
+        <DialogTrigger render={<Button />}>
+          <UploadIcon />
+          Unggah dokumen
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Upload document</DialogTitle>
+          <DialogTitle>
+            {nextVersionOf ? `Versi baru: ${nextVersionOf}` : "Unggah dokumen"}
+          </DialogTitle>
           <DialogDescription>
-            Add a knowledge document as PDF or Markdown. Nemu answers only from active documents,
-            and a scanned PDF without a text layer can't be indexed.
+            PDF, Markdown, atau BPMN. Nemu hanya menjawab dari dokumen aktif; coba dulu di Uji
+            jawaban sebelum mengaktifkan. PDF hasil pindai tanpa lapisan teks tidak bisa dibaca.
           </DialogDescription>
         </DialogHeader>
-        <DocumentUploadForm onUploaded={() => setOpen(false)}>
-          <DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose>
+        <DocumentUploadForm
+          packageId={packageId}
+          initialTitle={nextVersionOf}
+          onUploaded={() => setOpen(false)}
+        >
+          <DialogClose render={<Button type="button" variant="outline" />}>Batal</DialogClose>
         </DocumentUploadForm>
       </DialogContent>
     </Dialog>

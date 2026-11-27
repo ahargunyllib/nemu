@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DATA UJI SINTETIS Nemu F4-1. Kuis IPAS 4A berisi 2 KESALAHAN DISENGAJA:
+     (1) Soal 07: tidak ada jawaban benar (semua fraction 0). Jawaban yang dimaksud guru: setrika.
+     (2) Soal 15: teks soal merujuk gambar (3) timbangan-3.png, tetapi file gambarnya tidak disertakan.
+     Jangan diperbaiki. Lihat F4-1_kunci.csv. -->
+<quiz>
+  <question type="category">
+    <category><text>$course$/top/IPAS 4A/Kuis Latihan IPAS 4A</text></category>
+    <info format="html"><text>Data uji Nemu F4-1</text></info>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 01</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Sumber energi utama bagi Bumi adalah ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Matahari</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Bulan</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Angin</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Air</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 02</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Saat kita menggosok kedua telapak tangan, tangan terasa hangat. Energi gerak berubah menjadi energi ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>panas</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>cahaya</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>bunyi</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>listrik</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 03</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Contoh sumber energi yang dapat diperbarui adalah ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>sinar matahari</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>minyak bumi</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>batu bara</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>gas alam</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 04</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Kipas angin mengubah energi listrik menjadi energi ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>gerak</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>panas</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>kimia</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>cahaya</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 05</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Gaya yang menyebabkan buah jatuh dari pohon ke tanah adalah gaya ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>gravitasi</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>magnet</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>pegas</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>gesek</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 06</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Membuka laci meja dengan cara menariknya adalah contoh gaya ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>tarik</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>dorong</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>magnet</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>listrik</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 07</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Alat yang mengubah energi listrik menjadi energi panas adalah ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>setrika</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>kipas angin</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>radio</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>lampu senter</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 08</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Bola yang ditendang di lapangan rumput lama-kelamaan berhenti karena gaya ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>gesek</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>magnet</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>pegas</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>listrik</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 09</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Pada peta, arah yang ditunjukkan bagian atas mata angin umumnya adalah ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>utara</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>selatan</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>timur</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>barat</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 10</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Bagian peta yang menjelaskan arti simbol-simbol disebut ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>legenda</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>skala</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>judul</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>mata angin</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 11</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Pada peta, warna biru biasanya menunjukkan ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>perairan seperti laut, sungai, dan danau</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>dataran rendah</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>pegunungan</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>hutan</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 12</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Bentang alam berupa daratan tinggi dengan puncak yang runcing disebut ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>gunung</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>lembah</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>pantai</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>dataran rendah</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 13</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Daratan yang menjorok ke laut disebut ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>tanjung</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>teluk</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>selat</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>danau</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 14</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Kegiatan yang membantu mengurangi perubahan iklim adalah ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>menanam pohon</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>membakar sampah</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>membiarkan lampu menyala seharian</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>naik motor untuk jarak yang dekat</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 15</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Perhatikan ketiga gambar timbangan berikut.</p><p><img src="@@PLUGINFILE@@/timbangan-1.png" alt="Gambar (1)" width="240" height="170"> <img src="@@PLUGINFILE@@/timbangan-2.png" alt="Gambar (2)" width="240" height="170"> <img src="@@PLUGINFILE@@/timbangan-3.png" alt="Gambar (3)" width="240" height="170"></p><p>Gambar mana yang menunjukkan kotak A lebih berat daripada kotak B?</p>]]></text>
+      <file name="timbangan-1.png" path="/" encoding="base64">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</file>
+      <file name="timbangan-2.png" path="/" encoding="base64">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</file>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>false</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Gambar (1)</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Gambar (2)</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Gambar (3)</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+</quiz>

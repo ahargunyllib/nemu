@@ -211,28 +211,27 @@ export const gradeCommandSchema = z.discriminatedUnion("status", [
 
 // --- F2: stuck help ---------------------------------------------------------------------------
 
-export const screenElementSchema = z
-  .object({
-    name: z.string(),
-    controlType: z.string(),
-    rect: z
-      .object({ x: z.number(), y: z.number(), width: z.number(), height: z.number() })
-      .strict()
-      .nullable(),
-  })
+/** A form field as the page shows it: its label and visible value. Never a password field. */
+export const pageFieldSchema = z
+  .object({ label: z.string().max(300), value: z.string().max(500) })
   .strict();
 
-/** What the extension reads from the page when Nemu is called: never input values, nothing at all when a password field shows. */
-export const screenSnapshotSchema = z
+/**
+ * What the Nemu Extension reads from the page for "ini kenapa?" (#216): the title and address,
+ * alerts, toasts and error messages, headings, field labels with their visible values, and a
+ * viewport screenshot. No UIA text, no window bounds. When a password field is on screen the
+ * extension sends nothing at all, so the Nemu Service never sees a blocked snapshot.
+ */
+export const pageSnapshotSchema = z
   .object({
     title: z.string().max(500),
-    url: z.string().max(2_000).nullable(),
-    texts: z.array(z.string().max(2_000)).max(200),
-    elements: z.array(screenElementSchema).max(300),
-    /** JPEG, base64 without the data: prefix; ≤1280 px. Null when blocked or not captured. */
-    screenshotBase64: z.string().nullable(),
-    blocked: z.boolean(),
-    blockedReason: z.enum(["password_field", "login_title"]).nullable(),
+    url: z.string().max(2_000),
+    /** `role=alert` text, toasts (`role=status`, `aria-live`) and error messages. */
+    alerts: z.array(z.string().max(2_000)).max(30),
+    headings: z.array(z.string().max(300)).max(50),
+    fields: z.array(pageFieldSchema).max(150),
+    /** JPEG of the visible viewport (`captureVisibleTab`), base64 without the data: prefix; ≤1280 px. */
+    screenshotBase64: z.string().max(4_000_000).nullable(),
   })
   .strict();
 
@@ -263,7 +262,10 @@ export const helpExplanationSchema = z.discriminatedUnion("status", [
       teacherFault: z.boolean(),
       canSelfFix: z.boolean(),
       fixer: contactSchema.nullable(),
-      /** Accessible name of the control to point at when the teacher can fix it. */
+      /**
+       * The control to point at when the teacher can fix it, by the name the page shows (its
+       * label or text), so the extension finds it by label, role or text.
+       */
       guidedTarget: z.string().nullable(),
       citation: sourceCitationSchema,
       waDraft: z.object({ phone: z.string(), text: z.string() }).strict().nullable(),
@@ -277,7 +279,35 @@ export const helpExplanationSchema = z.discriminatedUnion("status", [
       waDraft: z.object({ phone: z.string(), text: z.string() }).strict().nullable(),
     })
     .strict(),
-  z.object({ status: z.literal("blocked"), sentence: z.string() }).strict(),
+  /**
+   * F2-08 / F3-12: the teacher's question matched a symptom of an uploaded BPMN, and the walk found
+   * the cause and the way back. `certainty` is "likely" when AlurSekolah gave no data (F3-13).
+   */
+  z
+    .object({
+      status: z.literal("process"),
+      sentence: z.string(),
+      why: z.string(),
+      certainty: z.enum(["confirmed", "likely"]),
+      process: z
+        .object({ documentId: z.string(), title: z.string(), version: z.string() })
+        .strict(),
+      /** The task or end event the symptom belongs to; highlighted in Lihat diagram. */
+      elementId: z.string(),
+      /** Sumber for the teacher: 2–4 plain-language steps, each with its BPMN element ids. */
+      steps: z
+        .array(z.object({ text: z.string(), elementIds: z.array(z.string()).min(1) }).strict())
+        .min(2)
+        .max(4),
+      fixer: contactSchema.nullable(),
+      /** A polite WhatsApp reply the teacher sends the parent herself: no amounts, no "tunggakan". */
+      parentReply: z.string().nullable(),
+    })
+    .strict(),
+  /** F3-13: AlurSekolah says the student's grades aren't saved, so the process isn't the cause. */
+  z
+    .object({ status: z.literal("grades_not_saved"), sentence: z.string(), student: z.string() })
+    .strict(),
 ]);
 
 // --- F3: grounded answers, BPMN, procedures ----------------------------------------------------
@@ -292,6 +322,20 @@ export const groundedAnswerSchema = z.discriminatedUnion("status", [
     .strict(),
   z.object({ status: z.literal("not_in_guide"), answer: z.string() }).strict(),
 ]);
+
+/** One row of a form table: who it is and the value of each repeating field, by field id. */
+export const formTableRowSchema = z
+  .object({ name: z.string().min(1).max(120), values: z.record(z.string(), z.string().max(200)) })
+  .strict();
+
+/** The repeating part of a BPMN task's form, as read from a photo and checked by the teacher. */
+export const formTableSchema = z
+  .object({
+    keyField: z.string().max(80).nullable(),
+    columns: z.array(z.string().max(80)).max(40),
+    rows: z.array(formTableRowSchema).max(60),
+  })
+  .strict();
 
 export const bpmnStepSchema = z.discriminatedUnion("kind", [
   z
@@ -313,6 +357,21 @@ export const bpmnStepSchema = z.discriminatedUnion("kind", [
       question: z.string(),
     })
     .strict(),
+  /**
+   * F3-15..17: the task's fields that repeat once per row (a photo of a book with one line per
+   * student), filled into the page table by the row's name and the column's label.
+   */
+  z
+    .object({
+      kind: z.literal("rows"),
+      taskId: z.string(),
+      /** The field that names each row ("Murid"); it is the row, not a value to fill. */
+      keyField: z.string().nullable(),
+      columns: z.array(z.object({ fieldId: z.string(), label: z.string() }).strict()),
+      rows: z.array(formTableRowSchema),
+      sentence: z.string(),
+    })
+    .strict(),
   z
     .object({
       kind: z.literal("human"),
@@ -330,6 +389,21 @@ export const bpmnStepSchema = z.discriminatedUnion("kind", [
     .strict(),
 ]);
 
+/** F3-19: where a teacher task's page came from. Without one Nemu only explains (cara 3). */
+export const processPageSourceSchema = z.enum(["link", "mapping", "recording"]);
+
+/** A teacher task on the walked path: its page (a menu path such as "Al-Quran › Setoran baru"). */
+export const processPlanTaskSchema = z
+  .object({
+    taskId: z.string(),
+    name: z.string(),
+    page: z.string().nullable(),
+    pageSource: processPageSourceSchema.nullable(),
+    /** The button only the teacher presses at the end of the task ("Simpan setoran", "Ajukan"). */
+    action: z.string(),
+  })
+  .strict();
+
 export const bpmnPlanSchema = z
   .object({
     processId: z.string(),
@@ -341,8 +415,58 @@ export const bpmnPlanSchema = z
     step: bpmnStepSchema,
     stepIndex: z.number().int().nonnegative(),
     stepCount: z.number().int().nonnegative(),
+    /** Every step of the walk so far, in order; it ends with an `ask` or the `done`. */
+    steps: z.array(bpmnStepSchema),
+    /** F3-15: 2–6 plain-language steps shown before Nemu does anything. */
+    overview: z.array(z.string()).min(2).max(6),
+    tasks: z.array(processPlanTaskSchema),
+    /** F3-18: other roles' and the system's tasks after the teacher's part; Nemu only names them. */
+    announcements: z.array(z.string()),
   })
   .strict();
+
+/** One question about the photo: a value Nemu couldn't read, or a name it couldn't place. */
+export const formPhotoQuestionSchema = z.discriminatedUnion("kind", [
+  z
+    .object({
+      kind: z.literal("value"),
+      id: z.string(),
+      rowName: z.string(),
+      fieldId: z.string(),
+      label: z.string(),
+      prompt: z.string(),
+      /** What the value might be, most likely first; never pre-selected. */
+      candidates: z.array(z.string()).max(2),
+      box: z.tuple([z.number(), z.number(), z.number(), z.number()]).nullable(),
+    })
+    .strict(),
+  z
+    .object({
+      kind: z.literal("name"),
+      id: z.string(),
+      /** The row's name as written, until the teacher picks one from the roster. */
+      rowName: z.string(),
+      prompt: z.string(),
+      candidates: z.array(z.string()).max(2),
+      box: z.tuple([z.number(), z.number(), z.number(), z.number()]).nullable(),
+    })
+    .strict(),
+]);
+
+/** F3-16: a photo read against a BPMN task's fields: header values, rows, and what to ask. */
+export const formPhotoResultSchema = z.discriminatedUnion("status", [
+  z
+    .object({
+      status: z.literal("ok"),
+      taskId: z.string(),
+      /** The slots so far plus header values read from the photo (a date written at the top). */
+      slots: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])),
+      table: formTableSchema,
+      questions: z.array(formPhotoQuestionSchema),
+    })
+    .strict(),
+  z.object({ status: z.literal("reshoot"), message: z.string() }).strict(),
+]);
 
 export const recordedEventSchema = z
   .object({
@@ -396,6 +520,20 @@ export const procedureSchema = z
     title: z.string(),
     parameters: z.array(procedureParameterSchema),
     steps: z.array(procedureStepSchema),
+    /** Who recorded it, as Nemu says it: "Pak Rizal" (F3-01, "Rekaman Pak Rizal"). */
+    recordedBy: z.string().max(80).optional(),
+  })
+  .strict();
+
+/** F3-01: what "Rekam cara" captured in the extension, kept until the operator reviews it. */
+export const procedureRecordingSchema = z
+  .object({
+    recordingId: z.string(),
+    title: z.string(),
+    recordedBy: z.string(),
+    events: z.array(recordedEventSchema),
+    narration: z.array(narrationSegmentSchema),
+    createdAt: z.number().int(),
   })
   .strict();
 
@@ -476,14 +614,21 @@ export type GradeRulesResult = z.infer<typeof gradeRulesResultSchema>;
 export type ReadbackRow = z.infer<typeof readbackRowSchema>;
 export type ReadbackResult = z.infer<typeof readbackResultSchema>;
 export type GradeCommand = z.infer<typeof gradeCommandSchema>;
-export type ScreenElement = z.infer<typeof screenElementSchema>;
-export type ScreenSnapshot = z.infer<typeof screenSnapshotSchema>;
+export type PageField = z.infer<typeof pageFieldSchema>;
+export type PageSnapshot = z.infer<typeof pageSnapshotSchema>;
 export type SourceCitation = z.infer<typeof sourceCitationSchema>;
 export type Contact = z.infer<typeof contactSchema>;
 export type HelpExplanation = z.infer<typeof helpExplanationSchema>;
 export type GroundedAnswer = z.infer<typeof groundedAnswerSchema>;
 export type BpmnStep = z.infer<typeof bpmnStepSchema>;
+export type ProcedureRecording = z.infer<typeof procedureRecordingSchema>;
 export type BpmnPlan = z.infer<typeof bpmnPlanSchema>;
+export type FormTableRow = z.infer<typeof formTableRowSchema>;
+export type FormTable = z.infer<typeof formTableSchema>;
+export type ProcessPageSource = z.infer<typeof processPageSourceSchema>;
+export type ProcessPlanTask = z.infer<typeof processPlanTaskSchema>;
+export type FormPhotoQuestion = z.infer<typeof formPhotoQuestionSchema>;
+export type FormPhotoResult = z.infer<typeof formPhotoResultSchema>;
 export type RecordedEvent = z.infer<typeof recordedEventSchema>;
 export type NarrationSegment = z.infer<typeof narrationSegmentSchema>;
 export type ProcedureStep = z.infer<typeof procedureStepSchema>;

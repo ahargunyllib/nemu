@@ -10,20 +10,15 @@
     "./*": "./src/*.ts"
   },
   "scripts": {
-    "data:generate": "node scripts/generate-demo-data.mjs",
-    "seed:generate": "node scripts/generate-workspace-seed.mjs",
-    "build": "node scripts/generate-demo-data.mjs && tsc -b",
+    "build": "tsc -b",
     "check-types": "tsc -b",
-    "test": "node scripts/generate-demo-data.mjs && tsc -b && node --test dist/school/*.test.js dist/school/grades/*.test.js dist/school/bpmn/*.test.js dist/index.test.js dist/claim-tools.test.js dist/claim-workflows.test.js dist/claim-workflows.pipeline.test.js scripts/demo-data-lib.test.mjs scripts/moment-validators.test.mjs scripts/claim-validators.test.mjs scripts/workspace-seed-lib.test.mjs scripts/telco-workspace-seed.test.mjs scripts/evaluation-utils.test.mjs scripts/retrieval-evaluation.test.mjs scripts/rule-sources.test.mjs",
-    "eval": "node scripts/generate-demo-data.mjs && tsc -b && node scripts/evaluate.mjs",
-    "eval:offline": "node scripts/generate-demo-data.mjs && tsc -b && node scripts/evaluate.mjs --offline",
-    "eval:live": "node scripts/generate-demo-data.mjs && tsc -b && node scripts/evaluate.mjs --live",
-    "eval:live:failed": "node scripts/generate-demo-data.mjs && tsc -b && node scripts/evaluate.mjs --live --moments=2,3",
+    "test": "tsc -b && node --test dist/school/*.test.js dist/school/grades/*.test.js dist/school/bpmn/*.test.js dist/school/quiz/*.test.js scripts/rule-sources.test.mjs",
     "eval:school": "tsc -b && node scripts/evaluate-school.mjs"
   },
   "dependencies": {
     "@bpmn-io/feelin": "7.0.0",
     "@nemu/contracts": "workspace:*",
+    "bpmn-auto-layout": "1.3.0",
     "bpmn-moddle": "10.3.1",
     "camunda-bpmn-moddle": "8.0.2",
     "jexl": "2.3.0",

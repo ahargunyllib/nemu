@@ -1,43 +1,14 @@
-import { createJevDecider, createOpenRouterAnswerGenerator, runNemu } from "@nemu/ai";
 import { createFixtureSchoolAi, createSchoolAi, type SchoolAi } from "@nemu/ai/school/runtime";
-import type {
-  DocumentFileStore,
-  InboxFileStore,
-  NemuService,
-  SchoolServices,
-} from "@nemu/api/context";
-import { createFixtureNemuService } from "@nemu/api/modules/chat/fixture-responder";
-import {
-  createNemuRuntimeDataSource,
-  createRuntimeNemuService,
-} from "@nemu/api/modules/chat/nemu-data-source";
-import { createNemuProfileRepository } from "@nemu/api/modules/chat/profile-repository";
-import { createDocumentRepository } from "@nemu/api/modules/documents/repository";
-import { createReferenceTableRepository } from "@nemu/api/modules/reference-tables/repository";
-import { createRuleSourceRepository } from "@nemu/api/modules/rule-sources/repository";
-import { createDemoSchoolDirectory } from "@nemu/api/modules/school/directory";
-import { createSlaClaimRepository } from "@nemu/api/modules/sla-claims/repository";
-import { getSlaClaimContext } from "@nemu/api/modules/sla-claims/service";
+import type { DocumentFileStore, InboxFileStore, SchoolServices } from "@nemu/api/context";
+import { createStoredAlurSekolahConnector } from "@nemu/api/modules/alursekolah/connector";
+import { createSecretCipher, type SecretCipher } from "@nemu/api/modules/integrations/cipher";
+import { createIntegrationSecretRepository } from "@nemu/api/modules/integrations/repository";
+import { createRegistrySchoolDirectory } from "@nemu/api/modules/school/registry-directory";
+import { createSchoolRepository } from "@nemu/api/modules/school/repository";
 import { createWorkspaceRepository } from "@nemu/api/modules/workspaces/repository";
 import { getDemoDate } from "@nemu/api/modules/workspaces/service";
 import { createAuth as createConfiguredAuth } from "@nemu/auth";
 import { type Database, createDb } from "@nemu/db";
-
-const REASONING_EFFORTS = ["low", "medium", "high", "xhigh", "max"] as const;
-
-function getReasoningEffort(): (typeof REASONING_EFFORTS)[number] {
-  const configuredEffort = ENV.OPENROUTER_REASONING_EFFORT;
-  switch (configuredEffort) {
-    case "low":
-    case "medium":
-    case "high":
-    case "xhigh":
-    case "max":
-      return configuredEffort;
-    default:
-      throw new Error(`Unsupported OpenRouter reasoning effort: ${configuredEffort}`);
-  }
-}
 
 import { ENV } from "./env.server";
 
@@ -65,51 +36,6 @@ export function createDocumentFileStore(): DocumentFileStore {
       await ENV.DOCUMENTS.delete(key);
     },
   };
-}
-
-export function createNemuService(db: Database): NemuService {
-  return ENV.NEMU_RESPONDER === "fixture" ? createFixtureNemuService() : createAiNemuService(db);
-}
-
-function createAiNemuService(db: Database): NemuService {
-  if (!ENV.OPENROUTER_API_KEY) {
-    return {
-      async respond() {
-        throw new Error("OPENROUTER_API_KEY is not set; set it or use NEMU_RESPONDER=fixture");
-      },
-    };
-  }
-
-  const jevDecider = createJevDecider({
-    apiKey: ENV.OPENROUTER_API_KEY,
-    model: ENV.OPENROUTER_JEV_MODEL,
-  });
-  const answerGenerator = createOpenRouterAnswerGenerator({
-    apiKey: ENV.OPENROUTER_API_KEY,
-    model: ENV.OPENROUTER_GENERATOR_MODEL,
-    reasoningEffort: getReasoningEffort(),
-  });
-
-  const slaClaims = createSlaClaimRepository(db);
-  const dataSource = createNemuRuntimeDataSource({
-    profiles: createNemuProfileRepository(db),
-    documents: createDocumentRepository(db),
-    tables: createReferenceTableRepository(db),
-    ruleSources: createRuleSourceRepository(db),
-    slaClaims: {
-      loadContext: (workspaceId, claimId) => getSlaClaimContext(slaClaims, workspaceId, claimId),
-    },
-    currentDate: (workspaceId) => getWorkspaceDemoDate(db, workspaceId),
-  });
-  return createRuntimeNemuService(dataSource, {
-    async respond(request, snapshot) {
-      return runNemu(request, {
-        ...snapshot,
-        jevDecider,
-        answerGenerator,
-      });
-    },
-  });
 }
 
 function createInboxFileStore(): InboxFileStore {
@@ -147,8 +73,17 @@ function createKeylessSchoolAi(): SchoolAi {
     parseGradeExcel: (input) => createFixtureSchoolAi().parseGradeExcel(input),
     explainError: missing,
     answerGrounded: missing,
+    suggestSymptoms: missing,
+    matchSymptom: missing,
+    explainProcess: missing,
     extractSlots: missing,
+    readFormPhoto: missing,
+    // Matching a form field to its page label works in code without a model.
+    matchFields: (input) => createFixtureSchoolAi().matchFields(input),
     compileProcedure: missing,
+    // No judgement checks exist yet (#218), so a quiz check needs no model.
+    judgeQuiz: (input) => createFixtureSchoolAi().judgeQuiz(input),
+    readQuizScript: missing,
     transcribe: missing,
     synthesize: missing,
   };
@@ -172,14 +107,23 @@ function createSchoolAiFromEnv(): SchoolAi {
   });
 }
 
+/** WS-07 settings are sealed with this; an empty INTEGRATION_SECRETS_KEY fails every save and read clearly. */
+export function createIntegrationSecretCipher(): SecretCipher {
+  return createSecretCipher(ENV.INTEGRATION_SECRETS_KEY ?? "");
+}
+
 /**
- * Nemu v2.2 school services. The directory is the synthetic SDIT Nusantara until the AlurSekolah
- * login (L-02) supplies real teacher profiles and rosters.
+ * Nemu school services. The directory reads the teachers and contacts registered in WS-06;
+ * AlurSekolah is reached with the base URL and key Admin Javan stored in WS-07.
  */
-export function createSchoolServices(): SchoolServices {
+export function createSchoolServices(db: Database): SchoolServices {
   return {
     ai: createSchoolAiFromEnv(),
-    directory: createDemoSchoolDirectory(),
+    directory: createRegistrySchoolDirectory(createSchoolRepository(db)),
     inbox: createInboxFileStore(),
+    alurSekolah: createStoredAlurSekolahConnector({
+      secrets: createIntegrationSecretRepository(db),
+      cipher: createIntegrationSecretCipher(),
+    }),
   };
 }

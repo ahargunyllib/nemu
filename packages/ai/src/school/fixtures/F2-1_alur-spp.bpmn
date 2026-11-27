@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic stand-in for data-uji 03_F2_macet/F2-1_spp/F2-1_alur-spp.bpmn (SDIT Nusantara,
+     fictional, no real amounts). Camunda 7 dialect. Replace with the official file when it is in hand:
+     nothing in Nemu's code knows about SPP; this file and the WS-04 symptoms drive the answer. -->
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  id="Definitions_AlurSpp" targetNamespace="http://alurkerja.com/bpmn">
+  <bpmn:collaboration id="Collab_AlurSpp">
+    <bpmn:participant id="Participant_Sekolah" name="SDIT Nusantara" processRef="Process_AlurSpp" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_AlurSpp" name="Alur Pembayaran SPP" isExecutable="true">
+    <bpmn:documentation>Alur bulanan pembayaran SPP dan akses nilai di aplikasi orang tua.</bpmn:documentation>
+    <bpmn:laneSet id="LaneSet_Spp">
+      <bpmn:lane id="Lane_Keuangan" name="Bagian Keuangan">
+        <bpmn:flowNodeRef>Start_AwalBulan</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_TerbitkanTagihan</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_JatuhTempo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Normal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_VerifikasiPembayaran</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_PembayaranSah</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Sistem" name="Sistem AlurSekolah">
+        <bpmn:flowNodeRef>Task_KunciNilai</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_BukaKunciNilai</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_NilaiTampil</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_OrangTua" name="Orang Tua">
+        <bpmn:flowNodeRef>Task_LunasiSpp</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_AwalBulan" name="Awal bulan">
+      <bpmn:documentation>Setiap awal bulan tagihan SPP dibuat.</bpmn:documentation>
+      <bpmn:outgoing>Flow_Mulai</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="Timer_AwalBulan" />
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_TerbitkanTagihan" name="Terbitkan Tagihan SPP" camunda:candidateGroups="keuangan">
+      <bpmn:documentation>Bagian keuangan menerbitkan tagihan SPP bulan ini.</bpmn:documentation>
+      <bpmn:incoming>Flow_Mulai</bpmn:incoming>
+      <bpmn:outgoing>Flow_Tagihan</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_JatuhTempo" name="SPP lunas saat jatuh tempo?">
+      <bpmn:documentation>Pada tanggal jatuh tempo, sistem memeriksa apakah SPP bulan ini sudah lunas.</bpmn:documentation>
+      <bpmn:incoming>Flow_Tagihan</bpmn:incoming>
+      <bpmn:outgoing>Flow_Lunas</bpmn:outgoing>
+      <bpmn:outgoing>Flow_BelumLunas</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="End_Normal" name="Nilai tampil seperti biasa">
+      <bpmn:incoming>Flow_Lunas</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Task_KunciNilai" name="Kunci Nilai Siswa">
+      <bpmn:documentation>Sistem menyembunyikan nilai siswa dari aplikasi orang tua. Nilai tidak muncul di aplikasi orang tua, tetapi tetap tersimpan dan terlihat oleh guru. Rapor anak terlihat kosong di aplikasi orang tua.</bpmn:documentation>
+      <bpmn:incoming>Flow_BelumLunas</bpmn:incoming>
+      <bpmn:outgoing>Flow_KeOrangTua</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="Task_LunasiSpp" name="Lunasi SPP" camunda:candidateGroups="orang_tua">
+      <bpmn:documentation>Orang tua melunasi SPP lewat bank atau langsung di sekolah.</bpmn:documentation>
+      <bpmn:incoming>Flow_KeOrangTua</bpmn:incoming>
+      <bpmn:incoming>Flow_BelumSah</bpmn:incoming>
+      <bpmn:outgoing>Flow_KeVerifikasi</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_VerifikasiPembayaran" name="Verifikasi Pembayaran" camunda:candidateGroups="keuangan">
+      <bpmn:documentation>Bagian keuangan memeriksa dan mencatat pembayaran SPP.</bpmn:documentation>
+      <bpmn:incoming>Flow_KeVerifikasi</bpmn:incoming>
+      <bpmn:outgoing>Flow_Verifikasi</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_PembayaranSah" name="Pembayaran sah?">
+      <bpmn:incoming>Flow_Verifikasi</bpmn:incoming>
+      <bpmn:outgoing>Flow_Sah</bpmn:outgoing>
+      <bpmn:outgoing>Flow_BelumSah</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_BukaKunciNilai" name="Buka Kunci Nilai Siswa">
+      <bpmn:documentation>Sistem membuka kunci, sehingga nilai tampil lagi di aplikasi orang tua.</bpmn:documentation>
+      <bpmn:incoming>Flow_Sah</bpmn:incoming>
+      <bpmn:outgoing>Flow_Selesai</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_NilaiTampil" name="Nilai tampil kembali">
+      <bpmn:incoming>Flow_Selesai</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_Mulai" sourceRef="Start_AwalBulan" targetRef="Task_TerbitkanTagihan" />
+    <bpmn:sequenceFlow id="Flow_Tagihan" sourceRef="Task_TerbitkanTagihan" targetRef="Gateway_JatuhTempo" />
+    <bpmn:sequenceFlow id="Flow_Lunas" name="Sudah lunas" sourceRef="Gateway_JatuhTempo" targetRef="End_Normal">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${sppLunas == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_BelumLunas" name="Belum lunas" sourceRef="Gateway_JatuhTempo" targetRef="Task_KunciNilai">
+      <bpmn:documentation>SPP bulan ini belum tercatat lunas saat jatuh tempo.</bpmn:documentation>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${sppLunas == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_KeOrangTua" sourceRef="Task_KunciNilai" targetRef="Task_LunasiSpp" />
+    <bpmn:sequenceFlow id="Flow_KeVerifikasi" sourceRef="Task_LunasiSpp" targetRef="Task_VerifikasiPembayaran" />
+    <bpmn:sequenceFlow id="Flow_Verifikasi" sourceRef="Task_VerifikasiPembayaran" targetRef="Gateway_PembayaranSah" />
+    <bpmn:sequenceFlow id="Flow_Sah" name="Sah" sourceRef="Gateway_PembayaranSah" targetRef="Task_BukaKunciNilai">
+      <bpmn:documentation>Pembayaran sudah diverifikasi bagian keuangan.</bpmn:documentation>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${pembayaranSah == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_BelumSah" name="Belum sah" sourceRef="Gateway_PembayaranSah" targetRef="Task_LunasiSpp">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${pembayaranSah == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Selesai" sourceRef="Task_BukaKunciNilai" targetRef="End_NilaiTampil" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_AlurSpp">
+    <bpmndi:BPMNPlane id="Plane_AlurSpp" bpmnElement="Collab_AlurSpp">
+      <bpmndi:BPMNShape id="Participant_Sekolah_di" bpmnElement="Participant_Sekolah" isHorizontal="true">
+        <dc:Bounds x="120" y="80" width="1140" height="450" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Keuangan_di" bpmnElement="Lane_Keuangan" isHorizontal="true">
+        <dc:Bounds x="150" y="80" width="1110" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Sistem_di" bpmnElement="Lane_Sistem" isHorizontal="true">
+        <dc:Bounds x="150" y="230" width="1110" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_OrangTua_di" bpmnElement="Lane_OrangTua" isHorizontal="true">
+        <dc:Bounds x="150" y="380" width="1110" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_AwalBulan_di" bpmnElement="Start_AwalBulan">
+        <dc:Bounds x="192" y="137" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_TerbitkanTagihan_di" bpmnElement="Task_TerbitkanTagihan">
+        <dc:Bounds x="270" y="115" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_JatuhTempo_di" bpmnElement="Gateway_JatuhTempo" isMarkerVisible="true">
+        <dc:Bounds x="425" y="130" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Normal_di" bpmnElement="End_Normal">
+        <dc:Bounds x="542" y="137" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_KunciNilai_di" bpmnElement="Task_KunciNilai">
+        <dc:Bounds x="400" y="265" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_LunasiSpp_di" bpmnElement="Task_LunasiSpp">
+        <dc:Bounds x="560" y="415" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_VerifikasiPembayaran_di" bpmnElement="Task_VerifikasiPembayaran">
+        <dc:Bounds x="720" y="115" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_PembayaranSah_di" bpmnElement="Gateway_PembayaranSah" isMarkerVisible="true">
+        <dc:Bounds x="875" y="130" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_BukaKunciNilai_di" bpmnElement="Task_BukaKunciNilai">
+        <dc:Bounds x="980" y="265" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_NilaiTampil_di" bpmnElement="End_NilaiTampil">
+        <dc:Bounds x="1152" y="287" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Mulai_di" bpmnElement="Flow_Mulai">
+        <di:waypoint x="228" y="155" />
+        <di:waypoint x="270" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Tagihan_di" bpmnElement="Flow_Tagihan">
+        <di:waypoint x="370" y="155" />
+        <di:waypoint x="425" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Lunas_di" bpmnElement="Flow_Lunas">
+        <di:waypoint x="475" y="155" />
+        <di:waypoint x="542" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_BelumLunas_di" bpmnElement="Flow_BelumLunas">
+        <di:waypoint x="450" y="180" />
+        <di:waypoint x="450" y="265" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_KeOrangTua_di" bpmnElement="Flow_KeOrangTua">
+        <di:waypoint x="500" y="305" />
+        <di:waypoint x="530" y="305" />
+        <di:waypoint x="530" y="455" />
+        <di:waypoint x="560" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_KeVerifikasi_di" bpmnElement="Flow_KeVerifikasi">
+        <di:waypoint x="610" y="415" />
+        <di:waypoint x="610" y="240" />
+        <di:waypoint x="770" y="240" />
+        <di:waypoint x="770" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Verifikasi_di" bpmnElement="Flow_Verifikasi">
+        <di:waypoint x="820" y="155" />
+        <di:waypoint x="875" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Sah_di" bpmnElement="Flow_Sah">
+        <di:waypoint x="925" y="155" />
+        <di:waypoint x="1030" y="155" />
+        <di:waypoint x="1030" y="265" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_BelumSah_di" bpmnElement="Flow_BelumSah">
+        <di:waypoint x="900" y="180" />
+        <di:waypoint x="900" y="475" />
+        <di:waypoint x="660" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Selesai_di" bpmnElement="Flow_Selesai">
+        <di:waypoint x="1080" y="305" />
+        <di:waypoint x="1152" y="305" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,6 +1,6 @@
 # Technical PRD: Nemu v2.3 MVP, AI scope
 
-Status: draft, 25 November 2026. It answers _how_ to build the **AI parts** of PRD Nemu v2.3 (the product PRD owns _what_; its section 0 lists what changed from v2.2). Deadline: MVP working Friday 27 November 2026, night; pitch and demo 1 December.
+Status: draft, 25 November 2026; status table updated 27 November. It answers _how_ to build the **AI parts** of PRD Nemu v2.3 (the product PRD owns _what_; its section 0 lists what changed from v2.2). Deadline: MVP working Friday 27 November 2026, night; pitch and demo 1 December.
 
 **Scope.** We follow the same split as before: AI owns AI features as a vertical slice, as with `chat`, `documents` and `rule-sources`.
 
@@ -16,7 +16,7 @@ Status: draft, 25 November 2026. It answers _how_ to build the **AI parts** of P
 
 - The Chrome/Edge extension: the cursor, bubbles and cards, hold Ctrl+Space, the DOM executor, and the three ways of working.
 - The workspace web pages (WS-01 to WS-10).
-- The WhatsApp Cloud API webhook and the WhatsApp Web hand-off.
+- The WhatsApp bot (whatsmeow on the team VPS, ADR-0013) and the WhatsApp Web hand-off.
 - The Moodle test instance.
 - Identity (ID-01 to ID-04).
 
@@ -58,42 +58,44 @@ Research behind this document was done on 25 November 2026 against live sources 
 
 ### 3.1 What AI delivers
 
-Already in PR #192 (✅), changed (✏️) or new (🆕). Pure functions live in `packages/ai`; procedures in `packages/api`.
+As of 27 November 2026, the extension work (#223 to #242) has built every flow end to end behind the `SchoolAi` seam, with fixture responders and synthetic test data. What remains for AI is the real model work and the switch to the official test pack. Status:
 
-| Function / procedure                                                                        | Requirement                | Status                               |
-| ------------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------ |
-| `readGradePhoto`, `matchNames`, `buildVerificationPlan`, `applyAnswers`, `applySchoolRules` | F1-03 to F1-07             | ✅                                   |
-| Roster and KKM from API v1 (`/siswa`, `/nilai/rekap.kkm`, `/akademik/guru/saya`)            | F1-04, F1-07               | 🆕 behind the `SchoolDirectory` port |
-| `diffReadback` fed from `GET /api/v1/nilai`                                                 | F1-10                      | ✏️                                   |
-| Lines for ways 1 and 2: "Nilai Aisyah, 86", "Ketik 84 untuk Dimas.", "Di buku 84, Bu."      | F1-08, F1-11               | ✏️ extend `guidedLine`               |
-| `stepNotes(task, actions)` → 3–6 steps with menu names                                      | F0-14                      | 🆕                                   |
-| `explainError` against **kamus table entries** + page snapshot from the DOM                 | F2-02, F2-03, F2-06, F2-07 | ✏️                                   |
-| `explainMissingGrade`: API check + BPMN cause trace + parent reply                          | F2-08                      | 🆕                                   |
-| `answerGrounded` with verified citations                                                    | F3-04, F3-07, WS-09        | ✅                                   |
-| `importBpmn`: any BPMN, including pools, events, boundary events                            | F3-10                      | ✏️                                   |
-| `indexBpmnSymptoms` at upload, operator-correctable                                         | F3-11                      | 🆕                                   |
-| `traceBpmn(symptom)`: cause path, reverse path, fixing role, element IDs                    | F3-12 to F3-14             | 🆕                                   |
-| `planBpmnStep` + field-to-label mapping + table photo reading by the BPMN's form schema     | F3-15 to F3-19             | ✏️                                   |
-| `compileProcedure`                                                                          | F3-01                      | ✅                                   |
-| `procedureToBpmn` (XML with layout, opens in bpmn.io)                                       | F3-03                      | 🆕                                   |
-| Nemu's own F1 and F4 flows as `.bpmn` files                                                 | F3-09                      | 🆕                                   |
-| `checkQuiz(preview snapshot)`: missing image, missing key, count, class, times              | F4-01, F4-05               | 🆕                                   |
-| `scriptToMoodleXml(script)`: no question generation; unreadable parts asked                 | F4-03                      | 🆕                                   |
-| `routeCommand`, `matchVoiceControl` (+ "pelan")                                             | F0-15                      | ✏️                                   |
-| `transcribe`, `synthesize`                                                                  | F0-03, F0-05               | ✅                                   |
-| Desktop screen reader (UIA, Electron)                                                       | –                          | ❌ removed                           |
-| Excel parsing                                                                               | F1-2 cut                   | dormant                              |
+- ✅ real and tested;
+- 🧩 the seam, the procedure and a fixture are on `main`, but the real model or the official data is still open (issue in brackets);
+- 🆕 not started.
+
+Pure functions live in `packages/ai`; procedures in `packages/api`.
+
+| Function / procedure                                                                        | Requirement                | Status     |
+| ------------------------------------------------------------------------------------------- | -------------------------- | ---------- |
+| `readGradePhoto`, `matchNames`, `buildVerificationPlan`, `applyAnswers`, `applySchoolRules` | F1-03 to F1-07             | ✅         |
+| Roster, KKM and read-back from API v1 (`/siswa`, `/nilai/rekap`, `/nilai`)                  | F1-04, F1-07, F1-10        | ✅ (#228)  |
+| `explainError`: kamus table (WS-05) + page snapshot from the extension                      | F2-02, F2-03, F2-06, F2-07 | 🧩 (#216)  |
+| `suggestSymptoms`, `matchSymptom`, `explainProcess` + grade check: F2-08 on any BPMN        | F2-08, F3-11 to F3-14      | 🧩 (#217)  |
+| `answerGrounded` with verified citations                                                    | F3-04, F3-07, WS-09        | ✅         |
+| `readFormPhoto`, `matchFields`, `planBpmnStep`: run a new BPMN (tahfidz)                    | F3-15 to F3-19             | 🧩 (#220)  |
+| `compileProcedure`, procedure → BPMN XML                                                    | F3-01, F3-03               | ✅ (#239)  |
+| Nemu's own F1 and F4 flows as `.bpmn` files                                                 | F3-09                      | 🆕 (#215)  |
+| `judgeQuiz`: quiz checks that need a model, if any                                          | F4-01                      | 🧩 (#218)  |
+| `readQuizScript` → Moodle XML: no question generation; unreadable parts asked               | F4-03                      | 🧩 (#219)  |
+| `routeCommand`, `matchVoiceControl` + Javanese-mixed commands                               | F0-04, F0-15               | 🧩 (#222)  |
+| `transcribe`, `synthesize`                                                                  | F0-03, F0-05               | ✅         |
+| Step notes after a task                                                                     | F0-14                      | 🆕         |
+| Desktop screen reader (UIA, Electron)                                                       | –                          | ❌ removed |
+| Excel parsing                                                                               | F1-2 cut                   | dormant    |
+
+**The official test pack** (`00_BACA-DULU.md` and its folders) is now available. The fixtures on `main` are synthetic stand-ins and differ from it. For example, the official `F2-1_alur-spp.bpmn` has a DOKU payment pool, partial payment and a "Paid in Cash" boundary event, and its three questions are different. Every 🧩 row is done only when its case passes on the official files.
 
 ### 3.2 What AI needs from the fullstack side
 
-| Need                                                                                                                                                                                                                                     | For              |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| **Page snapshot** from the extension when Nemu is called: URL, title, visible error/status texts, form labels with element roles and boxes; never input values; nothing when a password field is present (the `ScreenSnapshot` contract) | F2, F3-16, F4-01 |
-| **Quiz preview snapshot**: per question its text, images (`src`, loaded or broken), referenced figure labels ("(3)"), answer options; plus quiz settings (course, section, open/close)                                                   | F4-01            |
-| **Actions log** of a finished task (menu names clicked, fields filled)                                                                                                                                                                   | F0-14 step notes |
-| The WhatsApp webhook calls `enqueuePhoto` after `teacherForSender`                                                                                                                                                                       | F1-01            |
-| Teacher and contacts from the workspace (WS-06), kamus rows (WS-05), allowed sites (WS-03)                                                                                                                                               | F2, identity     |
-| An executor that refuses denied buttons (`isDeniedActionName`) and never submits                                                                                                                                                         | F0-08            |
+| Need                                                                                                                                                                                                                                         | For              |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| **Page snapshot** from the extension when Nemu is called: URL, title, visible error/status texts, form labels with element roles and boxes; never input values; nothing when a password field is present (the `PageSnapshot` contract, #216) | F2, F3-16, F4-01 |
+| **Quiz preview snapshot**: per question its text, images (`src`, loaded or broken), referenced figure labels ("(3)"), answer options; plus quiz settings (course, section, open/close)                                                       | F4-01            |
+| **Actions log** of a finished task (menu names clicked, fields filled)                                                                                                                                                                       | F0-14 step notes |
+| The WhatsApp bot (whatsmeow, ADR-0013) calls `enqueuePhoto` after `teacherForSender`                                                                                                                                                         | F1-01            |
+| Teacher and contacts from the workspace (WS-06), kamus rows (WS-05), allowed sites (WS-03)                                                                                                                                                   | F2, identity     |
+| An executor that refuses denied buttons (`isDeniedActionName`) and never submits                                                                                                                                                             | F0-08            |
 
 ### 3.3 AlurSekolah API v1 (read only, from the public OpenAPI spec)
 

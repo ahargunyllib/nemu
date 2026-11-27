@@ -1,19 +1,16 @@
 # Testing
 
-Tests protect business behavior: contracts, Action Level enforcement,
-calculations, citations, and the Nemu pipeline.
+Tests protect business behavior: contracts, authorization and identity,
+grade rules and calculations, citations, and the school AI.
 
 ## Placement
 
 - Co-locate a test with its owner as `*.test.ts` or `*.test.tsx`, and run the
   suite with `pnpm test`.
 - `packages/ai` tests use `node:test` against mocked provider responses and
-  never spend OpenRouter credits. Extend `packages/ai/src/index.test.ts` for
-  pipeline behavior instead of mocking the pipeline's own internals.
-- Build requests from `@nemu/contracts/fixtures` so tests and the fixture
-  responder (ADR-0001) share one source of example traffic.
-- The official evaluation files in `data/04_evaluasi` feed the eval scripts
-  only; never index them as knowledge or copy them into fixtures.
+  never spend OpenRouter credits. Feature tests in `packages/api` run against
+  `createFixtureSchoolAi` (ADR-0001) and a migrated in-memory D1
+  (`packages/api/src/testing`), so they exercise the real seeds.
 - Satisfy the types in tests with narrowing or matchers rather than casts or
   weaker assertions.
 
@@ -22,7 +19,7 @@ calculations, citations, and the Nemu pipeline.
 Write or retain a test when it verifies at least one of these:
 
 - a business contract or validation rule;
-- an authorization, Action Level, or data-integrity policy;
+- an authorization, identity, or data-integrity policy;
 - a non-trivial calculation, policy matrix, or state transition;
 - an important failure, recovery, or regression path.
 
@@ -36,7 +33,12 @@ Run the narrowest useful suite while iterating, then `pnpm check` and
 
 Unit tests can't load the extension, so after changing `apps/extension`, run
 `pnpm --filter extension verify` with `NEMU_RESPONDER=fixture pnpm dev` running.
-It drives the dev build in Playwright's Chromium and saves screenshots to
+It builds the extension, loads it in Playwright's Chromium, walks the settings
+page and the mock AlurSekolah, and saves screenshots to
 `apps/extension/.output/verify/`; look at them before reporting the change as
-verified. It isn't part of `pnpm test` because it needs the dev stack running.
+verified. Changes to the executor (`features/executor`) also need
+`pnpm --filter extension verify:executor`, which uses a development build for its `?uji-nemu` dock.
+Changes to F1 (`features/grade-photo`) also need `verify:grade-photo` (cara 1) and
+`verify:f1-2` (cara 2).
+Neither is part of `pnpm test` because they need the dev stack running.
 See `apps/extension/README.md`.

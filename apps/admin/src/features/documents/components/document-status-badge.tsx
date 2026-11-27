@@ -8,10 +8,10 @@ export default function DocumentStatusBadge({
   failureReason: string | null;
 }) {
   return status === "ready" ? (
-    <Badge variant="secondary">Ready</Badge>
+    <Badge variant="secondary">Siap</Badge>
   ) : (
     <Badge variant="destructive" title={failureReason ?? undefined}>
-      Failed
+      Gagal
     </Badge>
   );
 }

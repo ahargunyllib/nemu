@@ -1,39 +1,77 @@
-import { screenSnapshotSchema } from "@nemu/contracts/school";
+import { pageSnapshotSchema } from "@nemu/contracts/school";
 import { z } from "zod";
 
-import type { AuthenticatedContext } from "../../context";
-import { schoolProcedure } from "../../index";
+import type { Context } from "../../context";
+import { schoolAdminProcedure, schoolProcedure } from "../../index";
+import { createCatalogRepository } from "../documents/catalog-repository";
 import { createDocumentRepository } from "../documents/repository";
-import { requireTeacher } from "../school/teacher";
-import { ask, explain, route } from "./service";
+import { createKamusRepository } from "../kamus/repository";
+import { ask, explain, route, tryAnswer } from "./service";
 
-function helpDeps(context: AuthenticatedContext) {
-  return { ai: context.school.ai, documents: createDocumentRepository(context.db) };
+function helpDeps(context: Pick<Context, "db" | "school">) {
+  return {
+    ai: context.school.ai,
+    documents: createDocumentRepository(context.db),
+    kamus: createKamusRepository(context.db),
+  };
 }
 
 export const helpRouter = {
-  /** F2: the extension's page snapshot (+ what the teacher said) → whose fault, who fixes it, WhatsApp draft. */
+  /**
+   * F2: the page snapshot (+ what the teacher said) → whose fault and who fixes it: from a symptom
+   * of an uploaded BPMN (F2-08, checked against AlurSekolah first), else from WS-05.
+   */
   helpExplain: schoolProcedure
     .input(
-      z.object({ snapshot: screenSnapshotSchema, question: z.string().trim().max(500).nullable() }),
+      z.object({ snapshot: pageSnapshotSchema, question: z.string().trim().max(500).nullable() }),
     )
     .handler(async ({ context, input }) => {
-      const teacher = await requireTeacher(context.school.directory, context.session.user.id);
-      return explain(helpDeps(context), teacher, context.session.user.workspaceId, input);
+      const teacher = await context.caller.requireTeacher();
+      return explain(
+        {
+          ...helpDeps(context),
+          processes: {
+            ai: context.school.ai,
+            catalog: createCatalogRepository(context.db),
+            files: context.documentFiles,
+            alurSekolah: context.school.alurSekolah,
+          },
+        },
+        teacher,
+        context.caller.workspaceId,
+        input,
+      );
     }),
 
   /** F3-04/F3-07: a question answered only from active school knowledge, with verified citations. */
   helpAsk: schoolProcedure
     .input(z.object({ question: z.string().trim().min(1).max(500) }))
     .handler(async ({ context, input }) => {
-      await requireTeacher(context.school.directory, context.session.user.id);
-      return ask(helpDeps(context), context.session.user.workspaceId, input.question);
+      await context.caller.requireTeacher();
+      return ask(helpDeps(context), context.caller.workspaceId, input.question);
     }),
+
+  /** WS-09 Uji jawaban (operator or Admin Javan): the answer with chosen inactive documents. */
+  helpTryAnswer: schoolAdminProcedure
+    .input(
+      z.object({
+        question: z.string().trim().min(1).max(500),
+        documentIds: z.array(z.string().min(1)).max(50),
+      }),
+    )
+    .handler(({ context, input }) =>
+      tryAnswer(
+        { ...helpDeps(context), catalog: createCatalogRepository(context.db) },
+        context.session.user.workspaceId,
+        input.question,
+        input.documentIds,
+      ),
+    ),
 
   /** Routes a transcript to a feature; voice controls are recognized without a model call. */
   helpRoute: schoolProcedure
     .input(z.object({ utterance: z.string().trim().min(1).max(500) }))
     .handler(({ context, input }) =>
-      route(helpDeps(context), context.session.user.workspaceId, input.utterance),
+      route(helpDeps(context), context.caller.workspaceId, input.utterance),
     ),
 };
