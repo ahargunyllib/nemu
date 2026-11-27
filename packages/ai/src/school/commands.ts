@@ -44,15 +44,22 @@ export function routeCommand(
   ) {
     return { kind: "intent", intent: "kenapa", processName: null };
   }
-  const process = processNames.find((name) =>
-    name
+  // The process whose name shares the most words with the sentence (a tie keeps the first).
+  let process: string | undefined;
+  let best = 0;
+  for (const name of processNames) {
+    const shared = name
       .toLocaleLowerCase("id-ID")
       .split(/\s+/u)
       .filter(
         (word) => word.length > 3 && !["pengajuan", "proses", "form", "formulir"].includes(word),
       )
-      .some((word) => text.includes(word)),
-  );
+      .filter((word) => text.includes(word)).length;
+    if (shared > best) {
+      best = shared;
+      process = name;
+    }
+  }
   if (process) return { kind: "intent", intent: "proses", processName: process };
   if (/\b(berapa|apa|bagaimana|gimana|boleh|kapan|siapa|apakah|harus)\b/u.test(text)) {
     return { kind: "intent", intent: "tanya", processName: null };

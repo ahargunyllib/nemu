@@ -1,0 +1,79 @@
+[
+  {
+    "order": 1,
+    "action": "click",
+    "target": "Al-Quran",
+    "valueTemplate": null,
+    "requiresHumanAction": false
+  },
+  {
+    "order": 2,
+    "action": "select",
+    "target": "Kelas",
+    "valueTemplate": "{{kelas}}",
+    "requiresHumanAction": false
+  },
+  {
+    "order": 3,
+    "action": "click",
+    "target": "Ujian baru",
+    "valueTemplate": null,
+    "requiresHumanAction": false
+  },
+  {
+    "order": 4,
+    "action": "select",
+    "target": "Murid",
+    "valueTemplate": "{{murid}}",
+    "requiresHumanAction": false
+  },
+  {
+    "order": 5,
+    "action": "select",
+    "target": "Jenis ujian",
+    "valueTemplate": "{{jenis_ujian}}",
+    "requiresHumanAction": false
+  },
+  {
+    "order": 6,
+    "action": "fill",
+    "target": "Tanggal ujian",
+    "valueTemplate": "{{tanggal_ujian}}",
+    "requiresHumanAction": false
+  },
+  {
+    "order": 7,
+    "action": "fill",
+    "target": "Fashohah",
+    "valueTemplate": "{{fashohah}}",
+    "requiresHumanAction": false
+  },
+  {
+    "order": 8,
+    "action": "fill",
+    "target": "Tartil",
+    "valueTemplate": "{{tartil}}",
+    "requiresHumanAction": false
+  },
+  {
+    "order": 9,
+    "action": "fill",
+    "target": "Tajwid",
+    "valueTemplate": "{{tajwid}}",
+    "requiresHumanAction": false
+  },
+  {
+    "order": 10,
+    "action": "fill",
+    "target": "Adab",
+    "valueTemplate": "{{adab}}",
+    "requiresHumanAction": false
+  },
+  {
+    "order": 11,
+    "action": "click",
+    "target": "Simpan ujian",
+    "valueTemplate": null,
+    "requiresHumanAction": true
+  }
+]

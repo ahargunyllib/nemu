@@ -18,6 +18,7 @@ import {
   type ProcessContinuation,
   processTask,
 } from "../lib/process-task";
+import { procedureTask } from "../lib/procedure-task";
 import type { ProcessRunRequest, ProcessRunValue } from "../lib/requests";
 
 /**
@@ -72,6 +73,8 @@ function createProcessRun() {
   let phase: Phase = { name: "idle" };
   let documentId = "";
   let processName = "";
+  /** A recorded procedure (F3-01) instead of a BPMN, and the teacher's values for it. */
+  let procedure: { values: Record<string, string> } | null = null;
   let plan: BpmnPlan | null = null;
   let slots: ProcessSlots = {};
   let table: FormTable | null = null;
@@ -216,7 +219,35 @@ function createProcessRun() {
     if (!process) return notice(`Proses ${name} belum aktif di Nemu, ${address()}.`);
     documentId = process.documentId;
     processName = process.title;
+    if (process.kind === "procedure") {
+      procedure = { values: {} };
+      return replay();
+    }
     await planWith(utterance, null);
+  }
+
+  /** F3-01: the recorded steps, asking for each value they need, then the executor. */
+  async function replay() {
+    if (!procedure) return;
+    const run = generation;
+    const response = await call({ op: "run-procedure", documentId, values: procedure.values });
+    if (run !== generation) return;
+    if (!response.ok) return notice(response.message, () => void replay());
+    const result = response.value as ProcessRunValue["run-procedure"];
+    if (result.status === "missing") {
+      const { name, question } = result.parameter;
+      return setPhase({ name: "asking", question, slot: name }, question);
+    }
+    setPhase({ name: "running" });
+    await executor.start(
+      procedureTask({
+        title: result.title,
+        recordedBy: result.recordedBy,
+        steps: result.steps,
+        honorific: context.honorific,
+      }),
+    );
+    reset();
   }
 
   async function planWith(text: string | null, answering: string | null) {
@@ -426,6 +457,7 @@ function createProcessRun() {
     generation += 1;
     stopPolling();
     documentId = "";
+    procedure = null;
     plan = null;
     slots = {};
     table = null;
@@ -474,6 +506,13 @@ function createProcessRun() {
     hear(text: string): boolean {
       switch (phase.name) {
         case "asking":
+          if (procedure) {
+            procedure.values = { ...procedure.values, [phase.slot]: text.trim() };
+            void replay();
+            return true;
+          }
+          void planWith(text, phase.slot);
+          return true;
         case "photo":
           void planWith(text, phase.slot);
           return true;

@@ -520,6 +520,20 @@ export const procedureSchema = z
     title: z.string(),
     parameters: z.array(procedureParameterSchema),
     steps: z.array(procedureStepSchema),
+    /** Who recorded it, as Nemu says it: "Pak Rizal" (F3-01, "Rekaman Pak Rizal"). */
+    recordedBy: z.string().max(80).optional(),
+  })
+  .strict();
+
+/** F3-01: what "Rekam cara" captured in the extension, kept until the operator reviews it. */
+export const procedureRecordingSchema = z
+  .object({
+    recordingId: z.string(),
+    title: z.string(),
+    recordedBy: z.string(),
+    events: z.array(recordedEventSchema),
+    narration: z.array(narrationSegmentSchema),
+    createdAt: z.number().int(),
   })
   .strict();
 
@@ -607,6 +621,7 @@ export type Contact = z.infer<typeof contactSchema>;
 export type HelpExplanation = z.infer<typeof helpExplanationSchema>;
 export type GroundedAnswer = z.infer<typeof groundedAnswerSchema>;
 export type BpmnStep = z.infer<typeof bpmnStepSchema>;
+export type ProcedureRecording = z.infer<typeof procedureRecordingSchema>;
 export type BpmnPlan = z.infer<typeof bpmnPlanSchema>;
 export type FormTableRow = z.infer<typeof formTableRowSchema>;
 export type FormTable = z.infer<typeof formTableSchema>;

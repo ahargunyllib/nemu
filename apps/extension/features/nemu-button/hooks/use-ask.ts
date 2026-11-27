@@ -12,7 +12,10 @@ export type AskState =
   | {
       status: "answered";
       question: string;
-      result: Exclude<AskResult, { kind: "stop" } | { kind: "grades" } | { kind: "process" }>;
+      result: Exclude<
+        AskResult,
+        { kind: "stop" } | { kind: "grades" } | { kind: "process" } | { kind: "record" }
+      >;
     };
 
 /**
@@ -25,6 +28,7 @@ export function useAsk(
   onStop: () => void,
   onGrades: (utterance: string) => void = () => undefined,
   onProcess: (utterance: string, processName: string) => void = () => undefined,
+  onRecord: (title: string) => void = () => undefined,
 ) {
   const [state, setState] = useState<AskState>({ status: "idle" });
   const latest = useRef(0);
@@ -53,9 +57,14 @@ export function useAsk(
         onProcess(result.utterance, result.processName);
         return;
       }
+      if (result.kind === "record") {
+        setState({ status: "idle" });
+        onRecord(result.title);
+        return;
+      }
       setState({ status: "answered", question, result });
     },
-    [pageEmail, onStop, onGrades, onProcess],
+    [pageEmail, onStop, onGrades, onProcess, onRecord],
   );
 
   const reset = useCallback(() => {

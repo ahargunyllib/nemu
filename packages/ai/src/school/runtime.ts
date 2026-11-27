@@ -332,29 +332,24 @@ export function createFixtureSchoolAi(): SchoolAi {
       return matchFieldLabels(input.fields, input.pageLabels);
     },
 
+    // Every recorded value is a parameter (demo values change each time); the label names it.
     async compileProcedure(input) {
       const drafts = cleanRecording(input.events);
-      const parameters = drafts.flatMap((draft) =>
-        draft.action === "select" && draft.value
-          ? [
-              {
-                name: draft.label.toLowerCase().replace(/[^a-z0-9]+/gu, "_"),
-                label: draft.label,
-                question: `${draft.label} apa?`,
-                example: draft.value,
-              },
-            ]
-          : [],
-      );
+      const nameOf = (label: string) => label.toLowerCase().replace(/[^a-z0-9]+/gu, "_").replace(/^_+|_+$/gu, "");
+      const valued = (draft: (typeof drafts)[number]) =>
+        (draft.action === "select" || draft.action === "fill") && !!draft.value;
+      const parameters = drafts.filter(valued).map((draft) => ({
+        name: nameOf(draft.label),
+        label: draft.label,
+        question: /^\d+$/u.test(draft.value ?? "") ? `${draft.label} berapa?` : `${draft.label} apa?`,
+        example: draft.value ?? "",
+      }));
       return assembleProcedure(input.title, drafts, {
         title: input.title,
         parameters,
         steps: drafts.map((draft, index) => ({
           index,
-          value_template:
-            draft.action === "select" && draft.value
-              ? `{{${draft.label.toLowerCase().replace(/[^a-z0-9]+/gu, "_")}}}`
-              : null,
+          value_template: valued(draft) ? `{{${nameOf(draft.label)}}}` : null,
           instruction: "",
         })),
       });

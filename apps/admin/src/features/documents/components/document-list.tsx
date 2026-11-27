@@ -35,6 +35,7 @@ import {
 import {
   DocumentActiveSwitch,
   DocumentDeleteButton,
+  DocumentExportBpmnButton,
   DocumentOpenButton,
 } from "@/features/documents/components/document-row-controls";
 import DocumentSitesDialog from "@/features/documents/components/document-sites-dialog";
@@ -167,6 +168,9 @@ export default function DocumentList({
                           )}
                           {document.status === "ready" && document.format !== "procedure" && (
                             <DocumentOpenButton id={document.id} title={document.title} />
+                          )}
+                          {document.status === "ready" && document.format === "procedure" && (
+                            <DocumentExportBpmnButton id={document.id} title={document.title} />
                           )}
                           <DocumentDeleteButton id={document.id} title={document.title} />
                         </div>

@@ -13,6 +13,9 @@ import { createCatalogRepository } from "../documents/catalog-repository";
 import { createDocumentRepository } from "../documents/repository";
 import {
   compileRecording,
+  exportProcedureBpmn,
+  getRecording,
+  saveRecording,
   getProcedure,
   listProcedures,
   listProcesses,
@@ -118,6 +121,48 @@ export const processesRouter = {
       }),
     )
     .handler(({ context, input }) => matchProcessFields(processDeps(context), input)),
+  /** F3-01: "Rekam cara" from the extension; the operator reviews it in the Admin Workspace. */
+  procedureRecordingSave: schoolProcedure
+    .input(
+      z.object({
+        title: z.string().trim().min(1).max(200),
+        events: z.array(recordedEventSchema).min(1).max(500),
+        narration: z.array(narrationSegmentSchema).max(200),
+      }),
+    )
+    .handler(async ({ context, input }) => {
+      const teacher = await context.caller.requireTeacher();
+      const recording = await saveRecording(
+        processDeps(context),
+        teacher,
+        context.caller.workspaceId,
+        input,
+      );
+      return { recordingId: recording.recordingId, recordedBy: recording.recordedBy };
+    }),
+  procedureRecording: schoolAdminProcedure
+    .input(z.object({ recordingId: z.string().uuid() }))
+    .handler(async ({ context, input }) => {
+      const recording = await getRecording(
+        processDeps(context),
+        context.session.user.workspaceId,
+        input.recordingId,
+      );
+      if (!recording) throw new ORPCError("NOT_FOUND", { message: "Rekaman tidak ditemukan." });
+      return recording;
+    }),
+  /** F3-03: a saved procedure as BPMN 2.0 XML (bpmn-moddle, laid out with bpmn-auto-layout). */
+  procedureExportBpmn: schoolAdminProcedure
+    .input(documentIdSchema)
+    .handler(async ({ context, input }) => {
+      const exported = await exportProcedureBpmn(
+        processDeps(context),
+        context.session.user.workspaceId,
+        input.documentId,
+      );
+      if (!exported) throw new ORPCError("NOT_FOUND", { message: "Procedure not found" });
+      return exported;
+    }),
   /** F3-01: the operator's recording → parameterized steps for review (not saved yet). */
   procedureCompile: schoolAdminProcedure
     .input(

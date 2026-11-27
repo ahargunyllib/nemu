@@ -383,3 +383,105 @@ describe("F3-1 setoran tahfidz through the API (#213)", () => {
     ).resolves.toEqual({ tanggal_setoran: "Tanggal setoran", fashohah: "Fashohah" });
   });
 });
+
+describe("F3-3 Rekam cara through the API (#214)", () => {
+  it("a recording from the extension is reviewed, saved, exported as BPMN and replayed 5/5", async () => {
+    const context = await createSchoolContext();
+    const admin = {
+      ...context,
+      session: { ...context.session!, user: { ...context.session!.user, ...RIZAL } },
+    };
+    const recorded = JSON.parse(
+      await readFile(join(FIXTURES, "F3-3_rekaman.json"), "utf8"),
+    ) as { title: string; events: RecordedEvent[]; narration: Array<{ start: number; end: number; text: string }> };
+    // A password typed during the recording never keeps its value.
+    const events = [
+      ...recorded.events,
+      {
+        ...recorded.events[1]!,
+        t: 99_999,
+        type: "input" as const,
+        locator: { ...recorded.events[1]!.locator, label: "Kata sandi", name: "Kata sandi", role: "textbox" },
+        value: "rahasia",
+      },
+    ];
+    const saved = await call(
+      processesRouter.procedureRecordingSave,
+      { title: recorded.title, events, narration: recorded.narration },
+      { context },
+    );
+    expect(saved.recordedBy).toBe("Bu Siti");
+
+    await expect(
+      call(processesRouter.procedureRecording, { recordingId: saved.recordingId }, { context }),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    const recording = await call(
+      processesRouter.procedureRecording,
+      { recordingId: saved.recordingId },
+      { context: admin },
+    );
+    expect(recording.narration).toHaveLength(2);
+    expect(recording.events.at(-1)?.value).toBeNull();
+
+    const procedure = await call(
+      processesRouter.procedureCompile,
+      { title: recording.title, events: recorded.events, narration: recording.narration },
+      { context: admin },
+    );
+    const expected = JSON.parse(
+      await readFile(join(FIXTURES, "F3-3_langkah-yang-diharapkan.json"), "utf8"),
+    );
+    expect(
+      procedure.steps.map((step) => ({
+        order: step.order,
+        action: step.action,
+        target: step.locator.label,
+        valueTemplate: step.valueTemplate,
+        requiresHumanAction: step.requiresHumanAction,
+      })),
+    ).toEqual(expected);
+
+    const document = await call(
+      processesRouter.procedureSave,
+      {
+        title: procedure.title,
+        version: "1",
+        isActive: true,
+        procedure: { ...procedure, recordedBy: recording.recordedBy },
+      },
+      { context: admin },
+    );
+    const exported = await call(
+      processesRouter.procedureExportBpmn,
+      { documentId: document.id },
+      { context: admin },
+    );
+    expect(exported.fileName).toBe("Catat-ujian-tahfidz.bpmn");
+    expect(exported.xml).toContain('name="Guru menekan Simpan ujian"');
+    expect(exported.xml).toContain("<bpmndi:BPMNDiagram");
+
+    await expect(
+      call(helpRouter.helpRoute, { utterance: "Catat ujian tahfidz untuk Fatih" }, { context }),
+    ).resolves.toEqual({ kind: "intent", intent: "proses", processName: "Catat ujian tahfidz" });
+
+    const [header, ...rows] = (await readFile(join(FIXTURES, "F3-3_putaran-ulang.csv"), "utf8"))
+      .trim()
+      .split("\n");
+    const keys = header!.split(",");
+    let replays = 0;
+    for (const line of rows) {
+      const values = Object.fromEntries(line.split(",").map((value, i) => [keys[i]!, value]));
+      const run = await call(
+        processesRouter.procedureRun,
+        { documentId: document.id, values },
+        { context },
+      );
+      if (run.status !== "ok") throw new Error("missing parameter");
+      expect(run.recordedBy).toBe("Bu Siti");
+      expect(run.steps.find((step) => step.locator.label === "Murid")?.value).toBe(values.murid);
+      expect(run.steps.at(-1)).toMatchObject({ requiresHumanAction: true });
+      replays += 1;
+    }
+    expect(replays).toBe(5);
+  });
+});

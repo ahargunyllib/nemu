@@ -25,6 +25,8 @@ import { readPageSnapshot } from "../../features/ini-kenapa/lib/page-snapshot";
 import { AskBox } from "../../features/nemu-button/components/ask-box";
 import { useProcessRun } from "../../features/process-run/hooks/use-process-run";
 import { processRun } from "../../features/process-run/stores/process-run";
+import { useRecorder } from "../../features/recorder/hooks/use-recorder";
+import { recorder } from "../../features/recorder/stores/recorder";
 import { NemuButton } from "../../features/nemu-button/components/nemu-button";
 import { type AskState, useAsk } from "../../features/nemu-button/hooks/use-ask";
 import { HeardBubble, ListeningBubble } from "../../features/voice/components/talk-bubbles";
@@ -63,7 +65,20 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     },
     [close],
   );
-  const { state, ask, reset } = useAsk(pageEmail, close, startGrades, startProcess);
+  const startRecording = useCallback(
+    (title: string) => {
+      close();
+      recorder.start(title);
+    },
+    [close],
+  );
+  const { state, ask, reset } = useAsk(
+    pageEmail,
+    close,
+    startGrades,
+    startProcess,
+    startRecording,
+  );
   const preview = useDisplayPreview();
   const { voice, working, speak, repeat, stop } = useVoice(pageEmail);
   const run = useExecutor();
@@ -71,6 +86,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
   const pressSnapshot = useRef<PageSnapshot | null>(null);
   const grades = useGradePhoto();
   const process = useProcessRun();
+  const recording = useRecorder();
   const talk = useTalk({
     pageEmail,
     shortcut,
@@ -78,10 +94,13 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     isWorking: () => working || voiceCommands.isWorking(),
     onStart: () => {
       pressSnapshot.current = readPageSnapshot(document, location.href);
+      recorder.talkStarted();
       setOpen(true);
     },
     // While F1 or F3 waits for an answer (a photo question, a number), the words are that answer.
+    // While "Rekam cara" records, the words are the operator's narration.
     onQuestion: (question) => {
+      if (recorder.narrate(question)) return;
       if (!gradePhoto.hear(question) && !processRun.hear(question))
         void ask(question, pressSnapshot.current);
     },
@@ -127,16 +146,17 @@ export function NemuApp({ access }: { access: SiteAccess }) {
       gradePhoto.connect({ pageEmail, honorific, registered, speak: (text) => void speak(text) }),
     [pageEmail, honorific, registered, speak],
   );
-  // F3 runs an uploaded BPMN process as this teacher (#213).
-  useEffect(
-    () => processRun.connect({ pageEmail, honorific, speak: (text) => void speak(text) }),
-    [pageEmail, honorific, speak],
-  );
+  // F3 runs an uploaded BPMN process as this teacher (#213), and records a new one (#214).
+  useEffect(() => {
+    processRun.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
+    recorder.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
+  }, [pageEmail, honorific, speak]);
 
   // A task under way in this tab carries on after a page load (F0-13).
   useEffect(() => {
     void executor.restore();
     void gradePhoto.restore();
+    void recorder.restore();
   }, []);
 
   // Another account signed in: the previous teacher's answer goes (ID-04).
@@ -175,6 +195,12 @@ export function NemuApp({ access }: { access: SiteAccess }) {
         {run.display ? (
           <div className="pointer-events-auto">
             <NemuStage display={run.display} target={run.target} />
+          </div>
+        ) : recording.display ? (
+          <div className="pointer-events-auto flex flex-col items-end gap-2">
+            {talk.heard !== null && <HeardBubble text={talk.heard} />}
+            <NemuStage display={withSpokenWord(recording.display, voice)} />
+            {talk.state.phase === "listening" && <ListeningBubble />}
           </div>
         ) : grades.display ? (
           <div className="pointer-events-auto flex flex-col items-end gap-2">
@@ -220,6 +246,16 @@ export function NemuApp({ access }: { access: SiteAccess }) {
                   className={`${NEMU_LINK} rounded-2xl bg-background px-3 shadow-nemu-float`}
                 >
                   Lihat catatan langkah
+                </Button>
+              )}
+              {registered && !run.active && (
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={() => startRecording("")}
+                  className={`${NEMU_LINK} rounded-2xl bg-background px-3 shadow-nemu-float`}
+                >
+                  Rekam cara
                 </Button>
               )}
             </div>

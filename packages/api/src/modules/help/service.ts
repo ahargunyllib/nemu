@@ -172,7 +172,10 @@ export async function route(
   const documents = await deps.documents.list(workspaceId);
   const processes = documents
     .filter(
-      (document) => document.format === "bpmn" && document.isActive && document.status === "ready",
+      (document) =>
+        (document.format === "bpmn" || document.format === "procedure") &&
+        document.isActive &&
+        document.status === "ready",
     )
     .map((document) => document.title);
   return routeCommand(utterance, processes);

@@ -1,5 +1,6 @@
 import type { SlotValue } from "@nemu/ai/school/bpmn/conditions";
 import { importBpmn } from "@nemu/ai/school/bpmn/graph";
+import { procedureToBpmn } from "@nemu/ai/school/bpmn/procedure-bpmn";
 import { planBpmnStep, type TaskPage } from "@nemu/ai/school/bpmn/plan";
 import { imageDataUrl } from "@nemu/ai/school/llm";
 import { normalizeControlName } from "@nemu/ai/school/safety";
@@ -17,6 +18,8 @@ import {
   type FormTable,
   type NarrationSegment,
   type Procedure,
+  procedureRecordingSchema,
+  type ProcedureRecording,
   type RecordedEvent,
 } from "@nemu/contracts/school";
 
@@ -306,8 +309,74 @@ export async function runProcedure(
   workspaceId: string,
   documentId: string,
   values: Record<string, string>,
-): Promise<(ProcedureRun & { title: string }) | null> {
+): Promise<(ProcedureRun & { title: string; recordedBy: string | null }) | null> {
   const procedure = await getProcedure(deps, workspaceId, documentId);
   if (!procedure) return null;
-  return { ...instantiateProcedure(procedure, values), title: procedure.title };
+  return {
+    ...instantiateProcedure(procedure, values),
+    title: procedure.title,
+    recordedBy: procedure.recordedBy ?? null,
+  };
+}
+
+const recordingKey = (workspaceId: string, recordingId: string) =>
+  `recordings/${encodeURIComponent(workspaceId)}/${recordingId}.json`;
+
+/** "Pak Rizal": how Nemu names who recorded ("Rekaman Pak Rizal"). */
+export function recorderName(teacher: Pick<TeacherProfile, "honorific" | "name">): string {
+  const first = teacher.name.split(/[\s,]+/u).find((word) => word && !/\./u.test(word)) ?? teacher.name;
+  return `${teacher.honorific} ${first}`;
+}
+
+/**
+ * F3-01: "Rekam cara" in the extension hands its recording over here; the operator reviews it in
+ * the Admin Workspace (signed in), so nothing is compiled or saved from the page itself.
+ */
+export async function saveRecording(
+  deps: Pick<ProcessDeps, "files">,
+  teacher: TeacherProfile,
+  workspaceId: string,
+  input: { title: string; events: RecordedEvent[]; narration: NarrationSegment[] },
+): Promise<ProcedureRecording> {
+  const recording: ProcedureRecording = {
+    recordingId: crypto.randomUUID(),
+    title: input.title,
+    recordedBy: recorderName(teacher),
+    // Password fields never reach the service with a value (the extension drops them too).
+    events: input.events.map((event) =>
+      /sandi|password/iu.test(`${event.locator.label ?? ""} ${event.locator.name ?? ""}`)
+        ? { ...event, value: null }
+        : event,
+    ),
+    narration: input.narration,
+    createdAt: Date.now(),
+  };
+  const bytes = new TextEncoder().encode(JSON.stringify(recording));
+  await deps.files.put(
+    recordingKey(workspaceId, recording.recordingId),
+    bytes.buffer as ArrayBuffer,
+    "application/json",
+  );
+  return recording;
+}
+
+export async function getRecording(
+  deps: Pick<ProcessDeps, "files">,
+  workspaceId: string,
+  recordingId: string,
+): Promise<ProcedureRecording | null> {
+  const body = await deps.files.get(recordingKey(workspaceId, recordingId));
+  return body ? procedureRecordingSchema.parse(JSON.parse(new TextDecoder().decode(body))) : null;
+}
+
+/** F3-03: the saved procedure as BPMN 2.0 XML, laid out, for bpmn.io and Camunda Modeler. */
+export async function exportProcedureBpmn(
+  deps: Pick<ProcessDeps, "documents" | "files">,
+  workspaceId: string,
+  documentId: string,
+): Promise<{ fileName: string; xml: string } | null> {
+  const procedure = await getProcedure(deps, workspaceId, documentId);
+  if (!procedure) return null;
+  const fileName = `${procedure.title.replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/gu, "")}.bpmn`;
+  return { fileName, xml: await procedureToBpmn(procedure) };
 }
