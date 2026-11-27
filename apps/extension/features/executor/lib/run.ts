@@ -23,6 +23,12 @@ import { refusalFor, sitePermits } from "./safety";
 
 /** How long the Nemu cursor glides to the next target (`GLIDE_MS` in `@nemu/ui/nemu/nemu-stage`). */
 export const CURSOR_GLIDE_MS = 600;
+/**
+ * How long "Membuka …" stays up before Nemu clicks the menu (F0-13). The stage shows a display
+ * only once the cursor has arrived, so without this the click and the line came together and the
+ * next page replaced the line before the teacher could read it (#257).
+ */
+const NAVIGATE_READ_MS = 800;
 /** One digit typed (cara 1); Pelan doubles every wait. */
 const CHAR_MS = 120;
 /** How long a target may take to appear, e.g. after a menu opens another page. */
@@ -536,12 +542,14 @@ export class ExecutorRun {
 
     switch (step.verb) {
       case "clickMenu":
+        // The cursor has arrived and the line is up: say it and let her read it, then click.
+        this.deps.speak(sentence);
+        await this.sleep(NAVIGATE_READ_MS * unit, signal);
         // F0-13: the run moves on before the click, since the menu may load another page.
         this.state.events.push({ kind: "acted", verb: "clickMenu", name });
         this.state.index = index + 1;
         this.save();
         this.deps.log({ action: "clickMenu", target: name, result: "done" });
-        this.deps.speak(sentence);
         if (element instanceof HTMLElement) element.click();
         await this.sleep(SETTLE_MS * unit, signal);
         return;
