@@ -18,6 +18,7 @@
     "verify:f1-2": "node scripts/verify-f1-2.mjs",
     "verify:f2": "node scripts/verify-f2.mjs",
     "verify:f2-08": "node scripts/verify-f2-08.mjs",
+    "verify:f3-1": "node scripts/verify-f3-1.mjs",
     "verify:grade-photo": "node scripts/verify-grade-photo.mjs"
   },
   "dependencies": {

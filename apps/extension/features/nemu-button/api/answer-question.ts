@@ -9,7 +9,7 @@ import { type AskResult, fromGroundedAnswer, NOT_AVAILABLE_YET } from "../lib/an
  * school's rules go to `helpAsk`, "kenapa" to `helpExplain` with what the page shows plus a
  * viewport screenshot, and a voice control closes the bubble. `snapshot` is null while a password
  * field is on screen: then "kenapa" reads and sends nothing (F2-07). Grade entry goes to F1
- * (#207); processes wait for their flow.
+ * (#207); a process the school uploaded as BPMN to F3 (#213).
  */
 export async function answerQuestion(
   client: Pick<NemuServiceClient, "helpRoute" | "helpAsk" | "helpExplain">,
@@ -34,6 +34,8 @@ export async function answerQuestion(
       // F1 (#207) takes it from here: the class, subject and assessment, then the photo.
       return { kind: "grades", utterance: question };
     case "proses":
-      return { kind: "notice", text: NOT_AVAILABLE_YET };
+      return route.processName
+        ? { kind: "process", utterance: question, processName: route.processName }
+        : { kind: "notice", text: NOT_AVAILABLE_YET };
   }
 }

@@ -49,6 +49,11 @@ export type ProcessNode = {
   candidateGroups: string[];
   assignee: string | null;
   formFields: FormField[];
+  /**
+   * F3-19: the page the task is done on, when the BPMN says so: Camunda's `formKey`, or a
+   * `halaman` / `page` / `link` property ("Al-Quran › Setoran baru", a URL or a menu path).
+   */
+  link: string | null;
   incoming: string[];
   outgoing: string[];
   defaultFlow: string | null;
@@ -155,6 +160,24 @@ function formFieldsOf(element: Element): FormField[] {
   return fields;
 }
 
+const LINK_PROPERTIES = new Set(["halaman", "page", "link", "url"]);
+
+/** The task link: `camunda:formKey`, else a `camunda:property` named halaman, page, link or url. */
+function linkOf(element: Element): string | null {
+  const formKey = text(element.formKey).trim();
+  if (formKey) return formKey;
+  const extension = element.extensionElements as Element | undefined;
+  for (const value of asArray(extension?.values)) {
+    if (value.$type !== "camunda:Properties") continue;
+    for (const property of asArray(value.values)) {
+      const name = text(property.name).trim().toLowerCase();
+      const found = text(property.value).trim();
+      if (LINK_PROPERTIES.has(name) && found) return found;
+    }
+  }
+  return null;
+}
+
 function conditionOf(flow: Element): ProcessFlow["condition"] {
   const expression = flow.conditionExpression as Element | undefined;
   const body = text(expression?.body).trim();
@@ -218,6 +241,7 @@ export async function importBpmn(xml: string): Promise<ProcessGraph> {
         : [],
       assignee: text(element.assignee) || null,
       formFields: formFieldsOf(element),
+      link: linkOf(element),
       incoming: asArray(element.incoming).map((flow) => text(flow.id)),
       outgoing: asArray(element.outgoing).map((flow) => text(flow.id)),
       defaultFlow: text((element.default as Element | undefined)?.id) || null,

@@ -77,6 +77,9 @@ function createKeylessSchoolAi(): SchoolAi {
     matchSymptom: missing,
     explainProcess: missing,
     extractSlots: missing,
+    readFormPhoto: missing,
+    // Matching a form field to its page label works in code without a model.
+    matchFields: (input) => createFixtureSchoolAi().matchFields(input),
     compileProcedure: missing,
     transcribe: missing,
     synthesize: missing,

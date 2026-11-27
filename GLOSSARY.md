@@ -130,6 +130,10 @@ _Avoid_: preview, sandbox
 Javan's built-in knowledge on how AlurSekolah works. With "berlaku untuk semua sekolah", its active documents answer every school, not only Javan's own.
 _Avoid_: global knowledge, template
 
+**Task page**:
+The menu path a BPMN teacher task is done on ("Al-Quran › Setoran baru"): the task's own link in the BPMN, else the operator's WS-04 page, else a recording of the task. Without one Nemu only explains the steps (ADR-0017).
+_Avoid_: route, URL
+
 **Recorded Procedure**:
 Steps an operator recorded once ("cara Pak Rizal"), with demo values turned into parameters. Replayed without a model; save, send and submit steps stay the teacher's.
 _Avoid_: macro, script

@@ -2,6 +2,7 @@ import type { ActionLogEntry } from "@nemu/contracts/executor";
 import type { PageSnapshot } from "@nemu/contracts/school";
 
 import type { GradePhotoRequest } from "../../features/grade-photo/lib/requests";
+import type { ProcessRunRequest } from "../../features/process-run/lib/requests";
 
 /**
  * What the page found about who is signed in: the email a per-site reader saw (null when signed
@@ -28,7 +29,9 @@ export type NemuMessage =
   | { type: "nemu:notes-load" }
   | { type: "nemu:log-actions"; pageEmail: PageEmail; entries: ActionLogEntry[] }
   // F1 (#207): the WhatsApp photo, its questions, the fill's rules and the read-back.
-  | { type: "nemu:grade-photo"; pageEmail: PageEmail; request: GradePhotoRequest };
+  | { type: "nemu:grade-photo"; pageEmail: PageEmail; request: GradePhotoRequest }
+  // F3 (#213): an uploaded BPMN process, its photo and the page's labels.
+  | { type: "nemu:process-run"; pageEmail: PageEmail; request: ProcessRunRequest };
 
 const TYPES: ReadonlySet<string> = new Set([
   "nemu:site-access",
@@ -44,6 +47,7 @@ const TYPES: ReadonlySet<string> = new Set([
   "nemu:notes-load",
   "nemu:log-actions",
   "nemu:grade-photo",
+  "nemu:process-run",
 ]);
 
 export function isNemuMessage(message: unknown): message is NemuMessage {
