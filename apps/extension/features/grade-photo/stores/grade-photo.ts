@@ -105,6 +105,8 @@ function createGradePhoto() {
   const dismissed = new Set<string>();
   /** What the teacher asked for, and the words so far while Nemu asks for the rest. */
   let target: GradeTarget | null = null;
+  /** 2 when she asked to be taught ("Ajari saya ngisi nilai"): the fill starts in cara 2 (F1-11). */
+  let cara: 2 | undefined;
   let utterance = "";
   let job: InboxJob | null = null;
   let answers: VerificationAnswer[] = [];
@@ -309,6 +311,7 @@ function createGradePhoto() {
       subject: result.subject,
       assessment: result.assessment,
     };
+    cara = result.cara;
     if (job) return process();
     const waiting = jobs.find((candidate) => !dismissed.has(candidate.jobId));
     if (waiting) return start(waiting);
@@ -423,7 +426,7 @@ function createGradePhoto() {
     };
     void call({ op: "state-save", state: kept });
     setPhase({ name: "filling" });
-    void executor.start(task);
+    void executor.start(task, cara ? { cara } : {});
   }
 
   /** The executor's run ended: after Simpan wait for the save; after Berhenti let the photo be. */
