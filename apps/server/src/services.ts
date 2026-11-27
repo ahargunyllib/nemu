@@ -99,6 +99,7 @@ function createSchoolAiFromEnv(): SchoolAi {
       readA: ENV.OPENROUTER_SCHOOL_READ_A_MODEL,
       readB: ENV.OPENROUTER_SCHOOL_READ_B_MODEL,
       reread: ENV.OPENROUTER_SCHOOL_REREAD_MODEL,
+      script: ENV.OPENROUTER_SCHOOL_SCRIPT_MODEL,
       text: ENV.OPENROUTER_SCHOOL_TEXT_MODEL,
       transcription: ENV.OPENROUTER_STT_MODEL,
       speech: ENV.OPENROUTER_TTS_MODEL ?? "",
