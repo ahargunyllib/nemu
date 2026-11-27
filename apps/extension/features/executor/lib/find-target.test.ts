@@ -58,4 +58,29 @@ describe("findTarget (F0-06)", () => {
     expect(findTarget(document, { text: "Hapus" })).toEqual({ status: "missing" });
     expect(findTarget(document, { text: "Ya, simpan" })).toEqual({ status: "missing" });
   });
+
+  test("a label that repeats is found in its group: Moodle's Hari under Kuis dimulai or Tutup kuis", () => {
+    document.body.innerHTML = `
+      <fieldset id="open"><legend class="visually-hidden">Kuis dimulai</legend>
+        <label><input type="checkbox" id="open-on"> Aktifkan</label>
+        <label for="open-day">Hari</label><select id="open-day"><option>30</option></select>
+      </fieldset>
+      <fieldset id="close"><legend>Tutup kuis</legend>
+        <label><input type="checkbox" id="close-on"> Aktifkan</label>
+        <label for="close-day">Hari</label><select id="close-day"><option>3</option></select>
+      </fieldset>`;
+    expect(findTarget(document, { label: "Hari" })).toEqual({ status: "ambiguous", count: 2 });
+    expect(findTarget(document, { label: "Hari", group: "Tutup kuis" })).toMatchObject({
+      status: "found",
+      element: document.getElementById("close-day"),
+      name: "Hari (Tutup kuis)",
+    });
+    expect(findTarget(document, { label: "Aktifkan", group: "Kuis dimulai" })).toMatchObject({
+      status: "found",
+      element: document.getElementById("open-on"),
+    });
+    expect(findTarget(document, { label: "Hari", group: "Batas waktu" })).toEqual({
+      status: "missing",
+    });
+  });
 });

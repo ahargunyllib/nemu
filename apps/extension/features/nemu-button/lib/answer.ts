@@ -26,6 +26,8 @@ export type AskResult =
   | { kind: "record"; title: string }
   /** "Nemu, tolong cek kuis ini": F4-01 checks the Moodle quiz on the page (#209). */
   | { kind: "quiz-check"; utterance: string }
+  /** "Nemu, masukkan kuis dari naskah ini": F4-03 puts the teacher's script into Moodle (#210). */
+  | { kind: "quiz-import"; utterance: string }
   | { kind: "stop" };
 
 /** Grade entry and process runs wait for the executor (#202), whether typed or spoken. */
@@ -54,6 +56,19 @@ export function recordCommand(text: string): string | null {
   const match = text.trim().match(/^(?:nemu[,\s]+)?rekam(?:kan)? cara\b[\s,:]*(.*)$/iu);
   if (!match) return null;
   return (match[1] ?? "").replace(/[.?!]+$/u, "").trim();
+}
+
+/**
+ * "Nemu, masukkan kuis dari naskah ini" / "buat kuis IPAS dari naskah ini di Moodle": the
+ * extension's own script-to-quiz flow (#210). Grades for a quiz ("masukkan nilai kuis") are F1's.
+ */
+export function isQuizImportCommand(text: string): boolean {
+  if (/\bnilai\b/iu.test(text)) return false;
+  return (
+    /\b(?:masukkan|masukin|buat|buatkan|bikin|bikinkan|pasang|pasangkan|impor|import|jadikan)\b[^.?!]*\b(?:kuis|quiz)\b/iu.test(
+      text,
+    ) || /\bnaskah\b[^.?!]*\b(?:kuis|quiz|moodle)\b|\b(?:kuis|quiz)\b[^.?!]*\bnaskah\b/iu.test(text)
+  );
 }
 
 /** "Nemu, tolong cek kuis ini." / "periksa kuis IPAS ini": the extension's own quiz check (#209). */

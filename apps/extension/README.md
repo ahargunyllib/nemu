@@ -148,6 +148,26 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     **Berikutnya** / **Selesai**. The list survives a page load, so opening soal 15 from Navigasi
     kuis moves the pointer to its image. Catatan langkah lists every problem and "Nemu tidak
     mengubah apa pun di kuis ini."
+- **F4-03: put a quiz into Moodle from the teacher's script (#210).** `features/quiz-import/`.
+  "Nemu, masukkan kuis dari naskah ini, buka Senin 30 November, tutup Kamis 3 Desember" on a
+  Moodle course page is the extension's own command. She picks the script (PDF, Word or photo) with
+  **Pilih naskah**; `quizScriptRead` (`SchoolAi.readQuizScript`, #219) reads it into a draft. Nemu
+  never writes a question: each part the reading couldn't place (words, a key, a picture, the
+  section) is asked on Kartu Pilih, or typed or said. A date she didn't say is asked; a clock time
+  she didn't say becomes 00.00 (open) or 23.59 (close), and Nemu says so. **Masukkan ke Moodle**
+  then runs one executor task in cara 1 (`lib/import-task.ts`, step source per page):
+  - Mode Edit, the section's **Tambahkan konten** › Aktivitas atau sumber daya › Semua › Kuis ›
+    Tambahkan; Nama, Waktu Pengerjaan and both dates (targets named by group, "Hari" in
+    "Kuis dimulai"); Nemu points at **Simpan dan tampilkan**, which she presses.
+  - The quiz's own **Bank soal** › Soal-soal › Impor: Format XML Moodle, Dapatkan kategori dari
+    berkas unticked (so the questions land where Tambah › dari bank soal opens), and the XML
+    handed to the picker as a drop (`dropFile`). If the picker doesn't show it within 10 s, the XML
+    goes to Unduhan and Nemu points at **Pilih berkas …**. She presses **Impor**.
+  - **Soal** › Tambah › dari bank soal › Pilih semua; she presses **Tambahkan soal terpilih pada
+    kuis**. Every form submit is hers (F0-08); Nemu only opens menus, fills and ticks.
+  - The F4-1 check then runs on the new quiz with the number of questions it should have; when it
+    finds nothing Nemu says one sentence ("Kuis … sudah siap: 10 soal, dibuka … dan ditutup …"),
+    and Catatan langkah holds the import's steps (with the drop) and the check's.
 - **Contract.** Request and response schemas come from `@nemu/contracts/extension` and
   `@nemu/contracts/school`. Only the background calls the Nemu Service.
 
@@ -244,6 +264,17 @@ last-modified time and question count in the Moodle database are what they were.
 (default `https://localhost/`) points it at another Moodle; without the local database only the
 Soal page's count is compared. It skips with a message when Moodle isn't running. Screenshots go
 to `.output/verify-f4-1/`.
+
+`pnpm --filter extension verify:f4-2` runs F4-2 (#210) on the same Moodle. Locally it first removes
+an earlier run's "Latihan IPAS Kelas 4A" (`infra/setup/reset-f4-2.php`). On course 4A-UJI Bu Siti
+asks Nemu to put her script in, opening Monday 30 November and closing Thursday 3 December, and
+picks `infra/setup/f4-2/F4-2_naskah-ipas-10-soal.pdf`. It checks that Nemu asks nothing and says it
+uses 00.00 and 23.59, fills the quiz form itself, drops the XML on Impor's picker, and points at
+Simpan dan tampilkan, Impor, Tambahkan soal terpilih pada kuis and Pratinjau kuis for her to press;
+that the F4-1 check ends with the one sentence; and, in the Moodle database, that the quiz is in
+IPAS with those times (Asia/Jakarta) and its 10 questions match
+`infra/setup/f4-2/F4-2_hasil-yang-diharapkan.xml` (words without punctuation, choices, key, and
+soal 7's three pictures pixel for pixel). Screenshots go to `.output/verify-f4-2/`.
 
 It prints one line per check, exits non-zero on a failure, and saves screenshots to
 `.output/verify/` (each open tab is saved too when a check fails). Add `-- --headed` to watch it. `NEMU_SERVER_URL`, `MOCK_ALURSEKOLAH_URL`,

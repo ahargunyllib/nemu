@@ -26,7 +26,12 @@ import type {
   Transcript,
   VerificationAnswer,
 } from "@nemu/contracts/school";
-import type { QuizJudgeInput, QuizJudgement } from "@nemu/contracts/quiz";
+import type {
+  QuizJudgeInput,
+  QuizJudgement,
+  QuizScriptInput,
+  QuizScriptResult,
+} from "@nemu/contracts/quiz";
 import { type Client, createORPCClient, ORPCError } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 
@@ -97,6 +102,8 @@ export type NemuServiceClient = {
   >;
   // F4-01 (#209): quiz checks that need judgement (#218).
   quizJudge: Call<QuizJudgeInput, QuizJudgement>;
+  // F4-03 (#210): the teacher's script read into a quiz (#219).
+  quizScriptRead: Call<QuizScriptInput, QuizScriptResult>;
 };
 
 export type ProcessSlots = Record<string, string | number | boolean | null>;

@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DATA UJI SINTETIS Nemu F4-2. Hasil Moodle XML yang BENAR dari F4-2_naskah-ipas-10-soal.pdf.
+     Soal 07 memakai 3 gambar pilihan (a, b, c); gambar (c) di naskah ada di halaman 2. -->
+<quiz>
+  <question type="category">
+    <category><text>$course$/top/IPAS 4A/Latihan IPAS Kelas 4A</text></category>
+    <info format="html"><text></text></info>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 01</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Tarikan atau dorongan pada suatu benda disebut ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>false</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>energi</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>gaya</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>usaha</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>massa</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 02</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Contoh gaya otot adalah ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>false</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>buah jatuh dari pohon</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>magnet menarik paku</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>anak menendang bola</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>perahu terbawa arus sungai</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 03</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Benda berikut yang dapat ditarik magnet adalah ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>false</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>paku besi</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>penghapus karet</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>pensil kayu</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>gelas plastik</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 04</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Energi yang tersimpan di dalam makanan disebut energi ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>false</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>listrik</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>bunyi</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>cahaya</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>kimia</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 05</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Lampu yang menyala mengubah energi listrik menjadi energi ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>false</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>gerak</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>cahaya</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>kimia</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>bunyi</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 06</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Skala peta 1 : 100.000 artinya 1 cm di peta sama dengan ... pada jarak sebenarnya.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>false</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>1 km</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>10 km</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>100 m</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>100 km</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 07</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Perhatikan gambar berikut. Gambar mana yang menunjukkan dua magnet saling tarik-menarik?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>false</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p><img src="@@PLUGINFILE@@/magnet-a.png" alt="Gambar (a)" width="240" height="150"></p>]]></text>
+      <file name="magnet-a.png" path="/" encoding="base64">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</file>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p><img src="@@PLUGINFILE@@/magnet-b.png" alt="Gambar (b)" width="240" height="150"></p>]]></text>
+      <file name="magnet-b.png" path="/" encoding="base64">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</file>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p><img src="@@PLUGINFILE@@/magnet-c.png" alt="Gambar (c)" width="240" height="150"></p>]]></text>
+      <file name="magnet-c.png" path="/" encoding="base64">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</file>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 08</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Dataran rendah banyak dimanfaatkan penduduk untuk ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>false</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>perkebunan teh</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>persawahan</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>tempat pendakian</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>hutan pinus</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 09</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Penyebab utama perubahan iklim adalah bertambahnya ... di udara.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>false</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>uap air hujan</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>jumlah pohon</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>air laut</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>gas rumah kaca</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Soal 10</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Cara menghemat energi listrik di rumah adalah ....</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <single>true</single>
+    <shuffleanswers>false</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html"><text>Jawaban benar.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Sebagian benar.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Jawaban belum benar.</text></incorrectfeedback>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>menyalakan televisi tanpa ditonton</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>membuka pintu kulkas lama-lama</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>mematikan lampu pada siang hari</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>mengisi daya ponsel semalaman</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+</quiz>

@@ -20,6 +20,8 @@ export const targetRoleSchema = z.enum([
 /**
  * A page element as a person would name it: its label (accessible name), its role, the text it
  * shows, or the table cell in a row (`row`, e.g. the student's name) under a column header.
+ * `group` names the fieldset (by its legend) or ARIA group it sits in, for fields whose own
+ * label repeats, e.g. Moodle's "Hari" under both "Kuis dimulai" and "Tutup kuis".
  */
 export const executorTargetSchema = z
   .object({
@@ -28,6 +30,7 @@ export const executorTargetSchema = z
     text: z.string().min(1).optional(),
     row: z.string().min(1).optional(),
     column: z.string().min(1).optional(),
+    group: z.string().min(1).optional(),
   })
   .strict()
   .refine((target) => target.label || target.text || target.row, {

@@ -510,7 +510,8 @@ export class ExecutorRun {
     const sentence = {
       clickMenu: `Membuka ${name}…`,
       selectOption: `Memilih ${"option" in step ? step.option : ""}.`,
-      check: `Mencentang ${name}.`,
+      check:
+        "checked" in step && !step.checked ? `Menghapus centang ${name}.` : `Mencentang ${name}.`,
       setValue: `Mengisi ${name}.`,
     }[step.verb];
     const status: NemuStatus =
@@ -551,7 +552,12 @@ export class ExecutorRun {
         break;
       case "check":
         setChecked(element, step.checked);
-        this.state.events.push({ kind: "acted", verb: "check", name });
+        this.state.events.push({
+          kind: "acted",
+          verb: "check",
+          name,
+          ...(step.checked ? {} : { unchecked: true }),
+        });
         break;
       case "setValue": {
         if (!isValueField(element)) return this.askAbout({ status: "missing" }, name);

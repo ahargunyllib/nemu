@@ -94,6 +94,19 @@ function cellsFor(doc: Document, row: string, column: string | undefined): Eleme
   });
 }
 
+/** The fieldsets (by legend) and ARIA groups (by name) called `group`. */
+function groupsNamed(doc: Document, group: string): Element[] {
+  const wanted = normalizeControlName(group);
+  return [...doc.querySelectorAll("fieldset, [role=group], [role=radiogroup]")].filter(
+    (element) => {
+      const legend =
+        element instanceof HTMLFieldSetElement ? element.querySelector(":scope > legend") : null;
+      const name = legend ? textOf(legend) : accessibleName(element);
+      return normalizeControlName(name) === wanted;
+    },
+  );
+}
+
 export type TargetLookup =
   | { status: "found"; element: Element; name: string }
   | { status: "missing" }
@@ -108,7 +121,9 @@ export function findTarget(doc: Document, target: ExecutorTarget): TargetLookup 
   const selector = target.role ? ROLE_SELECTORS[target.role] : ANY_ROLE;
   const scopes: (Document | Element)[] = target.row
     ? cellsFor(doc, target.row, target.column)
-    : [doc];
+    : target.group
+      ? groupsNamed(doc, target.group)
+      : [doc];
   const candidates = [
     ...new Set(scopes.flatMap((scope) => [...scope.querySelectorAll(selector)])),
   ].filter((element) => isVisible(element) && !isPassword(element));
@@ -128,12 +143,14 @@ export function findTarget(doc: Document, target: ExecutorTarget): TargetLookup 
   if (matches.length === 0) return { status: "missing" };
   if (matches.length > 1) return { status: "ambiguous", count: matches.length };
   const [element] = matches as [Element];
-  return { status: "found", element, name: accessibleName(element) || describeTarget(target) };
+  const own = accessibleName(element) || describeTarget({ ...target, group: undefined });
+  return { status: "found", element, name: target.group ? `${own} (${target.group})` : own };
 }
 
 /** How Nemu names a target in a sentence: "Kelas", "Nilai di baris Budi Santoso". */
 export function describeTarget(target: ExecutorTarget): string {
-  if (target.label) return target.label;
-  if (target.text) return target.text;
+  const within = target.group ? ` (${target.group})` : "";
+  if (target.label) return `${target.label}${within}`;
+  if (target.text) return `${target.text}${within}`;
   return `${target.column ?? "isian"} di baris ${target.row ?? ""}`.trim();
 }

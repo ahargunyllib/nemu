@@ -9,6 +9,7 @@ import { imageLoaded, quizHeading, questionTarget } from "../lib/moodle-pages";
 import { checkQuiz } from "../lib/quiz-rules";
 import {
   nextQuizSteps,
+  type QuizAsked,
   QUIZ_CHECK_KIND,
   type QuizContinuation,
   quizCheckTask,
@@ -24,8 +25,11 @@ import {
 
 export type QuizCheckView = { display: NemuDisplay | null; target: Element | null };
 
-/** The problems being pointed at, kept in the background so a page load carries on (F0-13). */
-type Pointing = { problems: QuizProblem[]; index: number; notes: string[] };
+/**
+ * The problems being pointed at, kept in the background so a page load carries on (F0-13).
+ * `changed` is true after F4-03 put the quiz in: then the notes don't say nothing changed.
+ */
+type Pointing = { problems: QuizProblem[]; index: number; notes: string[]; changed?: boolean };
 
 type Context = { pageEmail: PageEmail; honorific: string; speak: (text: string) => void };
 
@@ -63,7 +67,7 @@ function createQuizCheck() {
   let view: QuizCheckView = { display: null, target: null };
   let pointing: Pointing | null = null;
   /** The quiz as the preview showed it, from the step source to the finisher on the same page. */
-  let read: { quiz: QuizSnapshot; utterance: string; honorific: string } | null = null;
+  let read: ({ quiz: QuizSnapshot } & QuizAsked) | null = null;
 
   function publish(next: QuizCheckView) {
     view = next;
@@ -126,7 +130,7 @@ function createQuizCheck() {
       state.problems.length === 0
         ? ["Nemu tidak menemukan masalah."]
         : state.problems.map((problem) => `Masalah: ${problem.sentence}`);
-    return [...state.notes, ...found, NOTHING_CHANGED];
+    return [...state.notes, ...found, ...(state.changed ? [] : [NOTHING_CHANGED])];
   }
 
   /** Catatan langkah: the steps, every problem, and that nothing was changed. */
@@ -150,7 +154,11 @@ function createQuizCheck() {
   async function afterRun(ended: RunState, notes: string[], showNotes: boolean) {
     const found = read;
     read = null;
+    // After F4-03 (#210) the import's own notes come first, whether or not the check finished.
+    const before = found?.before ?? (ended.continuation as QuizContinuation | null)?.before;
+    if (before) notes = [...before, ...notes];
     if (ended.status !== "done" || !found) return executor.presentNotes(notes, null, showNotes);
+    const changed = !!before;
     publish({
       display: {
         type: "kerja",
@@ -175,8 +183,9 @@ function createQuizCheck() {
     });
     const all = [...problems, ...(judged.ok ? judged.value.problems : [])];
     if (all.length === 0) {
-      pointing = { problems: [], index: 0, notes };
-      const sentence = say("Kuis ini sudah siap. Nemu tidak menemukan masalah", honorific);
+      pointing = { problems: [], index: 0, notes, changed };
+      const sentence =
+        found.ready ?? say("Kuis ini sudah siap. Nemu tidak menemukan masalah", honorific);
       publish({
         display: {
           type: "jawab",
@@ -189,7 +198,7 @@ function createQuizCheck() {
       context.speak(sentence);
       return;
     }
-    pointing = { problems: all, index: 0, notes };
+    pointing = { problems: all, index: 0, notes, changed };
     save();
     show();
   }
@@ -214,13 +223,17 @@ function createQuizCheck() {
       context = next;
     },
 
-    /** "Nemu, tolong cek kuis ini." on any page of a Moodle quiz. */
-    async start(utterance: string) {
+    /**
+     * "Nemu, tolong cek kuis ini." on any page of a Moodle quiz. F4-03 (#210) also starts it
+     * once the teacher has added the questions, with its own sentence and notes (`QuizAsked`).
+     */
+    async start(utterance: string, after: Pick<QuizAsked, "ready" | "before"> = {}) {
       pointing = null;
       save();
       const started = quizCheckTask(document, location.href, {
         utterance,
         honorific: context.honorific,
+        ...after,
       });
       if (!started) {
         const sentence = say(

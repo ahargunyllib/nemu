@@ -47,8 +47,17 @@ export type QuizContinuation = {
   utterance: string;
   /** "Bu" or "Pak" as Nemu knew her when she asked; after a page load it isn't known yet. */
   honorific: string;
+  /**
+   * After F4-03 put the quiz in (#210): the one sentence Nemu says when the check finds nothing,
+   * and the import's own Catatan langkah, which the check's notes follow.
+   */
+  ready?: string;
+  before?: string[];
   facts: QuizFacts;
 };
+
+/** What the teacher asked for, carried to the end of the check. */
+export type QuizAsked = Pick<QuizContinuation, "utterance" | "honorific" | "ready" | "before">;
 
 /** What the step source needs from the browser; tests pass their own. */
 export type QuizIo = {
@@ -88,7 +97,7 @@ function clickMenu(text: string): ExecutorStep {
 export function quizCheckTask(
   doc: Document,
   url: string,
-  asked: { utterance: string; honorific: string },
+  asked: QuizAsked,
 ): { task: ExecutorTask; continuation: QuizContinuation } | null {
   const page = quizPage(doc, url);
   if (!page) return null;
@@ -216,7 +225,7 @@ export async function readPreview(io: QuizIo, facts: QuizFacts): Promise<QuizSna
 export async function nextQuizSteps(
   io: QuizIo,
   continuation: QuizContinuation,
-  onRead: (quiz: QuizSnapshot, asked: { utterance: string; honorific: string }) => void,
+  onRead: (quiz: QuizSnapshot, asked: QuizAsked) => void,
 ): Promise<{ steps: ExecutorStep[]; continuation: QuizContinuation | null }> {
   const { cmid, facts } = continuation;
   const next = (phase: Phase, read: Partial<QuizFacts>): QuizContinuation => ({
@@ -265,8 +274,8 @@ export async function nextQuizSteps(
     }
     case "preview": {
       await arrive(io, cmid, ["attempt"]);
-      const { utterance, honorific } = continuation;
-      onRead(await readPreview(io, facts), { utterance, honorific });
+      const { utterance, honorific, ready, before } = continuation;
+      onRead(await readPreview(io, facts), { utterance, honorific, ready, before });
       return { steps: [], continuation: null };
     }
   }

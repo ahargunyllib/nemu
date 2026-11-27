@@ -19,6 +19,7 @@ export type AskState =
         | { kind: "process" }
         | { kind: "record" }
         | { kind: "quiz-check" }
+        | { kind: "quiz-import" }
       >;
     };
 
@@ -26,7 +27,8 @@ export type AskState =
  * One question at a time; a newer question or `reset` drops the older answer. The page is read
  * when the question is asked, unless the caller read it earlier (at the talk key-down). A grade
  * request goes to `onGrades` (F1), a process run to `onProcess` (F3) and a quiz check to
- * `onQuizCheck` (F4) instead of an answer.
+ * `onQuizCheck` (F4-01) and a script to put into Moodle to `onQuizImport` (F4-03) instead of an
+ * answer.
  */
 export function useAsk(
   pageEmail: PageEmail,
@@ -35,6 +37,7 @@ export function useAsk(
   onProcess: (utterance: string, processName: string) => void = () => undefined,
   onRecord: (title: string) => void = () => undefined,
   onQuizCheck: (utterance: string) => void = () => undefined,
+  onQuizImport: (utterance: string) => void = () => undefined,
 ) {
   const [state, setState] = useState<AskState>({ status: "idle" });
   const latest = useRef(0);
@@ -73,9 +76,14 @@ export function useAsk(
         onQuizCheck(result.utterance);
         return;
       }
+      if (result.kind === "quiz-import") {
+        setState({ status: "idle" });
+        onQuizImport(result.utterance);
+        return;
+      }
       setState({ status: "answered", question, result });
     },
-    [pageEmail, onStop, onGrades, onProcess, onRecord, onQuizCheck],
+    [pageEmail, onStop, onGrades, onProcess, onRecord, onQuizCheck, onQuizImport],
   );
 
   const reset = useCallback(() => {

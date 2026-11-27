@@ -138,6 +138,11 @@ It prints one line per step:
 - The last line is the F4-1 baseline, for section 4 of the guide and `setup/f4-1/F4-1_kunci.csv`:
   `F4-1 baseline: timemodified <unix time> (<date>), 15 questions`.
 
+F4-2 (#210) needs nothing more: Nemu creates its quiz from the teacher's script
+(`setup/f4-2/`). Before running it again, remove the last run's quiz with
+`docker compose cp setup/. moodle:/tmp/nemu-setup` and
+`docker compose exec -T moodle php /tmp/nemu-setup/reset-f4-2.php`.
+
 Running it again changes nothing: it imports only missing questions and leaves an existing F4-1
 quiz as it is. Check it: sign in as `siti.aminah` and open Kelas 4A (uji). You should see the
 quiz in IPAS, and **Soal** on the quiz page lists 15 questions.

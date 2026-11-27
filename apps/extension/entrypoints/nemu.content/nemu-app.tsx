@@ -27,6 +27,8 @@ import { useProcessRun } from "../../features/process-run/hooks/use-process-run"
 import { processRun } from "../../features/process-run/stores/process-run";
 import { useQuizCheck } from "../../features/quiz-check/hooks/use-quiz-check";
 import { quizCheck } from "../../features/quiz-check/stores/quiz-check";
+import { useQuizImport } from "../../features/quiz-import/hooks/use-quiz-import";
+import { quizImport } from "../../features/quiz-import/stores/quiz-import";
 import { useRecorder } from "../../features/recorder/hooks/use-recorder";
 import { recorder } from "../../features/recorder/stores/recorder";
 import { NemuButton } from "../../features/nemu-button/components/nemu-button";
@@ -81,6 +83,13 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     },
     [close],
   );
+  const startQuizImport = useCallback(
+    (utterance: string) => {
+      close();
+      quizImport.start(utterance);
+    },
+    [close],
+  );
   const { state, ask, reset } = useAsk(
     pageEmail,
     close,
@@ -88,6 +97,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     startProcess,
     startRecording,
     startQuizCheck,
+    startQuizImport,
   );
   const preview = useDisplayPreview();
   const { voice, working, speak, repeat, stop } = useVoice(pageEmail);
@@ -98,6 +108,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
   const process = useProcessRun();
   const recording = useRecorder();
   const quiz = useQuizCheck();
+  const importing = useQuizImport();
   const talk = useTalk({
     pageEmail,
     shortcut,
@@ -112,7 +123,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     // While "Rekam cara" records, the words are the operator's narration.
     onQuestion: (question) => {
       if (recorder.narrate(question)) return;
-      if (!gradePhoto.hear(question) && !processRun.hear(question))
+      if (!gradePhoto.hear(question) && !processRun.hear(question) && !quizImport.hear(question))
         void ask(question, pressSnapshot.current);
     },
   });
@@ -161,8 +172,9 @@ export function NemuApp({ access }: { access: SiteAccess }) {
   useEffect(() => {
     processRun.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
     recorder.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
-    // F4-01 checks a Moodle quiz as this teacher (#209).
+    // F4-01 checks a Moodle quiz as this teacher (#209); F4-03 puts her script into one (#210).
     quizCheck.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
+    quizImport.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
   }, [pageEmail, honorific, speak]);
 
   // A task under way in this tab carries on after a page load (F0-13).
@@ -213,6 +225,13 @@ export function NemuApp({ access }: { access: SiteAccess }) {
         ) : quiz.display ? (
           <div className="pointer-events-auto">
             <NemuStage display={withSpokenWord(quiz.display, voice)} target={quiz.target} />
+          </div>
+        ) : importing.display ? (
+          <div className="pointer-events-auto flex flex-col items-end gap-2">
+            {talk.heard !== null && <HeardBubble text={talk.heard} />}
+            <NemuStage display={withSpokenWord(importing.display, voice)} />
+            {talk.state.phase === "listening" && <ListeningBubble />}
+            {importing.typing && <AskBox pending={false} onAsk={(text) => quizImport.hear(text)} />}
           </div>
         ) : recording.display ? (
           <div className="pointer-events-auto flex flex-col items-end gap-2">
@@ -284,6 +303,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
           !process.active &&
           !preview.display &&
           !quiz.display &&
+          !importing.display &&
           !open &&
           grades.card && (
             <div className="pointer-events-auto">
