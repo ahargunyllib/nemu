@@ -334,7 +334,8 @@ export function overviewLines(input: {
     const node = input.graph.nodes[task.taskId];
     if (task.page) lines.push(`Buka ${task.page}.`);
     if (node) lines.push(plainTask(node));
-    lines.push(`${input.honorific} sendiri yang menekan ${task.action}; Nemu berhenti sebelum itu.`);
+    const address = input.honorific === "Bu" ? "Ibu" : "Bapak";
+    lines.push(`${address} sendiri yang menekan ${task.action}; Nemu berhenti sebelum itu.`);
   }
   const room = Math.max(1, 6 - lines.length);
   if (input.announcements.length) {
@@ -356,7 +357,10 @@ export function planBpmnStep(input: PlanBpmnInput): BpmnPlan {
   const specs = new Map(slotSpecs(input.graph, teacherLanes).map((spec) => [spec.name, spec]));
   const slots: Record<string, SlotValue> = { ...input.slots };
   const table = input.table ?? null;
-  const tableFields = new Set([...(table?.columns ?? []), ...(table?.keyField ? [table.keyField] : [])]);
+  const tableFields = new Set([
+    ...(table?.columns ?? []),
+    ...(table?.keyField ? [table.keyField] : []),
+  ]);
   const steps: BpmnStep[] = [];
   const path: string[] = [];
   const tasks: ProcessPlanTask[] = [];
@@ -432,7 +436,8 @@ export function planBpmnStep(input: PlanBpmnInput): BpmnPlan {
     // The start form is the teacher's too: what kind of process this is, for the gateways.
     if (node.kind === "startEvent") {
       for (const field of node.formFields) {
-        if (missing(slots[field.id]) && field.defaultValue !== null) slots[field.id] = field.defaultValue;
+        if (missing(slots[field.id]) && field.defaultValue !== null)
+          slots[field.id] = field.defaultValue;
         if (missing(slots[field.id]) && field.required && field.type !== "file")
           return askFor(node.id, field.id);
       }

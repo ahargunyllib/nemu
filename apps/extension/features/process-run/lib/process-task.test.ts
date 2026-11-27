@@ -122,7 +122,12 @@ describe("F3 process task (#213)", () => {
   });
 
   test("on each page Nemu fills what that page shows before opening the next menu item", async () => {
-    const { continuation } = processTask({ plan: PLAN, task: PLAN.tasks[0], honorific: "Bu", source: "" });
+    const { continuation } = processTask({
+      plan: PLAN,
+      task: PLAN.tasks[0],
+      honorific: "Bu",
+      source: "",
+    });
     document.body.innerHTML = CLASS_PAGE;
     const first = await nextProcessSteps(document, continuation, match, 0);
     expect(first.steps).toEqual([

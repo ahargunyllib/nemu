@@ -103,7 +103,8 @@ export const processesRouter = {
         context.caller.workspaceId,
         input,
       );
-      if (!result) throw new ORPCError("NOT_FOUND", { message: "Process, task or photo not found" });
+      if (!result)
+        throw new ORPCError("NOT_FOUND", { message: "Process, task or photo not found" });
       return result;
     }),
   /** F3-17: each BPMN form field → the label this page shows for it, or null. */

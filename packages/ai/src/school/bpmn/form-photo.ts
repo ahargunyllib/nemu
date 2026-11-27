@@ -176,7 +176,10 @@ export function assembleFormPhoto(
           fieldId: cell.field,
           label: field.label,
           prompt: `${field.label} ${name} tidak terbaca jelas. Berapa, ${input.honorific}?`,
-          candidates: cell.candidates.map((candidate) => candidate.trim()).filter(Boolean).slice(0, 2),
+          candidates: cell.candidates
+            .map((candidate) => candidate.trim())
+            .filter(Boolean)
+            .slice(0, 2),
           box: cell.box,
         });
       }
@@ -197,7 +200,10 @@ export function assembleFormPhoto(
   };
 }
 
-export async function readFormPhoto(llm: JsonCall, input: FormPhotoInput): Promise<FormPhotoReading> {
+export async function readFormPhoto(
+  llm: JsonCall,
+  input: FormPhotoInput,
+): Promise<FormPhotoReading> {
   const fieldIds = input.fields.map((field) => field.id);
   const model = await llm<ModelFormPhoto>({
     instructions: INSTRUCTIONS,

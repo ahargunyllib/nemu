@@ -1,0 +1,9 @@
+# A new BPMN process runs from its own form
+
+F3 shows that a school can teach Nemu a process with no code change (#213, F3-1 setoran tahfidz). So the only thing that knows the process is the uploaded `.bpmn`: its start form and gateway conditions pick the branch, its teacher tasks' form fields are what Nemu fills, each task's documentation says what the step is and which button ends it ("… lalu menekan Simpan setoran"), and the lanes say who does the rest. Nemu only names the other roles' and the system's tasks (F3-18).
+
+A photo of a book (one line per student) can't be described by a flat Camunda form, and we don't control how AlurKerja Studio exports. So we don't mark repeating fields in the BPMN: the model reads the photo against the task's unknown fields and says which field names each row; the fields it found in the rows become one `rows` step, filled into the page table by the row's name and the column's header. A value it can't read, or a name it can't place on the WS-06 roster, is asked, never guessed.
+
+Pages differ per school, so a task's page is a menu path, taken in this order: a link in the BPMN (`camunda:formKey` or a `halaman` property), the operator's WS-04 page, a recording titled like the task, the page WS-04 took from the task's label. Field labels are matched to the page's labels when Nemu is on the page (code first, the model for the rest), and single fields are filled on the page that shows them, so Kelas is picked before "Setoran baru" opens the form. Without a page, or when its first menu isn't on the page, Nemu only explains the steps.
+
+We accept that a process whose steps need judgment the BPMN doesn't hold (two teacher tasks on different pages in one run, a table without the person's name in a cell) is explained or done in part; the operator fixes that in WS-04 or with a recording, not with code.

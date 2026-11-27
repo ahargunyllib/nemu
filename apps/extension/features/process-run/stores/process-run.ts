@@ -168,7 +168,8 @@ function createProcessRun() {
       case "number": {
         const index = phase.index;
         const question = questions[index];
-        const what = question?.kind === "value" ? `${question.label} ${question.rowName}` : "nilainya";
+        const what =
+          question?.kind === "value" ? `${question.label} ${question.rowName}` : "nilainya";
         return {
           type: "jawab",
           sentence: phase.misheard
@@ -233,7 +234,8 @@ function createProcessRun() {
     plan = next;
     slots = next.slots;
     const step = next.step;
-    const forTeacherTask = step.kind === "ask" && next.tasks.some((task) => task.taskId === step.taskId);
+    const forTeacherTask =
+      step.kind === "ask" && next.tasks.some((task) => task.taskId === step.taskId);
     // What kind of process this is (a start form, a branch) is asked before the steps are shown.
     if (step.kind === "ask" && !forTeacherTask)
       return setPhase({ name: "asking", question: step.question, slot: step.slot }, step.question);
@@ -243,7 +245,11 @@ function createProcessRun() {
     }
     if (step.kind === "ask") {
       // A field the photo didn't have: asked one at a time, as typed or spoken words.
-      if (jobId) return setPhase({ name: "asking", question: step.question, slot: step.slot }, step.question);
+      if (jobId)
+        return setPhase(
+          { name: "asking", question: step.question, slot: step.slot },
+          step.question,
+        );
       return void needData(step.question, step.slot);
     }
     void execute();
@@ -399,7 +405,7 @@ function createProcessRun() {
       kept ??= await loadKept();
       const items = [...notes];
       if (ended.status === "done" && kept) {
-        for (const next of kept.announcements) items.push(`Berikutnya, bukan tugas Nemu: ${next}`);
+        for (const next of kept.announcements) items.push(`Selanjutnya, ${next}`);
         if (kept.jobId) {
           const acked = await call({ op: "ack", jobId: kept.jobId });
           items.push(acked.ok ? "Foto dihapus dari Nemu" : "Foto belum terhapus");

@@ -231,10 +231,10 @@ export function NemuApp({ access }: { access: SiteAccess }) {
           !preview.display &&
           !open &&
           grades.card && (
-          <div className="pointer-events-auto">
-            <NemuStage display={grades.card} />
-          </div>
-        )}
+            <div className="pointer-events-auto">
+              <NemuStage display={grades.card} />
+            </div>
+          )}
         <div className="pointer-events-auto">
           <NemuButton
             open={open}

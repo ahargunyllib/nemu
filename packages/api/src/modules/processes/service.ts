@@ -84,7 +84,9 @@ export type PlanProcessInput = {
 
 /** "Klik Al-Quran", "Al-Quran" → the menu path a recording took before its first field. */
 function recordingPath(procedure: Procedure): string | null {
-  const firstField = procedure.steps.findIndex((step) => step.action === "fill" || step.action === "select");
+  const firstField = procedure.steps.findIndex(
+    (step) => step.action === "fill" || step.action === "select",
+  );
   const lead = procedure.steps.slice(0, firstField < 0 ? procedure.steps.length : firstField);
   const names = lead
     .filter((step) => step.action === "click" && !step.requiresHumanAction)
@@ -105,7 +107,10 @@ export async function taskPages(
   graph: Awaited<ReturnType<typeof importBpmn>>,
 ): Promise<Record<string, TaskPage>> {
   const elements = new Map(
-    (await deps.elements.list(workspaceId, documentId)).map((element) => [element.elementId, element]),
+    (await deps.elements.list(workspaceId, documentId)).map((element) => [
+      element.elementId,
+      element,
+    ]),
   );
   const recordings: Array<{ title: string; path: string }> = [];
   for (const { documentId: id, title } of await listProcedures(deps, workspaceId)) {

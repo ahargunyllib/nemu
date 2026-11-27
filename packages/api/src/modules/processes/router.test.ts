@@ -241,7 +241,12 @@ describe("F3-1 setoran tahfidz through the API (#213)", () => {
 
     await call(
       documentsRouter.saveProcessElement,
-      { id: document.id, elementId: "Task_CatatSetoran", symptoms: [], page: "Al-Quran › Setoran baru" },
+      {
+        id: document.id,
+        elementId: "Task_CatatSetoran",
+        symptoms: [],
+        page: "Al-Quran › Setoran baru",
+      },
       { context: admin },
     );
     const plan = await planAll(context, sentence);
@@ -267,7 +272,12 @@ describe("F3-1 setoran tahfidz through the API (#213)", () => {
 
   it("a recording of the task gives its page when WS-04 wasn't edited", async () => {
     const { context, admin, document } = await tahfidzContext();
-    const at = (t: number, type: RecordedEvent["type"], name: string, role: string): RecordedEvent => ({
+    const at = (
+      t: number,
+      type: RecordedEvent["type"],
+      name: string,
+      role: string,
+    ): RecordedEvent => ({
       t,
       type,
       url: "https://alursekolah.example/#/tahfidz",

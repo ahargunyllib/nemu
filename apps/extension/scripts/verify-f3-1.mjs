@@ -38,7 +38,9 @@ const shots = join(root, ".output/verify-f3-1");
 mkdirSync(shots, { recursive: true });
 
 // F3-1_kunci.csv: the truth of the book page.
-const [header, ...lines] = readFileSync(join(fixtures, "F3-1_kunci.csv"), "utf8").trim().split("\n");
+const [header, ...lines] = readFileSync(join(fixtures, "F3-1_kunci.csv"), "utf8")
+  .trim()
+  .split("\n");
 const keys = header.split(",");
 const KUNCI = lines.map((line) => Object.fromEntries(line.split(",").map((v, i) => [keys[i], v])));
 
@@ -189,102 +191,129 @@ async function ask(question) {
   await overlay.getByRole("button", { name: "Kirim" }).click();
 }
 
-await check("F3-15: the steps show first, in 2–6 plain steps, before Nemu does anything", async () => {
-  expect(ready, "the BPMN isn't uploaded");
-  await ask("Catat setoran hafalan 4A hari ini");
-  const steps = overlay.getByRole("region", { name: `Langkah ${TITLE}` });
-  await steps.waitFor({ timeout: 15_000 });
-  const items = await steps.locator("li").allInnerTexts();
-  console.log(`  ${items.join(" | ")}`);
-  expect(items.length >= 2 && items.length <= 6, `${items.length} steps`);
-  expect(items[0] === `Buka ${PAGE}.`, `first step: ${items[0]}`);
-  expect(
-    items.some((item) => /Simpan setoran; Nemu berhenti sebelum itu/u.test(item)),
-    "the steps don't say the teacher presses Simpan setoran",
-  );
-  expect(
-    items.some((item) => /Koordinator Tahfidz/u.test(item)),
-    "another role's task isn't announced (F3-18)",
-  );
-  expect((await page.locator("#tf-kelas").count()) === 0, "Nemu moved before Mulai");
-  await page.screenshot({ path: join(shots, "langkah.png") });
-  await steps.getByRole("button", { name: "Mulai" }).click();
-});
+await check(
+  "F3-15: the steps show first, in 2–6 plain steps, before Nemu does anything",
+  async () => {
+    expect(ready, "the BPMN isn't uploaded");
+    await ask("Catat setoran hafalan 4A hari ini");
+    const steps = overlay.getByRole("region", { name: `Langkah ${TITLE}` });
+    await steps.waitFor({ timeout: 15_000 });
+    const items = await steps.locator("li").allInnerTexts();
+    console.log(`  ${items.join(" | ")}`);
+    expect(items.length >= 2 && items.length <= 6, `${items.length} steps`);
+    expect(items[0] === `Buka ${PAGE}.`, `first step: ${items[0]}`);
+    expect(
+      items.some((item) => /Simpan setoran; Nemu berhenti sebelum itu/u.test(item)),
+      "the steps don't say the teacher presses Simpan setoran",
+    );
+    expect(
+      items.some((item) => /Koordinator Tahfidz/u.test(item)),
+      "another role's task isn't announced (F3-18)",
+    );
+    expect((await page.locator("#tf-kelas").count()) === 0, "Nemu moved before Mulai");
+    await page.screenshot({ path: join(shots, "langkah.png") });
+    await steps.getByRole("button", { name: "Mulai" }).click();
+  },
+);
 
-await check("F3-16: Citra's smudged Tajwid is asked with the photo crop, never guessed", async () => {
-  const card = display("pilih");
-  await card.getByText("Tajwid Citra Lestari tidak terbaca jelas", { exact: false }).waitFor({
-    timeout: 30_000,
-  });
-  const labels = await card.getByRole("group").getByRole("button").allTextContents();
-  expect(labels.includes("Angka lain"), `choices: ${labels.join(", ")}`);
-  expect((await card.getByRole("img").count()) === 1, "no crop of the cell");
-  await page.screenshot({ path: join(shots, "tanya-tajwid.png") });
-  const truth = KUNCI.find((row) => row.murid === "Citra Lestari").tajwid;
-  await card.getByRole("group").getByRole("button", { name: truth, exact: true }).click();
-});
+await check(
+  "F3-16: Citra's smudged Tajwid is asked with the photo crop, never guessed",
+  async () => {
+    const card = display("pilih");
+    await card.getByText("Tajwid Citra Lestari tidak terbaca jelas", { exact: false }).waitFor({
+      timeout: 30_000,
+    });
+    const labels = await card.getByRole("group").getByRole("button").allTextContents();
+    expect(labels.includes("Angka lain"), `choices: ${labels.join(", ")}`);
+    expect((await card.getByRole("img").count()) === 1, "no crop of the cell");
+    await page.screenshot({ path: join(shots, "tanya-tajwid.png") });
+    const truth = KUNCI.find((row) => row.murid === "Citra Lestari").tajwid;
+    await card.getByRole("group").getByRole("button", { name: truth, exact: true }).click();
+  },
+);
 
-await check("F3-17/19: Nemu opens Al-Quran › Setoran baru through the menu and fills it", async () => {
-  await page.waitForURL(/#\/tahfidz$/u, { timeout: 20_000 });
-  await page.locator("#tabel-setoran").waitFor({ timeout: 20_000 });
-  await display("tunjuk").getByText("Silakan Ibu tekan Simpan setoran.").waitFor({
-    timeout: 120_000,
-  });
-  await page.screenshot({ path: join(shots, "tunjuk-simpan-setoran.png") });
-});
+await check(
+  "F3-17/19: Nemu opens Al-Quran › Setoran baru through the menu and fills it",
+  async () => {
+    await page.waitForURL(/#\/tahfidz$/u, { timeout: 20_000 });
+    await page.locator("#tabel-setoran").waitFor({ timeout: 20_000 });
+    await display("tunjuk").getByText("Silakan Ibu tekan Simpan setoran.").waitFor({
+      timeout: 120_000,
+    });
+    await page.screenshot({ path: join(shots, "tunjuk-simpan-setoran.png") });
+  },
+);
 
-await check("F3-1: 3/3 rows match F3-1_kunci.csv, and Nemu stops before Simpan setoran", async () => {
-  expect((await page.locator("#tf-kelas").inputValue()) === "4A", "Kelas isn't 4A");
-  const date = await page.locator("#tanggal_setoran").inputValue();
-  expect(date === "2026-12-01", `Tanggal setoran is ${date}`);
-  let matched = 0;
-  for (const want of KUNCI) {
-    const row = page.locator(`#tabel-setoran tr[data-murid="${want.murid}"]`);
-    const got = {
-      surah: await row.locator(".tf-surah").inputValue(),
-      ayat_dari: await row.locator(".tf-ayat_dari").inputValue(),
-      ayat_sampai: await row.locator(".tf-ayat_sampai").inputValue(),
-      fashohah: await row.locator(".tf-fashohah").inputValue(),
-      tartil: await row.locator(".tf-tartil").inputValue(),
-      tajwid: await row.locator(".tf-tajwid").inputValue(),
-      adab: await row.locator(".tf-adab").inputValue(),
-    };
-    const wrong = Object.entries(got).filter(([key, value]) => value !== want[key]);
-    if (!wrong.length) matched += 1;
-    else console.log(`  ${want.murid}: ${wrong.map(([k, v]) => `${k}=${v} (kunci ${want[k]})`).join(", ")}`);
-  }
-  console.log(`  ${matched}/${KUNCI.length} rows match the kunci`);
-  expect(matched === KUNCI.length, `${matched}/${KUNCI.length} rows match`);
-  const others = await page.locator("#tabel-setoran tbody tr").evaluateAll(
-    (rows, names) =>
-      rows.filter(
-        (row) => !names.includes(row.dataset.murid) && row.querySelector(".tf-surah").value,
-      ).length,
-    KUNCI.map((row) => row.murid),
-  );
-  expect(others === 0, `${others} other students were filled`);
-  expect(!(await page.locator("#konfirmasi").isVisible()), "Simpan setoran was pressed by Nemu");
-  const saved = await (await fetch(new URL("_mock/tahfidz", MOCK))).json();
-  expect(saved.length === 0, `${saved.length} setoran saved before the teacher pressed Simpan`);
-});
+await check(
+  "F3-1: 3/3 rows match F3-1_kunci.csv, and Nemu stops before Simpan setoran",
+  async () => {
+    expect((await page.locator("#tf-kelas").inputValue()) === "4A", "Kelas isn't 4A");
+    const date = await page.locator("#tanggal_setoran").inputValue();
+    expect(date === "2026-12-01", `Tanggal setoran is ${date}`);
+    let matched = 0;
+    for (const want of KUNCI) {
+      const row = page.locator(`#tabel-setoran tr[data-murid="${want.murid}"]`);
+      const got = {
+        surah: await row.locator(".tf-surah").inputValue(),
+        ayat_dari: await row.locator(".tf-ayat_dari").inputValue(),
+        ayat_sampai: await row.locator(".tf-ayat_sampai").inputValue(),
+        fashohah: await row.locator(".tf-fashohah").inputValue(),
+        tartil: await row.locator(".tf-tartil").inputValue(),
+        tajwid: await row.locator(".tf-tajwid").inputValue(),
+        adab: await row.locator(".tf-adab").inputValue(),
+      };
+      const wrong = Object.entries(got).filter(([key, value]) => value !== want[key]);
+      if (!wrong.length) matched += 1;
+      else
+        console.log(
+          `  ${want.murid}: ${wrong.map(([k, v]) => `${k}=${v} (kunci ${want[k]})`).join(", ")}`,
+        );
+    }
+    console.log(`  ${matched}/${KUNCI.length} rows match the kunci`);
+    expect(matched === KUNCI.length, `${matched}/${KUNCI.length} rows match`);
+    const others = await page.locator("#tabel-setoran tbody tr").evaluateAll(
+      (rows, names) =>
+        rows.filter(
+          (row) => !names.includes(row.dataset.murid) && row.querySelector(".tf-surah").value,
+        ).length,
+      KUNCI.map((row) => row.murid),
+    );
+    expect(others === 0, `${others} other students were filled`);
+    expect(!(await page.locator("#konfirmasi").isVisible()), "Simpan setoran was pressed by Nemu");
+    const saved = await (await fetch(new URL("_mock/tahfidz", MOCK))).json();
+    expect(saved.length === 0, `${saved.length} setoran saved before the teacher pressed Simpan`);
+  },
+);
 
-await check("the teacher saves; Catatan langkah names the system's and the coordinator's tasks", async () => {
-  await page.locator("#btn-simpan-setoran").click();
-  await page.locator("#ya-simpan").click();
-  await page.getByText("Setoran tersimpan untuk 3 murid kelas 4A.").waitFor();
-  const notes = overlay.getByRole("region", { name: "Catatan langkah" });
-  await notes.waitFor({ timeout: 10_000 });
-  const items = await notes.locator("li").allInnerTexts();
-  console.log(`  ${items.join(" | ")}`);
-  expect(items.some((item) => /Ibu menekan Simpan setoran|Bu menekan Simpan setoran/u.test(item)), "no 'menekan Simpan setoran'");
-  expect(items.some((item) => /Sistem AlurSekolah: hitung nilai hafalan/u.test(item)), "the system's task isn't named");
-  expect(items.some((item) => /Koordinator Tahfidz: periksa rekap tahfidz/u.test(item)), "the coordinator's task isn't named");
-  expect(items.includes("Foto dihapus dari Nemu"), "the photo wasn't deleted");
-  const left = await siti.inboxJobs();
-  expect(!left.some((job) => job.jobId === jobId), "the photo is still in the inbox");
-  await page.screenshot({ path: join(shots, "catatan-langkah.png") });
-  await notes.getByRole("button", { name: "Tutup" }).click();
-});
+await check(
+  "the teacher saves; Catatan langkah names the system's and the coordinator's tasks",
+  async () => {
+    await page.locator("#btn-simpan-setoran").click();
+    await page.locator("#ya-simpan").click();
+    await page.getByText("Setoran tersimpan untuk 3 murid kelas 4A.").waitFor();
+    const notes = overlay.getByRole("region", { name: "Catatan langkah" });
+    await notes.waitFor({ timeout: 10_000 });
+    const items = await notes.locator("li").allInnerTexts();
+    console.log(`  ${items.join(" | ")}`);
+    expect(
+      items.some((item) => /Ibu menekan Simpan setoran|Bu menekan Simpan setoran/u.test(item)),
+      "no 'menekan Simpan setoran'",
+    );
+    expect(
+      items.some((item) => /Sistem AlurSekolah: hitung nilai hafalan/u.test(item)),
+      "the system's task isn't named",
+    );
+    expect(
+      items.some((item) => /Koordinator Tahfidz: periksa rekap tahfidz/u.test(item)),
+      "the coordinator's task isn't named",
+    );
+    expect(items.includes("Foto dihapus dari Nemu"), "the photo wasn't deleted");
+    const left = await siti.inboxJobs();
+    expect(!left.some((job) => job.jobId === jobId), "the photo is still in the inbox");
+    await page.screenshot({ path: join(shots, "catatan-langkah.png") });
+    await notes.getByRole("button", { name: "Tutup" }).click();
+  },
+);
 
 await check("F3-19: with no page in WS-04, Nemu only explains (cara 3)", async () => {
   await setPage("");

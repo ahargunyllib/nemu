@@ -158,7 +158,9 @@ export function actionTarget(doc: Document, action: string): ExecutorTarget {
   if (found(doc, named)) return named;
   const denied = [...doc.querySelectorAll("button, input[type=submit], [role=button]")].filter(
     (element) =>
-      !element.closest("nemu-overlay") && isVisible(element) && isDeniedActionName(accessibleName(element)),
+      !element.closest("nemu-overlay") &&
+      isVisible(element) &&
+      isDeniedActionName(accessibleName(element)),
   );
   return denied.length === 1 ? { role: "button", text: accessibleName(denied[0]!) } : named;
 }
@@ -200,7 +202,12 @@ export async function nextProcessSteps(
   const names = await match(
     [
       ...continuation.header.map((field) => ({ id: field.fieldId, label: field.label })),
-      ...(lastPage ? (continuation.rows?.columns ?? []).map((column) => ({ id: `kolom:${column.fieldId}`, label: column.label })) : []),
+      ...(lastPage
+        ? (continuation.rows?.columns ?? []).map((column) => ({
+            id: `kolom:${column.fieldId}`,
+            label: column.label,
+          }))
+        : []),
     ],
     [...labels.fields, ...(lastPage ? labels.columns : [])],
   );

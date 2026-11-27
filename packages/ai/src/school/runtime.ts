@@ -8,7 +8,12 @@ import type {
 
 import { retrieveKnowledge } from "../knowledge.js";
 import type { SlotValue } from "./bpmn/conditions.js";
-import { matchFieldLabels, matchFields, type FieldMatch, type FieldToMatch } from "./bpmn/fields.js";
+import {
+  matchFieldLabels,
+  matchFields,
+  type FieldMatch,
+  type FieldToMatch,
+} from "./bpmn/fields.js";
 import {
   assembleFormPhoto,
   readFormPhoto,
@@ -306,7 +311,11 @@ export function createFixtureSchoolAi(): SchoolAi {
               answer[name] = days ? Number(days) : resolveWeekday(text, input.today) ? 1 : null;
             } else if (field && /\bkelas\b/iu.test(field.label)) {
               // "… 4A hari ini": a class the way schools write one.
-              answer[name] = text.match(/\b(\d{1,2}\s?[a-f])\b/iu)?.[1]?.replace(/\s/gu, "").toUpperCase() ?? null;
+              answer[name] =
+                text
+                  .match(/\b(\d{1,2}\s?[a-f])\b/iu)?.[1]
+                  ?.replace(/\s/gu, "")
+                  .toUpperCase() ?? null;
             }
           }
           return answer;

@@ -43,7 +43,9 @@ const CLASS_4A = [
   "Ilham Nugroho",
 ];
 
-const PAGES = { Task_CatatSetoran: { page: "Al-Quran › Setoran baru", source: "mapping" as const } };
+const PAGES = {
+  Task_CatatSetoran: { page: "Al-Quran › Setoran baru", source: "mapping" as const },
+};
 
 test("the teacher's sentence fills the start form, class and date; the book's columns are asked", async () => {
   const graph = await tahfidz();
@@ -71,7 +73,13 @@ test("the teacher's sentence fills the start form, class and date; the book's co
 
 test("an unclear sentence asks setoran or ujian from the start form before anything else", async () => {
   const graph = await tahfidz();
-  const plan = planBpmnStep({ graph, slots: {}, stepIndex: 0, honorific: "Bu", teacherLanes: TEACHER });
+  const plan = planBpmnStep({
+    graph,
+    slots: {},
+    stepIndex: 0,
+    honorific: "Bu",
+    teacherLanes: TEACHER,
+  });
   assert.equal(plan.step.kind, "ask");
   assert.equal(plan.step.kind === "ask" && plan.step.slot, "jenis_catatan");
 });
@@ -83,7 +91,11 @@ test("F3-1: the photo reads 3 rows matching the kunci; Citra's Tajwid is a quest
   const reading = await createFixtureSchoolAi().readFormPhoto({
     image: { type: "image", dataUrl: imageDataUrl(new Uint8Array(photo), "image/png") },
     fields: task.formFields.filter((field) => !["kelas", "tanggal_setoran"].includes(field.id)),
-    roster: CLASS_4A.map((name, index) => ({ studentId: `4a-${index + 1}`, name, number: index + 1 })),
+    roster: CLASS_4A.map((name, index) => ({
+      studentId: `4a-${index + 1}`,
+      name,
+      number: index + 1,
+    })),
     honorific: "Bu",
   });
   assert.equal(reading.status, "ok");
@@ -160,7 +172,7 @@ test("with the photo's rows the walk is: kelas, date, one rows step, Simpan seto
   assert.deepEqual(plan.overview, [
     "Buka Al-Quran › Setoran baru.",
     "Guru mencatat setoran seluruh murid satu kelas sekaligus dari buku setoran.",
-    "Bu sendiri yang menekan Simpan setoran; Nemu berhenti sebelum itu.",
+    "Ibu sendiri yang menekan Simpan setoran; Nemu berhenti sebelum itu.",
     "Sesudah itu, Sistem AlurSekolah: hitung nilai hafalan.",
     "Koordinator Tahfidz: periksa rekap tahfidz.",
   ]);
