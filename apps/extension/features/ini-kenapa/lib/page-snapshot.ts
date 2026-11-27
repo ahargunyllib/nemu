@@ -86,13 +86,25 @@ function readFields(doc: Document): PageField[] {
   return fields;
 }
 
+/** An alert's lines as sentences: "Tidak dapat menampilkan siswa. Anda belum ditugaskan …". */
+function alertText(element: Element): string {
+  const raw = element instanceof HTMLElement ? element.innerText : (element.textContent ?? "");
+  const lines = raw
+    .split(/\n+/u)
+    .map((line) => line.replace(/\s+/gu, " ").trim())
+    .filter(Boolean);
+  return lines
+    .map((line, at) => (at < lines.length - 1 && !/[.!?:;]$/u.test(line) ? `${line}.` : line))
+    .join(" ");
+}
+
 /** The outermost of nested alerts only, so one message isn't sent twice. */
 function readAlerts(doc: Document): string[] {
   const found = visible(doc, ALERTS);
   const outermost = found.filter(
     (element) => !found.some((other) => other !== element && other.contains(element)),
   );
-  const texts = outermost.map((element) => textOf(element).slice(0, 2_000)).filter(Boolean);
+  const texts = outermost.map((element) => alertText(element).slice(0, 2_000)).filter(Boolean);
   return [...new Set(texts)].slice(0, MAX_ALERTS);
 }
 

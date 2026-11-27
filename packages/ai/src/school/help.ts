@@ -105,7 +105,7 @@ function whatsappDraft(
   const greeting = `Assalamualaikum ${to.name}.`;
   const intro = `Saya ${teacher.name} (NIP ${teacher.nip}).`;
   const problem = errorText
-    ? `Di ${appName} muncul pesan: "${errorText.slice(0, 160)}".`
+    ? `Di ${appName} muncul pesan: "${errorText.slice(0, 160).replace(/[.!?\s]+$/u, "")}".`
     : `Saya mengalami kendala di ${appName}.`;
   return {
     phone: to.phone,
