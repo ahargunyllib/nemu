@@ -152,15 +152,17 @@ async function openSource(page, source, shot) {
 
 async function expectPdfAt(tab, response, page) {
   const url = new URL(tab.url());
-  const headers = await response.allHeaders();
+  // The PDF viewer takes the navigation over, so Playwright sees no headers; the signed link is
+  // still valid, so ask for it again and read what the Nemu Service serves.
+  const served = await fetch(response.url());
+  const headers = Object.fromEntries(served.headers);
   console.log(`  tab: ${url.origin}${url.pathname}${url.hash} (token hidden)`);
-  console.log(
-    `  ${response.status()} ${headers["content-type"]} · ${headers["content-disposition"]}`,
-  );
+  console.log(`  ${served.status} ${headers["content-type"]} · ${headers["content-disposition"]}`);
   expect(url.origin === new URL(SERVER).origin, `opened ${url.origin}, not the Nemu Service`);
   expect(url.searchParams.has("token"), "the link carries no signed token");
   expect(url.hash === `#page=${page}`, `opened ${url.hash || "no page"}, expected #page=${page}`);
-  expect(response.status() === 200, `the file answered HTTP ${response.status()}`);
+  expect(response.status() === 200, `the tab got HTTP ${response.status()}`);
+  expect(served.status === 200, `the file answered HTTP ${served.status}`);
   expect(headers["content-type"] === "application/pdf", "not served as application/pdf");
   expect(/^inline;/u.test(headers["content-disposition"] ?? ""), "not served inline");
 }
