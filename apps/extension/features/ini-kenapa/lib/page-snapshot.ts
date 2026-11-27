@@ -4,7 +4,7 @@ import { accessibleName, isVisible } from "../../executor/lib/find-target";
 
 /**
  * What the page shows, for "ini kenapa?" (#216): its title and address, alerts, toasts and error
- * messages, headings, and form fields with the value each one shows. Read on the Nemu Service's
+ * messages, headings, and the choices made in its form fields. Read on the Nemu Service's
  * behalf only on WS-03 sites, since the content script stops before mounting anywhere else. The
  * viewport screenshot is added by the background (`captureVisibleTab`).
  */
@@ -24,25 +24,14 @@ const ALERTS = [
 
 const HEADINGS = "h1, h2, h3, h4, [role=heading]";
 
-const FIELDS = [
-  "input",
-  "select",
-  "textarea",
-  "[role=textbox]",
-  "[role=combobox]",
-  "[contenteditable=true]",
-].join(", ");
+/**
+ * Choices only: "Kelas: 4A", a ticked checkbox (#255). Typed fields (text, number, textarea,
+ * contenteditable) are never read, since on Isi nilai they hold each pupil's grade and note.
+ */
+const FIELDS = "select, input[type=checkbox], input[type=radio]";
 
-/** Input types that show no value of their own, or one Nemu must never read. */
-const SKIPPED_INPUTS = new Set([
-  "password",
-  "hidden",
-  "submit",
-  "button",
-  "reset",
-  "image",
-  "file",
-]);
+/** A table row is one record: its fields are labelled with a pupil's name ("Nilai Aisyah"). */
+const RECORD_ROWS = "tr, [role=row]";
 
 const MAX_ALERTS = 30;
 const MAX_HEADINGS = 50;
@@ -62,25 +51,18 @@ export function hasPasswordOnScreen(doc: Document): boolean {
   return visible(doc, "input[type=password]").length > 0;
 }
 
-function fieldValue(element: Element): string | null {
-  if (element instanceof HTMLInputElement) {
-    if (SKIPPED_INPUTS.has(element.type)) return null;
-    if (element.type === "checkbox" || element.type === "radio")
-      return element.checked ? "dicentang" : "tidak dicentang";
-    return element.value;
-  }
+function fieldValue(element: Element): string {
   if (element instanceof HTMLSelectElement) return element.selectedOptions[0]?.text.trim() ?? "";
-  if (element instanceof HTMLTextAreaElement) return element.value;
-  return textOf(element);
+  return (element as HTMLInputElement).checked ? "dicentang" : "tidak dicentang";
 }
 
 function readFields(doc: Document): PageField[] {
   const fields: PageField[] = [];
   for (const element of visible(doc, FIELDS)) {
-    const value = fieldValue(element);
+    if (element.closest(RECORD_ROWS)) continue;
     const label = accessibleName(element).slice(0, 300);
-    if (value === null || !label) continue;
-    fields.push({ label, value: value.trim().slice(0, 500) });
+    if (!label) continue;
+    fields.push({ label, value: fieldValue(element).slice(0, 500) });
     if (fields.length >= MAX_FIELDS) break;
   }
   return fields;
