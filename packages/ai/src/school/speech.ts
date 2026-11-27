@@ -48,28 +48,46 @@ export type OpenRouterTranscriberConfig = {
   zdr?: boolean;
   fetchImplementation?: typeof fetch;
   timeoutMs?: number;
+  /** Wait before the one retry of a busy provider (HTTP 429 or 503). */
+  retryDelayMs?: number;
 };
 
+const BUSY = /HTTP (429|503)\b/u;
+
 export function createOpenRouterTranscriber(config: OpenRouterTranscriberConfig): Transcriber {
+  // A busy provider is retried once, so a rate limit doesn't reach the teacher as "tidak terdengar".
   return async (audio) => {
-    const response = (await fetchJson(
-      "https://openrouter.ai/api/v1/audio/transcriptions",
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${config.apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: config.model,
-          input_audio: { data: audio.base64, format: audio.format },
-          language: "id",
-          prompt: `Percakapan guru dengan asisten Nemu, kadang campur bahasa Jawa (${SPOKEN_JAVANESE.join(", ")}). Istilah: ${SCHOOL_GLOSSARY.join(", ")}.`,
-          provider: { data_collection: "deny", ...(config.zdr ? { zdr: true } : {}) },
-        }),
-      },
-      { fetchImplementation: config.fetchImplementation, timeoutMs: config.timeoutMs ?? 20_000 },
-    )) as { text?: unknown };
-    if (typeof response.text !== "string") throw new Error("Transcription response has no text");
-    return { text: response.text.trim() };
+    try {
+      return await transcribeOnce(config, audio);
+    } catch (error) {
+      if (!(error instanceof Error) || !BUSY.test(error.message)) throw error;
+      await new Promise((resolve) => setTimeout(resolve, config.retryDelayMs ?? 800));
+      return transcribeOnce(config, audio);
+    }
   };
+}
+
+async function transcribeOnce(
+  config: OpenRouterTranscriberConfig,
+  audio: AudioInput,
+): Promise<Transcript> {
+  const response = (await fetchJson(
+    "https://openrouter.ai/api/v1/audio/transcriptions",
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${config.apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: config.model,
+        input_audio: { data: audio.base64, format: audio.format },
+        language: "id",
+        prompt: `Percakapan guru dengan asisten Nemu, kadang campur bahasa Jawa (${SPOKEN_JAVANESE.join(", ")}). Istilah: ${SCHOOL_GLOSSARY.join(", ")}.`,
+        provider: { data_collection: "deny", ...(config.zdr ? { zdr: true } : {}) },
+      }),
+    },
+    { fetchImplementation: config.fetchImplementation, timeoutMs: config.timeoutMs ?? 20_000 },
+  )) as { text?: unknown };
+  if (typeof response.text !== "string") throw new Error("Transcription response has no text");
+  return { text: response.text.trim() };
 }
 
 export type Synthesizer = (text: string) => Promise<SpeechSynthesis>;
