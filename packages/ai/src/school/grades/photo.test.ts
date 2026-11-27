@@ -3,8 +3,14 @@ import test from "node:test";
 
 import type { VerificationAnswer } from "@nemu/contracts/school";
 
-import { F1_FINAL_VALUES, F1_READ_A, F1_READ_B, f1Page } from "../fixtures/f1-photo.js";
-import { CLASS_4B } from "../fixtures/sdit-nusantara.js";
+import {
+  F1_FINAL_VALUES,
+  F1_READ_A,
+  F1_READ_B,
+  F1_REREAD,
+  F1_ROSTER,
+  f1Page,
+} from "../fixtures/f1-photo.js";
 import { fakeJsonCall, textOf } from "../test-helpers.js";
 import { combineReadings, outlierLines, readGradePhoto } from "./reading.js";
 import { applySchoolRules } from "./rules.js";
@@ -31,11 +37,11 @@ function photoReaders(rereadAnswers: Record<string, string>) {
 
 const IMAGE = { type: "image", dataUrl: "data:image/jpeg;base64,AAAA" } as const;
 
-test("F1-1 shape: exactly the doubtful digits, differently spelled names and the S are asked", async () => {
-  const readers = photoReaders({ "3": "86", "7": "61", "10": "71", "15": "78" });
+test("F1-1: exactly the 4 doubtful digits, the 5 names spelled differently and the S are asked", async () => {
+  const readers = photoReaders(F1_REREAD);
   const result = await readGradePhoto(readers, {
     image: IMAGE,
-    roster: CLASS_4B,
+    roster: F1_ROSTER,
     assessment: "UTS",
   });
   assert.equal(result.status, "ok");
@@ -44,16 +50,16 @@ test("F1-1 shape: exactly the doubtful digits, differently spelled names and the
   const plan = buildVerificationPlan(result.reading);
   const kinds = plan.questions.map((question) => `${question.kind}:${question.line}`);
   assert.deepEqual(kinds.sort(), [
-    "absence:21",
+    "absence:23",
     "digit:10",
-    "digit:15",
-    "digit:3",
+    "digit:20",
+    "digit:28",
     "digit:7",
-    "name:11",
     "name:16",
-    "name:2",
-    "name:23",
-    "name:30",
+    "name:17",
+    "name:18",
+    "name:26",
+    "name:27",
   ]);
   assert.equal(plan.acceptedCount, 22);
   assert.equal(plan.acceptedSentence, "22 nilai lain sudah cocok.");
@@ -62,19 +68,23 @@ test("F1-1 shape: exactly the doubtful digits, differently spelled names and the
   assert.equal(farah?.prompt, "Nilai Farah Annisa: 71 atau 77?");
   assert.deepEqual(farah?.kind === "digit" && farah.options, ["71", "77"]);
   assert.ok(farah?.box, "a digit question carries the crop box");
+  const nurAini = plan.questions.find((question) => question.line === 20);
+  assert.equal(nurAini?.prompt, "Nilai Nur Aini berapa?", "a smudged digit is asked, not guessed");
+  const tiara = plan.questions.find((question) => question.line === 28);
+  assert.deepEqual(tiara?.kind === "digit" && tiara.options, ["44", "94"]);
 
   // Only the four doubtful cells were re-read, in one call; the roster never reached a model.
   assert.equal(readers.reread.calls.length, 1);
   for (const call of [...readers.readA.calls, ...readers.readB.calls, ...readers.reread.calls]) {
-    assert.doesNotMatch(textOf(call.content), /Ramadhani|Khairunnisa|Firmansyah/u);
+    assert.doesNotMatch(textOf(call.content), /Ramadhani|Azizah|Hidayatullah/u);
   }
 });
 
 test("answers plus KKM 75 give 13 remedial and an empty value for the sick student", async () => {
-  const readers = photoReaders({ "3": "86", "7": "61", "10": "71", "15": "78" });
+  const readers = photoReaders(F1_REREAD);
   const result = await readGradePhoto(readers, {
     image: IMAGE,
-    roster: CLASS_4B,
+    roster: F1_ROSTER,
     assessment: "UTS",
   });
   assert.equal(result.status, "ok");
@@ -107,9 +117,9 @@ test("answers plus KKM 75 give 13 remedial and an empty value for the sick stude
   const raka = ruled.entries.find((entry) => entry.name === "Raka Aditya");
   assert.deepEqual([raka?.value, raka?.status, raka?.remedial], [null, "S", false]);
   assert.equal(
-    ruled.entries.find((entry) => entry.name === "Yusuf Ibrahim")?.remedial,
-    false,
-    "75 is not below KKM",
+    ruled.entries.find((entry) => entry.name === "Fahri Hidayat")?.remedial,
+    true,
+    "73 is below KKM 75",
   );
   assert.equal(
     ruled.summarySentence,
@@ -118,10 +128,10 @@ test("answers plus KKM 75 give 13 remedial and an empty value for the sick stude
 });
 
 test("an unanswered question or a student picked twice keeps the result unresolved", async () => {
-  const readers = photoReaders({ "3": "86", "7": "61", "10": "71", "15": "78" });
+  const readers = photoReaders(F1_REREAD);
   const result = await readGradePhoto(readers, {
     image: IMAGE,
-    roster: CLASS_4B,
+    roster: F1_ROSTER,
     assessment: "UTS",
   });
   if (result.status !== "ok") throw new Error("expected ok");
@@ -153,7 +163,7 @@ test("an unreadable page asks for a new photo and is never guessed", async () =>
     readB: fakeJsonCall({ grade_book_reading: unreadable }),
     reread: fakeJsonCall({}),
   };
-  const result = await readGradePhoto(readers, { image: IMAGE, roster: CLASS_4B });
+  const result = await readGradePhoto(readers, { image: IMAGE, roster: F1_ROSTER });
   assert.equal(result.status, "reshoot");
   assert.equal(readers.reread.calls.length, 0);
 });
@@ -179,9 +189,10 @@ test("a value far from the rest of the column is flagged even when both readers 
 });
 
 test("without a cropper the re-read gets the whole page once, with cell positions", async () => {
-  const readers = photoReaders({ "3": "86", "7": "61", "10": "71", "15": "78" });
-  await readGradePhoto(readers, { image: IMAGE, roster: CLASS_4B, assessment: "UTS" });
+  const readers = photoReaders(F1_REREAD);
+  await readGradePhoto(readers, { image: IMAGE, roster: F1_ROSTER, assessment: "UTS" });
   const content = readers.reread.calls[0]!.content;
   assert.equal(content.filter((part) => part.type === "image").length, 1);
-  assert.match(textOf(content), /id=10: baris 10 \(Farah Annisa\), kolom UTS \(area x=/u);
+  assert.match(textOf(content), /id=10: baris 10 \(Farah Annisa\), kolom Nilai \(area x=/u);
+  assert.match(textOf(content), /id=10: .*pembaca lain melihat: 77 \/ 71/u);
 });

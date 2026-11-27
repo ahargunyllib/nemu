@@ -1,12 +1,14 @@
 import { call } from "@orpc/server";
 import { describe, expect, it } from "vite-plus/test";
 
-import { CLASS_4B } from "@nemu/ai/school/fixtures/sdit-nusantara";
+import { F1_ROSTER } from "@nemu/ai/school/fixtures/f1-photo";
+import { BU_SITI, CLASS_4B } from "@nemu/ai/school/fixtures/sdit-nusantara";
 import type { GradeEntry } from "@nemu/contracts/school";
 
 import { type FakeNilai, createFakeAlurSekolah } from "../../testing/alursekolah";
 import { connectAlurSekolah, createSchoolContext } from "../../testing/school";
 import { createDocumentRepository } from "../documents/repository";
+import { createDemoSchoolDirectory } from "../school/directory";
 import { inboxRouter } from "../inbox/router";
 import { gradesRouter } from "./router";
 
@@ -22,6 +24,11 @@ function jpegWithExif(): File {
 describe("F1 through the API (offline AI, seeded SDIT Nusantara)", () => {
   it("photo → 10 questions → answers → 13 remedial with the seeded SOP cited → read-back match", async () => {
     const context = await createSchoolContext();
+    // The official F1-1 photo is of 01_profil-sekolah's 4B, as WS-06 seeds it.
+    context.school.directory = createDemoSchoolDirectory(
+      [BU_SITI],
+      [{ className: "4B", students: F1_ROSTER }],
+    );
 
     const command = await call(
       gradesRouter.gradesParseCommand,
@@ -52,7 +59,7 @@ describe("F1 through the API (offline AI, seeded SDIT Nusantara)", () => {
     expect(questions).toHaveLength(10);
     expect(job.verification!.acceptedSentence).toBe("22 nilai lain sudah cocok.");
 
-    const truth: Record<number, string> = { 3: "86", 7: "61", 10: "71", 15: "78" };
+    const truth: Record<number, string> = { 7: "85", 10: "71", 20: "83", 28: "94" };
     const answers = questions.map((question) => ({
       questionId: question.id,
       answer:

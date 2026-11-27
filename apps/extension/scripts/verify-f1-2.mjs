@@ -4,7 +4,7 @@
 // the teacher takes over (her click on the page, then "Saya isi sendiri"), once by "Ajari saya"
 // (the dev dock's button does what the spoken command does; the test microphone can't say it).
 // In cara 2 the "teacher" types what Nemu says, except where F1-2_cara-2_skenario.csv has her type
-// something else first. Both deliberate mismatches must be caught ("Di buku 84, Bu.", never
+// something else first. Both deliberate mismatches must be caught ("Di buku 68, Bu.", never
 // "salah") and 0 wrong grades saved.
 //
 // Needs the stack running with the offline AI and the wa-bot secret, e.g.
@@ -38,7 +38,7 @@ const extension = join(root, ".output/verify-f1-2-extension");
 const shots = join(root, ".output/verify-f1-2");
 mkdirSync(shots, { recursive: true });
 
-// F1-2's scenario: the book (the synthetic F1-1 page of the mock's 4B) and what the teacher types
+// F1-2's scenario: the book (the official F1-1 page, in the mock's 4B order) and what the teacher types
 // first in cara 2. Two rows are deliberately off.
 const SCENARIO = readFileSync(
   join(root, "features/grade-photo/lib/F1-2_cara-2_skenario.csv"),
@@ -187,10 +187,20 @@ async function upToTheFill() {
     last = prompt;
     asked += 1;
     const buttons = card.getByRole("group").getByRole("button");
-    const digit = prompt.match(/^Nilai (.+?): /u);
+    const digit = prompt.match(/^Nilai (.+?)(?:: | berapa\?$)/u);
     if (digit) {
       const book = SCENARIO.find((row) => row.name === digit[1]).book;
-      await buttons.filter({ hasText: new RegExp(`^${book}$`, "u") }).click();
+      const offered = buttons.filter({ hasText: new RegExp(`^${book}$`, "u") });
+      if (await offered.count()) await offered.click();
+      else {
+        // A smudged digit has no reading to offer: "Angka lain", then the book's number typed.
+        await buttons.filter({ hasText: "Angka lain" }).click();
+        await display("jawab")
+          .getByText(new RegExp(`Berapa nilai ${digit[1]}`, "u"))
+          .waitFor();
+        await typeBox.fill(book);
+        await typeBox.press("Enter");
+      }
     } else if (/S \(sakit\)/u.test(prompt)) await buttons.filter({ hasText: "Kosongkan" }).click();
     else await buttons.first().click();
   }
@@ -296,8 +306,8 @@ async function scenario(how) {
       );
       expect(!said.some((line) => /salah/iu.test(line)), "Nemu said 'salah'");
       expect(
-        said.some((line) => line.startsWith("Untuk Putra dikosongkan saja.")),
-        "Putra Wijaya's blank grade wasn't said",
+        said.some((line) => line.startsWith("Untuk Raka dikosongkan saja.")),
+        "Raka Aditya's blank grade wasn't said",
       );
       for (const row of SCENARIO) {
         const nilai = await page.getByLabel(`Nilai ${row.name}`, { exact: true }).inputValue();
