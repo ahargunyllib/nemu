@@ -14,7 +14,7 @@ import { ask } from "./service";
 
 const SOP_TAHFIDZ = join(
   import.meta.dirname,
-  "../../testing/fixtures/SOP-Tahfidz-SDIT-Nusantara.md",
+  "../../testing/fixtures/WS-1_SOP-Setoran-Tahfidz-SDIT-Nusantara.pdf",
 );
 const QUESTION = "Setoran minimal berapa ayat?";
 const OPERATOR = { id: "rizal", role: "operator", workspaceId: "W-SEKOLAH" };
@@ -31,9 +31,13 @@ async function uploadSopTahfidz(
   context: SchoolTestContext,
   packageId: "alursekolah" | null = null,
 ) {
-  const file = new File([await readFile(SOP_TAHFIDZ)], "SOP-Tahfidz-SDIT-Nusantara.md", {
-    type: "text/markdown",
-  });
+  const file = new File(
+    [await readFile(SOP_TAHFIDZ)],
+    "WS-1_SOP-Setoran-Tahfidz-SDIT-Nusantara.pdf",
+    {
+      type: "application/pdf",
+    },
+  );
   return call(
     documentsRouter.uploadDocument,
     { title: "SOP Tahfidz", version: "2026", isActive: false, file, siteIds: [], packageId },
@@ -41,7 +45,7 @@ async function uploadSopTahfidz(
   );
 }
 
-describe("WS-1 (b): a newly uploaded SOP Tahfidz, tried before and after activation", () => {
+describe("WS-1 (b): the official SOP Tahfidz PDF, tried before and after activation", () => {
   it("answers the same in Uji jawaban (inactive) and for a teacher once it is active", async () => {
     const context = await createSchoolContext();
     const operator = as(context, OPERATOR);
@@ -59,8 +63,16 @@ describe("WS-1 (b): a newly uploaded SOP Tahfidz, tried before and after activat
     );
     expect(tried).toMatchObject({
       status: "answered",
-      answer: expect.stringContaining("minimal 5 ayat"),
-      citations: [expect.objectContaining({ docId: sop.id, title: "SOP Tahfidz" })],
+      answer: expect.stringContaining("3 ayat"),
+      citations: [
+        expect.objectContaining({
+          docId: sop.id,
+          title: "SOP Tahfidz",
+          page: 1,
+          article: "3",
+          quote: expect.stringContaining("Setiap setoran paling sedikit 3 ayat"),
+        }),
+      ],
     });
 
     await call(
