@@ -177,6 +177,13 @@ async function settle(doc: Document, targets: ExecutorTarget[], timeoutMs: numbe
   }
 }
 
+/** True when clicking `segment` makes the choice `value`: "Setoran baru" chooses "Setoran". */
+function choosesWith(value: string, segment: string): boolean {
+  const choice = normalizeControlName(value);
+  const item = normalizeControlName(segment);
+  return !!choice && (item === choice || item.startsWith(`${choice} `));
+}
+
 /**
  * The step source: fill the single fields this page shows, then open the next menu item; on the
  * last page fill the rest, the table rows, and point at the teacher's button.
@@ -218,9 +225,10 @@ export async function nextProcessSteps(
     const label = names[field.fieldId];
     const target: ExecutorTarget = { label: label ?? field.label };
     const element = found(doc, target);
-    // Not on this page yet: it waits for a later one, unless this is the last page.
+    // Not on this page yet: it waits for a later one, unless this is the last page. A choice the
+    // page makes with the menu item it opens next ("Setoran" → "Setoran baru") is that click.
     if (!element && !lastPage) {
-      pending.push(field);
+      if (!choosesWith(field.value, next)) pending.push(field);
       continue;
     }
     steps.push(fillStep(element, target, field.value));
