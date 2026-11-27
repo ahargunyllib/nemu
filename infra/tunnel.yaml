@@ -1,0 +1,9 @@
+# For a host without a public IP (README › Host without a public IP): a Cloudflare Tunnel takes the
+# place of Caddy and open ports. Use with COMPOSE_FILE=compose.yaml:tunnel.yaml and never start caddy.
+services:
+  tunnel:
+    image: cloudflare/cloudflared:2025.11.1
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?set TUNNEL_TOKEN in .env}
