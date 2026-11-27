@@ -41,13 +41,8 @@ import {
   type ReadGradePhotoInput,
   type ReadGradePhotoResult,
 } from "./grades/reading.js";
-import {
-  answerGrounded,
-  normalizeForQuote,
-  verifyGroundedAnswer,
-  type AnswerGroundedInput,
-} from "./grounding.js";
-import { explainError, pageLines, resolveHelp, type ExplainErrorInput } from "./help.js";
+import { answerGrounded, verifyGroundedAnswer, type AnswerGroundedInput } from "./grounding.js";
+import { explainError, type ExplainErrorInput } from "./help.js";
 import { createOpenRouterJsonCaller, type JsonCall, type JsonCallRequest } from "./llm.js";
 import {
   documentationSymptoms,
@@ -222,48 +217,8 @@ export function createFixtureSchoolAi(): SchoolAi {
     readGradePhoto: (input) => readGradePhoto(photoReaders(input.roster), input),
     parseGradeExcel: (input) => parseGradeExcel({}, input),
 
-    async explainError(input) {
-      const words = (text: string) =>
-        normalizeForQuote(text)
-          .replace(/[^\p{L}\p{N}]+/gu, " ")
-          .trim();
-      const screen = words(pageLines(input.snapshot).join(" "));
-      const entry = input.kamus.find((chunk) => {
-        // A message with placeholders ("mengampu [mapel] di kelas [kelas]") matches up to the first.
-        const quoted = chunk.text.match(/"([^"]+)"/u)?.[1]?.split(/[[…]/u)[0];
-        return chunk.active && !!quoted?.trim() && screen.includes(words(quoted).slice(0, 40));
-      });
-      const sentences = entry?.text.split(/(?<=\.)\s+/u) ?? [];
-      const fixerSentence =
-        sentences.find((sentence) => /perlu|cukup|hubungi/iu.test(sentence)) ?? "";
-      const role = /kepala sekolah/iu.test(fixerSentence)
-        ? "kepsek"
-        : /operator/iu.test(fixerSentence)
-          ? "operator"
-          : /guru cukup/iu.test(fixerSentence)
-            ? "guru"
-            : null;
-      return resolveHelp(
-        {
-          status: entry ? "matched" : "not_in_guide",
-          error_text: input.snapshot.alerts[0] ?? "",
-          chunk_id: entry?.id ?? null,
-          quote: fixerSentence.replace(/\.$/u, "") || null,
-          teacher_fault: false,
-          fixer_role: role,
-          can_self_fix: role === "guru",
-          // "… menekan tombol Sinkro Ruang GTK, lalu …" → "Sinkro Ruang GTK".
-          guided_target:
-            role === "guru"
-              ? (fixerSentence.match(/tombol (.+?)(?=,|\.| lalu\b| di\b|$)/u)?.[1] ?? null)
-              : null,
-          why: entry ? sentences.slice(1).join(" ") : "",
-          app_name: entry?.text.match(/^K-\d+ ([^:]+):/u)?.[1] ?? "aplikasi",
-        },
-        input.kamus.filter((chunk) => chunk.active),
-        input,
-      );
-    },
+    // Code matching only: a near miss the real model would judge is "not in the guide" here.
+    explainError: (input) => explainError({ llm: codeCall(() => ({ row_id: null })) }, input),
 
     async answerGrounded(input) {
       const context = retrieveKnowledge(

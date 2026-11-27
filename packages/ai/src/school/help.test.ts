@@ -3,122 +3,167 @@ import test from "node:test";
 
 import type { PageSnapshot } from "@nemu/contracts/school";
 
-import { BU_SITI, KAMUS_CHUNKS } from "./fixtures/sdit-nusantara.js";
+import { F2_2_PAGE, F2_3_PAGE, KAMUS_ROWS, NOT_IN_GUIDE_PAGES } from "./fixtures/kamus.js";
+import { BU_SITI } from "./fixtures/sdit-nusantara.js";
 import { explainError } from "./help.js";
-import { sentenceIssues } from "./safety.js";
+import { guidedTargetOf, matchKamus, requestFromFix } from "./kamus.js";
+import { mentionsSecret, sentenceIssues } from "./safety.js";
 import { fakeJsonCall, textOf } from "./test-helpers.js";
 
-/** What the extension sends (#216): title, URL, alerts, headings, fields and a viewport JPEG. */
-const RUANG_GTK: PageSnapshot = {
-  title: "Ruang GTK - Pengelolaan Kinerja",
-  url: "https://ruang.gtk.example/kinerja",
-  alerts: ["Data Perencanaan (SKP) belum bisa diajukan karena RHK atasan belum tersedia."],
-  headings: ["Pengelolaan Kinerja 2026"],
-  fields: [{ label: "Periode", value: "2026" }],
-  screenshotBase64: "AAAA",
-};
-
-const MATCHED = {
-  status: "matched",
-  error_text: "SKP belum bisa diajukan karena RHK atasan belum tersedia",
-  chunk_id: "kamus-k01",
-  quote: "Kepala sekolah perlu membuat RHK terlebih dahulu di E-Kinerja",
-  teacher_fault: false,
-  fixer_role: "kepsek",
-  can_self_fix: false,
-  guided_target: null,
-  why: "SKP Ibu menunggu RHK dari kepala sekolah.",
-  app_name: "Ruang GTK",
-};
-
-test("W7: not the teacher's fault, names who fixes it, and drafts a WhatsApp with the NIP", async () => {
-  const llm = fakeJsonCall({ stuck_help: MATCHED });
-  const result = await explainError(
+const ask = (snapshot: PageSnapshot, llm = fakeJsonCall({})) =>
+  explainError(
     { llm },
-    { snapshot: RUANG_GTK, question: "Nemu, ini kenapa?", kamus: KAMUS_CHUNKS, teacher: BU_SITI },
+    { snapshot, question: "Nemu, ini kenapa?", kamus: KAMUS_ROWS, teacher: BU_SITI },
   );
+
+function assertSafe(...texts: string[]) {
+  for (const text of texts) {
+    assert.doesNotMatch(text, /\bsalah\b/iu, text);
+    assert.equal(mentionsSecret(text), false, text);
+  }
+}
+
+test("F2-2: matched in code to Kamus Kendala no. 7, Pak Rizal fixes it, WhatsApp text ready", async () => {
+  const llm = fakeJsonCall({});
+  const result = await ask(F2_2_PAGE, llm);
+  assert.equal(llm.calls.length, 0, "an exact kamus match needs no model call");
   assert.equal(result.status, "matched");
   if (result.status !== "matched") return;
-  assert.equal(result.sentence, "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Ahmad (kepsek).");
+  assert.equal(result.entryId, "K-07");
+  assert.ok(result.sentence.startsWith("Bukan kesalahan Ibu."));
+  assert.equal(
+    result.sentence,
+    "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).",
+  );
   assert.deepEqual(sentenceIssues(result.sentence), []);
-  assert.equal(result.citation.article, "K-01");
-  assert.equal(result.waDraft?.phone, "6281200000001");
-  assert.match(result.waDraft?.text ?? "", /NIP 197001012000032001/u);
-  // v2.3 sends no screenshot with the message, so the draft doesn't promise one.
-  assert.doesNotMatch(result.waDraft?.text ?? "", /screenshot/iu);
-
-  // The NIP and phone numbers are added by code, never sent to the model.
-  const sent = textOf(llm.calls[0]!.content);
-  assert.doesNotMatch(sent, /197001012000032001|6281200000001/u);
-});
-
-test("the model gets the page's alerts, headings, fields and the viewport screenshot", async () => {
-  const llm = fakeJsonCall({ stuck_help: MATCHED });
-  await explainError(
-    { llm },
-    { snapshot: RUANG_GTK, question: null, kamus: KAMUS_CHUNKS, teacher: BU_SITI },
-  );
-  const content = llm.calls[0]!.content;
-  const first = content[0];
-  assert.equal(first?.type, "text");
-  const sent = JSON.parse(first?.type === "text" ? first.text : "{}");
-  assert.deepEqual(sent.peringatan, RUANG_GTK.alerts);
-  assert.deepEqual(sent.judul_bagian, ["Pengelolaan Kinerja 2026"]);
-  assert.deepEqual(sent.isian, [{ label: "Periode", nilai: "2026" }]);
-  assert.ok(content.some((part) => part.type === "image" && part.dataUrl.endsWith("AAAA")));
-});
-
-test("a fixer the kamus entry doesn't name is not trusted", async () => {
-  const llm = fakeJsonCall({ stuck_help: { ...MATCHED, fixer_role: "operator" } });
-  const result = await explainError(
-    { llm },
-    { snapshot: RUANG_GTK, question: null, kamus: KAMUS_CHUNKS, teacher: BU_SITI },
-  );
-  assert.equal(result.status, "not_in_guide");
-});
-
-test("F2-6: an error the kamus doesn't cover gets no invented cause and an offer to ask the operator", async () => {
-  const llm = fakeJsonCall({
-    stuck_help: {
-      ...MATCHED,
-      status: "not_in_guide",
-      chunk_id: null,
-      quote: null,
-      fixer_role: null,
-      error_text: "Error 502",
-    },
+  assert.match(result.why, /^Bukan kesalahan Ibu\. Penugasan guru per mapel dan kelas diatur/u);
+  assert.deepEqual([result.canSelfFix, result.guidedTarget], [false, null]);
+  assert.deepEqual(result.citation, {
+    chunkId: "kamus-k07",
+    docId: "kamus-kendala",
+    title: "Kamus Kendala",
+    page: null,
+    article: "K-07",
+    quote: KAMUS_ROWS.find((row) => row.code === "K-07")!.fix,
   });
-  const result = await explainError(
-    { llm },
-    { snapshot: RUANG_GTK, question: null, kamus: KAMUS_CHUNKS, teacher: BU_SITI },
+  assert.equal(result.fixer?.name, "Pak Rizal");
+  assert.equal(result.waDraft?.phone, BU_SITI.contacts.operator!.phone);
+  const text = result.waDraft?.text ?? "";
+  assert.equal(
+    text,
+    `Assalamualaikum Pak Rizal. Saya ${BU_SITI.name} (NIP ${BU_SITI.nip}). Di AlurSekolah, halaman "Isi nilai kelas 4A", muncul pesan: "Tidak dapat menampilkan siswa. Anda belum ditugaskan mengampu IPAS di kelas 4A. Hubungi admin sekolah". Mohon bantuannya menambahkan penugasan guru untuk mapel dan kelas itu di pengaturan AlurSekolah. Terima kasih.`,
   );
+  assertSafe(result.sentence, result.why, text);
+});
+
+test("F2-3: matched in code to no. 2, she fixes it herself at Sinkro Ruang GTK, no WhatsApp", async () => {
+  const llm = fakeJsonCall({});
+  const result = await ask(F2_3_PAGE, llm);
+  assert.equal(llm.calls.length, 0);
+  assert.equal(result.status, "matched");
+  if (result.status !== "matched") return;
+  assert.equal(result.entryId, "K-02");
+  assert.equal(result.sentence, "Ibu bisa memperbaikinya sendiri, saya tunjukkan caranya.");
+  assert.deepEqual(
+    [result.canSelfFix, result.guidedTarget, result.fixer, result.waDraft],
+    [true, "Sinkro Ruang GTK", null, null],
+  );
+  assert.equal(result.why, "Akun E-Kinerja Ibu belum ditandai sebagai pengguna Ruang GTK.");
+  // The extension points at the menu this sentence names before the button (cara 2).
+  assert.match(result.citation.quote, /^Buka E-Kinerja, tekan tombol "Sinkro Ruang GTK"/u);
+  assertSafe(result.sentence, result.why);
+});
+
+test("the RHK message (no. 1) is told apart from no. 2 although both start the same", async () => {
+  const result = await ask({
+    ...F2_3_PAGE,
+    alerts: [
+      "Data Perencanaan (SKP) Anda gagal dialirkan ke E-Kinerja. Alasan: Tidak ada RHK atasan yang bisa dikaitkan.",
+    ],
+  });
+  assert.equal(result.status === "matched" && result.entryId, "K-01");
+  assert.equal(result.status === "matched" && result.waDraft?.text.includes("Pak Ahmad"), true);
+});
+
+test("F2-6 (PK-409): no kamus row shares the message, so no model call and no invented cause", async () => {
+  const llm = fakeJsonCall({});
+  const result = await ask(NOT_IN_GUIDE_PAGES["F2-6 PK-409"]!, llm);
+  assert.equal(llm.calls.length, 0);
   assert.equal(result.status, "not_in_guide");
   if (result.status !== "not_in_guide") return;
   assert.equal(
     result.sentence,
     "Belum ada di panduan sekolah. Mau saya bantu tanyakan ke Pak Rizal?",
   );
-  assert.equal(result.waDraft?.phone, "6281200000002");
+  assert.equal(result.waDraft?.phone, BU_SITI.contacts.operator!.phone);
+  assert.match(result.waDraft?.text ?? "", /PK-409/u);
+  assertSafe(result.sentence, result.waDraft?.text ?? "");
 });
 
-test("the teacher can fix it: guided mode to the named button, no WhatsApp", async () => {
-  const llm = fakeJsonCall({
-    stuck_help: {
-      ...MATCHED,
-      chunk_id: "kamus-k04",
-      quote: "Guru cukup masuk kembali dengan menekan tombol Masuk",
-      teacher_fault: false,
-      fixer_role: "guru",
-      can_self_fix: true,
-      guided_target: "Masuk",
-    },
-  });
-  const result = await explainError(
-    { llm },
-    { snapshot: RUANG_GTK, question: null, kamus: KAMUS_CHUNKS, teacher: BU_SITI },
+test("a near miss asks the model only to pick among the closest rows, and none means not in the guide", async () => {
+  const llm = fakeJsonCall({ kamus_pick: { row_id: null } });
+  const result = await ask(NOT_IN_GUIDE_PAGES["Ruang GTK, another reason"]!, llm);
+  assert.equal(result.status, "not_in_guide");
+  assert.equal(llm.calls.length, 1);
+  const sent = JSON.parse(textOf(llm.calls[0]!.content));
+  assert.deepEqual(sent.kandidat.map((row: { row_id: string }) => row.row_id).sort(), [
+    "k01",
+    "k02",
+  ]);
+  // No NIP, phone number or field value is sent to the model.
+  assert.doesNotMatch(textOf(llm.calls[0]!.content), /197003152000032001|62812|isian/u);
+});
+
+test("a page with no error asks no model and is not in the guide", async () => {
+  const llm = fakeJsonCall({});
+  const result = await ask(NOT_IN_GUIDE_PAGES["Data Saya, no error"]!, llm);
+  assert.equal(llm.calls.length, 0);
+  assert.equal(result.status, "not_in_guide");
+});
+
+test("a picked row is answered from the row and the contacts, and an unknown id is refused", async () => {
+  const page = {
+    ...F2_2_PAGE,
+    alerts: [
+      "Tidak dapat menampilkan siswa. Anda belum ditugaskan mengampu Matematika di kelas 5A.",
+    ],
+    headings: ["Isi nilai kelas 5A"],
+  };
+  const picked = await ask(page, fakeJsonCall({ kamus_pick: { row_id: "k07" } }));
+  assert.equal(picked.status === "matched" && picked.entryId, "K-07");
+  assert.equal(picked.status === "matched" && picked.fixer?.name, "Pak Rizal");
+
+  const invented = await ask(page, fakeJsonCall({ kamus_pick: { row_id: "k99" } }));
+  assert.equal(invented.status, "not_in_guide");
+});
+
+test("a message with placeholders matches whatever fills them, in order", () => {
+  const row = {
+    ...KAMUS_ROWS.at(-1)!,
+    message: "Anda belum ditugaskan mengampu [mapel] di kelas [kelas]",
+  };
+  const hit = matchKamus([row], ["Anda belum ditugaskan mengampu Bahasa Inggris di kelas 5B."]);
+  assert.equal(hit.kind, "exact");
+  assert.equal(
+    matchKamus([row], ["di kelas 5B Anda belum ditugaskan mengampu"]).kind,
+    "candidates",
   );
-  assert.equal(result.status, "matched");
-  if (result.status !== "matched") return;
-  assert.deepEqual([result.canSelfFix, result.guidedTarget, result.waDraft], [true, "Masuk", null]);
-  assert.equal(result.sentence, "Ibu bisa memperbaikinya sendiri, saya tunjukkan caranya.");
+});
+
+test("the button and the request come from the kamus text", () => {
+  assert.equal(
+    guidedTargetOf('Buka E-Kinerja, tekan tombol "Sinkro Ruang GTK", lalu ikuti.'),
+    "Sinkro Ruang GTK",
+  );
+  assert.equal(guidedTargetOf("Guru cukup menekan tombol Masuk, lalu mengisi lagi."), "Masuk");
+  assert.equal(
+    guidedTargetOf("Buka menu tujuan pembelajaran untuk mapel tersebut, centang …"),
+    "tujuan pembelajaran",
+  );
+  assert.equal(guidedTargetOf("Kepala sekolah menyelesaikan SKP."), null);
+  assert.equal(
+    requestFromFix("Operator sekolah perlu memperbarui data PTK di Dapodik. Lalu tunggu."),
+    "memperbarui data PTK di Dapodik",
+  );
+  assert.equal(requestFromFix("Buka E-Kinerja, lalu tekan Sinkro."), null);
 });

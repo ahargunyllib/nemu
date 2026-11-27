@@ -72,7 +72,6 @@ const SOP = {
   title: "SOP Penilaian SDIT Nusantara",
   version: "2026",
 };
-const KAMUS = { docId: "kamus-kendala-sdit-nusantara", title: "Kamus Kendala", version: "2026" };
 
 /** Synthetic SOP Penilaian chunks (stand-in for F3-2_SOP-Penilaian-SDIT-Nusantara.pdf). */
 export const SOP_CHUNKS: KnowledgeChunk[] = [
@@ -107,49 +106,5 @@ export const SOP_CHUNKS: KnowledgeChunk[] = [
     article: "4.3",
     active: true,
     text: "4.3 Peserta didik yang tidak hadir karena sakit, izin, atau alpa nilainya dikosongkan, bukan diberi nilai 0, sampai mengikuti ujian susulan.",
-  },
-];
-
-/** Synthetic kamus kendala entries (stand-in for the school's error dictionary). */
-export const KAMUS_CHUNKS: KnowledgeChunk[] = [
-  {
-    id: "kamus-k01",
-    ...KAMUS,
-    page: 1,
-    article: "K-01",
-    active: true,
-    text: 'K-01 Ruang GTK: "SKP belum bisa diajukan karena RHK atasan belum tersedia". Bukan kesalahan guru. Kepala sekolah perlu membuat RHK terlebih dahulu di E-Kinerja.',
-  },
-  {
-    id: "kamus-k02",
-    ...KAMUS,
-    page: 1,
-    article: "K-02",
-    active: true,
-    text: 'K-02 Ruang GTK: "Data Perencanaan (SKP) Anda gagal dialirkan ke E-Kinerja". Akun Anda belum ditandai sebagai User Ruang GTK, jadi SKP belum bisa dikirim ke E-Kinerja. Bukan kesalahan guru. Guru cukup membuka menu E-Kinerja dan menekan tombol Sinkro Ruang GTK, lalu mengirim ulang SKP.',
-  },
-  {
-    id: "kamus-k03",
-    ...KAMUS,
-    page: 2,
-    article: "K-03",
-    active: true,
-    text: 'K-03 AlurSekolah: "Mata pelajaran belum dipetakan ke kelas". Bukan kesalahan guru. Operator sekolah perlu memetakan mata pelajaran di menu Pengaturan Kelas.',
-  },
-  {
-    id: "kamus-k04",
-    ...KAMUS,
-    page: 2,
-    article: "K-04",
-    active: true,
-    text: 'K-04 AlurSekolah: "Sesi Anda telah berakhir". Guru cukup masuk kembali dengan menekan tombol Masuk.',
-  },
-  {
-    id: "kamus-k07",
-    ...KAMUS,
-    page: 3,
-    article: "K-07",
-    active: true,
-    text: 'K-07 AlurSekolah: "Anda belum ditugaskan mengampu [mapel] di kelas [kelas]". Mata pelajaran itu belum ditugaskan ke akun Anda di kelas tersebut, jadi daftar siswanya tidak bisa dibuka. Bukan kesalahan guru. Operator sekolah perlu menugaskan mata pelajaran itu ke guru di menu Penugasan Guru.',
   },
 ];
