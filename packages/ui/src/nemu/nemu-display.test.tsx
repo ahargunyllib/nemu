@@ -147,6 +147,47 @@ describe("Kartu Pilih", () => {
   });
 });
 
+describe("Kartu Pilih for W5 and the inbox", () => {
+  test("shows the photo crop and a quiet note; still nothing pre-selected", () => {
+    render(
+      <KartuPilih
+        question="Nilai Alya: 86 atau 88?"
+        choices={[
+          { id: "86", label: "86" },
+          { id: "88", label: "88" },
+          { id: "lain", label: "Angka lain" },
+        ]}
+        onChoose={vi.fn()}
+        image={{ src: "data:image/jpeg;base64,AA", alt: "Foto buku nilai, baris 3" }}
+        note="Pertanyaan 1 dari 10."
+      />,
+    );
+    expect(screen.getByRole("img", { name: "Foto buku nilai, baris 3" })).toBeTruthy();
+    expect(screen.getByText("Pertanyaan 1 dari 10.")).toBeTruthy();
+    const buttons = within(screen.getByRole("group")).getAllByRole("button");
+    expect(buttons).toHaveLength(3);
+    for (const button of buttons) expect(document.activeElement).not.toBe(button);
+  });
+
+  test("the compact card puts its two choices side by side", () => {
+    const onChoose = vi.fn();
+    render(
+      <KartuPilih
+        compact
+        question="Foto dari WhatsApp"
+        choices={[
+          { id: "mulai", label: "Mulai" },
+          { id: "nanti", label: "Nanti" },
+        ]}
+        onChoose={onChoose}
+      />,
+    );
+    expect(screen.getByRole("group").className).not.toMatch(/flex-col/u);
+    fireEvent.click(screen.getByRole("button", { name: "Mulai" }));
+    expect(onChoose).toHaveBeenCalledWith("mulai");
+  });
+});
+
 describe("Kartu Info", () => {
   test("shows a title, a short list and one Tutup", () => {
     const onClose = vi.fn();

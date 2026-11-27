@@ -15,6 +15,8 @@ import { RowTicks } from "../../features/executor/components/row-ticks";
 import { useExecutor } from "../../features/executor/hooks/use-executor";
 import { TEST_TOOLS_ENABLED } from "../../features/executor/lib/test-responses";
 import { executor } from "../../features/executor/stores/executor";
+import { useGradePhoto } from "../../features/grade-photo/hooks/use-grade-photo";
+import { gradePhoto } from "../../features/grade-photo/stores/grade-photo";
 import { useIdentity } from "../../features/identity/hooks/use-identity";
 import { usePageEmail } from "../../features/identity/hooks/use-page-email";
 import type { IdentityResult } from "../../features/identity/lib/identity";
@@ -28,7 +30,7 @@ import { useTalk } from "../../features/voice/hooks/use-talk";
 import { useVoice, type VoiceState } from "../../features/voice/hooks/use-voice";
 import type { TalkState } from "../../features/voice/lib/talk-machine";
 import { talkShortcutFrom } from "../../features/voice/lib/talk-shortcut";
-import { spokenWordIn } from "../../features/voice/lib/word-timing";
+import { spokenWordIn, withSpokenWord } from "../../features/voice/lib/word-timing";
 import { voiceCommands } from "../../features/voice/stores/voice-commands";
 
 /**
@@ -45,12 +47,20 @@ export function NemuApp({ access }: { access: SiteAccess }) {
   const identity = useIdentity(pageEmail);
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
-  const { state, ask, reset } = useAsk(pageEmail, close);
+  const startGrades = useCallback(
+    (utterance: string) => {
+      close();
+      void gradePhoto.command(utterance);
+    },
+    [close],
+  );
+  const { state, ask, reset } = useAsk(pageEmail, close, startGrades);
   const preview = useDisplayPreview();
   const { voice, working, speak, repeat, stop } = useVoice(pageEmail);
   const run = useExecutor();
   // "ini kenapa?" reads the page as it was when the talk combination went down (F2-01).
   const pressSnapshot = useRef<PageSnapshot | null>(null);
+  const grades = useGradePhoto();
   const talk = useTalk({
     pageEmail,
     shortcut,
@@ -60,7 +70,10 @@ export function NemuApp({ access }: { access: SiteAccess }) {
       pressSnapshot.current = readPageSnapshot(document, location.href);
       setOpen(true);
     },
-    onQuestion: (question) => void ask(question, pressSnapshot.current),
+    // While F1 waits for an answer (a W5 question, a number), the words are that answer.
+    onQuestion: (question) => {
+      if (!gradePhoto.hear(question)) void ask(question, pressSnapshot.current);
+    },
   });
   const { dismiss } = talk;
 
@@ -96,9 +109,18 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     [pageEmail, honorific, speak],
   );
 
+  // F1 polls for WhatsApp photos as this teacher, and speaks with Nemu's voice (#207).
+  const registered = identity?.status === "registered";
+  useEffect(
+    () =>
+      gradePhoto.connect({ pageEmail, honorific, registered, speak: (text) => void speak(text) }),
+    [pageEmail, honorific, registered, speak],
+  );
+
   // A task under way in this tab carries on after a page load (F0-13).
   useEffect(() => {
     void executor.restore();
+    void gradePhoto.restore();
   }, []);
 
   // Another account signed in: the previous teacher's answer goes (ID-04).
@@ -138,6 +160,13 @@ export function NemuApp({ access }: { access: SiteAccess }) {
           <div className="pointer-events-auto">
             <NemuStage display={run.display} target={run.target} />
           </div>
+        ) : grades.display ? (
+          <div className="pointer-events-auto flex flex-col items-end gap-2">
+            {talk.heard !== null && <HeardBubble text={talk.heard} />}
+            <NemuStage display={withSpokenWord(grades.display, voice)} />
+            {talk.state.phase === "listening" && <ListeningBubble />}
+            {grades.typing && <AskBox pending={false} onAsk={(text) => gradePhoto.hear(text)} />}
+          </div>
         ) : preview.display ? (
           <div className="pointer-events-auto">
             <NemuStage display={preview.display} target={preview.target} />
@@ -172,6 +201,11 @@ export function NemuApp({ access }: { access: SiteAccess }) {
               )}
             </div>
           )
+        )}
+        {!run.display && !grades.display && !preview.display && !open && grades.card && (
+          <div className="pointer-events-auto">
+            <NemuStage display={grades.card} />
+          </div>
         )}
         <div className="pointer-events-auto">
           <NemuButton

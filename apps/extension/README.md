@@ -93,13 +93,39 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     langkah**); "Lain kali coba sendiri" starts that kind of task in cara 2 next time.
   - **Action log (WS-10).** Every action goes to `actionLogRecord` as who, when, website, task,
     action, target, cara and result, never a value.
-  - **Not connected yet.** The flows that build step lists (F1 #207, F3 #213/#214, F4 #209) come
-    later; until then grade entry and processes still answer that they aren't available.
+  - **Finishers.** A flow that has more to do once its task ends registers
+    `executor.registerFinisher(kind, …)`; it gets the notes so far and shows Catatan langkah itself
+    with `executor.presentNotes`. F1 uses it to read the grades back after Simpan.
+  - **Not connected yet.** The other flows that build step lists (F3 #213/#214, F4 #209) come
+    later; until then processes still answer that they aren't available.
   - **Dev tools.** In a dev build, an allowed page opened with `?uji-nemu`
     (`http://localhost:3003/?uji-nemu#/beranda`) shows a dock: **Muat respons uji** runs
     `F0-1_respons-ai-palsu.json` (three fake AI responses that try to press; it passes when Nemu
     points every time and nothing is pressed), **Pilih berkas…** runs another file of the same
     shape, **Contoh cara 1/2/3** fill a sample grade list, and **Koneksi putus** shows F0-09.
+- **F1: grade-book photo from WhatsApp (#207).** `features/grade-photo/`. The visible allowed tab
+  polls `inboxJobs` every 4 s through the background, which claims each photo for one tab (a
+  12 s lease its polling renews, held once the teacher starts), so the small Kartu Pilih **Foto
+  dari WhatsApp · Mulai / Nanti** shows above the Nemu button in one tab only.
+  - **Mulai** asks what the grades are; the answer, typed in the type box or spoken, goes to
+    `gradesParseCommand` until the class, subject and assessment are known. "masukkan nilai …"
+    asked from the panel (helpRoute `input_nilai`) starts the same flow, and asks for the photo
+    over WhatsApp when none is waiting. Then `inboxProcess` reads it (Gelembung Kerja meanwhile).
+  - **W5.** One Kartu Pilih per question with the cell cropped from `inboxPhoto` in the background
+    (only the crops reach the page), the readings as big buttons, nothing pre-selected, **Angka
+    lain** on every digit and S/I/A question (then the number is typed or said), **Tidak ada di
+    daftar** on names. Holding the talk combination answers too: "delapan puluh enam", "86",
+    "kosongkan", a name on the card.
+  - `gradesFinalize`'s entries become one cara 1 task (`lib/grade-task.ts`): the Nilai menu,
+    Kelas, Mata Pelajaran and Jenis Penilaian (UH, tugas and PR are **Harian**), Tampilkan Siswa,
+    then each student's **Nilai** found by the row's name and the column header, **Catatan**
+    "remedial" below KKM and "tidak hadir" for S/I/A (value left blank). It ends pointing at
+    Simpan: "Silakan Ibu tekan Simpan.", with every value behind **Lihat ringkasan**.
+  - **After Simpan** Nemu waits for the page's saved message (or **Sudah tersimpan**), reads the
+    grades back with `gradesReadbackAlurSekolah` (or, when WS-07 isn't connected, compares what
+    the page shows with `gradesReadback`), says the result in one sentence, calls `inboxAck` and
+    offers Catatan langkah. The wait survives a page load.
+  - **Nanti** hides the card in this tab; × or Berhenti before the fill lets the photo show again.
 - **Contract.** Request and response schemas come from `@nemu/contracts/extension` and
   `@nemu/contracts/school`. Only the background calls the Nemu Service.
 
@@ -153,6 +179,18 @@ extension against `http://localhost:3000`, loads it into Playwright's Chromium, 
 `pnpm --filter extension verify:executor` does the same for the executor with a development
 build: cara 1 from the Nilai menu to Simpan, Catatan langkah, the teacher's own click (F0-07),
 a page load mid-task, F0-1 (3/3), F0-09 and cara 3, saving screenshots to `.output/verify-executor/`.
+
+`pnpm --filter extension verify:grade-photo` runs F1-1 end to end on the mock (#207). It needs
+the stack started with `WA_BOT_SECRET` set as well (`NEMU_RESPONDER=fixture WA_BOT_SECRET=<32+
+characters> pnpm dev`, and the same `WA_BOT_SECRET` for the script) and, for the AlurSekolah
+read-back, WS-07 connected to the mock (Admin › Integrasi: URL `http://localhost:3003`, key
+`as_uji_sdit_nusantara_2026`). It sends the synthetic grade-book photo
+(`packages/ai/src/school/fixtures/f1-1-buku-nilai-4b.jpg`) the way `apps/wa-bot` does and checks:
+the card in one of two tabs only, Mulai and the missing class asked for, the 10 W5 questions (4
+doubtful cells, 5 names, 1 S) with their crops, the cara 1 fill of all 32 students with notes,
+Lihat ringkasan beside Simpan, the read-back sentence after the save, the photo gone from the
+inbox, Catatan langkah, and every saved grade right in under 5 minutes. Screenshots go to
+`.output/verify-grade-photo/`.
 
 It prints one line per check, exits non-zero on a failure, and saves screenshots to
 `.output/verify/` (each open tab is saved too when a check fails). Add `-- --headed` to watch it. `NEMU_SERVER_URL`, `MOCK_ALURSEKOLAH_URL`,

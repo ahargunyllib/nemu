@@ -386,7 +386,7 @@ export class ExecutorRun {
       );
     }
     if (step.verb === "point")
-      return this.pointAndWait(index, element, name, step.sentence, false, signal);
+      return this.pointAndWait(index, element, name, step.sentence, false, signal, step.ringkasan);
     if (step.verb === "scroll") {
       element.scrollIntoView({ block: "center", behavior: "smooth" });
       this.deps.log({ action: "scroll", target: name, result: "done" });
@@ -435,9 +435,10 @@ export class ExecutorRun {
     sentence: string,
     refused: boolean,
     signal: AbortSignal,
+    ringkasan?: string,
   ) {
     this.waiting = { refused };
-    this.render({ type: "tunjuk", sentence }, element);
+    this.render({ type: "tunjuk", sentence, note: ringkasan ? { ringkasan } : undefined }, element);
     this.deps.speak(sentence);
     await waitForEvent(
       this.deps.doc,

@@ -9,13 +9,22 @@ import { readPageSnapshot } from "../../ini-kenapa/lib/page-snapshot";
 export type AskState =
   | { status: "idle" }
   | { status: "asking"; question: string }
-  | { status: "answered"; question: string; result: Exclude<AskResult, { kind: "stop" }> };
+  | {
+      status: "answered";
+      question: string;
+      result: Exclude<AskResult, { kind: "stop" } | { kind: "grades" }>;
+    };
 
 /**
  * One question at a time; a newer question or `reset` drops the older answer. The page is read
- * when the question is asked, unless the caller read it earlier (at the talk key-down).
+ * when the question is asked, unless the caller read it earlier (at the talk key-down). A grade
+ * request goes to `onGrades` (F1) instead of becoming an answer.
  */
-export function useAsk(pageEmail: PageEmail, onStop: () => void) {
+export function useAsk(
+  pageEmail: PageEmail,
+  onStop: () => void,
+  onGrades: (utterance: string) => void = () => undefined,
+) {
   const [state, setState] = useState<AskState>({ status: "idle" });
   const latest = useRef(0);
 
@@ -33,9 +42,14 @@ export function useAsk(pageEmail: PageEmail, onStop: () => void) {
         onStop();
         return;
       }
+      if (result.kind === "grades") {
+        setState({ status: "idle" });
+        onGrades(result.utterance);
+        return;
+      }
       setState({ status: "answered", question, result });
     },
-    [pageEmail, onStop],
+    [pageEmail, onStop, onGrades],
   );
 
   const reset = useCallback(() => {

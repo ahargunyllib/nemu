@@ -9,7 +9,7 @@ import type {
 import { retrieveKnowledge } from "../knowledge.js";
 import type { SlotValue } from "./bpmn/conditions.js";
 import { extractSlots, resolveWeekday, slotSpecs, type ExtractSlotsInput } from "./bpmn/plan.js";
-import { F1_READ_A, F1_READ_B, F1_REREAD } from "./fixtures/f1-photo.js";
+import { F1_DOUBTFUL, F1_REREAD, f1Page } from "./fixtures/f1-photo.js";
 import {
   parseGradeExcel,
   type ParseGradeExcelInput,
@@ -140,17 +140,18 @@ const FAMILY = /\b(anak|suami|istri|ibu saya|bapak saya|orang tua|keluarga|mertu
  * simple rules. The real pipelines still run around these answers, so the shapes are real.
  */
 export function createFixtureSchoolAi(): SchoolAi {
-  const photoReaders = {
-    readA: codeCall(() => F1_READ_A),
-    readB: codeCall(() => F1_READ_B),
+  // The page is written for the class the teacher named, so its names follow that roster.
+  const photoReaders = (roster: ReadGradePhotoInput["roster"]) => ({
+    readA: codeCall(() => f1Page(true, F1_DOUBTFUL, roster)),
+    readB: codeCall(() => f1Page(false, {}, roster)),
     reread: codeCall((request) => {
       const ids = [...requestText(request).matchAll(/id=(\d+)/gu)].map((match) => match[1]!);
       return { cells: ids.map((id) => ({ id, value: F1_REREAD[id] ?? "?" })) };
     }),
-  };
+  });
 
   return {
-    readGradePhoto: (input) => readGradePhoto(photoReaders, input),
+    readGradePhoto: (input) => readGradePhoto(photoReaders(input.roster), input),
     parseGradeExcel: (input) => parseGradeExcel({}, input),
 
     async explainError(input) {

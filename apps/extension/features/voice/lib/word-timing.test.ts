@@ -5,6 +5,7 @@ import {
   mainSentence,
   rescaleWords,
   spokenWordIn,
+  withSpokenWord,
   wordIndexAt,
 } from "./word-timing";
 
@@ -85,5 +86,18 @@ describe("spokenWordIn", () => {
     expect(
       spokenWordIn(answer, { sentence: "Sumber: SOP Penilaian.", activeIndex: 0 }),
     ).toBeUndefined();
+  });
+});
+
+describe("withSpokenWord", () => {
+  test("marks the word in a bubble a flow speaks itself; a Kartu Pilih stays as it is", () => {
+    const voice = { sentence: "Nilai kelas berapa, Bu?", activeIndex: 1 };
+    expect(withSpokenWord({ type: "jawab", sentence: "Nilai kelas berapa, Bu?" }, voice)).toEqual({
+      type: "jawab",
+      sentence: "Nilai kelas berapa, Bu?",
+      highlightedWord: 1,
+    });
+    const card = { type: "pilih", question: "Nilai kelas berapa, Bu?" };
+    expect(withSpokenWord(card, voice)).toBe(card);
   });
 });

@@ -96,13 +96,19 @@ describe("answerQuestion", () => {
     expect(client.helpExplain).not.toHaveBeenCalled();
   });
 
-  test("grade entry isn't run from the type box yet, and 'berhenti' closes the bubble", async () => {
+  test("grade entry goes to F1, a process isn't run yet, and 'berhenti' closes the bubble", async () => {
     const grades = fakeClient({ kind: "intent", intent: "input_nilai", processName: null });
     await expect(answerQuestion(grades, "masukkan nilai UTS 4B", SNAPSHOT)).resolves.toEqual({
+      kind: "grades",
+      utterance: "masukkan nilai UTS 4B",
+    });
+    expect(grades.helpAsk).not.toHaveBeenCalled();
+
+    const process = fakeClient({ kind: "intent", intent: "proses", processName: "izin" });
+    await expect(answerQuestion(process, "ajukan izin", SNAPSHOT)).resolves.toEqual({
       kind: "notice",
       text: NOT_AVAILABLE_YET,
     });
-    expect(grades.helpAsk).not.toHaveBeenCalled();
 
     const stop = fakeClient({ kind: "control", control: "berhenti" });
     await expect(answerQuestion(stop, "berhenti", SNAPSHOT)).resolves.toEqual({ kind: "stop" });

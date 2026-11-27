@@ -10,6 +10,8 @@ import type { AnswerNext } from "../../ini-kenapa/lib/explanation";
 export type AskResult =
   | { kind: "answer"; text: string; sources: string[]; why?: string; next?: AnswerNext }
   | { kind: "notice"; text: string }
+  /** "masukkan nilai UTS Matematika 4B": the grade flow (F1, #207) takes the words. */
+  | { kind: "grades"; utterance: string }
   | { kind: "stop" };
 
 /** Grade entry and process runs wait for the executor (#202), whether typed or spoken. */

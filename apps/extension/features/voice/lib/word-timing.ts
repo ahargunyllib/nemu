@@ -79,3 +79,15 @@ export function spokenWordIn(
   if (!voice || voice.activeIndex < 0 || voice.sentence !== mainSentence(text)) return undefined;
   return voice.activeIndex;
 }
+
+/**
+ * A display with the word Nemu's voice is on marked in its sentence, for flows that speak their
+ * own bubbles (F1's questions and read-back). Kartu Pilih and Kartu Info have no sentence.
+ */
+export function withSpokenWord<
+  D extends { type: string; sentence?: string; highlightedWord?: number },
+>(display: D, voice: { sentence: string; activeIndex: number } | null): D {
+  if (display.sentence === undefined) return display;
+  const highlightedWord = spokenWordIn(display.sentence, voice);
+  return highlightedWord === undefined ? display : { ...display, highlightedWord };
+}

@@ -60,9 +60,16 @@ function sleep(ms: number, signal: AbortSignal): Promise<void> {
   });
 }
 
+/**
+ * What a feature does once its task ends, before Catatan langkah: F1 reads the grades back after
+ * the teacher saves (#207). It receives the notes so far and shows them itself with `presentNotes`.
+ */
+export type TaskFinisher = (ended: RunState, notes: string[], showNotes: boolean) => void;
+
 function createExecutor() {
   const listeners = new Set<() => void>();
   const sources = new Map<string, StepSource>();
+  const finishers = new Map<string, TaskFinisher>();
   let view: ExecutorView = IDLE;
   let run: ExecutorRun | null = null;
   let notes: StepNotes | null = null;
@@ -170,6 +177,11 @@ function createExecutor() {
         detach = null;
         notes = { title: "Catatan langkah", items };
         requestSaveNotes(notes);
+        const finisher = finishers.get(ended.task.kind);
+        if (finisher) {
+          publish({ display: null, target: null, ticks: [] });
+          return finisher(ended, items, show);
+        }
         const offer = ended.startCara === 1 ? ended.task.kind : null;
         if (show) showNotes(items, offer);
         else publish({ display: null, target: null, ticks: [] });
@@ -214,6 +226,19 @@ function createExecutor() {
     /** A feature whose steps come in parts registers where the next ones come from (F0-09). */
     registerStepSource(kind: string, source: StepSource) {
       sources.set(kind, source);
+    },
+
+    /** A feature that finishes its own tasks after they end (`TaskFinisher`). */
+    registerFinisher(kind: string, finisher: TaskFinisher) {
+      finishers.set(kind, finisher);
+    },
+
+    /** A finisher's last word: Catatan langkah with its own lines added, kept for the Nemu button. */
+    presentNotes(items: string[], offerToTry: string | null = null, show = true) {
+      notes = { title: "Catatan langkah", items };
+      requestSaveNotes(notes);
+      if (show) showNotes(items, offerToTry);
+      else publish({});
     },
 
     /**
