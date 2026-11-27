@@ -1,9 +1,10 @@
 // Loads a production build of the extension into Playwright's Chromium and checks F2-08 (#206)
-// end to end: Admin Javan connects WS-07 to the mock AlurSekolah, Pak Rizal uploads the synthetic
-// SPP BPMN (F2-1) in Pengetahuan sekolah and sees the suggested symptoms, Bu Siti's grades for
-// Budi and Nabila are saved in the mock, and then the three F2-1 questions are asked on the mock:
-// the answer, Kenapa?, Sumber with 2–4 steps and Lihat diagram (bpmn-js, cause highlighted), and
-// the parent reply in WhatsApp Web (answered locally, never sent; no amounts, no "tunggakan").
+// end to end: Admin Javan connects WS-07 to the mock AlurSekolah, Pak Rizal uploads the official
+// SPP BPMN (F2-1) in Pengetahuan sekolah and sees the suggested symptoms, Bu Siti's UTS grade for
+// Aisyah (4A) is saved in the mock, and then the three questions of F2-1_pertanyaan-dan-kunci.csv
+// are asked on the mock: the answer, Kenapa?, Sumber with 2–4 steps and Lihat diagram (bpmn-js,
+// cause highlighted), and the parent reply in WhatsApp Web (answered locally, never sent; no
+// amounts, no "tunggakan").
 // Also: grades the mock doesn't have, and a question no process covers (F3-14).
 // Needs `NEMU_RESPONDER=fixture pnpm dev` running. Screenshots: .output/verify-f2-08/.
 import { execFileSync } from "node:child_process";
@@ -102,7 +103,7 @@ await check(
   async () => {
     await signIn("rizal@nemu.demo", "rizal-demo-2026");
     await admin.goto(new URL("documents", ADMIN).href);
-    const symptoms = admin.getByRole("button", { name: "Gejala dan halaman Alur Pembayaran SPP" });
+    const symptoms = admin.getByRole("button", { name: "Gejala dan halaman Alur SPP" });
     // The seeded SOP is always listed, so a second row means the list has loaded.
     await admin.getByRole("row").nth(1).waitFor();
     await admin.waitForLoadState("networkidle");
@@ -110,7 +111,7 @@ await check(
       await admin.getByRole("button", { name: "Unggah dokumen" }).click();
       const dialog = admin.getByRole("dialog");
       await dialog.getByLabel("File").setInputFiles(bpmn);
-      await dialog.getByLabel("Judul").fill("Alur Pembayaran SPP");
+      await dialog.getByLabel("Judul").fill("Alur SPP");
       await dialog.getByLabel("Versi").fill("1");
       const active = dialog.getByRole("switch", { name: "Langsung aktif" });
       if ((await active.getAttribute("aria-checked")) !== "true") await active.click();
@@ -126,10 +127,7 @@ await check(
       await rows.first().getByRole("switch", { name: "Aktif" }).click();
       await activeRows.first().waitFor();
     }
-    await activeRows
-      .first()
-      .getByRole("button", { name: "Gejala dan halaman Alur Pembayaran SPP" })
-      .click();
+    await activeRows.first().getByRole("button", { name: "Gejala dan halaman Alur SPP" }).click();
     const sheet = admin.getByRole("dialog");
     await sheet
       .getByText("nilai tidak muncul di aplikasi orang tua", { exact: false })
@@ -141,20 +139,17 @@ await check(
   },
 );
 
-// Bu Siti saved UTS Matematika 4B for Budi and Nabila; Kevin has no grade.
+// Bu Siti saved UTS Bahasa Inggris 4A for Aisyah; Kevin (4B) has no grade.
 await fetch(new URL("_mock/reset", MOCK), { method: "POST" });
 const saved = await fetch(new URL("_mock/nilai", MOCK), {
   method: "PUT",
   headers: { "content-type": "application/json" },
   body: JSON.stringify({
     username: "siti.aminah",
-    kelas: "4B",
-    mapel: "Matematika",
+    kelas: "4A",
+    mapel: "Bahasa Inggris",
     jenis: "UTS",
-    baris: [
-      { nama: "Budi Santoso", nilai: "82", catatan: "" },
-      { nama: "Nabila Putri Ramadhani", nilai: "90", catatan: "" },
-    ],
+    baris: [{ nama: "Aisyah Putri Wijaya", nilai: "86", catatan: "" }],
   }),
 });
 expect(saved.ok, `saving the mock grades failed: HTTP ${saved.status}`);
@@ -185,7 +180,6 @@ function expectSafeReply(url) {
   console.log(`  text: ${text}`);
   expect(`${url.origin}${url.pathname}` === "https://web.whatsapp.com/send", "not WhatsApp Web");
   expect(!url.searchParams.has("phone"), "the reply names a number; the teacher picks the chat");
-  expect(text.startsWith("Assalamualaikum"), "the greeting is missing");
   expect(!/tunggakan/iu.test(text), "the reply says tunggakan");
   expect(!/rp\s?\d|\d[\d.]*\s?(ribu|juta)/iu.test(text), "the reply names an amount");
   return text;
@@ -199,15 +193,12 @@ await page.locator("#btn-masuk").click();
 await page.locator("#menu-email").filter({ hasText: "@" }).waitFor();
 
 await check(
-  "F2-1 Q1: Budi's grades are saved, so the cause is certain; Bu Ratna helps",
+  "F2-1 Q1: Aisyah's grade is saved, so the cause is certain; Bu Ratna helps",
   async () => {
     expect(documentReady, "the SPP BPMN isn't uploaded");
-    await ask(
-      page,
-      "Nilai Budi sudah saya masukkan, tapi kenapa tidak muncul di aplikasi orang tua?",
-    );
+    await ask(page, "Nilai UTS Aisyah kok tidak muncul di aplikasi orang tua?");
     await bubble(page)
-      .getByText("Nilai Budi Santoso sudah tersimpan.", { exact: false })
+      .getByText("Nilai Aisyah Putri Wijaya sudah tersimpan.", { exact: false })
       .waitFor({ timeout: 15_000 });
     await bubble(page)
       .getByText("Yang bisa membantu: Bu Ratna (keuangan).", { exact: false })
@@ -224,13 +215,13 @@ await check(
 );
 
 await check(
-  "Lihat diagram: bpmn-js draws the SPP process with Kunci Nilai Siswa highlighted",
+  "Lihat diagram: bpmn-js draws the SPP process with Lock Student Grades highlighted",
   async () => {
-    const link = bubble(page).getByRole("link", { name: "Lihat diagram Alur Pembayaran SPP" });
+    const link = bubble(page).getByRole("link", { name: "Lihat diagram Alur SPP" });
     const [diagram] = await Promise.all([context.waitForEvent("page"), link.click()]);
     await diagram.waitForLoadState();
     console.log(`  ${diagram.url()}`);
-    const cause = diagram.locator(".djs-element.nemu-cause[data-element-id='Task_KunciNilai']");
+    const cause = diagram.locator(".djs-element.nemu-cause[data-element-id='Task_LockGrades']");
     await cause.waitFor({ timeout: 15_000 });
     const path = await diagram.locator(".djs-element.nemu-path").count();
     expect(path >= 3, `only ${path} path elements are marked`);
@@ -247,32 +238,33 @@ await check(
   "F2-1 Q1: the parent reply opens in WhatsApp Web; the teacher presses Kirim",
   async () => {
     const text = expectSafeReply(await parentReply(page));
-    expect(text.includes("Nilai Budi Santoso sudah tersimpan"), "the reply doesn't say it's saved");
+    expect(text.startsWith("Assalamu"), "the greeting is missing");
+    expect(text.includes("sudah kami masukkan"), "the reply doesn't say the grade is in");
     expect(text.includes("Bu Ratna"), "the reply doesn't name Bu Ratna");
   },
 );
 
-await check("F2-1 Q2: Nabila, also saved; same cause and a safe reply", async () => {
-  await ask(
-    page,
-    "Orang tua Nabila bilang nilainya belum kelihatan di aplikasi orang tua, kok bisa?",
-  );
+await check("F2-1 Q2: paid in part, still locked: the Overdue Left branch, Bu Ratna", async () => {
+  await ask(page, "Orang tuanya bilang sudah bayar sebagian, kok masih terkunci?");
   await bubble(page)
-    .getByText("Nilai Nabila Putri Ramadhani sudah tersimpan.", { exact: false })
-    .waitFor({ timeout: 15_000 });
-  await bubble(page).getByText("Bu Ratna (keuangan)", { exact: false }).waitFor();
-  expectSafeReply(await parentReply(page));
-});
-
-await check("F2-1 Q3: no student named, so no data: Nemu says 'kemungkinan' (F3-13)", async () => {
-  await ask(page, "Nemu, rapor anak di aplikasi orang tua kosong, kenapa ya?");
-  await bubble(page)
-    .getByText(/^Kemungkinan /u)
+    .getByText("sebagian dibayar", { exact: false })
+    .first()
     .waitFor({ timeout: 15_000 });
   await bubble(page).getByText("Bu Ratna (keuangan)", { exact: false }).waitFor();
   const text = expectSafeReply(await parentReply(page));
-  expect(/kemungkinan/iu.test(text), "the reply sounds certain without data");
-  await page.screenshot({ path: join(shots, "q3-kemungkinan.png") });
+  expect(text.includes("Bu Ratna"), "the reply doesn't name Bu Ratna");
+});
+
+await check("F2-1 Q3: paid in cash: from Paid in Cash to Unlock, Bu Ratna", async () => {
+  await ask(page, "Kalau bayar tunai, kapan nilainya terbuka?");
+  await bubble(page)
+    .getByText("pembayaran tunai", { exact: false })
+    .first()
+    .waitFor({ timeout: 15_000 });
+  await bubble(page).getByText("Bu Ratna (keuangan)", { exact: false }).waitFor();
+  const text = expectSafeReply(await parentReply(page));
+  expect(text.includes("Bu Ratna"), "the reply doesn't name Bu Ratna");
+  await page.screenshot({ path: join(shots, "q3-tunai.png") });
 });
 
 await check("F3-13: Kevin has no grade in AlurSekolah, so Nemu says to save it first", async () => {

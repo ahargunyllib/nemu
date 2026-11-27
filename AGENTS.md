@@ -62,6 +62,16 @@ When the user names the branch for the work, use that exact branch name instead 
 
 Don't name or link the external design file the design system was taken from in code, docs, commit messages, branch names, or PRs; refer to `docs/design-system.md` instead. For example, the Nemu brand token PR cites `docs/design-system.md`, not the design file.
 
+Write every pull request so a reviewer can follow it without reading the whole diff. The description follows `.github/pull_request_template.md`:
+
+- a TL;DR that matches the actual diff;
+- where to start reading;
+- the core files kept separate from mechanical or generated ones (fixtures, migrations, snapshots, lockfiles);
+- risks, migration order and anything the reviewer must decide;
+- the test evidence: commands run, live eval numbers, and what wasn't verified.
+
+A change someone can see (extension, admin, mock sites) also gets before/after screenshots or a recording in the description, captured from the `verify:*` scripts or a browser and attached with the before-and-after workflow (`gh pr edit --attach`). Rewrite a pushed branch's history only when the user agrees, since that needs a force push. For example, the official test-pack PRs (#244 to #251) were re-described this way, with captures from `main` and from each branch.
+
 Don't add agent attribution: no `Co-Authored-By` trailers in commit messages and no "Generated with" lines in PR descriptions. Include this rule in briefs for any session or subagent you start.
 
 ## Agent skills

@@ -14,7 +14,7 @@ export type FakeNilai = {
   skor: number;
   tanggal: string;
 };
-export type FakeSiswa = { nis: string; nama: string; kelas: string };
+export type FakeSiswa = { nis: string; nama: string; kelas: string; wali_kelas?: string };
 
 export const FAKE_ALURSEKOLAH_URL = "https://uji.alursekolah.test";
 export const FAKE_ALURSEKOLAH_KEY = "as_uji_fake_0123456789";

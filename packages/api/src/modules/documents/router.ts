@@ -98,7 +98,10 @@ export const documentsRouter = {
       if (!updated) throw new ORPCError("NOT_FOUND", { message: "Paket tidak ditemukan" });
     }),
 
-  /** F3-11 / F3-19: a BPMN's tasks and end events with their symptoms and pages. */
+  /**
+   * F3-11 / F3-19: a BPMN's tasks, events and end events with their symptoms, the step that undoes
+   * each (`wayBack`), who at school can help (`role`) and pages.
+   */
   listProcessElements: schoolAdminProcedure
     .input(documentIdSchema)
     .handler(({ context, input }) =>
@@ -114,6 +117,9 @@ export const documentsRouter = {
         elementId: z.string().min(1),
         symptoms: z.array(z.string().trim().min(1).max(200)).max(20),
         page: z.string().trim().max(120).nullable(),
+        // Left out: kept as they are.
+        wayBack: z.string().trim().max(200).nullable().optional(),
+        role: z.string().trim().max(60).nullable().optional(),
       }),
     )
     .handler(async ({ context, input }) => {
@@ -121,7 +127,13 @@ export const documentsRouter = {
         context.session.user.workspaceId,
         input.id,
         input.elementId,
-        { symptoms: input.symptoms, page: input.page || null, pageEdited: true },
+        {
+          symptoms: input.symptoms,
+          page: input.page || null,
+          pageEdited: true,
+          ...(input.wayBack === undefined ? {} : { wayBack: input.wayBack || null }),
+          ...(input.role === undefined ? {} : { role: input.role || null }),
+        },
       );
       if (!updated) throw new ORPCError("NOT_FOUND", { message: "Elemen proses tidak ditemukan" });
     }),

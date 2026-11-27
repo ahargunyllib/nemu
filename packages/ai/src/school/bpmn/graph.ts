@@ -248,6 +248,14 @@ export async function importBpmn(xml: string): Promise<ProcessGraph> {
     };
   }
 
+  // Not every modeler writes a node's incoming/outgoing; the flows' own source and target do.
+  for (const flow of Object.values(flows)) {
+    const source = nodes[flow.source];
+    const target = nodes[flow.target];
+    if (source && !source.outgoing.includes(flow.id)) source.outgoing.push(flow.id);
+    if (target && !target.incoming.includes(flow.id)) target.incoming.push(flow.id);
+  }
+
   // Flows drawn with only a label ("Sakit > 1 hari") can't be evaluated; keep the label for review.
   for (const flow of Object.values(flows)) {
     const source = nodes[flow.source];

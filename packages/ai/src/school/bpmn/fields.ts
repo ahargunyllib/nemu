@@ -7,6 +7,11 @@ import { normalizeControlName } from "../safety.js";
  * matches what it can tell for sure; only what is left goes to the model, which may say none.
  */
 
+/** One of `values` or null; `anyOf`, since some providers reject an enum under a type list. */
+export function nullableEnum(values: readonly string[]): Record<string, unknown> {
+  return { anyOf: [{ type: "string", enum: [...values] }, { type: "null" }] };
+}
+
 export type FieldToMatch = { id: string; label: string };
 export type FieldMatch = Record<string, string | null>;
 
@@ -96,7 +101,7 @@ Pakai hanya label dari daftar. Kalau tidak ada yang artinya sama, label null. Sa
               required: ["field", "label"],
               properties: {
                 field: { type: "string", enum: left.map((field) => field.id) },
-                label: { type: ["string", "null"], enum: [...labels, null] },
+                label: nullableEnum(labels),
               },
             },
           },

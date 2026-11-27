@@ -30,6 +30,7 @@ import type { ProcessGraph } from "./bpmn/graph.js";
 import { extractSlots, resolveWeekday, slotSpecs, type ExtractSlotsInput } from "./bpmn/plan.js";
 import { F1_READ_A, F1_READ_B, F1_REREAD } from "./fixtures/f1-photo.js";
 import { F4_2_READING, F4_2_SCRIPT_SHA256 } from "./fixtures/f4-2-script.js";
+import { F2_1_SPP_INDEX, F2_1_SPP_PHRASING, isF21Spp } from "./fixtures/f2-1-spp.js";
 import { fixtureFormPhoto } from "./fixtures/form-photo.js";
 import {
   parseGradeExcel,
@@ -41,23 +42,21 @@ import {
   type ReadGradePhotoInput,
   type ReadGradePhotoResult,
 } from "./grades/reading.js";
-import {
-  answerGrounded,
-  normalizeForQuote,
-  verifyGroundedAnswer,
-  type AnswerGroundedInput,
-} from "./grounding.js";
-import { explainError, pageLines, resolveHelp, type ExplainErrorInput } from "./help.js";
+import { answerGrounded, verifyGroundedAnswer, type AnswerGroundedInput } from "./grounding.js";
+import { explainError, type ExplainErrorInput } from "./help.js";
 import { createOpenRouterJsonCaller, type JsonCall, type JsonCallRequest } from "./llm.js";
 import {
   documentationSymptoms,
   draftPhrasing,
   explainProcess,
   keywordSymptomMatch,
+  keywordViaMatch,
   matchSymptom,
   suggestSymptoms,
   type ExplainProcessInput,
+  type ProcessIndex,
   type SymptomCandidate,
+  type SymptomMatch,
 } from "./process-help.js";
 import {
   assembleProcedure,
@@ -82,13 +81,16 @@ export type SchoolAi = {
   parseGradeExcel(input: ParseGradeExcelInput): Promise<ParseGradeExcelResult>;
   explainError(input: ExplainErrorInput): Promise<HelpExplanation>;
   answerGrounded(input: AnswerGroundedInput): Promise<GroundedAnswer>;
-  /** F3-11: on BPMN upload, the symptoms a user sees at each task and end event, by element id. */
-  suggestSymptoms(input: { graph: ProcessGraph }): Promise<Record<string, string[]>>;
-  /** F3-12: the stored symptom the teacher's words describe, or null (F3-14). */
+  /**
+   * F3-11: on BPMN upload, per task, event and end event: the symptoms a user sees there, the step
+   * that undoes it and the school role who can help, by element id.
+   */
+  suggestSymptoms(input: { graph: ProcessGraph }): Promise<ProcessIndex>;
+  /** F3-12: the stored symptom the teacher's words describe (and what came first), or null (F3-14). */
   matchSymptom(input: {
     question: string;
     candidates: readonly SymptomCandidate[];
-  }): Promise<SymptomCandidate | null>;
+  }): Promise<SymptomMatch | null>;
   /** F2-08 / F3-12..13: cause, way back, who helps and the parent reply; null if the walk fails. */
   explainProcess(input: ExplainProcessInput): Promise<HelpExplanation | null>;
   extractSlots(input: ExtractSlotsInput): Promise<Record<string, SlotValue>>;
@@ -102,7 +104,7 @@ export type SchoolAi = {
   compileProcedure(input: CompileProcedureInput): Promise<Procedure>;
   /**
    * F4-01: quiz checks that need judgement beyond the extension's DOM rules (#218), e.g. whether
-   * a question suits the class. None are built yet, so both runtimes answer with no problems.
+   * a question suits the class. None is needed for F4-1 (#218), so both answer with no problems.
    */
   judgeQuiz(input: QuizJudgeInput): Promise<QuizJudgement>;
   /**
@@ -123,6 +125,8 @@ export type SchoolAiConfig = {
     /** Photo Read B: a different model family. */
     readB: string;
     reread: string;
+    /** F4-03: the teacher's quiz script (a PDF as a file, or a photo), with its pictures. */
+    script: string;
     /** Excel headers, help, grounded answers, slot extraction, procedure compile. */
     text: string;
     transcription: string;
@@ -175,10 +179,9 @@ export function createSchoolAi(config: SchoolAiConfig): SchoolAi {
     readFormPhoto: (input) => readFormPhoto(readers.readA, input),
     matchFields: (input) => matchFields({ llm: text }, input),
     compileProcedure: (input) => compileProcedure({ llm: text }, input),
-    // #218 (Zahra): a model call goes here once a judgement check is agreed with SE.
+    // #218: F4-1's problems are all caught by the extension's DOM rules, so no model check runs.
     judgeQuiz: async () => ({ problems: [] }),
-    // #219 (Zahra): the vision reader also takes the PDF itself (`input_file`).
-    readQuizScript: (input) => readQuizScript({ llm: readers.readA }, input),
+    readQuizScript: (input) => readQuizScript({ llm: caller(config.models.script, "low") }, input),
     transcribe: createOpenRouterTranscriber({
       apiKey: config.apiKey,
       model: config.models.transcription,
@@ -221,48 +224,8 @@ export function createFixtureSchoolAi(): SchoolAi {
     readGradePhoto: (input) => readGradePhoto(photoReaders, input),
     parseGradeExcel: (input) => parseGradeExcel({}, input),
 
-    async explainError(input) {
-      const words = (text: string) =>
-        normalizeForQuote(text)
-          .replace(/[^\p{L}\p{N}]+/gu, " ")
-          .trim();
-      const screen = words(pageLines(input.snapshot).join(" "));
-      const entry = input.kamus.find((chunk) => {
-        // A message with placeholders ("mengampu [mapel] di kelas [kelas]") matches up to the first.
-        const quoted = chunk.text.match(/"([^"]+)"/u)?.[1]?.split(/[[…]/u)[0];
-        return chunk.active && !!quoted?.trim() && screen.includes(words(quoted).slice(0, 40));
-      });
-      const sentences = entry?.text.split(/(?<=\.)\s+/u) ?? [];
-      const fixerSentence =
-        sentences.find((sentence) => /perlu|cukup|hubungi/iu.test(sentence)) ?? "";
-      const role = /kepala sekolah/iu.test(fixerSentence)
-        ? "kepsek"
-        : /operator/iu.test(fixerSentence)
-          ? "operator"
-          : /guru cukup/iu.test(fixerSentence)
-            ? "guru"
-            : null;
-      return resolveHelp(
-        {
-          status: entry ? "matched" : "not_in_guide",
-          error_text: input.snapshot.alerts[0] ?? "",
-          chunk_id: entry?.id ?? null,
-          quote: fixerSentence.replace(/\.$/u, "") || null,
-          teacher_fault: false,
-          fixer_role: role,
-          can_self_fix: role === "guru",
-          // "… menekan tombol Sinkro Ruang GTK, lalu …" → "Sinkro Ruang GTK".
-          guided_target:
-            role === "guru"
-              ? (fixerSentence.match(/tombol (.+?)(?=,|\.| lalu\b| di\b|$)/u)?.[1] ?? null)
-              : null,
-          why: entry ? sentences.slice(1).join(" ") : "",
-          app_name: entry?.text.match(/^K-\d+ ([^:]+):/u)?.[1] ?? "aplikasi",
-        },
-        input.kamus.filter((chunk) => chunk.active),
-        input,
-      );
-    },
+    // Code matching only: a near miss the real model would judge is "not in the guide" here.
+    explainError: (input) => explainError({ llm: codeCall(() => ({ row_id: null })) }, input),
 
     async answerGrounded(input) {
       const context = retrieveKnowledge(
@@ -273,13 +236,30 @@ export function createFixtureSchoolAi(): SchoolAi {
       const top = context[0];
       if (!top || top.score < 1)
         return { status: "not_in_guide", answer: "Belum ada di panduan sekolah." };
-      // A guide section starts with its Markdown heading; the answer is the first sentence under it.
-      const quote = top.text
+      // The answer is the sentence or numbered point of the chunk that shares most words with the
+      // question (the first one on a tie), without its Markdown heading, point number and full stop.
+      const sentences = top.text
         .replace(/^#{1,6}\s.*$/gmu, "")
         .trim()
-        .split(/(?<=\.)\s+/u)[0]!
-        .replace(/^\d+(\.\d+)*\s+/u, "")
-        .replace(/\.$/u, "");
+        .split(/(?<=\.)\s+|\n(?=\d+(?:\.\d+)+\s)/u)
+        .map((sentence) =>
+          sentence
+            .trim()
+            .replace(/^\d+(\.\d+)*\s+/u, "")
+            .replace(/\.$/u, ""),
+        );
+      const best = retrieveKnowledge(
+        sentences.map((text, index) => ({
+          ...top,
+          id: String(index).padStart(4, "0"),
+          title: "",
+          article: undefined,
+          text,
+        })),
+        input.question,
+        1,
+      )[0];
+      const quote = sentences[Number(best?.id ?? 0)]!;
       return verifyGroundedAnswer(
         {
           status: "answered",
@@ -290,25 +270,63 @@ export function createFixtureSchoolAi(): SchoolAi {
       );
     },
 
-    // Symptoms from the elements' own documentation, matching by shared words, drafts as written.
+    // The official F2-1 SPP file gets the index the live model writes for it (fixtures/f2-1-spp.ts);
+    // any other file gets symptoms from its elements' own documentation. Matching by shared words,
+    // drafts as written.
     suggestSymptoms: (input) =>
       suggestSymptoms(
         {
           llm: codeCall(() => ({
-            elements: Object.entries(documentationSymptoms(input.graph)).map(
-              ([element_id, symptoms]) => ({ element_id, symptoms }),
-            ),
+            elements: isF21Spp(input.graph)
+              ? Object.entries(F2_1_SPP_INDEX).map(([element_id, entry]) => ({
+                  element_id,
+                  ...entry,
+                }))
+              : Object.entries(documentationSymptoms(input.graph)).map(
+                  ([element_id, symptoms]) => ({
+                    element_id,
+                    symptoms,
+                    way_back: null,
+                    role: null,
+                  }),
+                ),
           })),
         },
         input,
       ),
     matchSymptom: (input) =>
       matchSymptom(
-        { llm: codeCall(() => ({ index: keywordSymptomMatch(input.question, input.candidates) })) },
+        {
+          llm: codeCall(() => {
+            const index = keywordSymptomMatch(input.question, input.candidates);
+            return {
+              index,
+              via: index === null ? null : keywordViaMatch(input.question, input.candidates, index),
+            };
+          }),
+        },
         input,
       ),
+    // The official F2-1 walks read as the key phrases them; any other walk keeps the code's drafts.
     explainProcess: (input) =>
-      explainProcess({ llm: codeCall((request) => draftPhrasing(requestText(request))) }, input),
+      explainProcess(
+        {
+          llm: codeCall((request) => {
+            const text = requestText(request);
+            const drafted = draftPhrasing(text);
+            const cause = (JSON.parse(text) as { jalur: Array<{ nama: string }> }).jalur.at(-1);
+            const canned = isF21Spp(input.process.graph)
+              ? F2_1_SPP_PHRASING[cause?.nama ?? ""]
+              : undefined;
+            if (!canned || canned.steps.length !== drafted.steps.length) return drafted;
+            return {
+              ...canned,
+              steps: canned.steps.map((step, index) => ({ index, text: step })),
+            };
+          }),
+        },
+        input,
+      ),
 
     async extractSlots(input) {
       return extractSlots(
@@ -340,15 +358,19 @@ export function createFixtureSchoolAi(): SchoolAi {
                   .toUpperCase() ?? null;
             }
           }
-          return answer;
+          return {
+            isian: Object.entries(answer)
+              .filter(([, value]) => value !== null)
+              .map(([nama, nilai]) => ({ nama, nilai: String(nilai) })),
+          };
         }),
         input,
       );
     },
 
-    // The test photo carries its own reading (fixtures/form-photo.ts); the rest is the real code.
+    // A known test photo reads as its model reading (fixtures/form-photo.ts); the rest is the real code.
     async readFormPhoto(input) {
-      return assembleFormPhoto(input, fixtureFormPhoto(input.image.dataUrl));
+      return assembleFormPhoto(input, await fixtureFormPhoto(input.image.dataUrl));
     },
     async matchFields(input) {
       return matchFieldLabels(input.fields, input.pageLabels);

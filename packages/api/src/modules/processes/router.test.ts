@@ -237,13 +237,13 @@ describe("F3-1 setoran tahfidz through the API (#213)", () => {
     };
     // The page WS-04 took from the label is used until the operator edits it.
     const auto = await planAll(context, sentence);
-    expect(auto.tasks[0]).toMatchObject({ page: "Catat Setoran Kelas", pageSource: "mapping" });
+    expect(auto.tasks[0]).toMatchObject({ page: "setoran satu kelas", pageSource: "mapping" });
 
     await call(
       documentsRouter.saveProcessElement,
       {
         id: document.id,
-        elementId: "Task_CatatSetoran",
+        elementId: "Task_Setoran",
         symptoms: [],
         page: "Al-Quran › Setoran baru",
       },
@@ -252,18 +252,18 @@ describe("F3-1 setoran tahfidz through the API (#213)", () => {
     const plan = await planAll(context, sentence);
     expect(plan.tasks).toEqual([
       {
-        taskId: "Task_CatatSetoran",
-        name: "Catat Setoran Kelas",
+        taskId: "Task_Setoran",
+        name: "Isi setoran satu kelas",
         page: "Al-Quran › Setoran baru",
         pageSource: "mapping",
         action: "Simpan setoran",
       },
     ]);
-    expect(plan.step).toMatchObject({ kind: "ask", slot: "murid" });
+    expect(plan.step).toMatchObject({ kind: "ask", taskId: "Task_Setoran", slot: "surah" });
 
     await call(
       documentsRouter.saveProcessElement,
-      { id: document.id, elementId: "Task_CatatSetoran", symptoms: [], page: null },
+      { id: document.id, elementId: "Task_Setoran", symptoms: [], page: null },
       { context: admin },
     );
     const none = await planAll(context, sentence);
@@ -287,7 +287,7 @@ describe("F3-1 setoran tahfidz through the API (#213)", () => {
     const procedure = await call(
       processesRouter.procedureCompile,
       {
-        title: "Catat setoran kelas",
+        title: "Isi setoran satu kelas",
         events: [
           at(0, "click", "Al-Quran", "link"),
           at(1, "click", "Setoran baru", "button"),
@@ -299,7 +299,7 @@ describe("F3-1 setoran tahfidz through the API (#213)", () => {
     );
     await call(
       processesRouter.procedureSave,
-      { title: "Catat setoran kelas", version: "1", isActive: true, procedure },
+      { title: "Isi setoran satu kelas", version: "1", isActive: true, procedure },
       { context: admin },
     );
     const plan = await planAll(context, {
@@ -317,9 +317,9 @@ describe("F3-1 setoran tahfidz through the API (#213)", () => {
   it("F3-1: the book photo is read, Citra's Tajwid is asked, and the steps end before Simpan setoran", async () => {
     const { context, document } = await tahfidzContext();
     const photo = new File(
-      [await readFile(join(FIXTURES, "F3-1_foto-buku-setoran-tahfidz-4A.png"))],
-      "buku-setoran.png",
-      { type: "image/png" },
+      [await readFile(join(FIXTURES, "F3-1_foto-buku-setoran-tahfidz-4A.jpg"))],
+      "buku-setoran.jpg",
+      { type: "image/jpeg" },
     );
     const job = await call(inboxRouter.inboxUploadPhoto, { file: photo }, { context });
     const first = await planAll(context, {
@@ -328,7 +328,7 @@ describe("F3-1 setoran tahfidz through the API (#213)", () => {
       answering: null,
       slots: {},
     });
-    expect(first.step).toMatchObject({ kind: "ask", taskId: "Task_CatatSetoran" });
+    expect(first.step).toMatchObject({ kind: "ask", taskId: "Task_Setoran" });
 
     const read = await call(
       processesRouter.processReadPhoto,
@@ -337,7 +337,7 @@ describe("F3-1 setoran tahfidz through the API (#213)", () => {
     );
     if (read.status !== "ok") throw new Error(`photo: ${read.status}`);
     expect(read.questions).toMatchObject([
-      { kind: "value", rowName: "Citra Lestari", fieldId: "tajwid", candidates: ["81", "87"] },
+      { kind: "value", rowName: "Citra Lestari", fieldId: "tajwid", candidates: [] },
     ]);
     const table = {
       ...read.table,
@@ -352,7 +352,14 @@ describe("F3-1 setoran tahfidz through the API (#213)", () => {
       slots: read.slots,
       table,
     });
-    expect(plan.steps.map((step) => step.kind)).toEqual(["fill", "fill", "rows", "human", "done"]);
+    expect(plan.steps.map((step) => step.kind)).toEqual([
+      "fill",
+      "fill",
+      "fill",
+      "rows",
+      "human",
+      "done",
+    ]);
     const rows = plan.steps.find((step) => step.kind === "rows");
     expect(rows?.kind === "rows" && rows.rows.map((row) => row.name)).toEqual([
       "Aisyah Putri Wijaya",
@@ -361,8 +368,8 @@ describe("F3-1 setoran tahfidz through the API (#213)", () => {
     ]);
     expect(plan.steps.at(-2)).toMatchObject({ kind: "human", action: "Simpan setoran" });
     expect(plan.announcements).toEqual([
-      "Sistem AlurSekolah: hitung nilai hafalan.",
-      "Koordinator Tahfidz: periksa rekap tahfidz.",
+      "Sistem AlurSekolah: hitung nilai dan huruf.",
+      "Sistem AlurSekolah: tampilkan di aplikasi orang tua.",
     ]);
   });
 

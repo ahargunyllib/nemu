@@ -23,16 +23,17 @@ import { orpc } from "@/shared/api/orpc";
 
 type ProcessElement = {
   elementId: string;
-  kind: "task" | "end";
+  kind: "task" | "end" | "event";
   name: string;
   symptoms: string[];
+  role: string | null;
   page: string | null;
   pageEdited: boolean;
 };
 
 /**
- * F3-11 / F3-19: a BPMN's tasks and end events. The operator corrects the symptoms a teacher sees
- * when the process stops there, and the page each user task is done on.
+ * F3-11 / F3-19: a BPMN's tasks, events and end events. The operator corrects the symptoms a
+ * teacher sees there, who at school can help, and the page each user task is done on.
  */
 export default function ProcessElementsSheet({ id, title }: { id: string; title: string }) {
   const [open, setOpen] = useState(false);
@@ -54,8 +55,8 @@ export default function ProcessElementsSheet({ id, title }: { id: string; title:
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
           <SheetDescription>
-            Gejala yang dilihat guru saat proses berhenti di langkah ini, dan halaman tempat tugas
-            dikerjakan. Satu gejala per baris.
+            Gejala yang dilihat guru atau orang tua di langkah ini, siapa di sekolah yang bisa
+            membantu, dan halaman tempat tugas dikerjakan. Satu gejala per baris.
           </SheetDescription>
           <Button
             variant="outline"
@@ -82,6 +83,7 @@ export default function ProcessElementsSheet({ id, title }: { id: string; title:
 function ElementEditor({ documentId, element }: { documentId: string; element: ProcessElement }) {
   const [symptoms, setSymptoms] = useState(element.symptoms.join("\n"));
   const [page, setPage] = useState(element.page ?? "");
+  const [role, setRole] = useState(element.role ?? "");
   const queryClient = useQueryClient();
   const save = useMutation(
     orpc.saveProcessElement.mutationOptions({
@@ -105,12 +107,19 @@ function ElementEditor({ documentId, element }: { documentId: string; element: P
             .map((line) => line.trim())
             .filter(Boolean),
           page: element.kind === "task" ? page : null,
+          role: role.trim() || null,
         });
       }}
     >
       <div className="flex items-center justify-between gap-2">
         <span className="font-medium">{element.name}</span>
-        <Badge variant="secondary">{element.kind === "task" ? "Tugas" : "Akhir proses"}</Badge>
+        <Badge variant="secondary">
+          {element.kind === "task"
+            ? "Tugas"
+            : element.kind === "event"
+              ? "Peristiwa"
+              : "Akhir proses"}
+        </Badge>
       </div>
       <div className="grid gap-2">
         <Label htmlFor={`${fieldId}-symptoms`}>Gejala</Label>
@@ -119,6 +128,15 @@ function ElementEditor({ documentId, element }: { documentId: string; element: P
           placeholder="nilai tidak muncul di aplikasi orang tua"
           value={symptoms}
           onChange={(event) => setSymptoms(event.target.value)}
+        />
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor={`${fieldId}-role`}>Yang bisa membantu</Label>
+        <Input
+          id={`${fieldId}-role`}
+          placeholder="bagian keuangan"
+          value={role}
+          onChange={(event) => setRole(event.target.value)}
         />
       </div>
       {element.kind === "task" && (

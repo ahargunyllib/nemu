@@ -242,14 +242,16 @@ extension against `http://localhost:3000`, loads it into Playwright's Chromium, 
 build: cara 1 from the Nilai menu to Simpan, Catatan langkah, the teacher's own click (F0-07),
 a page load mid-task, F0-1 (3/3), F0-09 and cara 3, saving screenshots to `.output/verify-executor/`.
 
-`pnpm --filter extension verify:f2-08` runs F2-1 end to end (#206): Admin Javan connects WS-07
-to the mock, Pak Rizal uploads `packages/ai/src/school/fixtures/F2-1_alur-spp.bpmn` in Pengetahuan
-sekolah (once; later runs reuse it) and sees the suggested symptoms, grades for Budi and Nabila are
-saved in the mock, and the three F2-1 questions are asked: the answer ("sudah tersimpan" or
-"Kemungkinan"), Kenapa?, Sumber with 2–4 steps, **Lihat diagram** (bpmn-js in the Admin Workspace
-with Kunci Nilai Siswa highlighted) and the parent reply in WhatsApp Web (no number, no amounts, no
-"tunggakan"; answered locally, never sent). It also checks a student without grades and a
-question no process covers. `NEMU_ADMIN_URL` (default `http://localhost:3002/`) points it at another
+`pnpm --filter extension verify:f2-08` runs F2-1 end to end (#206, #217): Admin Javan connects
+WS-07 to the mock, Pak Rizal uploads the official `packages/ai/src/school/fixtures/F2-1_alur-spp.bpmn`
+as "Alur SPP" in Pengetahuan sekolah (once; later runs reuse it) and sees the suggested symptoms,
+Aisyah's UTS grade (4A) is saved in the mock, and the three questions of
+`F2-1_pertanyaan-dan-kunci.csv` are asked: the answer ("sudah tersimpan", the partly-paid branch,
+paying in cash), Kenapa?, Sumber with 2–4 steps, **Lihat diagram** (bpmn-js in the Admin Workspace
+with Lock Student Grades highlighted) and the parent reply in WhatsApp Web (no number, no amounts,
+no "tunggakan"; answered locally, never sent). It also checks a student without grades and a
+question no process covers. A local database that still has the synthetic "Alur Pembayaran SPP"
+from before #217 should have it switched off first, or its symptoms compete with the official ones. `NEMU_ADMIN_URL` (default `http://localhost:3002/`) points it at another
 Admin Workspace. Screenshots go to `.output/verify-f2-08/`.
 
 `pnpm --filter extension verify:grade-photo` runs F1-1 end to end on the mock (#207). It needs

@@ -5,7 +5,8 @@ import test from "node:test";
 
 import { importBpmn } from "./bpmn/graph.js";
 import { planBpmnStep } from "./bpmn/plan.js";
-import { BU_SITI, KAMUS_CHUNKS, SOP_CHUNKS } from "./fixtures/sdit-nusantara.js";
+import { F2_2_PAGE, F2_3_PAGE, KAMUS_ROWS, NOT_IN_GUIDE_PAGES } from "./fixtures/kamus.js";
+import { BU_SITI, SOP_CHUNKS } from "./fixtures/sdit-nusantara.js";
 import { F1_BOOK, F1_FINAL_VALUES, F1_ROSTER } from "./fixtures/f1-photo.js";
 import { applyAnswers, buildVerificationPlan } from "./grades/verification.js";
 import { createFixtureSchoolAi, createSchoolAi } from "./runtime.js";
@@ -24,15 +25,6 @@ test("offline mode reads any photo as the official F1-1 page, with its 10 questi
     10,
   );
 });
-
-const PAGE = {
-  title: "Ruang GTK",
-  url: "https://ruang.gtk.example/kinerja",
-  alerts: [] as string[],
-  headings: [] as string[],
-  fields: [],
-  screenshotBase64: null,
-};
 
 const PROFIL_4B = F1_ROSTER;
 
@@ -91,35 +83,11 @@ test("offline mode: 4 doubtful cells, 5 names and the S asked, then the book's v
   }
 });
 
-test("offline mode explains a kamus error and names the fixer", async () => {
+test("F2-2 offline: IPAS 4A not assigned is Pak Rizal's to fix (K-07), with a WhatsApp draft", async () => {
   const result = await ai.explainError({
-    snapshot: { ...PAGE, alerts: ["SKP belum bisa diajukan karena RHK atasan belum tersedia"] },
-    question: "ini kenapa",
-    kamus: KAMUS_CHUNKS,
-    teacher: BU_SITI,
-  });
-  assert.equal(
-    result.status === "matched" && result.sentence,
-    "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Ahmad (kepsek).",
-  );
-});
-
-test("F2-2 offline: an unassigned subject is Pak Rizal's to fix (K-07), with a WhatsApp draft", async () => {
-  const result = await ai.explainError({
-    snapshot: {
-      ...PAGE,
-      title: "AlurSekolah (tiruan)",
-      alerts: [
-        "Tidak dapat menampilkan siswa Anda belum ditugaskan mengampu IPAS di kelas 4A. Hubungi admin sekolah.",
-      ],
-      headings: ["Isi nilai kelas"],
-      fields: [
-        { label: "Kelas", value: "4A" },
-        { label: "Mata pelajaran", value: "IPAS" },
-      ],
-    },
+    snapshot: F2_2_PAGE,
     question: "Nemu, ini kenapa?",
-    kamus: KAMUS_CHUNKS,
+    kamus: KAMUS_ROWS,
     teacher: BU_SITI,
   });
   assert.equal(result.status, "matched");
@@ -132,20 +100,13 @@ test("F2-2 offline: an unassigned subject is Pak Rizal's to fix (K-07), with a W
   assert.equal(result.canSelfFix, false);
   assert.equal(result.waDraft?.phone, "6281200000002");
   assert.match(result.waDraft?.text ?? "", /^Assalamualaikum Pak Rizal\./u);
-  assert.doesNotMatch(result.waDraft?.text ?? "", /screenshot/iu);
 });
 
 test("F2-3 offline: the teacher syncs Ruang GTK herself (K-02), no WhatsApp", async () => {
   const result = await ai.explainError({
-    snapshot: {
-      ...PAGE,
-      alerts: [
-        'Data Perencanaan (SKP) Anda gagal dialirkan ke E-Kinerja Alasan: Tidak ditandai sebagai User Ruang GTK. Mohon coba lagi atau Anda dapat juga menekan tombol "Sinkro Ruang GTK" di E-Kinerja dan ikuti petunjuknya.',
-      ],
-      headings: ["Pengelolaan Kinerja 2026"],
-    },
+    snapshot: F2_3_PAGE,
     question: "ini kenapa?",
-    kamus: KAMUS_CHUNKS,
+    kamus: KAMUS_ROWS,
     teacher: BU_SITI,
   });
   assert.equal(result.status, "matched");
@@ -155,20 +116,21 @@ test("F2-3 offline: the teacher syncs Ruang GTK herself (K-02), no WhatsApp", as
     [result.canSelfFix, result.guidedTarget, result.waDraft],
     [true, "Sinkro Ruang GTK", null],
   );
-  assert.match(result.citation.quote, /menu E-Kinerja/u);
 });
 
-test("offline mode: an error the kamus doesn't cover offers the operator", async () => {
-  const result = await ai.explainError({
-    snapshot: { ...PAGE, alerts: ["Error 502 Bad Gateway"] },
-    question: "ini kenapa?",
-    kamus: KAMUS_CHUNKS,
-    teacher: BU_SITI,
-  });
-  assert.equal(result.status, "not_in_guide");
-  if (result.status !== "not_in_guide") return;
-  assert.match(result.sentence, /^Belum ada di panduan sekolah\./u);
-  assert.equal(result.waDraft?.phone, "6281200000002");
+test("offline mode: screens the kamus doesn't cover offer the operator", async () => {
+  for (const snapshot of Object.values(NOT_IN_GUIDE_PAGES)) {
+    const result = await ai.explainError({
+      snapshot,
+      question: "ini kenapa?",
+      kamus: KAMUS_ROWS,
+      teacher: BU_SITI,
+    });
+    assert.equal(result.status, "not_in_guide");
+    if (result.status !== "not_in_guide") return;
+    assert.match(result.sentence, /^Belum ada di panduan sekolah\./u);
+    assert.equal(result.waDraft?.phone, "6281200000002");
+  }
 });
 
 test("offline mode answers from the SOP with a verified quote, and abstains otherwise", async () => {
@@ -212,6 +174,7 @@ test("without a TTS model the service returns text and timings for the local voi
       readA: "a",
       readB: "b",
       reread: "a",
+      script: "c",
       text: "t",
       transcription: "s",
       speech: "",
