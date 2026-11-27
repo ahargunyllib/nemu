@@ -118,6 +118,10 @@ _Avoid_: upload, ticket
 One screen asking the teacher about a doubtful digit, a name spelled differently from the roster, or an S/I/A cell. Its options are never pre-selected.
 _Avoid_: confirmation, review
 
+**Naskah soal**:
+The teacher's own question script (PDF, Word or photo) that Nemu turns into a Moodle quiz (F4-03). Nemu copies its words, choices, key and pictures; anything it can't read becomes a Verification Question, never a guess.
+_Avoid_: question bank, quiz file
+
 **Kamus Kendala**:
 The school's error dictionary (WS-05): what an error message means, whose fault it is, and who fixes it, one row per message, typed or imported from Excel. Nemu answers "ini kenapa?" only from it, never from uploaded documents.
 _Avoid_: FAQ, error list

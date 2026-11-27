@@ -153,6 +153,11 @@ is and adds an attempt only for a student who hasn't submitted one. Check it: si
 15 questions, and both F4-3 quizzes in Bahasa Inggris, where **Hasil** of "Latihan: My Family
 (has/have)" says "Yang telah mengerjakan: 3 orang".
 
+F4-2 (#210) needs nothing more: Nemu creates its quiz from the teacher's script
+(`setup/f4-2/`). Before running it again, remove the last run's quiz with
+`docker compose cp setup/. moodle:/tmp/nemu-setup` and
+`docker compose exec -T moodle php /tmp/nemu-setup/reset-f4-2.php`.
+
 Moodle 5.3 differs from the guides in one place, for anything done by hand: **Bank soal** first
 lists the course's question banks. Open **Sistem bank soal bersama**, then **Impor**. A database
 shell, if you need one:

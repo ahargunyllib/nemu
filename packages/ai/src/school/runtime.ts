@@ -1,4 +1,9 @@
-import type { QuizJudgeInput, QuizJudgement } from "@nemu/contracts/quiz";
+import type {
+  QuizJudgeInput,
+  QuizJudgement,
+  QuizScriptInput,
+  QuizScriptResult,
+} from "@nemu/contracts/quiz";
 import type {
   GroundedAnswer,
   HelpExplanation,
@@ -24,6 +29,7 @@ import {
 import type { ProcessGraph } from "./bpmn/graph.js";
 import { extractSlots, resolveWeekday, slotSpecs, type ExtractSlotsInput } from "./bpmn/plan.js";
 import { F1_DOUBTFUL, F1_REREAD, f1Page } from "./fixtures/f1-photo.js";
+import { F4_2_READING, F4_2_SCRIPT_SHA256 } from "./fixtures/f4-2-script.js";
 import { fixtureFormPhoto } from "./fixtures/form-photo.js";
 import {
   parseGradeExcel,
@@ -59,6 +65,7 @@ import {
   compileProcedure,
   type CompileProcedureInput,
 } from "./procedures.js";
+import { fileBytes, readQuizScript } from "./quiz/script.js";
 import {
   createOpenRouterSynthesizer,
   createOpenRouterTranscriber,
@@ -98,6 +105,11 @@ export type SchoolAi = {
    * a question suits the class. None are built yet, so both runtimes answer with no problems.
    */
   judgeQuiz(input: QuizJudgeInput): Promise<QuizJudgement>;
+  /**
+   * F4-03 (#219): the teacher's script (PDF, Word or photo) read into a quiz draft. Parts it
+   * can't read come back as questions for her, in the shape of F1's photo questions.
+   */
+  readQuizScript(input: QuizScriptInput): Promise<QuizScriptResult>;
   transcribe(audio: AudioInput): Promise<Transcript>;
   /** Audio plus word timings; `audioBase64` is "" when the client must use its local voice. */
   synthesize(text: string): Promise<SpeechSynthesis>;
@@ -165,6 +177,8 @@ export function createSchoolAi(config: SchoolAiConfig): SchoolAi {
     compileProcedure: (input) => compileProcedure({ llm: text }, input),
     // #218 (Zahra): a model call goes here once a judgement check is agreed with SE.
     judgeQuiz: async () => ({ problems: [] }),
+    // #219 (Zahra): the vision reader also takes the PDF itself (`input_file`).
+    readQuizScript: (input) => readQuizScript({ llm: readers.readA }, input),
     transcribe: createOpenRouterTranscriber({
       apiKey: config.apiKey,
       model: config.models.transcription,
@@ -372,6 +386,22 @@ export function createFixtureSchoolAi(): SchoolAi {
     // The DOM rules find everything F4-1 needs; the offline runtime adds no judgement.
     async judgeQuiz() {
       return { problems: [] };
+    },
+
+    // Richard's F4-2 script reads as its own words; any other file reads as no questions.
+    async readQuizScript(input) {
+      const digest = await crypto.subtle.digest(
+        "SHA-256",
+        fileBytes(input.file.dataUrl) as BufferSource,
+      );
+      const hex = [...new Uint8Array(digest)]
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+      const reading =
+        hex === F4_2_SCRIPT_SHA256
+          ? F4_2_READING
+          : { readable: false, title: null, subject: null, class_name: null, questions: [] };
+      return readQuizScript({ llm: codeCall(() => reading) }, input);
     },
 
     async transcribe() {

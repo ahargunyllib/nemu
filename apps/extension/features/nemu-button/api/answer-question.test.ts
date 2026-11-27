@@ -163,4 +163,28 @@ describe("answerQuestion", () => {
       answerQuestion(client, "Bagaimana cara menghapus nilai?", SNAPSHOT),
     ).resolves.toMatchObject({ kind: "answer" });
   });
+
+  test("'masukkan kuis dari naskah ini' is the extension's own F4-03 flow (#210): nothing is sent", async () => {
+    const client = fakeClient({ kind: "intent", intent: "unknown", processName: null });
+    for (const words of [
+      "Nemu, masukkan kuis dari naskah ini ke Moodle. Buka Senin 30 November, tutup Kamis 3 Desember.",
+      "Buatkan kuis IPAS dari naskah ini",
+      "naskah soal ini jadikan kuis di Moodle ya",
+    ])
+      await expect(answerQuestion(client, words, SNAPSHOT)).resolves.toEqual({
+        kind: "quiz-import",
+        utterance: words,
+      });
+    expect(client.helpRoute).not.toHaveBeenCalled();
+    // Grades for a quiz are F1's, and checking a quiz is F4-01's.
+    const grades = fakeClient({ kind: "intent", intent: "input_nilai", processName: null });
+    await expect(answerQuestion(grades, "masukkan nilai kuis IPAS 4A", SNAPSHOT)).resolves.toEqual({
+      kind: "grades",
+      utterance: "masukkan nilai kuis IPAS 4A",
+    });
+    await expect(answerQuestion(client, "Nemu, tolong cek kuis ini.", SNAPSHOT)).resolves.toEqual({
+      kind: "quiz-check",
+      utterance: "Nemu, tolong cek kuis ini.",
+    });
+  });
 });

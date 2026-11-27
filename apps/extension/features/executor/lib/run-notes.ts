@@ -4,8 +4,11 @@ export type Cara = 1 | 2 | 3;
 
 /** What happened during a run, kept for Catatan langkah (F0-14). Values are never kept. */
 export type RunEvent =
-  /** Nemu did the step itself (cara 1). `option` is the chosen option of a select. */
-  | { kind: "acted"; verb: ExecutorVerb; name: string; option?: string }
+  /**
+   * Nemu did the step itself (cara 1). `option` is the chosen option of a select; `unchecked`
+   * when a check step took a tick away.
+   */
+  | { kind: "acted"; verb: ExecutorVerb; name: string; option?: string; unchecked?: boolean }
   /** The teacher did it while Nemu pointed and checked (cara 2); `corrected` when Nemu had to say the right value again. */
   | { kind: "taught"; verb: ExecutorVerb; name: string; corrected?: boolean }
   /** The teacher pressed what Nemu pointed at; `refused` when Nemu had been asked to press it. */
@@ -28,7 +31,10 @@ function line(event: RunEvent, count: number, teacher: string, corrected: number
       if (event.verb === "clickMenu") return `Nemu membuka ${event.name}`;
       if (event.verb === "selectOption")
         return `Nemu memilih ${event.option ?? ""} di ${event.name}`;
-      if (event.verb === "check") return `Nemu mencentang ${event.name}`;
+      if (event.verb === "check")
+        return event.unchecked
+          ? `Nemu menghapus centang ${event.name}`
+          : `Nemu mencentang ${event.name}`;
       return `Nemu menggulir ke ${event.name}`;
     case "taught":
       if (event.verb === "setValue")

@@ -23,6 +23,8 @@ export const targetRoleSchema = z.enum([
  * `near` picks, among controls with the same name, the one in the part of the page that shows
  * that text, e.g. the "Edit" menu of the activity "Latihan: My Family (has/have)" on a Moodle
  * course page.
+ * `group` names the fieldset (by its legend) or ARIA group it sits in, for fields whose own
+ * label repeats, e.g. Moodle's "Hari" under both "Kuis dimulai" and "Tutup kuis".
  */
 export const executorTargetSchema = z
   .object({
@@ -32,6 +34,7 @@ export const executorTargetSchema = z
     row: z.string().min(1).optional(),
     column: z.string().min(1).optional(),
     near: z.string().min(1).optional(),
+    group: z.string().min(1).optional(),
   })
   .strict()
   .refine((target) => target.label || target.text || target.row, {

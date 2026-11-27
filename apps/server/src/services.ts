@@ -83,6 +83,7 @@ function createKeylessSchoolAi(): SchoolAi {
     compileProcedure: missing,
     // No judgement checks exist yet (#218), so a quiz check needs no model.
     judgeQuiz: (input) => createFixtureSchoolAi().judgeQuiz(input),
+    readQuizScript: missing,
     transcribe: missing,
     synthesize: missing,
   };
