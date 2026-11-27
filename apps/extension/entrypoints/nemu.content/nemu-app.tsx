@@ -1,9 +1,10 @@
+import type { PageSnapshot } from "@nemu/contracts/school";
 import { shortcutKeys } from "@nemu/contracts/talk-shortcut";
 import { Button } from "@nemu/ui/components/button";
 import { GelembungJawab, GelembungJawabSkeleton } from "@nemu/ui/nemu/gelembung-jawab";
 import { NEMU_LINK } from "@nemu/ui/nemu/nemu-frame";
 import { NemuStage } from "@nemu/ui/nemu/nemu-stage";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { SiteAccess } from "../../features/allowed-sites/lib/site-access";
 import { DisplayPreviewDock } from "../../features/display-preview/components/display-preview-dock";
@@ -17,6 +18,8 @@ import { executor } from "../../features/executor/stores/executor";
 import { useIdentity } from "../../features/identity/hooks/use-identity";
 import { usePageEmail } from "../../features/identity/hooks/use-page-email";
 import type { IdentityResult } from "../../features/identity/lib/identity";
+import { useNextAction } from "../../features/ini-kenapa/hooks/use-next-action";
+import { readPageSnapshot } from "../../features/ini-kenapa/lib/page-snapshot";
 import { AskBox } from "../../features/nemu-button/components/ask-box";
 import { NemuButton } from "../../features/nemu-button/components/nemu-button";
 import { type AskState, useAsk } from "../../features/nemu-button/hooks/use-ask";
@@ -46,13 +49,18 @@ export function NemuApp({ access }: { access: SiteAccess }) {
   const preview = useDisplayPreview();
   const { voice, working, speak, repeat, stop } = useVoice(pageEmail);
   const run = useExecutor();
+  // "ini kenapa?" reads the page as it was when the talk combination went down (F2-01).
+  const pressSnapshot = useRef<PageSnapshot | null>(null);
   const talk = useTalk({
     pageEmail,
     shortcut,
     enabled: identity?.status === "registered",
     isWorking: () => working || voiceCommands.isWorking(),
-    onStart: () => setOpen(true),
-    onQuestion: (question) => void ask(question),
+    onStart: () => {
+      pressSnapshot.current = readPageSnapshot(document, location.href);
+      setOpen(true);
+    },
+    onQuestion: (question) => void ask(question, pressSnapshot.current),
   });
   const { dismiss } = talk;
 
@@ -69,6 +77,17 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     dismiss();
     stop();
   }, [reset, dismiss, stop]);
+
+  // After "ini kenapa?": show how to fix it (cara 2) or open the WhatsApp message.
+  const answerNext =
+    state.status === "answered" && state.result.kind === "answer" ? state.result.next : undefined;
+  const nextAction = useNextAction(
+    answerNext,
+    useCallback(() => {
+      dismissAll();
+      close();
+    }, [dismissAll, close]),
+  );
 
   // The executor works as the teacher on the page, in Nemu's voice.
   const honorific = identity?.status === "registered" ? identity.honorific : "";
@@ -132,6 +151,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
                 talk={talk.state}
                 heard={talk.heard}
                 voice={voice}
+                action={nextAction}
                 onAsk={askTyped}
                 onRepeat={repeat}
                 onRead={(text) => void speak(text)}
@@ -184,6 +204,7 @@ type NemuPanelProps = {
   talk: TalkState;
   heard: string | null;
   voice: VoiceState | null;
+  action: { label: string; onSelect: () => void } | undefined;
   onAsk: (question: string) => void;
   onRepeat: () => void;
   onRead: (text: string) => void;
@@ -197,6 +218,7 @@ function NemuPanel({
   talk,
   heard,
   voice,
+  action,
   onAsk,
   onRepeat,
   onRead,
@@ -218,7 +240,12 @@ function NemuPanel({
             <GelembungJawab
               sentence={state.result.text}
               highlightedWord={spokenWordIn(state.result.text, voice)}
-              notes={state.result.kind === "answer" ? { sumber: state.result.sources } : undefined}
+              notes={
+                state.result.kind === "answer"
+                  ? { kenapa: state.result.why, sumber: state.result.sources }
+                  : undefined
+              }
+              action={action}
               onRead={onRead}
               onRepeat={onRepeat}
               onClose={onDismiss}

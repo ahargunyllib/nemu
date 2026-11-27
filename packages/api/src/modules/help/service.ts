@@ -5,7 +5,7 @@ import type {
   CommandRoute,
   GroundedAnswer,
   HelpExplanation,
-  ScreenSnapshot,
+  PageSnapshot,
 } from "@nemu/contracts/school";
 
 import type { CatalogRepository } from "../documents/catalog-repository";
@@ -27,9 +27,9 @@ export async function explain(
   deps: HelpDeps,
   teacher: TeacherProfile,
   workspaceId: string,
-  input: { snapshot: ScreenSnapshot; question: string | null },
+  input: { snapshot: PageSnapshot; question: string | null },
 ): Promise<HelpExplanation> {
-  const kamus = input.snapshot.blocked ? [] : await loadKamusChunks(deps.kamus, workspaceId);
+  const kamus = await loadKamusChunks(deps.kamus, workspaceId);
   return deps.ai.explainError({
     snapshot: input.snapshot,
     question: input.question,

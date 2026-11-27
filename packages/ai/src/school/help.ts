@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { Contact, HelpExplanation, ScreenSnapshot } from "@nemu/contracts/school";
+import type { Contact, HelpExplanation, PageSnapshot } from "@nemu/contracts/school";
 
 import { retrieveKnowledge, type KnowledgeChunk } from "../knowledge.js";
 import { normalizeForQuote, quoteIsInChunk, toCitation } from "./grounding.js";
@@ -9,10 +9,12 @@ import type { TeacherProfile } from "./profile.js";
 import { mentionsSecret, NOT_IN_GUIDE_SENTENCE } from "./safety.js";
 
 /**
- * F2 "Nemu, ini kenapa?": read the error on the active window, match it to the school's kamus
+ * F2 "Nemu, ini kenapa?": read the error on the page, match it to the school's kamus
  * kendala, and say whose fault it is and who can fix it (F2-03). Who fixes it is taken from the
  * matched kamus entry, quoted and verified; the person's name and number come from the teacher's
  * profile; the NIP is added by code. Nothing is invented for an error the kamus doesn't cover (F2-06).
+ * The page snapshot comes from the Nemu Extension (#216), which sends nothing while a password
+ * field is on screen.
  */
 
 const modelHelpSchema = z.object({
@@ -76,12 +78,18 @@ export const ROLE_ALIASES: Record<string, string[]> = {
   guru: ["guru", "ibu/bapak guru"],
 };
 
-function isBlockedSnapshot(snapshot: ScreenSnapshot): boolean {
-  return snapshot.blocked;
+/** The snapshot's text, alerts first: what the kamus is matched against. */
+export function pageLines(snapshot: PageSnapshot): string[] {
+  return [
+    snapshot.title,
+    ...snapshot.alerts,
+    ...snapshot.headings,
+    ...snapshot.fields.map((field) => `${field.label}: ${field.value}`),
+  ];
 }
 
 export type ExplainErrorInput = {
-  snapshot: ScreenSnapshot;
+  snapshot: PageSnapshot;
   question: string | null;
   kamus: readonly KnowledgeChunk[];
   teacher: TeacherProfile;
@@ -97,11 +105,11 @@ function whatsappDraft(
   const greeting = `Assalamualaikum ${to.name}.`;
   const intro = `Saya ${teacher.name} (NIP ${teacher.nip}).`;
   const problem = errorText
-    ? `Di ${appName} muncul pesan: "${errorText.slice(0, 160)}".`
+    ? `Di ${appName} muncul pesan: "${errorText.slice(0, 160).replace(/[.!?\s]+$/u, "")}".`
     : `Saya mengalami kendala di ${appName}.`;
   return {
     phone: to.phone,
-    text: `${greeting} ${intro} ${problem} ${request} Screenshot terlampir. Terima kasih.`,
+    text: `${greeting} ${intro} ${problem} ${request} Terima kasih.`,
   };
 }
 
@@ -110,15 +118,8 @@ export async function explainError(
   input: ExplainErrorInput,
 ): Promise<HelpExplanation> {
   const { snapshot, teacher } = input;
-  if (isBlockedSnapshot(snapshot)) {
-    return {
-      status: "blocked",
-      sentence: `Layar ini ada kata sandinya, jadi tidak saya baca, ${teacher.honorific}.`,
-    };
-  }
-
   const active = input.kamus.filter((chunk) => chunk.active);
-  const query = [input.question ?? "", snapshot.title, ...snapshot.texts].join(" ");
+  const query = [input.question ?? "", ...pageLines(snapshot)].join(" ");
   const context = active.length <= 30 ? active : retrieveKnowledge(active, query, 12);
   const roles = Object.keys(teacher.contacts);
 
@@ -127,9 +128,11 @@ export async function explainError(
       type: "text",
       text: JSON.stringify({
         pertanyaan_guru: input.question,
-        judul_jendela: snapshot.title,
+        judul_halaman: snapshot.title,
         url: snapshot.url,
-        teks_layar: snapshot.texts.slice(0, 120),
+        peringatan: snapshot.alerts,
+        judul_bagian: snapshot.headings,
+        isian: snapshot.fields.map((field) => ({ label: field.label, nilai: field.value })),
         kamus_kendala: context.map((chunk) => ({
           chunk_id: chunk.id,
           judul: chunk.title,

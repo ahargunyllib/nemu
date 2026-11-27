@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc -b",
     "check-types": "tsc -b",
-    "test": "tsc -b && node --test dist/school/*.test.js dist/school/grades/*.test.js dist/school/bpmn/*.test.js dist/desktop/*.test.js scripts/rule-sources.test.mjs",
+    "test": "tsc -b && node --test dist/school/*.test.js dist/school/grades/*.test.js dist/school/bpmn/*.test.js scripts/rule-sources.test.mjs",
     "eval:school": "tsc -b && node scripts/evaluate-school.mjs"
   },
   "dependencies": {

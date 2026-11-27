@@ -1,4 +1,4 @@
-import type { ScreenSnapshot } from "@nemu/contracts/school";
+import type { PageSnapshot } from "@nemu/contracts/school";
 import { browser } from "wxt/browser";
 
 import type { NemuMessage, PageEmail } from "../../../shared/lib/messages";
@@ -8,7 +8,7 @@ import type { AskResult } from "../lib/answer";
 export async function requestAnswer(
   pageEmail: PageEmail,
   question: string,
-  snapshot: ScreenSnapshot,
+  snapshot: PageSnapshot | null,
 ): Promise<AskResult> {
   const message: NemuMessage = { type: "nemu:ask", pageEmail, question, snapshot };
   try {

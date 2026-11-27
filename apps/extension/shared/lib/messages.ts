@@ -1,5 +1,5 @@
 import type { ActionLogEntry } from "@nemu/contracts/executor";
-import type { ScreenSnapshot } from "@nemu/contracts/school";
+import type { PageSnapshot } from "@nemu/contracts/school";
 
 /**
  * What the page found about who is signed in: the email a per-site reader saw (null when signed
@@ -11,7 +11,8 @@ export type PageEmail = { kind: "read"; email: string | null } | { kind: "unread
 export type NemuMessage =
   | { type: "nemu:site-access"; url: string }
   | { type: "nemu:identify"; pageEmail: PageEmail }
-  | { type: "nemu:ask"; pageEmail: PageEmail; question: string; snapshot: ScreenSnapshot }
+  // `snapshot` is null while a password field is on screen (F2-07).
+  | { type: "nemu:ask"; pageEmail: PageEmail; question: string; snapshot: PageSnapshot | null }
   // Hold to talk (#200): the background records through the offscreen document.
   | { type: "nemu:listen-start" }
   | { type: "nemu:listen-stop"; pageEmail: PageEmail }

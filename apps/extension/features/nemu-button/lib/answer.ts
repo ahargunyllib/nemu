@@ -1,11 +1,14 @@
-import type { GroundedAnswer, HelpExplanation, SourceCitation } from "@nemu/contracts/school";
+import type { GroundedAnswer, SourceCitation } from "@nemu/contracts/school";
+
+import type { AnswerNext } from "../../ini-kenapa/lib/explanation";
 
 /**
- * What the Gelembung Jawab shows for a typed question: an answer with its sources, a notice in
- * place of one, or nothing because the teacher said "berhenti". The five display types are #201.
+ * What the Gelembung Jawab shows for a question: an answer with its sources (and, for "ini
+ * kenapa?", the Kenapa? note and one next step), a notice in place of one, or nothing because the
+ * teacher said "berhenti". The five display types are #201.
  */
 export type AskResult =
-  | { kind: "answer"; text: string; sources: string[] }
+  | { kind: "answer"; text: string; sources: string[]; why?: string; next?: AnswerNext }
   | { kind: "notice"; text: string }
   | { kind: "stop" };
 
@@ -28,10 +31,4 @@ export function fromGroundedAnswer(answer: GroundedAnswer): AskResult {
   return answer.status === "answered"
     ? { kind: "answer", text: answer.answer, sources: uniqueSources(answer.citations) }
     : { kind: "answer", text: answer.answer, sources: [] };
-}
-
-export function fromExplanation(explanation: HelpExplanation): AskResult {
-  return explanation.status === "matched"
-    ? { kind: "answer", text: explanation.sentence, sources: [sourceLabel(explanation.citation)] }
-    : { kind: "answer", text: explanation.sentence, sources: [] };
 }

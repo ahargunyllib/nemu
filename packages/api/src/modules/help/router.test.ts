@@ -8,11 +8,10 @@ import { helpRouter } from "./router";
 const SNAPSHOT = {
   title: "Ruang GTK - Pengelolaan Kinerja",
   url: "https://ruang.gtk.example/kinerja",
-  texts: ["Data Perencanaan (SKP) belum bisa diajukan karena RHK atasan belum tersedia."],
-  elements: [],
+  alerts: ["Data Perencanaan (SKP) belum bisa diajukan karena RHK atasan belum tersedia."],
+  headings: [],
+  fields: [],
   screenshotBase64: null,
-  blocked: false,
-  blockedReason: null,
 };
 
 describe("F2 and school questions through the API (seeded kamus and SOP)", () => {
@@ -28,6 +27,61 @@ describe("F2 and school questions through the API (seeded kamus and SOP)", () =>
       sentence: "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Ahmad (kepsek).",
       citation: { docId: "kamus-kendala", article: "K-01" },
       waDraft: { phone: "6281200000001" },
+    });
+  });
+
+  it("F2-2: an unassigned subject on AlurSekolah is Pak Rizal's to fix, from Kamus Kendala K-07", async () => {
+    const context = await createSchoolContext();
+    const result = await call(
+      helpRouter.helpExplain,
+      {
+        snapshot: {
+          title: "AlurSekolah (tiruan)",
+          url: "http://localhost:3003/#/nilai",
+          alerts: [
+            "Tidak dapat menampilkan siswa\nAnda belum ditugaskan mengampu IPAS di kelas 4A. Hubungi admin sekolah.",
+          ],
+          headings: ["Isi nilai kelas"],
+          fields: [
+            { label: "Kelas", value: "4A" },
+            { label: "Mata pelajaran", value: "IPAS" },
+          ],
+          screenshotBase64: null,
+        },
+        question: "Nemu, ini kenapa?",
+      },
+      { context },
+    );
+    expect(result).toMatchObject({
+      status: "matched",
+      sentence: "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).",
+      canSelfFix: false,
+      citation: { docId: "kamus-kendala", article: "K-07" },
+      waDraft: { phone: "6281200000002" },
+    });
+  });
+
+  it("F2-3: the Ruang GTK sync error is the teacher's to fix with Sinkro Ruang GTK (K-02), no WhatsApp", async () => {
+    const context = await createSchoolContext();
+    const result = await call(
+      helpRouter.helpExplain,
+      {
+        snapshot: {
+          ...SNAPSHOT,
+          alerts: [
+            "Data Perencanaan (SKP) Anda gagal dialirkan ke E-Kinerja\nAlasan: Tidak ditandai sebagai User Ruang GTK.",
+          ],
+        },
+        question: "ini kenapa?",
+      },
+      { context },
+    );
+    expect(result).toMatchObject({
+      status: "matched",
+      canSelfFix: true,
+      guidedTarget: "Sinkro Ruang GTK",
+      waDraft: null,
+      citation: { article: "K-02" },
     });
   });
 

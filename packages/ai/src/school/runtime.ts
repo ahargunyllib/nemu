@@ -26,7 +26,7 @@ import {
   verifyGroundedAnswer,
   type AnswerGroundedInput,
 } from "./grounding.js";
-import { explainError, resolveHelp, type ExplainErrorInput } from "./help.js";
+import { explainError, pageLines, resolveHelp, type ExplainErrorInput } from "./help.js";
 import { createOpenRouterJsonCaller, type JsonCall, type JsonCallRequest } from "./llm.js";
 import {
   assembleProcedure,
@@ -154,15 +154,15 @@ export function createFixtureSchoolAi(): SchoolAi {
     parseGradeExcel: (input) => parseGradeExcel({}, input),
 
     async explainError(input) {
-      if (input.snapshot.blocked) return explainError({ llm: codeCall(() => ({})) }, input);
       const words = (text: string) =>
         normalizeForQuote(text)
           .replace(/[^\p{L}\p{N}]+/gu, " ")
           .trim();
-      const screen = words([input.snapshot.title, ...input.snapshot.texts].join(" "));
+      const screen = words(pageLines(input.snapshot).join(" "));
       const entry = input.kamus.find((chunk) => {
-        const quoted = chunk.text.match(/"([^"]+)"/u)?.[1];
-        return chunk.active && !!quoted && screen.includes(words(quoted).slice(0, 40));
+        // A message with placeholders ("mengampu [mapel] di kelas [kelas]") matches up to the first.
+        const quoted = chunk.text.match(/"([^"]+)"/u)?.[1]?.split(/[[…]/u)[0];
+        return chunk.active && !!quoted?.trim() && screen.includes(words(quoted).slice(0, 40));
       });
       const sentences = entry?.text.split(/(?<=\.)\s+/u) ?? [];
       const fixerSentence =
@@ -177,14 +177,17 @@ export function createFixtureSchoolAi(): SchoolAi {
       return resolveHelp(
         {
           status: entry ? "matched" : "not_in_guide",
-          error_text: input.snapshot.texts[0] ?? "",
+          error_text: input.snapshot.alerts[0] ?? "",
           chunk_id: entry?.id ?? null,
           quote: fixerSentence.replace(/\.$/u, "") || null,
           teacher_fault: false,
           fixer_role: role,
           can_self_fix: role === "guru",
+          // "… menekan tombol Sinkro Ruang GTK, lalu …" → "Sinkro Ruang GTK".
           guided_target:
-            role === "guru" ? (fixerSentence.match(/tombol (\w+)/u)?.[1] ?? null) : null,
+            role === "guru"
+              ? (fixerSentence.match(/tombol (.+?)(?=,|\.| lalu\b| di\b|$)/u)?.[1] ?? null)
+              : null,
           why: entry ? sentences.slice(1).join(" ") : "",
           app_name: entry?.text.match(/^K-\d+ ([^:]+):/u)?.[1] ?? "aplikasi",
         },

@@ -1,4 +1,4 @@
-import { screenSnapshotSchema } from "@nemu/contracts/school";
+import { pageSnapshotSchema } from "@nemu/contracts/school";
 import { z } from "zod";
 
 import type { Context } from "../../context";
@@ -20,7 +20,7 @@ export const helpRouter = {
   /** F2: the page snapshot (+ what the teacher said) → whose fault and who fixes it, from WS-05. */
   helpExplain: schoolProcedure
     .input(
-      z.object({ snapshot: screenSnapshotSchema, question: z.string().trim().max(500).nullable() }),
+      z.object({ snapshot: pageSnapshotSchema, question: z.string().trim().max(500).nullable() }),
     )
     .handler(async ({ context, input }) => {
       const teacher = await context.caller.requireTeacher();

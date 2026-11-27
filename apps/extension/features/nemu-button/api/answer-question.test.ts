@@ -1,17 +1,17 @@
 import type { CommandRoute } from "@nemu/contracts/school";
 import { describe, expect, test, vi } from "vite-plus/test";
 
+import { PASSWORD_ON_SCREEN } from "../../ini-kenapa/lib/explanation";
 import { NOT_AVAILABLE_YET } from "../lib/answer";
 import { answerQuestion } from "./answer-question";
 
 const SNAPSHOT = {
   title: "AlurSekolah",
   url: "https://nemu-alursekolah.ahargunyllib.dev/#/nilai",
-  texts: ["Isi nilai kelas"],
-  elements: [],
+  alerts: ["Anda belum ditugaskan mengampu IPAS di kelas 4A. Hubungi admin sekolah."],
+  headings: ["Isi nilai kelas"],
+  fields: [{ label: "Kelas", value: "4A" }],
   screenshotBase64: null,
-  blocked: false,
-  blockedReason: null,
 };
 
 const CITATION = {
@@ -33,21 +33,21 @@ function fakeClient(route: CommandRoute) {
     })),
     helpExplain: vi.fn(async () => ({
       status: "matched" as const,
-      entryId: "K-03",
+      entryId: "K-07",
       sentence: "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).",
-      why: "Mata pelajaran belum dipetakan ke kelas.",
+      why: "Mata pelajaran itu belum ditugaskan ke akun Ibu.",
       teacherFault: false,
       canSelfFix: false,
-      fixer: null,
+      fixer: { name: "Pak Rizal", role: "operator", phone: "6281200001003" },
       guidedTarget: null,
       citation: {
         ...CITATION,
         docId: "kamus-kendala-sdit-nusantara",
         title: "Kamus Kendala",
         page: 2,
-        article: "K-03",
+        article: "K-07",
       },
-      waDraft: null,
+      waDraft: { phone: "6281200001003", text: "Assalamualaikum Pak Rizal. Mohon bantuannya." },
     })),
   };
 }
@@ -64,17 +64,36 @@ describe("answerQuestion", () => {
     expect(client.helpExplain).not.toHaveBeenCalled();
   });
 
-  test("'kenapa' sends what the page shows to helpExplain", async () => {
+  test("'kenapa' sends what the page shows and the viewport screenshot to helpExplain", async () => {
     const client = fakeClient({ kind: "intent", intent: "kenapa", processName: null });
-    await expect(answerQuestion(client, "Ini kenapa?", SNAPSHOT)).resolves.toEqual({
+    await expect(
+      answerQuestion(client, "Ini kenapa?", SNAPSHOT, async () => "JPEG"),
+    ).resolves.toEqual({
       kind: "answer",
       text: "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).",
-      sources: ["Kamus Kendala · hlm. 2 · K-03"],
+      why: "Mata pelajaran itu belum ditugaskan ke akun Ibu.",
+      sources: ["Kamus Kendala · hlm. 2 · K-07"],
+      next: {
+        kind: "whatsapp",
+        label: "Buka WhatsApp ke Pak Rizal",
+        url: "https://web.whatsapp.com/send?phone=6281200001003&text=Assalamualaikum%20Pak%20Rizal.%20Mohon%20bantuannya.",
+      },
     });
     expect(client.helpExplain).toHaveBeenCalledWith({
-      snapshot: SNAPSHOT,
+      snapshot: { ...SNAPSHOT, screenshotBase64: "JPEG" },
       question: "Ini kenapa?",
     });
+  });
+
+  test("with a password field on screen, 'kenapa' captures and sends nothing", async () => {
+    const client = fakeClient({ kind: "intent", intent: "kenapa", processName: null });
+    const capture = vi.fn(async () => "JPEG");
+    await expect(answerQuestion(client, "Ini kenapa?", null, capture)).resolves.toEqual({
+      kind: "notice",
+      text: PASSWORD_ON_SCREEN,
+    });
+    expect(capture).not.toHaveBeenCalled();
+    expect(client.helpExplain).not.toHaveBeenCalled();
   });
 
   test("grade entry isn't run from the type box yet, and 'berhenti' closes the bubble", async () => {
