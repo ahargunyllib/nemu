@@ -24,17 +24,18 @@ test("offline mode reads any photo as the F1-1-shaped page, with its 10 question
   );
 });
 
+const PAGE = {
+  title: "Ruang GTK",
+  url: "https://ruang.gtk.example/kinerja",
+  alerts: [] as string[],
+  headings: [] as string[],
+  fields: [],
+  screenshotBase64: null,
+};
+
 test("offline mode explains a kamus error and names the fixer", async () => {
   const result = await ai.explainError({
-    snapshot: {
-      title: "Ruang GTK",
-      url: null,
-      texts: ["SKP belum bisa diajukan karena RHK atasan belum tersedia"],
-      elements: [],
-      screenshotBase64: null,
-      blocked: false,
-      blockedReason: null,
-    },
+    snapshot: { ...PAGE, alerts: ["SKP belum bisa diajukan karena RHK atasan belum tersedia"] },
     question: "ini kenapa",
     kamus: KAMUS_CHUNKS,
     teacher: BU_SITI,
@@ -43,6 +44,70 @@ test("offline mode explains a kamus error and names the fixer", async () => {
     result.status === "matched" && result.sentence,
     "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Ahmad (kepsek).",
   );
+});
+
+test("F2-2 offline: an unassigned subject is Pak Rizal's to fix (K-07), with a WhatsApp draft", async () => {
+  const result = await ai.explainError({
+    snapshot: {
+      ...PAGE,
+      title: "AlurSekolah (tiruan)",
+      alerts: [
+        "Tidak dapat menampilkan siswa Anda belum ditugaskan mengampu IPAS di kelas 4A. Hubungi admin sekolah.",
+      ],
+      headings: ["Isi nilai kelas"],
+      fields: [
+        { label: "Kelas", value: "4A" },
+        { label: "Mata pelajaran", value: "IPAS" },
+      ],
+    },
+    question: "Nemu, ini kenapa?",
+    kamus: KAMUS_CHUNKS,
+    teacher: BU_SITI,
+  });
+  assert.equal(result.status, "matched");
+  if (result.status !== "matched") return;
+  assert.equal(result.entryId, "K-07");
+  assert.equal(result.sentence, "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).");
+  assert.equal(result.canSelfFix, false);
+  assert.equal(result.waDraft?.phone, "6281200000002");
+  assert.match(result.waDraft?.text ?? "", /^Assalamualaikum Pak Rizal\./u);
+  assert.doesNotMatch(result.waDraft?.text ?? "", /screenshot/iu);
+});
+
+test("F2-3 offline: the teacher syncs Ruang GTK herself (K-02), no WhatsApp", async () => {
+  const result = await ai.explainError({
+    snapshot: {
+      ...PAGE,
+      alerts: [
+        'Data Perencanaan (SKP) Anda gagal dialirkan ke E-Kinerja Alasan: Tidak ditandai sebagai User Ruang GTK. Mohon coba lagi atau Anda dapat juga menekan tombol "Sinkro Ruang GTK" di E-Kinerja dan ikuti petunjuknya.',
+      ],
+      headings: ["Pengelolaan Kinerja 2026"],
+    },
+    question: "ini kenapa?",
+    kamus: KAMUS_CHUNKS,
+    teacher: BU_SITI,
+  });
+  assert.equal(result.status, "matched");
+  if (result.status !== "matched") return;
+  assert.equal(result.entryId, "K-02");
+  assert.deepEqual(
+    [result.canSelfFix, result.guidedTarget, result.waDraft],
+    [true, "Sinkro Ruang GTK", null],
+  );
+  assert.match(result.citation.quote, /menu E-Kinerja/u);
+});
+
+test("offline mode: an error the kamus doesn't cover offers the operator", async () => {
+  const result = await ai.explainError({
+    snapshot: { ...PAGE, alerts: ["Error 502 Bad Gateway"] },
+    question: "ini kenapa?",
+    kamus: KAMUS_CHUNKS,
+    teacher: BU_SITI,
+  });
+  assert.equal(result.status, "not_in_guide");
+  if (result.status !== "not_in_guide") return;
+  assert.match(result.sentence, /^Belum ada di panduan sekolah\./u);
+  assert.equal(result.waDraft?.phone, "6281200000002");
 });
 
 test("offline mode answers from the SOP with a verified quote, and abstains otherwise", async () => {

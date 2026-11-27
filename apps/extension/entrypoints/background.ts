@@ -20,8 +20,9 @@ import { isNemuMessage, type NemuMessage } from "../shared/lib/messages";
 async function handle(
   message: NemuMessage,
   senderUrl: string | undefined,
-  tabId: number | undefined,
+  tab: { id?: number; windowId?: number } | undefined,
 ) {
+  const tabId = tab?.id;
   switch (message.type) {
     case "nemu:site-access": {
       const config = await currentSiteConfig();
@@ -30,7 +31,7 @@ async function handle(
     case "nemu:identify":
       return identifyTeacher(message.pageEmail);
     case "nemu:ask":
-      return askNemu(message);
+      return askNemu(message, tab);
     case "nemu:listen-start":
       return startRecording();
     case "nemu:listen-stop":
@@ -62,7 +63,7 @@ function syncScripts() {
 export default defineBackground(() => {
   browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (!isNemuMessage(message)) return;
-    void handle(message, sender.url, sender.tab?.id).then(sendResponse);
+    void handle(message, sender.url, sender.tab).then(sendResponse);
     return true;
   });
 

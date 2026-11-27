@@ -211,28 +211,27 @@ export const gradeCommandSchema = z.discriminatedUnion("status", [
 
 // --- F2: stuck help ---------------------------------------------------------------------------
 
-export const screenElementSchema = z
-  .object({
-    name: z.string(),
-    controlType: z.string(),
-    rect: z
-      .object({ x: z.number(), y: z.number(), width: z.number(), height: z.number() })
-      .strict()
-      .nullable(),
-  })
+/** A form field as the page shows it: its label and visible value. Never a password field. */
+export const pageFieldSchema = z
+  .object({ label: z.string().max(300), value: z.string().max(500) })
   .strict();
 
-/** What the screen-reader sends: never input values, nothing at all when a password field shows. */
-export const screenSnapshotSchema = z
+/**
+ * What the Nemu Extension reads from the page for "ini kenapa?" (#216): the title and address,
+ * alerts, toasts and error messages, headings, field labels with their visible values, and a
+ * viewport screenshot. No UIA text, no window bounds. When a password field is on screen the
+ * extension sends nothing at all, so the Nemu Service never sees a blocked snapshot.
+ */
+export const pageSnapshotSchema = z
   .object({
     title: z.string().max(500),
-    url: z.string().max(2_000).nullable(),
-    texts: z.array(z.string().max(2_000)).max(200),
-    elements: z.array(screenElementSchema).max(300),
-    /** JPEG, base64 without the data: prefix; ≤1280 px. Null when blocked or not captured. */
-    screenshotBase64: z.string().nullable(),
-    blocked: z.boolean(),
-    blockedReason: z.enum(["password_field", "login_title"]).nullable(),
+    url: z.string().max(2_000),
+    /** `role=alert` text, toasts (`role=status`, `aria-live`) and error messages. */
+    alerts: z.array(z.string().max(2_000)).max(30),
+    headings: z.array(z.string().max(300)).max(50),
+    fields: z.array(pageFieldSchema).max(150),
+    /** JPEG of the visible viewport (`captureVisibleTab`), base64 without the data: prefix; ≤1280 px. */
+    screenshotBase64: z.string().max(4_000_000).nullable(),
   })
   .strict();
 
@@ -263,7 +262,10 @@ export const helpExplanationSchema = z.discriminatedUnion("status", [
       teacherFault: z.boolean(),
       canSelfFix: z.boolean(),
       fixer: contactSchema.nullable(),
-      /** Accessible name of the control to point at when the teacher can fix it. */
+      /**
+       * The control to point at when the teacher can fix it, by the name the page shows (its
+       * label or text), so the extension finds it by label, role or text.
+       */
       guidedTarget: z.string().nullable(),
       citation: sourceCitationSchema,
       waDraft: z.object({ phone: z.string(), text: z.string() }).strict().nullable(),
@@ -277,7 +279,6 @@ export const helpExplanationSchema = z.discriminatedUnion("status", [
       waDraft: z.object({ phone: z.string(), text: z.string() }).strict().nullable(),
     })
     .strict(),
-  z.object({ status: z.literal("blocked"), sentence: z.string() }).strict(),
 ]);
 
 // --- F3: grounded answers, BPMN, procedures ----------------------------------------------------
@@ -476,8 +477,8 @@ export type GradeRulesResult = z.infer<typeof gradeRulesResultSchema>;
 export type ReadbackRow = z.infer<typeof readbackRowSchema>;
 export type ReadbackResult = z.infer<typeof readbackResultSchema>;
 export type GradeCommand = z.infer<typeof gradeCommandSchema>;
-export type ScreenElement = z.infer<typeof screenElementSchema>;
-export type ScreenSnapshot = z.infer<typeof screenSnapshotSchema>;
+export type PageField = z.infer<typeof pageFieldSchema>;
+export type PageSnapshot = z.infer<typeof pageSnapshotSchema>;
 export type SourceCitation = z.infer<typeof sourceCitationSchema>;
 export type Contact = z.infer<typeof contactSchema>;
 export type HelpExplanation = z.infer<typeof helpExplanationSchema>;

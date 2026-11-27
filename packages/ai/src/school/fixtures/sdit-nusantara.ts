@@ -125,7 +125,7 @@ export const KAMUS_CHUNKS: KnowledgeChunk[] = [
     page: 1,
     article: "K-02",
     active: true,
-    text: 'K-02 AlurSekolah: "Sesi Anda telah berakhir". Guru cukup masuk kembali dengan menekan tombol Masuk.',
+    text: 'K-02 Ruang GTK: "Data Perencanaan (SKP) Anda gagal dialirkan ke E-Kinerja". Akun Anda belum ditandai sebagai User Ruang GTK, jadi SKP belum bisa dikirim ke E-Kinerja. Bukan kesalahan guru. Guru cukup membuka menu E-Kinerja dan menekan tombol Sinkro Ruang GTK, lalu mengirim ulang SKP.',
   },
   {
     id: "kamus-k03",
@@ -134,5 +134,21 @@ export const KAMUS_CHUNKS: KnowledgeChunk[] = [
     article: "K-03",
     active: true,
     text: 'K-03 AlurSekolah: "Mata pelajaran belum dipetakan ke kelas". Bukan kesalahan guru. Operator sekolah perlu memetakan mata pelajaran di menu Pengaturan Kelas.',
+  },
+  {
+    id: "kamus-k04",
+    ...KAMUS,
+    page: 2,
+    article: "K-04",
+    active: true,
+    text: 'K-04 AlurSekolah: "Sesi Anda telah berakhir". Guru cukup masuk kembali dengan menekan tombol Masuk.',
+  },
+  {
+    id: "kamus-k07",
+    ...KAMUS,
+    page: 3,
+    article: "K-07",
+    active: true,
+    text: 'K-07 AlurSekolah: "Anda belum ditugaskan mengampu [mapel] di kelas [kelas]". Mata pelajaran itu belum ditugaskan ke akun Anda di kelas tersebut, jadi daftar siswanya tidak bisa dibuka. Bukan kesalahan guru. Operator sekolah perlu menugaskan mata pelajaran itu ke guru di menu Penugasan Guru.',
   },
 ];

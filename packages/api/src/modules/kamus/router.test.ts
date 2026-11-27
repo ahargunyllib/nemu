@@ -11,11 +11,10 @@ const OPERATOR = { id: "rizal", role: "operator", workspaceId: "W-SEKOLAH" };
 const RAPOR_SNAPSHOT = {
   title: "AlurSekolah - Rapor",
   url: "https://sditn.alursekolah.id/rapor",
-  texts: ["Rapor belum bisa dicetak karena nilai sikap belum diisi wali kelas."],
-  elements: [],
+  alerts: ["Rapor belum bisa dicetak karena nilai sikap belum diisi wali kelas."],
+  headings: [],
+  fields: [],
   screenshotBase64: null,
-  blocked: false,
-  blockedReason: null,
 };
 
 describe("WS-05 Kamus Kendala", () => {
@@ -43,7 +42,16 @@ describe("WS-05 Kamus Kendala", () => {
       { context: operator },
     );
     const rows = await call(kamusRouter.listKamus, undefined, { context: operator });
-    expect(rows.map((row) => row.code)).toEqual(["K-01", "K-02", "K-03", "K-10"]);
+    expect(rows.map((row) => row.code)).toEqual([
+      "K-01",
+      "K-02",
+      "K-03",
+      "K-04",
+      "K-05",
+      "K-06",
+      "K-07",
+      "K-10",
+    ]);
 
     await expect(
       call(helpRouter.helpExplain, { snapshot: RAPOR_SNAPSHOT, question: null }, { context }),

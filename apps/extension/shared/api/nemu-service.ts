@@ -8,7 +8,7 @@ import type {
   CommandRoute,
   GroundedAnswer,
   HelpExplanation,
-  ScreenSnapshot,
+  PageSnapshot,
   SpeechSynthesis,
   Transcript,
 } from "@nemu/contracts/school";
@@ -25,7 +25,7 @@ export type NemuServiceClient = {
   extensionIdentify: Call<undefined, ExtensionIdentity>;
   helpRoute: Call<{ utterance: string }, CommandRoute>;
   helpAsk: Call<{ question: string }, GroundedAnswer>;
-  helpExplain: Call<{ snapshot: ScreenSnapshot; question: string | null }, HelpExplanation>;
+  helpExplain: Call<{ snapshot: PageSnapshot; question: string | null }, HelpExplanation>;
   speechTranscribe: Call<{ audioBase64: string; format: "wav" | "webm" }, Transcript>;
   speechSynthesize: Call<{ text: string }, SpeechSynthesis>;
   actionLogRecord: Call<{ entries: ActionLogEntry[] }, { recorded: number }>;
