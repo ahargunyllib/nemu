@@ -139,7 +139,7 @@ const snapshotPromise = reader.readActiveWindow();
 
 ## What the executor must enforce
 
-The AI never emits a press of Simpan, Kirim, Ajukan or Hapus: those are `human` steps or `requiresHumanAction`. The executor must refuse them independently (F0-08):
+The AI never emits a press of Simpan, Kirim, Ajukan or Hapus: those are `human` steps or `requiresHumanAction`. The executor must refuse them independently (F0-08). It does so in the Nemu Extension (#202, `apps/extension/features/executor`); turn `fill` / `human` steps and procedure steps into its step list (`@nemu/contracts/executor`):
 
 - Use `isDeniedActionName(name)` from `@nemu/ai/school/safety` on every target before acting.
 - Never call `form.submit()` / `requestSubmit()`, never dispatch Enter.

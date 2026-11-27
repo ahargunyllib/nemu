@@ -36,5 +36,7 @@ Unit tests can't load the extension, so after changing `apps/extension`, run
 It builds the extension, loads it in Playwright's Chromium, walks the settings
 page and the mock AlurSekolah, and saves screenshots to
 `apps/extension/.output/verify/`; look at them before reporting the change as
-verified. It isn't part of `pnpm test` because it needs the dev stack running.
+verified. Changes to the executor (`features/executor`) also need
+`pnpm --filter extension verify:executor`, which uses a development build for its `?uji-nemu` dock.
+Neither is part of `pnpm test` because they need the dev stack running.
 See `apps/extension/README.md`.

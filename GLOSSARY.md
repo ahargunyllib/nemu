@@ -52,6 +52,22 @@ _Avoid_: modal, summary dialog
 The small dark orange dot that glides (about 0.6 s) to the next page element, rings it, and only then lets the bubble speak (F0-16). Clicks go through it.
 _Avoid_: pointer, mascot cursor
 
+**Executor**:
+The part of the Nemu Extension that does a task on the page: one step list (point, isi, pilih, centang, gulir, klik menu), run in one of the three cara, with the safety rules enforced in the extension itself (#202).
+_Avoid_: bot, macro, automation
+
+**Cara**:
+How Nemu and the teacher share a task. Cara 1: Nemu fills and stops before Simpan. Cara 2: Nemu points and says the value, the teacher types, Nemu checks. Cara 3: the teacher works alone and Nemu checks after Simpan.
+_Avoid_: mode, level
+
+**Catatan langkah**:
+The Kartu Info at the end of each task listing what was done and by whom; reopenable from the Nemu button, with "Lain kali coba sendiri" to start in cara 2 next time.
+_Avoid_: summary, log
+
+**Action log (WS-10)**:
+One row per executor action: who, when, website, action, target and result, never the value typed.
+_Avoid_: audit trail, chat log
+
 **Admin Workspace**:
 The web console where Admin Javan and school operators manage knowledge, teachers and settings.
 _Avoid_: workspace (alone), dashboard

@@ -1,5 +1,6 @@
 import type { RouterClient } from "@orpc/server";
 
+import { actionLogRouter } from "../modules/action-log/router";
 import { documentsRouter } from "../modules/documents/router";
 import { extensionRouter } from "../modules/extension/router";
 import { gradesRouter } from "../modules/grades/router";
@@ -28,6 +29,7 @@ export const appRouter = {
   ...waBotRouter,
   ...extensionRouter,
   ...integrationsRouter,
+  ...actionLogRouter,
 };
 export type AppRouter = typeof appRouter;
 export type AppRouterClient = RouterClient<typeof appRouter>;
