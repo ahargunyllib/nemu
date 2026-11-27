@@ -43,8 +43,7 @@ export async function procedureToBpmn(procedure: Procedure): Promise<string> {
       targetRef: target,
     });
     flows.push(flow);
-    (previous.outgoing as ModdleElement[] | undefined)?.push(flow) ??
-      (previous.outgoing = [flow]);
+    previous.outgoing = [...((previous.outgoing as ModdleElement[] | undefined) ?? []), flow];
     target.incoming = [...((target.incoming as ModdleElement[] | undefined) ?? []), flow];
     previous = target;
   };

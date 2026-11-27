@@ -335,13 +335,19 @@ export function createFixtureSchoolAi(): SchoolAi {
     // Every recorded value is a parameter (demo values change each time); the label names it.
     async compileProcedure(input) {
       const drafts = cleanRecording(input.events);
-      const nameOf = (label: string) => label.toLowerCase().replace(/[^a-z0-9]+/gu, "_").replace(/^_+|_+$/gu, "");
+      const nameOf = (label: string) =>
+        label
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/gu, "_")
+          .replace(/^_+|_+$/gu, "");
       const valued = (draft: (typeof drafts)[number]) =>
         (draft.action === "select" || draft.action === "fill") && !!draft.value;
       const parameters = drafts.filter(valued).map((draft) => ({
         name: nameOf(draft.label),
         label: draft.label,
-        question: /^\d+$/u.test(draft.value ?? "") ? `${draft.label} berapa?` : `${draft.label} apa?`,
+        question: /^\d+$/u.test(draft.value ?? "")
+          ? `${draft.label} berapa?`
+          : `${draft.label} apa?`,
         example: draft.value ?? "",
       }));
       return assembleProcedure(input.title, drafts, {

@@ -391,9 +391,11 @@ describe("F3-3 Rekam cara through the API (#214)", () => {
       ...context,
       session: { ...context.session!, user: { ...context.session!.user, ...RIZAL } },
     };
-    const recorded = JSON.parse(
-      await readFile(join(FIXTURES, "F3-3_rekaman.json"), "utf8"),
-    ) as { title: string; events: RecordedEvent[]; narration: Array<{ start: number; end: number; text: string }> };
+    const recorded = JSON.parse(await readFile(join(FIXTURES, "F3-3_rekaman.json"), "utf8")) as {
+      title: string;
+      events: RecordedEvent[];
+      narration: Array<{ start: number; end: number; text: string }>;
+    };
     // A password typed during the recording never keeps its value.
     const events = [
       ...recorded.events,
@@ -401,7 +403,12 @@ describe("F3-3 Rekam cara through the API (#214)", () => {
         ...recorded.events[1]!,
         t: 99_999,
         type: "input" as const,
-        locator: { ...recorded.events[1]!.locator, label: "Kata sandi", name: "Kata sandi", role: "textbox" },
+        locator: {
+          ...recorded.events[1]!.locator,
+          label: "Kata sandi",
+          name: "Kata sandi",
+          role: "textbox",
+        },
         value: "rahasia",
       },
     ];

@@ -1,4 +1,9 @@
-import type { ExecutorStep, ExecutorTarget, ExecutorTask, TargetRole } from "@nemu/contracts/executor";
+import type {
+  ExecutorStep,
+  ExecutorTarget,
+  ExecutorTask,
+  TargetRole,
+} from "@nemu/contracts/executor";
 import type { Procedure } from "@nemu/contracts/school";
 
 import { addressFor } from "../../grade-photo/lib/grade-task";
@@ -15,13 +20,23 @@ export const PROCEDURE_TASK_KIND = "f3-rekaman";
 
 type RunStep = Procedure["steps"][number] & { value: string | null };
 
-const ROLES = new Set<TargetRole>(["textbox", "combobox", "checkbox", "radio", "button", "link", "menuitem", "tab"]);
+const ROLES = new Set<TargetRole>([
+  "textbox",
+  "combobox",
+  "checkbox",
+  "radio",
+  "button",
+  "link",
+  "menuitem",
+  "tab",
+]);
 
 function targetOf(step: RunStep, fallback?: TargetRole): ExecutorTarget {
   const name = step.locator.label ?? step.locator.name ?? step.locator.placeholder ?? "";
-  const role = step.locator.role && ROLES.has(step.locator.role as TargetRole)
-    ? (step.locator.role as TargetRole)
-    : fallback;
+  const role =
+    step.locator.role && ROLES.has(step.locator.role as TargetRole)
+      ? (step.locator.role as TargetRole)
+      : fallback;
   if (step.action === "click") return { text: name, ...(role ? { role } : {}) };
   return { label: name, ...(role ? { role } : {}) };
 }
@@ -53,7 +68,9 @@ export function procedureTask(input: {
     }
     if (step.action === "click") return [{ verb: "clickMenu", target: targetOf(step) }];
     if (step.action === "select")
-      return [{ verb: "selectOption", target: targetOf(step, "combobox"), option: step.value ?? "" }];
+      return [
+        { verb: "selectOption", target: targetOf(step, "combobox"), option: step.value ?? "" },
+      ];
     return [{ verb: "setValue", target: targetOf(step, "textbox"), value: step.value ?? "" }];
   });
   return { kind: PROCEDURE_TASK_KIND, title: input.title, source, steps };

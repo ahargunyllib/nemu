@@ -40,7 +40,10 @@ export async function handleRecorder(
   try {
     return { ok: true, value: await answer(request, pageEmail, tabId) };
   } catch (error) {
-    return { ok: false, message: error instanceof Error && !("code" in error) ? error.message : failureMessage(error) };
+    return {
+      ok: false,
+      message: error instanceof Error && !("code" in error) ? error.message : failureMessage(error),
+    };
   }
 }
 

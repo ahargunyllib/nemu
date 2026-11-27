@@ -508,6 +508,8 @@ function createProcessRun() {
         case "asking":
           if (procedure) {
             procedure.values = { ...procedure.values, [phase.slot]: text.trim() };
+            // Until the next question shows, words aren't an answer to this one.
+            setPhase({ name: "working", sentence: "Nemu menyiapkan langkahnya…" });
             void replay();
             return true;
           }

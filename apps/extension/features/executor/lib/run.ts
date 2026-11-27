@@ -401,7 +401,16 @@ export class ExecutorRun {
       );
     }
     if (step.verb === "point")
-      return this.pointAndWait(index, element, name, step.sentence, false, signal, step.ringkasan, step.sumber);
+      return this.pointAndWait(
+        index,
+        element,
+        name,
+        step.sentence,
+        false,
+        signal,
+        step.ringkasan,
+        step.sumber,
+      );
     if (step.verb === "scroll") {
       element.scrollIntoView({ block: "center", behavior: "smooth" });
       this.deps.log({ action: "scroll", target: name, result: "done" });

@@ -72,13 +72,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     },
     [close],
   );
-  const { state, ask, reset } = useAsk(
-    pageEmail,
-    close,
-    startGrades,
-    startProcess,
-    startRecording,
-  );
+  const { state, ask, reset } = useAsk(pageEmail, close, startGrades, startProcess, startRecording);
   const preview = useDisplayPreview();
   const { voice, working, speak, repeat, stop } = useVoice(pageEmail);
   const run = useExecutor();

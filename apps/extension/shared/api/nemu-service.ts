@@ -83,7 +83,12 @@ export type NemuServiceClient = {
         recordedBy: string | null;
         steps: Array<Procedure["steps"][number] & { value: string | null }>;
       }
-    | { status: "missing"; title: string; recordedBy: string | null; parameter: Procedure["parameters"][number] }
+    | {
+        status: "missing";
+        title: string;
+        recordedBy: string | null;
+        parameter: Procedure["parameters"][number];
+      }
   >;
   processMatchFields: Call<
     { fields: Array<{ id: string; label: string }>; pageLabels: string[] },

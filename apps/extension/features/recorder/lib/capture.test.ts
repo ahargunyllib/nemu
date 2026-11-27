@@ -18,7 +18,12 @@ beforeEach(() => {
 
 function record(run: () => void): RecordedEvent[] {
   const events: RecordedEvent[] = [];
-  const stop = captureEvents(document, Date.now(), (event) => events.push(event), () => true);
+  const stop = captureEvents(
+    document,
+    Date.now(),
+    (event) => events.push(event),
+    () => true,
+  );
   run();
   stop();
   return events;
@@ -38,7 +43,14 @@ describe("Rekam cara capture", () => {
       fire("#nilai", "input");
       fire("#simpan", "click");
     });
-    expect(events.map((event) => [event.type, event.locator.role, event.locator.label ?? event.locator.name, event.value])).toEqual([
+    expect(
+      events.map((event) => [
+        event.type,
+        event.locator.role,
+        event.locator.label ?? event.locator.name,
+        event.value,
+      ]),
+    ).toEqual([
       ["click", "link", "Al-Quran", null],
       ["change", "combobox", "Kelas", "4A"],
       ["input", "textbox", "Fashohah", "90"],
@@ -59,11 +71,13 @@ describe("Rekam cara capture", () => {
     expect(JSON.stringify(events)).not.toContain("rahasia");
   });
 
-  test("script-made events are not the operator's", () => {
+  test("a script-made click isn't the operator's; a value a custom select sets is kept", () => {
     const events: RecordedEvent[] = [];
     const stop = captureEvents(document, Date.now(), (event) => events.push(event));
     fire("#simpan", "click");
+    document.querySelector<HTMLSelectElement>("#kelas")!.value = "4A";
+    fire("#kelas", "change");
     stop();
-    expect(events).toEqual([]);
+    expect(events.map((event) => [event.type, event.locator.label])).toEqual([["change", "Kelas"]]);
   });
 });

@@ -17,7 +17,10 @@ export function roleOf(element: Element): string | null {
   const explicit = element.getAttribute("role");
   if (explicit) return explicit;
   if (element instanceof HTMLAnchorElement) return "link";
-  if (element instanceof HTMLButtonElement || element instanceof HTMLElement && element.tagName === "SUMMARY")
+  if (
+    element instanceof HTMLButtonElement ||
+    (element instanceof HTMLElement && element.tagName === "SUMMARY")
+  )
     return "button";
   if (element instanceof HTMLSelectElement) return "combobox";
   if (element instanceof HTMLTextAreaElement) return "textbox";
@@ -53,10 +56,15 @@ export function locatorFor(element: Element): RecordedEvent["locator"] {
 
 function valueOf(element: Element): string | null {
   if (isPassword(element)) return null;
-  if (element instanceof HTMLSelectElement) return element.selectedOptions[0]?.text.trim() ?? element.value;
-  if (element instanceof HTMLInputElement && (element.type === "checkbox" || element.type === "radio"))
+  if (element instanceof HTMLSelectElement)
+    return element.selectedOptions[0]?.text.trim() ?? element.value;
+  if (
+    element instanceof HTMLInputElement &&
+    (element.type === "checkbox" || element.type === "radio")
+  )
     return element.checked ? "ya" : "tidak";
-  if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) return element.value;
+  if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)
+    return element.value;
   return null;
 }
 
@@ -74,11 +82,13 @@ export function toRecordedEvent(
   url: string,
   trusted: (event: Event) => boolean = (candidate) => candidate.isTrusted,
 ): RecordedEvent | null {
-  if (!trusted(event)) return null;
   const element = eventTarget(event);
   if (!element) return null;
   const locator = locatorFor(element);
   if (event.type === "click") {
+    // Only the operator's own clicks; a value is kept however it changed, because custom
+    // selects and date pickers set it from script after her click.
+    if (!trusted(event)) return null;
     if (!locator.name && !locator.css) return null;
     return { t, type: "click", url, locator, value: null };
   }

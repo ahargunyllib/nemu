@@ -1,7 +1,13 @@
 import type { Procedure } from "@nemu/contracts/school";
 import { Badge } from "@nemu/ui/components/badge";
 import { Button } from "@nemu/ui/components/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@nemu/ui/components/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@nemu/ui/components/card";
 import { Input } from "@nemu/ui/components/input";
 import { Label } from "@nemu/ui/components/label";
 import { Skeleton } from "@nemu/ui/components/skeleton";
@@ -66,8 +72,7 @@ export default function RecordingReview({ recordingId }: { recordingId: string }
     }),
   );
 
-  if (recording.error)
-    return <p className="text-destructive">{recording.error.message}</p>;
+  if (recording.error) return <p className="text-destructive">{recording.error.message}</p>;
   if (!recording.data || !draft) return <Skeleton className="h-96 w-full" />;
   const firstUrl = recording.data.events[0]?.url;
 
@@ -77,8 +82,8 @@ export default function RecordingReview({ recordingId }: { recordingId: string }
         <CardHeader>
           <CardTitle>Rekaman {recording.data.recordedBy}</CardTitle>
           <CardDescription>
-            {draft.steps.length} langkah, {recording.data.narration.length} penjelasan suara. Langkah
-            bertanda “dikerjakan guru” tidak pernah dikerjakan Nemu.
+            {draft.steps.length} langkah, {recording.data.narration.length} penjelasan suara.
+            Langkah bertanda “dikerjakan guru” tidak pernah dikerjakan Nemu.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
@@ -88,6 +93,14 @@ export default function RecordingReview({ recordingId }: { recordingId: string }
               id="judul-cara"
               value={draft.title}
               onChange={(event) => setDraft({ ...draft, title: event.target.value })}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="direkam-oleh">Direkam oleh</Label>
+            <Input
+              id="direkam-oleh"
+              value={draft.recordedBy ?? ""}
+              onChange={(event) => setDraft({ ...draft, recordedBy: event.target.value })}
             />
           </div>
           {recording.data.narration.length > 0 && (
@@ -110,7 +123,9 @@ export default function RecordingReview({ recordingId }: { recordingId: string }
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          {draft.parameters.length === 0 && <p className="text-muted-foreground">Tidak ada isian.</p>}
+          {draft.parameters.length === 0 && (
+            <p className="text-muted-foreground">Tidak ada isian.</p>
+          )}
           {draft.parameters.map((parameter) => (
             <div key={parameter.name} className="grid gap-2 sm:grid-cols-2">
               <div className="grid gap-2">
@@ -143,7 +158,9 @@ export default function RecordingReview({ recordingId }: { recordingId: string }
       <Card>
         <CardHeader>
           <CardTitle>Langkah</CardTitle>
-          <CardDescription>Hapus langkah yang tidak perlu, misalnya klik yang keliru.</CardDescription>
+          <CardDescription>
+            Hapus langkah yang tidak perlu, misalnya klik yang keliru.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -206,7 +223,12 @@ export default function RecordingReview({ recordingId }: { recordingId: string }
           <Button
             disabled={save.isPending || !draft.title.trim() || draft.steps.length === 0}
             onClick={() =>
-              save.mutate({ title: draft.title.trim(), version: "1", isActive: true, procedure: draft })
+              save.mutate({
+                title: draft.title.trim(),
+                version: "1",
+                isActive: true,
+                procedure: { ...draft, recordedBy: draft.recordedBy?.trim() || undefined },
+              })
             }
           >
             {save.isPending && <Spinner />}
@@ -216,8 +238,8 @@ export default function RecordingReview({ recordingId }: { recordingId: string }
       </div>
       {firstUrl && !savedId && (
         <p className="text-right text-muted-foreground">
-          Rekam ulang membuka halaman yang direkam. Tekan Rekam cara di Nemu, lalu buka tautan rekaman
-          yang baru.
+          Rekam ulang membuka halaman yang direkam. Tekan Rekam cara di Nemu, lalu buka tautan
+          rekaman yang baru.
         </p>
       )}
     </div>

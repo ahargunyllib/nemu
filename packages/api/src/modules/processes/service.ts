@@ -324,7 +324,8 @@ const recordingKey = (workspaceId: string, recordingId: string) =>
 
 /** "Pak Rizal": how Nemu names who recorded ("Rekaman Pak Rizal"). */
 export function recorderName(teacher: Pick<TeacherProfile, "honorific" | "name">): string {
-  const first = teacher.name.split(/[\s,]+/u).find((word) => word && !/\./u.test(word)) ?? teacher.name;
+  const first =
+    teacher.name.split(/[\s,]+/u).find((word) => word && !/\./u.test(word)) ?? teacher.name;
   return `${teacher.honorific} ${first}`;
 }
 

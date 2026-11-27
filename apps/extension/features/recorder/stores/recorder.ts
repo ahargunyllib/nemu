@@ -46,7 +46,8 @@ function createRecorder() {
 
   const call = <R extends Parameters<typeof requestRecorder>[1]>(request: R) =>
     requestRecorder(context.pageEmail, request);
-  const address = () => (context.honorific === "Bu" ? "Ibu" : context.honorific === "Pak" ? "Bapak" : "Anda");
+  const address = () =>
+    context.honorific === "Bu" ? "Ibu" : context.honorific === "Pak" ? "Bapak" : "Anda";
 
   function stepCount(): number {
     return recording ? cleanRecording(recording.events).length : 0;
@@ -129,7 +130,12 @@ function createRecorder() {
 
   function start(title: string) {
     reset();
-    recording = { title: title.trim() || DEFAULT_TITLE, startedAt: Date.now(), events: [], narration: [] };
+    recording = {
+      title: title.trim() || DEFAULT_TITLE,
+      startedAt: Date.now(),
+      events: [],
+      narration: [],
+    };
     setPhase({ name: "recording" }, `Nemu mulai merekam, ${address()}.`);
     listen();
     keep();
