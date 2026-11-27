@@ -23,9 +23,16 @@ function digitOptions(readings: {
   a: string | null;
   b: string | null;
   reread: string | null;
+  alternatives?: readonly string[];
 }): string[] {
   const values = new Set<number>();
   for (const reading of [readings.a, readings.b, readings.reread]) {
+    const value = parseGradeValue(reading);
+    if (value !== null) values.add(value);
+  }
+  // When the readers agree on a doubtful cell, the other way a reader saw it is the second option.
+  for (const reading of readings.alternatives ?? []) {
+    if (values.size >= 2) break;
     const value = parseGradeValue(reading);
     if (value !== null) values.add(value);
   }

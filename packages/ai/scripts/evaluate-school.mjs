@@ -1,22 +1,24 @@
-// Nemu v2.2 school evaluation (AI_TECHNICAL_PRD §12, spike S1).
+// Nemu school evaluation (AI_TECHNICAL_PRD §13, F1-1).
 //
-//   pnpm --filter @nemu/ai eval:school                       offline: the synthetic F1-1 page, no credits
-//   pnpm --filter @nemu/ai eval:school -- --live --photo F1-1_foto-buku-nilai-4B-UTS-Matematika.jpg \
-//        [--truth truth.json] [--roster roster.json] [--assessment UTS] [--audio clip.wav]
+//   pnpm --filter @nemu/ai eval:school                       offline: the fixture reader, no credits
+//   pnpm --filter @nemu/ai eval:school -- --live [--photo <jpg>] [--truth <csv|json>] [--roster <csv|json>]
+//        [--assessment UTS] [--kkm 75] [--audio clip.wav]
 //
-// --truth: {"10": 71, "21": "S", …} keyed by line (the official answer key, converted once).
-// --roster: [{"studentId": "…", "name": "…", "number": 1}, …]; defaults to the synthetic 4B.
+// Defaults are the official F1-1 files in src/school/fixtures: the photo, F1-1_kunci-jawaban.csv
+// and daftar-siswa-4B.csv. --truth also takes {"10": 71, "23": "S", …} keyed by line.
+// --roster also takes [{"studentId": "…", "name": "…", "number": 1}, …].
 // Live mode reads models from apps/server/.env (OPENROUTER_SCHOOL_*), like the server does.
 import { existsSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { extname } from "node:path";
 
-import { buildVerificationPlan } from "../dist/school/grades/verification.js";
-import { CLASS_4B } from "../dist/school/fixtures/sdit-nusantara.js";
-import { F1_FINAL_VALUES } from "../dist/school/fixtures/f1-photo.js";
+import { applyAnswers, buildVerificationPlan } from "../dist/school/grades/verification.js";
+import { applySchoolRules } from "../dist/school/grades/rules.js";
 import { stripJpegMetadata } from "../dist/school/image.js";
 import { imageDataUrl } from "../dist/school/llm.js";
 import { createFixtureSchoolAi, createSchoolAi } from "../dist/school/runtime.js";
+
+const FIXTURES = new URL("../src/school/fixtures/", import.meta.url);
 
 function option(name) {
   const index = process.argv.indexOf(`--${name}`);
@@ -34,46 +36,121 @@ function loadServerEnv() {
   }
 }
 
+function parseCsv(text) {
+  const rows = [];
+  for (const line of text.trim().split(/\r?\n/u)) {
+    const cells = [];
+    let cell = "";
+    let quoted = false;
+    for (let index = 0; index < line.length; index += 1) {
+      const char = line[index];
+      if (quoted && char === '"' && line[index + 1] === '"') {
+        cell += '"';
+        index += 1;
+      } else if (char === '"') quoted = !quoted;
+      else if (char === "," && !quoted) {
+        cells.push(cell);
+        cell = "";
+      } else cell += char;
+    }
+    cells.push(cell);
+    rows.push(cells);
+  }
+  const [header, ...body] = rows;
+  return body.map((cells) => Object.fromEntries(header.map((key, index) => [key, cells[index]])));
+}
+
+async function loadRoster(path) {
+  const text = await readFile(path, "utf8");
+  if (extname(path) !== ".csv") return JSON.parse(text);
+  return parseCsv(text).map((row) => ({
+    studentId: row.nisn,
+    name: row.nama_lengkap,
+    number: Number(row.no_absen),
+  }));
+}
+
+/** line → { value: number | "S" | "I" | "A", name?: roster name, mustFlag?: boolean } */
+async function loadTruth(path) {
+  const text = await readFile(path, "utf8");
+  if (extname(path) !== ".csv") {
+    return Object.fromEntries(
+      Object.entries(JSON.parse(text)).map(([line, value]) => [line, { value }]),
+    );
+  }
+  return Object.fromEntries(
+    parseCsv(text).map((row) => [
+      row.baris_di_buku,
+      {
+        value: row.nilai_benar
+          ? Number(row.nilai_benar)
+          : (row.catatan.match(/\b([SIA]) \(/u)?.[1] ?? null),
+        name: row.nama_di_alursekolah,
+        nameDiffers: row.nama_di_buku !== row.nama_di_alursekolah,
+        mustFlag: row.wajib_ditandai_kuning === "ya",
+      },
+    ]),
+  );
+}
+
 const live = process.argv.includes("--live");
 loadServerEnv();
 
-const ai = live
-  ? createSchoolAi({
-      apiKey: process.env.OPENROUTER_API_KEY ?? "",
-      zdr: process.env.OPENROUTER_ZDR === "true",
-      models: {
-        readA: process.env.OPENROUTER_SCHOOL_READ_A_MODEL ?? "google/gemini-4-hydrogen",
-        readB: process.env.OPENROUTER_SCHOOL_READ_B_MODEL ?? "openai/gpt-6.1-terra",
-        reread: process.env.OPENROUTER_SCHOOL_REREAD_MODEL ?? "google/gemini-4-hydrogen",
-        text: process.env.OPENROUTER_SCHOOL_TEXT_MODEL ?? "anthropic/claude-haiku-5.5",
-        transcription: process.env.OPENROUTER_STT_MODEL ?? "openai/whisper-large-v3-turbo",
-        speech: process.env.OPENROUTER_TTS_MODEL ?? "",
-        speechVoice: process.env.OPENROUTER_TTS_VOICE ?? "",
-      },
-    })
-  : createFixtureSchoolAi();
+// Usage per call, from OpenRouter's response (cost in US$ when it reports one).
+const usage = [];
+const meteredFetch = async (input, init) => {
+  const response = await fetch(input, init);
+  const copy = response.clone();
+  try {
+    const body = await copy.json();
+    usage.push({
+      model: body.model ?? null,
+      input: body.usage?.input_tokens ?? 0,
+      output: body.usage?.output_tokens ?? 0,
+      cost: body.usage?.cost ?? null,
+    });
+  } catch {
+    // Not JSON: nothing to meter.
+  }
+  return response;
+};
+
+const models = {
+  readA: process.env.OPENROUTER_SCHOOL_READ_A_MODEL ?? "google/gemini-4-hydrogen",
+  readB: process.env.OPENROUTER_SCHOOL_READ_B_MODEL ?? "openai/gpt-6.1-terra",
+  reread: process.env.OPENROUTER_SCHOOL_REREAD_MODEL ?? "openai/gpt-6.2-sol",
+  text: process.env.OPENROUTER_SCHOOL_TEXT_MODEL ?? "anthropic/claude-haiku-5.5",
+  transcription: process.env.OPENROUTER_STT_MODEL ?? "openai/whisper-large-v3-turbo",
+  speech: process.env.OPENROUTER_TTS_MODEL ?? "",
+  speechVoice: process.env.OPENROUTER_TTS_VOICE ?? "",
+};
 
 if (live && !process.env.OPENROUTER_API_KEY) {
   console.error("Live mode needs OPENROUTER_API_KEY (apps/server/.env).");
   process.exit(2);
 }
 
-const roster = option("roster") ? JSON.parse(await readFile(option("roster"), "utf8")) : CLASS_4B;
-const truth = option("truth")
-  ? JSON.parse(await readFile(option("truth"), "utf8"))
-  : live
-    ? null
-    : Object.fromEntries(F1_FINAL_VALUES.map((value, index) => [String(index + 1), value]));
+const ai = live
+  ? createSchoolAi({
+      apiKey: process.env.OPENROUTER_API_KEY ?? "",
+      zdr: process.env.OPENROUTER_ZDR === "true",
+      models,
+      fetchImplementation: meteredFetch,
+    })
+  : createFixtureSchoolAi();
 
-let image = { type: "image", dataUrl: "data:image/jpeg;base64,AA" };
-if (option("photo")) {
-  const bytes = stripJpegMetadata(new Uint8Array(await readFile(option("photo"))));
-  const mime = extname(option("photo")).toLowerCase() === ".png" ? "image/png" : "image/jpeg";
-  image = { type: "image", dataUrl: imageDataUrl(bytes, mime) };
-} else if (live) {
-  console.error("Live mode needs --photo <path>.");
-  process.exit(2);
-}
+const roster = await loadRoster(
+  option("roster") ?? new URL("daftar-siswa-4B.csv", FIXTURES).pathname,
+);
+const truth = await loadTruth(
+  option("truth") ?? new URL("F1-1_kunci-jawaban.csv", FIXTURES).pathname,
+);
+const photoPath = option("photo") ?? new URL("f1-1-buku-nilai-4b.jpg", FIXTURES).pathname;
+const kkm = Number(option("kkm") ?? 75);
+
+const bytes = stripJpegMetadata(new Uint8Array(await readFile(photoPath)));
+const mime = extname(photoPath).toLowerCase() === ".png" ? "image/png" : "image/jpeg";
+const image = { type: "image", dataUrl: imageDataUrl(bytes, mime) };
 
 const started = performance.now();
 const result = await ai.readGradePhoto({
@@ -88,55 +165,133 @@ if (result.status !== "ok") {
   process.exit(1);
 }
 
-const plan = buildVerificationPlan(result.reading);
-const flagged = new Set(
+const { reading } = result;
+const plan = buildVerificationPlan(reading);
+const asked = (kind) => plan.questions.filter((question) => question.kind === kind);
+const cellAsked = new Set(
   plan.questions.filter((question) => question.kind !== "name").map((question) => question.line),
 );
+const nameAsked = new Set(asked("name").map((question) => question.line));
 const report = {
   mode: live ? "live" : "offline",
+  models: live ? models : "fixture",
   seconds: Math.round(seconds * 10) / 10,
-  rows: result.reading.rows.length,
+  rows: reading.rows.length,
   questions: plan.questions.length,
   byKind: Object.fromEntries(
     ["digit", "name", "absence"].map((kind) => [
       kind,
-      plan.questions.filter((question) => question.kind === kind).length,
+      asked(kind).map((question) => question.line),
     ]),
   ),
   accepted: plan.acceptedSentence,
 };
 
-if (truth) {
-  // Accuracy before the teacher checks: the reader's value (or suggestion) equals the truth.
-  // Flag recall: every cell whose value is wrong must be among the questions (target 100%).
-  let correct = 0;
-  let wrong = 0;
-  let wrongFlagged = 0;
-  for (const row of result.reading.rows) {
-    const expected = truth[String(row.line)];
-    if (expected === undefined) continue;
-    const cell = row.cells[0];
-    const got = cell.status === "value" ? cell.value : cell.status;
-    const right =
-      typeof expected === "number" ? got === expected : String(got) === String(expected);
-    if (right) correct += 1;
-    else {
-      wrong += 1;
-      if (flagged.has(row.line)) wrongFlagged += 1;
-    }
+const studentByName = new Map(roster.map((student) => [student.name, student.studentId]));
+const valueOf = (cell) => (cell.status === "value" ? cell.value : cell.status);
+
+// Before the teacher checks: the reader's value (or first suggestion) equals the truth.
+let correct = 0;
+const wrongLines = [];
+const misnamedLines = [];
+for (const row of reading.rows) {
+  const expected = truth[String(row.line)];
+  if (!expected) continue;
+  if (String(valueOf(row.cells[0])) === String(expected.value)) correct += 1;
+  else wrongLines.push(row.line);
+  if (expected.name && row.studentId !== studentByName.get(expected.name))
+    misnamedLines.push(row.line);
+}
+const truthLines = Object.keys(truth).length;
+const missingLines = Object.keys(truth)
+  .map(Number)
+  .filter((line) => !reading.rows.some((row) => row.line === line));
+report.cellAccuracyBeforeCheck = `${((correct / truthLines) * 100).toFixed(1)}% (${correct}/${truthLines})`;
+// The same per digit, for the numeric cells (an unreadable cell counts all its digits wrong).
+let digits = 0;
+let digitsRight = 0;
+for (const row of reading.rows) {
+  const expected = truth[String(row.line)];
+  if (typeof expected?.value !== "number") continue;
+  const want = String(expected.value);
+  const got = String(valueOf(row.cells[0]));
+  digits += want.length;
+  if (got.length === want.length)
+    digitsRight += [...want].filter((digit, index) => got[index] === digit).length;
+}
+report.digitAccuracyBeforeCheck = `${((digitsRight / digits) * 100).toFixed(1)}% (${digitsRight}/${digits})`;
+report.wrongCells = wrongLines.map((line) => {
+  const cell = reading.rows.find((row) => row.line === line).cells[0];
+  return `${line}: ${valueOf(cell)} (truth ${truth[line].value}; readings ${JSON.stringify(cell.readings)})`;
+});
+report.flagRecallOnWrongCells = wrongLines.length
+  ? `${((wrongLines.filter((line) => cellAsked.has(line)).length / wrongLines.length) * 100).toFixed(0)}%`
+  : "n/a (no wrong cells)";
+report.unflaggedWrongLines = wrongLines.filter((line) => !cellAsked.has(line));
+report.missingLines = missingLines;
+report.unaskedWrongNames = misnamedLines.filter((line) => !nameAsked.has(line));
+
+const mustFlag = Object.entries(truth)
+  .filter(([, row]) => row.mustFlag)
+  .map(([line]) => Number(line));
+const nameLines = Object.entries(truth)
+  .filter(([, row]) => row.nameDiffers)
+  .map(([line]) => Number(line));
+const absentLines = Object.entries(truth)
+  .filter(([, row]) => typeof row.value === "string")
+  .map(([line]) => Number(line));
+report.doubtfulFlagged = `${mustFlag.filter((line) => cellAsked.has(line)).length}/${mustFlag.length}`;
+report.namesConfirmed = `${nameLines.filter((line) => nameAsked.has(line)).length}/${nameLines.length}`;
+report.absenceAsked = `${absentLines.filter((line) => asked("absence").some((q) => q.line === line)).length}/${absentLines.length}`;
+
+// The teacher answers every question from the book; then the school rules run (KKM, S blank).
+if (Object.values(truth).every((row) => row.name)) {
+  const answers = plan.questions.map((question) => {
+    const expected = truth[String(question.line)];
+    if (question.kind === "name")
+      return { questionId: question.id, answer: studentByName.get(expected?.name) ?? "none" };
+    if (typeof expected?.value !== "number")
+      return { questionId: question.id, answer: "Kosongkan" };
+    return { questionId: question.id, answer: String(expected.value) };
+  });
+  const applied = applyAnswers(reading, answers);
+  if (applied.status !== "ok") report.afterCheck = { unresolved: applied.lines };
+  else {
+    const ruled = applySchoolRules(
+      applied.column,
+      applied.entries,
+      { kkm },
+      {
+        "school.kkm": "sop",
+        "school.absence_blank": "sop",
+      },
+    );
+    const wanted = new Map(Object.values(truth).map((row) => [row.name, row.value]));
+    const wrongSaved = ruled.entries
+      .filter((entry) => {
+        const expected = wanted.get(entry.name);
+        return typeof expected === "number" ? entry.value !== expected : entry.value !== null;
+      })
+      .map((entry) => `${entry.name}: ${entry.value}`);
+    const expectedRemedial = [...wanted.values()].filter(
+      (value) => typeof value === "number" && value < kkm,
+    ).length;
+    report.afterCheck = {
+      entries: ruled.entries.length,
+      wrongGradesSaved: wrongSaved,
+      remedial: `${ruled.summary.remedial} (expected ${expectedRemedial})`,
+      blank: ruled.entries.filter((entry) => entry.value === null).map((entry) => entry.name),
+    };
   }
-  report.cellAccuracyBeforeCheck = `${((correct / (correct + wrong)) * 100).toFixed(1)}%`;
-  report.flagRecallOnWrongCells = wrong
-    ? `${((wrongFlagged / wrong) * 100).toFixed(0)}%`
-    : "n/a (no wrong cells)";
-  report.unflaggedWrongLines = result.reading.rows
-    .filter((row) => {
-      const expected = truth[String(row.line)];
-      const cell = row.cells[0];
-      const got = cell.status === "value" ? cell.value : cell.status;
-      return expected !== undefined && String(got) !== String(expected) && !flagged.has(row.line);
-    })
-    .map((row) => row.line);
+}
+
+if (live) {
+  const known = usage.filter((call) => call.cost !== null);
+  report.calls = usage.length;
+  report.tokens = usage.map((call) => `${call.model}: ${call.input} in / ${call.output} out`);
+  report.costUsd = known.length
+    ? Math.round(known.reduce((sum, call) => sum + call.cost, 0) * 10000) / 10000
+    : "not reported";
 }
 
 if (option("audio")) {

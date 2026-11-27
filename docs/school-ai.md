@@ -6,10 +6,10 @@ Everything here runs on the synthetic school **SDIT Nusantara**. Replace the syn
 
 ## Run it
 
-| Mode    | How                                                             | Models                                                                                                                                                                                                                                      |
-| ------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Offline | `NEMU_RESPONDER=fixture` in `apps/server/.env`, then `pnpm dev` | None. Every photo reads as the F1-1-shaped synthetic page written for the named class's roster (4 doubtful digits, 5 names spelled differently, 1 S), help and answers come from rules. Shapes are real, so the UI can be built against it. |
-| Live    | `NEMU_RESPONDER=ai` and a valid `OPENROUTER_API_KEY`            | The `OPENROUTER_SCHOOL_*` models in `apps/server/.env.schema`                                                                                                                                                                               |
+| Mode    | How                                                             | Models                                                                                                                                                                                              |
+| ------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Offline | `NEMU_RESPONDER=fixture` in `apps/server/.env`, then `pnpm dev` | None. Every photo reads as the official F1-1 page (4 doubtful digits, 5 names spelled differently, Raka's S), help and answers come from rules. Shapes are real, so the UI can be built against it. |
+| Live    | `NEMU_RESPONDER=ai` and a valid `OPENROUTER_API_KEY`            | The `OPENROUTER_SCHOOL_*` models in `apps/server/.env.schema`                                                                                                                                       |
 
 The OpenRouter key in `apps/server/.env` had **expired** on 25 Nov 2026 (HTTP 401), so nothing live was run. Renew it before live testing.
 
@@ -178,11 +178,7 @@ The AI never emits a press of Simpan, Kirim, Ajukan or Hapus: those are `human` 
 | Izin BPMN                               | `packages/ai/src/school/fixtures/pengajuan-izin-guru.bpmn` (tests only); the official v2.2 `F3-1_pengajuan-izin-guru.bpmn` (`arsip/`) is the regression check next to it                                        | Upload `F3-1_pengajuan-izin-guru.bpmn`                                                                          |
 | Tahfidz BPMN, F3-1 photo and key        | Done: the official `04_F3_workspace/` files in `packages/ai/src/school/fixtures/` (`F3-1_catat-hafalan-tahfidz.bpmn`, `F3-1_foto-buku-setoran-tahfidz-4A.jpg`, `F3-1_kunci.csv`)                                | Javan's own "Student Activity Input" BPMN, if they give it                                                      |
 | F3-3 recording, expected steps, replays | `packages/ai/src/school/fixtures/F3-3_rekaman.json`, `F3-3_langkah-yang-diharapkan.json`, `F3-3_putaran-ulang.csv`                                                                                              | The official F3-3 files                                                                                         |
-| F1-1 grade-book photo                   | `packages/ai/src/school/fixtures/f1-1-buku-nilai-4b.jpg`, drawn by `packages/ai/scripts/f1-1-photo.py` for 01_profil-sekolah's 4B, laid out where the offline reader puts its cells                             | The official F1-1 photo from the test pack                                                                      |
-| F1 eval truth                           | Synthetic page                                                                                                                                                                                                  | `pnpm --filter @nemu/ai eval:school -- --live --photo <F1-1 photo> --truth <truth.json>`                        |
+| F1-1 grade-book photo and eval truth    | Done: the official photo, `F1-1_kunci-jawaban.csv` and `daftar-siswa-4B.csv` in `packages/ai/src/school/fixtures/`; `pnpm --filter @nemu/ai eval:school -- --live` scores them                                  | A real teacher's photo, with its key, through `--photo`, `--truth` and `--roster`                               |
 
-## Known limits
-
-- F3-1 (slot extraction, the photo read with both vision models, label matching) has run live on the official files (#220); most other prompts are tested against recorded shapes only.
 - Photo jobs are polled, not pushed (ADR-0011).
 - With OpenRouter TTS the word highlight is estimated, so it can drift by a few hundred ms (ADR-0012).

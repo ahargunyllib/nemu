@@ -131,7 +131,7 @@ beforeEach(gradeTable);
 describe("F1 cara 2 (F1-2)", () => {
   test("the scenario has two deliberate mismatches", () => {
     const off = SCENARIO.filter((row) => row.firstTyped !== row.book);
-    expect(off.map((row) => row.name)).toEqual(["Muhammad Rizky", "Umar Faruq"]);
+    expect(off.map((row) => row.name)).toEqual(["Bagas Saputra", "Budi Santoso"]);
   });
 
   test("Nemu says each grade from the book, catches both mismatches gently, and 0 wrong grades are left", async () => {
@@ -140,32 +140,39 @@ describe("F1 cara 2 (F1-2)", () => {
     void run.run();
     await vi.waitFor(() => expect(display()).toMatchObject(SAVE), { timeout: 5000 });
 
-    expect(spoken).toContain("Ketik 82 untuk Ahmad.");
-    expect(spoken).toContain("Ketik 84 untuk Muhammad.");
-    expect(spoken).toContain("Di Catatan Aisyah Zahra, tulis remedial.");
+    expect(spoken).toContain("Ketik 62 untuk Ahmad.");
+    expect(spoken).toContain("Ketik 68 untuk Bagas.");
+    expect(spoken).toContain("Di Catatan Ahmad Fadli, tulis remedial.");
     expect(spoken).toContain(
-      "Untuk Putra dikosongkan saja. Di Catatan Putra Wijaya, tulis tidak hadir.",
+      "Untuk Raka dikosongkan saja. Di Catatan Raka Aditya, tulis tidak hadir.",
     );
     // Both deliberate mismatches are caught, each with the book's value, and nothing else is.
     const corrections = spoken.filter((line) => line.startsWith("Di buku"));
-    expect(corrections).toEqual(["Di buku 84, Bu.", "Di buku 55, Bu."]);
+    expect(corrections).toEqual(["Di buku 68, Bu.", "Di buku 77, Bu."]);
     expect(spoken.some((line) => /salah/iu.test(line))).toBe(false);
     expect(wrongOnPage()).toEqual([]);
   });
 
   test("'Ajari saya' in the middle of the cara 1 fill switches the remaining rows to cara 2", async () => {
-    const { run, spoken, display, teacherTypes, ended } = harness(1);
+    // Nemu waits once Alya is filled, so "Ajari saya" lands before Bagas, the first row off.
+    const { run, spoken, display, teacherTypes, ended } = harness(1, (_ms, signal) =>
+      field("Nilai", "Alya Nur Fitri").value === "90" && run.state.cara === 1
+        ? new Promise((resolve) =>
+            signal.addEventListener("abort", () => resolve(), { once: true }),
+          )
+        : new Promise((resolve) => setTimeout(resolve, 0)),
+    );
     void run.run();
-    await vi.waitFor(() => expect(field("Nilai", "Alya Nur Fitri").value).toBe("86"));
+    await vi.waitFor(() => expect(field("Nilai", "Alya Nur Fitri").value).toBe("90"));
     teacherTypes();
     run.teach();
     await vi.waitFor(() => expect(display()).toMatchObject(SAVE), { timeout: 5000 });
 
     expect(run.state.cara).toBe(2);
-    expect(spoken).not.toContain("Ketik 82 untuk Ahmad.");
+    expect(spoken).not.toContain("Ketik 62 untuk Ahmad.");
     expect(spoken.filter((line) => line.startsWith("Di buku"))).toEqual([
-      "Di buku 84, Bu.",
-      "Di buku 55, Bu.",
+      "Di buku 68, Bu.",
+      "Di buku 77, Bu.",
     ]);
     expect(wrongOnPage()).toEqual([]);
 
@@ -182,17 +189,17 @@ describe("F1 cara 2 (F1-2)", () => {
   });
 
   test("the teacher taking over (Saya isi sendiri) switches the remaining rows to cara 2", async () => {
-    let hold = false;
+    // Nemu waits once Ahmad is filled, so she takes over before Bagas, the first row off.
+    let hold = true;
     const { run, spoken, display, teacherTypes } = harness(1, (_ms, signal) =>
-      hold
+      hold && field("Nilai", "Ahmad Fadli").value === "62"
         ? new Promise((resolve) =>
             signal.addEventListener("abort", () => resolve(), { once: true }),
           )
         : new Promise((resolve) => setTimeout(resolve, 0)),
     );
     void run.run();
-    await vi.waitFor(() => expect(field("Nilai", "Ahmad Fadli").value).toBe("82"));
-    hold = true;
+    await vi.waitFor(() => expect(field("Nilai", "Ahmad Fadli").value).toBe("62"));
     await vi.waitFor(() => expect(run.isActing()).toBe(true));
     // Her own mouse on the page stops Nemu (F0-07), which asks how to go on.
     run.interrupt();
@@ -205,8 +212,8 @@ describe("F1 cara 2 (F1-2)", () => {
 
     expect(run.state.cara).toBe(2);
     expect(spoken.filter((line) => line.startsWith("Di buku"))).toEqual([
-      "Di buku 84, Bu.",
-      "Di buku 55, Bu.",
+      "Di buku 68, Bu.",
+      "Di buku 77, Bu.",
     ]);
     expect(wrongOnPage()).toEqual([]);
   });

@@ -34,7 +34,13 @@ export const gradeCellSchema = z
     confidence: confidenceSchema,
     reasons: z.array(flagReasonSchema),
     readings: z
-      .object({ a: z.string().nullable(), b: z.string().nullable(), reread: z.string().nullable() })
+      .object({
+        a: z.string().nullable(),
+        b: z.string().nullable(),
+        reread: z.string().nullable(),
+        /** Other values a reader said the digits could be ("71" for a hooked 1 read as 77). */
+        alternatives: z.array(z.string()).optional(),
+      })
       .strict(),
     bbox: boxSchema.nullable(),
   })

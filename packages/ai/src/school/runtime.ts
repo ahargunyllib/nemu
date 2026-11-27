@@ -28,7 +28,7 @@ import {
 } from "./bpmn/form-photo.js";
 import type { ProcessGraph } from "./bpmn/graph.js";
 import { extractSlots, resolveWeekday, slotSpecs, type ExtractSlotsInput } from "./bpmn/plan.js";
-import { F1_DOUBTFUL, F1_REREAD, f1Page } from "./fixtures/f1-photo.js";
+import { F1_READ_A, F1_READ_B, F1_REREAD } from "./fixtures/f1-photo.js";
 import { F4_2_READING, F4_2_SCRIPT_SHA256 } from "./fixtures/f4-2-script.js";
 import { F2_1_SPP_INDEX, F2_1_SPP_PHRASING, isF21Spp } from "./fixtures/f2-1-spp.js";
 import { fixtureFormPhoto } from "./fixtures/form-photo.js";
@@ -206,22 +206,22 @@ const FAMILY = /\b(anak|suami|istri|ibu saya|bapak saya|orang tua|keluarga|mertu
 
 /**
  * Offline school AI for development and UI work (`NEMU_RESPONDER=fixture`). Deterministic and
- * free: every photo reads as the synthetic F1-1 page, help matches by keyword, slots come from
+ * free: every photo reads as the official F1-1 page, help matches by keyword, slots come from
  * simple rules. The real pipelines still run around these answers, so the shapes are real.
  */
 export function createFixtureSchoolAi(): SchoolAi {
-  // The page is written for the class the teacher named, so its names follow that roster.
-  const photoReaders = (roster: ReadGradePhotoInput["roster"]) => ({
-    readA: codeCall(() => f1Page(true, F1_DOUBTFUL, roster)),
-    readB: codeCall(() => f1Page(false, {}, roster)),
+  // Every photo reads as the official F1-1 page (fixtures/f1-photo.ts).
+  const photoReaders = {
+    readA: codeCall(() => F1_READ_A),
+    readB: codeCall(() => F1_READ_B),
     reread: codeCall((request) => {
       const ids = [...requestText(request).matchAll(/id=(\d+)/gu)].map((match) => match[1]!);
       return { cells: ids.map((id) => ({ id, value: F1_REREAD[id] ?? "?" })) };
     }),
-  });
+  };
 
   return {
-    readGradePhoto: (input) => readGradePhoto(photoReaders(input.roster), input),
+    readGradePhoto: (input) => readGradePhoto(photoReaders, input),
     parseGradeExcel: (input) => parseGradeExcel({}, input),
 
     // Code matching only: a near miss the real model would judge is "not in the guide" here.

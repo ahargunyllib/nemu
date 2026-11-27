@@ -281,13 +281,14 @@ Unchanged (PR #192): retrieval, closed-world JSON, and every quote checked again
 
 ## 10. Models (live OpenRouter prices, US$ per 1M tokens in/out, 2026-11-25)
 
-| Task                                                              | Default                              | Budget                                 | Strict ZDR                       |
-| ----------------------------------------------------------------- | ------------------------------------ | -------------------------------------- | -------------------------------- |
-| Photo Read A (structure + ranges)                                 | `google/gemini-4-hydrogen` 1.50/7.50 | `google/gemini-3.7-flash` 0.75/3.75    | `openai/gpt-6.2-sol` via Azure   |
-| Photo Read B                                                      | `openai/gpt-6.1-terra` 1/5           | `anthropic/claude-haiku-5.5` 0.10/0.50 | `openai/gpt-6.1-terra` via Azure |
-| Crop re-read, script photos (F4-03)                               | `google/gemini-4-hydrogen`           | `google/gemini-3.7-flash`              | `openai/gpt-6.2-sol`             |
-| Kamus fallback, symptoms, trace phrasing, slots, compile, answers | `anthropic/claude-haiku-5.5`         | `openai/gpt-6-luna`                    | `anthropic/claude-haiku-5.5`     |
-| Speech-to-text                                                    | `openai/whisper-large-v3-turbo`      | –                                      | (verify ZDR)                     |
+| Task                                                              | Default                                                               | Budget                                 | Strict ZDR                       |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------- | -------------------------------------- | -------------------------------- |
+| Photo Read A (structure + ranges)                                 | `google/gemini-4-hydrogen` 1.50/7.50                                  | `google/gemini-3.7-flash` 0.75/3.75    | `openai/gpt-6.2-sol` via Azure   |
+| Photo Read B                                                      | `openai/gpt-6.1-terra` 1/5                                            | `anthropic/claude-haiku-5.5` 0.10/0.50 | `openai/gpt-6.1-terra` via Azure |
+| Crop re-read (F1)                                                 | `openai/gpt-6.2-sol` 2/10 (third family; reads F1-1's hooked 71, 3/3) | `google/gemini-3.7-flash`              | `openai/gpt-6.2-sol`             |
+| Teacher's script → Moodle XML (F4-03)                             | `anthropic/claude-haiku-5.5` (reads PDFs; 10/10 on F4-2, 7/7 runs)    | `google/gemini-3.7-flash`              | `anthropic/claude-haiku-5.5`     |
+| Kamus fallback, symptoms, trace phrasing, slots, compile, answers | `anthropic/claude-haiku-5.5`                                          | `openai/gpt-6-luna`                    | `anthropic/claude-haiku-5.5`     |
+| Speech-to-text                                                    | `openai/whisper-large-v3-turbo`                                       | –                                      | (verify ZDR)                     |
 
 Every call sends `provider: {data_collection: "deny", require_parameters: true}` and a strict JSON schema; model IDs are environment configuration.
 

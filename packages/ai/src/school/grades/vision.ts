@@ -141,6 +141,8 @@ const SHARED_RULES = `
 - A crossed-out value: struck=true; if a new value is written next to it, put it in replaced_by.
 - A small initial or paraf in the cell: has_initial=true.
 - If any digit could be read two ways, unsure=true and list both readings in alternatives (most likely first).
+- Handwritten 1 and 7, 4 and 9, 3 and 8, 6 and 0 are easy to confuse. Compare each digit with how the same writer forms that digit in other rows; a digit shaped differently from the writer's usual one is unsure.
+- If a digit is smudged, faded or covered, do not guess it: unsure=true, or kind "illegible" if no reading is possible.
 - If a cell cannot be read at all, kind "illegible".
 - Number columns left to right as c1, c2, … and keep the same keys in every row.
 - row is the line number on the page, starting at 1 for the first student line. Skip header, title and total/average lines.
@@ -183,7 +185,7 @@ export async function readWithModel(
 export type RereadRequest = { id: string; description: string; image: LlmContent };
 
 const rereadSchema = z.object({
-  cells: z.array(z.object({ id: z.string(), value: z.string() })),
+  cells: z.array(z.object({ id: z.string(), strokes: z.string().optional(), value: z.string() })),
 });
 
 const REREAD_JSON_SCHEMA = {
@@ -196,15 +198,23 @@ const REREAD_JSON_SCHEMA = {
       items: {
         type: "object",
         additionalProperties: false,
-        required: ["id", "value"],
-        properties: { id: { type: "string" }, value: { type: "string" } },
+        required: ["id", "strokes", "value"],
+        properties: {
+          id: { type: "string" },
+          strokes: { type: "string" },
+          value: { type: "string" },
+        },
       },
     },
   },
 } as const;
 
-const REREAD_INSTRUCTIONS = `Each image is one handwritten cell from an Indonesian grade book.
-For each id, answer exactly what is written: digits (e.g. "77"), "S", "I", "A", "blank" if empty, or "?" if you are not sure.
+const REREAD_INSTRUCTIONS = `You check doubtful handwritten cells from an Indonesian grade book, one id at a time.
+Each id says what earlier readers saw there; they may be wrong, so look at the ink yourself.
+Compare every digit with how the same writer forms that digit in other rows of the column: a 1 can carry a long hook or flag and still be a 1 if its stem is upright, unlike the writer's 7s; a closed 9 can look like a 4.
+If a value is crossed out and another written beside it, answer the new one.
+First describe in strokes the ink of each digit (e.g. "slanted stem, flat top" or "upright stem, hooked flag"), and how it compares with the writer's other digits; then give the value.
+Answer exactly what is written: digits (e.g. "77"), "S", "I", "A", "blank" if empty, or "?" if any digit is smudged, covered or still unclear.
 Do not guess. "?" is better than a wrong number.`;
 
 /**
@@ -240,7 +250,8 @@ export async function rereadCells(
       schemaName: "cell_reread",
       schema: REREAD_JSON_SCHEMA,
       parse: (value) => rereadSchema.parse(value),
-      maxOutputTokens: 1_000,
+      // Reasoning tokens count against this too; a short budget cuts the JSON off.
+      maxOutputTokens: 6_000,
     });
     for (const cell of response.cells) results.set(cell.id, cell.value.trim());
   }

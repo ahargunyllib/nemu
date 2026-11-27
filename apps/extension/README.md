@@ -258,7 +258,7 @@ Admin Workspace. Screenshots go to `.output/verify-f2-08/`.
 the stack started with `WA_BOT_SECRET` set as well (`NEMU_RESPONDER=fixture WA_BOT_SECRET=<32+
 characters> pnpm dev`, and the same `WA_BOT_SECRET` for the script) and, for the AlurSekolah
 read-back, WS-07 connected to the mock (Admin › Integrasi: URL `http://localhost:3003`, key
-`as_uji_sdit_nusantara_2026`). It sends the synthetic grade-book photo
+`as_uji_sdit_nusantara_2026`). It sends the official F1-1 grade-book photo
 (`packages/ai/src/school/fixtures/f1-1-buku-nilai-4b.jpg`) the way `apps/wa-bot` does and checks:
 the card in one of two tabs only, Mulai and the missing class asked for, the 10 W5 questions (4
 doubtful cells, 5 names, 1 S) with their crops, the cara 1 fill of all 32 students with notes,
@@ -270,8 +270,8 @@ inbox, Catatan langkah, and every saved grade right in under 5 minutes. Screensh
 development build. It runs the F1 flow twice: Nemu starts filling in cara 1, then the rest
 switches to cara 2, once because the teacher takes over ("Saya isi sendiri") and once by "Ajari
 saya" (the `?uji-nemu` dock's button, since the test microphone can't say it). The "teacher"
-types what Nemu says, except where `features/grade-photo/lib/F1-2_cara-2_skenario.csv` (synthetic,
-two deliberate mismatches) has her type something else first. It checks that each line is the
+types what Nemu says, except where `features/grade-photo/lib/F1-2_cara-2_skenario.csv` (the
+official F1-1 values, with data-uji F1-2's two deliberate mismatches: Bagas 86 for 68, Budi 71 for 77) has her type something else first. It checks that each line is the
 book's grade, that both mismatches get "Di buku …, Bu." and never "salah", Catatan langkah, and 0
 wrong grades saved. Screenshots go to `.output/verify-f1-2/`.
 

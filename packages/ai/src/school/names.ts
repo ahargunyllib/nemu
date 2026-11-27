@@ -5,7 +5,8 @@ import type { NameCandidate } from "@nemu/contracts/school";
 /**
  * Matches grade-book names to the class roster (F1-04). Deterministic: the roster never goes to a
  * model. Exact, reordered and abbreviated names are accepted; any spelling difference is asked,
- * because the PRD has the teacher confirm "nama beda ejaan" (F1-06).
+ * because the PRD has the teacher confirm "nama beda ejaan" (F1-06). Grade-book photos ask about
+ * abbreviations too (`confirmAbbreviated`): data-uji F1-1 confirms "Laila N.A." and "Taufik H.".
  */
 
 export type RosterStudent = { studentId: string; name: string; number?: number };
@@ -214,6 +215,11 @@ export function matchKind(raw: string, roster: string): MatchKind {
 
 const AUTO_KINDS: ReadonlySet<MatchKind> = new Set(["exact", "reordered", "abbreviated"]);
 
+export type MatchNamesOptions = {
+  /** Ask the teacher about a shortened name ("Nabila", "Taufik H.") instead of accepting it. */
+  confirmAbbreviated?: boolean;
+};
+
 function rankCandidates(raw: string, roster: readonly RosterStudent[]): NameCandidate[] {
   return roster
     .map((student) => ({
@@ -232,6 +238,7 @@ function rankCandidates(raw: string, roster: readonly RosterStudent[]): NameCand
 export function matchNames(
   rows: readonly NameInput[],
   roster: readonly RosterStudent[],
+  options: MatchNamesOptions = {},
 ): NameMatch[] {
   if (!rows.length) return [];
   const scores = rows.map((row) => roster.map((student) => nameScore(row.nameRaw, student.name)));
@@ -276,7 +283,8 @@ export function matchNames(
       !!row.nameAlt &&
       canonicalName(row.nameAlt) !== canonicalName(row.nameRaw) &&
       !AUTO_KINDS.has(matchKind(row.nameAlt, assigned.name));
-    const auto = AUTO_KINDS.has(kind) && !ambiguous && !altDisagrees;
+    const shortened = options.confirmAbbreviated && kind === "abbreviated";
+    const auto = AUTO_KINDS.has(kind) && !shortened && !ambiguous && !altDisagrees;
 
     const ordered = [
       { studentId: assigned.studentId, name: assigned.name, score },

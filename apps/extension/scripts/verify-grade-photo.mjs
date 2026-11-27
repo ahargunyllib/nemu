@@ -1,5 +1,5 @@
 // F1-1 on the mock AlurSekolah (#207): loads a development build of the extension into
-// Playwright's Chromium, sends the synthetic grade-book photo the way apps/wa-bot does, and walks
+// Playwright's Chromium, sends the official F1-1 grade-book photo the way apps/wa-bot does, and walks
 // the whole flow as Bu Siti: the card in one tab only, Mulai, the command with the missing class
 // asked for, W5's questions (by button, and once by "Angka lain" and typing), the cara 1 fill with
 // visible navigation, Simpan pressed by the "teacher", the read-back, inboxAck, Catatan langkah.
@@ -37,40 +37,41 @@ const extension = join(root, ".output/verify-grade-photo-extension");
 const shots = join(root, ".output/verify-grade-photo");
 mkdirSync(shots, { recursive: true });
 
-// The truth of the synthetic F1-1 page, in 01_profil-sekolah's 4B order (KKM 75).
+// The truth of the official F1-1 page (F1-1_kunci-jawaban.csv), in 01_profil-sekolah's 4B order
+// (KKM 75). Raka is S (sakit).
 const CLASS_4B = [
-  ["Ahmad Fadli", 82],
-  ["Aisyah Zahra", 74],
-  ["Alya Nur Fitri", 86],
-  ["Bagas Saputra", 58],
+  ["Ahmad Fadli", 62],
+  ["Aisyah Zahra", 82],
+  ["Alya Nur Fitri", 90],
+  ["Bagas Saputra", 68],
   ["Budi Santoso", 77],
-  ["Citra Ayu Lestari", 91],
-  ["Dimas Pratama", 61],
-  ["Dinda Maharani", 70],
-  ["Fahri Hidayat", 95],
+  ["Citra Ayu Lestari", 64],
+  ["Dimas Pratama", 85],
+  ["Dinda Maharani", 87],
+  ["Fahri Hidayat", 73],
   ["Farah Annisa", 71],
-  ["Galih Ramadhan", 80],
+  ["Galih Ramadhan", 69],
   ["Hana Salsabila", 81],
   ["Ilham Maulana", 90],
   ["Intan Permata", 65],
-  ["Kevin Ardiansyah", 78],
-  ["Laila Nur Azizah", 73],
-  ["Muhammad Rizky", 84],
-  ["Nabila Putri Ramadhani", 69],
-  ["Naufal Akbar", 88],
-  ["Nur Aini", 72],
-  ["Putra Wijaya", null],
-  ["Qonita Rahma", 93],
-  ["Raka Aditya", 60],
-  ["Rani Oktaviani", 76],
-  ["Salsabila Putri", 68],
-  ["Siti Nur Haliza", 79],
-  ["Taufik Hidayatullah", 74],
-  ["Tiara Anjani", 87],
-  ["Umar Faruq", 55],
-  ["Vina Amelia", 83],
-  ["Yusuf Alfarizi", 75],
-  ["Zahra Khairunnisa", 97],
+  ["Kevin Ardiansyah", 72],
+  ["Laila Nur Azizah", 64],
+  ["Muhammad Rizky", 63],
+  ["Nabila Putri Ramadhani", 80],
+  ["Naufal Akbar", 73],
+  ["Nur Aini", 83],
+  ["Putra Wijaya", 77],
+  ["Qonita Rahma", 79],
+  ["Raka Aditya", null],
+  ["Rani Oktaviani", 82],
+  ["Salsabila Putri", 77],
+  ["Siti Nur Haliza", 85],
+  ["Taufik Hidayatullah", 85],
+  ["Tiara Anjani", 94],
+  ["Umar Faruq", 64],
+  ["Vina Amelia", 63],
+  ["Yusuf Alfarizi", 82],
+  ["Zahra Khairunnisa", 90],
 ];
 const TRUTH = new Map(CLASS_4B);
 
@@ -231,15 +232,15 @@ await check(
       if (index === 0) await page.screenshot({ path: join(shots, "w5-nama.png") });
       if (index === 1) await page.screenshot({ path: join(shots, "w5-angka.png") });
 
-      const digit = prompt.match(/^Nilai (.+?): /u);
+      const digit = prompt.match(/^Nilai (.+?)(?:: | berapa\?$)/u);
       if (digit) {
         expect(labels.includes("Angka lain"), "no Angka lain");
         const truth = String(TRUTH.get(digit[1]));
-        if (digit[1] === "Farah Annisa") {
-          // "Angka lain", then the number typed.
+        // Farah's 71 by "Angka lain" and typing, as does Nur Aini's smudged 83 (no reading offered).
+        if (digit[1] === "Farah Annisa" || !labels.includes(truth)) {
           await buttons.filter({ hasText: "Angka lain" }).click();
           await display("jawab")
-            .getByText(/Berapa nilai Farah Annisa/u)
+            .getByText(new RegExp(`Berapa nilai ${digit[1]}`, "u"))
             .waitFor();
           await typeBox.fill(truth);
           await typeBox.press("Enter");
@@ -283,7 +284,7 @@ await check("cara 1 opens Isi nilai kelas through the menu and fills every value
 await check("Nemu points at Simpan; the numbers are behind Lihat ringkasan", async () => {
   await display("tunjuk").getByRole("button", { name: "Lihat ringkasan" }).click();
   await display("tunjuk")
-    .getByText(/Ahmad Fadli 82, Aisyah Zahra 74 \(remedial\)/u)
+    .getByText(/Ahmad Fadli 62 \(remedial\), Aisyah Zahra 82/u)
     .waitFor();
   await page.screenshot({ path: join(shots, "tunjuk-simpan.png") });
 });
