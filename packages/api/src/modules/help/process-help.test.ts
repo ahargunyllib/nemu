@@ -180,6 +180,16 @@ describe("F2-08: nilai tidak muncul, from the uploaded SPP BPMN", () => {
     expect(answer.sentence).toMatch(/^Belum ada di proses sekolah\./u);
   });
 
+  it("a bare 'ini kenapa?' on a page without an error stays 'belum ada di panduan sekolah' (F2)", async () => {
+    const { siti } = await withSppProcess();
+    const answer = await call(
+      helpRouter.helpExplain,
+      { snapshot: PAGE, question: "Nemu, ini kenapa?" },
+      { context: siti },
+    );
+    expect(answer.sentence).toMatch(/^Belum ada di panduan sekolah\./u);
+  });
+
   it("an error on the page still goes to the Kamus Kendala (F2-2) with the process active", async () => {
     const { siti } = await withSppProcess();
     const answer = await call(

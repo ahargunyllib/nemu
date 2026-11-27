@@ -158,6 +158,14 @@ function contentWords(text: string): Set<string> {
   );
 }
 
+/**
+ * Whether the teacher described what she sees ("jadwal pelajaran besok berubah") rather than only
+ * asking "ini kenapa?" about the page: only then is "belum ada di proses sekolah" the answer (F3-14).
+ */
+export function describesSymptom(question: string): boolean {
+  return contentWords(question).size >= 2;
+}
+
 /** The offline matcher: the symptom sharing the most content words (≥3 and ≥60% of its own). */
 export function keywordSymptomMatch(
   question: string,
@@ -325,7 +333,8 @@ function templates(input: ExplainProcessInput, trace: CauseTrace, fixer: Contact
       ? `Untuk dibantu, Bapak/Ibu dapat menghubungi ${fixer.name} (${fixer.role}) di sekolah.`
       : "Untuk dibantu, Bapak/Ibu dapat menghubungi sekolah.",
     end?.kind === "endEvent" && isParentSafe(end.name) ? `Setelah itu, ${asClause(end.name)}.` : "",
-    `Terima kasih. Salam, ${teacher.honorific} ${teacher.name}.`,
+    // "Siti Aminah, S.Pd." already ends with its own period.
+    `Terima kasih. Salam, ${teacher.honorific} ${teacher.name.replace(/\.$/u, "")}.`,
   ]
     .filter(Boolean)
     .join(" ");

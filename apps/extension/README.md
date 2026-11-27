@@ -29,7 +29,10 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   background then runs the content script there too.
 - **Answers.** The background sends the question to `helpRoute`. Questions about school rules go to
   `helpAsk`, "ini kenapa?" to `helpExplain` with the page's visible text (never input values, and
-  nothing while a password field shows), and "berhenti" closes the bubble. Grade entry and
+  nothing while a password field shows), and "berhenti" closes the bubble. When the question matches
+  a symptom of an uploaded BPMN (F2-08), Sumber lists the process steps with **Lihat diagram** (the
+  Admin Workspace at `WXT_ADMIN_URL`, default `http://localhost:3002`), and the one button opens a
+  reply to the parent in WhatsApp Web. Grade entry and
   processes say they aren't available yet, until F1 (#207) and F3 (#213) hand their step lists to
   the executor.
 - **Talking (#200).** Hold **Ctrl + Spasi** on an allowed page, or press and hold the Nemu button,
@@ -179,6 +182,16 @@ extension against `http://localhost:3000`, loads it into Playwright's Chromium, 
 `pnpm --filter extension verify:executor` does the same for the executor with a development
 build: cara 1 from the Nilai menu to Simpan, Catatan langkah, the teacher's own click (F0-07),
 a page load mid-task, F0-1 (3/3), F0-09 and cara 3, saving screenshots to `.output/verify-executor/`.
+
+`pnpm --filter extension verify:f2-08` runs F2-1 end to end (#206): Admin Javan connects WS-07
+to the mock, Pak Rizal uploads `packages/ai/src/school/fixtures/F2-1_alur-spp.bpmn` in Pengetahuan
+sekolah (once; later runs reuse it) and sees the suggested symptoms, grades for Budi and Nabila are
+saved in the mock, and the three F2-1 questions are asked: the answer ("sudah tersimpan" or
+"Kemungkinan"), Kenapa?, Sumber with 2–4 steps, **Lihat diagram** (bpmn-js in the Admin Workspace
+with Kunci Nilai Siswa highlighted) and the parent reply in WhatsApp Web (no number, no amounts, no
+"tunggakan"; answered locally, never sent). It also checks a student without grades and a
+question no process covers. `NEMU_ADMIN_URL` (default `http://localhost:3002/`) points it at another
+Admin Workspace. Screenshots go to `.output/verify-f2-08/`.
 
 `pnpm --filter extension verify:grade-photo` runs F1-1 end to end on the mock (#207). It needs
 the stack started with `WA_BOT_SECRET` set as well (`NEMU_RESPONDER=fixture WA_BOT_SECRET=<32+

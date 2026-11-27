@@ -1,6 +1,6 @@
 import { importBpmn } from "@nemu/ai/school/bpmn/graph";
 import { routeCommand } from "@nemu/ai/school/commands";
-import type { SymptomCandidate } from "@nemu/ai/school/process-help";
+import { describesSymptom, type SymptomCandidate } from "@nemu/ai/school/process-help";
 import type { TeacherProfile } from "@nemu/ai/school/profile";
 import type { SchoolAi } from "@nemu/ai/school/runtime";
 import { NOT_IN_GUIDE_SENTENCE, NOT_IN_PROCESS_SENTENCE } from "@nemu/ai/school/safety";
@@ -118,8 +118,13 @@ export async function explain(
     kamus,
     teacher,
   });
-  // F3-14: no error on the page and no symptom of the school's processes matches.
-  if (explanation.status === "not_in_guide" && symptoms && !input.snapshot.alerts.length) {
+  // F3-14: she described something, the page shows no error, and no process symptom matches.
+  if (
+    explanation.status === "not_in_guide" &&
+    symptoms &&
+    !input.snapshot.alerts.length &&
+    describesSymptom(input.question ?? "")
+  ) {
     return {
       ...explanation,
       sentence: explanation.sentence.replace(NOT_IN_GUIDE_SENTENCE, NOT_IN_PROCESS_SENTENCE),
