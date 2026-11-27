@@ -1,8 +1,8 @@
-# Nemu v2.2 school AI: integration guide
+# Nemu v2.3 school AI: integration guide
 
-The AI side of Nemu v2.2 (AlurSekolah) as built for the MVP. It is for the fullstack side: what to call, in what order, and what you must enforce. The design is in `docs/AI_TECHNICAL_PRD.md`; the decisions are ADR-0009 to ADR-0012.
+The AI side of Nemu v2.3 (AlurSekolah) as built for the MVP. The client is the Nemu Extension for Chrome and Edge; there is no desktop app. It is for the fullstack side: what to call, in what order, and what you must enforce. The design is in `docs/AI_TECHNICAL_PRD.md`; the decisions are ADR-0009 to ADR-0013.
 
-Everything here runs on the synthetic school **SDIT Nusantara**. Replace the synthetic pieces listed at the end once the official `data-uji-mvp-v2` files are in hand.
+Everything here runs on the synthetic school **SDIT Nusantara**. Replace the synthetic pieces listed at the end with the official v2.3 test pack (`00_BACA-DULU.md` and its folders) as each one is brought in.
 
 ## Run it
 
