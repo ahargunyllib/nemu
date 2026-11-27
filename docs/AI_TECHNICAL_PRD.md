@@ -346,7 +346,13 @@ Per ADR-0003, a case is complete only when the extension path passes too.
 
 ## 14. ADRs
 
-- **Existing:** ADR-0009 two readers, ADR-0010 BPMN walked in code, ADR-0011 photo jobs in R2, ADR-0012 speech.
+- **Existing (AI):** ADR-0009 two readers, ADR-0010 BPMN walked in code, ADR-0011 photo jobs in R2, ADR-0012 speech.
+- **Existing (from the extension work):**
+  - ADR-0013: WhatsApp photos arrive through whatsmeow.
+  - ADR-0014: integration secrets are sealed in D1.
+  - ADR-0015: the extension knows the teacher without a login.
+  - ADR-0016: known sites are granted, and WS-03 decides.
+  - ADR-0017: a new BPMN process runs from its own form.
 - **To write with the code:**
   - **BPMN symptom index and tracing.** Symptoms are generated once at upload and point to element IDs; tracing is graph code; the model only phrases.
   - **Kamus as a table.** Deterministic matching first, a model only as fallback.
