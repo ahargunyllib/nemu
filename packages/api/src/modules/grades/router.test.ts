@@ -20,7 +20,7 @@ function jpegWithExif(): File {
 }
 
 describe("F1 through the API (offline AI, seeded SDIT Nusantara)", () => {
-  it("photo → 10 questions → answers → 13 remedial with the seeded SOP cited → read-back match", async () => {
+  it("photo → 10 questions → answers → 13 remedial with the official SOP cited → read-back match", async () => {
     const context = await createSchoolContext();
 
     const command = await call(
@@ -71,8 +71,8 @@ describe("F1 through the API (offline AI, seeded SDIT Nusantara)", () => {
     if (result.status !== "ok") return;
     expect(result.summary).toEqual({ filled: 31, blank: 1, remedial: 13 });
     expect(result.citations).toEqual({
-      "school.kkm": "sop-p2-3-2",
-      "school.absence_blank": "sop-p3-4-3",
+      "school.kkm": "sop-penilaian-sdit-nusantara-page-2-pasal-3.2",
+      "school.absence_blank": "sop-penilaian-sdit-nusantara-page-3-pasal-4.3",
     });
 
     const saved = result.entries.map((entry) => ({
