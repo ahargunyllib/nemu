@@ -304,3 +304,55 @@ Set `MOODLE_DOMAIN=localhost:8443` in `.env` (Caddy then listens on 8443), and r
 `COMPOSE_FILE=compose.yaml:$HOME/nemu-moodle-8443.yaml`. In the Admin Workspace, add
 `localhost:8443` under **Situs** ("baca dan isi"), and point the verify scripts at it with
 `MOODLE_URL=https://localhost:8443/`.
+
+## Host without a public IP
+
+The deploy guide assumes a VPS with a public IP, where Caddy gets a certificate and serves 80/443. A
+machine behind a campus or office network, reachable only over Tailscale or a VPN, has neither. A
+Cloudflare Tunnel replaces both: `cloudflared` connects out to Cloudflare, which serves HTTPS for
+the domain. Nothing listens on the machine, and no sudo or firewall change is needed. The team's
+Moodle (`nemu-moodle.ahargunyllib.dev`) runs this way.
+
+Follow the deploy guide, with these differences:
+
+1. **Skip steps 2 and 4.** Don't add the A record and don't open ports.
+2. **Create the tunnel**, once, in the Cloudflare account that holds `ahargunyllib.dev`:
+   1. Zero Trust › Networks › Tunnels › **Create a tunnel**, type Cloudflared, name `nemu-vps`.
+   2. Copy only the token from the install command it shows: the `eyJ…` part of
+      `cloudflared service install eyJ…`. Don't run that command; the token goes into `.env`
+      instead.
+   3. **Public Hostname** › Add: subdomain `nemu-moodle`, domain `ahargunyllib.dev`, service
+      **HTTP** `moodle:8080`. This creates the DNS record.
+3. **In `.env`** (step 6), also set the three lines `.env.example` lists for this setup:
+   - `TUNNEL_TOKEN` is the token;
+   - `COMPOSE_FILE=compose.yaml:tunnel.yaml`, so every `docker compose` command adds the tunnel;
+   - `AUTO_DEPLOY_SERVICES=postgres moodle tunnel wa-bot`, so Caddy never starts.
+4. **Start it** (step 7) without Caddy:
+
+   ```bash
+   docker compose up -d postgres moodle tunnel
+   docker compose logs tunnel
+   ```
+
+   The log shows four `Registered tunnel connection` lines. Ignore the `cert.pem` error, which
+   token-based tunnels always print. `https://nemu-moodle.ahargunyllib.dev` answers once the
+   Public Hostname exists.
+
+## Deploying without SSH
+
+`auto-deploy.sh` makes a merge to `main` the deploy, so only the person who set up the machine
+needs SSH. It runs every 5 minutes from cron. It fetches `main`, and when `infra/` or
+`apps/wa-bot/` changed, it resets the clone and runs `docker compose up -d --build` for
+`AUTO_DEPLOY_SERVICES` (every service when unset). Install it once, as the user who owns the
+clone, with no sudo:
+
+```bash
+(crontab -l 2>/dev/null; echo "*/5 * * * * $PWD/auto-deploy.sh >> $HOME/nemu-auto-deploy.log 2>&1") | crontab -
+```
+
+Run that from `infra/`. Each deploy adds a line to `~/nemu-auto-deploy.log`.
+
+- **Not covered:** one-off commands still need someone on the machine. That means
+  `./setup-4a-uji.sh` after an F4 test, the wa-bot QR scan, and changes to `.env`.
+- **Local edits are lost:** the script resets the clone to `main`. Put machine-specific settings in
+  `.env` or in a file outside the clone, never in tracked files.
