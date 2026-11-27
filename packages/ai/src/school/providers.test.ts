@@ -68,6 +68,54 @@ test("transcription sends Indonesian audio as base64 JSON with the school glossa
   assert.match(String(body.prompt), /AlurSekolah/u);
 });
 
+function sequenceFetch(...responses: Response[]) {
+  let calls = 0;
+  const fetchImplementation = (async () => {
+    const response = responses[Math.min(calls, responses.length - 1)]!;
+    calls += 1;
+    return response.clone();
+  }) as typeof fetch;
+  return { fetchImplementation, calls: () => calls };
+}
+
+test("transcription retries once when the provider is busy (HTTP 429)", async () => {
+  const busy = new Response(JSON.stringify({ error: { message: "Rate limited" } }), {
+    status: 429,
+  });
+  const ok = new Response(JSON.stringify({ text: "pelan" }));
+  const once = sequenceFetch(busy, ok);
+  const transcribe = createOpenRouterTranscriber({
+    apiKey: "k",
+    model: "microsoft/mai-transcribe-2",
+    fetchImplementation: once.fetchImplementation,
+    retryDelayMs: 0,
+  });
+  assert.deepEqual(await transcribe({ base64: "UklG", format: "wav" }), { text: "pelan" });
+  assert.equal(once.calls(), 2);
+
+  const twice = sequenceFetch(busy, busy, ok);
+  const giveUp = createOpenRouterTranscriber({
+    apiKey: "k",
+    model: "microsoft/mai-transcribe-2",
+    fetchImplementation: twice.fetchImplementation,
+    retryDelayMs: 0,
+  });
+  await assert.rejects(giveUp({ base64: "UklG", format: "wav" }), /HTTP 429/u);
+  assert.equal(twice.calls(), 2);
+});
+
+test("transcription doesn't retry a request the provider refused for good", async () => {
+  const refused = sequenceFetch(new Response("{}", { status: 400 }));
+  const transcribe = createOpenRouterTranscriber({
+    apiKey: "k",
+    model: "m",
+    fetchImplementation: refused.fetchImplementation,
+    retryDelayMs: 0,
+  });
+  await assert.rejects(transcribe({ base64: "UklG", format: "wav" }), /HTTP 400/u);
+  assert.equal(refused.calls(), 1);
+});
+
 test("speech returns the exact text with word timings for the highlight", async () => {
   const { requests, fetchImplementation } = recordingFetch(
     new Response(new Uint8Array([1, 2, 3]), { headers: { "content-type": "audio/mpeg" } }),
