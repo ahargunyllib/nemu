@@ -1,7 +1,7 @@
 import type { QuizQuestion, QuizSnapshot } from "@nemu/contracts/quiz";
 import { describe, expect, test } from "vite-plus/test";
 
-import { checkQuiz, classIn } from "./quiz-rules";
+import { checkQuiz, classIn, closingSentence } from "./quiz-rules";
 
 const question = (slot: number, change: Partial<QuizQuestion> = {}): QuizQuestion => ({
   slot,
@@ -96,5 +96,27 @@ describe("checkQuiz (F4-01 DOM rules)", () => {
       "Kuis ini sudah ditutup 4 Desember 2026, 21.00, jadi siswa tidak bisa mengerjakannya, Bu.",
     );
     expect(checkQuiz({ ...clean, opens: null, closes: null }, after)).toEqual([]);
+  });
+});
+
+describe("closingSentence: what Nemu says after the last problem (#256)", () => {
+  test("names how many problems there were, as the official F4-1 key does", () => {
+    expect(closingSentence(2, "Bu")).toBe("Selain dua hal itu, kuisnya sudah siap, Bu.");
+  });
+
+  test("fits the count: one problem is just “hal itu”, more are written in words", () => {
+    expect(closingSentence(1, "Bu")).toBe("Selain hal itu, kuisnya sudah siap, Bu.");
+    expect(closingSentence(3, "Pak")).toBe("Selain tiga hal itu, kuisnya sudah siap, Pak.");
+    expect(closingSentence(11, "Bu")).toBe("Selain sebelas hal itu, kuisnya sudah siap, Bu.");
+    expect(closingSentence(14, "Bu")).toBe("Selain empat belas hal itu, kuisnya sudah siap, Bu.");
+    expect(closingSentence(25, "Bu")).toBe("Selain 25 hal itu, kuisnya sudah siap, Bu.");
+  });
+
+  test("without a known honorific the sentence still ends cleanly", () => {
+    expect(closingSentence(2, "")).toBe("Selain dua hal itu, kuisnya sudah siap.");
+  });
+
+  test("says nothing when there were no problems", () => {
+    expect(closingSentence(0, "Bu")).toBeNull();
   });
 });
