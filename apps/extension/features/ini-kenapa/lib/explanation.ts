@@ -1,6 +1,7 @@
 import type { HelpExplanation } from "@nemu/contracts/school";
 
 import { type AskResult, sourceLabel } from "../../nemu-button/lib/answer";
+import { processDiagramUrl } from "./process-diagram";
 import { whatsAppUrl } from "./whatsapp";
 
 /**
@@ -24,6 +25,29 @@ export const PASSWORD_ON_SCREEN =
 
 /** helpExplain's answer as the Gelembung Jawab: sentence, Kenapa?, Sumber and one next step. */
 export function fromExplanation(explanation: HelpExplanation): AskResult {
+  if (explanation.status === "grades_not_saved") {
+    return { kind: "answer", text: explanation.sentence, sources: [] };
+  }
+  if (explanation.status === "process") {
+    // F2-08: Sumber is the process in 2–4 steps; the one action is the reply to the parent.
+    return {
+      kind: "answer",
+      text: explanation.sentence,
+      why: explanation.why || undefined,
+      sources: explanation.steps.map((step) => step.text),
+      diagram: {
+        label: `Lihat diagram ${explanation.process.title}`,
+        href: processDiagramUrl(explanation),
+      },
+      next: explanation.parentReply
+        ? {
+            kind: "whatsapp",
+            label: "Buka balasan untuk orang tua",
+            url: whatsAppUrl({ phone: null, text: explanation.parentReply }),
+          }
+        : undefined,
+    };
+  }
   if (explanation.status === "not_in_guide") {
     const to = explanation.offerOperator;
     return {

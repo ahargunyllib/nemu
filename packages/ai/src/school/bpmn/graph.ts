@@ -26,6 +26,8 @@ export type ProcessFlow = {
   source: string;
   target: string;
   condition: { language: ConditionLanguage; body: string } | null;
+  /** The flow's own documentation: what it means in plain words ("SPP belum lunas saat …"). */
+  documentation: string;
 };
 
 export type ProcessNodeKind =
@@ -196,6 +198,7 @@ export async function importBpmn(xml: string): Promise<ProcessGraph> {
         source: text((element.sourceRef as Element | undefined)?.id),
         target: text((element.targetRef as Element | undefined)?.id),
         condition: conditionOf(element),
+        documentation: documentationOf(element),
       };
       continue;
     }

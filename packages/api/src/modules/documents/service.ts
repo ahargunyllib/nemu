@@ -1,3 +1,5 @@
+import type { SchoolAi } from "@nemu/ai/school/runtime";
+
 import type { DocumentFileStore } from "../../context";
 import type { WorkspaceId } from "../../workspace-ids";
 import type { CatalogRepository } from "./catalog-repository";
@@ -20,6 +22,8 @@ export type DocumentDeps = {
   files: DocumentFileStore;
   /** Stores a BPMN's tasks and end events for the WS-04 editor; left out where none is needed. */
   catalog?: Pick<CatalogRepository, "replaceProcessElements">;
+  /** F3-11: suggests each element's symptoms on BPMN upload; without it they start empty. */
+  symptoms?: Pick<SchoolAi, "suggestSymptoms">;
 };
 
 export type UploadDocumentInput = {
@@ -69,7 +73,7 @@ export function inspectDocumentFile(format: DocumentFormat, bytes: ArrayBuffer):
 }
 
 export async function uploadDocument(
-  { documents, files, catalog }: DocumentDeps,
+  { documents, files, catalog, symptoms }: DocumentDeps,
   {
     workspaceId,
     title,
@@ -161,7 +165,7 @@ export async function uploadDocument(
     const ready = await documents.replaceChunksAndSetReady(document.id, chunks, isActive);
     if (format === "bpmn" && catalog) {
       const xml = new TextDecoder("utf-8").decode(bytes);
-      await catalog.replaceProcessElements(id, await bpmnProcessElements(id, xml));
+      await catalog.replaceProcessElements(id, await bpmnProcessElements(id, xml, symptoms));
     }
     return ready;
   } catch (error) {

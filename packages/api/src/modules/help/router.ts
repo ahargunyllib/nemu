@@ -17,14 +17,30 @@ function helpDeps(context: Pick<Context, "db" | "school">) {
 }
 
 export const helpRouter = {
-  /** F2: the page snapshot (+ what the teacher said) → whose fault and who fixes it, from WS-05. */
+  /**
+   * F2: the page snapshot (+ what the teacher said) → whose fault and who fixes it: from a symptom
+   * of an uploaded BPMN (F2-08, checked against AlurSekolah first), else from WS-05.
+   */
   helpExplain: schoolProcedure
     .input(
       z.object({ snapshot: pageSnapshotSchema, question: z.string().trim().max(500).nullable() }),
     )
     .handler(async ({ context, input }) => {
       const teacher = await context.caller.requireTeacher();
-      return explain(helpDeps(context), teacher, context.caller.workspaceId, input);
+      return explain(
+        {
+          ...helpDeps(context),
+          processes: {
+            ai: context.school.ai,
+            catalog: createCatalogRepository(context.db),
+            files: context.documentFiles,
+            alurSekolah: context.school.alurSekolah,
+          },
+        },
+        teacher,
+        context.caller.workspaceId,
+        input,
+      );
     }),
 
   /** F3-04/F3-07: a question answered only from active school knowledge, with verified citations. */

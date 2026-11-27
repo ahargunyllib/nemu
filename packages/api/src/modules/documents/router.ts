@@ -18,11 +18,12 @@ import {
   uploadDocument,
 } from "./service";
 
-function documentDeps(context: Pick<Context, "db" | "documentFiles">) {
+function documentDeps(context: Pick<Context, "db" | "documentFiles" | "school">) {
   return {
     documents: createDocumentRepository(context.db),
     files: context.documentFiles,
     catalog: createCatalogRepository(context.db),
+    symptoms: context.school.ai,
   };
 }
 

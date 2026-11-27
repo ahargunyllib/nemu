@@ -75,6 +75,7 @@ export const ROLE_ALIASES: Record<string, string[]> = {
   kepsek: ["kepala sekolah", "kepsek", "atasan", "penilai"],
   operator: ["operator", "operator sekolah", "admin sekolah", "tata usaha"],
   dinas: ["dinas pendidikan", "dinas", "pengawas"],
+  keuangan: ["bagian keuangan", "keuangan", "bendahara"],
   guru: ["guru", "ibu/bapak guru"],
 };
 

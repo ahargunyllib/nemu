@@ -18,9 +18,11 @@ export type NemuStatus = {
 export type NemuNotes = {
   kenapa?: string;
   sumber?: readonly string[];
+  /** A link under the Sumber list, such as "Lihat diagram" for a BPMN-backed answer. */
+  sumberLink?: { label: string; href: string };
   ringkasan?: string;
 };
-export type NemuNoteKind = keyof NemuNotes;
+export type NemuNoteKind = "kenapa" | "sumber" | "ringkasan";
 
 /** Gelembung Tunjuk carries at most one link. */
 export type NemuSingleNote =

@@ -63,6 +63,7 @@ export const BU_SITI: TeacherProfile = {
   contacts: {
     kepsek: { name: "Pak Ahmad", role: "kepsek", phone: "6281200000001" },
     operator: { name: "Pak Rizal", role: "operator", phone: "6281200000002" },
+    keuangan: { name: "Bu Ratna", role: "keuangan", phone: "6281200000003" },
   },
 };
 

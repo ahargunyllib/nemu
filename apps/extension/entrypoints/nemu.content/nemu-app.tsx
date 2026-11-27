@@ -276,7 +276,11 @@ function NemuPanel({
               highlightedWord={spokenWordIn(state.result.text, voice)}
               notes={
                 state.result.kind === "answer"
-                  ? { kenapa: state.result.why, sumber: state.result.sources }
+                  ? {
+                      kenapa: state.result.why,
+                      sumber: state.result.sources,
+                      sumberLink: state.result.diagram,
+                    }
                   : undefined
               }
               action={action}
