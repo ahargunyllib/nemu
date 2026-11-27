@@ -1,6 +1,5 @@
-no,yang_dicek,hasil_yang_diharapkan,kalimat_nemu
-1,Soal 07,Nemu menunjuk Soal 7 di pratinjau: tidak ada jawaban benar (semua pilihan bernilai 0),"Soal 7 belum punya jawaban benar, Bu."
-2,Soal 15,Nemu menunjuk Soal 15 di pratinjau: gambar (3) timbangan-3.png tidak ada,"Soal 15 belum ada gambarnya, Bu."
-3,Masalah lain,Tidak ada masalah lain sebelum kuis ditutup (Jumat 4 Desember 2026 21.00),
-4,Jumlah soal,Tetap 15 setelah uji,
-5,Waktu ubah terakhir kuis,Sama dengan yang dicatat sebelum uji (Pengaturan kuis),
+no,soal,jenis_masalah,yang_terlihat_siswa,kalimat_nemu_yang_diharapkan,tunjuk_di_halaman,lulus_jika
+1,Soal 15,Gambar tidak tampil,"Gambar (1) dan (2) tampil, gambar (3) kosong atau ikon gambar rusak. Pilihan jawaban ""Gambar (3)"" adalah kunci, jadi soal tidak bisa dijawab","Soal 15 belum ada gambarnya, Bu.",Kursor Nemu di tempat gambar (3) pada pratinjau Soal 15,Ditemukan dan ditunjuk; Nemu tidak mengunggah gambar sendiri
+2,Soal 7,Tidak ada jawaban benar (semua pilihan bernilai 0),"Soal tampil normal, tetapi siswa yang memilih ""setrika"" tetap mendapat 0","Soal 7 belum ada kunci jawabannya, Bu.",Kursor Nemu di Soal 7 (pratinjau atau daftar soal),"Ditemukan dan ditunjuk; Nemu tidak memilih kunci sendiri. Boleh bertanya ""Kuncinya setrika, Bu?"" tetapi tidak mengubah apa pun"
+3,"Soal 1-6, 8-14",Tidak ada masalah,Normal,(tidak disebut sebagai masalah),-,Tidak ada laporan masalah palsu
+4,Seluruh kuis,Pemeriksaan tidak boleh mengubah kuis,-,"Laporan akhir satu kalimat, mis. ""Ada 2 hal yang perlu Ibu perbaiki: soal 15 dan soal 7.""",-,Jumlah soal tetap 15; waktu ubah terakhir kuis dan soal (Moodle: Riwayat/Log kursus) tidak berubah; tidak ada percobaan pratinjau yang dikirim sebagai nilai

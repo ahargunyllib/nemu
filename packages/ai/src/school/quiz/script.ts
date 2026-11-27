@@ -10,6 +10,7 @@ import type {
 
 import { base64ToBytes, type JsonCall, type LlmContent } from "../llm.js";
 import { normalizeControlName } from "../safety.js";
+import { readDocx } from "./docx.js";
 import { extractPdfImages, type ScriptImage } from "./pdf-images.js";
 import { quizTimesFrom } from "./times.js";
 
@@ -59,7 +60,7 @@ const CHOICE_SCHEMA = {
   properties: {
     label: { type: "string" },
     text: { type: ["string", "null"] },
-    text_candidates: { type: "array", items: { type: "string" }, maxItems: 3 },
+    text_candidates: { type: "array", items: { type: "string" } },
     image: { type: ["string", "null"] },
     image_missing: { type: "boolean" },
   },
@@ -76,7 +77,6 @@ const SCRIPT_SCHEMA = {
     class_name: { type: ["string", "null"] },
     questions: {
       type: "array",
-      maxItems: 200,
       items: {
         type: "object",
         additionalProperties: false,
@@ -84,10 +84,10 @@ const SCRIPT_SCHEMA = {
         properties: {
           number: { type: "integer" },
           text: { type: ["string", "null"] },
-          text_candidates: { type: "array", items: { type: "string" }, maxItems: 3 },
+          text_candidates: { type: "array", items: { type: "string" } },
           image: { type: ["string", "null"] },
           image_missing: { type: "boolean" },
-          choices: { type: "array", items: CHOICE_SCHEMA, maxItems: 10 },
+          choices: { type: "array", items: CHOICE_SCHEMA },
           key: { type: ["string", "null"] },
         },
       },
@@ -113,27 +113,52 @@ export function fileBytes(dataUrl: string): Uint8Array {
   return base64ToBytes(dataUrl.split(",", 2)[1] ?? "");
 }
 
-function isPdf(input: QuizScriptInput): boolean {
-  return input.file.mimeType === "application/pdf" || /\.pdf$/iu.test(input.file.name);
+const DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+function scriptKind(input: QuizScriptInput): "pdf" | "docx" | "photo" | null {
+  const { mimeType, name } = input.file;
+  if (mimeType === "application/pdf" || /\.pdf$/iu.test(name)) return "pdf";
+  if (mimeType === DOCX || /\.docx$/iu.test(name)) return "docx";
+  if (mimeType.startsWith("image/")) return "photo";
+  return null;
 }
 
-/** The script's own pictures: a PDF's embedded images, or the photo itself. */
-export async function scriptImages(input: QuizScriptInput): Promise<ScriptImage[]> {
-  if (isPdf(input)) return extractPdfImages(fileBytes(input.file.dataUrl)).catch(() => []);
-  return [];
-}
-
-/** What the model sees: the file (a PDF as a file, a photo as an image) and each picture by id. */
-export function scriptContent(
+/**
+ * What the model sees and the script's own pictures: a PDF as a file plus its embedded images, a
+ * Word file as its text (read in code) plus its images, a photo as itself. Null for a file Nemu
+ * can't read (an old .doc).
+ */
+export async function scriptSource(
   input: QuizScriptInput,
-  images: readonly ScriptImage[],
-): LlmContent[] {
-  const content: LlmContent[] = [
-    { type: "text", text: `Berkas naskah: ${input.file.name}` },
-    input.file.mimeType.startsWith("image/")
-      ? { type: "image", dataUrl: input.file.dataUrl }
-      : { type: "file", dataUrl: input.file.dataUrl, filename: input.file.name },
-  ];
+): Promise<{ content: LlmContent[]; images: ScriptImage[] } | null> {
+  const kind = scriptKind(input);
+  const bytes = fileBytes(input.file.dataUrl);
+  const named: LlmContent = { type: "text", text: `Berkas naskah: ${input.file.name}` };
+  if (kind === "pdf") {
+    const images = await extractPdfImages(bytes).catch(() => []);
+    const file: LlmContent = {
+      type: "file",
+      dataUrl: input.file.dataUrl,
+      filename: input.file.name,
+    };
+    return { content: scriptContent([named, file], images), images };
+  }
+  if (kind === "docx") {
+    const word = await readDocx(bytes).catch(() => null);
+    if (!word?.text) return null;
+    const text: LlmContent = {
+      type: "text",
+      text: `Isi naskah (berkas Word; [gambar-N] menandai tempat gambar):\n${word.text}`,
+    };
+    return { content: scriptContent([named, text], word.images), images: word.images };
+  }
+  if (kind === "photo")
+    return { content: [named, { type: "image", dataUrl: input.file.dataUrl }], images: [] };
+  return null;
+}
+
+/** The script, then each picture by id. */
+function scriptContent(content: LlmContent[], images: readonly ScriptImage[]): LlmContent[] {
   for (const image of images) {
     content.push({
       type: "text",
@@ -144,11 +169,19 @@ export function scriptContent(
   return content;
 }
 
+/** The schema carries no array limits (Gemini refuses them as too many states), so code does. */
 function parseModelScript(value: unknown): ModelQuizScript {
   const script = value as ModelQuizScript;
   if (typeof script !== "object" || script === null || !Array.isArray(script.questions))
     throw new Error("The script reading has no questions");
-  return script;
+  return {
+    ...script,
+    questions: script.questions.slice(0, 200).map((question) => ({
+      ...question,
+      text_candidates: question.text_candidates.slice(0, 3),
+      choices: question.choices.slice(0, 10),
+    })),
+  };
 }
 
 function letter(index: number): string {
@@ -315,10 +348,16 @@ export async function readQuizScript(
   reader: QuizScriptReader,
   input: QuizScriptInput,
 ): Promise<QuizScriptResult> {
-  const images = await scriptImages(input);
+  const source = await scriptSource(input);
+  if (!source)
+    return {
+      status: "unreadable",
+      message: `Nemu belum bisa membaca berkas ini, Bu. Kirim naskahnya sebagai PDF, Word (.docx) atau foto, ya.`,
+    };
+  const { content, images } = source;
   const model = await reader.llm({
     instructions: INSTRUCTIONS,
-    content: scriptContent(input, images),
+    content,
     schemaName: "quiz_script",
     schema: SCRIPT_SCHEMA,
     parse: parseModelScript,

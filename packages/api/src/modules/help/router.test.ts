@@ -8,7 +8,9 @@ import { helpRouter } from "./router";
 const SNAPSHOT = {
   title: "Ruang GTK - Pengelolaan Kinerja",
   url: "https://ruang.gtk.example/kinerja",
-  alerts: ["Data Perencanaan (SKP) belum bisa diajukan karena RHK atasan belum tersedia."],
+  alerts: [
+    "Data Perencanaan (SKP) Anda gagal dialirkan ke E-Kinerja. Alasan: Tidak ada RHK atasan yang bisa dikaitkan.",
+  ],
   headings: [],
   fields: [],
   screenshotBase64: null,
@@ -57,7 +59,10 @@ describe("F2 and school questions through the API (seeded kamus and SOP)", () =>
       sentence: "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).",
       canSelfFix: false,
       citation: { docId: "kamus-kendala", article: "K-07" },
-      waDraft: { phone: "6281200000002" },
+      waDraft: {
+        phone: "6281200000002",
+        text: expect.stringContaining("Mohon bantuannya menambahkan penugasan guru"),
+      },
     });
   });
 
