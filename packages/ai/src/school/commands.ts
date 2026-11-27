@@ -29,6 +29,10 @@ export function routeCommand(
   const control = matchVoiceControl(utterance);
   if (control) return { kind: "control", control };
   const text = utterance.toLocaleLowerCase("id-ID");
+  // "Nilai Budi sudah saya masukkan, tapi kenapa tidak muncul?" asks why, it doesn't enter grades.
+  if (/\b(kenapa|mengapa|kok)\b|\btidak (muncul|tampil|kelihatan|terlihat)\b/u.test(text)) {
+    return { kind: "intent", intent: "kenapa", processName: null };
+  }
   if (
     /\bnilai\b/u.test(text) &&
     /\b(masuk|masukkan|masukin|input|isi|isikan|entri|ketik)\b/u.test(text)

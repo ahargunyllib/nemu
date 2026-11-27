@@ -73,3 +73,5 @@ export function sentenceIssues(text: string, maxWords = 14): SentenceIssue[] {
 }
 
 export const NOT_IN_GUIDE_SENTENCE = "Belum ada di panduan sekolah.";
+/** F3-14: the teacher describes something no symptom of the school's processes covers. */
+export const NOT_IN_PROCESS_SENTENCE = "Belum ada di proses sekolah.";

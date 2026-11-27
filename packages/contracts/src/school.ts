@@ -279,6 +279,35 @@ export const helpExplanationSchema = z.discriminatedUnion("status", [
       waDraft: z.object({ phone: z.string(), text: z.string() }).strict().nullable(),
     })
     .strict(),
+  /**
+   * F2-08 / F3-12: the teacher's question matched a symptom of an uploaded BPMN, and the walk found
+   * the cause and the way back. `certainty` is "likely" when AlurSekolah gave no data (F3-13).
+   */
+  z
+    .object({
+      status: z.literal("process"),
+      sentence: z.string(),
+      why: z.string(),
+      certainty: z.enum(["confirmed", "likely"]),
+      process: z
+        .object({ documentId: z.string(), title: z.string(), version: z.string() })
+        .strict(),
+      /** The task or end event the symptom belongs to; highlighted in Lihat diagram. */
+      elementId: z.string(),
+      /** Sumber for the teacher: 2–4 plain-language steps, each with its BPMN element ids. */
+      steps: z
+        .array(z.object({ text: z.string(), elementIds: z.array(z.string()).min(1) }).strict())
+        .min(2)
+        .max(4),
+      fixer: contactSchema.nullable(),
+      /** A polite WhatsApp reply the teacher sends the parent herself: no amounts, no "tunggakan". */
+      parentReply: z.string().nullable(),
+    })
+    .strict(),
+  /** F3-13: AlurSekolah says the student's grades aren't saved, so the process isn't the cause. */
+  z
+    .object({ status: z.literal("grades_not_saved"), sentence: z.string(), student: z.string() })
+    .strict(),
 ]);
 
 // --- F3: grounded answers, BPMN, procedures ----------------------------------------------------

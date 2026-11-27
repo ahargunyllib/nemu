@@ -48,6 +48,8 @@ jobs:
     env:
       # Same domain as the prod server in packages/infra/alchemy.run.ts.
       WXT_SERVER_URL: https://nemu-api.ahargunyllib.dev
+      # "Lihat diagram" opens the Admin Workspace (same domain as in packages/infra/alchemy.run.ts).
+      WXT_ADMIN_URL: https://nemu-admin.ahargunyllib.dev
       WXT_EXTENSION_VERSION: 0.1.${{ github.run_number }}
       GH_TOKEN: ${{ github.token }}
     steps:

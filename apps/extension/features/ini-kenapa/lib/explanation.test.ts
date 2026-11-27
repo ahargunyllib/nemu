@@ -52,6 +52,55 @@ describe("fromExplanation", () => {
       next: { kind: "whatsapp", label: "Ya, tanyakan ke Pak Rizal" },
     });
   });
+
+  test("F2-08: the process steps are Sumber, with Lihat diagram, and the reply goes to the parent", () => {
+    const reply = "Assalamualaikum, Bapak/Ibu. Nilai Budi Santoso sudah tersimpan di sekolah.";
+    const result = fromExplanation({
+      status: "process",
+      sentence: "Nilai Budi Santoso sudah tersimpan. … Yang bisa membantu: Bu Ratna (keuangan).",
+      why: "Di Alur Pembayaran SPP, …",
+      certainty: "confirmed",
+      process: { documentId: "doc-spp", title: "Alur Pembayaran SPP", version: "1" },
+      elementId: "Task_KunciNilai",
+      steps: [
+        { text: "SPP belum lunas.", elementIds: ["Gateway_JatuhTempo", "Flow_BelumLunas"] },
+        { text: "Sistem menyembunyikan nilai.", elementIds: ["Task_KunciNilai"] },
+      ],
+      fixer: { name: "Bu Ratna", role: "keuangan", phone: "6281200001005" },
+      parentReply: reply,
+    });
+    expect(result).toMatchObject({
+      kind: "answer",
+      sources: ["SPP belum lunas.", "Sistem menyembunyikan nilai."],
+      next: { kind: "whatsapp", label: "Buka balasan untuk orang tua" },
+      diagram: { label: "Lihat diagram Alur Pembayaran SPP" },
+    });
+    if (result.kind !== "answer") return;
+    const diagram = new URL(result.diagram!.href);
+    expect(diagram.pathname).toBe("/process-diagram");
+    expect(Object.fromEntries(diagram.searchParams)).toEqual({
+      document: "doc-spp",
+      element: "Task_KunciNilai",
+      path: "Gateway_JatuhTempo,Flow_BelumLunas,Task_KunciNilai",
+    });
+    const whatsapp = new URL(result.next!.kind === "whatsapp" ? result.next!.url : "");
+    expect(whatsapp.searchParams.has("phone")).toBe(false);
+    expect(whatsapp.searchParams.get("text")).toBe(reply);
+  });
+
+  test("F3-13: grades AlurSekolah doesn't have are said plainly, with no action", () => {
+    expect(
+      fromExplanation({
+        status: "grades_not_saved",
+        student: "Kevin Ardiansyah",
+        sentence: "Nilai Kevin Ardiansyah belum tersimpan di AlurSekolah, jadi belum bisa tampil.",
+      }),
+    ).toEqual({
+      kind: "answer",
+      text: "Nilai Kevin Ardiansyah belum tersimpan di AlurSekolah, jadi belum bisa tampil.",
+      sources: [],
+    });
+  });
 });
 
 describe("whatsAppUrl", () => {
@@ -65,6 +114,12 @@ describe("whatsAppUrl", () => {
     expect(`${url.origin}${url.pathname}`).toBe("https://web.whatsapp.com/send");
     expect(url.searchParams.get("phone")).toBe("6281200001003");
     expect(url.searchParams.get("text")).toBe("Saya Siti (NIP 1970). Terima kasih & salam.");
+  });
+
+  test("without a number WhatsApp Web lets the teacher pick the chat", () => {
+    expect(whatsAppUrl({ phone: null, text: "Halo Bu" })).toBe(
+      "https://web.whatsapp.com/send?text=Halo%20Bu",
+    );
   });
 
   test("a local number starting with 0 gets Indonesia's 62", () => {

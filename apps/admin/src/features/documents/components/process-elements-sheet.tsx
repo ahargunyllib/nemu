@@ -14,6 +14,7 @@ import { Skeleton } from "@nemu/ui/components/skeleton";
 import { Spinner } from "@nemu/ui/components/spinner";
 import { Textarea } from "@nemu/ui/components/textarea";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { WorkflowIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -56,6 +57,15 @@ export default function ProcessElementsSheet({ id, title }: { id: string; title:
             Gejala yang dilihat guru saat proses berhenti di langkah ini, dan halaman tempat tugas
             dikerjakan. Satu gejala per baris.
           </SheetDescription>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-fit"
+            nativeButton={false}
+            render={<Link to="/process-diagram" search={{ document: id }} />}
+          >
+            Lihat diagram
+          </Button>
         </SheetHeader>
         <div className="grid gap-4 overflow-y-auto px-4 pb-4">
           {elements.data

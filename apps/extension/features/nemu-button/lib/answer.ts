@@ -8,7 +8,15 @@ import type { AnswerNext } from "../../ini-kenapa/lib/explanation";
  * teacher said "berhenti". The five display types are #201.
  */
 export type AskResult =
-  | { kind: "answer"; text: string; sources: string[]; why?: string; next?: AnswerNext }
+  | {
+      kind: "answer";
+      text: string;
+      sources: string[];
+      why?: string;
+      next?: AnswerNext;
+      /** "Lihat diagram" under Sumber, for a BPMN-backed answer (F2-08). */
+      diagram?: { label: string; href: string };
+    }
   | { kind: "notice"; text: string }
   /** "masukkan nilai UTS Matematika 4B": the grade flow (F1, #207) takes the words. */
   | { kind: "grades"; utterance: string }

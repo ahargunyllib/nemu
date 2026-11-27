@@ -8,6 +8,7 @@ import type {
 
 import { retrieveKnowledge } from "../knowledge.js";
 import type { SlotValue } from "./bpmn/conditions.js";
+import type { ProcessGraph } from "./bpmn/graph.js";
 import { extractSlots, resolveWeekday, slotSpecs, type ExtractSlotsInput } from "./bpmn/plan.js";
 import { F1_DOUBTFUL, F1_REREAD, f1Page } from "./fixtures/f1-photo.js";
 import {
@@ -28,6 +29,16 @@ import {
 } from "./grounding.js";
 import { explainError, pageLines, resolveHelp, type ExplainErrorInput } from "./help.js";
 import { createOpenRouterJsonCaller, type JsonCall, type JsonCallRequest } from "./llm.js";
+import {
+  documentationSymptoms,
+  draftPhrasing,
+  explainProcess,
+  keywordSymptomMatch,
+  matchSymptom,
+  suggestSymptoms,
+  type ExplainProcessInput,
+  type SymptomCandidate,
+} from "./process-help.js";
 import {
   assembleProcedure,
   cleanRecording,
@@ -50,6 +61,15 @@ export type SchoolAi = {
   parseGradeExcel(input: ParseGradeExcelInput): Promise<ParseGradeExcelResult>;
   explainError(input: ExplainErrorInput): Promise<HelpExplanation>;
   answerGrounded(input: AnswerGroundedInput): Promise<GroundedAnswer>;
+  /** F3-11: on BPMN upload, the symptoms a user sees at each task and end event, by element id. */
+  suggestSymptoms(input: { graph: ProcessGraph }): Promise<Record<string, string[]>>;
+  /** F3-12: the stored symptom the teacher's words describe, or null (F3-14). */
+  matchSymptom(input: {
+    question: string;
+    candidates: readonly SymptomCandidate[];
+  }): Promise<SymptomCandidate | null>;
+  /** F2-08 / F3-12..13: cause, way back, who helps and the parent reply; null if the walk fails. */
+  explainProcess(input: ExplainProcessInput): Promise<HelpExplanation | null>;
   extractSlots(input: ExtractSlotsInput): Promise<Record<string, SlotValue>>;
   compileProcedure(input: CompileProcedureInput): Promise<Procedure>;
   transcribe(audio: AudioInput): Promise<Transcript>;
@@ -110,6 +130,9 @@ export function createSchoolAi(config: SchoolAiConfig): SchoolAi {
     parseGradeExcel: (input) => parseGradeExcel({ mapHeaders: text }, input),
     explainError: (input) => explainError({ llm: text }, input),
     answerGrounded: (input) => answerGrounded({ llm: text }, input),
+    suggestSymptoms: (input) => suggestSymptoms({ llm: text }, input),
+    matchSymptom: (input) => matchSymptom({ llm: text }, input),
+    explainProcess: (input) => explainProcess({ llm: text }, input),
     extractSlots: (input) => extractSlots(text, input),
     compileProcedure: (input) => compileProcedure({ llm: text }, input),
     transcribe: createOpenRouterTranscriber({
@@ -222,6 +245,26 @@ export function createFixtureSchoolAi(): SchoolAi {
         context,
       );
     },
+
+    // Symptoms from the elements' own documentation, matching by shared words, drafts as written.
+    suggestSymptoms: (input) =>
+      suggestSymptoms(
+        {
+          llm: codeCall(() => ({
+            elements: Object.entries(documentationSymptoms(input.graph)).map(
+              ([element_id, symptoms]) => ({ element_id, symptoms }),
+            ),
+          })),
+        },
+        input,
+      ),
+    matchSymptom: (input) =>
+      matchSymptom(
+        { llm: codeCall(() => ({ index: keywordSymptomMatch(input.question, input.candidates) })) },
+        input,
+      ),
+    explainProcess: (input) =>
+      explainProcess({ llm: codeCall((request) => draftPhrasing(requestText(request))) }, input),
 
     async extractSlots(input) {
       return extractSlots(

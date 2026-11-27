@@ -26,6 +26,18 @@ test("commands are routed to the right feature", () => {
     intent: "kenapa",
     processName: null,
   });
+  // F2-1: grades she already entered that parents can't see is a "why", not grade entry.
+  for (const question of [
+    "Nilai Budi sudah saya masukkan, tapi kenapa tidak muncul di aplikasi orang tua?",
+    "Orang tua Nabila bilang nilainya belum kelihatan di aplikasi orang tua, kok bisa?",
+    "Nilai yang saya isi tidak tampil di aplikasi orang tua",
+  ]) {
+    assert.deepEqual(routeCommand(question), {
+      kind: "intent",
+      intent: "kenapa",
+      processName: null,
+    });
+  }
   assert.deepEqual(routeCommand("saya mau izin Kamis, anak sakit", ["Pengajuan Izin Guru"]), {
     kind: "intent",
     intent: "proses",

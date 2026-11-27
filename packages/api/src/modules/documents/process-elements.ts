@@ -1,17 +1,26 @@
 import { importBpmn } from "@nemu/ai/school/bpmn/graph";
+import type { SchoolAi } from "@nemu/ai/school/runtime";
 
 import type { ProcessElementRecord } from "./catalog-repository";
 
 /**
  * F3-11 / F3-19: the tasks and end events of an uploaded BPMN, ready for the operator to correct
  * in WS-04. A user task's page starts as its own label (the menu Nemu opens to do it); symptoms
- * start empty until the school AI (#217) suggests them or the operator writes them.
+ * are the school AI's suggestion (F3-11), or empty when it has none or fails, until the operator
+ * writes them.
  */
 export async function bpmnProcessElements(
   documentId: string,
   xml: string,
+  ai?: Pick<SchoolAi, "suggestSymptoms">,
 ): Promise<ProcessElementRecord[]> {
   const graph = await importBpmn(xml);
+  let suggested: Record<string, string[]> = {};
+  try {
+    suggested = ai ? await ai.suggestSymptoms({ graph }) : {};
+  } catch (error) {
+    console.error("Suggesting BPMN symptoms failed", error);
+  }
   return Object.values(graph.nodes)
     .filter((node) => node.kind === "task" || node.kind === "endEvent")
     .map((node, sequence) => {
@@ -22,7 +31,7 @@ export async function bpmnProcessElements(
         kind: node.kind === "task" ? ("task" as const) : ("end" as const),
         name: node.name || node.id,
         sequence,
-        symptoms: [],
+        symptoms: suggested[node.id] ?? [],
         page: userTask ? pageFromLabel(node.name) : null,
         pageEdited: false,
       };

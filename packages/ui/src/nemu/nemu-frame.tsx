@@ -208,11 +208,23 @@ export function NemuNoteLinks({
       {open && (
         <div className="rounded-2xl bg-nemu-subtle px-4 py-3 text-xl leading-7 text-nemu-subtle-foreground">
           {open === "sumber" ? (
-            <ul className="flex list-disc flex-col gap-1 pl-5">
-              {notes.sumber?.map((source) => (
-                <li key={source}>{source}</li>
-              ))}
-            </ul>
+            <>
+              <ul className="flex list-disc flex-col gap-1 pl-5">
+                {notes.sumber?.map((source) => (
+                  <li key={source}>{source}</li>
+                ))}
+              </ul>
+              {notes.sumberLink && (
+                <a
+                  href={notes.sumberLink.href}
+                  target="_blank"
+                  rel="noopener"
+                  className={cn(NEMU_LINK, "mt-1 inline-flex items-center")}
+                >
+                  {notes.sumberLink.label}
+                </a>
+              )}
+            </>
           ) : (
             <p>{notes[open]}</p>
           )}

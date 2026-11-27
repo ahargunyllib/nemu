@@ -39,7 +39,7 @@ All are oRPC procedures on the Nemu Service, open to a `W-SEKOLAH` session or to
 | `gradesReadbackAlurSekolah`                     | `{entries, className, subject, assessment, semester?}` → reads `/api/v1/nilai` with the WS-07 key → `{match, mismatches, sentence}` | F1-10       |
 | `gradesReadback`                                | `{entries, saved}` (scraped Rekap Nilai rows) → `{match, mismatches, sentence}`; fallback when AlurSekolah isn't connected          | F1-10       |
 | `gradesGuidedLine`                              | `{entries, studentId, typed}` → "Ketik 77 untuk Budi." / "Di buku 77, Bu."                                                          | F1-11       |
-| `helpExplain`                                   | `{snapshot, question}` → bubble sentence, `why`, `citation`, `fixer`, `waDraft`, `guidedTarget`                                     | F2          |
+| `helpExplain`                                   | `{snapshot, question}` → bubble sentence, `why`, `citation`, `fixer`, `waDraft`, `guidedTarget`; or a BPMN `process` answer         | F2, F2-08   |
 | `helpAsk`                                       | question → answer with verified citations, or "Belum ada di panduan sekolah."                                                       | F3-04/07    |
 | `helpTryAnswer` (admin)                         | `{question, documentIds}` → the `helpAsk` answer as if those inactive documents were active (Uji jawaban)                           | WS-09       |
 | `processList`, `processXml`                     | active BPMN processes; the XML for the viewer                                                                                       | F3-03/06    |
@@ -50,9 +50,9 @@ All are oRPC procedures on the Nemu Service, open to a `W-SEKOLAH` session or to
 | `speechTranscribe`                              | 16 kHz mono audio (base64) → text to show in the bubble                                                                             | F0-04       |
 | `speechSynthesize`                              | sentence → audio + word timings, or `audioBase64: ""` (use the local OS voice)                                                      | F0-05       |
 
-`.bpmn` files are accepted by `uploadDocument` and the Admin Workspace picker. On upload each task and end event is stored in `process_element` with an empty symptom list and, for a user task, a page taken from its label; the operator corrects both in WS-04 (`listProcessElements`, `saveProcessElement`). Generating symptoms on upload (F3-11) is #217's and should write into the same rows.
+`.bpmn` files are accepted by `uploadDocument` and the Admin Workspace picker. On upload each task and end event is stored in `process_element` with the symptoms `SchoolAi.suggestSymptoms` gives it (F3-11; empty if the model fails) and, for a user task, a page taken from its label; the operator corrects both in WS-04 (`listProcessElements`, `saveProcessElement`).
 
-`helpExplain` reads only the WS-05 Kamus Kendala table (`kamus_kendala`, citation `docId: "kamus-kendala"`, `article` = the row's code), not uploaded documents.
+`helpExplain` first matches the teacher's words to those symptoms (F2-08, below). Otherwise it reads only the WS-05 Kamus Kendala table (`kamus_kendala`, citation `docId: "kamus-kendala"`, `article` = the row's code).
 
 ## Flows
 
@@ -88,6 +88,19 @@ The Nemu Extension does this (#205, `apps/extension/features/ini-kenapa`):
    - If `canSelfFix`, **Tunjukkan caranya** starts cara 2: the executor points at `guidedTarget`, found by label, role or text. When it isn't on the page, Nemu first points at the menu the kamus sentence (`citation.quote`) names on the way ("buka menu E-Kinerja"). The teacher clicks.
    - Else **Buka WhatsApp ke …** opens `https://web.whatsapp.com/send?phone=…&text=…` from `waDraft`, with no screenshot. **The teacher presses Kirim.**
    - `not_in_guide`: speak `sentence` ("Belum ada di panduan sekolah. …"); **Ya, tanyakan ke …** opens `waDraft` to the operator.
+
+### F2-08: "nilai tidak muncul" from an uploaded BPMN
+
+Nothing in the code knows SPP: the school's uploaded `.bpmn`, its WS-04 symptoms and its WS-06 contacts drive the answer. Test case F2-1 uses the synthetic `packages/ai/src/school/fixtures/F2-1_alur-spp.bpmn` with `F2-1_pertanyaan-dan-kunci.csv`.
+
+1. `helpRoute` sends "kenapa", "kok" and "tidak muncul/tampil" questions to `kenapa` before grade entry, so "nilai Budi sudah saya masukkan, tapi kenapa tidak muncul?" is a question.
+2. `helpExplain` collects the symptoms of every active, ready BPMN and calls `SchoolAi.matchSymptom` (offline: shared content words; live: the text model picks one or none).
+3. On a match, the Nemu Service asks AlurSekolah first (F3-13, `help/grade-check.ts`, the WS-07 key as in the F1 read-back): the student named in the question from `/siswa`, then `/nilai?nis=`. Saved → `certainty: "confirmed"`; no grades → `grades_not_saved` ("Simpan dulu nilainya"); not connected, no student named or an error → `"likely"`, and the sentence starts with "Kemungkinan".
+4. `SchoolAi.explainProcess` walks the file in code (`bpmn/trace.ts`): back to the gateway branch that led to the symptom's element, forward to the nearest end event (the way back). The fixer is the first task on the way back whose lane names a WS-06 contact role ("Bagian Keuangan" → `keuangan` → Bu Ratna). The model only rewords the steps, `why` and the parent reply; code keeps the element ids and replaces a reply with an amount or the word "tunggakan" by the safe draft.
+5. The answer (`status: "process"`): `sentence`, `why` (Kenapa?), `steps` (Sumber: 2–4 plain steps, each with its element ids), `fixer`, `parentReply`, `process` and `elementId`.
+   - The extension shows the steps under Sumber with **Lihat diagram**, a link to the Admin Workspace's `/process-diagram?document=…&element=…&path=…`, where bpmn-js draws the file with the cause outlined (operators are signed in there; `WXT_ADMIN_URL`, default `http://localhost:3002`).
+   - **Buka balasan untuk orang tua** opens `https://web.whatsapp.com/send?text=…` with no number, so WhatsApp Web asks which chat. **The teacher presses Kirim.**
+6. No symptom matches and the page shows no error (F3-14): the Kamus Kendala answer says "Belum ada di proses sekolah." instead of "Belum ada di panduan sekolah."
 
 ### F3: processes and recorded procedures
 
@@ -133,6 +146,7 @@ The AI never emits a press of Simpan, Kirim, Ajukan or Hapus: those are `human` 
 | Teacher profile, roster, contacts, KKM | Done: WS-06 in D1 (`createRegistrySchoolDirectory`), seeded from `profil-sekolah.json` and `daftar-siswa-*.csv`; `createDemoSchoolDirectory()` stays for tests                      | Rosters from the AlurSekolah `/siswa` read (#204) once the school's key is set                                                                       |
 | SOP Penilaian                          | Seed migration, document `sop-penilaian-sdit-nusantara`                                                                                                                             | Upload the official PDF in Admin → Pengetahuan sekolah. Then re-point the four `school.*` Rule Sources at the new SOP and deactivate the seeded one. |
 | Kamus Kendala                          | Seed migrations, rows K-01..K-07 in `kamus_kendala` (K-02 is test F2-3, K-07 is F2-2)                                                                                               | Import the official kamus in Admin → Kamus Kendala (Excel) or type the rows.                                                                         |
+| SPP BPMN and F2-1 questions            | `packages/ai/src/school/fixtures/F2-1_alur-spp.bpmn`, `F2-1_pertanyaan-dan-kunci.csv` (tests; upload the BPMN in Pengetahuan sekolah for the demo)                                  | The official `03_F2_macet/F2-1_spp/` files                                                                                                           |
 | Izin BPMN                              | `packages/ai/src/school/fixtures/pengajuan-izin-guru.bpmn` (tests only)                                                                                                             | Upload `F3-1_pengajuan-izin-guru.bpmn`                                                                                                               |
 | F1-1 grade-book photo                  | `packages/ai/src/school/fixtures/f1-1-buku-nilai-4b.jpg`, drawn by `packages/ai/scripts/f1-1-photo.py` for 01_profil-sekolah's 4B, laid out where the offline reader puts its cells | The official F1-1 photo from the test pack                                                                                                           |
 | F1 eval truth                          | Synthetic page                                                                                                                                                                      | `pnpm --filter @nemu/ai eval:school -- --live --photo <F1-1 photo> --truth <truth.json>`                                                             |
