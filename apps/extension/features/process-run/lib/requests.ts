@@ -1,14 +1,20 @@
 import type { BpmnPlan, FormPhotoResult, InboxJob } from "@nemu/contracts/school";
 
-import type { ProcessPlanInput, ProcessSlots } from "../../../shared/api/nemu-service";
+import type {
+  NemuServiceClient,
+  ProcessPlanInput,
+  ProcessSlots,
+} from "../../../shared/api/nemu-service";
 
 /**
  * What the F3 flow in the page asks the background for (#213). The background alone calls the
  * Nemu Service, as the teacher whose email the page shows (ADR-0015).
  */
 export type ProcessRunRequest =
-  /** The active BPMN `helpRoute` named ("Catat Hafalan Tahfidz"), or null. */
+  /** The active BPMN or recorded procedure `helpRoute` named ("Catat Hafalan Tahfidz"), or null. */
   | { op: "find"; processName: string }
+  /** F3-01 replay: the recorded steps with the teacher's values, or the next value to ask for. */
+  | { op: "run-procedure"; documentId: string; values: Record<string, string> }
   | { op: "plan"; input: ProcessPlanInput }
   /** Photos waiting in the teacher's inbox (WhatsApp or upload), newest first. */
   | { op: "jobs" }
@@ -22,7 +28,8 @@ export type ProcessRunRequest =
   | { op: "state-load" };
 
 export type ProcessRunValue = {
-  find: { documentId: string; title: string } | null;
+  find: { documentId: string; title: string; kind: "bpmn" | "procedure" } | null;
+  "run-procedure": Awaited<ReturnType<NemuServiceClient["procedureRun"]>>;
   plan: BpmnPlan & { documentId: string };
   jobs: InboxJob[];
   "read-photo": FormPhotoResult;

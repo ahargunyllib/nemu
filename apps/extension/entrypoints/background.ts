@@ -19,6 +19,7 @@ import {
   forgetProcessRunTabs,
   handleProcessRun,
 } from "../features/process-run/api/process-run-service";
+import { forgetRecorderTabs, handleRecorder } from "../features/recorder/api/recorder-service";
 import { identifyTeacher } from "../features/identity/api/identify-teacher";
 import { askNemu } from "../features/nemu-button/api/ask-nemu";
 import { cancelRecording, startRecording } from "../features/voice/api/microphone";
@@ -62,6 +63,8 @@ async function handle(
       return handleGradePhoto(message.request, message.pageEmail, tabId);
     case "nemu:process-run":
       return handleProcessRun(message.request, message.pageEmail, tabId);
+    case "nemu:recorder":
+      return handleRecorder(message.request, message.pageEmail, tabId);
   }
 }
 
@@ -85,6 +88,7 @@ export default defineBackground(() => {
   forgetClosedTabs();
   forgetGradePhotoTabs();
   forgetProcessRunTabs();
+  forgetRecorderTabs();
   browser.permissions.onAdded.addListener(syncScripts);
   browser.permissions.onRemoved.addListener(syncScripts);
   browser.runtime.onStartup.addListener(syncScripts);

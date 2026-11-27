@@ -13,7 +13,7 @@ import { Button } from "@nemu/ui/components/button";
 import { Spinner } from "@nemu/ui/components/spinner";
 import { Switch } from "@nemu/ui/components/switch";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ExternalLinkIcon, Trash2Icon } from "lucide-react";
+import { DownloadIcon, ExternalLinkIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -103,4 +103,41 @@ async function openFile(id: string) {
   } catch (error) {
     toast.error(error instanceof Error ? error.message : "File tidak bisa dibuka");
   }
+}
+
+/** F3-03: a recorded procedure as BPMN 2.0, for bpmn.io, Camunda Modeler or another school. */
+export function DocumentExportBpmnButton({
+  id,
+  title,
+  withLabel = false,
+}: {
+  id: string;
+  title: string;
+  withLabel?: boolean;
+}) {
+  const exportBpmn = useMutation(
+    orpc.procedureExportBpmn.mutationOptions({
+      onSuccess: ({ fileName, xml }) => {
+        const url = URL.createObjectURL(new Blob([xml], { type: "application/xml" }));
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        link.click();
+        URL.revokeObjectURL(url);
+      },
+      onError: (error) => toast.error(error.message),
+    }),
+  );
+  return (
+    <Button
+      variant={withLabel ? "default" : "ghost"}
+      size={withLabel ? "default" : "icon-sm"}
+      aria-label={`Unduh BPMN ${title}`}
+      disabled={exportBpmn.isPending}
+      onClick={() => exportBpmn.mutate({ documentId: id })}
+    >
+      {exportBpmn.isPending ? <Spinner /> : <DownloadIcon />}
+      {withLabel && "Unduh BPMN"}
+    </Button>
+  );
 }

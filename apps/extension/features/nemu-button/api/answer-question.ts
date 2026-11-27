@@ -2,7 +2,12 @@ import type { PageSnapshot } from "@nemu/contracts/school";
 
 import type { NemuServiceClient } from "../../../shared/api/nemu-service";
 import { fromExplanation, PASSWORD_ON_SCREEN } from "../../ini-kenapa/lib/explanation";
-import { type AskResult, fromGroundedAnswer, NOT_AVAILABLE_YET } from "../lib/answer";
+import {
+  type AskResult,
+  fromGroundedAnswer,
+  NOT_AVAILABLE_YET,
+  recordCommand,
+} from "../lib/answer";
 
 /**
  * A typed or spoken question goes to `helpRoute` first (docs/school-ai.md). Questions about the
@@ -17,6 +22,9 @@ export async function answerQuestion(
   snapshot: PageSnapshot | null,
   captureScreenshot: () => Promise<string | null> = async () => null,
 ): Promise<AskResult> {
+  // "Rekam cara …" is the extension's own command; nothing is sent for it.
+  const recordTitle = recordCommand(question);
+  if (recordTitle !== null) return { kind: "record", title: recordTitle };
   const route = await client.helpRoute({ utterance: question });
   if (route.kind === "control") return { kind: "stop" };
   switch (route.intent) {

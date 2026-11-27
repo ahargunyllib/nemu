@@ -38,8 +38,16 @@ async function answer(
       const found = (await client.processList()).find((item) =>
         sameName(item.title, request.processName),
       );
-      return found ? { documentId: found.documentId, title: found.title } : null;
+      if (found) return { documentId: found.documentId, title: found.title, kind: "bpmn" };
+      const recorded = (await client.procedureList()).find((item) =>
+        sameName(item.title, request.processName),
+      );
+      return recorded
+        ? { documentId: recorded.documentId, title: recorded.title, kind: "procedure" }
+        : null;
     }
+    case "run-procedure":
+      return client.procedureRun({ documentId: request.documentId, values: request.values });
     case "plan":
       return client.processPlan(request.input);
     case "jobs":

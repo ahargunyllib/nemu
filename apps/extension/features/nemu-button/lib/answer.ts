@@ -22,6 +22,8 @@ export type AskResult =
   | { kind: "grades"; utterance: string }
   /** "Catat setoran hafalan 4A hari ini": the school's BPMN process runs (F3, #213). */
   | { kind: "process"; utterance: string; processName: string }
+  /** "Rekam cara input ujian": the operator records a procedure (F3-01, #214). */
+  | { kind: "record"; title: string }
   | { kind: "stop" };
 
 /** Grade entry and process runs wait for the executor (#202), whether typed or spoken. */
@@ -43,4 +45,11 @@ export function fromGroundedAnswer(answer: GroundedAnswer): AskResult {
   return answer.status === "answered"
     ? { kind: "answer", text: answer.answer, sources: uniqueSources(answer.citations) }
     : { kind: "answer", text: answer.answer, sources: [] };
+}
+
+/** "Rekam cara input ujian tahfidz" → "input ujian tahfidz"; null when it isn't that command. */
+export function recordCommand(text: string): string | null {
+  const match = text.trim().match(/^(?:nemu[,\s]+)?rekam(?:kan)? cara\b[\s,:]*(.*)$/iu);
+  if (!match) return null;
+  return (match[1] ?? "").replace(/[.?!]+$/u, "").trim();
 }

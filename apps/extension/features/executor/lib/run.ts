@@ -401,7 +401,16 @@ export class ExecutorRun {
       );
     }
     if (step.verb === "point")
-      return this.pointAndWait(index, element, name, step.sentence, false, signal, step.ringkasan);
+      return this.pointAndWait(
+        index,
+        element,
+        name,
+        step.sentence,
+        false,
+        signal,
+        step.ringkasan,
+        step.sumber,
+      );
     if (step.verb === "scroll") {
       element.scrollIntoView({ block: "center", behavior: "smooth" });
       this.deps.log({ action: "scroll", target: name, result: "done" });
@@ -451,9 +460,12 @@ export class ExecutorRun {
     refused: boolean,
     signal: AbortSignal,
     ringkasan?: string,
+    sumber?: string,
   ) {
     this.waiting = { refused };
-    this.render({ type: "tunjuk", sentence, note: ringkasan ? { ringkasan } : undefined }, element);
+    // Gelembung Tunjuk carries one link: the numbers behind it, else where the step came from.
+    const note = ringkasan ? { ringkasan } : sumber ? { sumber: [sumber] } : undefined;
+    this.render({ type: "tunjuk", sentence, note }, element);
     this.deps.speak(sentence);
     await waitForEvent(
       this.deps.doc,

@@ -8,6 +8,9 @@ import type {
   BpmnPlan,
   CommandRoute,
   FormPhotoResult,
+  NarrationSegment,
+  Procedure,
+  RecordedEvent,
   FormTable,
   GradeCommand,
   GradeEntry,
@@ -65,6 +68,27 @@ export type NemuServiceClient = {
   processReadPhoto: Call<
     { documentId: string; jobId: string; taskId: string; slots: ProcessSlots },
     FormPhotoResult
+  >;
+  // F3-01 (#214): "Rekam cara" and replaying a recorded procedure.
+  procedureRecordingSave: Call<
+    { title: string; events: RecordedEvent[]; narration: NarrationSegment[] },
+    { recordingId: string; recordedBy: string }
+  >;
+  procedureList: Call<undefined, Array<{ documentId: string; title: string; version: string }>>;
+  procedureRun: Call<
+    { documentId: string; values: Record<string, string> },
+    | {
+        status: "ok";
+        title: string;
+        recordedBy: string | null;
+        steps: Array<Procedure["steps"][number] & { value: string | null }>;
+      }
+    | {
+        status: "missing";
+        title: string;
+        recordedBy: string | null;
+        parameter: Procedure["parameters"][number];
+      }
   >;
   processMatchFields: Call<
     { fields: Array<{ id: string; label: string }>; pageLabels: string[] },
