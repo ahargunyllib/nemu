@@ -236,6 +236,21 @@ export function keywordSymptomMatch(
 }
 
 /**
+ * Routing screens a question before any model call (PRD voice ≤ 4 s): a clear keyword match is a
+ * symptom, a question sharing fewer than two content words with every symptom is not, and only a
+ * near miss in between ("kalau bayar tunai, kapan nilainya terbuka?") is worth asking the model.
+ */
+export function screenSymptoms(
+  question: string,
+  candidates: readonly SymptomCandidate[],
+): "match" | "near" | "none" {
+  if (keywordSymptomMatch(question, candidates) !== null) return "match";
+  return candidates.some((candidate) => sharedWords(question, candidate.symptom).shared >= 2)
+    ? "near"
+    : "none";
+}
+
+/**
  * The offline "via": another element of the same document whose symptom shares two words with the
  * question that the matched symptom doesn't already explain ("bayar tunai").
  */

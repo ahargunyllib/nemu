@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { call } from "@orpc/server";
-import { describe, expect, it } from "vite-plus/test";
+import { describe, expect, it, vi } from "vite-plus/test";
 
 import { connectAlurSekolah, createSchoolContext } from "../../testing/school";
 import { documentsRouter } from "../documents/router";
@@ -305,13 +305,38 @@ describe("F2-08 with the seeded WS-06 teacher and the mock's pupils", () => {
     expect(route).toEqual({ kind: "intent", intent: "kenapa", processName: null });
   });
 
-  it("an SOP question still goes to the school's guides", async () => {
+  it("an SOP question still goes to the school's guides, with no model call", async () => {
     const siti = await seededStack();
+    const matchSymptom = vi.spyOn(siti.school.ai, "matchSymptom");
     const route = await call(
       helpRouter.helpRoute,
       { utterance: "Berapa KKM untuk kelas 4?" },
       { context: siti },
     );
     expect(route).toEqual({ kind: "intent", intent: "tanya", processName: null });
+    expect(matchSymptom).not.toHaveBeenCalled();
+  });
+
+  it("a question that clearly names a symptom is routed to the process in code", async () => {
+    const siti = await seededStack();
+    const matchSymptom = vi.spyOn(siti.school.ai, "matchSymptom");
+    const route = await call(
+      helpRouter.helpRoute,
+      { utterance: "Kapan tagihan sudah lewat jatuh tempo?" },
+      { context: siti },
+    );
+    expect(route).toEqual({ kind: "intent", intent: "kenapa", processName: null });
+    expect(matchSymptom).not.toHaveBeenCalled();
+  });
+
+  it("only a near miss asks the model, once", async () => {
+    const siti = await seededStack();
+    const matchSymptom = vi.spyOn(siti.school.ai, "matchSymptom");
+    await call(
+      helpRouter.helpRoute,
+      { utterance: "Kalau sudah bayar sebagian kapan terbuka?" },
+      { context: siti },
+    );
+    expect(matchSymptom).toHaveBeenCalledTimes(1);
   });
 });

@@ -2,6 +2,7 @@ import { importBpmn } from "@nemu/ai/school/bpmn/graph";
 import { routeCommand } from "@nemu/ai/school/commands";
 import {
   describesSymptom,
+  screenSymptoms,
   type ProcessIndex,
   type SymptomCandidate,
 } from "@nemu/ai/school/process-help";
@@ -216,9 +217,11 @@ export async function route(
       { documents: deps.documents, catalog: deps.processes.catalog },
       workspaceId,
     );
+    const screened = screenSymptoms(utterance, candidates);
     if (
-      candidates.length &&
-      (await deps.processes.ai.matchSymptom({ question: utterance, candidates }))
+      screened === "match" ||
+      (screened === "near" &&
+        (await deps.processes.ai.matchSymptom({ question: utterance, candidates })))
     ) {
       return { kind: "intent", intent: "kenapa", processName: null };
     }
