@@ -37,6 +37,11 @@ export type GradePhotoRequest =
       saved: ReadbackRow[];
     }
   | { op: "ack"; jobId: string }
+  /**
+   * F1-11 cara 2: "Ketik 84 untuk Dimas." for a student (`typed: null`), or the check of what the
+   * teacher typed ("Di buku 84, Bu." when it differs).
+   */
+  | { op: "guided-line"; entries: GradeEntry[]; studentId: string; typed: string | null }
   /** The flow's state for this tab, kept across page loads (F0-13). */
   | { op: "state-save"; state: unknown }
   | { op: "state-load" };
@@ -51,6 +56,7 @@ export type GradePhotoValue = {
   finalize: GradeRulesResult;
   readback: ReadbackResult & { source: "alursekolah" | "page" };
   ack: { deleted: boolean };
+  "guided-line": { sentence: string; ok: boolean | null };
   "state-save": null;
   "state-load": unknown;
 };

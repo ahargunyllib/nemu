@@ -192,6 +192,15 @@ Lihat ringkasan beside Simpan, the read-back sentence after the save, the photo 
 inbox, Catatan langkah, and every saved grade right in under 5 minutes. Screenshots go to
 `.output/verify-grade-photo/`.
 
+`pnpm --filter extension verify:f1-2` runs F1-2 (#208, cara 2) on the same stack with a
+development build. It runs the F1 flow twice: Nemu starts filling in cara 1, then the rest
+switches to cara 2, once because the teacher takes over ("Saya isi sendiri") and once by "Ajari
+saya" (the `?uji-nemu` dock's button, since the test microphone can't say it). The "teacher"
+types what Nemu says, except where `features/grade-photo/lib/F1-2_cara-2_skenario.csv` (synthetic,
+two deliberate mismatches) has her type something else first. It checks that each line is the
+book's grade, that both mismatches get "Di buku …, Bu." and never "salah", Catatan langkah, and 0
+wrong grades saved. Screenshots go to `.output/verify-f1-2/`.
+
 It prints one line per check, exits non-zero on a failure, and saves screenshots to
 `.output/verify/` (each open tab is saved too when a check fails). Add `-- --headed` to watch it. `NEMU_SERVER_URL`, `MOCK_ALURSEKOLAH_URL`,
 `MOCK_RUANG_GTK_URL` and `MOCK_ERAPOR_URL` point it elsewhere, such as the deployed mocks. If

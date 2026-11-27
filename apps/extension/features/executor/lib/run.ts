@@ -64,6 +64,19 @@ export type StepSource = (
   continuation: unknown,
 ) => Promise<{ steps: ExecutorStep[]; continuation: unknown }>;
 
+/** A value step in cara 2. */
+export type GuidedStep = Extract<ExecutorStep, { verb: "setValue" }>;
+
+/**
+ * A feature's own words for cara 2 value steps, e.g. F1's grade lines (F1-11): what Nemu says as
+ * it points, and the check of what the teacher typed once she leaves the field. `null` (or a
+ * failure) falls back to the executor's own words and check.
+ */
+export type CaraTwoGuide = {
+  prompt(step: GuidedStep): Promise<string | null>;
+  check(step: GuidedStep, typed: string): Promise<{ ok: boolean; sentence: string } | null>;
+};
+
 export type RunView = { display: NemuDisplay | null; target: Element | null; ticks: Element[] };
 
 export type RunDeps = {
@@ -80,6 +93,8 @@ export type RunDeps = {
   log(entry: Pick<ActionLogEntry, "action" | "target" | "result">): void;
   save(state: RunState): void;
   source?: StepSource;
+  /** The task's own cara 2 words for value steps; with one, a value is checked when she leaves the field. */
+  guide?: CaraTwoGuide;
   /** The run ended: show Catatan langkah when `showNotes`. */
   onEnd(state: RunState, notes: string[], showNotes: boolean): void;
   /** Whether an event came from the teacher's hand. Tests stand in for `isTrusted`. */
@@ -560,6 +575,7 @@ export class ExecutorRun {
       this.deps.speak(sentence);
     };
     this.waiting = { refused: false };
+    let corrected = false;
     if (step.verb !== "clickMenu" && this.alreadyDone(step, element)) {
       this.waiting = null;
       this.tick(index, element);
@@ -600,6 +616,10 @@ export class ExecutorRun {
         );
         break;
       case "setValue":
+        if (this.deps.guide) {
+          corrected = await this.guided(step, element, name, this.deps.guide, say, signal);
+          break;
+        }
         say(
           step.rowName
             ? `Ketik ${step.value} untuk ${step.rowName}.`
@@ -619,9 +639,60 @@ export class ExecutorRun {
     }
     this.waiting = null;
     if (VALUE_VERBS.has(step.verb)) this.tick(index, element);
-    this.state.events.push({ kind: "taught", verb: step.verb, name });
+    this.state.events.push({
+      kind: "taught",
+      verb: step.verb,
+      name,
+      ...(corrected ? { corrected } : {}),
+    });
     this.save();
     this.deps.log({ action: step.verb, target: name, result: "teacher" });
+  }
+
+  /**
+   * Cara 2 with the task's own words (F1-11): Nemu says the guide's line, and each time the
+   * teacher leaves the field it checks what she typed; a difference is said gently and Nemu waits
+   * for the fix. True when Nemu had to correct her.
+   */
+  private async guided(
+    step: GuidedStep,
+    element: Element,
+    name: string,
+    guide: CaraTwoGuide,
+    say: (sentence: string) => void,
+    signal: AbortSignal,
+  ): Promise<boolean> {
+    const prompt = await guide.prompt(step).catch(() => null);
+    if (signal.aborted) throw new Interrupted();
+    say(
+      prompt ??
+        (step.rowName
+          ? `Ketik ${step.value} untuk ${step.rowName}.`
+          : `Ketik ${step.value} di ${name}.`),
+    );
+    const left = async () => {
+      await waitForEvent(element, ["change"], () => true, signal);
+      return currentValue(element);
+    };
+    let corrected = false;
+    let typed = await left();
+    for (;;) {
+      const verdict = (await guide.check(step, typed).catch(() => null)) ?? {
+        ok: sameValue(typed, step.value),
+        sentence: `Di daftar tertulis ${step.value}.`,
+      };
+      if (signal.aborted) throw new Interrupted();
+      // She changed it again while Nemu was checking: check the newer value.
+      const now = currentValue(element);
+      if (now !== typed) {
+        typed = now;
+        continue;
+      }
+      if (verdict.ok) return corrected;
+      corrected = true;
+      say(verdict.sentence);
+      typed = await left();
+    }
   }
 
   /** The field already holds what the step would put there, so there is nothing to teach. */

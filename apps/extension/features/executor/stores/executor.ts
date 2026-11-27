@@ -14,7 +14,13 @@ import {
 } from "../api/request-run-storage";
 import { tryNextTime, wantsToTry } from "../api/teach-preference";
 import { executorSettings } from "../lib/executor-settings";
-import { createRunState, ExecutorRun, type RunState, type StepSource } from "../lib/run";
+import {
+  type CaraTwoGuide,
+  createRunState,
+  ExecutorRun,
+  type RunState,
+  type StepSource,
+} from "../lib/run";
 import type { Cara } from "../lib/run-notes";
 import { guardSubmits, isTeacherInput, toSafeTask } from "../lib/safety";
 
@@ -70,6 +76,7 @@ function createExecutor() {
   const listeners = new Set<() => void>();
   const sources = new Map<string, StepSource>();
   const finishers = new Map<string, TaskFinisher>();
+  const guides = new Map<string, CaraTwoGuide>();
   let view: ExecutorView = IDLE;
   let run: ExecutorRun | null = null;
   let notes: StepNotes | null = null;
@@ -171,6 +178,7 @@ function createExecutor() {
       save: (next) =>
         requestSaveRun(next.status === "done" || next.status === "stopped" ? null : next),
       source: sources.get(state.task.kind),
+      guide: guides.get(state.task.kind),
       onEnd: (ended, items, show) => {
         flushLog();
         detach?.();
@@ -233,6 +241,11 @@ function createExecutor() {
       finishers.set(kind, finisher);
     },
 
+    /** A feature's own cara 2 words for its value steps (`CaraTwoGuide`), e.g. F1's grade lines. */
+    registerGuide(kind: string, guide: CaraTwoGuide) {
+      guides.set(kind, guide);
+    },
+
     /** A finisher's last word: Catatan langkah with its own lines added, kept for the Nemu button. */
     presentNotes(items: string[], offerToTry: string | null = null, show = true) {
       notes = { title: "Catatan langkah", items };
@@ -267,6 +280,11 @@ function createExecutor() {
 
     stop() {
       run?.stop();
+    },
+
+    /** "Ajari saya" (F0-11): the rest of the task in cara 2, as the voice command does. */
+    teach() {
+      run?.teach();
     },
 
     /** Ends the task without Catatan langkah and closes whatever the executor shows. */

@@ -18,6 +18,7 @@ import {
   replyFromSpeech,
 } from "../lib/answers";
 import { addressFor, GRADE_TASK_KIND, type GradeTarget, gradeTask } from "../lib/grade-task";
+import { gradeGuide } from "../lib/guided-lines";
 import type { GradePhotoRequest, GradePhotoValue } from "../lib/requests";
 import { gradesOnPage, watchForSave } from "../lib/saved-page";
 
@@ -340,6 +341,7 @@ function createGradePhoto() {
       if (read.status === "reshoot") {
         // The photo can't be read: it goes, and the next one the teacher sends is offered.
         void call({ op: "ack", jobId: read.jobId });
+        jobs = jobs.filter((item) => item.jobId !== read.jobId);
         job = null;
         return notice(read.message ?? "Fotonya belum terbaca jelas. Kirim ulang, ya.");
       }
@@ -473,6 +475,8 @@ function createGradePhoto() {
     if (!response.ok) return notice(response.message, () => void readBack());
     const result = response.value as GradePhotoValue["readback"];
     const acked = await call({ op: "ack", jobId: current.jobId });
+    // The deleted photo is no longer offered, even before the next poll.
+    jobs = jobs.filter((item) => item.jobId !== current.jobId);
     const where = result.source === "alursekolah" ? "dari AlurSekolah" : "di halaman";
     const checked = result.match
       ? `Nemu membaca ulang ${current.entries.length} nilai ${where}: semua sesuai`
@@ -546,6 +550,18 @@ function createGradePhoto() {
   }
 
   executor.registerFinisher(GRADE_TASK_KIND, afterFill);
+  // Cara 2 ("Ajari saya", or the teacher taking over): Nemu says each grade from the book and
+  // checks what she typed (F1-11). The grades come from the kept state, so this survives a reload.
+  executor.registerGuide(
+    GRADE_TASK_KIND,
+    gradeGuide({
+      entries: async () => (kept ??= await loadKept())?.entries ?? null,
+      line: async (entries, studentId, typed) => {
+        const response = await call({ op: "guided-line", entries, studentId, typed });
+        return response.ok ? (response.value as GradePhotoValue["guided-line"]) : null;
+      },
+    }),
+  );
   // Visible again: ask for photos now rather than at the next tick.
   if (typeof document !== "undefined")
     document.addEventListener("visibilitychange", () => void poll());
