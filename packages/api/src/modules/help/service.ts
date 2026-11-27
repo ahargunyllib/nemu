@@ -46,17 +46,11 @@ export type ProcessHelpDeps = {
 
 type ExplainInput = { snapshot: PageSnapshot; question: string | null };
 
-/**
- * The teacher's words against every active BPMN's symptoms (operator-corrected in WS-04). On a
- * match, the grades are checked in AlurSekolah first, then the file is walked to the cause.
- * `symptoms` says whether the school has any, for F3-14.
- */
-async function explainFromProcess(
-  deps: Pick<HelpDeps, "documents"> & ProcessHelpDeps,
-  teacher: TeacherProfile,
+/** The active, ready BPMNs, their WS-04 elements and every symptom as a match candidate. */
+async function processSymptoms(
+  deps: Pick<HelpDeps, "documents"> & Pick<ProcessHelpDeps, "catalog">,
   workspaceId: string,
-  question: string,
-): Promise<{ answer: HelpExplanation | null; symptoms: boolean }> {
+) {
   const processes = (await deps.documents.list(workspaceId)).filter(
     (document) => document.format === "bpmn" && document.isActive && document.status === "ready",
   );
@@ -72,6 +66,21 @@ async function explainFromProcess(
       })),
     ),
   );
+  return { processes, elements, candidates };
+}
+
+/**
+ * The teacher's words against every active BPMN's symptoms (operator-corrected in WS-04). On a
+ * match, the grades are checked in AlurSekolah first, then the file is walked to the cause.
+ * `symptoms` says whether the school has any, for F3-14.
+ */
+async function explainFromProcess(
+  deps: Pick<HelpDeps, "documents"> & ProcessHelpDeps,
+  teacher: TeacherProfile,
+  workspaceId: string,
+  question: string,
+): Promise<{ answer: HelpExplanation | null; symptoms: boolean }> {
+  const { processes, elements, candidates } = await processSymptoms(deps, workspaceId);
   if (!candidates.length) return { answer: null, symptoms: false };
 
   const found = await deps.ai.matchSymptom({ question, candidates });
@@ -180,7 +189,9 @@ export async function tryAnswer(
 
 /** Which feature a sentence is for; voice controls ("berhenti") are matched first, in code. */
 export async function route(
-  deps: Pick<HelpDeps, "documents">,
+  deps: Pick<HelpDeps, "documents"> & {
+    processes?: Pick<ProcessHelpDeps, "catalog"> & { ai: Pick<SchoolAi, "matchSymptom"> };
+  },
   workspaceId: string,
   utterance: string,
 ): Promise<CommandRoute> {
@@ -193,5 +204,24 @@ export async function route(
         document.status === "ready",
     )
     .map((document) => document.title);
-  return routeCommand(utterance, processes);
+  const routed = routeCommand(utterance, processes);
+  // A question with no "kenapa" ("kalau bayar tunai, kapan nilainya terbuka?") can still be about
+  // a situation an uploaded BPMN describes: then the process answers it (F2-08), not the guides.
+  if (
+    deps.processes &&
+    routed.kind === "intent" &&
+    (routed.intent === "tanya" || routed.intent === "unknown")
+  ) {
+    const { candidates } = await processSymptoms(
+      { documents: deps.documents, catalog: deps.processes.catalog },
+      workspaceId,
+    );
+    if (
+      candidates.length &&
+      (await deps.processes.ai.matchSymptom({ question: utterance, candidates }))
+    ) {
+      return { kind: "intent", intent: "kenapa", processName: null };
+    }
+  }
+  return routed;
 }

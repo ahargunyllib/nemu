@@ -22,19 +22,30 @@ function words(text: string): string[] {
     .filter(Boolean);
 }
 
-/** The one student the question names: full name first, then a first name, the teacher's classes first. */
+/** "Siti Aminah, S.Pd." → "siti aminah": a name without its academic titles. */
+function personName(name: string): string {
+  return words(name.split(",")[0] ?? "").join(" ");
+}
+
+/**
+ * The one student the question names: full name first, then a first name; among the same score,
+ * the teacher's classes first, then her own homeroom (parents ask their child's wali kelas).
+ */
 export function studentInQuestion(
   question: string,
   students: readonly AlurSekolahSiswa[],
-  teacherClasses: readonly string[],
+  teacher: Pick<TeacherProfile, "classes" | "name">,
 ): AlurSekolahSiswa | null {
   const asked = ` ${words(question).join(" ")} `;
+  const self = personName(teacher.name);
   const scored = students
     .map((student) => {
       const name = words(student.nama);
       const full = asked.includes(` ${name.join(" ")} `);
       const first = name[0] && name[0].length >= 3 && asked.includes(` ${name[0]} `);
-      const score = (full ? 4 : first ? 2 : 0) + (teacherClasses.includes(student.kelas) ? 1 : 0);
+      const ownClass = teacher.classes.includes(student.kelas) ? 0.5 : 0;
+      const homeroom = self && personName(student.wali_kelas ?? "") === self ? 0.5 : 0;
+      const score = (full ? 4 : first ? 2 : 0) + ownClass + homeroom;
       return { student, score, named: full || first };
     })
     .filter((item) => item.named)
@@ -47,14 +58,14 @@ export function studentInQuestion(
 export async function checkSavedGrades(
   connect: AlurSekolahConnector,
   workspaceId: string,
-  teacher: Pick<TeacherProfile, "classes">,
+  teacher: Pick<TeacherProfile, "classes" | "name">,
   question: string,
 ): Promise<GradeCheck> {
   if (!ABOUT_GRADES.test(question)) return { status: "not_asked" };
   try {
     const client = await connect(workspaceId);
     const students = await client.siswa();
-    const student = studentInQuestion(question, students.data, teacher.classes);
+    const student = studentInQuestion(question, students.data, teacher);
     if (!student) return { status: "not_asked" };
     const saved = await client.nilai({ nis: student.nis, halaman: 1, ukuran: 1 });
     return saved.meta.total > 0

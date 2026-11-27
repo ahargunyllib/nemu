@@ -6,6 +6,8 @@ import { describe, expect, it } from "vite-plus/test";
 
 import { connectAlurSekolah, createSchoolContext } from "../../testing/school";
 import { documentsRouter } from "../documents/router";
+import { createRegistrySchoolDirectory } from "../school/registry-directory";
+import { createSchoolRepository } from "../school/repository";
 import { helpRouter } from "./router";
 
 /**
@@ -260,5 +262,56 @@ describe("F2-08: nilai tidak muncul, from the uploaded SPP BPMN", () => {
       { context: siti },
     );
     expect(answer).toMatchObject({ status: "matched", citation: { article: "K-07" } });
+  });
+});
+
+/**
+ * The stack `verify:f2-08` runs: Bu Siti from the seeded WS-06 registry (wali kelas 4A, teaches
+ * 4A and 4B) and an AlurSekolah shaped like the mock, which has two pupils called Aisyah.
+ */
+describe("F2-08 with the seeded WS-06 teacher and the mock's pupils", () => {
+  async function seededStack() {
+    const { siti } = await withSppProcess();
+    const directory = createRegistrySchoolDirectory(createSchoolRepository(siti.db));
+    const teacher = { ...siti, school: { ...siti.school, directory } };
+    teacher.alurSekolahFake.siswa.splice(
+      0,
+      teacher.alurSekolahFake.siswa.length,
+      { nis: "4101", nama: "Aisyah Putri Wijaya", kelas: "4A", wali_kelas: "Siti Aminah, S.Pd." },
+      { nis: "0159870002", nama: "Aisyah Zahra", kelas: "4B", wali_kelas: "" },
+    );
+    await connectAlurSekolah(teacher);
+    return teacher;
+  }
+
+  it("Q1: 'Aisyah' is the pupil in the asking teacher's own homeroom, so her saved grade counts", async () => {
+    const siti = await seededStack();
+    const answer = await call(
+      helpRouter.helpExplain,
+      { snapshot: PAGE, question: "Nilai UTS Aisyah kok tidak muncul di aplikasi orang tua?" },
+      { context: siti },
+    );
+    expect(answer).toMatchObject({ status: "process", certainty: "confirmed" });
+    expect(answer.sentence).toMatch(/^Nilai Aisyah Putri Wijaya sudah tersimpan\./u);
+  });
+
+  it("Q3: a process question without 'kenapa' is routed to the process, not the SOP", async () => {
+    const siti = await seededStack();
+    const route = await call(
+      helpRouter.helpRoute,
+      { utterance: "Kalau bayar tunai, kapan nilainya terbuka?" },
+      { context: siti },
+    );
+    expect(route).toEqual({ kind: "intent", intent: "kenapa", processName: null });
+  });
+
+  it("an SOP question still goes to the school's guides", async () => {
+    const siti = await seededStack();
+    const route = await call(
+      helpRouter.helpRoute,
+      { utterance: "Berapa KKM untuk kelas 4?" },
+      { context: siti },
+    );
+    expect(route).toEqual({ kind: "intent", intent: "tanya", processName: null });
   });
 });
