@@ -219,14 +219,17 @@ export const gradeCommandSchema = z.discriminatedUnion("status", [
 
 // --- F2: stuck help ---------------------------------------------------------------------------
 
-/** A form field as the page shows it: its label and visible value. Never a password field. */
+/**
+ * A choice the page shows: a select's label and chosen option, or a checkbox or radio and whether
+ * it is ticked. Never a typed field (a grade, a note) and never a field in a table row (#255).
+ */
 export const pageFieldSchema = z
   .object({ label: z.string().max(300), value: z.string().max(500) })
   .strict();
 
 /**
  * What the Nemu Extension reads from the page for "ini kenapa?" (#216): the title and address,
- * alerts, toasts and error messages, headings, field labels with their visible values, and a
+ * alerts, toasts and error messages, headings, the choices made in its form fields, and a
  * viewport screenshot. No UIA text, no window bounds. When a password field is on screen the
  * extension sends nothing at all, so the Nemu Service never sees a blocked snapshot.
  */
