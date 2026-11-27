@@ -53,7 +53,7 @@ export function checkQuiz(
       problems.push({
         kind: "no_key",
         slot: question.slot,
-        sentence: say(`Soal ${question.slot} belum punya jawaban benar`, honorific),
+        sentence: say(`Soal ${question.slot} belum ada kunci jawabannya`, honorific),
       });
   }
 

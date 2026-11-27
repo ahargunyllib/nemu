@@ -7,9 +7,10 @@ import { inflateSync } from "node:zlib";
 import { quizScriptResultSchema, type QuizScriptInput } from "@nemu/contracts/quiz";
 
 import { F4_2_READING } from "../fixtures/f4-2-script.js";
-import { base64ToBytes, bytesToBase64 } from "../llm.js";
+import { base64ToBytes, bytesToBase64, type JsonCall, type JsonCallRequest } from "../llm.js";
 import { createFixtureSchoolAi } from "../runtime.js";
 import { fakeJsonCall } from "../test-helpers.js";
+import { readDocx } from "./docx.js";
 import { applyQuizAnswers, moodleXml, SKIP_QUESTION } from "./moodle-xml.js";
 import { extractPdfImages } from "./pdf-images.js";
 import { assembleQuizScript, type ModelQuizScript, readQuizScript } from "./script.js";
@@ -298,4 +299,105 @@ test("offline, any other file reads as no questions instead of invented ones", a
     status: "unreadable",
     message: "Nemu tidak menemukan soal di berkas ini, Bu.",
   });
+});
+
+/** A small Word file the way Word writes one: auto-numbered list, a picture as an inline drawing. */
+async function wordScript(png: Uint8Array): Promise<Uint8Array> {
+  const { CFB } = await import("xlsx");
+  const numbered = (level: number, body: string) =>
+    `<w:p><w:pPr><w:numPr><w:ilvl w:val="${level}"/><w:numId w:val="3"/></w:numPr></w:pPr>${body}</w:p>`;
+  const run = (text: string) => `<w:r><w:t xml:space="preserve">${text}</w:t></w:r>`;
+  const document = [
+    `<w:document xmlns:w="w" xmlns:r="r"><w:body>`,
+    `<w:p>${run("Latihan IPAS Kelas 4A &amp; Remedial")}</w:p>`,
+    numbered(0, run("Tarikan atau dorongan pada suatu benda disebut ....")),
+    numbered(1, run("energi")),
+    numbered(1, run("gaya")),
+    numbered(0, run("Gambar mana yang menunjukkan dua magnet saling tarik-menarik?")),
+    numbered(1, `<w:r><w:drawing><a:blip r:embed="rId9"/></w:drawing></w:r>`),
+    numbered(1, `<w:r><w:pict><v:imagedata r:id="rId8"/></w:pict></w:r>`),
+    `<w:p>${run("Kunci: 1. b")}</w:p>`,
+    `</w:body></w:document>`,
+  ].join("");
+  const numbering = `<w:numbering><w:abstractNum w:abstractNumId="7"><w:lvl w:ilvl="0"><w:numFmt w:val="decimal"/></w:lvl><w:lvl w:ilvl="1"><w:numFmt w:val="lowerLetter"/></w:lvl></w:abstractNum><w:num w:numId="3"><w:abstractNumId w:val="7"/></w:num></w:numbering>`;
+  const rels = `<Relationships><Relationship Id="rId9" Target="media/image1.png"/><Relationship Id="rId8" Target="media/image2.emf"/></Relationships>`;
+  const zip = CFB.utils.cfb_new();
+  const add = (path: string, content: string | Uint8Array) =>
+    CFB.utils.cfb_add(zip, path, typeof content === "string" ? Buffer.from(content) : content);
+  add("word/document.xml", document);
+  add("word/numbering.xml", numbering);
+  add("word/_rels/document.xml.rels", rels);
+  add("word/media/image1.png", png);
+  add("word/media/image2.emf", new Uint8Array([1, 0, 0, 0]));
+  return new Uint8Array(CFB.write(zip, { fileType: "zip", type: "buffer" }) as Buffer);
+}
+
+test("a Word script is read in code: numbering written out, pictures in place and taken out", async () => {
+  const pdf = await readFile(join(PACK, "F4-2_naskah-ipas-10-soal.pdf"));
+  const [picture] = await extractPdfImages(pdf);
+  const png = base64ToBytes(picture!.dataUrl.split(",")[1]!);
+  const word = await readDocx(await wordScript(png));
+  assert.equal(
+    word.text,
+    [
+      "Latihan IPAS Kelas 4A & Remedial",
+      "1. Tarikan atau dorongan pada suatu benda disebut ....",
+      "a. energi",
+      "b. gaya",
+      "2. Gambar mana yang menunjukkan dua magnet saling tarik-menarik?",
+      "a. [gambar-1]",
+      "b. [gambar yang tidak bisa diambil]",
+      "Kunci: 1. b",
+    ].join("\n"),
+  );
+  assert.deepEqual(
+    word.images.map((image) => [image.id, image.width, image.height, image.dataUrl]),
+    [["gambar-1", 240, 150, picture!.dataUrl]],
+  );
+
+  // The model gets the text and the picture, never the .docx itself.
+  const input = await scriptInput();
+  const llm = fakeJsonCall({ quiz_script: F4_2_READING });
+  await readQuizScript(
+    { llm },
+    {
+      ...input,
+      file: {
+        name: "naskah.docx",
+        mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        dataUrl: `data:application/octet-stream;base64,${bytesToBase64(await wordScript(png))}`,
+      },
+    },
+  );
+  const content = llm.calls[0]!.content;
+  assert.ok(!content.some((part) => part.type === "file"));
+  assert.ok(content.some((part) => part.type === "text" && part.text.includes("a. [gambar-1]")));
+  assert.equal(content.filter((part) => part.type === "image").length, 1);
+});
+
+test("a file Nemu can't read (an old .doc) is said so, without a model call", async () => {
+  const input = await scriptInput();
+  const llm = fakeJsonCall({});
+  const result = await readQuizScript(
+    { llm },
+    {
+      ...input,
+      file: { name: "naskah.doc", mimeType: "application/msword", dataUrl: "data:,AAAA" },
+    },
+  );
+  assert.equal(result.status, "unreadable");
+  assert.equal(llm.calls.length, 0);
+});
+
+test("the script schema has no array limits, which Gemini refuses; code keeps the bounds", async () => {
+  let schema = "";
+  const many = structuredClone(F4_2_READING);
+  many.questions[0]!.text_candidates = ["a", "b", "c", "d", "e"];
+  const llm = (async (request: JsonCallRequest<unknown>) => {
+    schema = JSON.stringify(request.schema);
+    return request.parse(many);
+  }) as JsonCall;
+  const result = await readQuizScript({ llm }, await scriptInput());
+  assert.doesNotMatch(schema, /maxItems/u);
+  assert.equal(result.status, "ok");
 });

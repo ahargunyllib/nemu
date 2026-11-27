@@ -1,13 +1,13 @@
-// F3-1 on the mock AlurSekolah (#213): a process the school taught Nemu with no code change.
+// F3-1 on the mock AlurSekolah (#213, #220): a process the school taught Nemu with no code change.
 // Loads a production build of the extension into Playwright's Chromium, then:
-//   1. Pak Rizal uploads the synthetic tahfidz BPMN in Pengetahuan sekolah and, in WS-04, sets the
-//      page of "Catat Setoran Kelas" to "Al-Quran › Setoran baru" (F3-19);
+//   1. Pak Rizal uploads the official tahfidz BPMN in Pengetahuan sekolah and, in WS-04, sets the
+//      page of "Isi setoran satu kelas" to "Al-Quran › Setoran baru" (F3-19);
 //   2. the setoran book photo lands in Bu Siti's inbox (as an upload, like a WhatsApp photo);
 //   3. Bu Siti types "Catat setoran hafalan 4A hari ini" on the mock: the steps show first (2–6),
-//      Mulai, Citra's smudged Tajwid is asked (never guessed), the executor opens the page through
-//      the menu and fills it, and stops pointing at "Simpan setoran";
+//      Mulai, Citra's scribbled Tajwid is asked (never guessed), the executor picks Kelas, opens
+//      Setoran baru (the BPMN's "Setoran" choice) and fills it, and stops pointing at "Simpan setoran";
 //   4. every row is checked against F3-1_kunci.csv (3/3) and nothing is saved until the "teacher"
-//      presses Simpan setoran; then Catatan langkah names the system's and the coordinator's tasks;
+//      presses Simpan setoran; then Catatan langkah names the system's tasks;
 //   5. with no page in WS-04 Nemu only explains (cara 3).
 // Needs `NEMU_RESPONDER=fixture pnpm dev` running. Screenshots: .output/verify-f3-1/.
 import { execFileSync } from "node:child_process";
@@ -28,16 +28,18 @@ const HEADED = process.argv.includes("--headed");
 const EMAIL = "siti.aminah@sditnusantara.sch.id";
 const TITLE = "Catat Hafalan Tahfidz";
 const PAGE = "Al-Quran › Setoran baru";
+// The BPMN task whose page WS-04 sets; "Pilih jenis catatan" names no button and leads into it.
+const TASK = "Isi setoran satu kelas";
 
 const root = resolve(import.meta.dirname, "..");
 const fixtures = resolve(root, "../../packages/ai/src/school/fixtures");
 const bpmn = join(fixtures, "F3-1_catat-hafalan-tahfidz.bpmn");
-const photo = join(fixtures, "F3-1_foto-buku-setoran-tahfidz-4A.png");
+const photo = join(fixtures, "F3-1_foto-buku-setoran-tahfidz-4A.jpg");
 const extension = join(root, ".output/chrome-mv3");
 const shots = join(root, ".output/verify-f3-1");
 mkdirSync(shots, { recursive: true });
 
-// F3-1_kunci.csv: the truth of the book page.
+// F3-1_kunci.csv: the truth of the book page (its last cell is quoted; only earlier ones are read).
 const [header, ...lines] = readFileSync(join(fixtures, "F3-1_kunci.csv"), "utf8")
   .trim()
   .split("\n");
@@ -104,7 +106,7 @@ async function signIn(email, password) {
   await admin.waitForURL((url) => !url.pathname.startsWith("/login"));
 }
 
-/** WS-04: the page of Catat Setoran Kelas, as Pak Rizal types it in the sheet. */
+/** WS-04: the page of the setoran task, as Pak Rizal types it in the sheet. */
 async function setPage(value) {
   await admin.goto(new URL("documents", ADMIN).href);
   await admin.getByRole("row").nth(1).waitFor();
@@ -118,10 +120,10 @@ async function setPage(value) {
     .getByRole("button", { name: `Gejala dan halaman ${TITLE}` })
     .click();
   const sheet = admin.getByRole("dialog");
-  const form = sheet.locator("form").filter({ hasText: "Catat Setoran Kelas" });
+  const form = sheet.locator("form").filter({ hasText: TASK });
   await form.getByLabel("Halaman").fill(value);
   await form.getByRole("button", { name: "Simpan" }).click();
-  await admin.getByText("Catat Setoran Kelas disimpan").first().waitFor({ timeout: 10_000 });
+  await admin.getByText(`${TASK} disimpan`).first().waitFor({ timeout: 10_000 });
   await admin.keyboard.press("Escape");
 }
 
@@ -167,7 +169,7 @@ await fetch(new URL("_mock/reset", MOCK), {
 let jobId = null;
 await check("the setoran book photo lands in Bu Siti's inbox", async () => {
   const job = await siti.inboxUploadPhoto({
-    file: new File([readFileSync(photo)], "buku-setoran-4A.png", { type: "image/png" }),
+    file: new File([readFileSync(photo)], "buku-setoran-4A.jpg", { type: "image/jpeg" }),
   });
   expect(job.status === "queued", `the photo is ${job.status}`);
   jobId = job.jobId;
@@ -207,8 +209,12 @@ await check(
       "the steps don't say the teacher presses Simpan setoran",
     );
     expect(
-      items.some((item) => /Koordinator Tahfidz/u.test(item)),
-      "another role's task isn't announced (F3-18)",
+      items.some((item) => /^Pilih jenis catatan: kelas 4A, Setoran\.$/u.test(item)),
+      "the steps don't say Kelas 4A and Setoran are picked",
+    );
+    expect(
+      items.some((item) => /Sistem AlurSekolah: hitung nilai dan huruf/u.test(item)),
+      "the system's task isn't announced (F3-18)",
     );
     expect((await page.locator("#tf-kelas").count()) === 0, "Nemu moved before Mulai");
     await page.screenshot({ path: join(shots, "langkah.png") });
@@ -217,7 +223,7 @@ await check(
 );
 
 await check(
-  "F3-16: Citra's smudged Tajwid is asked with the photo crop, never guessed",
+  "F3-16: Citra's scribbled Tajwid is asked with the photo crop, never guessed",
   async () => {
     const card = display("pilih");
     await card.getByText("Tajwid Citra Lestari tidak terbaca jelas", { exact: false }).waitFor({
@@ -227,8 +233,15 @@ await check(
     expect(labels.includes("Angka lain"), `choices: ${labels.join(", ")}`);
     expect((await card.getByRole("img").count()) === 1, "no crop of the cell");
     await page.screenshot({ path: join(shots, "tanya-tajwid.png") });
+    // The test teacher's answer (F3-1_kunci.csv): a choice when offered, else typed.
     const truth = KUNCI.find((row) => row.murid === "Citra Lestari").tajwid;
-    await card.getByRole("group").getByRole("button", { name: truth, exact: true }).click();
+    if (labels.includes(truth)) {
+      await card.getByRole("group").getByRole("button", { name: truth, exact: true }).click();
+    } else {
+      await card.getByRole("group").getByRole("button", { name: "Angka lain" }).click();
+      await overlay.getByLabel("Pertanyaan untuk Nemu").fill(truth);
+      await overlay.getByRole("button", { name: "Kirim" }).click();
+    }
   },
 );
 
@@ -285,35 +298,32 @@ await check(
   },
 );
 
-await check(
-  "the teacher saves; Catatan langkah names the system's and the coordinator's tasks",
-  async () => {
-    await page.locator("#btn-simpan-setoran").click();
-    await page.locator("#ya-simpan").click();
-    await page.getByText("Setoran tersimpan untuk 3 murid kelas 4A.").waitFor();
-    const notes = overlay.getByRole("region", { name: "Catatan langkah" });
-    await notes.waitFor({ timeout: 10_000 });
-    const items = await notes.locator("li").allInnerTexts();
-    console.log(`  ${items.join(" | ")}`);
-    expect(
-      items.some((item) => /Ibu menekan Simpan setoran|Bu menekan Simpan setoran/u.test(item)),
-      "no 'menekan Simpan setoran'",
-    );
-    expect(
-      items.some((item) => /Sistem AlurSekolah: hitung nilai hafalan/u.test(item)),
-      "the system's task isn't named",
-    );
-    expect(
-      items.some((item) => /Koordinator Tahfidz: periksa rekap tahfidz/u.test(item)),
-      "the coordinator's task isn't named",
-    );
-    expect(items.includes("Foto dihapus dari Nemu"), "the photo wasn't deleted");
-    const left = await siti.inboxJobs();
-    expect(!left.some((job) => job.jobId === jobId), "the photo is still in the inbox");
-    await page.screenshot({ path: join(shots, "catatan-langkah.png") });
-    await notes.getByRole("button", { name: "Tutup" }).click();
-  },
-);
+await check("the teacher saves; Catatan langkah names the system's tasks", async () => {
+  await page.locator("#btn-simpan-setoran").click();
+  await page.locator("#ya-simpan").click();
+  await page.getByText("Setoran tersimpan untuk 3 murid kelas 4A.").waitFor();
+  const notes = overlay.getByRole("region", { name: "Catatan langkah" });
+  await notes.waitFor({ timeout: 10_000 });
+  const items = await notes.locator("li").allInnerTexts();
+  console.log(`  ${items.join(" | ")}`);
+  expect(
+    items.some((item) => /Ibu menekan Simpan setoran|Bu menekan Simpan setoran/u.test(item)),
+    "no 'menekan Simpan setoran'",
+  );
+  expect(
+    items.some((item) => /Sistem AlurSekolah: hitung nilai dan huruf/u.test(item)),
+    "the system's score task isn't named",
+  );
+  expect(
+    items.some((item) => /Sistem AlurSekolah: tampilkan di aplikasi orang tua/u.test(item)),
+    "the system's parent-app task isn't named",
+  );
+  expect(items.includes("Foto dihapus dari Nemu"), "the photo wasn't deleted");
+  const left = await siti.inboxJobs();
+  expect(!left.some((job) => job.jobId === jobId), "the photo is still in the inbox");
+  await page.screenshot({ path: join(shots, "catatan-langkah.png") });
+  await notes.getByRole("button", { name: "Tutup" }).click();
+});
 
 await check("F3-19: with no page in WS-04, Nemu only explains (cara 3)", async () => {
   await setPage("");

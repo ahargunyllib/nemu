@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_F1_InputNilai" targetNamespace="http://nemu.id/bpmn" exporter="Nemu">
+  <bpmn:process id="Process_F1_InputNilai" name="F1 Input Nilai" isExecutable="false">
+    <bpmn:documentation>Alur Nemu memasukkan nilai dari foto buku nilai ke AlurSekolah (F1, cara 1/2/3). Tugas pengguna (userTask, grup "guru") dikerjakan guru; tugas layanan (serviceTask) adalah panggilan ke Nemu Service; tugas skrip (scriptTask) dikerjakan Nemu Extension di halaman. Nemu tidak pernah menekan Simpan (F0-08). Sumber: apps/extension/features/grade-photo dan features/executor.</bpmn:documentation>
+    <bpmn:startEvent id="Start_FotoMasuk" name="Foto buku nilai masuk lewat WhatsApp">
+      <bpmn:documentation>wa-bot menaruh foto di kotak masuk Nemu Service. Guru juga bisa memulai dengan "masukkan nilai …" di panel Nemu; kalau belum ada foto, Nemu memintanya lewat WhatsApp.</bpmn:documentation>
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageDef_FotoMasuk" />
+    </bpmn:startEvent>
+    <bpmn:scriptTask id="Task_TawarkanFoto" name="Nemu menawarkan foto">
+      <bpmn:documentation>Tab yang terlihat menanyakan inboxJobs tiap 4 detik dan mengklaim foto untuk satu tab saja; Kartu Pilih "Foto dari WhatsApp · Mulai / Nanti".</bpmn:documentation>
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:userTask id="Task_GuruMulai" name="Guru menekan Mulai" camunda:candidateGroups="guru">
+      <bpmn:documentation>"Nanti" menyembunyikan kartu di tab ini; foto tetap menunggu.</bpmn:documentation>
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_2b</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_GuruMenyebutNilai" name="Guru menyebut nilainya" camunda:candidateGroups="guru">
+      <bpmn:documentation>Diketik atau diucapkan, misalnya "UTS Matematika 4B".</bpmn:documentation>
+      <bpmn:incoming>Flow_2b</bpmn:incoming>
+      <bpmn:incoming>Flow_4b</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Task_PahamiPerintah" name="Nemu Service memahami perintah">
+      <bpmn:documentation>gradesParseCommand: kelas, mata pelajaran, dan jenis penilaian.</bpmn:documentation>
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_PerintahLengkap" name="Kelas, mapel, dan penilaian lengkap?">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_4a</bpmn:outgoing>
+      <bpmn:outgoing>Flow_4b</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_BacaFoto" name="Nemu Service membaca foto">
+      <bpmn:documentation>inboxProcess: membaca nama, nilai, dan S/I/A dari foto memakai daftar siswa kelas itu (WS-06). Gelembung Kerja selama membaca.</bpmn:documentation>
+      <bpmn:incoming>Flow_4a</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_FotoTerbaca" name="Foto terbaca?">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_5a</bpmn:outgoing>
+      <bpmn:outgoing>Flow_5b</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="End_KirimUlang" name="Guru diminta mengirim ulang foto">
+      <bpmn:incoming>Flow_5b</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="Gateway_AdaRagu" name="Ada bacaan yang ragu?">
+      <bpmn:incoming>Flow_5a</bpmn:incoming>
+      <bpmn:outgoing>Flow_6a</bpmn:outgoing>
+      <bpmn:outgoing>Flow_6b</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_GuruMemeriksa" name="Guru memeriksa" camunda:candidateGroups="guru">
+      <bpmn:documentation>W5: satu Kartu Pilih per bacaan yang ragu (angka, nama, S/I/A) dengan potongan foto selnya. Tidak ada pilihan yang sudah terpilih; "Angka lain" dan "Tidak ada di daftar" selalu ada. Dijawab dengan klik, ketik, atau suara.</bpmn:documentation>
+      <bpmn:incoming>Flow_6a</bpmn:incoming>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_GabungPeriksa">
+      <bpmn:incoming>Flow_6b</bpmn:incoming>
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_SusunNilai" name="Nemu Service menyusun nilai">
+      <bpmn:documentation>gradesFinalize: nilai per siswa, catatan "remedial" di bawah KKM dan "tidak hadir" untuk S/I/A (nilai dikosongkan).</bpmn:documentation>
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+      <bpmn:outgoing>Flow_9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_Cara" name="Cara apa?">
+      <bpmn:documentation>Cara bawaan sekolah (WS-08), atau cara 2 kalau guru memilih "Lain kali coba sendiri".</bpmn:documentation>
+      <bpmn:incoming>Flow_9</bpmn:incoming>
+      <bpmn:outgoing>Flow_Cara1</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Cara2</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Cara3</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:scriptTask id="Task_Cara1" name="Nemu mengisi nilai (cara 1)">
+      <bpmn:documentation>Nemu membuka menu Nilai, memilih Kelas, Mata Pelajaran, dan Jenis Penilaian, menekan Tampilkan Siswa, lalu mengisi Nilai dan Catatan tiap siswa sekitar satu isian per detik (Pelan: separuhnya). Lalu Nemu menunjuk Simpan: "Silakan Ibu tekan Simpan." Gerakan guru sendiri menghentikan Nemu (F0-07); "Ajari saya" atau "Saya isi sendiri" melanjutkan sisanya dengan cara 2.</bpmn:documentation>
+      <bpmn:incoming>Flow_Cara1</bpmn:incoming>
+      <bpmn:outgoing>Flow_10a</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:userTask id="Task_Cara2" name="Guru mengetik nilai yang ditunjuk Nemu (cara 2)" camunda:candidateGroups="guru">
+      <bpmn:documentation>Nemu menunjuk tiap isian dan menyebut nilainya; ketikan guru diperiksa saat pindah isian. Kalau berbeda: "Di buku …, Bu."</bpmn:documentation>
+      <bpmn:incoming>Flow_Cara2</bpmn:incoming>
+      <bpmn:outgoing>Flow_10b</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Cara3" name="Guru mengisi sendiri (cara 3)" camunda:candidateGroups="guru">
+      <bpmn:documentation>"Silakan Ibu isi sendiri. Nemu memeriksa setelah Ibu menekan Simpan."</bpmn:documentation>
+      <bpmn:incoming>Flow_Cara3</bpmn:incoming>
+      <bpmn:outgoing>Flow_10c</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_GabungCara">
+      <bpmn:incoming>Flow_10a</bpmn:incoming>
+      <bpmn:incoming>Flow_10b</bpmn:incoming>
+      <bpmn:incoming>Flow_10c</bpmn:incoming>
+      <bpmn:outgoing>Flow_11</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_GuruMenekanSimpan" name="Guru menekan Simpan" camunda:candidateGroups="guru">
+      <bpmn:documentation>Hanya guru yang menekan Simpan. "Lihat ringkasan" di samping Simpan memuat setiap nilai.</bpmn:documentation>
+      <bpmn:incoming>Flow_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_12</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_SetelahSimpan" name="Cara 3?">
+      <bpmn:incoming>Flow_12</bpmn:incoming>
+      <bpmn:outgoing>Flow_12a</bpmn:outgoing>
+      <bpmn:outgoing>Flow_12b</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:scriptTask id="Task_PeriksaIsian" name="Nemu memeriksa setiap isian">
+      <bpmn:documentation>Cara 3: Nemu membandingkan setiap isian di halaman dengan daftar nilai: "Semua … isian sudah sesuai" atau "… belum sesuai" dengan ringkasannya.</bpmn:documentation>
+      <bpmn:incoming>Flow_12a</bpmn:incoming>
+      <bpmn:outgoing>Flow_13</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:exclusiveGateway id="Gateway_GabungSimpan">
+      <bpmn:incoming>Flow_12b</bpmn:incoming>
+      <bpmn:incoming>Flow_13</bpmn:incoming>
+      <bpmn:outgoing>Flow_14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_BacaUlang" name="Nemu Service membaca ulang nilai">
+      <bpmn:documentation>Setelah pesan tersimpan muncul (atau guru menekan "Sudah tersimpan"): gradesReadbackAlurSekolah membaca nilai dari AlurSekolah (WS-07); tanpa WS-07, gradesReadback membandingkan yang tampil di halaman. Nemu menyampaikan hasilnya dalam satu kalimat.</bpmn:documentation>
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+      <bpmn:outgoing>Flow_15</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_HapusFoto" name="Nemu Service menghapus foto">
+      <bpmn:documentation>inboxAck: foto buku nilai dihapus dari kotak masuk Nemu.</bpmn:documentation>
+      <bpmn:incoming>Flow_15</bpmn:incoming>
+      <bpmn:outgoing>Flow_16</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Task_CatatanLangkah" name="Nemu menampilkan Catatan langkah">
+      <bpmn:documentation>F0-14: setiap langkah, jumlah pertanyaan yang dijawab guru, dan hasil baca ulang. Setiap tindakan juga tercatat di log tindakan (WS-10) tanpa nilainya.</bpmn:documentation>
+      <bpmn:incoming>Flow_16</bpmn:incoming>
+      <bpmn:outgoing>Flow_17</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="End_NilaiTersimpan" name="Nilai tersimpan dan terperiksa">
+      <bpmn:incoming>Flow_17</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="Start_FotoMasuk" targetRef="Task_TawarkanFoto" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_TawarkanFoto" targetRef="Task_GuruMulai" />
+    <bpmn:sequenceFlow id="Flow_2b" sourceRef="Task_GuruMulai" targetRef="Task_GuruMenyebutNilai" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_GuruMenyebutNilai" targetRef="Task_PahamiPerintah" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_PahamiPerintah" targetRef="Gateway_PerintahLengkap" />
+    <bpmn:sequenceFlow id="Flow_4a" name="Ya" sourceRef="Gateway_PerintahLengkap" targetRef="Task_BacaFoto">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${perintahLengkap == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_4b" name="Tidak: Nemu bertanya" sourceRef="Gateway_PerintahLengkap" targetRef="Task_GuruMenyebutNilai">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${perintahLengkap == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_BacaFoto" targetRef="Gateway_FotoTerbaca" />
+    <bpmn:sequenceFlow id="Flow_5a" name="Ya" sourceRef="Gateway_FotoTerbaca" targetRef="Gateway_AdaRagu">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${fotoTerbaca == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_5b" name="Tidak" sourceRef="Gateway_FotoTerbaca" targetRef="End_KirimUlang">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${fotoTerbaca == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_6a" name="Ya" sourceRef="Gateway_AdaRagu" targetRef="Task_GuruMemeriksa">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${adaBacaanRagu == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_6b" name="Tidak" sourceRef="Gateway_AdaRagu" targetRef="Gateway_GabungPeriksa">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${adaBacaanRagu == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Task_GuruMemeriksa" targetRef="Gateway_GabungPeriksa" />
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Gateway_GabungPeriksa" targetRef="Task_SusunNilai" />
+    <bpmn:sequenceFlow id="Flow_9" sourceRef="Task_SusunNilai" targetRef="Gateway_Cara" />
+    <bpmn:sequenceFlow id="Flow_Cara1" name="Cara 1" sourceRef="Gateway_Cara" targetRef="Task_Cara1">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${cara == 1}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Cara2" name="Cara 2" sourceRef="Gateway_Cara" targetRef="Task_Cara2">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${cara == 2}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Cara3" name="Cara 3" sourceRef="Gateway_Cara" targetRef="Task_Cara3">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${cara == 3}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_10a" sourceRef="Task_Cara1" targetRef="Gateway_GabungCara" />
+    <bpmn:sequenceFlow id="Flow_10b" sourceRef="Task_Cara2" targetRef="Gateway_GabungCara" />
+    <bpmn:sequenceFlow id="Flow_10c" sourceRef="Task_Cara3" targetRef="Gateway_GabungCara" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Gateway_GabungCara" targetRef="Task_GuruMenekanSimpan" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Task_GuruMenekanSimpan" targetRef="Gateway_SetelahSimpan" />
+    <bpmn:sequenceFlow id="Flow_12a" name="Ya" sourceRef="Gateway_SetelahSimpan" targetRef="Task_PeriksaIsian">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${cara == 3}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_12b" name="Tidak" sourceRef="Gateway_SetelahSimpan" targetRef="Gateway_GabungSimpan">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${cara != 3}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_PeriksaIsian" targetRef="Gateway_GabungSimpan" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Gateway_GabungSimpan" targetRef="Task_BacaUlang" />
+    <bpmn:sequenceFlow id="Flow_15" sourceRef="Task_BacaUlang" targetRef="Task_HapusFoto" />
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Task_HapusFoto" targetRef="Task_CatatanLangkah" />
+    <bpmn:sequenceFlow id="Flow_17" sourceRef="Task_CatatanLangkah" targetRef="End_NilaiTersimpan" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Process_F1_InputNilai">
+    <bpmndi:BPMNPlane id="BPMNPlane_Process_F1_InputNilai" bpmnElement="Process_F1_InputNilai">
+      <bpmndi:BPMNShape id="Start_FotoMasuk_di" bpmnElement="Start_FotoMasuk">
+        <dc:Bounds x="57" y="52" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_TawarkanFoto_di" bpmnElement="Task_TawarkanFoto">
+        <dc:Bounds x="175" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_GuruMulai_di" bpmnElement="Task_GuruMulai">
+        <dc:Bounds x="325" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_GuruMenyebutNilai_di" bpmnElement="Task_GuruMenyebutNilai">
+        <dc:Bounds x="475" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PahamiPerintah_di" bpmnElement="Task_PahamiPerintah">
+        <dc:Bounds x="625" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_PerintahLengkap_di" bpmnElement="Gateway_PerintahLengkap" isMarkerVisible="true">
+        <dc:Bounds x="800" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_BacaFoto_di" bpmnElement="Task_BacaFoto">
+        <dc:Bounds x="925" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_FotoTerbaca_di" bpmnElement="Gateway_FotoTerbaca" isMarkerVisible="true">
+        <dc:Bounds x="1100" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_AdaRagu_di" bpmnElement="Gateway_AdaRagu" isMarkerVisible="true">
+        <dc:Bounds x="1250" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_GuruMemeriksa_di" bpmnElement="Task_GuruMemeriksa">
+        <dc:Bounds x="1375" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_GabungPeriksa_di" bpmnElement="Gateway_GabungPeriksa" isMarkerVisible="true">
+        <dc:Bounds x="1550" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SusunNilai_di" bpmnElement="Task_SusunNilai">
+        <dc:Bounds x="1675" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Cara_di" bpmnElement="Gateway_Cara" isMarkerVisible="true">
+        <dc:Bounds x="1850" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Cara1_di" bpmnElement="Task_Cara1">
+        <dc:Bounds x="1975" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_GabungCara_di" bpmnElement="Gateway_GabungCara" isMarkerVisible="true">
+        <dc:Bounds x="2150" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_GuruMenekanSimpan_di" bpmnElement="Task_GuruMenekanSimpan">
+        <dc:Bounds x="2275" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_SetelahSimpan_di" bpmnElement="Gateway_SetelahSimpan" isMarkerVisible="true">
+        <dc:Bounds x="2450" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PeriksaIsian_di" bpmnElement="Task_PeriksaIsian">
+        <dc:Bounds x="2575" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_GabungSimpan_di" bpmnElement="Gateway_GabungSimpan" isMarkerVisible="true">
+        <dc:Bounds x="2750" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_BacaUlang_di" bpmnElement="Task_BacaUlang">
+        <dc:Bounds x="2875" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_HapusFoto_di" bpmnElement="Task_HapusFoto">
+        <dc:Bounds x="3025" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CatatanLangkah_di" bpmnElement="Task_CatatanLangkah">
+        <dc:Bounds x="3175" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_NilaiTersimpan_di" bpmnElement="End_NilaiTersimpan">
+        <dc:Bounds x="3357" y="52" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_KirimUlang_di" bpmnElement="End_KirimUlang">
+        <dc:Bounds x="1257" y="192" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Cara2_di" bpmnElement="Task_Cara2">
+        <dc:Bounds x="1975" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Cara3_di" bpmnElement="Task_Cara3">
+        <dc:Bounds x="1975" y="310" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="93" y="70" />
+        <di:waypoint x="175" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="275" y="70" />
+        <di:waypoint x="325" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2b_di" bpmnElement="Flow_2b">
+        <di:waypoint x="425" y="70" />
+        <di:waypoint x="475" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="575" y="70" />
+        <di:waypoint x="625" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="725" y="70" />
+        <di:waypoint x="800" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4a_di" bpmnElement="Flow_4a">
+        <di:waypoint x="850" y="70" />
+        <di:waypoint x="925" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4b_di" bpmnElement="Flow_4b">
+        <di:waypoint x="825" y="95" />
+        <di:waypoint x="825" y="140" />
+        <di:waypoint x="525" y="140" />
+        <di:waypoint x="525" y="110" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="1025" y="70" />
+        <di:waypoint x="1100" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_5a_di" bpmnElement="Flow_5a">
+        <di:waypoint x="1150" y="70" />
+        <di:waypoint x="1250" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_5b_di" bpmnElement="Flow_5b">
+        <di:waypoint x="1125" y="95" />
+        <di:waypoint x="1125" y="210" />
+        <di:waypoint x="1257" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6a_di" bpmnElement="Flow_6a">
+        <di:waypoint x="1300" y="70" />
+        <di:waypoint x="1375" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6b_di" bpmnElement="Flow_6b">
+        <di:waypoint x="1275" y="95" />
+        <di:waypoint x="1275" y="140" />
+        <di:waypoint x="1575" y="140" />
+        <di:waypoint x="1575" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7">
+        <di:waypoint x="1475" y="70" />
+        <di:waypoint x="1550" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8">
+        <di:waypoint x="1600" y="70" />
+        <di:waypoint x="1675" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_9_di" bpmnElement="Flow_9">
+        <di:waypoint x="1775" y="70" />
+        <di:waypoint x="1850" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Cara1_di" bpmnElement="Flow_Cara1">
+        <di:waypoint x="1900" y="70" />
+        <di:waypoint x="1975" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Cara2_di" bpmnElement="Flow_Cara2">
+        <di:waypoint x="1875" y="95" />
+        <di:waypoint x="1875" y="210" />
+        <di:waypoint x="1975" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Cara3_di" bpmnElement="Flow_Cara3">
+        <di:waypoint x="1875" y="95" />
+        <di:waypoint x="1875" y="350" />
+        <di:waypoint x="1975" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10a_di" bpmnElement="Flow_10a">
+        <di:waypoint x="2075" y="70" />
+        <di:waypoint x="2150" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
+        <di:waypoint x="2200" y="70" />
+        <di:waypoint x="2275" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12">
+        <di:waypoint x="2375" y="70" />
+        <di:waypoint x="2450" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12a_di" bpmnElement="Flow_12a">
+        <di:waypoint x="2500" y="70" />
+        <di:waypoint x="2575" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12b_di" bpmnElement="Flow_12b">
+        <di:waypoint x="2475" y="95" />
+        <di:waypoint x="2475" y="140" />
+        <di:waypoint x="2775" y="140" />
+        <di:waypoint x="2775" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <di:waypoint x="2675" y="70" />
+        <di:waypoint x="2750" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14">
+        <di:waypoint x="2800" y="70" />
+        <di:waypoint x="2875" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15_di" bpmnElement="Flow_15">
+        <di:waypoint x="2975" y="70" />
+        <di:waypoint x="3025" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16">
+        <di:waypoint x="3125" y="70" />
+        <di:waypoint x="3175" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17_di" bpmnElement="Flow_17">
+        <di:waypoint x="3275" y="70" />
+        <di:waypoint x="3357" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10b_di" bpmnElement="Flow_10b">
+        <di:waypoint x="2075" y="210" />
+        <di:waypoint x="2175" y="210" />
+        <di:waypoint x="2175" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10c_di" bpmnElement="Flow_10c">
+        <di:waypoint x="2075" y="350" />
+        <di:waypoint x="2175" y="350" />
+        <di:waypoint x="2175" y="95" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
+
