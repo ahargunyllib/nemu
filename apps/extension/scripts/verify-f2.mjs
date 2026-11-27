@@ -1,6 +1,6 @@
 // Loads a production build of the extension into Playwright's Chromium and checks F2 "Nemu, ini
-// kenapa?" (#205) end to end on the mocks: F2-2 (AlurSekolah, IPAS 4A not assigned → Pak Rizal,
-// Kamus Kendala K-07, a WhatsApp Web link, never sent), F2-3 (Ruang GTK → cara 2 points at
+// kenapa?" (#205, #216) end to end on the mocks with the official Kamus Kendala: F2-2 (AlurSekolah,
+// IPAS 4A not assigned → Pak Rizal, Kamus Kendala K-07, a WhatsApp Web link, never sent), F2-3 (Ruang GTK → cara 2 points at
 // E-Kinerja, then Sinkro Ruang GTK; the teacher clicks; no WhatsApp), an error the guide doesn't
 // cover (an offer to message the operator) and the password guard.
 // Playwright's clicks are real (isTrusted) input. web.whatsapp.com is answered locally, so nothing
@@ -115,7 +115,9 @@ await check(
       .getByText("Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).")
       .waitFor({ timeout: 15_000 });
     await bubble(page).getByRole("button", { name: "Kenapa?" }).click();
-    await bubble(page).getByText("belum ditugaskan ke akun Anda", { exact: false }).waitFor();
+    await bubble(page)
+      .getByText("Penugasan guru per mapel dan kelas diatur admin sekolah", { exact: false })
+      .waitFor();
     await bubble(page).getByRole("button", { name: "Sumber" }).click();
     await bubble(page).getByText("Kamus Kendala · K-07", { exact: false }).waitFor();
     await page.screenshot({ path: join(shots, "f2-2-answer.png") });
@@ -136,6 +138,7 @@ await check("F2-2: the button opens WhatsApp Web to Pak Rizal with the polite te
   expect(url.searchParams.get("phone") === "6281200001003", "not Pak Rizal's number");
   expect(text.startsWith("Assalamualaikum Pak Rizal."), "the greeting is missing");
   expect(text.includes("Anda belum ditugaskan mengampu IPAS di kelas 4A"), "no error text");
+  expect(text.includes("menambahkan penugasan guru"), "no request from Kamus Kendala K-07");
   expect(!/screenshot/iu.test(text), "the message promises a screenshot");
   await whatsapp.close();
 });

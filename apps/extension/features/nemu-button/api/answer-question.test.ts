@@ -170,6 +170,7 @@ describe("answerQuestion", () => {
       "Nemu, masukkan kuis dari naskah ini ke Moodle. Buka Senin 30 November, tutup Kamis 3 Desember.",
       "Buatkan kuis IPAS dari naskah ini",
       "naskah soal ini jadikan kuis di Moodle ya",
+      "Pasang soal dari file ini ke Moodle kelas 4A, buka Senin sampai Kamis.",
     ])
       await expect(answerQuestion(client, words, SNAPSHOT)).resolves.toEqual({
         kind: "quiz-import",

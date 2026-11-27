@@ -207,10 +207,17 @@ await check("Nemu points at Pratinjau kuis, and Bu Siti presses it herself", asy
   await page.waitForURL(/\/mod\/quiz\/attempt\.php/u, { timeout: 20_000 });
 });
 
-const kunci = readFileSync(join(infra, "setup/f4-1/F4-1_kunci.csv"), "utf8")
+// The official key's kalimat_nemu_yang_diharapkan column, for the rows about one question.
+const csvCells = (line) =>
+  [...line.matchAll(/(?:^|,)("(?:[^"]|"")*"|[^,]*)/gu)].map(([, cell]) =>
+    cell.startsWith('"') ? cell.slice(1, -1).replaceAll('""', '"') : cell,
+  );
+const [header, ...rows] = readFileSync(join(infra, "setup/f4-1/F4-1_kunci.csv"), "utf8")
+  .trim()
   .split("\n")
-  .map((line) => line.match(/"([^"]+)"\s*$/u)?.[1])
-  .filter(Boolean);
+  .map(csvCells);
+const sentenceColumn = header.indexOf("kalimat_nemu_yang_diharapkan");
+const kunci = rows.map((row) => row[sentenceColumn]).filter((text) => /^Soal \d+ /u.test(text));
 
 await check(
   "F4-1: soal 7 (no key) and soal 15 (no image), one sentence each, pointed at",

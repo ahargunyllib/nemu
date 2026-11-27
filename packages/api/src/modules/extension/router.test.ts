@@ -1,3 +1,4 @@
+import { sitePermissionFor } from "@nemu/contracts/extension";
 import { call, ORPCError } from "@orpc/server";
 import { describe, expect, it } from "vite-plus/test";
 
@@ -157,6 +158,41 @@ describe("WS-03 permissions and WS-08 settings reach the extension without an up
       defaultCara: "tunjuk",
       fillSpeed: "pelan",
     });
+  });
+
+  it("WS-1 (a): the test pack's sites 1-4 get Nemu, e-Rapor (site 5, not entered) doesn't", async () => {
+    const admin = await asAdmin();
+    const official = [
+      ["sdit-nusantara.alursekolah.id", "read_fill"],
+      ["moodle-uji.tim-nemu", "read_fill"],
+      ["https://web.whatsapp.com", "prepare_message"],
+      ["ruang-gtk.tiruan.local", "read_only"],
+    ] as const;
+    for (const [pattern, permission] of official) {
+      await call(
+        extensionRouter.saveAllowedSite,
+        { id: null, pattern, label: "", permission },
+        { context: admin },
+      );
+    }
+
+    const extension = {
+      ...admin,
+      session: null,
+      extension: { installCode: INSTALL_CODE, email: null },
+    };
+    const { allowedSites } = await call(extensionRouter.extensionConfig, undefined, {
+      context: extension,
+    });
+    expect(sitePermissionFor(allowedSites, "http://erapor.tiruan.local/")).toBeNull();
+    expect(sitePermissionFor(allowedSites, "https://sdit-nusantara.alursekolah.id/nilai")).toBe(
+      "read_fill",
+    );
+    expect(sitePermissionFor(allowedSites, "https://moodle-uji.tim-nemu/mod/quiz/")).toBe(
+      "read_fill",
+    );
+    expect(sitePermissionFor(allowedSites, "https://web.whatsapp.com/")).toBe("prepare_message");
+    expect(sitePermissionFor(allowedSites, "http://ruang-gtk.tiruan.local/")).toBe("read_only");
   });
 
   it("defaults to Ctrl + Space, cara 1 and normal speed, and refuses a bare key", async () => {

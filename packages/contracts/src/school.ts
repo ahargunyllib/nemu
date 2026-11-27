@@ -204,6 +204,8 @@ export const gradeCommandSchema = z.discriminatedUnion("status", [
       className: z.string(),
       subject: z.string(),
       assessment: z.string(),
+      /** "Ajari saya ngisi nilai sendiri": she asked to be taught, so the fill starts in cara 2. */
+      cara: z.literal(2).optional(),
     })
     .strict(),
   z.object({ status: z.literal("ask"), missing: z.string(), question: z.string() }).strict(),
@@ -565,6 +567,7 @@ export const speechSynthesisSchema = z
 
 export const voiceControlSchema = z.enum([
   "berhenti",
+  "pelan",
   "lanjut",
   "ulangi",
   "saya_saja",

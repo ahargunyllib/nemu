@@ -59,31 +59,3 @@ export function recordCommand(text: string): string | null {
   if (!match) return null;
   return (match[1] ?? "").replace(/[.?!]+$/u, "").trim();
 }
-
-/**
- * "Nemu, masukkan kuis dari naskah ini" / "buat kuis IPAS dari naskah ini di Moodle": the
- * extension's own script-to-quiz flow (#210). Grades for a quiz ("masukkan nilai kuis") are F1's.
- */
-export function isQuizImportCommand(text: string): boolean {
-  if (/\bnilai\b/iu.test(text)) return false;
-  return (
-    /\b(?:masukkan|masukin|buat|buatkan|bikin|bikinkan|pasang|pasangkan|impor|import|jadikan)\b[^.?!]*\b(?:kuis|quiz)\b/iu.test(
-      text,
-    ) || /\bnaskah\b[^.?!]*\b(?:kuis|quiz|moodle)\b|\b(?:kuis|quiz)\b[^.?!]*\bnaskah\b/iu.test(text)
-  );
-}
-
-/** "Nemu, tolong cek kuis ini." / "periksa kuis IPAS ini": the extension's own quiz check (#209). */
-export function isQuizCheckCommand(text: string): boolean {
-  return /\b(?:cek|cekkan|periksa|periksakan|check)\b[^.?!]*\b(?:kuis|quiz)\b/iu.test(text);
-}
-
-/**
- * "Tolong hapus latihan bahasa Inggris yang kemarin." / "ganti kuis IPAS": deleting or replacing a
- * quiz, which Nemu never does itself (F4-06, #211). It names a quiz, "latihan" or "ulangan".
- */
-export function isQuizDeleteCommand(text: string): boolean {
-  return /\b(?:hapus|hapuskan|menghapus|ganti|gantikan|mengganti|delete|remove)\b[^.?!]*\b(?:kuis|quiz|latihan|ulangan)\b/iu.test(
-    text,
-  );
-}
