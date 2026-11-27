@@ -1,3 +1,4 @@
+import { quizCommand } from "@nemu/ai/school/commands";
 import type { PageSnapshot } from "@nemu/contracts/school";
 
 import type { NemuServiceClient } from "../../../shared/api/nemu-service";
@@ -5,9 +6,6 @@ import { fromExplanation, PASSWORD_ON_SCREEN } from "../../ini-kenapa/lib/explan
 import {
   type AskResult,
   fromGroundedAnswer,
-  isQuizCheckCommand,
-  isQuizDeleteCommand,
-  isQuizImportCommand,
   NOT_AVAILABLE_YET,
   recordCommand,
 } from "../lib/answer";
@@ -30,12 +28,11 @@ export async function answerQuestion(
   // "Rekam cara …" is the extension's own command; nothing is sent for it.
   const recordTitle = recordCommand(question);
   if (recordTitle !== null) return { kind: "record", title: recordTitle };
-  // Deleting a quiz: Nemu counts who took it and warns; she presses Hapus (F4-06, #211).
-  if (isQuizDeleteCommand(question)) return { kind: "quiz-delete", utterance: question };
-  // "Masukkan kuis dari naskah ini" is put into Moodle by the extension (F4-03, #210).
-  if (isQuizImportCommand(question)) return { kind: "quiz-import", utterance: question };
-  // "Nemu, tolong cek kuis ini" is checked in the page itself (F4-01, #209).
-  if (isQuizCheckCommand(question)) return { kind: "quiz-check", utterance: question };
+  // Deleting a quiz: Nemu counts who took it and warns; she presses Hapus (F4-06, #211). "Masukkan
+  // kuis dari naskah ini" is put into Moodle by the extension (F4-03, #210). "Nemu, tolong cek kuis
+  // ini" is checked in the page itself (F4-01, #209).
+  const quiz = quizCommand(question);
+  if (quiz) return { kind: quiz, utterance: question };
   const route = await client.helpRoute({ utterance: question });
   if (route.kind === "control") return { kind: "stop" };
   switch (route.intent) {

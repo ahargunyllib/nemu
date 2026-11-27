@@ -1,10 +1,31 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+
 import { call } from "@orpc/server";
 import { describe, expect, it } from "vite-plus/test";
+
+import { KAMUS_ROWS } from "@nemu/ai/school/fixtures/kamus";
 
 import { createSchoolContext } from "../../testing/school";
 import { helpRouter } from "../help/router";
 import { kamusRouter } from "./router";
-import { parseKamusGrid } from "./service";
+import { parseFixer, parseKamusGrid } from "./service";
+
+/** The official test pack's kamus file, as the school hands it over. */
+const OFFICIAL_KAMUS = join(
+  import.meta.dirname,
+  "../../../../ai/src/school/fixtures/kamus-kendala-sdit-nusantara.json",
+);
+
+const fields = (row: Omit<(typeof KAMUS_ROWS)[number], "id">) => ({
+  code: row.code,
+  app: row.app,
+  message: row.message,
+  meaning: row.meaning,
+  teacherFault: row.teacherFault,
+  fixer: row.fixer,
+  fix: row.fix,
+});
 
 const OPERATOR = { id: "rizal", role: "operator", workspaceId: "W-SEKOLAH" };
 
@@ -48,7 +69,6 @@ describe("WS-05 Kamus Kendala", () => {
       "K-03",
       "K-04",
       "K-05",
-      "K-06",
       "K-07",
       "K-10",
     ]);
@@ -59,6 +79,37 @@ describe("WS-05 Kamus Kendala", () => {
       status: "matched",
       citation: { docId: "kamus-kendala", article: "K-10" },
     });
+  });
+
+  it("W-SEKOLAH holds the official kamus, and importing its JSON file changes nothing", async () => {
+    const context = await createSchoolContext();
+    const operator = {
+      ...context,
+      session: { ...context.session!, user: { ...context.session!.user, ...OPERATOR } },
+    };
+    const seeded = await call(kamusRouter.listKamus, undefined, { context: operator });
+    expect(seeded.map((row) => ({ id: row.id, ...fields(row) }))).toEqual(
+      KAMUS_ROWS.map((row) => ({ id: row.id, ...fields(row) })),
+    );
+
+    const file = new File([await readFile(OFFICIAL_KAMUS)], "kamus-kendala-sdit-nusantara.json");
+    await expect(call(kamusRouter.importKamus, { file }, { context: operator })).resolves.toEqual({
+      imported: 6,
+      skipped: [],
+    });
+    const imported = await call(kamusRouter.listKamus, undefined, { context: operator });
+    expect(imported.map((row) => ({ id: row.id, ...fields(row) }))).toEqual(
+      KAMUS_ROWS.map((row) => ({ id: row.id, ...fields(row) })),
+    );
+  });
+
+  it("reads the role a kamus names first", () => {
+    expect(parseFixer("Operator sekolah (bersama kepala sekolah untuk pembagian tugas)")).toBe(
+      "operator",
+    );
+    expect(parseFixer("Operator sekolah (admin AlurSekolah)")).toBe("operator");
+    expect(parseFixer("Guru sendiri")).toBe("guru");
+    expect(parseFixer("Kepala sekolah")).toBe("kepsek");
   });
 
   it("keeps the kamus from a teacher", async () => {

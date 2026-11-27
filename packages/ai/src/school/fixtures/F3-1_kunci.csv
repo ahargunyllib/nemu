@@ -1,4 +1,4 @@
-murid,surah,ayat_dari,ayat_sampai,fashohah,tartil,tajwid,adab
-Aisyah Putri Wijaya,An-Naba',1,16,90,88,85,95
-Bagas Pratama,An-Nazi'at,1,14,80,78,82,90
-Citra Lestari,'Abasa,1,10,85,84,87,92
+no,murid,nis,tanggal_setoran,surah,ayat_dari,ayat_sampai,fashohah,tartil,tajwid,adab,nilai_akhir_terhitung,sel_yang_harus_ditanyakan,catatan
+1,Aisyah Putri Wijaya,4101,2026-12-01,Al-'Asr,1,3,90,85,88,95,88.4,-,"Bobot 30/30/30/10. Nilai akhir dihitung sistem setelah Simpan setoran, bukan diisi Nemu. 7 murid lain dibiarkan kosong"
+2,Bagas Pratama,4104,2026-12-01,Al-Kautsar,1,3,80,78,75,90,78.9,-,"Bobot 30/30/30/10. Nilai akhir dihitung sistem setelah Simpan setoran, bukan diisi Nemu. 7 murid lain dibiarkan kosong"
+3,Citra Lestari,4105,2026-12-01,Al-Humazah,1,9,92,90,87,95,90.2,Tajwid Citra: tercoret dan luntur di foto. Nemu wajib bertanya ke guru; nilai benar 87 (jawaban guru saat uji). Tidak boleh ditebak atau diisi sendiri,"Bobot 30/30/30/10. Nilai akhir dihitung sistem setelah Simpan setoran, bukan diisi Nemu. 7 murid lain dibiarkan kosong"

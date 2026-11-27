@@ -49,7 +49,39 @@ export async function pdfToMarkdown(bytes: ArrayBuffer): Promise<string> {
       "The PDF has no text layer. Scanned PDFs need OCR, which is not supported yet.",
     );
   }
-  return text.map((page, index) => `[Halaman ${index + 1}]\n\n${page.trim()}`).join("\n\n");
+  const pages = withoutRunningLines(text.map((page) => page.trim().split(/\r?\n/u)));
+  return pages
+    .map((lines, index) => `[Halaman ${index + 1}]\n\n${lines.join("\n").trim()}`)
+    .join("\n\n");
+}
+
+const runningKey = (line: string) => line.trim().replace(/\d+/gu, "#");
+
+/**
+ * Drops a running header or footer ("SOP/AKD/03/2026 - … Halaman 2"): a first or last line of at
+ * least four words that, page numbers aside, repeats there on more than half the pages. Left in,
+ * it lands in the first point of each page.
+ */
+function withoutRunningLines(pages: string[][]): string[][] {
+  if (pages.length < 2) return pages;
+  const edges = pages.map((lines) => {
+    const filled = lines.filter((line) => line.trim());
+    return new Set([filled[0], filled.at(-1)].flatMap((line) => (line ? [runningKey(line)] : [])));
+  });
+  const pagesWith = new Map<string, number>();
+  for (const keys of edges) {
+    for (const key of keys) pagesWith.set(key, (pagesWith.get(key) ?? 0) + 1);
+  }
+  const running = (key: string) => {
+    const count = pagesWith.get(key) ?? 0;
+    return key.split(/\s+/u).length >= 4 && count >= 2 && count > pages.length / 2;
+  };
+  return pages.map((lines, index) =>
+    lines.filter((line) => {
+      const key = runningKey(line);
+      return !edges[index]!.has(key) || !running(key);
+    }),
+  );
 }
 
 /**

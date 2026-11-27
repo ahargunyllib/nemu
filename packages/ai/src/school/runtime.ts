@@ -41,13 +41,8 @@ import {
   type ReadGradePhotoInput,
   type ReadGradePhotoResult,
 } from "./grades/reading.js";
-import {
-  answerGrounded,
-  normalizeForQuote,
-  verifyGroundedAnswer,
-  type AnswerGroundedInput,
-} from "./grounding.js";
-import { explainError, pageLines, resolveHelp, type ExplainErrorInput } from "./help.js";
+import { answerGrounded, verifyGroundedAnswer, type AnswerGroundedInput } from "./grounding.js";
+import { explainError, type ExplainErrorInput } from "./help.js";
 import { createOpenRouterJsonCaller, type JsonCall, type JsonCallRequest } from "./llm.js";
 import {
   documentationSymptoms,
@@ -102,7 +97,7 @@ export type SchoolAi = {
   compileProcedure(input: CompileProcedureInput): Promise<Procedure>;
   /**
    * F4-01: quiz checks that need judgement beyond the extension's DOM rules (#218), e.g. whether
-   * a question suits the class. None are built yet, so both runtimes answer with no problems.
+   * a question suits the class. None is needed for F4-1 (#218), so both answer with no problems.
    */
   judgeQuiz(input: QuizJudgeInput): Promise<QuizJudgement>;
   /**
@@ -123,6 +118,8 @@ export type SchoolAiConfig = {
     /** Photo Read B: a different model family. */
     readB: string;
     reread: string;
+    /** F4-03: the teacher's quiz script (a PDF as a file, or a photo), with its pictures. */
+    script: string;
     /** Excel headers, help, grounded answers, slot extraction, procedure compile. */
     text: string;
     transcription: string;
@@ -175,10 +172,9 @@ export function createSchoolAi(config: SchoolAiConfig): SchoolAi {
     readFormPhoto: (input) => readFormPhoto(readers.readA, input),
     matchFields: (input) => matchFields({ llm: text }, input),
     compileProcedure: (input) => compileProcedure({ llm: text }, input),
-    // #218 (Zahra): a model call goes here once a judgement check is agreed with SE.
+    // #218: F4-1's problems are all caught by the extension's DOM rules, so no model check runs.
     judgeQuiz: async () => ({ problems: [] }),
-    // #219 (Zahra): the vision reader also takes the PDF itself (`input_file`).
-    readQuizScript: (input) => readQuizScript({ llm: readers.readA }, input),
+    readQuizScript: (input) => readQuizScript({ llm: caller(config.models.script, "low") }, input),
     transcribe: createOpenRouterTranscriber({
       apiKey: config.apiKey,
       model: config.models.transcription,
@@ -221,48 +217,8 @@ export function createFixtureSchoolAi(): SchoolAi {
     readGradePhoto: (input) => readGradePhoto(photoReaders(input.roster), input),
     parseGradeExcel: (input) => parseGradeExcel({}, input),
 
-    async explainError(input) {
-      const words = (text: string) =>
-        normalizeForQuote(text)
-          .replace(/[^\p{L}\p{N}]+/gu, " ")
-          .trim();
-      const screen = words(pageLines(input.snapshot).join(" "));
-      const entry = input.kamus.find((chunk) => {
-        // A message with placeholders ("mengampu [mapel] di kelas [kelas]") matches up to the first.
-        const quoted = chunk.text.match(/"([^"]+)"/u)?.[1]?.split(/[[…]/u)[0];
-        return chunk.active && !!quoted?.trim() && screen.includes(words(quoted).slice(0, 40));
-      });
-      const sentences = entry?.text.split(/(?<=\.)\s+/u) ?? [];
-      const fixerSentence =
-        sentences.find((sentence) => /perlu|cukup|hubungi/iu.test(sentence)) ?? "";
-      const role = /kepala sekolah/iu.test(fixerSentence)
-        ? "kepsek"
-        : /operator/iu.test(fixerSentence)
-          ? "operator"
-          : /guru cukup/iu.test(fixerSentence)
-            ? "guru"
-            : null;
-      return resolveHelp(
-        {
-          status: entry ? "matched" : "not_in_guide",
-          error_text: input.snapshot.alerts[0] ?? "",
-          chunk_id: entry?.id ?? null,
-          quote: fixerSentence.replace(/\.$/u, "") || null,
-          teacher_fault: false,
-          fixer_role: role,
-          can_self_fix: role === "guru",
-          // "… menekan tombol Sinkro Ruang GTK, lalu …" → "Sinkro Ruang GTK".
-          guided_target:
-            role === "guru"
-              ? (fixerSentence.match(/tombol (.+?)(?=,|\.| lalu\b| di\b|$)/u)?.[1] ?? null)
-              : null,
-          why: entry ? sentences.slice(1).join(" ") : "",
-          app_name: entry?.text.match(/^K-\d+ ([^:]+):/u)?.[1] ?? "aplikasi",
-        },
-        input.kamus.filter((chunk) => chunk.active),
-        input,
-      );
-    },
+    // Code matching only: a near miss the real model would judge is "not in the guide" here.
+    explainError: (input) => explainError({ llm: codeCall(() => ({ row_id: null })) }, input),
 
     async answerGrounded(input) {
       const context = retrieveKnowledge(
@@ -357,15 +313,19 @@ export function createFixtureSchoolAi(): SchoolAi {
                   .toUpperCase() ?? null;
             }
           }
-          return answer;
+          return {
+            isian: Object.entries(answer)
+              .filter(([, value]) => value !== null)
+              .map(([nama, nilai]) => ({ nama, nilai: String(nilai) })),
+          };
         }),
         input,
       );
     },
 
-    // The test photo carries its own reading (fixtures/form-photo.ts); the rest is the real code.
+    // A known test photo reads as its model reading (fixtures/form-photo.ts); the rest is the real code.
     async readFormPhoto(input) {
-      return assembleFormPhoto(input, fixtureFormPhoto(input.image.dataUrl));
+      return assembleFormPhoto(input, await fixtureFormPhoto(input.image.dataUrl));
     },
     async matchFields(input) {
       return matchFieldLabels(input.fields, input.pageLabels);

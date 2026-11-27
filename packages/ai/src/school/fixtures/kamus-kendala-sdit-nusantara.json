@@ -1,0 +1,62 @@
+{
+  "judul": "Kamus Kendala Aplikasi Guru - SDIT Nusantara",
+  "disusun_oleh": "Pak Rizal (operator) - DATA UJI SINTETIS",
+  "versi": "1.1, 25 November 2026 (tambah no. 7 untuk data uji v2.3)",
+  "isi": [
+    {
+      "no": 1,
+      "aplikasi": "Ruang GTK",
+      "pesan": "Data Perencanaan (SKP) Anda gagal dialirkan ke E-Kinerja. Alasan: Tidak ada RHK atasan yang bisa dikaitkan.",
+      "arti": "Rencana kerja (RHK) kepala sekolah belum lengkap atau belum disepakati, jadi rencana kerja Ibu/Bapak belum bisa dikaitkan ke atasan.",
+      "siapa": "Kepala sekolah",
+      "langkah": "Kepala sekolah menyelesaikan dan menyepakati perencanaan SKP-nya. Setelah itu guru menekan kirim ulang. Kalau data atasan di sistem salah, kepala sekolah menghubungi admin kepegawaian.",
+      "sumber": "Pola laporan guru di komentar tutorial YouTube SKP 2025-2026; Suara.com, 2 Jan 2026 (data atasan tidak sesuai)."
+    },
+    {
+      "no": 2,
+      "aplikasi": "Ruang GTK",
+      "pesan": "Data Perencanaan (SKP) Anda gagal dialirkan ke E-Kinerja. Alasan: Tidak ditandai sebagai User Ruang GTK.",
+      "arti": "Akun E-Kinerja Ibu/Bapak belum ditandai sebagai pengguna Ruang GTK.",
+      "siapa": "Guru sendiri",
+      "langkah": "Buka E-Kinerja, tekan tombol \"Sinkro Ruang GTK\", lalu ikuti petunjuknya. Setelah itu coba kirim ulang dari Ruang GTK.",
+      "sumber": "Teks pesan error itu sendiri; komentar tutorial YouTube sinkron SKP."
+    },
+    {
+      "no": 3,
+      "aplikasi": "Info GTK",
+      "pesan": "Pengguna tidak ditemukan.",
+      "arti": "Akun Ibu/Bapak belum dikenali Info GTK. Biasanya email atau data PTK di Dapodik belum sesuai atau belum tersinkron.",
+      "siapa": "Operator sekolah",
+      "langkah": "Operator memeriksa email dan data PTK guru di Dapodik, memperbaikinya, lalu melakukan sinkronisasi. Guru mencoba masuk lagi setelah sinkron.",
+      "sumber": "Bisnis.com, 8 Jan 2026; rambay.id; kiakrikil.com (panduan login Info GTK)."
+    },
+    {
+      "no": 4,
+      "aplikasi": "Info GTK",
+      "pesan": "Beban Mengajar: Tidak Valid (JJM kurang dari 24 jam).",
+      "arti": "Jam mengajar yang tercatat kurang dari 24 jam per minggu, jadi syarat tunjangan belum terpenuhi.",
+      "siapa": "Operator sekolah (bersama kepala sekolah untuk pembagian tugas)",
+      "langkah": "Operator memeriksa rombel dan pembelajaran guru di Dapodik, memperbaiki jam yang belum tercatat, lalu sinkronisasi. Perubahan di Info GTK bisa butuh 1-7 hari.",
+      "sumber": "kepalasekolah.id; kiakrikil.com (beban mengajar dan sinkron Dapodik)."
+    },
+    {
+      "no": 5,
+      "aplikasi": "e-Rapor SD",
+      "pesan": "Deskripsi capaian kosong. Tujuan pembelajaran belum dipilih.",
+      "arti": "Deskripsi rapor dibuat dari tujuan pembelajaran. Karena belum dipilih, deskripsinya kosong.",
+      "siapa": "Guru sendiri",
+      "langkah": "Buka menu tujuan pembelajaran untuk mapel tersebut, centang tujuan pembelajaran yang dinilai, simpan, lalu cetak ulang.",
+      "sumber": "Komentar tutorial YouTube e-Rapor 2025; kiakrikil.com (deskripsi dari capaian tujuan pembelajaran)."
+    },
+    {
+      "no": 7,
+      "aplikasi": "AlurSekolah",
+      "pesan": "Anda belum ditugaskan mengampu IPAS di kelas 4A. Hubungi admin sekolah.",
+      "arti": "Bukan kesalahan Ibu/Bapak. Penugasan guru per mapel dan kelas diatur admin sekolah, dan mapel ini belum dipasangkan ke akun Ibu/Bapak untuk kelas tersebut.",
+      "siapa": "Operator sekolah (admin AlurSekolah)",
+      "langkah": "Operator menambahkan penugasan guru untuk mapel dan kelas itu di pengaturan AlurSekolah. Setelah itu guru memuat ulang halaman Isi nilai kelas.",
+      "sumber": "Teks pesan error itu sendiri; pengaturan penugasan guru diatur admin sekolah. Data uji sintetis."
+    }
+  ],
+  "catatan_nomor": "No. 6 sengaja kosong. Pesan F2-6 lama (kode PK-409) dipakai untuk menguji jawaban \"belum ada di panduan sekolah\"."
+}

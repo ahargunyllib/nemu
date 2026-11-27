@@ -48,7 +48,7 @@ const BEFORE_TEST = {
 describe("checkQuiz (F4-01 DOM rules)", () => {
   test("F4-1: exactly the two planted problems, each as one sentence", () => {
     expect(checkQuiz(f41(), BEFORE_TEST)).toEqual([
-      { kind: "no_key", slot: 7, sentence: "Soal 7 belum punya jawaban benar, Bu." },
+      { kind: "no_key", slot: 7, sentence: "Soal 7 belum ada kunci jawabannya, Bu." },
       { kind: "missing_image", slot: 15, sentence: "Soal 15 belum ada gambarnya, Bu." },
     ]);
   });
