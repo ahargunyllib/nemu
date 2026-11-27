@@ -13,7 +13,8 @@
     "build": "tsc -b",
     "check-types": "tsc -b",
     "test": "tsc -b && node --test dist/school/*.test.js dist/school/grades/*.test.js dist/school/bpmn/*.test.js dist/school/quiz/*.test.js scripts/rule-sources.test.mjs",
-    "eval:school": "tsc -b && node scripts/evaluate-school.mjs"
+    "eval:school": "tsc -b && node scripts/evaluate-school.mjs",
+    "eval:quiz": "tsc -b && node scripts/evaluate-quiz.mjs"
   },
   "dependencies": {
     "@bpmn-io/feelin": "7.0.0",

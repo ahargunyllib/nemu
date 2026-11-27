@@ -239,6 +239,7 @@ test("without a TTS model the service returns text and timings for the local voi
       readA: "a",
       readB: "b",
       reread: "a",
+      script: "c",
       text: "t",
       transcription: "s",
       speech: "",
