@@ -93,9 +93,10 @@ export const ruleSource = sqliteTable(
   (table) => [primaryKey({ columns: [table.workspaceId, table.key] })],
 );
 
-// WS-04 / F3-11 / F3-19: each user task and end event of an uploaded BPMN, with the symptoms a
-// teacher would see when the process stops there and the AlurSekolah page the task is done on.
-// Created on upload; the operator corrects them in the Admin Workspace.
+// WS-04 / F3-11 / F3-19: each task, end event and triggering event (start, boundary, catch) of an
+// uploaded BPMN, with the symptoms a teacher or parent sees there, the step that undoes it, the
+// school role who can help, and the AlurSekolah page a user task is done on. Created on upload;
+// the operator corrects them in the Admin Workspace.
 export const processElement = sqliteTable(
   "process_element",
   {
@@ -103,13 +104,17 @@ export const processElement = sqliteTable(
       .notNull()
       .references(() => knowledgeDocument.id, { onDelete: "cascade" }),
     elementId: text("element_id").notNull(),
-    kind: text("kind", { enum: ["task", "end"] }).notNull(),
+    kind: text("kind", { enum: ["task", "end", "event"] }).notNull(),
     name: text("name").notNull(),
     sequence: integer("sequence").notNull(),
     symptoms: text("symptoms", { mode: "json" })
       .$type<string[]>()
       .default(sql`'[]'`)
       .notNull(),
+    // F3-12: the element whose step ends this symptom ("Unlock" for "Lock"), or null.
+    wayBack: text("way_back"),
+    // F3-12: the school role who can help here ("bagian keuangan"), matched to a WS-06 contact.
+    role: text("role"),
     // The page (menu label) a user task is done on; null for end events.
     page: text("page"),
     // Whether `page` was edited by hand rather than taken from the task label.

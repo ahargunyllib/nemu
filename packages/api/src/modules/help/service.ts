@@ -1,6 +1,10 @@
 import { importBpmn } from "@nemu/ai/school/bpmn/graph";
 import { routeCommand } from "@nemu/ai/school/commands";
-import { describesSymptom, type SymptomCandidate } from "@nemu/ai/school/process-help";
+import {
+  describesSymptom,
+  type ProcessIndex,
+  type SymptomCandidate,
+} from "@nemu/ai/school/process-help";
 import type { TeacherProfile } from "@nemu/ai/school/profile";
 import type { SchoolAi } from "@nemu/ai/school/runtime";
 import { NOT_IN_GUIDE_SENTENCE, NOT_IN_PROCESS_SENTENCE } from "@nemu/ai/school/safety";
@@ -70,15 +74,24 @@ async function explainFromProcess(
   );
   if (!candidates.length) return { answer: null, symptoms: false };
 
-  const match = await deps.ai.matchSymptom({ question, candidates });
-  const document = match && processes.find((item) => item.id === match.documentId);
+  const found = await deps.ai.matchSymptom({ question, candidates });
+  const match = found?.match;
+  const at = match ? processes.findIndex((item) => item.id === match.documentId) : -1;
+  const document = processes[at];
   const body = document ? await deps.files.get(document.storageKey) : null;
-  if (!match || !document || !body) return { answer: null, symptoms: true };
+  if (!found || !match || !document || !body) return { answer: null, symptoms: true };
 
   const [graph, gradeCheck] = await Promise.all([
     importBpmn(new TextDecoder().decode(body)),
     checkSavedGrades(deps.alurSekolah, workspaceId, teacher, `${question} ${match.symptom}`),
   ]);
+  // The WS-04 index as the operator left it: symptoms, the way back and who can help.
+  const index: ProcessIndex = Object.fromEntries(
+    elements[at]!.map((element) => [
+      element.elementId,
+      { symptoms: element.symptoms, wayBack: element.wayBack, role: element.role },
+    ]),
+  );
   const answer = await deps.ai.explainProcess({
     question,
     process: {
@@ -86,8 +99,10 @@ async function explainFromProcess(
       title: document.title,
       version: document.version,
       graph,
+      index,
     },
     match,
+    via: found.via,
     gradeCheck,
     teacher,
   });

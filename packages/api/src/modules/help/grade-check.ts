@@ -7,8 +7,9 @@ import type { AlurSekolahConnector } from "../alursekolah/connector";
 /**
  * F3-13: before Nemu explains why grades don't show, it asks AlurSekolah (through the school's
  * WS-07 key, the same adapter as the F1 read-back) whether the named student has grades saved.
- * Not connected, no student named, or AlurSekolah not answering all read as "unknown", so the
- * answer says "kemungkinan" instead of claiming anything.
+ * A question that names no student has nothing to check ("not_asked": Nemu explains the process
+ * as a rule). Not connected or AlurSekolah not answering read as "unknown", so the answer says
+ * "kemungkinan" instead of claiming anything.
  */
 
 const ABOUT_GRADES = /\b(nilai|nilainya|rapor|rapornya)\b/iu;
@@ -49,12 +50,12 @@ export async function checkSavedGrades(
   teacher: Pick<TeacherProfile, "classes">,
   question: string,
 ): Promise<GradeCheck> {
-  if (!ABOUT_GRADES.test(question)) return { status: "unknown" };
+  if (!ABOUT_GRADES.test(question)) return { status: "not_asked" };
   try {
     const client = await connect(workspaceId);
     const students = await client.siswa();
     const student = studentInQuestion(question, students.data, teacher.classes);
-    if (!student) return { status: "unknown" };
+    if (!student) return { status: "not_asked" };
     const saved = await client.nilai({ nis: student.nis, halaman: 1, ukuran: 1 });
     return saved.meta.total > 0
       ? { status: "saved", student: student.nama }
