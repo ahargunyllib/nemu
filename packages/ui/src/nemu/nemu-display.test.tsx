@@ -86,6 +86,35 @@ describe("Gelembung Jawab", () => {
     expect(onRead).toHaveBeenLastCalledWith("Sumber: SOP Penilaian SDIT Nusantara · hlm. 2");
   });
 
+  test("opens a source that has its document, and reads its name with the others", () => {
+    const onRead = vi.fn();
+    const onOpen = vi.fn();
+    render(
+      <GelembungJawab
+        sentence="KKM semua mata pelajaran adalah 75."
+        notes={{
+          sumber: [
+            { label: "SOP Penilaian SDIT Nusantara · hlm. 2 · 3.2", onOpen },
+            "Rekaman Pak Rizal, langkah 4 dari 4",
+          ],
+        }}
+        onRead={onRead}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Sumber" }));
+    expect(onRead).toHaveBeenLastCalledWith(
+      "Sumber: SOP Penilaian SDIT Nusantara · hlm. 2 · 3.2; Rekaman Pak Rizal, langkah 4 dari 4",
+    );
+    expect(
+      screen.queryByRole("button", { name: "Rekaman Pak Rizal, langkah 4 dari 4" }),
+    ).toBeNull();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "SOP Penilaian SDIT Nusantara · hlm. 2 · 3.2" }),
+    );
+    expect(onOpen).toHaveBeenCalledOnce();
+  });
+
   test("says its sentence again when the sentence is clicked", () => {
     const onRepeat = vi.fn();
     render(

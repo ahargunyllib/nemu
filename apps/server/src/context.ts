@@ -8,6 +8,7 @@ import { ENV } from "./env.server";
 import {
   createAuth,
   createDocumentFileStore,
+  createDocumentLinks,
   createIntegrationSecretCipher,
   createSchoolServices,
   getDb,
@@ -37,6 +38,7 @@ export async function createContext({ context }: CreateContextOptions): Promise<
     db,
     session,
     documentFiles: createDocumentFileStore(),
+    documentLinks: createDocumentLinks(),
     school: createSchoolServices(db),
     secretCipher: createIntegrationSecretCipher(),
     demoDate: await getWorkspaceDemoDate(db, workspaceId),

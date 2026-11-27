@@ -257,6 +257,11 @@ export const sourceCitationSchema = z
   })
   .strict();
 
+/** Sumber (#258): a short-lived signed path, on the Nemu Service, to a cited PDF. */
+export const documentFileLinkSchema = z
+  .object({ path: z.string().startsWith("/"), expiresAt: z.number().int() })
+  .strict();
+
 export const contactSchema = z
   .object({ name: z.string(), role: z.string(), phone: z.string() })
   .strict();
@@ -629,6 +634,7 @@ export type GradeCommand = z.infer<typeof gradeCommandSchema>;
 export type PageField = z.infer<typeof pageFieldSchema>;
 export type PageSnapshot = z.infer<typeof pageSnapshotSchema>;
 export type SourceCitation = z.infer<typeof sourceCitationSchema>;
+export type DocumentFileLink = z.infer<typeof documentFileLinkSchema>;
 export type Contact = z.infer<typeof contactSchema>;
 export type HelpExplanation = z.infer<typeof helpExplanationSchema>;
 export type GroundedAnswer = z.infer<typeof groundedAnswerSchema>;

@@ -1,3 +1,7 @@
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
 import * as Alchemy from "alchemy";
 import * as Cloudflare from "alchemy/Cloudflare";
 import * as Config from "effect/Config";
@@ -15,6 +19,21 @@ export const db = Cloudflare.D1.Database("database", {
 
 // Knowledge document files uploaded in the Admin Workspace; metadata lives in D1.
 export const documents = Cloudflare.R2.Bucket("documents");
+
+// Files of seeded knowledge documents (D1 has their metadata), so Sumber can open them (#258).
+// `alchemy dev` puts them in the local bucket; production gets them once with
+// `wrangler r2 object put` (docs/school-ai.md), not on every deploy.
+const SEED_DOCUMENT_FILES = [
+  {
+    key: "seed/sekolah/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf",
+    file: "../ai/src/school/fixtures/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf",
+    contentType: "application/pdf",
+  },
+].map((seed) => {
+  const path = fileURLToPath(new URL(seed.file, import.meta.url).href);
+  // The Action runs again only when a file's contents change.
+  return { ...seed, path, sha256: createHash("sha256").update(readFileSync(path)).digest("hex") };
+});
 
 // Grade-book photo jobs (Nemu v2.2). Deleted when the teacher saves; this rule removes leftovers
 // after a day (UU PDP: photos of children's grades are not kept).
@@ -144,6 +163,26 @@ export default Alchemy.Stack(
     ),
   },
   Effect.gen(function* () {
+    const { dev } = yield* Alchemy.AlchemyContext;
+    if (dev) {
+      const documentsBucket = yield* documents;
+      const SeedDocumentFiles = Alchemy.Action(
+        "SeedDocumentFiles",
+        Effect.gen(function* () {
+          const bucket = yield* Cloudflare.R2.WriteBucket(documentsBucket);
+          return Effect.fn(function* (input: { files: typeof SEED_DOCUMENT_FILES }) {
+            for (const seed of input.files) {
+              yield* bucket.put(seed.key, readFileSync(seed.path), {
+                httpMetadata: { contentType: seed.contentType },
+              });
+            }
+            return { keys: input.files.map((seed) => seed.key) };
+          });
+        }).pipe(Effect.provide(Cloudflare.R2.WriteBucketLocal)),
+      );
+      yield* SeedDocumentFiles({ files: SEED_DOCUMENT_FILES });
+    }
+
     const serverWorker = yield* server;
     const adminWorker = yield* Cloudflare.Website.Vite("admin", {
       rootDir: "../../apps/admin",

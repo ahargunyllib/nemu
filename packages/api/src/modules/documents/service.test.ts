@@ -46,6 +46,15 @@ function createFakes() {
     async findById(workspaceId, id) {
       return rows.find((row) => row.workspaceId === workspaceId && row.id === id);
     },
+    async findReadable(workspaceId, id) {
+      return rows.find(
+        (row) =>
+          row.workspaceId === workspaceId &&
+          row.id === id &&
+          row.isActive &&
+          row.status === "ready",
+      );
+    },
     async setActive(workspaceId, id, isActive) {
       const row = rows.find(
         (candidate) => candidate.workspaceId === workspaceId && candidate.id === id,

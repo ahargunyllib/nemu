@@ -1,6 +1,10 @@
 import { createFixtureSchoolAi, createSchoolAi, type SchoolAi } from "@nemu/ai/school/runtime";
 import type { DocumentFileStore, InboxFileStore, SchoolServices } from "@nemu/api/context";
 import { createStoredAlurSekolahConnector } from "@nemu/api/modules/alursekolah/connector";
+import {
+  createDocumentLinkSigner,
+  type DocumentLinkSigner,
+} from "@nemu/api/modules/documents/file-link";
 import { createSecretCipher, type SecretCipher } from "@nemu/api/modules/integrations/cipher";
 import { createIntegrationSecretRepository } from "@nemu/api/modules/integrations/repository";
 import { createRegistrySchoolDirectory } from "@nemu/api/modules/school/registry-directory";
@@ -36,6 +40,11 @@ export function createDocumentFileStore(): DocumentFileStore {
       await ENV.DOCUMENTS.delete(key);
     },
   };
+}
+
+// Sumber links (#258) are signed with the Better Auth secret, under their own purpose label.
+export function createDocumentLinks(): DocumentLinkSigner {
+  return createDocumentLinkSigner(ENV.BETTER_AUTH_SECRET);
 }
 
 function createInboxFileStore(): InboxFileStore {

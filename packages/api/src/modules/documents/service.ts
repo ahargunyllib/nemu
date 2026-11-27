@@ -3,6 +3,7 @@ import type { SchoolAi } from "@nemu/ai/school/runtime";
 import type { DocumentFileStore } from "../../context";
 import type { WorkspaceId } from "../../workspace-ids";
 import type { CatalogRepository } from "./catalog-repository";
+import type { DocumentLinkSigner } from "./file-link";
 import { indexBpmnDocument, indexMarkdownDocument, pdfToMarkdown } from "./indexing";
 import { bpmnProcessElements } from "./process-elements";
 import type { DocumentRecord, DocumentRepository, NewKnowledgeChunkRecord } from "./repository";
@@ -225,4 +226,53 @@ export async function readDocumentFile(
 
   const body = await files.get(document.storageKey);
   return body ? { document, body } : undefined;
+}
+
+/** How long a Sumber link opens its document: long enough to click, short enough not to share. */
+export const DOCUMENT_LINK_TTL_MS = 10 * 60 * 1000;
+
+/**
+ * Sumber (#258): a link to a PDF the caller's school reads, for a tab that carries no Nemu headers
+ * or session; the browser's viewer opens it at the cited page. Undefined when the school doesn't
+ * read that document, or it isn't a PDF.
+ */
+export async function createDocumentFileLink(
+  { documents, links }: { documents: DocumentRepository; links: DocumentLinkSigner },
+  workspaceId: string,
+  id: string,
+): Promise<{ path: string; expiresAt: number } | undefined> {
+  const document = await documents.findReadable(workspaceId, id);
+  if (document?.format !== "pdf") return undefined;
+
+  const expiresAt = links.now() + DOCUMENT_LINK_TTL_MS;
+  const token = await links.sign({ workspaceId, documentId: document.id, expiresAt });
+  const path = `/api-reference/documents/${encodeURIComponent(document.id)}/file?token=${token}`;
+  return { path, expiresAt };
+}
+
+export type SignedDocumentFile =
+  | { status: "ok"; document: DocumentRecord; body: ArrayBuffer }
+  | { status: "invalid" | "expired" | "not_found" };
+
+/**
+ * Opens a Sumber link: the token must be signed for this document and unexpired, and the school
+ * must still read the document, so switching it off in WS-04 closes links already handed out.
+ */
+export async function openSignedDocumentFile(
+  {
+    documents,
+    files,
+    links,
+  }: { documents: DocumentRepository; files: DocumentFileStore; links: DocumentLinkSigner },
+  id: string,
+  token: string,
+): Promise<SignedDocumentFile> {
+  const claims = await links.verify(token);
+  if (claims === "invalid" || claims === "expired") return { status: claims };
+  if (claims.documentId !== id) return { status: "invalid" };
+
+  const document = await documents.findReadable(claims.workspaceId, id);
+  if (!document) return { status: "not_found" };
+  const body = await files.get(document.storageKey);
+  return body ? { status: "ok", document, body } : { status: "not_found" };
 }
