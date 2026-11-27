@@ -172,6 +172,30 @@ describe("cara 1", () => {
   });
 });
 
+describe("F0-13: a step that loads another page", () => {
+  test("a switch like Moodle's Mode Edit is saved as done the moment it is switched", async () => {
+    document.body.innerHTML = `<input type="checkbox" role="switch" id="mode"><label for="mode">Mode Edit</label>`;
+    const order: string[] = [];
+    const task: ExecutorTask = {
+      kind: "tunjuk",
+      title: "Mode Edit",
+      steps: [{ verb: "check", target: { role: "checkbox", label: "Mode Edit" }, checked: true }],
+    };
+    // The page reloads soon after the switch changes, so the next wait may never end.
+    document.getElementById("mode")?.addEventListener("change", () => order.push("switched"));
+    const { run } = harness(createRunState(task, { cara: 1 }), {
+      save: (state) => order.push(`saved ${state.index}`),
+      sleep: () => {
+        order.push("wait");
+        return new Promise((resolve) => setTimeout(resolve, 0));
+      },
+    });
+    await run.run();
+    const switched = order.indexOf("switched");
+    expect(order.slice(switched, switched + 2)).toEqual(["switched", "saved 1"]);
+  });
+});
+
 describe("pointing at Simpan", () => {
   test("a point step's ringkasan sits behind Lihat ringkasan beside the button (F1)", async () => {
     gradePage();
