@@ -19,6 +19,8 @@ export type NemuMessage =
   | { type: "nemu:identify"; pageEmail: PageEmail }
   // `snapshot` is null while a password field is on screen (F2-07).
   | { type: "nemu:ask"; pageEmail: PageEmail; question: string; snapshot: PageSnapshot | null }
+  // Sumber (#258): open a cited document at its page in a new tab.
+  | { type: "nemu:open-source"; pageEmail: PageEmail; docId: string; page: number | null }
   // Hold to talk (#200): the background records through the offscreen document.
   | { type: "nemu:listen-start" }
   | { type: "nemu:listen-stop"; pageEmail: PageEmail }
@@ -46,6 +48,7 @@ const TYPES: ReadonlySet<string> = new Set([
   "nemu:site-access",
   "nemu:identify",
   "nemu:ask",
+  "nemu:open-source",
   "nemu:listen-start",
   "nemu:listen-stop",
   "nemu:listen-cancel",

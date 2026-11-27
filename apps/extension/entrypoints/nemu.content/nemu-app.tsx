@@ -1,6 +1,7 @@
 import type { PageSnapshot } from "@nemu/contracts/school";
 import { shortcutKeys } from "@nemu/contracts/talk-shortcut";
 import { Button } from "@nemu/ui/components/button";
+import type { NemuSource } from "@nemu/ui/lib/nemu-display";
 import { GelembungJawab, GelembungJawabSkeleton } from "@nemu/ui/nemu/gelembung-jawab";
 import { NEMU_LINK } from "@nemu/ui/nemu/nemu-frame";
 import { NemuStage } from "@nemu/ui/nemu/nemu-stage";
@@ -22,6 +23,7 @@ import { usePageEmail } from "../../features/identity/hooks/use-page-email";
 import type { IdentityResult } from "../../features/identity/lib/identity";
 import { useNextAction } from "../../features/ini-kenapa/hooks/use-next-action";
 import { readPageSnapshot } from "../../features/ini-kenapa/lib/page-snapshot";
+import { requestSourceFile } from "../../features/nemu-button/api/request-source";
 import { AskBox } from "../../features/nemu-button/components/ask-box";
 import { useProcessRun } from "../../features/process-run/hooks/use-process-run";
 import { processRun } from "../../features/process-run/stores/process-run";
@@ -35,6 +37,7 @@ import { useRecorder } from "../../features/recorder/hooks/use-recorder";
 import { recorder } from "../../features/recorder/stores/recorder";
 import { NemuButton } from "../../features/nemu-button/components/nemu-button";
 import { type AskState, useAsk } from "../../features/nemu-button/hooks/use-ask";
+import type { SourceFile } from "../../features/nemu-button/lib/answer";
 import { HeardBubble, ListeningBubble } from "../../features/voice/components/talk-bubbles";
 import { useTalk } from "../../features/voice/hooks/use-talk";
 import { useVoice, type VoiceState } from "../../features/voice/hooks/use-voice";
@@ -111,6 +114,15 @@ export function NemuApp({ access }: { access: SiteAccess }) {
   );
   const preview = useDisplayPreview();
   const { voice, working, speak, repeat, stop } = useVoice(pageEmail);
+  // When the Nemu Service refuses, Nemu says why instead of opening an empty tab.
+  const openSource = useCallback(
+    (file: SourceFile) => {
+      void requestSourceFile(pageEmail, file).then((result) => {
+        if ("notice" in result) void speak(result.notice);
+      });
+    },
+    [pageEmail, speak],
+  );
   const run = useExecutor();
   // "ini kenapa?" reads the page as it was when the talk combination went down (F2-01).
   const pressSnapshot = useRef<PageSnapshot | null>(null);
@@ -298,6 +310,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
                 onAsk={askTyped}
                 onRepeat={repeat}
                 onRead={(text) => void speak(text)}
+                onOpenSource={openSource}
                 onDismiss={dismissAll}
               />
               {run.hasNotes && !run.active && (
@@ -374,8 +387,21 @@ type NemuPanelProps = {
   onAsk: (question: string) => void;
   onRepeat: () => void;
   onRead: (text: string) => void;
+  onOpenSource: (file: SourceFile) => void;
   onDismiss: () => void;
 };
+
+/** Sumber's list: a cited PDF opens at its page (#258); other sources stay text. */
+function sumberEntries(
+  sources: readonly string[],
+  files: readonly SourceFile[] | undefined,
+  onOpen: (file: SourceFile) => void,
+): NemuSource[] {
+  return sources.map((label) => {
+    const file = files?.find((candidate) => candidate.label === label);
+    return file ? { label, onOpen: () => onOpen(file) } : label;
+  });
+}
 
 /** One display at a time: a talk failure, else the answer (or its Skeleton). */
 function NemuPanel({
@@ -388,6 +414,7 @@ function NemuPanel({
   onAsk,
   onRepeat,
   onRead,
+  onOpenSource,
   onDismiss,
 }: NemuPanelProps) {
   if (!identity) return <GelembungJawabSkeleton />;
@@ -410,7 +437,7 @@ function NemuPanel({
                 state.result.kind === "answer"
                   ? {
                       kenapa: state.result.why,
-                      sumber: state.result.sources,
+                      sumber: sumberEntries(state.result.sources, state.result.files, onOpenSource),
                       sumberLink: state.result.diagram,
                     }
                   : undefined

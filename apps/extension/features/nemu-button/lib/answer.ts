@@ -12,6 +12,8 @@ export type AskResult =
       kind: "answer";
       text: string;
       sources: string[];
+      /** The sources Sumber can open: a cited document at its page (#258). */
+      files?: SourceFile[];
       why?: string;
       next?: AnswerNext;
       /** "Lihat diagram" under Sumber, for a BPMN-backed answer (F2-08). */
@@ -32,6 +34,9 @@ export type AskResult =
   | { kind: "quiz-import"; utterance: string }
   | { kind: "stop" };
 
+/** A cited document by the Sumber label it shows; `page` is where the browser opens it. */
+export type SourceFile = { label: string; docId: string; page: number | null };
+
 /** Grade entry and process runs wait for the executor (#202), whether typed or spoken. */
 export const NOT_AVAILABLE_YET =
   "Nemu belum bisa mengisi nilai atau menjalankan proses. Coba tanyakan aturan sekolah, misalnya “KKM berapa?”";
@@ -47,10 +52,27 @@ function uniqueSources(citations: readonly SourceCitation[]): string[] {
   return [...new Set(citations.map(sourceLabel))];
 }
 
+/** Citations with a page come from a PDF's text layer (ADR-0008), so Sumber can open them there. */
+function sourceFiles(citations: readonly SourceCitation[]): SourceFile[] {
+  const files = new Map<string, SourceFile>();
+  for (const citation of citations) {
+    const label = sourceLabel(citation);
+    if (citation.page !== null && !files.has(label)) {
+      files.set(label, { label, docId: citation.docId, page: citation.page });
+    }
+  }
+  return [...files.values()];
+}
+
 export function fromGroundedAnswer(answer: GroundedAnswer): AskResult {
-  return answer.status === "answered"
-    ? { kind: "answer", text: answer.answer, sources: uniqueSources(answer.citations) }
-    : { kind: "answer", text: answer.answer, sources: [] };
+  if (answer.status !== "answered") return { kind: "answer", text: answer.answer, sources: [] };
+  const files = sourceFiles(answer.citations);
+  return {
+    kind: "answer",
+    text: answer.answer,
+    sources: uniqueSources(answer.citations),
+    ...(files.length > 0 ? { files } : {}),
+  };
 }
 
 /** "Rekam cara input ujian tahfidz" → "input ujian tahfidz"; null when it isn't that command. */

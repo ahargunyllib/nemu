@@ -14,10 +14,18 @@ export type NemuStatus = {
   progress?: { done: number; total: number };
 };
 
+/** A source Nemu can open, such as a cited PDF at its page (#258). */
+export type NemuSourceLink = { label: string; onOpen: () => void };
+export type NemuSource = string | NemuSourceLink;
+
+export function sourceName(source: NemuSource): string {
+  return typeof source === "string" ? source : source.label;
+}
+
 /** The small links under a sentence. Each is read only once the teacher clicks it. */
 export type NemuNotes = {
   kenapa?: string;
-  sumber?: readonly string[];
+  sumber?: readonly NemuSource[];
   /** A link under the Sumber list, such as "Lihat diagram" for a BPMN-backed answer. */
   sumberLink?: { label: string; href: string };
   ringkasan?: string;
@@ -27,7 +35,7 @@ export type NemuNoteKind = "kenapa" | "sumber" | "ringkasan";
 /** Gelembung Tunjuk carries at most one link. */
 export type NemuSingleNote =
   | { kenapa: string; sumber?: never; ringkasan?: never }
-  | { sumber: readonly string[]; kenapa?: never; ringkasan?: never }
+  | { sumber: readonly NemuSource[]; kenapa?: never; ringkasan?: never }
   | { ringkasan: string; kenapa?: never; sumber?: never };
 
 /** What every bubble shares: one sentence, the word being spoken (#200), and its links' reader. */
@@ -111,7 +119,7 @@ export const NOTE_LABELS: Record<NemuNoteKind, string> = {
 
 /** The text a link reads out once it is opened. */
 export function noteText(kind: NemuNoteKind, notes: NemuNotes): string {
-  if (kind === "sumber") return `Sumber: ${(notes.sumber ?? []).join("; ")}`;
+  if (kind === "sumber") return `Sumber: ${(notes.sumber ?? []).map(sourceName).join("; ")}`;
   return notes[kind] ?? "";
 }
 

@@ -27,6 +27,7 @@ import { handleQuizImport } from "../features/quiz-import/api/quiz-import-servic
 import { forgetRecorderTabs, handleRecorder } from "../features/recorder/api/recorder-service";
 import { identifyTeacher } from "../features/identity/api/identify-teacher";
 import { askNemu } from "../features/nemu-button/api/ask-nemu";
+import { openSourceForPage } from "../features/nemu-button/api/open-source-file";
 import { cancelRecording, startRecording } from "../features/voice/api/microphone";
 import { synthesizeSentence, transcribeRecording } from "../features/voice/api/speech";
 import { isNemuMessage, type NemuMessage } from "../shared/lib/messages";
@@ -34,7 +35,7 @@ import { isNemuMessage, type NemuMessage } from "../shared/lib/messages";
 async function handle(
   message: NemuMessage,
   senderUrl: string | undefined,
-  tab: { id?: number; windowId?: number } | undefined,
+  tab: { id?: number; index?: number; windowId?: number } | undefined,
 ) {
   const tabId = tab?.id;
   switch (message.type) {
@@ -46,6 +47,8 @@ async function handle(
       return identifyTeacher(message.pageEmail);
     case "nemu:ask":
       return askNemu(message, tab);
+    case "nemu:open-source":
+      return openSourceForPage(message, tab);
     case "nemu:listen-start":
       return startRecording();
     case "nemu:listen-stop":

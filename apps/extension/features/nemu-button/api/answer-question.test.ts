@@ -59,6 +59,14 @@ describe("answerQuestion", () => {
       kind: "answer",
       text: "KKM seluruh mata pelajaran adalah 75.",
       sources: ["SOP Penilaian SDIT Nusantara · hlm. 2 · 3.2"],
+      // Sumber opens the cited PDF at its page (#258).
+      files: [
+        {
+          label: "SOP Penilaian SDIT Nusantara · hlm. 2 · 3.2",
+          docId: "sop-penilaian-sdit-nusantara",
+          page: 2,
+        },
+      ],
     });
     expect(client.helpRoute).toHaveBeenCalledWith({ utterance: "KKM berapa?" });
     expect(client.helpExplain).not.toHaveBeenCalled();

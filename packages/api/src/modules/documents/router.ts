@@ -1,3 +1,4 @@
+import { documentFileLinkSchema } from "@nemu/contracts/school";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 
@@ -186,15 +187,18 @@ export const documentsRouter = {
    * Sumber (#258): a short-lived link to a document the teacher's school reads. The extension
    * opens it in a new tab at `#page=<page>`; the tab carries no headers, so the link is signed.
    */
-  documentFileLink: schoolProcedure.input(documentIdSchema).handler(async ({ context, input }) => {
-    const link = await createDocumentFileLink(
-      { documents: createDocumentRepository(context.db), links: context.documentLinks },
-      context.caller.workspaceId,
-      input.id,
-    );
-    if (!link) throw new ORPCError("NOT_FOUND", { message: "Dokumen tidak ditemukan" });
-    return link;
-  }),
+  documentFileLink: schoolProcedure
+    .input(documentIdSchema)
+    .output(documentFileLinkSchema)
+    .handler(async ({ context, input }) => {
+      const link = await createDocumentFileLink(
+        { documents: createDocumentRepository(context.db), links: context.documentLinks },
+        context.caller.workspaceId,
+        input.id,
+      );
+      if (!link) throw new ORPCError("NOT_FOUND", { message: "Dokumen tidak ditemukan" });
+      return link;
+    }),
 
   /** The file behind a Sumber link, inline so the browser's PDF viewer opens it at its page. */
   documentFile: publicProcedure

@@ -7,6 +7,7 @@ import {
 import type {
   BpmnPlan,
   CommandRoute,
+  DocumentFileLink,
   FormPhotoResult,
   NarrationSegment,
   Procedure,
@@ -46,6 +47,8 @@ export type NemuServiceClient = {
   helpRoute: Call<{ utterance: string }, CommandRoute>;
   helpAsk: Call<{ question: string }, GroundedAnswer>;
   helpExplain: Call<{ snapshot: PageSnapshot; question: string | null }, HelpExplanation>;
+  /** Sumber (#258): a short-lived signed link to a cited PDF. */
+  documentFileLink: Call<{ id: string }, DocumentFileLink>;
   speechTranscribe: Call<{ audioBase64: string; format: "wav" | "webm" }, Transcript>;
   speechSynthesize: Call<{ text: string }, SpeechSynthesis>;
   actionLogRecord: Call<{ entries: ActionLogEntry[] }, { recorded: number }>;

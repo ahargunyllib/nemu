@@ -7,6 +7,7 @@ import {
   type NemuNotes,
   type NemuStatus,
   noteText,
+  sourceName,
   statusText,
 } from "@nemu/ui/lib/nemu-display";
 import { cn } from "cn";
@@ -211,7 +212,20 @@ export function NemuNoteLinks({
             <>
               <ul className="flex list-disc flex-col gap-1 pl-5">
                 {notes.sumber?.map((source) => (
-                  <li key={source}>{source}</li>
+                  <li key={sourceName(source)}>
+                    {typeof source === "string" ? (
+                      source
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="link"
+                        onClick={source.onOpen}
+                        className="h-auto min-h-11 p-0 text-left text-xl font-normal whitespace-normal text-nemu-strong underline underline-offset-4 hover:text-foreground"
+                      >
+                        {source.label}
+                      </Button>
+                    )}
+                  </li>
                 ))}
               </ul>
               {notes.sumberLink && (

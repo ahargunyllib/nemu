@@ -52,6 +52,23 @@ async function fromExtension(clock = testClock()) {
   return { context, pdf, clock };
 }
 
+/** Pak Rizal (operator) uploads an active document in Pengetahuan sekolah (WS-04). */
+function uploadAsOperator(context: SchoolTestContext, file: File) {
+  const operator = {
+    ...context,
+    extension: null,
+    session: {
+      session: {},
+      user: { id: "rizal", role: "operator", workspaceId: "W-SEKOLAH" },
+    } as unknown as SchoolTestContext["session"],
+  };
+  return call(
+    documentsRouter.uploadDocument,
+    { title: file.name, version: "2026", isActive: true, file, siteIds: [] },
+    { context: operator },
+  );
+}
+
 /** Opens a link in a new tab: a plain GET with no Nemu headers and no session. */
 async function open(context: SchoolTestContext, path: string) {
   const { response } = await handler.handle(new Request(`http://nemu.test${path}`), {
@@ -96,6 +113,17 @@ describe("Sumber opens the cited document (#258)", () => {
     );
     await expect(
       call(documentsRouter.documentFileLink, { id: "sop-penilaian-sdit-nusantara" }, { context }),
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+
+  it("gives no link to a document that isn't a PDF", async () => {
+    const { context } = await fromExtension();
+    const markdown = await uploadAsOperator(
+      context,
+      new File(["## Absensi\n\nAbsensi diisi sebelum pukul 08.00."], "absensi.md"),
+    );
+    await expect(
+      call(documentsRouter.documentFileLink, { id: markdown.id }, { context }),
     ).rejects.toMatchObject({ code: "NOT_FOUND" });
   });
 
@@ -168,25 +196,10 @@ describe("Sumber opens the cited document (#258)", () => {
 
   it("opens a PDF the operator uploaded (WS-1: the SOP Setoran Tahfidz)", async () => {
     const { context } = await fromExtension();
-    const operator = {
-      ...context,
-      extension: null,
-      session: {
-        ...(await createSchoolContext()).session!,
-        user: { id: "rizal", role: "operator", workspaceId: "W-SEKOLAH" },
-      } as SchoolTestContext["session"],
-    };
     const pdf = await readFile(SOP_TAHFIDZ_PDF);
-    const uploaded = await call(
-      documentsRouter.uploadDocument,
-      {
-        title: "SOP Setoran Tahfidz",
-        version: "2026",
-        isActive: true,
-        file: new File([pdf], "WS-1_SOP-Setoran-Tahfidz-SDIT-Nusantara.pdf"),
-        siteIds: [],
-      },
-      { context: operator },
+    const uploaded = await uploadAsOperator(
+      context,
+      new File([pdf], "WS-1_SOP-Setoran-Tahfidz-SDIT-Nusantara.pdf"),
     );
 
     const link = await call(documentsRouter.documentFileLink, { id: uploaded.id }, { context });

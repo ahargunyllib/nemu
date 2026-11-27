@@ -232,8 +232,9 @@ export async function readDocumentFile(
 export const DOCUMENT_LINK_TTL_MS = 10 * 60 * 1000;
 
 /**
- * Sumber (#258): a link to a document the caller's school reads, for a tab that carries no Nemu
- * headers or session. Undefined when the school doesn't read that document.
+ * Sumber (#258): a link to a PDF the caller's school reads, for a tab that carries no Nemu headers
+ * or session; the browser's viewer opens it at the cited page. Undefined when the school doesn't
+ * read that document, or it isn't a PDF.
  */
 export async function createDocumentFileLink(
   { documents, links }: { documents: DocumentRepository; links: DocumentLinkSigner },
@@ -241,7 +242,7 @@ export async function createDocumentFileLink(
   id: string,
 ): Promise<{ path: string; expiresAt: number } | undefined> {
   const document = await documents.findReadable(workspaceId, id);
-  if (!document) return undefined;
+  if (document?.format !== "pdf") return undefined;
 
   const expiresAt = links.now() + DOCUMENT_LINK_TTL_MS;
   const token = await links.sign({ workspaceId, documentId: document.id, expiresAt });
