@@ -145,9 +145,12 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     rules still stand.
   - **Pointing.** One Gelembung Jawab per problem, pointed at on the preview: the missing image or
     the answers when the question is on this page, else its button in Navigasi kuis, with
-    **Berikutnya** / **Selesai**. The list survives a page load, so opening soal 15 from Navigasi
-    kuis moves the pointer to its image. Catatan langkah lists every problem and "Nemu tidak
-    mengubah apa pun di kuis ini."
+    **Berikutnya**. The list survives a page load, so opening soal 15 from Navigasi kuis moves the
+    pointer to its image. After the last problem one more Gelembung Jawab, about no element, says
+    the closing sentence (#256), built in code from the count with no model call:
+    "Selain dua hal itu, kuisnya sudah siap, Bu." (`closingSentence`). With no problems Nemu says
+    only that the quiz is ready; a check stopped early, or problems closed with ×, get none. Its
+    **Catatan langkah** lists every problem and "Nemu tidak mengubah apa pun di kuis ini."
 - **F4-06: warn before deleting a quiz students took (#211).** `features/quiz-delete/`. "Tolong
   hapus latihan bahasa Inggris yang kemarin" (typed or spoken; "hapus"/"ganti" with "kuis",
   "latihan" or "ulangan") is the extension's own command. Nemu never presses Hapus.

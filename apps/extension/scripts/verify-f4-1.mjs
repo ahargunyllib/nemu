@@ -2,7 +2,8 @@
 // to end on the Moodle test site (infra/): Bu Siti asks "Nemu, tolong cek kuis ini." on the quiz
 // page, Nemu opens Setelan, Soal and the quiz page through the menus, points at Pratinjau kuis
 // (she presses it), and then points at soal 7 (no key) and soal 15 (missing image) with one
-// sentence each, as setup/f4-1/F4-1_kunci.csv expects. Afterwards the quiz's last-modified time
+// sentence each, as setup/f4-1/F4-1_kunci.csv expects, and then says one closing sentence
+// ("Selain dua hal itu, kuisnya sudah siap, Bu.", #256). Afterwards the quiz's last-modified time
 // and question count are what they were (read from the Moodle database when it runs locally).
 // Needs `NEMU_RESPONDER=fixture pnpm dev` (the Nemu Service and the mock AlurSekolah, where Bu
 // Siti's email is read) and the Moodle test site; skips with a message when Moodle isn't running.
@@ -252,12 +253,9 @@ await check(
         );
         await page.screenshot({ path: join(shots, "3-soal-15-gambar.png") });
       }
-      const finish = jawab.getByRole("button", { name: "Selesai" });
-      if (await finish.count()) {
-        await finish.click();
-        break;
-      }
       await jawab.getByRole("button", { name: "Berikutnya" }).click();
+      // After the last problem the closing sentence comes, with Catatan langkah behind it.
+      if (await jawab.getByRole("button", { name: "Catatan langkah" }).count()) break;
     }
     console.log(`  Nemu said: ${sentences.join(" | ")}`);
     for (const expected of kunci)
@@ -271,11 +269,34 @@ await check(
   },
 );
 
+await check(
+  "After the last problem Nemu says one closing sentence, about no element (#256)",
+  async () => {
+    const jawab = display("jawab");
+    // The issue's example for the official key's two problems.
+    const expected = "Selain dua hal itu, kuisnya sudah siap, Bu.";
+    const texts = (await jawab.locator("p").allInnerTexts()).map((text) => text.trim());
+    const closing = texts.find((text) => text.startsWith("Selain ")) ?? texts.join(" ");
+    console.log(`  Nemu closed with: ${closing}`);
+    const closesAt = new Date(2026, 11, 4, 21, 0);
+    if (new Date() < closesAt) expect(closing === expected, `Nemu didn't close with “${expected}”`);
+    else
+      expect(/^Selain .+ hal itu, kuisnya sudah siap, Bu\.$/u.test(closing), "no closing sentence");
+    await page.waitForTimeout(900);
+    expect(
+      !(await overlay.locator("[data-nemu-ring]").count()),
+      "the closing sentence still rings an element",
+    );
+    await page.screenshot({ path: join(shots, "4-penutup.png") });
+    await jawab.getByRole("button", { name: "Catatan langkah" }).click();
+  },
+);
+
 await check("Catatan langkah lists the problems and says nothing was changed", async () => {
   const info = display("info");
   await info.getByText("Nemu tidak mengubah apa pun di kuis ini.").waitFor({ timeout: 10_000 });
   await info.getByText("Masalah: Soal 15 belum ada gambarnya, Bu.").waitFor();
-  await page.screenshot({ path: join(shots, "4-catatan-langkah.png") });
+  await page.screenshot({ path: join(shots, "5-catatan-langkah.png") });
   console.log(`  Pages opened: ${[...new Set(visited)].join(" → ")}`);
 });
 

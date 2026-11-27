@@ -6,7 +6,7 @@ import type { RunState } from "../../executor/lib/run";
 import { executor } from "../../executor/stores/executor";
 import { requestQuizCheck } from "../api/request-quiz-check";
 import { imageLoaded, quizHeading, questionTarget } from "../lib/moodle-pages";
-import { checkQuiz } from "../lib/quiz-rules";
+import { checkQuiz, closingSentence } from "../lib/quiz-rules";
 import {
   nextQuizSteps,
   type QuizAsked,
@@ -28,8 +28,15 @@ export type QuizCheckView = { display: NemuDisplay | null; target: Element | nul
 /**
  * The problems being pointed at, kept in the background so a page load carries on (F0-13).
  * `changed` is true after F4-03 put the quiz in: then the notes don't say nothing changed.
+ * `closing` is the sentence after the last problem (#256), shown when `index` passes it.
  */
-type Pointing = { problems: QuizProblem[]; index: number; notes: string[]; changed?: boolean };
+type Pointing = {
+  problems: QuizProblem[];
+  index: number;
+  notes: string[];
+  changed?: boolean;
+  closing?: string | null;
+};
 
 type Context = { pageEmail: PageEmail; honorific: string; speak: (text: string) => void };
 
@@ -94,13 +101,16 @@ function createQuizCheck() {
     return questionTarget(document, problem.slot, kind);
   }
 
-  /** One problem at a time, pointed at on the page, with the next one behind Berikutnya. */
+  /**
+   * One problem at a time, pointed at on the page, with the next one behind Berikutnya. After the
+   * last one Nemu says the closing sentence (#256), about no element, and Catatan langkah follows.
+   */
   function show() {
     if (!pointing) return publish({ display: null, target: null });
-    const { problems, index } = pointing;
+    const { problems, index, closing } = pointing;
     const problem = problems[index];
-    if (!problem) return finish();
-    const last = index === problems.length - 1;
+    if (!problem) return closing && index === problems.length ? showReady(closing) : finish();
+    const last = index === problems.length - 1 && !closing;
     publish({
       display: {
         type: "jawab",
@@ -116,6 +126,20 @@ function createQuizCheck() {
       target: targetFor(problem),
     });
     context.speak(problem.sentence);
+  }
+
+  /** The quiz is ready: with no problems, or apart from those just shown. Catatan langkah follows. */
+  function showReady(sentence: string) {
+    publish({
+      display: {
+        type: "jawab",
+        sentence,
+        action: { label: "Catatan langkah", onSelect: finish },
+        onClose: close,
+      },
+      target: null,
+    });
+    context.speak(sentence);
   }
 
   function next() {
@@ -184,21 +208,16 @@ function createQuizCheck() {
     const all = [...problems, ...(judged.ok ? judged.value.problems : [])];
     if (all.length === 0) {
       pointing = { problems: [], index: 0, notes, changed };
-      const sentence =
-        found.ready ?? say("Kuis ini sudah siap. Nemu tidak menemukan masalah", honorific);
-      publish({
-        display: {
-          type: "jawab",
-          sentence,
-          action: { label: "Catatan langkah", onSelect: finish },
-          onClose: close,
-        },
-        target: null,
-      });
-      context.speak(sentence);
+      showReady(found.ready ?? say("Kuis ini sudah siap. Nemu tidak menemukan masalah", honorific));
       return;
     }
-    pointing = { problems: all, index: 0, notes, changed };
+    pointing = {
+      problems: all,
+      index: 0,
+      notes,
+      changed,
+      closing: closingSentence(all.length, honorific),
+    };
     save();
     show();
   }

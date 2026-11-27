@@ -11,6 +11,28 @@ function say(sentence: string, honorific: string): string {
   return honorific ? `${sentence}, ${honorific}.` : `${sentence}.`;
 }
 
+const ONES = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan"];
+
+/** 2 → "dua", 14 → "empat belas"; a number past two words stays in digits (EYD). */
+function countWord(count: number): string {
+  if (count < 10) return ONES[count] ?? String(count);
+  if (count === 10) return "sepuluh";
+  if (count === 11) return "sebelas";
+  if (count < 20) return `${ONES[count - 10]} belas`;
+  return String(count);
+}
+
+/**
+ * The one sentence after the last problem (#256), built from the count with no model call
+ * (#218): "Selain dua hal itu, kuisnya sudah siap, Bu." Null when nothing was found, because the
+ * quiz-ready sentence already says it.
+ */
+export function closingSentence(count: number, honorific: string): string | null {
+  if (count <= 0) return null;
+  const things = count === 1 ? "hal itu" : `${countWord(count)} hal itu`;
+  return say(`Selain ${things}, kuisnya sudah siap`, honorific);
+}
+
 /** A class the way schools write it ("4A", "10 IPA" is not one): a grade and a letter. */
 const CLASS = /(?:^|[^\p{L}\p{N}])(\d{1,2})\s?([A-F])(?![\p{L}\p{N}])/u;
 
