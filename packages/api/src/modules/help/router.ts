@@ -68,10 +68,20 @@ export const helpRouter = {
       ),
     ),
 
-  /** Routes a transcript to a feature; voice controls are recognized without a model call. */
+  /**
+   * Routes a transcript to a feature; voice controls are recognized without a model call. A
+   * question the rules call "tanya" goes to "kenapa" when it matches an uploaded BPMN's symptom.
+   */
   helpRoute: schoolProcedure
     .input(z.object({ utterance: z.string().trim().min(1).max(500) }))
     .handler(({ context, input }) =>
-      route(helpDeps(context), context.caller.workspaceId, input.utterance),
+      route(
+        {
+          ...helpDeps(context),
+          processes: { ai: context.school.ai, catalog: createCatalogRepository(context.db) },
+        },
+        context.caller.workspaceId,
+        input.utterance,
+      ),
     ),
 };

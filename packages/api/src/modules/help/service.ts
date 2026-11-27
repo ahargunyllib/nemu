@@ -1,6 +1,10 @@
 import { importBpmn } from "@nemu/ai/school/bpmn/graph";
 import { routeCommand } from "@nemu/ai/school/commands";
-import { describesSymptom, type SymptomCandidate } from "@nemu/ai/school/process-help";
+import {
+  describesSymptom,
+  type ProcessIndex,
+  type SymptomCandidate,
+} from "@nemu/ai/school/process-help";
 import type { TeacherProfile } from "@nemu/ai/school/profile";
 import type { SchoolAi } from "@nemu/ai/school/runtime";
 import { NOT_IN_GUIDE_SENTENCE, NOT_IN_PROCESS_SENTENCE } from "@nemu/ai/school/safety";
@@ -42,17 +46,11 @@ export type ProcessHelpDeps = {
 
 type ExplainInput = { snapshot: PageSnapshot; question: string | null };
 
-/**
- * The teacher's words against every active BPMN's symptoms (operator-corrected in WS-04). On a
- * match, the grades are checked in AlurSekolah first, then the file is walked to the cause.
- * `symptoms` says whether the school has any, for F3-14.
- */
-async function explainFromProcess(
-  deps: Pick<HelpDeps, "documents"> & ProcessHelpDeps,
-  teacher: TeacherProfile,
+/** The active, ready BPMNs, their WS-04 elements and every symptom as a match candidate. */
+async function processSymptoms(
+  deps: Pick<HelpDeps, "documents"> & Pick<ProcessHelpDeps, "catalog">,
   workspaceId: string,
-  question: string,
-): Promise<{ answer: HelpExplanation | null; symptoms: boolean }> {
+) {
   const processes = (await deps.documents.list(workspaceId)).filter(
     (document) => document.format === "bpmn" && document.isActive && document.status === "ready",
   );
@@ -68,17 +66,41 @@ async function explainFromProcess(
       })),
     ),
   );
+  return { processes, elements, candidates };
+}
+
+/**
+ * The teacher's words against every active BPMN's symptoms (operator-corrected in WS-04). On a
+ * match, the grades are checked in AlurSekolah first, then the file is walked to the cause.
+ * `symptoms` says whether the school has any, for F3-14.
+ */
+async function explainFromProcess(
+  deps: Pick<HelpDeps, "documents"> & ProcessHelpDeps,
+  teacher: TeacherProfile,
+  workspaceId: string,
+  question: string,
+): Promise<{ answer: HelpExplanation | null; symptoms: boolean }> {
+  const { processes, elements, candidates } = await processSymptoms(deps, workspaceId);
   if (!candidates.length) return { answer: null, symptoms: false };
 
-  const match = await deps.ai.matchSymptom({ question, candidates });
-  const document = match && processes.find((item) => item.id === match.documentId);
+  const found = await deps.ai.matchSymptom({ question, candidates });
+  const match = found?.match;
+  const at = match ? processes.findIndex((item) => item.id === match.documentId) : -1;
+  const document = processes[at];
   const body = document ? await deps.files.get(document.storageKey) : null;
-  if (!match || !document || !body) return { answer: null, symptoms: true };
+  if (!found || !match || !document || !body) return { answer: null, symptoms: true };
 
   const [graph, gradeCheck] = await Promise.all([
     importBpmn(new TextDecoder().decode(body)),
     checkSavedGrades(deps.alurSekolah, workspaceId, teacher, `${question} ${match.symptom}`),
   ]);
+  // The WS-04 index as the operator left it: symptoms, the way back and who can help.
+  const index: ProcessIndex = Object.fromEntries(
+    elements[at]!.map((element) => [
+      element.elementId,
+      { symptoms: element.symptoms, wayBack: element.wayBack, role: element.role },
+    ]),
+  );
   const answer = await deps.ai.explainProcess({
     question,
     process: {
@@ -86,8 +108,10 @@ async function explainFromProcess(
       title: document.title,
       version: document.version,
       graph,
+      index,
     },
     match,
+    via: found.via,
     gradeCheck,
     teacher,
   });
@@ -165,7 +189,9 @@ export async function tryAnswer(
 
 /** Which feature a sentence is for; voice controls ("berhenti") are matched first, in code. */
 export async function route(
-  deps: Pick<HelpDeps, "documents">,
+  deps: Pick<HelpDeps, "documents"> & {
+    processes?: Pick<ProcessHelpDeps, "catalog"> & { ai: Pick<SchoolAi, "matchSymptom"> };
+  },
   workspaceId: string,
   utterance: string,
 ): Promise<CommandRoute> {
@@ -178,5 +204,24 @@ export async function route(
         document.status === "ready",
     )
     .map((document) => document.title);
-  return routeCommand(utterance, processes);
+  const routed = routeCommand(utterance, processes);
+  // A question with no "kenapa" ("kalau bayar tunai, kapan nilainya terbuka?") can still be about
+  // a situation an uploaded BPMN describes: then the process answers it (F2-08), not the guides.
+  if (
+    deps.processes &&
+    routed.kind === "intent" &&
+    (routed.intent === "tanya" || routed.intent === "unknown")
+  ) {
+    const { candidates } = await processSymptoms(
+      { documents: deps.documents, catalog: deps.processes.catalog },
+      workspaceId,
+    );
+    if (
+      candidates.length &&
+      (await deps.processes.ai.matchSymptom({ question: utterance, candidates }))
+    ) {
+      return { kind: "intent", intent: "kenapa", processName: null };
+    }
+  }
+  return routed;
 }

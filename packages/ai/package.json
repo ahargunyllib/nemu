@@ -17,7 +17,8 @@
     "eval:quiz": "tsc -b && node scripts/evaluate-quiz.mjs",
     "eval:f2": "tsc -b && node scripts/evaluate-f2.mjs",
     "eval:f0-2": "tsc -b && node scripts/evaluate-f0-2.mjs",
-    "eval:f3-1": "tsc -b && node scripts/evaluate-f3-1.mjs"
+    "eval:f3-1": "tsc -b && node scripts/evaluate-f3-1.mjs",
+    "eval:f2-1": "tsc -b && node scripts/evaluate-f2-1.mjs"
   },
   "dependencies": {
     "@bpmn-io/feelin": "7.0.0",

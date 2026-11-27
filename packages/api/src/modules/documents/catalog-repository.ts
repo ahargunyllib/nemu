@@ -37,7 +37,8 @@ export type CatalogRepository = {
     workspaceId: string,
     documentId: string,
     elementId: string,
-    changes: Pick<ProcessElementRecord, "symptoms" | "page" | "pageEdited">,
+    changes: Pick<ProcessElementRecord, "symptoms" | "page" | "pageEdited"> &
+      Partial<Pick<ProcessElementRecord, "wayBack" | "role">>,
   ): Promise<boolean>;
 };
 
