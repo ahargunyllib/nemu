@@ -3,7 +3,14 @@ import type { ExecutorStep, ExecutorTask } from "@nemu/contracts/executor";
 import type { NemuDisplay } from "@nemu/ui/lib/nemu-display";
 import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
 
-import { createRunState, ExecutorRun, type RunDeps, type RunState, type StepSource } from "./run";
+import {
+  CURSOR_GLIDE_MS,
+  createRunState,
+  ExecutorRun,
+  type RunDeps,
+  type RunState,
+  type StepSource,
+} from "./run";
 import { toSafeTask } from "./safety";
 import { F0_1_FILE } from "./test-responses";
 
@@ -173,6 +180,40 @@ describe("cara 1", () => {
 });
 
 describe("F0-13: a step that loads another page", () => {
+  test("'Membuka Nilai…' is up and said before Nemu clicks the menu, long enough to read", async () => {
+    // A clock that moves only when Nemu waits. The stage shows a display about an element once
+    // the cursor has glided there (CURSOR_GLIDE_MS after the render), so that is when the
+    // teacher first sees the line.
+    let now = 0;
+    let shownAt = null as number | null;
+    let saidAt = null as number | null;
+    let clickedAt = null as number | null;
+    document.querySelector("a")?.addEventListener("click", () => (clickedAt ??= now));
+    const { run } = harness(
+      createRunState({ ...GRADES, steps: GRADES.steps.slice(0, 1) }, { cara: 1 }),
+      {
+        render: ({ display }) => {
+          if (display?.type === "kerja" && display.sentence === "Membuka Nilai…")
+            shownAt ??= now + CURSOR_GLIDE_MS;
+        },
+        speak: (text) => {
+          if (text === "Membuka Nilai…") saidAt ??= now;
+        },
+        sleep: (ms) => {
+          now += ms;
+          return Promise.resolve();
+        },
+      },
+    );
+    await run.run();
+
+    expect(clickedAt).not.toBeNull();
+    expect(shownAt).not.toBeNull();
+    expect(saidAt).not.toBeNull();
+    expect(Number(saidAt)).toBeLessThan(Number(clickedAt));
+    expect(Number(clickedAt) - Number(shownAt)).toBeGreaterThanOrEqual(500);
+  });
+
   test("a switch like Moodle's Mode Edit is saved as done the moment it is switched", async () => {
     document.body.innerHTML = `<input type="checkbox" role="switch" id="mode"><label for="mode">Mode Edit</label>`;
     const order: string[] = [];
