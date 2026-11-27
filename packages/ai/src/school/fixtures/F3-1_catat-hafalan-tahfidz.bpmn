@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic stand-in for data-uji F3-1_catat-hafalan-tahfidz.bpmn (SDIT Nusantara, fictional).
+     Camunda 7 dialect, the format AlurKerja Studio is expected to export. Replace with the official
+     file. Nemu has no tahfidz code: this file is the only place that knows the process. No task here
+     names its page, so the page of "Catat Setoran Kelas" comes from WS-04 (F3-19). -->
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  id="Definitions_Tahfidz" targetNamespace="http://alurkerja.com/bpmn">
+  <bpmn:collaboration id="Collab_Tahfidz">
+    <bpmn:participant id="Participant_Sekolah" name="SDIT Nusantara" processRef="Process_CatatHafalanTahfidz" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_CatatHafalanTahfidz" name="Catat Hafalan Tahfidz" isExecutable="true">
+    <bpmn:documentation>Guru tahfidz mencatat setoran hafalan dan ujian kenaikan juz di menu Al-Quran AlurSekolah pada hari yang sama.</bpmn:documentation>
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Guru" name="Guru Tahfidz">
+        <bpmn:flowNodeRef>Start_Hafalan</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Jenis</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CatatSetoran</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CatatUjian</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Gabung</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Sistem" name="Sistem AlurSekolah">
+        <bpmn:flowNodeRef>Task_HitungNilai</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Koordinator" name="Koordinator Tahfidz">
+        <bpmn:flowNodeRef>Task_PeriksaRekap</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Tercatat</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_Hafalan" name="Murid menyetor hafalan">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="jenis_catatan" label="Jenis catatan" type="enum">
+            <camunda:value id="setoran" name="Setoran" />
+            <camunda:value id="ujian" name="Ujian kenaikan juz" />
+            <camunda:validation><camunda:constraint name="required" /></camunda:validation>
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="Gateway_Jenis" name="Setoran atau ujian?" default="Flow_Setoran">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_Setoran</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Ujian</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_Setoran" name="Setoran sekelas sekaligus" sourceRef="Gateway_Jenis" targetRef="Task_CatatSetoran" />
+    <bpmn:sequenceFlow id="Flow_Ujian" name="Ujian satu murid per formulir" sourceRef="Gateway_Jenis" targetRef="Task_CatatUjian">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${jenis_catatan == 'ujian'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="Task_CatatSetoran" name="Catat Setoran Kelas" camunda:candidateGroups="guru">
+      <bpmn:documentation>Guru mencatat setoran seluruh murid satu kelas sekaligus dari buku setoran, lalu menekan Simpan setoran.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="kelas" label="Kelas" type="string">
+            <camunda:validation><camunda:constraint name="required" /></camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="tanggal_setoran" label="Tanggal setoran" type="date">
+            <camunda:validation><camunda:constraint name="required" /></camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="murid" label="Murid" type="string">
+            <camunda:validation><camunda:constraint name="required" /></camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="surah" label="Surah" type="string">
+            <camunda:validation><camunda:constraint name="required" /></camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="ayat_dari" label="Dari ayat" type="long" />
+          <camunda:formField id="ayat_sampai" label="Sampai ayat" type="long" />
+          <camunda:formField id="fashohah" label="Fashohah" type="long" />
+          <camunda:formField id="tartil" label="Tartil" type="long" />
+          <camunda:formField id="tajwid" label="Tajwid" type="long" />
+          <camunda:formField id="adab" label="Adab" type="long" />
+          <camunda:formField id="catatan" label="Catatan" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Setoran</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_CatatUjian" name="Catat Ujian Murid" camunda:candidateGroups="guru">
+      <bpmn:documentation>Guru mencatat ujian kenaikan juz satu murid per formulir, lalu menekan Simpan ujian.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="kelas" label="Kelas" type="string">
+            <camunda:validation><camunda:constraint name="required" /></camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="murid" label="Murid" type="string">
+            <camunda:validation><camunda:constraint name="required" /></camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="jenis_ujian" label="Jenis ujian" type="string">
+            <camunda:validation><camunda:constraint name="required" /></camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="tanggal_ujian" label="Tanggal ujian" type="date">
+            <camunda:validation><camunda:constraint name="required" /></camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="fashohah" label="Fashohah" type="long" />
+          <camunda:formField id="tartil" label="Tartil" type="long" />
+          <camunda:formField id="tajwid" label="Tajwid" type="long" />
+          <camunda:formField id="adab" label="Adab" type="long" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Ujian</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_Gabung">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_HitungNilai" name="Hitung nilai hafalan">
+      <bpmn:documentation>AlurSekolah menghitung nilai: Fashohah 30%, Tartil 30%, Tajwid 30%, Adab 10%.</bpmn:documentation>
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="Task_PeriksaRekap" name="Periksa rekap tahfidz" camunda:candidateGroups="koordinator_tahfidz">
+      <bpmn:documentation>Koordinator tahfidz memeriksa rekap setoran setiap Jumat.</bpmn:documentation>
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="End_Tercatat" name="Hafalan tercatat">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="Start_Hafalan" targetRef="Gateway_Jenis" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_CatatSetoran" targetRef="Gateway_Gabung" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_CatatUjian" targetRef="Gateway_Gabung" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Gateway_Gabung" targetRef="Task_HitungNilai" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_HitungNilai" targetRef="Task_PeriksaRekap" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_PeriksaRekap" targetRef="End_Tercatat" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_Tahfidz">
+    <bpmndi:BPMNPlane id="Plane_Tahfidz" bpmnElement="Collab_Tahfidz">
+      <bpmndi:BPMNShape id="Participant_Sekolah_di" bpmnElement="Participant_Sekolah" isHorizontal="true">
+        <dc:Bounds x="100" y="60" width="1180" height="480" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Guru_di" bpmnElement="Lane_Guru" isHorizontal="true">
+        <dc:Bounds x="130" y="60" width="1150" height="220" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Sistem_di" bpmnElement="Lane_Sistem" isHorizontal="true">
+        <dc:Bounds x="130" y="280" width="1150" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Koordinator_di" bpmnElement="Lane_Koordinator" isHorizontal="true">
+        <dc:Bounds x="130" y="410" width="1150" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_Hafalan_di" bpmnElement="Start_Hafalan">
+        <dc:Bounds x="180" y="142" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Jenis_di" bpmnElement="Gateway_Jenis" isMarkerVisible="true">
+        <dc:Bounds x="270" y="135" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CatatSetoran_di" bpmnElement="Task_CatatSetoran">
+        <dc:Bounds x="380" y="80" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CatatUjian_di" bpmnElement="Task_CatatUjian">
+        <dc:Bounds x="380" y="180" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Gabung_di" bpmnElement="Gateway_Gabung" isMarkerVisible="true">
+        <dc:Bounds x="580" y="135" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_HitungNilai_di" bpmnElement="Task_HitungNilai">
+        <dc:Bounds x="700" y="305" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PeriksaRekap_di" bpmnElement="Task_PeriksaRekap">
+        <dc:Bounds x="900" y="435" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Tercatat_di" bpmnElement="End_Tercatat">
+        <dc:Bounds x="1110" y="457" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="216" y="160" /><di:waypoint x="270" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Setoran_di" bpmnElement="Flow_Setoran">
+        <di:waypoint x="295" y="135" /><di:waypoint x="295" y="120" /><di:waypoint x="380" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Ujian_di" bpmnElement="Flow_Ujian">
+        <di:waypoint x="295" y="185" /><di:waypoint x="295" y="220" /><di:waypoint x="380" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="520" y="120" /><di:waypoint x="605" y="120" /><di:waypoint x="605" y="135" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="520" y="220" /><di:waypoint x="605" y="220" /><di:waypoint x="605" y="185" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="630" y="160" /><di:waypoint x="770" y="160" /><di:waypoint x="770" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="840" y="345" /><di:waypoint x="970" y="345" /><di:waypoint x="970" y="435" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="1040" y="475" /><di:waypoint x="1110" y="475" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

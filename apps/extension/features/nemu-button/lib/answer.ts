@@ -20,6 +20,8 @@ export type AskResult =
   | { kind: "notice"; text: string }
   /** "masukkan nilai UTS Matematika 4B": the grade flow (F1, #207) takes the words. */
   | { kind: "grades"; utterance: string }
+  /** "Catat setoran hafalan 4A hari ini": the school's BPMN process runs (F3, #213). */
+  | { kind: "process"; utterance: string; processName: string }
   | { kind: "stop" };
 
 /** Grade entry and process runs wait for the executor (#202), whether typed or spoken. */

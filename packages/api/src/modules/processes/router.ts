@@ -1,4 +1,5 @@
 import {
+  formTableSchema,
   narrationSegmentSchema,
   procedureSchema,
   recordedEventSchema,
@@ -8,23 +9,30 @@ import { z } from "zod";
 
 import type { Context } from "../../context";
 import { schoolAdminProcedure, schoolProcedure } from "../../index";
+import { createCatalogRepository } from "../documents/catalog-repository";
 import { createDocumentRepository } from "../documents/repository";
 import {
   compileRecording,
   getProcedure,
   listProcedures,
   listProcesses,
+  matchProcessFields,
   planProcess,
+  readProcessPhoto,
   processXml,
   runProcedure,
   saveProcedure,
 } from "./service";
 
 function processDeps(context: Pick<Context, "db" | "school" | "documentFiles">) {
+  const catalog = createCatalogRepository(context.db);
   return {
     ai: context.school.ai,
     documents: createDocumentRepository(context.db),
     files: context.documentFiles,
+    elements: { list: catalog.listProcessElements.bind(catalog) },
+    inbox: context.school.inbox,
+    directory: context.school.directory,
   };
 }
 
@@ -59,6 +67,7 @@ export const processesRouter = {
         answering: z.string().max(80).nullable(),
         slots: z.record(z.string(), slotValueSchema),
         stepIndex: z.number().int().min(0).max(100),
+        table: formTableSchema.nullish(),
       }),
     )
     .handler(async ({ context, input }) => {
@@ -74,6 +83,40 @@ export const processesRouter = {
       return plan;
     }),
 
+  /**
+   * F3-16: the photo in the teacher's inbox (`jobId`) read against the task the plan asked about.
+   * Send the returned `slots` and, once the teacher answered `questions`, `table` to `processPlan`.
+   */
+  processReadPhoto: schoolProcedure
+    .input(
+      documentIdSchema.extend({
+        jobId: z.string().min(1).max(80),
+        taskId: z.string().min(1).max(200),
+        slots: z.record(z.string(), slotValueSchema),
+      }),
+    )
+    .handler(async ({ context, input }) => {
+      const teacher = await context.caller.requireTeacher();
+      const result = await readProcessPhoto(
+        processDeps(context),
+        teacher,
+        context.caller.workspaceId,
+        input,
+      );
+      if (!result) throw new ORPCError("NOT_FOUND", { message: "Process, task or photo not found" });
+      return result;
+    }),
+  /** F3-17: each BPMN form field → the label this page shows for it, or null. */
+  processMatchFields: schoolProcedure
+    .input(
+      z.object({
+        fields: z
+          .array(z.object({ id: z.string().min(1).max(80), label: z.string().min(1).max(200) }))
+          .max(60),
+        pageLabels: z.array(z.string().min(1).max(200)).max(200),
+      }),
+    )
+    .handler(({ context, input }) => matchProcessFields(processDeps(context), input)),
   /** F3-01: the operator's recording → parameterized steps for review (not saved yet). */
   procedureCompile: schoolAdminProcedure
     .input(

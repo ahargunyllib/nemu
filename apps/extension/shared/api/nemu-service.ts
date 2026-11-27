@@ -5,7 +5,10 @@ import {
   type ExtensionIdentity,
 } from "@nemu/contracts/extension";
 import type {
+  BpmnPlan,
   CommandRoute,
+  FormPhotoResult,
+  FormTable,
   GradeCommand,
   GradeEntry,
   GradeRulesResult,
@@ -56,6 +59,28 @@ export type NemuServiceClient = {
     { entries: GradeEntry[]; studentId: string; typed: string | null },
     { sentence: string; ok: boolean | null }
   >;
+  // F3 (#213): a process the school uploaded as BPMN, run from the teacher's words and a photo.
+  processList: Call<undefined, Array<{ documentId: string; title: string; version: string }>>;
+  processPlan: Call<ProcessPlanInput, BpmnPlan & { documentId: string }>;
+  processReadPhoto: Call<
+    { documentId: string; jobId: string; taskId: string; slots: ProcessSlots },
+    FormPhotoResult
+  >;
+  processMatchFields: Call<
+    { fields: Array<{ id: string; label: string }>; pageLabels: string[] },
+    Record<string, string | null>
+  >;
+};
+
+export type ProcessSlots = Record<string, string | number | boolean | null>;
+
+export type ProcessPlanInput = {
+  documentId: string;
+  text: string | null;
+  answering: string | null;
+  slots: ProcessSlots;
+  stepIndex: number;
+  table?: FormTable | null;
 };
 
 export type ExtensionCredentials = { installCode: string; email?: string | null };

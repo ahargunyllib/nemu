@@ -8,9 +8,17 @@ import type {
 
 import { retrieveKnowledge } from "../knowledge.js";
 import type { SlotValue } from "./bpmn/conditions.js";
+import { matchFieldLabels, matchFields, type FieldMatch, type FieldToMatch } from "./bpmn/fields.js";
+import {
+  assembleFormPhoto,
+  readFormPhoto,
+  type FormPhotoInput,
+  type FormPhotoReading,
+} from "./bpmn/form-photo.js";
 import type { ProcessGraph } from "./bpmn/graph.js";
 import { extractSlots, resolveWeekday, slotSpecs, type ExtractSlotsInput } from "./bpmn/plan.js";
 import { F1_DOUBTFUL, F1_REREAD, f1Page } from "./fixtures/f1-photo.js";
+import { fixtureFormPhoto } from "./fixtures/form-photo.js";
 import {
   parseGradeExcel,
   type ParseGradeExcelInput,
@@ -71,6 +79,13 @@ export type SchoolAi = {
   /** F2-08 / F3-12..13: cause, way back, who helps and the parent reply; null if the walk fails. */
   explainProcess(input: ExplainProcessInput): Promise<HelpExplanation | null>;
   extractSlots(input: ExtractSlotsInput): Promise<Record<string, SlotValue>>;
+  /** F3-16: a photo read against a BPMN task's fields; unreadable values become questions. */
+  readFormPhoto(input: FormPhotoInput): Promise<FormPhotoReading>;
+  /** F3-17: each BPMN form field → the page label it is, or null. */
+  matchFields(input: {
+    fields: readonly FieldToMatch[];
+    pageLabels: readonly string[];
+  }): Promise<FieldMatch>;
   compileProcedure(input: CompileProcedureInput): Promise<Procedure>;
   transcribe(audio: AudioInput): Promise<Transcript>;
   /** Audio plus word timings; `audioBase64` is "" when the client must use its local voice. */
@@ -134,6 +149,8 @@ export function createSchoolAi(config: SchoolAiConfig): SchoolAi {
     matchSymptom: (input) => matchSymptom({ llm: text }, input),
     explainProcess: (input) => explainProcess({ llm: text }, input),
     extractSlots: (input) => extractSlots(text, input),
+    readFormPhoto: (input) => readFormPhoto(readers.readA, input),
+    matchFields: (input) => matchFields({ llm: text }, input),
     compileProcedure: (input) => compileProcedure({ llm: text }, input),
     transcribe: createOpenRouterTranscriber({
       apiKey: config.apiKey,
@@ -284,15 +301,26 @@ export function createFixtureSchoolAi(): SchoolAi {
                   null;
             } else if (field?.type === "date") {
               answer[name] = resolveWeekday(text, input.today);
-            } else if (field?.type === "long") {
+            } else if (field?.type === "long" && /\b(hari|lama)\b/iu.test(field.label)) {
               const days = text.match(/(\d+)\s*hari/u)?.[1];
               answer[name] = days ? Number(days) : resolveWeekday(text, input.today) ? 1 : null;
+            } else if (field && /\bkelas\b/iu.test(field.label)) {
+              // "… 4A hari ini": a class the way schools write one.
+              answer[name] = text.match(/\b(\d{1,2}\s?[a-f])\b/iu)?.[1]?.replace(/\s/gu, "").toUpperCase() ?? null;
             }
           }
           return answer;
         }),
         input,
       );
+    },
+
+    // The test photo carries its own reading (fixtures/form-photo.ts); the rest is the real code.
+    async readFormPhoto(input) {
+      return assembleFormPhoto(input, fixtureFormPhoto(input.image.dataUrl));
+    },
+    async matchFields(input) {
+      return matchFieldLabels(input.fields, input.pageLabels);
     },
 
     async compileProcedure(input) {

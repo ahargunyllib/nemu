@@ -96,7 +96,7 @@ describe("answerQuestion", () => {
     expect(client.helpExplain).not.toHaveBeenCalled();
   });
 
-  test("grade entry goes to F1, a process isn't run yet, and 'berhenti' closes the bubble", async () => {
+  test("grade entry goes to F1, a process to F3, and 'berhenti' closes the bubble", async () => {
     const grades = fakeClient({ kind: "intent", intent: "input_nilai", processName: null });
     await expect(answerQuestion(grades, "masukkan nilai UTS 4B", SNAPSHOT)).resolves.toEqual({
       kind: "grades",
@@ -104,8 +104,22 @@ describe("answerQuestion", () => {
     });
     expect(grades.helpAsk).not.toHaveBeenCalled();
 
-    const process = fakeClient({ kind: "intent", intent: "proses", processName: "izin" });
-    await expect(answerQuestion(process, "ajukan izin", SNAPSHOT)).resolves.toEqual({
+    const process = fakeClient({
+      kind: "intent",
+      intent: "proses",
+      processName: "Catat Hafalan Tahfidz",
+    });
+    await expect(
+      answerQuestion(process, "Catat setoran hafalan 4A hari ini", SNAPSHOT),
+    ).resolves.toEqual({
+      kind: "process",
+      utterance: "Catat setoran hafalan 4A hari ini",
+      processName: "Catat Hafalan Tahfidz",
+    });
+    expect(process.helpAsk).not.toHaveBeenCalled();
+
+    const unnamed = fakeClient({ kind: "intent", intent: "proses", processName: null });
+    await expect(answerQuestion(unnamed, "ajukan proses", SNAPSHOT)).resolves.toEqual({
       kind: "notice",
       text: NOT_AVAILABLE_YET,
     });

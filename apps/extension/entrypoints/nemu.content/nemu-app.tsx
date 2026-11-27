@@ -23,6 +23,8 @@ import type { IdentityResult } from "../../features/identity/lib/identity";
 import { useNextAction } from "../../features/ini-kenapa/hooks/use-next-action";
 import { readPageSnapshot } from "../../features/ini-kenapa/lib/page-snapshot";
 import { AskBox } from "../../features/nemu-button/components/ask-box";
+import { useProcessRun } from "../../features/process-run/hooks/use-process-run";
+import { processRun } from "../../features/process-run/stores/process-run";
 import { NemuButton } from "../../features/nemu-button/components/nemu-button";
 import { type AskState, useAsk } from "../../features/nemu-button/hooks/use-ask";
 import { HeardBubble, ListeningBubble } from "../../features/voice/components/talk-bubbles";
@@ -54,13 +56,21 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     },
     [close],
   );
-  const { state, ask, reset } = useAsk(pageEmail, close, startGrades);
+  const startProcess = useCallback(
+    (utterance: string, processName: string) => {
+      close();
+      void processRun.start(utterance, processName);
+    },
+    [close],
+  );
+  const { state, ask, reset } = useAsk(pageEmail, close, startGrades, startProcess);
   const preview = useDisplayPreview();
   const { voice, working, speak, repeat, stop } = useVoice(pageEmail);
   const run = useExecutor();
   // "ini kenapa?" reads the page as it was when the talk combination went down (F2-01).
   const pressSnapshot = useRef<PageSnapshot | null>(null);
   const grades = useGradePhoto();
+  const process = useProcessRun();
   const talk = useTalk({
     pageEmail,
     shortcut,
@@ -70,9 +80,10 @@ export function NemuApp({ access }: { access: SiteAccess }) {
       pressSnapshot.current = readPageSnapshot(document, location.href);
       setOpen(true);
     },
-    // While F1 waits for an answer (a W5 question, a number), the words are that answer.
+    // While F1 or F3 waits for an answer (a photo question, a number), the words are that answer.
     onQuestion: (question) => {
-      if (!gradePhoto.hear(question)) void ask(question, pressSnapshot.current);
+      if (!gradePhoto.hear(question) && !processRun.hear(question))
+        void ask(question, pressSnapshot.current);
     },
   });
   const { dismiss } = talk;
@@ -115,6 +126,11 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     () =>
       gradePhoto.connect({ pageEmail, honorific, registered, speak: (text) => void speak(text) }),
     [pageEmail, honorific, registered, speak],
+  );
+  // F3 runs an uploaded BPMN process as this teacher (#213).
+  useEffect(
+    () => processRun.connect({ pageEmail, honorific, speak: (text) => void speak(text) }),
+    [pageEmail, honorific, speak],
   );
 
   // A task under way in this tab carries on after a page load (F0-13).
@@ -167,6 +183,13 @@ export function NemuApp({ access }: { access: SiteAccess }) {
             {talk.state.phase === "listening" && <ListeningBubble />}
             {grades.typing && <AskBox pending={false} onAsk={(text) => gradePhoto.hear(text)} />}
           </div>
+        ) : process.display ? (
+          <div className="pointer-events-auto flex flex-col items-end gap-2">
+            {talk.heard !== null && <HeardBubble text={talk.heard} />}
+            <NemuStage display={withSpokenWord(process.display, voice)} />
+            {talk.state.phase === "listening" && <ListeningBubble />}
+            {process.typing && <AskBox pending={false} onAsk={(text) => processRun.hear(text)} />}
+          </div>
         ) : preview.display ? (
           <div className="pointer-events-auto">
             <NemuStage display={preview.display} target={preview.target} />
@@ -202,7 +225,12 @@ export function NemuApp({ access }: { access: SiteAccess }) {
             </div>
           )
         )}
-        {!run.display && !grades.display && !preview.display && !open && grades.card && (
+        {!run.display &&
+          !grades.display &&
+          !process.active &&
+          !preview.display &&
+          !open &&
+          grades.card && (
           <div className="pointer-events-auto">
             <NemuStage display={grades.card} />
           </div>

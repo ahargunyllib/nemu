@@ -323,6 +323,20 @@ export const groundedAnswerSchema = z.discriminatedUnion("status", [
   z.object({ status: z.literal("not_in_guide"), answer: z.string() }).strict(),
 ]);
 
+/** One row of a form table: who it is and the value of each repeating field, by field id. */
+export const formTableRowSchema = z
+  .object({ name: z.string().min(1).max(120), values: z.record(z.string(), z.string().max(200)) })
+  .strict();
+
+/** The repeating part of a BPMN task's form, as read from a photo and checked by the teacher. */
+export const formTableSchema = z
+  .object({
+    keyField: z.string().max(80).nullable(),
+    columns: z.array(z.string().max(80)).max(40),
+    rows: z.array(formTableRowSchema).max(60),
+  })
+  .strict();
+
 export const bpmnStepSchema = z.discriminatedUnion("kind", [
   z
     .object({
@@ -343,6 +357,21 @@ export const bpmnStepSchema = z.discriminatedUnion("kind", [
       question: z.string(),
     })
     .strict(),
+  /**
+   * F3-15..17: the task's fields that repeat once per row (a photo of a book with one line per
+   * student), filled into the page table by the row's name and the column's label.
+   */
+  z
+    .object({
+      kind: z.literal("rows"),
+      taskId: z.string(),
+      /** The field that names each row ("Murid"); it is the row, not a value to fill. */
+      keyField: z.string().nullable(),
+      columns: z.array(z.object({ fieldId: z.string(), label: z.string() }).strict()),
+      rows: z.array(formTableRowSchema),
+      sentence: z.string(),
+    })
+    .strict(),
   z
     .object({
       kind: z.literal("human"),
@@ -360,6 +389,21 @@ export const bpmnStepSchema = z.discriminatedUnion("kind", [
     .strict(),
 ]);
 
+/** F3-19: where a teacher task's page came from. Without one Nemu only explains (cara 3). */
+export const processPageSourceSchema = z.enum(["link", "mapping", "recording"]);
+
+/** A teacher task on the walked path: its page (a menu path such as "Al-Quran › Setoran baru"). */
+export const processPlanTaskSchema = z
+  .object({
+    taskId: z.string(),
+    name: z.string(),
+    page: z.string().nullable(),
+    pageSource: processPageSourceSchema.nullable(),
+    /** The button only the teacher presses at the end of the task ("Simpan setoran", "Ajukan"). */
+    action: z.string(),
+  })
+  .strict();
+
 export const bpmnPlanSchema = z
   .object({
     processId: z.string(),
@@ -371,8 +415,58 @@ export const bpmnPlanSchema = z
     step: bpmnStepSchema,
     stepIndex: z.number().int().nonnegative(),
     stepCount: z.number().int().nonnegative(),
+    /** Every step of the walk so far, in order; it ends with an `ask` or the `done`. */
+    steps: z.array(bpmnStepSchema),
+    /** F3-15: 2–6 plain-language steps shown before Nemu does anything. */
+    overview: z.array(z.string()).min(2).max(6),
+    tasks: z.array(processPlanTaskSchema),
+    /** F3-18: other roles' and the system's tasks after the teacher's part; Nemu only names them. */
+    announcements: z.array(z.string()),
   })
   .strict();
+
+/** One question about the photo: a value Nemu couldn't read, or a name it couldn't place. */
+export const formPhotoQuestionSchema = z.discriminatedUnion("kind", [
+  z
+    .object({
+      kind: z.literal("value"),
+      id: z.string(),
+      rowName: z.string(),
+      fieldId: z.string(),
+      label: z.string(),
+      prompt: z.string(),
+      /** What the value might be, most likely first; never pre-selected. */
+      candidates: z.array(z.string()).max(2),
+      box: z.tuple([z.number(), z.number(), z.number(), z.number()]).nullable(),
+    })
+    .strict(),
+  z
+    .object({
+      kind: z.literal("name"),
+      id: z.string(),
+      /** The row's name as written, until the teacher picks one from the roster. */
+      rowName: z.string(),
+      prompt: z.string(),
+      candidates: z.array(z.string()).max(2),
+      box: z.tuple([z.number(), z.number(), z.number(), z.number()]).nullable(),
+    })
+    .strict(),
+]);
+
+/** F3-16: a photo read against a BPMN task's fields: header values, rows, and what to ask. */
+export const formPhotoResultSchema = z.discriminatedUnion("status", [
+  z
+    .object({
+      status: z.literal("ok"),
+      taskId: z.string(),
+      /** The slots so far plus header values read from the photo (a date written at the top). */
+      slots: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])),
+      table: formTableSchema,
+      questions: z.array(formPhotoQuestionSchema),
+    })
+    .strict(),
+  z.object({ status: z.literal("reshoot"), message: z.string() }).strict(),
+]);
 
 export const recordedEventSchema = z
   .object({
@@ -514,6 +608,12 @@ export type HelpExplanation = z.infer<typeof helpExplanationSchema>;
 export type GroundedAnswer = z.infer<typeof groundedAnswerSchema>;
 export type BpmnStep = z.infer<typeof bpmnStepSchema>;
 export type BpmnPlan = z.infer<typeof bpmnPlanSchema>;
+export type FormTableRow = z.infer<typeof formTableRowSchema>;
+export type FormTable = z.infer<typeof formTableSchema>;
+export type ProcessPageSource = z.infer<typeof processPageSourceSchema>;
+export type ProcessPlanTask = z.infer<typeof processPlanTaskSchema>;
+export type FormPhotoQuestion = z.infer<typeof formPhotoQuestionSchema>;
+export type FormPhotoResult = z.infer<typeof formPhotoResultSchema>;
 export type RecordedEvent = z.infer<typeof recordedEventSchema>;
 export type NarrationSegment = z.infer<typeof narrationSegmentSchema>;
 export type ProcedureStep = z.infer<typeof procedureStepSchema>;
