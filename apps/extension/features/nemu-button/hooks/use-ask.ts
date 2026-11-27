@@ -14,14 +14,19 @@ export type AskState =
       question: string;
       result: Exclude<
         AskResult,
-        { kind: "stop" } | { kind: "grades" } | { kind: "process" } | { kind: "record" }
+        | { kind: "stop" }
+        | { kind: "grades" }
+        | { kind: "process" }
+        | { kind: "record" }
+        | { kind: "quiz-check" }
       >;
     };
 
 /**
  * One question at a time; a newer question or `reset` drops the older answer. The page is read
  * when the question is asked, unless the caller read it earlier (at the talk key-down). A grade
- * request goes to `onGrades` (F1) and a process run to `onProcess` (F3) instead of an answer.
+ * request goes to `onGrades` (F1), a process run to `onProcess` (F3) and a quiz check to
+ * `onQuizCheck` (F4) instead of an answer.
  */
 export function useAsk(
   pageEmail: PageEmail,
@@ -29,6 +34,7 @@ export function useAsk(
   onGrades: (utterance: string) => void = () => undefined,
   onProcess: (utterance: string, processName: string) => void = () => undefined,
   onRecord: (title: string) => void = () => undefined,
+  onQuizCheck: (utterance: string) => void = () => undefined,
 ) {
   const [state, setState] = useState<AskState>({ status: "idle" });
   const latest = useRef(0);
@@ -62,9 +68,14 @@ export function useAsk(
         onRecord(result.title);
         return;
       }
+      if (result.kind === "quiz-check") {
+        setState({ status: "idle" });
+        onQuizCheck(result.utterance);
+        return;
+      }
       setState({ status: "answered", question, result });
     },
-    [pageEmail, onStop, onGrades, onProcess, onRecord],
+    [pageEmail, onStop, onGrades, onProcess, onRecord, onQuizCheck],
   );
 
   const reset = useCallback(() => {

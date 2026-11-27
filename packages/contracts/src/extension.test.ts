@@ -28,6 +28,10 @@ test("an exact host matches only itself, and a port pins the port", () => {
   );
   assert.ok(siteMatches("localhost:3003", "http://localhost:3003/#/nilai"));
   assert.ok(!siteMatches("localhost:3003", "http://localhost:3005/"));
+  // The local Moodle test site (infra/) is https://localhost, on the default port.
+  assert.ok(siteMatches("localhost:443", "https://localhost/mod/quiz/view.php?id=3"));
+  assert.ok(!siteMatches("localhost:443", "http://localhost/"));
+  assert.ok(!siteMatches("localhost:443", "http://localhost:3003/"));
 });
 
 test("WS-1 (a): e-Rapor is off a list that holds the mocks, and browser pages never match", () => {
@@ -46,6 +50,7 @@ test("the host permission for a site uses http only for localhost and drops the 
   assert.equal(hostPermissionFor("*.alursekolah.id"), "https://*.alursekolah.id/*");
   assert.equal(hostPermissionFor("portal.sekolah.sch.id"), "https://portal.sekolah.sch.id/*");
   assert.equal(hostPermissionFor("localhost:3003"), "http://localhost/*");
+  assert.equal(hostPermissionFor("localhost:443"), "https://localhost/*");
 });
 
 test("WS-03: the narrower permission wins where two sites cover a page", () => {

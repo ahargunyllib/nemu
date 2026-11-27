@@ -3,6 +3,7 @@ import type { PageSnapshot } from "@nemu/contracts/school";
 
 import type { GradePhotoRequest } from "../../features/grade-photo/lib/requests";
 import type { ProcessRunRequest } from "../../features/process-run/lib/requests";
+import type { QuizCheckRequest } from "../../features/quiz-check/lib/requests";
 import type { RecorderRequest } from "../../features/recorder/lib/requests";
 
 /**
@@ -34,7 +35,9 @@ export type NemuMessage =
   // F3 (#213): an uploaded BPMN process, its photo and the page's labels.
   | { type: "nemu:process-run"; pageEmail: PageEmail; request: ProcessRunRequest }
   // F3-01 (#214): "Rekam cara", handed to the Nemu Service for the operator's review.
-  | { type: "nemu:recorder"; pageEmail: PageEmail; request: RecorderRequest };
+  | { type: "nemu:recorder"; pageEmail: PageEmail; request: RecorderRequest }
+  // F4-01 (#209): checking a Moodle quiz; judgement checks come from the Nemu Service (#218).
+  | { type: "nemu:quiz-check"; pageEmail: PageEmail; request: QuizCheckRequest };
 
 const TYPES: ReadonlySet<string> = new Set([
   "nemu:site-access",
@@ -52,6 +55,7 @@ const TYPES: ReadonlySet<string> = new Set([
   "nemu:grade-photo",
   "nemu:process-run",
   "nemu:recorder",
+  "nemu:quiz-check",
 ]);
 
 export function isNemuMessage(message: unknown): message is NemuMessage {

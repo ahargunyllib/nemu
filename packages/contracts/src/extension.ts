@@ -103,7 +103,9 @@ export function siteMatches(pattern: string, url: string): boolean {
   if (page.protocol !== "https:" && page.protocol !== "http:") return false;
   const site = parsePattern(pattern);
   if (!site.host) return false;
-  if (site.port !== null && page.port !== site.port) return false;
+  // `localhost:443` is the local Moodle on https://localhost, whose URL carries no port.
+  const pagePort = page.port || (page.protocol === "https:" ? "443" : "80");
+  if (site.port !== null && pagePort !== site.port) return false;
   const hostname = page.hostname.toLowerCase();
   return site.wildcard
     ? hostname === site.host || hostname.endsWith(`.${site.host}`)
@@ -150,11 +152,13 @@ export function mayFill(permission: SitePermission | null): boolean {
 }
 
 /**
- * The Chrome match pattern a site needs as a host permission: http for localhost, https otherwise.
- * Chrome match patterns take no port, so `localhost:3003` becomes `http://localhost/*`.
+ * The Chrome match pattern a site needs as a host permission: http for localhost (https on port
+ * 443), https otherwise. Chrome match patterns take no port, so `localhost:3003` becomes
+ * `http://localhost/*`.
  */
 export function hostPermissionFor(pattern: string): string {
   const site = parsePattern(pattern);
-  const scheme = site.host === "localhost" || site.host === "127.0.0.1" ? "http" : "https";
+  const local = site.host === "localhost" || site.host === "127.0.0.1";
+  const scheme = local && site.port !== "443" ? "http" : "https";
   return `${scheme}://${site.wildcard ? "*." : ""}${site.host}/*`;
 }

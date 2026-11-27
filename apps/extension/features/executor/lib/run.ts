@@ -473,6 +473,9 @@ export class ExecutorRun {
       (event) => this.trusted(event) && element.contains(event.target as Node),
       signal,
     );
+    // Her press sends its form after this listener's turn; while Nemu still waits for her, the
+    // submit guard (F0-08) lets it through instead of taking it for Nemu's own.
+    await this.sleep(0, signal);
     this.waiting = null;
     // The press may load another page, so the run moves past this step before the page reacts.
     this.state.events.push({ kind: "pressed", name, refused });

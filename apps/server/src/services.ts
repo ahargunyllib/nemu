@@ -81,6 +81,8 @@ function createKeylessSchoolAi(): SchoolAi {
     // Matching a form field to its page label works in code without a model.
     matchFields: (input) => createFixtureSchoolAi().matchFields(input),
     compileProcedure: missing,
+    // No judgement checks exist yet (#218), so a quiz check needs no model.
+    judgeQuiz: (input) => createFixtureSchoolAi().judgeQuiz(input),
     transcribe: missing,
     synthesize: missing,
   };

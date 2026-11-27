@@ -10,6 +10,7 @@ import { inboxRouter } from "../modules/inbox/router";
 import { integrationsRouter } from "../modules/integrations/router";
 import { kamusRouter } from "../modules/kamus/router";
 import { processesRouter } from "../modules/processes/router";
+import { quizRouter } from "../modules/quiz/router";
 import { referenceTablesRouter } from "../modules/reference-tables/router";
 import { ruleSourcesRouter } from "../modules/rule-sources/router";
 import { schoolRouter } from "../modules/school/router";
@@ -32,6 +33,7 @@ export const appRouter = {
   ...integrationsRouter,
   ...actionLogRouter,
   ...kamusRouter,
+  ...quizRouter,
 };
 export type AppRouter = typeof appRouter;
 export type AppRouterClient = RouterClient<typeof appRouter>;
