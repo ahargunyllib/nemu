@@ -15,7 +15,8 @@
     "test": "vp test run",
     "verify": "node scripts/verify.mjs",
     "verify:executor": "node scripts/verify-executor.mjs",
-    "verify:f2": "node scripts/verify-f2.mjs"
+    "verify:f2": "node scripts/verify-f2.mjs",
+    "verify:grade-photo": "node scripts/verify-grade-photo.mjs"
   },
   "dependencies": {
     "@fontsource-variable/plus-jakarta-sans": "^5.3.0",

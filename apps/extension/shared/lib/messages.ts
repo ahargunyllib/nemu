@@ -1,6 +1,8 @@
 import type { ActionLogEntry } from "@nemu/contracts/executor";
 import type { PageSnapshot } from "@nemu/contracts/school";
 
+import type { GradePhotoRequest } from "../../features/grade-photo/lib/requests";
+
 /**
  * What the page found about who is signed in: the email a per-site reader saw (null when signed
  * out), or `unreadable` on a site that shows no AlurSekolah account (Ruang GTK, Moodle).
@@ -24,7 +26,9 @@ export type NemuMessage =
   | { type: "nemu:run-load" }
   | { type: "nemu:notes-save"; notes: { title: string; items: string[] } }
   | { type: "nemu:notes-load" }
-  | { type: "nemu:log-actions"; pageEmail: PageEmail; entries: ActionLogEntry[] };
+  | { type: "nemu:log-actions"; pageEmail: PageEmail; entries: ActionLogEntry[] }
+  // F1 (#207): the WhatsApp photo, its questions, the fill's rules and the read-back.
+  | { type: "nemu:grade-photo"; pageEmail: PageEmail; request: GradePhotoRequest };
 
 const TYPES: ReadonlySet<string> = new Set([
   "nemu:site-access",
@@ -39,6 +43,7 @@ const TYPES: ReadonlySet<string> = new Set([
   "nemu:notes-save",
   "nemu:notes-load",
   "nemu:log-actions",
+  "nemu:grade-photo",
 ]);
 
 export function isNemuMessage(message: unknown): message is NemuMessage {

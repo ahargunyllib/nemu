@@ -6,7 +6,8 @@ import test from "node:test";
 import { importBpmn } from "./bpmn/graph.js";
 import { planBpmnStep } from "./bpmn/plan.js";
 import { BU_SITI, CLASS_4B, KAMUS_CHUNKS, SOP_CHUNKS } from "./fixtures/sdit-nusantara.js";
-import { buildVerificationPlan } from "./grades/verification.js";
+import { F1_FINAL_VALUES } from "./fixtures/f1-photo.js";
+import { applyAnswers, buildVerificationPlan } from "./grades/verification.js";
 import { createFixtureSchoolAi, createSchoolAi } from "./runtime.js";
 
 const ai = createFixtureSchoolAi();
@@ -32,6 +33,90 @@ const PAGE = {
   fields: [],
   screenshotBase64: null,
 };
+
+// 4B as 01_profil-sekolah lists it (WS-06 and the mock AlurSekolah), not the older test roster.
+const PROFIL_4B = [
+  "Ahmad Fadli",
+  "Aisyah Zahra",
+  "Alya Nur Fitri",
+  "Bagas Saputra",
+  "Budi Santoso",
+  "Citra Ayu Lestari",
+  "Dimas Pratama",
+  "Dinda Maharani",
+  "Fahri Hidayat",
+  "Farah Annisa",
+  "Galih Ramadhan",
+  "Hana Salsabila",
+  "Ilham Maulana",
+  "Intan Permata",
+  "Kevin Ardiansyah",
+  "Laila Nur Azizah",
+  "Muhammad Rizky",
+  "Nabila Putri Ramadhani",
+  "Naufal Akbar",
+  "Nur Aini",
+  "Putra Wijaya",
+  "Qonita Rahma",
+  "Raka Aditya",
+  "Rani Oktaviani",
+  "Salsabila Putri",
+  "Siti Nur Haliza",
+  "Taufik Hidayatullah",
+  "Tiara Anjani",
+  "Umar Faruq",
+  "Vina Amelia",
+  "Yusuf Alfarizi",
+  "Zahra Khairunnisa",
+].map((name, index) => ({ studentId: `s-${index + 1}`, name, number: index + 1 }));
+
+test("offline mode writes the page for the roster it is given: 4 doubtful cells, then the truth", async () => {
+  const result = await ai.readGradePhoto({
+    image: { type: "image", dataUrl: "data:image/jpeg;base64,AA" },
+    roster: PROFIL_4B,
+    assessment: "UTS",
+  });
+  assert.equal(result.status, "ok");
+  if (result.status !== "ok") return;
+  const plan = buildVerificationPlan(result.reading);
+  const digits = plan.questions.filter((question) => question.kind === "digit");
+  assert.deepEqual(
+    digits.map((question) => question.line),
+    [3, 7, 10, 15],
+  );
+  assert.deepEqual(
+    plan.questions.filter((question) => question.kind === "absence").map((q) => q.line),
+    [21],
+  );
+  // F1-1: 5 names spelled differently and the S are asked too; the other 22 lines are accepted.
+  assert.equal(plan.questions.length, 10);
+  assert.equal(plan.acceptedCount, 22);
+
+  const truth = (line: number) => String(F1_FINAL_VALUES[line - 1]);
+  const answers = plan.questions.map((question) => ({
+    questionId: question.id,
+    answer:
+      question.kind === "name"
+        ? PROFIL_4B[question.line - 1]!.studentId
+        : question.kind === "absence"
+          ? "Kosongkan"
+          : truth(question.line),
+  }));
+  for (const question of plan.questions) {
+    if (question.kind === "name")
+      assert.equal(question.options[0]?.studentId, PROFIL_4B[question.line - 1]!.studentId);
+    if (question.kind === "digit") assert.ok(question.options.includes(truth(question.line)));
+  }
+  const applied = applyAnswers(result.reading, answers);
+  assert.equal(applied.status, "ok");
+  if (applied.status !== "ok") return;
+  assert.equal(applied.entries.length, 32);
+  for (const entry of applied.entries) {
+    const line = PROFIL_4B.findIndex((student) => student.studentId === entry.studentId) + 1;
+    const expected = F1_FINAL_VALUES[line - 1];
+    assert.equal(entry.value, expected === "S" ? null : expected, entry.name);
+  }
+});
 
 test("offline mode explains a kamus error and names the fixer", async () => {
   const result = await ai.explainError({

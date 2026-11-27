@@ -147,7 +147,10 @@ await check(
     await page.keyboard.up("Space");
     await page.keyboard.up("Control");
     await heardBubble(page).getByText(HEARD).waitFor({ timeout: 15_000 });
-    await bubble(page).getByText("Nemu belum bisa mengisi nilai").waitFor({ timeout: 15_000 });
+    // A grade request goes to F1 (#207); with no photo yet, Nemu asks for one over WhatsApp.
+    await bubble(page)
+      .getByText(/Kirim foto buku nilai UTS Matematika 4B ke WhatsApp Nemu/u)
+      .waitFor({ timeout: 15_000 });
     await bubble(page).locator("[data-nemu-spoken]").first().waitFor({ timeout: 5_000 });
     await page.waitForTimeout(1_200);
     await page.screenshot({ path: join(shots, "speaking.png") });

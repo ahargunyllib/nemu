@@ -35,9 +35,17 @@ export const executorTargetSchema = z
   });
 
 export const executorStepSchema = z.discriminatedUnion("verb", [
-  /** The teacher's turn: Nemu points and waits for her to press it (Simpan, Kirim, uploads). */
+  /**
+   * The teacher's turn: Nemu points and waits for her to press it (Simpan, Kirim, uploads).
+   * `ringkasan` is what Lihat ringkasan shows beside it, e.g. the grades about to be saved.
+   */
   z
-    .object({ verb: z.literal("point"), target: executorTargetSchema, sentence: z.string() })
+    .object({
+      verb: z.literal("point"),
+      target: executorTargetSchema,
+      sentence: z.string(),
+      ringkasan: z.string().max(4000).optional(),
+    })
     .strict(),
   /** Types a value into a field. `rowName` (the student) is what Nemu says with it. */
   z

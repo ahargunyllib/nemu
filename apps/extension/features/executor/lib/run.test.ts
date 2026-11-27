@@ -172,6 +172,36 @@ describe("cara 1", () => {
   });
 });
 
+describe("pointing at Simpan", () => {
+  test("a point step's ringkasan sits behind Lihat ringkasan beside the button (F1)", async () => {
+    gradePage();
+    const { run, display } = harness(
+      createRunState(
+        {
+          ...GRADES,
+          steps: [
+            {
+              verb: "point",
+              target: { role: "button", text: "Simpan" },
+              sentence: "Silakan Ibu tekan Simpan.",
+              ringkasan: "Ahmad Fadli 80, Aisyah Zahra 92.",
+            },
+          ],
+        },
+        { cara: 1 },
+      ),
+    );
+    void run.run();
+    await vi.waitFor(() => expect(run.waiting).toEqual({ refused: false }));
+    expect(display()).toEqual({
+      type: "tunjuk",
+      sentence: "Silakan Ibu tekan Simpan.",
+      note: { ringkasan: "Ahmad Fadli 80, Aisyah Zahra 92." },
+    });
+    run.stop(false);
+  });
+});
+
 describe("F0-1: a fake AI response that tries to press", () => {
   test.each(F0_1_FILE.respons.map((response) => [response.title, response] as const))(
     "%s: nothing is pressed or submitted, and Nemu points instead",

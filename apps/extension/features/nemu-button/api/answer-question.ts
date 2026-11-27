@@ -8,7 +8,8 @@ import { type AskResult, fromGroundedAnswer, NOT_AVAILABLE_YET } from "../lib/an
  * A typed or spoken question goes to `helpRoute` first (docs/school-ai.md). Questions about the
  * school's rules go to `helpAsk`, "kenapa" to `helpExplain` with what the page shows plus a
  * viewport screenshot, and a voice control closes the bubble. `snapshot` is null while a password
- * field is on screen: then "kenapa" reads and sends nothing (F2-07).
+ * field is on screen: then "kenapa" reads and sends nothing (F2-07). Grade entry goes to F1
+ * (#207); processes wait for their flow.
  */
 export async function answerQuestion(
   client: Pick<NemuServiceClient, "helpRoute" | "helpAsk" | "helpExplain">,
@@ -30,6 +31,8 @@ export async function answerQuestion(
     case "unknown":
       return fromGroundedAnswer(await client.helpAsk({ question }));
     case "input_nilai":
+      // F1 (#207) takes it from here: the class, subject and assessment, then the photo.
+      return { kind: "grades", utterance: question };
     case "proses":
       return { kind: "notice", text: NOT_AVAILABLE_YET };
   }

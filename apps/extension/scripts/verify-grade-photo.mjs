@@ -1,0 +1,338 @@
+// F1-1 on the mock AlurSekolah (#207): loads a development build of the extension into
+// Playwright's Chromium, sends the synthetic grade-book photo the way apps/wa-bot does, and walks
+// the whole flow as Bu Siti: the card in one tab only, Mulai, the command with the missing class
+// asked for, W5's questions (by button, and once by "Angka lain" and typing), the cara 1 fill with
+// visible navigation, Simpan pressed by the "teacher", the read-back, inboxAck, Catatan langkah.
+// It checks every saved grade against the page's truth (0 wrong) and the time (≤ 5 minutes).
+//
+// Needs the stack running with the offline AI and the wa-bot secret, e.g.
+//   NEMU_RESPONDER=fixture WA_BOT_SECRET=<32+ chars> pnpm dev
+// and WS-07 connected to the mock (Admin › Integrasi: http://localhost:3003, the mock's key) for
+// the AlurSekolah read-back; without it the read-back compares what the page shows instead.
+// Screenshots go to .output/verify-grade-photo/.
+import { execFileSync } from "node:child_process";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+
+import { chromium } from "playwright-core";
+
+const SERVER = process.env.NEMU_SERVER_URL ?? "http://localhost:3000";
+const MOCK = process.env.MOCK_ALURSEKOLAH_URL ?? "http://localhost:3003/";
+const INSTALL_CODE = process.env.NEMU_INSTALL_CODE ?? "NEMU-SDITN-2026";
+const WA_BOT_SECRET = process.env.WA_BOT_SECRET;
+const HEADED = process.argv.includes("--headed");
+// Bu Siti in WS-06 (synthetic): her WhatsApp number and her AlurSekolah email.
+const PHONE = "6281200001001";
+const EMAIL = "siti.aminah@sditnusantara.sch.id";
+
+if (!WA_BOT_SECRET) {
+  console.error("Set WA_BOT_SECRET to the secret the running Nemu Service was started with.");
+  process.exit(1);
+}
+
+const root = resolve(import.meta.dirname, "..");
+const photo = resolve(root, "../../packages/ai/src/school/fixtures/f1-1-buku-nilai-4b.jpg");
+const extension = join(root, ".output/verify-grade-photo-extension");
+const shots = join(root, ".output/verify-grade-photo");
+mkdirSync(shots, { recursive: true });
+
+// The truth of the synthetic F1-1 page, in 01_profil-sekolah's 4B order (KKM 75).
+const CLASS_4B = [
+  ["Ahmad Fadli", 82],
+  ["Aisyah Zahra", 74],
+  ["Alya Nur Fitri", 86],
+  ["Bagas Saputra", 58],
+  ["Budi Santoso", 77],
+  ["Citra Ayu Lestari", 91],
+  ["Dimas Pratama", 61],
+  ["Dinda Maharani", 70],
+  ["Fahri Hidayat", 95],
+  ["Farah Annisa", 71],
+  ["Galih Ramadhan", 80],
+  ["Hana Salsabila", 81],
+  ["Ilham Maulana", 90],
+  ["Intan Permata", 65],
+  ["Kevin Ardiansyah", 78],
+  ["Laila Nur Azizah", 73],
+  ["Muhammad Rizky", 84],
+  ["Nabila Putri Ramadhani", 69],
+  ["Naufal Akbar", 88],
+  ["Nur Aini", 72],
+  ["Putra Wijaya", null],
+  ["Qonita Rahma", 93],
+  ["Raka Aditya", 60],
+  ["Rani Oktaviani", 76],
+  ["Salsabila Putri", 68],
+  ["Siti Nur Haliza", 79],
+  ["Taufik Hidayatullah", 74],
+  ["Tiara Anjani", 87],
+  ["Umar Faruq", 55],
+  ["Vina Amelia", 83],
+  ["Yusuf Alfarizi", 75],
+  ["Zahra Khairunnisa", 97],
+];
+const TRUTH = new Map(CLASS_4B);
+
+async function service(procedure) {
+  const response = await fetch(`${SERVER}/rpc/${procedure.name}`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-nemu-install-code": INSTALL_CODE,
+      "x-nemu-email": EMAIL,
+    },
+    body: JSON.stringify({ json: procedure.input ?? null }),
+  });
+  return (await response.json()).json;
+}
+
+// Start clean: no photo left from an earlier run, no grades saved in the mock.
+for (const job of await service({ name: "inboxJobs" }))
+  await service({ name: "inboxAck", input: { jobId: job.jobId } });
+await fetch(new URL("_mock/reset", MOCK), {
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: "{}",
+});
+
+execFileSync("pnpm", ["exec", "wxt", "build", "--mode", "development"], {
+  cwd: root,
+  stdio: "inherit",
+  env: { ...process.env, WXT_SERVER_URL: SERVER },
+});
+rmSync(extension, { recursive: true, force: true });
+cpSync(join(root, ".output/chrome-mv3-dev"), extension, { recursive: true });
+
+let failed = false;
+let page;
+async function check(name, run) {
+  try {
+    await run();
+    console.log(`✔ ${name}`);
+  } catch (error) {
+    failed = true;
+    await page
+      ?.screenshot({ path: join(shots, `failed-${name.slice(0, 24)}.png`) })
+      .catch(() => undefined);
+    console.log(`✘ ${name}\n  ${error instanceof Error ? error.message.split("\n")[0] : error}`);
+  }
+}
+function expect(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+const context = await chromium.launchPersistentContext(mkdtempSync(join(tmpdir(), "nemu-")), {
+  headless: !HEADED,
+  channel: "chromium",
+  viewport: { width: 1280, height: 900 },
+  args: [`--disable-extensions-except=${extension}`, `--load-extension=${extension}`],
+});
+const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
+const extensionId = new URL(worker.url()).host;
+
+const settings = await context.newPage();
+await settings.goto(`chrome-extension://${extensionId}/options.html`);
+await settings.getByLabel("Kode pemasangan sekolah").fill(INSTALL_CODE);
+await settings.getByRole("button", { name: "Simpan" }).click();
+await settings.getByText(/^Terpasang untuk /u).waitFor();
+await settings.close();
+for (const open of context.pages()) if (open.url().includes("welcome")) await open.close();
+
+async function signedInTab() {
+  const tab = await context.newPage();
+  await tab.goto(new URL("#/keluar", MOCK).href);
+  await tab.locator("#username").fill("siti.aminah");
+  await tab.locator("#password").fill("nemu-uji-2026");
+  await tab.locator("#btn-masuk").click();
+  await tab.locator("#menu-email").filter({ hasText: "@" }).waitFor();
+  await tab.locator("nemu-overlay").getByRole("button", { name: "Tanya Nemu" }).waitFor();
+  return tab;
+}
+const tabs = [await signedInTab(), await signedInTab()];
+const cardIn = (tab) =>
+  tab.locator("nemu-overlay").getByRole("region", { name: "Pilihan Nemu" }).filter({
+    hasText: "Foto dari WhatsApp",
+  });
+
+// apps/wa-bot's call: the photo from Bu Siti's number.
+const form = new FormData();
+form.set("phone", PHONE);
+form.set("messageId", `verify-f1-${Date.now()}`);
+form.set("photo", new Blob([readFileSync(photo)], { type: "image/jpeg" }), "buku-nilai.jpg");
+const sent = await (
+  await fetch(`${SERVER}/api-reference/wa-bot/photos`, {
+    method: "POST",
+    headers: { authorization: `Bearer ${WA_BOT_SECRET}` },
+    body: form,
+  })
+).json();
+const jobId = sent.jobId;
+
+await check("the photo shows as the small Foto dari WhatsApp card, in one tab only", async () => {
+  expect(sent.status === "queued", `wa-bot photo was ${sent.status}`);
+  const winner = await Promise.race(
+    tabs.map((tab) =>
+      cardIn(tab)
+        .waitFor({ timeout: 15_000 })
+        .then(() => tab),
+    ),
+  );
+  const other = tabs.find((tab) => tab !== winner);
+  // Both tabs keep polling every 4 s; the other never shows it.
+  await winner.waitForTimeout(9000);
+  expect((await cardIn(other).count()) === 0, "the card shows in both tabs");
+  expect((await cardIn(winner).count()) === 1, "the card went away");
+  page = winner;
+  await other.close();
+  await page.screenshot({ path: join(shots, "kartu-foto.png") });
+});
+
+const overlay = page.locator("nemu-overlay");
+const display = (type) => overlay.locator(`[data-nemu-display='${type}']`);
+const typeBox = overlay.getByRole("textbox");
+const started = Date.now();
+
+await check(
+  "Mulai asks what the grades are; a missing class is asked for, then the photo is read",
+  async () => {
+    await cardIn(page).getByRole("button", { name: "Mulai" }).click();
+    await display("jawab")
+      .getByText(/Nilai apa ini, Ibu\?/u)
+      .waitFor({ timeout: 5000 });
+    await typeBox.fill("Nemu, masukkan nilai UTS Matematika");
+    await typeBox.press("Enter");
+    await display("jawab").getByText("Nilai kelas berapa, Bu?").waitFor({ timeout: 5000 });
+    await typeBox.fill("4B");
+    await typeBox.press("Enter");
+    await display("pilih").waitFor({ timeout: 60_000 });
+  },
+);
+
+const questions = [];
+await check(
+  "W5: one Kartu Pilih per question with the photo crop, nothing pre-selected",
+  async () => {
+    for (let index = 0; index < 20; index += 1) {
+      const card = display("pilih");
+      if (!(await card.isVisible().catch(() => false))) break;
+      const prompt = (await card.locator("[data-slot=card-title]").textContent()).trim();
+      if (questions.at(-1)?.prompt === prompt) {
+        await page.waitForTimeout(100);
+        continue;
+      }
+      const note = await card.locator("[data-slot=card-footer]").textContent();
+      const buttons = card.getByRole("group").getByRole("button");
+      const labels = await buttons.allTextContents();
+      const image = await card.getByRole("img").count();
+      questions.push({ prompt, labels, image });
+      expect(/Pertanyaan \d+ dari \d+\. 22 nilai lain sudah cocok\./u.test(note), `note: ${note}`);
+      expect(labels.length >= 2 && labels.length <= 3, `${labels.length} buttons`);
+      if (index === 0) await page.screenshot({ path: join(shots, "w5-nama.png") });
+      if (index === 1) await page.screenshot({ path: join(shots, "w5-angka.png") });
+
+      const digit = prompt.match(/^Nilai (.+?): /u);
+      if (digit) {
+        expect(labels.includes("Angka lain"), "no Angka lain");
+        const truth = String(TRUTH.get(digit[1]));
+        if (digit[1] === "Farah Annisa") {
+          // "Angka lain", then the number typed.
+          await buttons.filter({ hasText: "Angka lain" }).click();
+          await display("jawab")
+            .getByText(/Berapa nilai Farah Annisa/u)
+            .waitFor();
+          await typeBox.fill(truth);
+          await typeBox.press("Enter");
+        } else await buttons.filter({ hasText: new RegExp(`^${truth}$`, "u") }).click();
+      } else if (/S \(sakit\)/u.test(prompt)) {
+        await buttons.filter({ hasText: "Kosongkan" }).click();
+      } else {
+        // A name spelled differently: the roster name Nemu offers first.
+        expect(labels.includes("Tidak ada di daftar"), "no Tidak ada di daftar");
+        await buttons.first().click();
+      }
+      await page.waitForTimeout(150);
+    }
+    const digits = questions.filter((question) => question.prompt.startsWith("Nilai "));
+    expect(digits.length === 4, `${digits.length} doubtful cells asked, not 4`);
+    expect(questions.length === 10, `${questions.length} questions, not 10`);
+    expect(
+      digits.every((question) => question.image === 1),
+      "a digit question has no crop",
+    );
+  },
+);
+
+await check("cara 1 opens Isi nilai kelas through the menu and fills every value", async () => {
+  await display("kerja")
+    .getByText(/Nemu mengisi · \d+ dari \d+/u)
+    .waitFor({ timeout: 30_000 });
+  await page.waitForURL(/#\/nilai$/u);
+  await page.screenshot({ path: join(shots, "mengisi.png") });
+  await display("tunjuk").getByText("Silakan Ibu tekan Simpan.").waitFor({ timeout: 180_000 });
+  expect(!(await page.locator("#konfirmasi").isVisible()), "Simpan was pressed by Nemu");
+  for (const [name, value] of CLASS_4B) {
+    const typed = await page.getByLabel(`Nilai ${name}`, { exact: true }).inputValue();
+    expect(typed === (value === null ? "" : String(value)), `${name}: ${typed}, not ${value}`);
+    const note = await page.getByLabel(`Catatan ${name}`, { exact: true }).inputValue();
+    const expected = value === null ? "tidak hadir" : value < 75 ? "remedial" : "";
+    expect(note === expected, `${name}'s note: "${note}", not "${expected}"`);
+  }
+});
+
+await check("Nemu points at Simpan; the numbers are behind Lihat ringkasan", async () => {
+  await display("tunjuk").getByRole("button", { name: "Lihat ringkasan" }).click();
+  await display("tunjuk")
+    .getByText(/Ahmad Fadli 82, Aisyah Zahra 74 \(remedial\)/u)
+    .waitFor();
+  await page.screenshot({ path: join(shots, "tunjuk-simpan.png") });
+});
+
+await check(
+  "the teacher saves; the read-back is said in one sentence and the photo is deleted",
+  async () => {
+    await page.locator("#btn-simpan").click();
+    await page.locator("#ya-simpan").click();
+    await page.getByText("Nilai tersimpan.").waitFor();
+    const answer = display("jawab");
+    await answer.getByText("Tersimpan").waitFor({ timeout: 30_000 });
+    const sentence = await answer.textContent();
+    console.log(
+      `  read-back: ${sentence.replace(/Tersimpan|Catatan langkah|Lihat ringkasan/gu, "").trim()}`,
+    );
+    await page.screenshot({ path: join(shots, "baca-ulang.png") });
+    const left = await service({ name: "inboxJobs" });
+    expect(!left.some((job) => job.jobId === jobId), "the photo is still in the inbox");
+  },
+);
+
+await check("Catatan langkah shows at the end", async () => {
+  await display("jawab").getByRole("button", { name: "Catatan langkah" }).click();
+  const notes = overlay.getByRole("region", { name: "Catatan langkah" });
+  await notes.getByText("Bu menjawab 10 pertanyaan tentang foto").waitFor({ timeout: 5000 });
+  await notes.getByText("Bu menekan Simpan").waitFor();
+  await notes.getByText(/Nemu membaca ulang 32 nilai dari AlurSekolah: semua sesuai/u).waitFor();
+  await notes.getByText("Foto buku nilai dihapus dari Nemu").waitFor();
+  await page.screenshot({ path: join(shots, "catatan-langkah.png") });
+});
+
+await check("F1-1: 0 wrong grades saved in AlurSekolah, in under 5 minutes", async () => {
+  const minutes = (Date.now() - started) / 60_000;
+  console.log(`  Mulai to Catatan langkah: ${minutes.toFixed(1)} min`);
+  expect(minutes <= 5, `${minutes.toFixed(1)} minutes`);
+  const saved = await (
+    await fetch(new URL("_mock/nilai", MOCK), { headers: { accept: "application/json" } })
+  ).json();
+  const rows = saved["4B|Matematika|UTS"] ?? {};
+  for (const [name, value] of CLASS_4B) {
+    const stored = String(rows[name]?.nilai ?? "");
+    expect(
+      stored === (value === null ? "" : String(value)),
+      `${name} saved ${stored}, not ${value}`,
+    );
+  }
+});
+
+await context.close();
+console.log(failed ? "\nSome checks failed." : "\nAll checks passed.");
+process.exit(failed ? 1 : 0);

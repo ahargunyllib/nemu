@@ -6,11 +6,19 @@ import {
 } from "@nemu/contracts/extension";
 import type {
   CommandRoute,
+  GradeCommand,
+  GradeEntry,
+  GradeRulesResult,
+  GradeSheetReading,
   GroundedAnswer,
   HelpExplanation,
+  InboxJob,
   PageSnapshot,
+  ReadbackResult,
+  ReadbackRow,
   SpeechSynthesis,
   Transcript,
+  VerificationAnswer,
 } from "@nemu/contracts/school";
 import { type Client, createORPCClient, ORPCError } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
@@ -29,6 +37,21 @@ export type NemuServiceClient = {
   speechTranscribe: Call<{ audioBase64: string; format: "wav" | "webm" }, Transcript>;
   speechSynthesize: Call<{ text: string }, SpeechSynthesis>;
   actionLogRecord: Call<{ entries: ActionLogEntry[] }, { recorded: number }>;
+  // F1 (#207): the WhatsApp photo, its verification, the rules, and the read-back.
+  inboxJobs: Call<undefined, InboxJob[]>;
+  inboxProcess: Call<{ jobId: string; className: string; assessment: string | null }, InboxJob>;
+  inboxPhoto: Call<{ jobId: string }, Blob>;
+  inboxAck: Call<{ jobId: string }, { deleted: boolean }>;
+  gradesParseCommand: Call<{ utterance: string }, GradeCommand>;
+  gradesFinalize: Call<
+    { reading: GradeSheetReading; answers: VerificationAnswer[] },
+    GradeRulesResult
+  >;
+  gradesReadbackAlurSekolah: Call<
+    { entries: GradeEntry[]; className: string; subject: string; assessment: string },
+    ReadbackResult
+  >;
+  gradesReadback: Call<{ entries: GradeEntry[]; saved: ReadbackRow[] }, ReadbackResult>;
 };
 
 export type ExtensionCredentials = { installCode: string; email?: string | null };

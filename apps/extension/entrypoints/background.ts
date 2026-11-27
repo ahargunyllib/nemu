@@ -11,6 +11,10 @@ import {
   saveNotes,
   saveRun,
 } from "../features/executor/api/run-storage";
+import {
+  forgetGradePhotoTabs,
+  handleGradePhoto,
+} from "../features/grade-photo/api/grade-photo-service";
 import { identifyTeacher } from "../features/identity/api/identify-teacher";
 import { askNemu } from "../features/nemu-button/api/ask-nemu";
 import { cancelRecording, startRecording } from "../features/voice/api/microphone";
@@ -50,6 +54,8 @@ async function handle(
       return loadNotes();
     case "nemu:log-actions":
       return recordActions(message);
+    case "nemu:grade-photo":
+      return handleGradePhoto(message.request, message.pageEmail, tabId);
   }
 }
 
@@ -71,6 +77,7 @@ export default defineBackground(() => {
   browser.action.onClicked.addListener(() => void browser.runtime.openOptionsPage());
 
   forgetClosedTabs();
+  forgetGradePhotoTabs();
   browser.permissions.onAdded.addListener(syncScripts);
   browser.permissions.onRemoved.addListener(syncScripts);
   browser.runtime.onStartup.addListener(syncScripts);
