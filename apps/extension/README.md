@@ -32,7 +32,10 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   nothing while a password field shows), and "berhenti" closes the bubble. When the question matches
   a symptom of an uploaded BPMN (F2-08), Sumber lists the process steps with **Lihat diagram** (the
   Admin Workspace at `WXT_ADMIN_URL`, default `http://localhost:3002`), and the one button opens a
-  reply to the parent in WhatsApp Web. Grade entry and
+  reply to the parent in WhatsApp Web. A source cited from a PDF is a link in the Sumber list: the
+  background asks the Nemu Service for a short-lived signed link (`documentFileLink`, ADR-0018)
+  and opens the PDF at the cited page (`#page=`) in a new tab next to the teacher's
+  (`verify:sumber`). Grade entry and
   processes say they aren't available yet, until F1 (#207) and F3 (#213) hand their step lists to
   the executor.
 - **Talking (#200).** Hold **Ctrl + Spasi** on an allowed page, or press and hold the Nemu button,

@@ -23,7 +23,8 @@
     "verify:f4-1": "node scripts/verify-f4-1.mjs",
     "verify:f4-3": "node scripts/verify-f4-3.mjs",
     "verify:f4-2": "node scripts/verify-f4-2.mjs",
-    "verify:grade-photo": "node scripts/verify-grade-photo.mjs"
+    "verify:grade-photo": "node scripts/verify-grade-photo.mjs",
+    "verify:sumber": "node scripts/verify-sumber.mjs"
   },
   "dependencies": {
     "@fontsource-variable/plus-jakarta-sans": "^5.3.0",

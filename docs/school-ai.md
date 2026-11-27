@@ -140,7 +140,8 @@ Nothing in the code knows SPP: the school's uploaded `.bpmn`, its WS-04 index an
 
 - `helpAsk` answers with `citations[].page` and `article` (the point); "Cuti melahirkan berapa lama?" is "Belum ada di panduan sekolah."
 - Eval over the five test-pack questions (`F3-2_pertanyaan-dan-kunci.csv`): `pnpm --filter @nemu/api exec vp test run src/modules/help/f3-2-sop.test.ts` (fixture), with `NEMU_LIVE_EVAL=1` and `--silent=false` for the configured text model and its answers.
-- The seed stores the PDF's metadata only. For the file itself (download in Pengetahuan sekolah, a Sumber link) put it in the documents bucket: `wrangler r2 object put <documents bucket>/seed/sekolah/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf --file packages/ai/src/school/fixtures/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf --content-type application/pdf --remote`. Uploading the PDF in Pengetahuan sekolah instead makes a new document; re-point the Rule Sources at it.
+- Sumber opens the cited PDF at its page (#258, ADR-0018): the extension asks `documentFileLink {id}` for a 10-minute signed path and opens `<Nemu Service>/api-reference/documents/<id>/file?token=…#page=<page>` in a new tab. Only active, ready PDFs the school reads get a link.
+- The seed stores the PDF's metadata only; the file goes in the documents bucket at `seed/sekolah/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf`. `pnpm dev` puts it in the local bucket (the `SeedDocumentFiles` action in `packages/infra/alchemy.run.ts`, dev only). Production needs it once, by hand: find the bucket with `pnpm dlx wrangler@4 r2 bucket list` (the `documents` bucket of the `prod` stage), then `pnpm dlx wrangler@4 r2 object put <documents bucket>/seed/sekolah/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf --file packages/ai/src/school/fixtures/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf --content-type application/pdf --remote`. Uploading the PDF in Pengetahuan sekolah instead makes a new document; re-point the Rule Sources at it.
 
 ### Speech
 
