@@ -148,6 +148,26 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     **Berikutnya** / **Selesai**. The list survives a page load, so opening soal 15 from Navigasi
     kuis moves the pointer to its image. Catatan langkah lists every problem and "Nemu tidak
     mengubah apa pun di kuis ini."
+- **F4-06: warn before deleting a quiz students took (#211).** `features/quiz-delete/`. "Tolong
+  hapus latihan bahasa Inggris yang kemarin" (typed or spoken; "hapus"/"ganti" with "kuis",
+  "latihan" or "ulangan") is the extension's own command. Nemu never presses Hapus.
+  - **Which quiz** (`lib/pick-quiz.ts`): on the course page each quiz is scored on her words
+    against its section and name, and a day she names ("kemarin", "hari ini") against the open
+    and close dates the page shows. A quiz 2 points ahead of the next is picked; otherwise Kartu
+    Pilih asks between the close ones (F4-3's decoy, on days it was open "kemarin" too). On a
+    quiz's own page it is that quiz.
+  - **Counting** (`lib/delete-task.ts`): one executor task opens the quiz and **Hasil** through the
+    menus and reads the number of different students in the attempts table (or "Yang telah
+    mengerjakan: N orang").
+  - **Warning** (`lib/warning.ts`): Kartu Pilih beside that count, "Kuis ini sudah dikerjakan 3
+    siswa. Kalau dihapus, nilainya ikut terhapus.", with **Jangan hapus** first and ⚠ **Tunjukkan
+    tombol Hapus** under it. She can also answer by voice ("jangan", "tunjukkan").
+  - **Jangan hapus** ends with Catatan langkah: the count, her choice, and "Nemu tidak menekan
+    Hapus; Nemu hanya menunjuknya."
+  - **Tunjukkan tombol Hapus** runs a second task: back to the course, **Mode Edit** on if it is
+    off, the quiz's own **Edit** menu (`near` the quiz's name, since every activity's menu is
+    called Edit), then a point at **Hapus**: "Kalau jadi dihapus, tekan Hapus sendiri, Bu." She
+    presses it or not; Moodle then asks her to confirm. The executor refuses Hapus anyway (F0-08).
 - **F4-03: put a quiz into Moodle from the teacher's script (#210).** `features/quiz-import/`.
   "Nemu, masukkan kuis dari naskah ini, buka Senin 30 November, tutup Kamis 3 Desember" on a
   Moodle course page is the extension's own command. She picks the script (PDF, Word or photo) with
@@ -264,6 +284,20 @@ last-modified time and question count in the Moodle database are what they were.
 (default `https://localhost/`) points it at another Moodle; without the local database only the
 Soal page's count is compared. It skips with a message when Moodle isn't running. Screenshots go
 to `.output/verify-f4-1/`.
+
+`pnpm --filter extension verify:f4-3` runs F4-3 (#211) on the same Moodle, after
+`./setup-4a-uji.sh` created the F4-3 quizzes and attempts. On the course page Bu Siti types
+"Tolong hapus latihan bahasa Inggris yang kemarin." It checks that Nemu picks "Latihan: My Family
+(has/have)" (or asks between it and the decoy on a day the decoy fits "kemarin"; it says which),
+opens the quiz and Hasil itself, rings the count and shows the warning word for word with
+**Jangan hapus** first and ⚠ on the second choice. Round 1 she keeps it: Catatan langkah, and the
+quiz still has 3 finished attempts and 3 grades. Round 2 ("Nemu, hapus kuis Latihan My Family.")
+she asks for the button: Nemu switches on Mode Edit, opens the quiz's Edit menu and rings Hapus,
+nothing is deleted while it points, she presses Hapus and cancels Moodle's confirmation. Last, in
+Moodle's database the quiz and its grades are there and its log has no new deletion, and the local
+Nemu Service's action log (WS-10, read from `packages/infra/.alchemy`) has Hapus only as a point
+she pressed. Without the local database it checks the pages only. Screenshots go to
+`.output/verify-f4-3/`.
 
 `pnpm --filter extension verify:f4-2` runs F4-2 (#210) on the same Moodle. Locally it first removes
 an earlier run's "Latihan IPAS Kelas 4A" (`infra/setup/reset-f4-2.php`). On course 4A-UJI Bu Siti

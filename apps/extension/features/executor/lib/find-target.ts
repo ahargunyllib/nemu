@@ -94,6 +94,25 @@ function cellsFor(doc: Document, row: string, column: string | undefined): Eleme
   });
 }
 
+/**
+ * `near`: of several matches, the ones closest to the text, i.e. whose nearest ancestor that shows
+ * it is the smallest. An "Edit" menu inside an activity card beats one in the section around it.
+ */
+function nearest(matches: Element[], near: string): Element[] {
+  const wanted = normalizeControlName(near);
+  const reach = (element: Element): number => {
+    for (let scope: Element | null = element; scope; scope = scope.parentElement) {
+      const text = normalizeControlName(textOf(scope));
+      if (` ${text} `.includes(` ${wanted} `)) return text.length;
+    }
+    return Number.POSITIVE_INFINITY;
+  };
+  const scored = matches.map((element) => ({ element, reach: reach(element) }));
+  const best = Math.min(...scored.map(({ reach }) => reach));
+  if (!Number.isFinite(best)) return [];
+  return scored.filter(({ reach }) => reach === best).map(({ element }) => element);
+}
+
 /** The fieldsets (by legend) and ARIA groups (by name) called `group`. */
 function groupsNamed(doc: Document, group: string): Element[] {
   const wanted = normalizeControlName(group);
@@ -139,7 +158,8 @@ export function findTarget(doc: Document, target: ExecutorTarget): TargetLookup 
     });
 
   const exact = named(true);
-  const matches = exact.length > 0 ? exact : named(false);
+  const byName = exact.length > 0 ? exact : named(false);
+  const matches = target.near ? nearest(byName, target.near) : byName;
   if (matches.length === 0) return { status: "missing" };
   if (matches.length > 1) return { status: "ambiguous", count: matches.length };
   const [element] = matches as [Element];
@@ -149,8 +169,9 @@ export function findTarget(doc: Document, target: ExecutorTarget): TargetLookup 
 
 /** How Nemu names a target in a sentence: "Kelas", "Nilai di baris Budi Santoso". */
 export function describeTarget(target: ExecutorTarget): string {
+  const near = target.near ? ` di ${target.near}` : "";
   const within = target.group ? ` (${target.group})` : "";
-  if (target.label) return `${target.label}${within}`;
-  if (target.text) return `${target.text}${within}`;
+  if (target.label) return `${target.label}${near}${within}`;
+  if (target.text) return `${target.text}${near}${within}`;
   return `${target.column ?? "isian"} di baris ${target.row ?? ""}`.trim();
 }

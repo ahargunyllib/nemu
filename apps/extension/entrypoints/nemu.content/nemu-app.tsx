@@ -27,6 +27,8 @@ import { useProcessRun } from "../../features/process-run/hooks/use-process-run"
 import { processRun } from "../../features/process-run/stores/process-run";
 import { useQuizCheck } from "../../features/quiz-check/hooks/use-quiz-check";
 import { quizCheck } from "../../features/quiz-check/stores/quiz-check";
+import { useQuizDelete } from "../../features/quiz-delete/hooks/use-quiz-delete";
+import { quizDelete } from "../../features/quiz-delete/stores/quiz-delete";
 import { useQuizImport } from "../../features/quiz-import/hooks/use-quiz-import";
 import { quizImport } from "../../features/quiz-import/stores/quiz-import";
 import { useRecorder } from "../../features/recorder/hooks/use-recorder";
@@ -83,6 +85,13 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     },
     [close],
   );
+  const startQuizDelete = useCallback(
+    (utterance: string) => {
+      close();
+      void quizDelete.start(utterance);
+    },
+    [close],
+  );
   const startQuizImport = useCallback(
     (utterance: string) => {
       close();
@@ -97,6 +106,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     startProcess,
     startRecording,
     startQuizCheck,
+    startQuizDelete,
     startQuizImport,
   );
   const preview = useDisplayPreview();
@@ -108,6 +118,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
   const process = useProcessRun();
   const recording = useRecorder();
   const quiz = useQuizCheck();
+  const quizDeletion = useQuizDelete();
   const importing = useQuizImport();
   const talk = useTalk({
     pageEmail,
@@ -119,11 +130,17 @@ export function NemuApp({ access }: { access: SiteAccess }) {
       recorder.talkStarted();
       setOpen(true);
     },
-    // While F1 or F3 waits for an answer (a photo question, a number), the words are that answer.
+    // While F1, F3 or F4-06 waits for an answer (a photo question, a number, a choice), the words
+    // are that answer.
     // While "Rekam cara" records, the words are the operator's narration.
     onQuestion: (question) => {
       if (recorder.narrate(question)) return;
-      if (!gradePhoto.hear(question) && !processRun.hear(question) && !quizImport.hear(question))
+      if (
+        !gradePhoto.hear(question) &&
+        !processRun.hear(question) &&
+        !quizDelete.hear(question) &&
+        !quizImport.hear(question)
+      )
         void ask(question, pressSnapshot.current);
     },
   });
@@ -174,6 +191,8 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     recorder.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
     // F4-01 checks a Moodle quiz as this teacher (#209); F4-03 puts her script into one (#210).
     quizCheck.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
+    // F4-06 warns before she deletes a quiz students took (#211).
+    quizDelete.connect({ honorific, speak: (text) => void speak(text) });
     quizImport.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
   }, [pageEmail, honorific, speak]);
 
@@ -225,6 +244,15 @@ export function NemuApp({ access }: { access: SiteAccess }) {
         ) : quiz.display ? (
           <div className="pointer-events-auto">
             <NemuStage display={withSpokenWord(quiz.display, voice)} target={quiz.target} />
+          </div>
+        ) : quizDeletion.display ? (
+          <div className="pointer-events-auto flex flex-col items-end gap-2">
+            {talk.heard !== null && <HeardBubble text={talk.heard} />}
+            <NemuStage
+              display={withSpokenWord(quizDeletion.display, voice)}
+              target={quizDeletion.target}
+            />
+            {talk.state.phase === "listening" && <ListeningBubble />}
           </div>
         ) : importing.display ? (
           <div className="pointer-events-auto flex flex-col items-end gap-2">
@@ -303,6 +331,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
           !process.active &&
           !preview.display &&
           !quiz.display &&
+          !quizDeletion.display &&
           !importing.display &&
           !open &&
           grades.card && (

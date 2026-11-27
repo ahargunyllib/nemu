@@ -558,6 +558,9 @@ export class ExecutorRun {
           name,
           ...(step.checked ? {} : { unchecked: true }),
         });
+        // A switch may load another page (Moodle's Mode Edit), so the run moves on now (F0-13).
+        this.state.index = index + 1;
+        this.save();
         break;
       case "setValue": {
         if (!isValueField(element)) return this.askAbout({ status: "missing" }, name);

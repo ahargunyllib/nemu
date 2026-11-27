@@ -26,6 +26,8 @@ export type AskResult =
   | { kind: "record"; title: string }
   /** "Nemu, tolong cek kuis ini": F4-01 checks the Moodle quiz on the page (#209). */
   | { kind: "quiz-check"; utterance: string }
+  /** "Tolong hapus latihan bahasa Inggris yang kemarin": F4-06 warns before she deletes (#211). */
+  | { kind: "quiz-delete"; utterance: string }
   /** "Nemu, masukkan kuis dari naskah ini": F4-03 puts the teacher's script into Moodle (#210). */
   | { kind: "quiz-import"; utterance: string }
   | { kind: "stop" };
@@ -74,4 +76,14 @@ export function isQuizImportCommand(text: string): boolean {
 /** "Nemu, tolong cek kuis ini." / "periksa kuis IPAS ini": the extension's own quiz check (#209). */
 export function isQuizCheckCommand(text: string): boolean {
   return /\b(?:cek|cekkan|periksa|periksakan|check)\b[^.?!]*\b(?:kuis|quiz)\b/iu.test(text);
+}
+
+/**
+ * "Tolong hapus latihan bahasa Inggris yang kemarin." / "ganti kuis IPAS": deleting or replacing a
+ * quiz, which Nemu never does itself (F4-06, #211). It names a quiz, "latihan" or "ulangan".
+ */
+export function isQuizDeleteCommand(text: string): boolean {
+  return /\b(?:hapus|hapuskan|menghapus|ganti|gantikan|mengganti|delete|remove)\b[^.?!]*\b(?:kuis|quiz|latihan|ulangan)\b/iu.test(
+    text,
+  );
 }

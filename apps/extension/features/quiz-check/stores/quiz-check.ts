@@ -254,6 +254,10 @@ function createQuizCheck() {
       const saved = await requestQuizCheck(context.pageEmail, { op: "state-load" });
       if (!saved.ok || !saved.value) return;
       pointing = saved.value as Pointing;
+      // A missing image is told apart only once the browser gives up on it; until then Nemu
+      // would point at the whole question.
+      const images = document.querySelectorAll<HTMLImageElement>(".que .formulation img");
+      await Promise.all([...images].map((image) => imageLoaded(image)));
       show();
     },
 

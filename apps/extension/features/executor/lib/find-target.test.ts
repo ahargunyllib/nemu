@@ -59,6 +59,36 @@ describe("findTarget (F0-06)", () => {
     expect(findTarget(document, { text: "Ya, simpan" })).toEqual({ status: "missing" });
   });
 
+  test("`near` picks the control in the card that shows the text (Moodle's Edit menus)", () => {
+    document.body.innerHTML = `
+      <ul data-sectionname="Bahasa Inggris">
+        <li><span>Latihan: My Family (has/have)</span><a href="#" role="button" aria-label="Edit">⋮</a></li>
+        <li><span>Parts of Body + Family (pengecoh)</span><a href="#" role="button" aria-label="Edit">⋮</a></li>
+      </ul>`;
+    const [first, second] = document.querySelectorAll("a");
+    expect(findTarget(document, { role: "button", label: "Edit" })).toEqual({
+      status: "ambiguous",
+      count: 2,
+    });
+    expect(
+      findTarget(document, {
+        role: "button",
+        label: "Edit",
+        near: "Parts of Body + Family (pengecoh)",
+      }),
+    ).toMatchObject({ status: "found", element: second });
+    expect(
+      findTarget(document, {
+        role: "button",
+        label: "Edit",
+        near: "Latihan: My Family (has/have)",
+      }),
+    ).toMatchObject({ status: "found", element: first });
+    expect(findTarget(document, { role: "button", label: "Edit", near: "Kuis IPAS" })).toEqual({
+      status: "missing",
+    });
+  });
+
   test("a label that repeats is found in its group: Moodle's Hari under Kuis dimulai or Tutup kuis", () => {
     document.body.innerHTML = `
       <fieldset id="open"><legend class="visually-hidden">Kuis dimulai</legend>

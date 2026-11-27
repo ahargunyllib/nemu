@@ -6,6 +6,7 @@ import {
   type AskResult,
   fromGroundedAnswer,
   isQuizCheckCommand,
+  isQuizDeleteCommand,
   isQuizImportCommand,
   NOT_AVAILABLE_YET,
   recordCommand,
@@ -16,8 +17,9 @@ import {
  * school's rules go to `helpAsk`, "kenapa" to `helpExplain` with what the page shows plus a
  * viewport screenshot, and a voice control closes the bubble. `snapshot` is null while a password
  * field is on screen: then "kenapa" reads and sends nothing (F2-07). Grade entry goes to F1
- * (#207); a process the school uploaded as BPMN to F3 (#213); checking a Moodle quiz to F4 (#209), and putting the teacher's script into Moodle as a
- * quiz to F4-03 (#210).
+ * (#207); a process the school uploaded as BPMN to F3 (#213); checking a Moodle quiz to F4 (#209),
+ * deleting one to F4-06 (#211), and putting the teacher's script into Moodle as a quiz to F4-03
+ * (#210).
  */
 export async function answerQuestion(
   client: Pick<NemuServiceClient, "helpRoute" | "helpAsk" | "helpExplain">,
@@ -28,6 +30,8 @@ export async function answerQuestion(
   // "Rekam cara …" is the extension's own command; nothing is sent for it.
   const recordTitle = recordCommand(question);
   if (recordTitle !== null) return { kind: "record", title: recordTitle };
+  // Deleting a quiz: Nemu counts who took it and warns; she presses Hapus (F4-06, #211).
+  if (isQuizDeleteCommand(question)) return { kind: "quiz-delete", utterance: question };
   // "Masukkan kuis dari naskah ini" is put into Moodle by the extension (F4-03, #210).
   if (isQuizImportCommand(question)) return { kind: "quiz-import", utterance: question };
   // "Nemu, tolong cek kuis ini" is checked in the page itself (F4-01, #209).

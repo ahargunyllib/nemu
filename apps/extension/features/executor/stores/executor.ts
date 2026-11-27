@@ -102,10 +102,14 @@ function createExecutor() {
     for (const listener of listeners) listener();
   }
 
-  /** The action log (WS-10), sent in small batches; it never holds a value. */
+  /**
+   * The action log (WS-10); it never holds a value. Filled fields go in small batches. Anything
+   * else goes at once: a menu click, a switch or her press may load another page, and a batch
+   * still waiting would be lost with this one.
+   */
   function queueLog(entry: Omit<ActionLogEntry, "website" | "at">) {
     pendingLog.push({ ...entry, website: location.host, at: Date.now() });
-    if (pendingLog.length >= 50) flushLog();
+    if (pendingLog.length >= 50 || entry.action !== "setValue") flushLog();
     else flushTimer ??= setTimeout(flushLog, LOG_FLUSH_MS);
   }
 

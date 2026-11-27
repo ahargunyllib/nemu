@@ -21,7 +21,6 @@ step says otherwise.
 - A Linux VPS (Ubuntu 24.04 or Debian 12) with at least 2 GB RAM and 20 GB disk, a public IP, and
   SSH access as a user who can `sudo`.
 - Access to the Cloudflare DNS of `ahargunyllib.dev`.
-- The F4 test-data folder `06_F4_kuis/` from the team Drive (`data-uji-mvp-v2`), for step 9.
 
 ### 2. Point the domain at the VPS
 
@@ -115,7 +114,7 @@ first. The first start installs Moodle into Postgres. Wait until the log shows `
 `https://nemu-moodle.ahargunyllib.dev`: it shows "Masuk ke situs" once step 8 has run, or the
 English login page before that.
 
-### 8. Prepare the test course and the F4-1 quiz
+### 8. Prepare the test course and the F4 quizzes
 
 ```bash
 ./setup-4a-uji.sh
@@ -135,32 +134,39 @@ It prints one line per step:
   correct answer and soal 15 has no `timbangan-3.png` on purpose; if Moodle refuses soal 07, the
   script uses the guide's fallback (import it with "setrika" at 100%, then set it to 0 in the
   database). It also sets the site's time zone to Asia/Jakarta.
-- The last line is the F4-1 baseline, for section 4 of the guide and `setup/f4-1/F4-1_kunci.csv`:
+- The F4-1 baseline, for section 4 of the guide and `setup/f4-1/F4-1_kunci.csv`:
   `F4-1 baseline: timemodified <unix time> (<date>), 15 questions`.
+- **F4-3** (Persiapan steps 2 to 5 of `setup/f4-3/F4-3_skenario.md`): the 5 questions of
+  `setup/f4-3/F4-3_kuis-my-family.xml` in Sistem bank soal bersama › Latihan My Family, and two
+  quizzes in Bahasa Inggris: "Latihan: My Family (has/have)" (Monday 30 November 2026 07.00 to
+  Friday 4 December 21.00, MF 01 to 05) and the decoy "Parts of Body + Family (pengecoh)" (Monday
+  23 November 07.00 to Friday 27 November 21.00, MF 01 and 02). Then `siswa.aisyah`,
+  `siswa.bagas` and `siswa.citra` each answer and submit the first quiz through Moodle's quiz
+  attempt API (5/5, 3/5 and 2/5), so its **Hasil** page shows 3 attempts. It also switches off
+  Moodle's user tours: the Mode Edit tour closes the menu Nemu points into.
+- The last line is the F4-3 baseline: `F4-3 baseline: Latihan: My Family (has/have) (cmid <id>),
+  3 finished attempts, 3 grades`.
+
+Running it again changes nothing: it imports only missing questions, leaves an existing quiz as it
+is and adds an attempt only for a student who hasn't submitted one. Check it: sign in as
+`siti.aminah` and open Kelas 4A (uji). You should see the F4-1 quiz in IPAS, where **Soal** lists
+15 questions, and both F4-3 quizzes in Bahasa Inggris, where **Hasil** of "Latihan: My Family
+(has/have)" says "Yang telah mengerjakan: 3 orang".
 
 F4-2 (#210) needs nothing more: Nemu creates its quiz from the teacher's script
 (`setup/f4-2/`). Before running it again, remove the last run's quiz with
 `docker compose cp setup/. moodle:/tmp/nemu-setup` and
 `docker compose exec -T moodle php /tmp/nemu-setup/reset-f4-2.php`.
 
-Running it again changes nothing: it imports only missing questions and leaves an existing F4-1
-quiz as it is. Check it: sign in as `siti.aminah` and open Kelas 4A (uji). You should see the
-quiz in IPAS, and **Soal** on the quiz page lists 15 questions.
-
-### 9. Set up the F4-3 quizzes
-
-Follow `F4-3_skenario.md` in `06_F4_kuis/` from the team Drive, signed in as `siti.aminah` (or the
-admin): import `F4-3_kuis-my-family.xml`, create both quizzes in Bahasa Inggris, then have the
-three students attempt "Latihan: My Family (has/have)".
-
-Moodle 5.3 differs from the guide in one place: **Bank soal** first lists the course's question
-banks. Open **Sistem bank soal bersama**, then **Impor**. A database shell, if you need one:
+Moodle 5.3 differs from the guides in one place, for anything done by hand: **Bank soal** first
+lists the course's question banks. Open **Sistem bank soal bersama**, then **Impor**. A database
+shell, if you need one:
 
 ```bash
 docker compose exec postgres psql -U moodle -d moodle
 ```
 
-### 10. Hand over
+### 9. Hand over
 
 Share with the team: the URL, `siti.aminah` with `TEACHER_PASSWORD`, and the student accounts
 from `setup/akun-siswa-uji.csv`. The admin password stays in the password manager.
@@ -239,10 +245,15 @@ The session lives in the `wa_bot_data` volume, so restarts and updates don't nee
 Everything lives in named volumes (`postgres_data`, `moodledata`, `moodlehtml`, `wa_bot_data`,
 and Caddy's certificates).
 
-- **After a test changes a quiz:** delete the quiz in Moodle, then run `./setup-4a-uji.sh` again
-  (F4-1; it recreates the quiz and prints a new baseline) or redo step 9 (F4-3).
+- **After a test changes the F4-1 quiz:** delete the quiz in Moodle, then run `./setup-4a-uji.sh`
+  again; it recreates the quiz and prints a new baseline.
+- **After an F4-3 run where the teacher deleted "Latihan: My Family (has/have)"** (round 2 of
+  the scenario): run `./setup-4a-uji.sh` again. A deleted quiz waits for Moodle's cron before it is
+  gone, so the script skips it and creates a new one with the 3 students' attempts; the last line
+  must say `3 finished attempts, 3 grades`. Nothing else is needed; the deleted copy may still show
+  in the course's recycle bin (Tempat sampah), which the test doesn't use.
 - **To start over completely:** `docker compose down -v` deletes all data (and unlinks the WhatsApp
-  number), then repeat steps 7 to 9 and link the number again.
+  number), then repeat steps 7 and 8 and link the number again.
 
 ## Troubleshooting
 
@@ -267,8 +278,29 @@ docker compose up -d caddy postgres moodle
 
 Caddy serves `https://localhost` with its own certificate, so the browser warns once. The local
 Nemu Service already lists it as an allowed website (`localhost:443`, "Moodle (uji, lokal)"), so
-the Nemu button shows there. `pnpm --filter extension verify:f4-1` checks F4-1 against it (see
-`apps/extension/README.md`). If an earlier stack on this machine left volumes with another
-password, run under another project name, e.g. `COMPOSE_PROJECT_NAME=nemu-f4`, for every
-command including `./setup-4a-uji.sh`. When you're done, `docker compose down -v` removes the
-containers and their data.
+the Nemu button shows there. `pnpm --filter extension verify:f4-1` and `verify:f4-3` check F4-1
+and F4-3 against it (see `apps/extension/README.md`). If an earlier stack on this machine left
+volumes with another password, run under another project name, e.g. `COMPOSE_PROJECT_NAME=nemu-f4`,
+for every command including `./setup-4a-uji.sh`. When you're done, `docker compose down -v`
+removes the containers and their data.
+
+**Two stacks at once, or 80/443 taken:** give the second one other host ports with an override
+file outside the repo, e.g. `~/nemu-moodle-8443.yaml`:
+
+```yaml
+services:
+  caddy:
+    ports: !override
+      - "8080:80"
+      - "8443:8443"
+  moodle:
+    environment:
+      # 8443 outside, 8080 inside the container: Moodle must trust the proxy's address.
+      REVERSEPROXY: "true"
+```
+
+Set `MOODLE_DOMAIN=localhost:8443` in `.env` (Caddy then listens on 8443), and run every command,
+`./setup-4a-uji.sh` included, with `COMPOSE_PROJECT_NAME=<another name>` and
+`COMPOSE_FILE=compose.yaml:$HOME/nemu-moodle-8443.yaml`. In the Admin Workspace, add
+`localhost:8443` under **Situs** ("baca dan isi"), and point the verify scripts at it with
+`MOODLE_URL=https://localhost:8443/`.

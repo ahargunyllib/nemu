@@ -147,6 +147,23 @@ describe("answerQuestion", () => {
     });
   });
 
+  test("'hapus latihan …' is the extension's own quiz deletion warning (F4-06): nothing is sent", async () => {
+    const client = fakeClient({ kind: "intent", intent: "unknown", processName: null });
+    for (const words of [
+      "Tolong hapus latihan bahasa Inggris yang kemarin.",
+      "Nemu, hapus kuis ini",
+      "ganti ulangan IPAS minggu lalu",
+    ])
+      await expect(answerQuestion(client, words, SNAPSHOT)).resolves.toEqual({
+        kind: "quiz-delete",
+        utterance: words,
+      });
+    expect(client.helpRoute).not.toHaveBeenCalled();
+    await expect(
+      answerQuestion(client, "Bagaimana cara menghapus nilai?", SNAPSHOT),
+    ).resolves.toMatchObject({ kind: "answer" });
+  });
+
   test("'masukkan kuis dari naskah ini' is the extension's own F4-03 flow (#210): nothing is sent", async () => {
     const client = fakeClient({ kind: "intent", intent: "unknown", processName: null });
     for (const words of [
