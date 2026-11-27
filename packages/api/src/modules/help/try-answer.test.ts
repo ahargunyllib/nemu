@@ -69,7 +69,7 @@ describe("WS-1 (b): the official SOP Tahfidz PDF, tried before and after activat
           docId: sop.id,
           title: "SOP Tahfidz",
           page: 1,
-          article: "3",
+          article: "3 ayat 3.2",
           quote: expect.stringContaining("Setiap setoran paling sedikit 3 ayat"),
         }),
       ],
