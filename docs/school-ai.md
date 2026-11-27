@@ -131,6 +131,8 @@ Nothing in the code knows SPP: the school's uploaded `.bpmn`, its WS-04 symptoms
 ### Speech
 
 - `speechTranscribe` before anything else; show `text`.
+- Routing reads spoken Javanese and the recognizer's usual slips as Indonesian first (`normalizeUtterance` in `packages/ai/src/school/commands.ts`): "tulung isiake nilai" is grade entry, "nilaine kok ora metu" is "kenapa". A short control (`pelan`, `ulangi`, `ajari saya`, `lanjut`, `saya saja`) counts only as the whole utterance; "berhenti" counts at the start of anything. "Ajari saya ngisi nilai …" is grade entry, and `gradesParseCommand` returns `cara: 2` for it.
+- F0-2 (10 spoken commands, ≥ 8 right): `pnpm --filter @nemu/ai eval:f0-2` checks the sentences as text; add `-- --audio <folder> [--models a,b]` with recordings named `01.m4a` … `10.m4a` to transcribe and route them.
 - `speechSynthesize(sentence)`. With `timing: "estimated"`, scale every `offsetMs` and `durationMs` by `audio.duration * 1000 / estimatedDurationMs` once the audio loads.
 - With `audioBase64: ""`, speak `text` with `speechSynthesis` (Windows: Microsoft Andika `id-ID`) at `rate = 0.85` and use the same `words`.
 
