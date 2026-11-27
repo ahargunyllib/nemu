@@ -27,7 +27,7 @@ import { handleQuizImport } from "../features/quiz-import/api/quiz-import-servic
 import { forgetRecorderTabs, handleRecorder } from "../features/recorder/api/recorder-service";
 import { identifyTeacher } from "../features/identity/api/identify-teacher";
 import { askNemu } from "../features/nemu-button/api/ask-nemu";
-import { openSourceForPage } from "../features/nemu-button/api/open-source-file";
+import { openSourceForPage } from "../features/nemu-button/api/open-source-for-page";
 import { cancelRecording, startRecording } from "../features/voice/api/microphone";
 import { synthesizeSentence, transcribeRecording } from "../features/voice/api/speech";
 import { isNemuMessage, type NemuMessage } from "../shared/lib/messages";

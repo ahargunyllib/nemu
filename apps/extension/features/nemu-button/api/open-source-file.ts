@@ -1,10 +1,6 @@
 import type { DocumentFileLink } from "@nemu/contracts/school";
-import { browser } from "wxt/browser";
 
 import { failureMessage, type NemuServiceClient } from "../../../shared/api/nemu-service";
-import { serverUrl } from "../../../shared/lib/config";
-import type { PageEmail } from "../../../shared/lib/messages";
-import { teacherClient } from "../../identity/api/teacher-client";
 import type { SourceFile } from "../lib/answer";
 
 export type OpenSourceResult = { opened: true } | { notice: string };
@@ -32,27 +28,4 @@ export async function openSourceFile(
   }
   await openTab(`${base}${link.path}${file.page === null ? "" : `#page=${file.page}`}`);
   return { opened: true };
-}
-
-/** Background: opens a cited document for the teacher whose email the page shows. */
-export async function openSourceForPage(
-  request: { pageEmail: PageEmail; docId: string; page: number | null },
-  tab?: { id?: number; index?: number; windowId?: number },
-): Promise<OpenSourceResult> {
-  const teacher = await teacherClient(request.pageEmail);
-  if ("notice" in teacher) return { notice: teacher.notice };
-  return openSourceFile(
-    {
-      client: teacher.client,
-      serverUrl: serverUrl(),
-      openTab: (url) =>
-        browser.tabs.create({
-          url,
-          openerTabId: tab?.id,
-          windowId: tab?.windowId,
-          index: tab?.index === undefined ? undefined : tab.index + 1,
-        }),
-    },
-    request,
-  );
 }
