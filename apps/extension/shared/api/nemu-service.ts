@@ -1,3 +1,4 @@
+import type { ActionLogEntry } from "@nemu/contracts/executor";
 import {
   EXTENSION_HEADERS,
   type ExtensionConfig,
@@ -27,6 +28,7 @@ export type NemuServiceClient = {
   helpExplain: Call<{ snapshot: ScreenSnapshot; question: string | null }, HelpExplanation>;
   speechTranscribe: Call<{ audioBase64: string; format: "wav" | "webm" }, Transcript>;
   speechSynthesize: Call<{ text: string }, SpeechSynthesis>;
+  actionLogRecord: Call<{ entries: ActionLogEntry[] }, { recorded: number }>;
 };
 
 export type ExtensionCredentials = { installCode: string; email?: string | null };

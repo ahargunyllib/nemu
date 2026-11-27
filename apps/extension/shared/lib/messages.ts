@@ -1,3 +1,4 @@
+import type { ActionLogEntry } from "@nemu/contracts/executor";
 import type { ScreenSnapshot } from "@nemu/contracts/school";
 
 /**
@@ -15,7 +16,14 @@ export type NemuMessage =
   | { type: "nemu:listen-start" }
   | { type: "nemu:listen-stop"; pageEmail: PageEmail }
   | { type: "nemu:listen-cancel" }
-  | { type: "nemu:speak"; pageEmail: PageEmail; text: string };
+  | { type: "nemu:speak"; pageEmail: PageEmail; text: string }
+  // The executor (#202): its run per tab and the last Catatan langkah live in
+  // `chrome.storage.session`, which only the background reads; actions go to the action log.
+  | { type: "nemu:run-save"; state: unknown }
+  | { type: "nemu:run-load" }
+  | { type: "nemu:notes-save"; notes: { title: string; items: string[] } }
+  | { type: "nemu:notes-load" }
+  | { type: "nemu:log-actions"; pageEmail: PageEmail; entries: ActionLogEntry[] };
 
 const TYPES: ReadonlySet<string> = new Set([
   "nemu:site-access",
@@ -25,6 +33,11 @@ const TYPES: ReadonlySet<string> = new Set([
   "nemu:listen-stop",
   "nemu:listen-cancel",
   "nemu:speak",
+  "nemu:run-save",
+  "nemu:run-load",
+  "nemu:notes-save",
+  "nemu:notes-load",
+  "nemu:log-actions",
 ]);
 
 export function isNemuMessage(message: unknown): message is NemuMessage {

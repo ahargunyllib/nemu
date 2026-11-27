@@ -122,7 +122,7 @@ the page's Shadow DOM.
 | **Gelembung Tunjuk** | The teacher's turn     | One sentence beside the field or button the cursor points at. No buttons, at most one link            |
 | **Gelembung Jawab**  | An answer or a problem | One sentence, the **Kenapa?**, **Sumber** and **Lihat ringkasan** links, at most one action button, × |
 | **Kartu Pilih**      | A decision             | One question, 2–3 equal stacked big buttons, nothing pre-selected or focused                          |
-| **Kartu Info**       | Something to read      | A title, a short list, one **[Tutup]**                                                                |
+| **Kartu Info**       | Something to read      | A title, a short list, at most one link (Catatan langkah: "Lain kali coba sendiri"), one **[Tutup]**  |
 
 - **Gelembung** (bubble): white, `rounded-3xl`, a 2 px `nemu` edge, 420 px wide. **Kartu** (card):
   the stock card, 400 px wide, with an 8 px `nemu` band along its top.

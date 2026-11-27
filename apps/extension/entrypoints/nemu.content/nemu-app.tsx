@@ -1,10 +1,17 @@
+import { Button } from "@nemu/ui/components/button";
 import { GelembungJawab, GelembungJawabSkeleton } from "@nemu/ui/nemu/gelembung-jawab";
+import { NEMU_LINK } from "@nemu/ui/nemu/nemu-frame";
 import { NemuStage } from "@nemu/ui/nemu/nemu-stage";
 import { useCallback, useEffect, useState } from "react";
 
 import { DisplayPreviewDock } from "../../features/display-preview/components/display-preview-dock";
 import { useDisplayPreview } from "../../features/display-preview/hooks/use-display-preview";
 import { PREVIEW_ENABLED } from "../../features/display-preview/lib/preview-scenes";
+import { ExecutorTestDock } from "../../features/executor/components/executor-test-dock";
+import { RowTicks } from "../../features/executor/components/row-ticks";
+import { useExecutor } from "../../features/executor/hooks/use-executor";
+import { TEST_TOOLS_ENABLED } from "../../features/executor/lib/test-responses";
+import { executor } from "../../features/executor/stores/executor";
 import { useIdentity } from "../../features/identity/hooks/use-identity";
 import { usePageEmail } from "../../features/identity/hooks/use-page-email";
 import type { IdentityResult } from "../../features/identity/lib/identity";
@@ -35,6 +42,7 @@ export function NemuApp() {
   const { state, ask, reset } = useAsk(pageEmail, close);
   const preview = useDisplayPreview();
   const { voice, working, speak, repeat, stop } = useVoice(pageEmail);
+  const run = useExecutor();
   const talk = useTalk({
     pageEmail,
     shortcut: TALK_SHORTCUT,
@@ -58,6 +66,18 @@ export function NemuApp() {
     dismiss();
     stop();
   }, [reset, dismiss, stop]);
+
+  // The executor works as the teacher on the page, in Nemu's voice.
+  const honorific = identity?.status === "registered" ? identity.honorific : "";
+  useEffect(
+    () => executor.connect({ pageEmail, honorific, speak: (text) => void speak(text) }),
+    [pageEmail, honorific, speak],
+  );
+
+  // A task under way in this tab carries on after a page load (F0-13).
+  useEffect(() => {
+    void executor.restore();
+  }, []);
 
   // Another account signed in: the previous teacher's answer goes (ID-04).
   useEffect(dismissAll, [identity, dismissAll]);
@@ -92,7 +112,11 @@ export function NemuApp() {
           if (event.key === "Escape") close();
         }}
       >
-        {preview.display ? (
+        {run.display ? (
+          <div className="pointer-events-auto">
+            <NemuStage display={run.display} target={run.target} />
+          </div>
+        ) : preview.display ? (
           <div className="pointer-events-auto">
             <NemuStage display={preview.display} target={preview.target} />
           </div>
@@ -110,6 +134,19 @@ export function NemuApp() {
                 onRead={(text) => void speak(text)}
                 onDismiss={dismissAll}
               />
+              {run.hasNotes && !run.active && (
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={() => {
+                    close();
+                    executor.showNotes();
+                  }}
+                  className={`${NEMU_LINK} rounded-2xl bg-background px-3 shadow-nemu-float`}
+                >
+                  Lihat catatan langkah
+                </Button>
+              )}
             </div>
           )
         )}
@@ -123,6 +160,8 @@ export function NemuApp() {
           />
         </div>
       </div>
+      <RowTicks elements={run.ticks} />
+      {TEST_TOOLS_ENABLED && <ExecutorTestDock />}
       {PREVIEW_ENABLED && (
         <DisplayPreviewDock
           onShow={(scene) => {

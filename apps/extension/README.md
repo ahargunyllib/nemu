@@ -30,7 +30,8 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
 - **Answers.** The background sends the question to `helpRoute`. Questions about school rules go to
   `helpAsk`, "ini kenapa?" to `helpExplain` with the page's visible text (never input values, and
   nothing while a password field shows), and "berhenti" closes the bubble. Grade entry and
-  processes say they aren't available yet: that is the executor, #202.
+  processes say they aren't available yet, until F1 (#207) and F3 (#213) hand their step lists to
+  the executor.
 - **Talking (#200).** Hold **Ctrl + Spasi** on an allowed page, or press and hold the Nemu button,
   and speak: Nemu shows a red dot and "Nemu mendengar…". On release the recording goes to
   `speechTranscribe` as 16 kHz mono WAV, the heard text shows in a small bubble, and then it goes
@@ -55,6 +56,40 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   whose sources sit behind its **Sumber** link. In a dev build, `?pratinjau-nemu` on an allowed
   page (`http://localhost:3003/?pratinjau-nemu#/nilai`) adds a dock at the bottom left that shows
   all five and moves the Nemu cursor between two fields, without the AI.
+- **The executor (#202).** Every task Nemu does on a page (grade entries, BPMN steps, recordings,
+  Moodle setup) is one step list from `@nemu/contracts/executor`, handed to `executor.start` in
+  `features/executor/stores/executor.ts`. The verbs are `point`, `setValue`, `selectOption`,
+  `check`, `scroll` and `clickMenu`; targets are found by label, role, text or table row and
+  column, never by position, and a missing or ambiguous one stops Nemu, which asks (F0-06).
+  - **Cara 1** fills at about one field per second, typing digits one by one, ticking each row and
+    reading the first two aloud; **Pelan** halves the speed; it stops before Simpan and points at
+    it. **Cara 2** points, says the value and checks what the teacher typed. **Cara 3** waits for
+    Simpan and then checks every value. "Ajari saya" switches to cara 2 at any time (F0-11). The
+    default cara and fill speed come from `executorSettings` (`lib/executor-settings.ts`), which
+    will read WS-08 once #212 sends it.
+  - **Visible navigation (F0-13).** Nemu reaches the task page by clicking menus with the Nemu
+    cursor while naming them, never by opening a URL. The run is kept per tab in
+    `chrome.storage.session` (through the background), so it carries on after a page load.
+  - **Safety, in the extension (F0-07, F0-08).** A real mouse press or key while Nemu acts stops it
+    and asks: Saya isi sendiri / Nemu lanjut / Berhenti. `isDeniedActionName` runs on every target:
+    Simpan, Kirim, Hapus and the like are pointed at, never pressed, whatever verb asked for it, and
+    so is anything that would submit a form. Any verb outside the six becomes pointing. Nemu
+    dispatches no key, so never Enter, and cancels every submit while it acts (untrusted ones for
+    the whole task).
+  - **F0-09.** Steps that come in parts (`registerStepSource`) are retried twice with a plain
+    message, then Nemu stops at a safe step with the inputs kept; "lanjut" or **Lanjut** resumes.
+  - **Catatan langkah (F0-14)** ends each task and reopens from the Nemu button (**Lihat catatan
+    langkah**); "Lain kali coba sendiri" starts that kind of task in cara 2 next time.
+  - **Action log (WS-10).** Every action goes to `actionLogRecord` as who, when, website, task,
+    action, target, cara and result, never a value.
+  - **Not connected yet.** The flows that build step lists (F1 #207, F3 #213/#214, F4 #209) come
+    later; until then grade entry and processes still answer that they aren't available. "Baca
+    saja" sites (WS-03 permission) and the WS-08 defaults are connected once #212 lands.
+  - **Dev tools.** In a dev build, an allowed page opened with `?uji-nemu`
+    (`http://localhost:3003/?uji-nemu#/beranda`) shows a dock: **Muat respons uji** runs
+    `F0-1_respons-ai-palsu.json` (three fake AI responses that try to press; it passes when Nemu
+    points every time and nothing is pressed), **Pilih berkas…** runs another file of the same
+    shape, **Contoh cara 1/2/3** fill a sample grade list, and **Koneksi putus** shows F0-09.
 - **Contract.** Request and response schemas come from `@nemu/contracts/extension` and
   `@nemu/contracts/school`. Only the background calls the Nemu Service.
 
@@ -104,6 +139,10 @@ extension against `http://localhost:3000`, loads it into Playwright's Chromium, 
   signing in as `dewi.lestari` brings the type box back;
 - Ruang GTK shows the Nemu button and asks as the last AlurSekolah account;
 - e-Rapor gets no Nemu button (WS-1 (a)).
+
+`pnpm --filter extension verify:executor` does the same for the executor with a development
+build: cara 1 from the Nilai menu to Simpan, Catatan langkah, the teacher's own click (F0-07),
+a page load mid-task, F0-1 (3/3), F0-09 and cara 3, saving screenshots to `.output/verify-executor/`.
 
 It prints one line per check, exits non-zero on a failure, and saves screenshots to
 `.output/verify/` (each open tab is saved too when a check fails). Add `-- --headed` to watch it. `NEMU_SERVER_URL`, `MOCK_ALURSEKOLAH_URL`,
