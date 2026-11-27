@@ -1,18 +1,34 @@
 import {
+  BookOpenIcon,
   FileTextIcon,
+  FlaskConicalIcon,
   GlobeIcon,
   KeyRoundIcon,
   LayoutDashboardIcon,
+  ListChecksIcon,
   type LucideIcon,
+  PackageIcon,
   SchoolIcon,
-  ShieldCheckIcon,
+  SlidersHorizontalIcon,
   TableIcon,
   UsersIcon,
 } from "lucide-react";
 
 import { isFullAdmin } from "@/features/workspace/lib/roles";
 
-type NavPath = "/dashboard" | "/documents" | "/tables" | "/schools" | "/teachers" | "/integrations";
+type NavPath =
+  | "/dashboard"
+  | "/documents"
+  | "/package"
+  | "/kamus"
+  | "/try-answer"
+  | "/tables"
+  | "/schools"
+  | "/teachers"
+  | "/sites"
+  | "/settings"
+  | "/integrations"
+  | "/action-log";
 
 export type NavItem = {
   label: string;
@@ -40,18 +56,22 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    label: "Knowledge",
+    label: "Pengetahuan",
     items: [
-      { to: "/documents", label: "Documents", icon: FileTextIcon },
+      { to: "/package", label: "Paket AlurSekolah", icon: PackageIcon, adminOnly: true },
+      { to: "/documents", label: "Pengetahuan sekolah", icon: FileTextIcon },
+      { to: "/kamus", label: "Kamus Kendala", icon: BookOpenIcon },
+      { to: "/try-answer", label: "Uji jawaban", icon: FlaskConicalIcon },
       { to: "/tables", label: "Tables", icon: TableIcon, adminOnly: true },
     ],
   },
   {
-    label: "Configuration",
+    label: "Pengaturan",
     items: [
+      { to: "/sites", label: "Situs yang diizinkan", icon: GlobeIcon, adminOnly: true },
+      { to: "/settings", label: "Pengaturan Nemu", icon: SlidersHorizontalIcon, adminOnly: true },
       { to: "/integrations", label: "Integrasi", icon: KeyRoundIcon, adminOnly: true },
-      { label: "Domains", icon: GlobeIcon, comingSoon: true, adminOnly: true },
-      { label: "Action Rules", icon: ShieldCheckIcon, comingSoon: true, adminOnly: true },
+      { to: "/action-log", label: "Log tindakan", icon: ListChecksIcon, adminOnly: true },
     ],
   },
 ];

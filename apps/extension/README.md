@@ -38,8 +38,14 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   to `helpRoute` like a typed question. The microphone runs in an offscreen document
   (`entrypoints/offscreen`), so its permission belongs to the extension: the welcome page that
   opens after install asks for it once, and a hold without it opens that page again. Holds under
-  300 ms send nothing; recordings stop at 15 s. The combination will come from WS-08 (#212); until
-  then it is `TALK_SHORTCUT` in `features/voice/lib/talk-shortcut.ts`.
+  300 ms send nothing; recordings stop at 15 s. The combination is the school's WS-08 setting,
+  read with the WS-03 list (`extensionConfig.settings.talkShortcut`); a page picks it up on its
+  next load, and Ctrl + Spasi stands in when the school has none.
+- **Site permission and settings (#212).** The background answers `nemu:site-access` with the
+  page's WS-03 permission (baca dan isi · siapkan pesan · baca saja; the narrower wins where two
+  sites cover a page) and the school's WS-08 settings (talk combination, default cara, fill
+  speed). `NemuApp` takes the talk combination from it; the executor reads the same config
+  through `executorSettings` (below).
 - **Nemu's voice (#200).** Nemu speaks the first sentence of every answer through
   `speechSynthesize`, and the Gelembung Jawab marks the word being spoken. Estimated timings are
   rescaled to the real audio length. When the service sends no audio (the fixture responder, or no
@@ -65,8 +71,13 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     reading the first two aloud; **Pelan** halves the speed; it stops before Simpan and points at
     it. **Cara 2** points, says the value and checks what the teacher typed. **Cara 3** waits for
     Simpan and then checks every value. "Ajari saya" switches to cara 2 at any time (F0-11). The
-    default cara and fill speed come from `executorSettings` (`lib/executor-settings.ts`), which
-    will read WS-08 once #212 sends it.
+    default cara and the cara 1 fill speed are the school's WS-08 settings (pelan 2 s, normal 1 s,
+    cepat 0.5 s per field), read by `executorSettings` (`lib/executor-settings.ts`) from the
+    config the background last fetched.
+  - **Site permission (WS-03).** `executorSettings` also gives the page's permission, and
+    `sitePermits` (`lib/safety.ts`) decides each acting step: on a _baca saja_ site Nemu fills and
+    clicks nothing, and on _siapkan pesan_ it only types the message. A step the site doesn't permit
+    becomes the teacher's, as in cara 2 (Nemu points and says it), and is logged as `refused`.
   - **Visible navigation (F0-13).** Nemu reaches the task page by clicking menus with the Nemu
     cursor while naming them, never by opening a URL. The run is kept per tab in
     `chrome.storage.session` (through the background), so it carries on after a page load.
@@ -83,8 +94,7 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   - **Action log (WS-10).** Every action goes to `actionLogRecord` as who, when, website, task,
     action, target, cara and result, never a value.
   - **Not connected yet.** The flows that build step lists (F1 #207, F3 #213/#214, F4 #209) come
-    later; until then grade entry and processes still answer that they aren't available. "Baca
-    saja" sites (WS-03 permission) and the WS-08 defaults are connected once #212 lands.
+    later; until then grade entry and processes still answer that they aren't available.
   - **Dev tools.** In a dev build, an allowed page opened with `?uji-nemu`
     (`http://localhost:3003/?uji-nemu#/beranda`) shows a dock: **Muat respons uji** runs
     `F0-1_respons-ai-palsu.json` (three fake AI responses that try to press; it passes when Nemu

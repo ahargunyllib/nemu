@@ -369,3 +369,42 @@ describe("cara 2 and 3", () => {
     expect(ended.mock.calls[0]?.[1]).toContain("Nemu memeriksa 3 isian: 1 belum sesuai");
   });
 });
+
+describe("WS-03 site permission", () => {
+  test("on a 'baca saja' site a cara 1 run fills and clicks nothing: Nemu points, the teacher acts", async () => {
+    const task = { ...GRADES, steps: [GRADES.steps[0]!, GRADES.steps[2]!] };
+    const { run, log, display } = harness(createRunState(task, { cara: 1 }), {
+      permission: "read_only",
+    });
+    void run.run();
+
+    await vi.waitFor(() =>
+      expect(display()).toMatchObject({ type: "tunjuk", sentence: "Klik Nilai." }),
+    );
+    expect(presses.menu).toBe(0);
+    press(document.querySelector("a") as Element);
+    await vi.waitFor(() =>
+      expect(display()).toMatchObject({ sentence: "Ketik 80 untuk Ahmad Fadli." }),
+    );
+    expect(field("Ahmad Fadli").value).toBe("");
+    typeAsTeacher(field("Ahmad Fadli"), "80");
+    await vi.waitFor(() => expect(run.state.ticked).toEqual([1]));
+    expect(log).toEqual(
+      expect.arrayContaining([
+        { action: "clickMenu", target: "Nilai", result: "refused" },
+        { action: "setValue", target: "Nilai Ahmad Fadli", result: "refused" },
+      ]),
+    );
+  });
+
+  test("on a 'siapkan pesan' site Nemu types the text but leaves clicks to the teacher", async () => {
+    const task = { ...GRADES, steps: [GRADES.steps[0]!, GRADES.steps[2]!] };
+    const { run, display } = harness(createRunState(task, { cara: 1 }), {
+      permission: "prepare_message",
+    });
+    void run.run();
+    await vi.waitFor(() => expect(display()).toMatchObject({ sentence: "Klik Nilai." }));
+    press(document.querySelector("a") as Element);
+    await vi.waitFor(() => expect(field("Ahmad Fadli").value).toBe("80"));
+  });
+});

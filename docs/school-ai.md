@@ -41,6 +41,7 @@ All are oRPC procedures on the Nemu Service, open to a `W-SEKOLAH` session or to
 | `gradesGuidedLine`                              | `{entries, studentId, typed}` → "Ketik 77 untuk Budi." / "Di buku 77, Bu."                                                          | F1-11       |
 | `helpExplain`                                   | `{snapshot, question}` → bubble sentence, `why`, `citation`, `fixer`, `waDraft`, `guidedTarget`                                     | F2          |
 | `helpAsk`                                       | question → answer with verified citations, or "Belum ada di panduan sekolah."                                                       | F3-04/07    |
+| `helpTryAnswer` (admin)                         | `{question, documentIds}` → the `helpAsk` answer as if those inactive documents were active (Uji jawaban)                           | WS-09       |
 | `processList`, `processXml`                     | active BPMN processes; the XML for the viewer                                                                                       | F3-03/06    |
 | `processPlan`                                   | `{documentId, text, answering, slots, stepIndex}` → one step: `fill` \| `ask` \| `human` \| `done`                                  | F3-09       |
 | `procedureCompile` (admin)                      | recorded events + narration → `Procedure` for review                                                                                | F3-01       |
@@ -49,7 +50,9 @@ All are oRPC procedures on the Nemu Service, open to a `W-SEKOLAH` session or to
 | `speechTranscribe`                              | 16 kHz mono audio (base64) → text to show in the bubble                                                                             | F0-04       |
 | `speechSynthesize`                              | sentence → audio + word timings, or `audioBase64: ""` (use the local OS voice)                                                      | F0-05       |
 
-`.bpmn` files are now accepted by the existing `uploadDocument` (Admin Workspace → Documents); the admin UI's file picker may need `.bpmn` added to its accept list.
+`.bpmn` files are accepted by `uploadDocument` and the Admin Workspace picker. On upload each task and end event is stored in `process_element` with an empty symptom list and, for a user task, a page taken from its label; the operator corrects both in WS-04 (`listProcessElements`, `saveProcessElement`). Generating symptoms on upload (F3-11) is #217's and should write into the same rows.
+
+`helpExplain` reads only the WS-05 Kamus Kendala table (`kamus_kendala`, citation `docId: "kamus-kendala"`, `article` = the row's code), not uploaded documents.
 
 ## Flows
 
@@ -147,12 +150,13 @@ The AI never emits a press of Simpan, Kirim, Ajukan or Hapus: those are `human` 
 
 ## Synthetic pieces to replace
 
-| Piece                                  | Where                                                                                                                                                          | Replace with                                                                                                                                                                    |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Teacher profile, roster, contacts, KKM | Done: WS-06 in D1 (`createRegistrySchoolDirectory`), seeded from `profil-sekolah.json` and `daftar-siswa-*.csv`; `createDemoSchoolDirectory()` stays for tests | Rosters from the AlurSekolah `/siswa` read (#204) once the school's key is set                                                                                                  |
-| SOP Penilaian, Kamus Kendala           | Seed migration, documents `sop-penilaian-sdit-nusantara`, `kamus-kendala-sdit-nusantara`                                                                       | Upload the official PDFs in Admin → Documents. Then re-point the four `school.*` Rule Sources at the new SOP (Admin → Documents → Rule Sources) and deactivate the seeded ones. |
-| Izin BPMN                              | `packages/ai/src/school/fixtures/pengajuan-izin-guru.bpmn` (tests only)                                                                                        | Upload `F3-1_pengajuan-izin-guru.bpmn`                                                                                                                                          |
-| F1 eval truth                          | Synthetic page                                                                                                                                                 | `pnpm --filter @nemu/ai eval:school -- --live --photo <F1-1 photo> --truth <truth.json>`                                                                                        |
+| Piece                                  | Where                                                                                                                                                          | Replace with                                                                                                                                         |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Teacher profile, roster, contacts, KKM | Done: WS-06 in D1 (`createRegistrySchoolDirectory`), seeded from `profil-sekolah.json` and `daftar-siswa-*.csv`; `createDemoSchoolDirectory()` stays for tests | Rosters from the AlurSekolah `/siswa` read (#204) once the school's key is set                                                                       |
+| SOP Penilaian                          | Seed migration, document `sop-penilaian-sdit-nusantara`                                                                                                        | Upload the official PDF in Admin → Pengetahuan sekolah. Then re-point the four `school.*` Rule Sources at the new SOP and deactivate the seeded one. |
+| Kamus Kendala                          | Seed migration, rows K-01..K-03 in `kamus_kendala`                                                                                                             | Import the official kamus in Admin → Kamus Kendala (Excel) or type the rows.                                                                         |
+| Izin BPMN                              | `packages/ai/src/school/fixtures/pengajuan-izin-guru.bpmn` (tests only)                                                                                        | Upload `F3-1_pengajuan-izin-guru.bpmn`                                                                                                               |
+| F1 eval truth                          | Synthetic page                                                                                                                                                 | `pnpm --filter @nemu/ai eval:school -- --live --photo <F1-1 photo> --truth <truth.json>`                                                             |
 
 ## Known limits
 

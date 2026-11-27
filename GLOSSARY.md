@@ -17,8 +17,16 @@ The code (kode pemasangan) a school operator types into the Nemu Extension's set
 _Avoid_: license key, token, API key
 
 **Allowed website (WS-03)**:
-A site on the school's list where the Nemu button appears and Nemu may read the page, such as `*.alursekolah.id`. Everywhere else Nemu shows and reads nothing (ADR-0016).
+A site on the school's list where the Nemu button appears and Nemu may read the page, such as `*.alursekolah.id`. Everywhere else Nemu shows and reads nothing (ADR-0016). Each site carries a **Site permission**.
 _Avoid_: whitelist, allowlist (in UI copy)
+
+**Site permission**:
+What Nemu may do on an allowed website: _baca dan isi_ (read and fill fields), _siapkan pesan_ (prepare a message the teacher sends herself) or _baca saja_ (only read and point). Where two sites cover a page, the narrower one wins. The extension reads it with the WS-03 list, so a change needs no update.
+_Avoid_: action level, scope
+
+**Nemu settings (WS-08)**:
+How Nemu works for every teacher of one school: the talk combination (default Ctrl + Space), the default cara, and the fill speed of cara 1. Delivered to the extension with the WS-03 list.
+_Avoid_: preferences, config
 
 **Nemu button**:
 The dark orange round button at the bottom right of an allowed website. Clicking it opens the type box; holding Ctrl + Spasi talks to Nemu instead.
@@ -111,8 +119,16 @@ One screen asking the teacher about a doubtful digit, a name spelled differently
 _Avoid_: confirmation, review
 
 **Kamus Kendala**:
-The school's error dictionary: what an error message means, whose fault it is, and who fixes it. Nemu answers "ini kenapa?" only from it.
+The school's error dictionary (WS-05): what an error message means, whose fault it is, and who fixes it, one row per message, typed or imported from Excel. Nemu answers "ini kenapa?" only from it, never from uploaded documents.
 _Avoid_: FAQ, error list
+
+**Uji jawaban (WS-09)**:
+Asking a question in the Admin Workspace and seeing the answer and sources Nemu would give if chosen inactive documents were active. It runs the same answering as the teacher's question, so activating the document changes nothing about the answer.
+_Avoid_: preview, sandbox
+
+**Paket AlurSekolah (WS-02)**:
+Javan's built-in knowledge on how AlurSekolah works. With "berlaku untuk semua sekolah", its active documents answer every school, not only Javan's own.
+_Avoid_: global knowledge, template
 
 **Recorded Procedure**:
 Steps an operator recorded once ("cara Pak Rizal"), with demo values turned into parameters. Replayed without a model; save, send and submit steps stay the teacher's.

@@ -1,10 +1,11 @@
+import type { TalkShortcut } from "@nemu/contracts/talk-shortcut";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { PageEmail } from "../../../shared/lib/messages";
 import { requestListenCancel, requestListenStart, requestListenStop } from "../api/request-voice";
 import { matchShortCommand } from "../lib/short-commands";
 import { IDLE, type TalkEvent, talkReducer, type TalkState } from "../lib/talk-machine";
-import { createHoldDetector, type TalkShortcut } from "../lib/talk-shortcut";
+import { createHoldDetector } from "../lib/talk-shortcut";
 import { voiceCommands } from "../stores/voice-commands";
 
 type TalkOptions = {

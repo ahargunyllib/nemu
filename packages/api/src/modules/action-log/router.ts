@@ -1,8 +1,8 @@
 import { actionLogRecordInputSchema } from "@nemu/contracts/executor";
 import { z } from "zod";
 
-import { schoolProcedure } from "../../index";
-import { insertActionLog } from "./repository";
+import { schoolFullAdminProcedure, schoolProcedure } from "../../index";
+import { insertActionLog, listActionLog } from "./repository";
 
 export const actionLogRouter = {
   /**
@@ -25,4 +25,9 @@ export const actionLogRouter = {
       );
       return { recorded: input.entries.length };
     }),
+
+  /** WS-10 (Admin Javan): the school's newest executor actions, as a table without filters. */
+  listActionLog: schoolFullAdminProcedure.handler(({ context }) =>
+    listActionLog(context.db, context.session.user.workspaceId),
+  ),
 };

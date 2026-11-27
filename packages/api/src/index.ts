@@ -145,6 +145,11 @@ export const schoolAdminProcedure = workspaceAdminProcedure.use(
   requireWorkspaceAccess(WORKSPACES.school),
 );
 
+/** School pages only Admin Javan sees: WS-02 package, WS-03 websites, WS-08 settings, WS-10 log. */
+export const schoolFullAdminProcedure = fullAdminProcedure.use(
+  requireWorkspaceAccess(WORKSPACES.school),
+);
+
 /** Procedures only the WhatsApp bot calls, with its shared secret instead of a user session. */
 export const waBotProcedure = publicProcedure.use(async ({ context, next }) => {
   if (context.internalCaller !== "wa-bot") {

@@ -1,15 +1,8 @@
 import { describe, expect, test } from "vite-plus/test";
 
-import {
-  createHoldDetector,
-  DEFAULT_TALK_SHORTCUT,
-  type KeyInput,
-  parseShortcut,
-  shortcutKeys,
-  type TalkShortcut,
-} from "./talk-shortcut";
+import { createHoldDetector, type KeyInput, talkShortcutFrom } from "./talk-shortcut";
 
-const ctrlSpace = parseShortcut(DEFAULT_TALK_SHORTCUT) as TalkShortcut;
+const ctrlSpace = talkShortcutFrom("Ctrl+Space");
 
 function key(overrides: Partial<KeyInput>): KeyInput {
   return {
@@ -24,22 +17,20 @@ function key(overrides: Partial<KeyInput>): KeyInput {
   };
 }
 
-describe("parseShortcut", () => {
-  test("reads the default Ctrl + Space and labels it in Indonesian", () => {
-    expect(ctrlSpace).toEqual({ ctrl: true, alt: false, shift: false, meta: false, code: "Space" });
-    expect(shortcutKeys(ctrlSpace)).toEqual(["Ctrl", "Spasi"]);
+describe("talkShortcutFrom", () => {
+  test("follows the school's WS-08 combination", () => {
+    expect(talkShortcutFrom("Alt+Shift+N")).toEqual({
+      ctrl: false,
+      alt: true,
+      shift: true,
+      meta: false,
+      code: "KeyN",
+    });
   });
 
-  test("accepts another combination a school may pick in WS-08", () => {
-    const shortcut = parseShortcut("Alt + Shift + n");
-    expect(shortcut).toEqual({ ctrl: false, alt: true, shift: true, meta: false, code: "KeyN" });
-    expect(shortcutKeys(shortcut as TalkShortcut)).toEqual(["Alt", "Shift", "N"]);
-  });
-
-  test("refuses a bare key, two main keys, or an unknown key", () => {
-    expect(parseShortcut("Space")).toBeNull();
-    expect(parseShortcut("Ctrl+A+B")).toBeNull();
-    expect(parseShortcut("Ctrl+F13")).toBeNull();
+  test("falls back to Ctrl + Space without a setting or with one Nemu can't hear", () => {
+    expect(talkShortcutFrom(undefined)).toEqual(ctrlSpace);
+    expect(talkShortcutFrom("Space")).toEqual(ctrlSpace);
   });
 });
 

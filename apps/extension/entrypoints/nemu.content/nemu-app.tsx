@@ -1,9 +1,11 @@
+import { shortcutKeys } from "@nemu/contracts/talk-shortcut";
 import { Button } from "@nemu/ui/components/button";
 import { GelembungJawab, GelembungJawabSkeleton } from "@nemu/ui/nemu/gelembung-jawab";
 import { NEMU_LINK } from "@nemu/ui/nemu/nemu-frame";
 import { NemuStage } from "@nemu/ui/nemu/nemu-stage";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import type { SiteAccess } from "../../features/allowed-sites/lib/site-access";
 import { DisplayPreviewDock } from "../../features/display-preview/components/display-preview-dock";
 import { useDisplayPreview } from "../../features/display-preview/hooks/use-display-preview";
 import { PREVIEW_ENABLED } from "../../features/display-preview/lib/preview-scenes";
@@ -22,19 +24,20 @@ import { HeardBubble, ListeningBubble } from "../../features/voice/components/ta
 import { useTalk } from "../../features/voice/hooks/use-talk";
 import { useVoice, type VoiceState } from "../../features/voice/hooks/use-voice";
 import type { TalkState } from "../../features/voice/lib/talk-machine";
-import { shortcutKeys, TALK_SHORTCUT } from "../../features/voice/lib/talk-shortcut";
+import { talkShortcutFrom } from "../../features/voice/lib/talk-shortcut";
 import { spokenWordIn } from "../../features/voice/lib/word-timing";
 import { voiceCommands } from "../../features/voice/stores/voice-commands";
-
-const SHORTCUT_KEYS = shortcutKeys(TALK_SHORTCUT);
 
 /**
  * Everything Nemu draws on an allowed page (WS-03): the Nemu button and, once it is clicked or the
  * talk combination is held, the panel above it. Who Nemu helps follows the account signed in on
  * the page. Only one of the five display types shows at a time (PRD §6.2), and Nemu speaks the
- * main sentence of every answer.
+ * main sentence of every answer. The talk combination is the school's WS-08 setting from `access`;
+ * the executor reads the site's WS-03 permission and the WS-08 defaults itself (`executorSettings`).
  */
-export function NemuApp() {
+export function NemuApp({ access }: { access: SiteAccess }) {
+  const talkShortcut = access.settings.talkShortcut;
+  const shortcut = useMemo(() => talkShortcutFrom(talkShortcut), [talkShortcut]);
   const pageEmail = usePageEmail();
   const identity = useIdentity(pageEmail);
   const [open, setOpen] = useState(false);
@@ -45,7 +48,7 @@ export function NemuApp() {
   const run = useExecutor();
   const talk = useTalk({
     pageEmail,
-    shortcut: TALK_SHORTCUT,
+    shortcut,
     enabled: identity?.status === "registered",
     isWorking: () => working || voiceCommands.isWorking(),
     onStart: () => setOpen(true),
@@ -153,7 +156,7 @@ export function NemuApp() {
         <div className="pointer-events-auto">
           <NemuButton
             open={open}
-            shortcutKeys={SHORTCUT_KEYS}
+            shortcutKeys={shortcutKeys(shortcut)}
             onToggle={() => setOpen((current) => !current)}
             onHoldStart={talk.press}
             onHoldEnd={talk.release}

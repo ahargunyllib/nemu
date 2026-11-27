@@ -2,16 +2,22 @@ import { screenSnapshotSchema } from "@nemu/contracts/school";
 import { z } from "zod";
 
 import type { Context } from "../../context";
-import { schoolProcedure } from "../../index";
+import { schoolAdminProcedure, schoolProcedure } from "../../index";
+import { createCatalogRepository } from "../documents/catalog-repository";
 import { createDocumentRepository } from "../documents/repository";
-import { ask, explain, route } from "./service";
+import { createKamusRepository } from "../kamus/repository";
+import { ask, explain, route, tryAnswer } from "./service";
 
-function helpDeps(context: Pick<Context, "db" | "school" | "documentFiles">) {
-  return { ai: context.school.ai, documents: createDocumentRepository(context.db) };
+function helpDeps(context: Pick<Context, "db" | "school">) {
+  return {
+    ai: context.school.ai,
+    documents: createDocumentRepository(context.db),
+    kamus: createKamusRepository(context.db),
+  };
 }
 
 export const helpRouter = {
-  /** F2: the screen-reader's snapshot (+ what the teacher said) → whose fault, who fixes it, WhatsApp draft. */
+  /** F2: the page snapshot (+ what the teacher said) → whose fault and who fixes it, from WS-05. */
   helpExplain: schoolProcedure
     .input(
       z.object({ snapshot: screenSnapshotSchema, question: z.string().trim().max(500).nullable() }),
@@ -28,6 +34,23 @@ export const helpRouter = {
       await context.caller.requireTeacher();
       return ask(helpDeps(context), context.caller.workspaceId, input.question);
     }),
+
+  /** WS-09 Uji jawaban (operator or Admin Javan): the answer with chosen inactive documents. */
+  helpTryAnswer: schoolAdminProcedure
+    .input(
+      z.object({
+        question: z.string().trim().min(1).max(500),
+        documentIds: z.array(z.string().min(1)).max(50),
+      }),
+    )
+    .handler(({ context, input }) =>
+      tryAnswer(
+        { ...helpDeps(context), catalog: createCatalogRepository(context.db) },
+        context.session.user.workspaceId,
+        input.question,
+        input.documentIds,
+      ),
+    ),
 
   /** Routes a transcript to a feature; voice controls are recognized without a model call. */
   helpRoute: schoolProcedure

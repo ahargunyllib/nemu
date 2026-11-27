@@ -2,12 +2,16 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 
 import type { Context } from "../../context";
-import { workspaceAdminProcedure } from "../../index";
+import {
+  schoolAdminProcedure,
+  schoolFullAdminProcedure,
+  workspaceAdminProcedure,
+} from "../../index";
+import { createCatalogRepository } from "./catalog-repository";
 import { createDocumentRepository } from "./repository";
 import {
   deleteDocument,
   documentFormatOf,
-  listDocuments,
   readDocumentFile,
   MAX_DOCUMENT_BYTES,
   setDocumentActive,
@@ -18,8 +22,12 @@ function documentDeps(context: Pick<Context, "db" | "documentFiles">) {
   return {
     documents: createDocumentRepository(context.db),
     files: context.documentFiles,
+    catalog: createCatalogRepository(context.db),
   };
 }
+
+/** The one package WS-02 manages today: Javan's built-in AlurSekolah guide. */
+const ALURSEKOLAH_PACKAGE = "alursekolah";
 
 const uploadDocumentInputSchema = z.object({
   title: z.string().trim().min(1).max(200),
@@ -32,6 +40,8 @@ const uploadDocumentInputSchema = z.object({
       "Upload a PDF, Markdown (.md) or BPMN (.bpmn) file",
     )
     .refine((file) => file.size <= MAX_DOCUMENT_BYTES, "Upload a file no larger than 10 MB"),
+  siteIds: z.array(z.string().min(1)).max(50).default([]),
+  packageId: z.literal(ALURSEKOLAH_PACKAGE).nullable().default(null),
 });
 
 const documentIdSchema = z.object({ id: z.string().min(1) });
@@ -43,12 +53,77 @@ export const documentsRouter = {
       uploadDocument(documentDeps(context), {
         ...input,
         workspaceId: context.session.user.workspaceId,
+        createdBy: context.session.user.id,
       }),
     ),
 
-  listDocuments: workspaceAdminProcedure.handler(({ context }) =>
-    listDocuments(documentDeps(context), context.session.user.workspaceId),
-  ),
+  /** WS-04: the school's own documents, newest first, with who uploaded and switched them. */
+  listDocuments: workspaceAdminProcedure
+    .input(z.object({ packageId: z.literal(ALURSEKOLAH_PACKAGE).nullable() }).optional())
+    .handler(({ context, input }) =>
+      createCatalogRepository(context.db).listDocuments(
+        context.session.user.workspaceId,
+        input?.packageId ?? null,
+      ),
+    ),
+
+  /** WS-04: the WS-03 websites a document applies to; empty for every site. */
+  setDocumentSites: workspaceAdminProcedure
+    .input(documentIdSchema.extend({ siteIds: z.array(z.string().min(1)).max(50) }))
+    .handler(async ({ context, input }) => {
+      const updated = await createCatalogRepository(context.db).setSites(
+        context.session.user.workspaceId,
+        input.id,
+        input.siteIds,
+      );
+      if (!updated) throw new ORPCError("NOT_FOUND", { message: "Document not found" });
+    }),
+
+  /** WS-02 (Admin Javan): the built-in AlurSekolah package and whether every school uses it. */
+  getKnowledgePackage: schoolFullAdminProcedure.handler(async ({ context }) => {
+    const found = await createCatalogRepository(context.db).findPackage(ALURSEKOLAH_PACKAGE);
+    if (!found) throw new ORPCError("NOT_FOUND", { message: "Paket tidak ditemukan" });
+    return found;
+  }),
+
+  setPackageAllSchools: schoolFullAdminProcedure
+    .input(z.object({ allSchools: z.boolean() }))
+    .handler(async ({ context, input }) => {
+      const updated = await createCatalogRepository(context.db).setPackageAllSchools(
+        ALURSEKOLAH_PACKAGE,
+        input.allSchools,
+        context.session.user.id,
+      );
+      if (!updated) throw new ORPCError("NOT_FOUND", { message: "Paket tidak ditemukan" });
+    }),
+
+  /** F3-11 / F3-19: a BPMN's tasks and end events with their symptoms and pages. */
+  listProcessElements: schoolAdminProcedure
+    .input(documentIdSchema)
+    .handler(({ context, input }) =>
+      createCatalogRepository(context.db).listProcessElements(
+        context.session.user.workspaceId,
+        input.id,
+      ),
+    ),
+
+  saveProcessElement: schoolAdminProcedure
+    .input(
+      documentIdSchema.extend({
+        elementId: z.string().min(1),
+        symptoms: z.array(z.string().trim().min(1).max(200)).max(20),
+        page: z.string().trim().max(120).nullable(),
+      }),
+    )
+    .handler(async ({ context, input }) => {
+      const updated = await createCatalogRepository(context.db).updateProcessElement(
+        context.session.user.workspaceId,
+        input.id,
+        input.elementId,
+        { symptoms: input.symptoms, page: input.page || null, pageEdited: true },
+      );
+      if (!updated) throw new ORPCError("NOT_FOUND", { message: "Elemen proses tidak ditemukan" });
+    }),
 
   setDocumentActive: workspaceAdminProcedure
     .input(documentIdSchema.extend({ isActive: z.boolean() }))
@@ -58,6 +133,7 @@ export const documentsRouter = {
         context.session.user.workspaceId,
         input.id,
         input.isActive,
+        context.session.user.id,
       );
       if (!document) throw new ORPCError("NOT_FOUND", { message: "Document not found" });
       return document;

@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { describe, expect, test } from "vite-plus/test";
 
-import { guardSubmits, isTeacherInput, refusalFor, toSafeTask } from "./safety";
+import { guardSubmits, isTeacherInput, refusalFor, sitePermits, toSafeTask } from "./safety";
 import { F0_1_FILE } from "./test-responses";
 
 function element(html: string): Element {
@@ -101,6 +101,15 @@ describe("isTeacherInput (F0-07)", () => {
     );
     expect(isTeacherInput(input({ type: "keydown", key: " ", ctrlKey: true }), host)).toBe(false);
   });
+
+  test("the school's own talk combination (WS-08) doesn't interrupt either; N alone still does", () => {
+    const altShiftN = { ctrl: false, alt: true, shift: true, meta: false, code: "KeyN" };
+    const keyN = { type: "keydown", key: "N", code: "KeyN" };
+    expect(isTeacherInput(input({ ...keyN, altKey: true, shiftKey: true }), host, altShiftN)).toBe(
+      false,
+    );
+    expect(isTeacherInput(input(keyN), host, altShiftN)).toBe(true);
+  });
 });
 
 describe("guardSubmits (F0-08)", () => {
@@ -121,5 +130,29 @@ describe("guardSubmits (F0-08)", () => {
     expect(submit()).toBe(true);
     remove();
     expect(submit()).toBe(false);
+  });
+});
+
+describe("sitePermits (WS-03)", () => {
+  test("'baca dan isi' permits every verb; 'baca saja' only pointing and scrolling", () => {
+    for (const verb of [
+      "point",
+      "scroll",
+      "setValue",
+      "selectOption",
+      "check",
+      "clickMenu",
+    ] as const)
+      expect(sitePermits("read_fill", verb)).toBe(true);
+    expect(sitePermits("read_only", "point")).toBe(true);
+    expect(sitePermits("read_only", "scroll")).toBe(true);
+    for (const verb of ["setValue", "selectOption", "check", "clickMenu"] as const)
+      expect(sitePermits("read_only", verb)).toBe(false);
+  });
+
+  test("'siapkan pesan' lets Nemu type the message and nothing else", () => {
+    expect(sitePermits("prepare_message", "setValue")).toBe(true);
+    for (const verb of ["selectOption", "check", "clickMenu"] as const)
+      expect(sitePermits("prepare_message", verb)).toBe(false);
   });
 });

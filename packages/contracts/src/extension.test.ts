@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { hostPermissionFor, isAllowedUrl, siteMatches } from "./extension.js";
+import {
+  hostPermissionFor,
+  isAllowedUrl,
+  mayFill,
+  siteMatches,
+  sitePermissionFor,
+} from "./extension.js";
 
 test("a wildcard site covers the tenant subdomains and the apex, not look-alikes", () => {
   assert.ok(siteMatches("*.alursekolah.id", "https://sditnusantara.alursekolah.id/nilai"));
@@ -40,4 +46,26 @@ test("the host permission for a site uses http only for localhost and drops the 
   assert.equal(hostPermissionFor("*.alursekolah.id"), "https://*.alursekolah.id/*");
   assert.equal(hostPermissionFor("portal.sekolah.sch.id"), "https://portal.sekolah.sch.id/*");
   assert.equal(hostPermissionFor("localhost:3003"), "http://localhost/*");
+});
+
+test("WS-03: the narrower permission wins where two sites cover a page", () => {
+  const sites = [
+    { pattern: "*.alursekolah.id", label: "AlurSekolah", permission: "read_fill" as const },
+    { pattern: "rapor.alursekolah.id", label: "Rapor", permission: "read_only" as const },
+    { pattern: "web.whatsapp.com", label: "WhatsApp", permission: "prepare_message" as const },
+  ];
+  assert.equal(sitePermissionFor(sites, "https://sditn.alursekolah.id/nilai"), "read_fill");
+  assert.equal(sitePermissionFor(sites, "https://rapor.alursekolah.id/"), "read_only");
+  assert.equal(sitePermissionFor(sites, "https://web.whatsapp.com/"), "prepare_message");
+  assert.equal(sitePermissionFor(sites, "https://nemu-erapor.ahargunyllib.dev/"), null);
+  assert.ok(mayFill("read_fill"));
+  assert.ok(!mayFill("read_only"));
+  assert.ok(!mayFill("prepare_message"));
+});
+
+test("a list cached before WS-03 had permissions still reads and fills", () => {
+  assert.equal(
+    sitePermissionFor([{ pattern: "localhost:3003" }], "http://localhost:3003/#/nilai"),
+    "read_fill",
+  );
 });

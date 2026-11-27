@@ -26,7 +26,7 @@ describe("F2 and school questions through the API (seeded kamus and SOP)", () =>
     expect(result).toMatchObject({
       status: "matched",
       sentence: "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Ahmad (kepsek).",
-      citation: { docId: "kamus-kendala-sdit-nusantara", article: "K-01" },
+      citation: { docId: "kamus-kendala", article: "K-01" },
       waDraft: { phone: "6281200000001" },
     });
   });

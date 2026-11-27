@@ -10,7 +10,6 @@ import {
   MAX_DOCUMENT_BYTES,
   type UploadDocumentInput,
   deleteDocument,
-  listDocuments,
   readDocumentFile,
   setDocumentActive,
   uploadDocument,
@@ -29,6 +28,10 @@ function createFakes() {
         failureReason: null,
         createdAt: now,
         updatedAt: now,
+        siteIds: [],
+        packageId: null,
+        createdBy: null,
+        changedBy: null,
         ...record,
         workspaceId: record.workspaceId ?? "W-TRAVEL",
       };
@@ -298,7 +301,7 @@ describe("uploadDocument", () => {
       await uploadDocument(deps, upload(file, { title: basename(path, ".md") }));
     }
 
-    const listed = await listDocuments(deps, "W-TRAVEL");
+    const listed = await deps.documents.list("W-TRAVEL");
     expect(listed).toHaveLength(paths.length);
     expect(listed.every((document) => document.status === "ready")).toBe(true);
   });
@@ -312,7 +315,7 @@ describe("setDocumentActive", () => {
     const deactivated = await setDocumentActive(deps, "W-TRAVEL", document.id, false);
 
     expect(deactivated?.isActive).toBe(false);
-    expect((await listDocuments(deps, "W-TRAVEL"))[0]?.isActive).toBe(false);
+    expect((await deps.documents.list("W-TRAVEL"))[0]?.isActive).toBe(false);
   });
 });
 
@@ -328,7 +331,7 @@ describe("workspace isolation", () => {
       upload(new File(["# Telco"], "telco.md"), { workspaceId: "W-TELKO" }),
     );
 
-    await expect(listDocuments(deps, "W-TRAVEL")).resolves.toEqual([
+    await expect(deps.documents.list("W-TRAVEL")).resolves.toEqual([
       expect.objectContaining({ workspaceId: "W-TRAVEL" }),
     ]);
   });
@@ -342,7 +345,7 @@ describe("deleteDocument", () => {
     const deleted = await deleteDocument(deps, "W-TRAVEL", document.id);
 
     expect(deleted?.id).toBe(document.id);
-    expect(await listDocuments(deps, "W-TRAVEL")).toHaveLength(0);
+    expect(await deps.documents.list("W-TRAVEL")).toHaveLength(0);
     expect(objects.size).toBe(0);
     expect(await readDocumentFile(deps, "W-TRAVEL", document.id)).toBeUndefined();
   });
@@ -359,7 +362,7 @@ describe("deleteDocument", () => {
 
     await deleteDocument({ ...deps, files: failingFiles }, "W-TRAVEL", document.id);
 
-    expect(await listDocuments(deps, "W-TRAVEL")).toHaveLength(0);
+    expect(await deps.documents.list("W-TRAVEL")).toHaveLength(0);
   });
 
   it("returns nothing for an unknown document", async () => {

@@ -87,7 +87,7 @@ export function estimateWordTimings(text: string): { words: SpokenWord[]; durati
     offset += durationMs;
     if (/[.!?]$/u.test(token)) offset += 500;
     else if (/[.;:]$/u.test(token)) offset += 300;
-    else if (/,$/u.test(token)) offset += 180;
+    else if (token.endsWith(",")) offset += 180;
   }
   return { words, durationMs: offset };
 }

@@ -202,7 +202,10 @@ export function createFixtureSchoolAi(): SchoolAi {
       const top = context[0];
       if (!top || top.score < 1)
         return { status: "not_in_guide", answer: "Belum ada di panduan sekolah." };
+      // A guide section starts with its Markdown heading; the answer is the first sentence under it.
       const quote = top.text
+        .replace(/^#{1,6}\s.*$/gmu, "")
+        .trim()
         .split(/(?<=\.)\s+/u)[0]!
         .replace(/^\d+(\.\d+)*\s+/u, "")
         .replace(/\.$/u, "");

@@ -84,3 +84,40 @@ describe("action log (WS-10)", () => {
     expect(error).toMatchObject({ code: "FORBIDDEN" });
   });
 });
+
+describe("WS-10 action log page", () => {
+  const ADMIN_JAVAN = { id: "javan", role: "admin", workspaceId: "W-SEKOLAH" };
+  const OPERATOR = { id: "rizal", role: "operator", workspaceId: "W-SEKOLAH" };
+
+  it("shows Admin Javan what the executor recorded, newest first, and keeps it from an operator", async () => {
+    const extension = await fromExtension({ installCode: INSTALL_CODE, email: BU_SITI });
+    await call(
+      actionLogRouter.actionLogRecord,
+      {
+        entries: [
+          FILLED,
+          { ...FILLED, action: "point", target: "Simpan", result: "teacher", at: FILLED.at + 1 },
+        ],
+      },
+      { context: extension },
+    );
+
+    // The same database, with an Admin Workspace session instead of the extension's headers.
+    const signedIn = async (user: typeof ADMIN_JAVAN) => ({
+      ...extension,
+      extension: null,
+      session: (await createSchoolContext(user)).session,
+    });
+    const rows = await call(actionLogRouter.listActionLog, undefined, {
+      context: await signedIn(ADMIN_JAVAN),
+    });
+    expect(rows).toMatchObject([
+      { teacherName: "Siti Aminah, S.Pd.", action: "point", target: "Simpan", result: "teacher" },
+      { action: "setValue", target: "Nilai Budi Santoso", cara: 1, result: "done" },
+    ]);
+
+    await expect(
+      call(actionLogRouter.listActionLog, undefined, { context: await signedIn(OPERATOR) }),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+});

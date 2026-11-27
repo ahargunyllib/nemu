@@ -8,6 +8,7 @@ import { healthRouter } from "../modules/health/router";
 import { helpRouter } from "../modules/help/router";
 import { inboxRouter } from "../modules/inbox/router";
 import { integrationsRouter } from "../modules/integrations/router";
+import { kamusRouter } from "../modules/kamus/router";
 import { processesRouter } from "../modules/processes/router";
 import { referenceTablesRouter } from "../modules/reference-tables/router";
 import { ruleSourcesRouter } from "../modules/rule-sources/router";
@@ -30,6 +31,7 @@ export const appRouter = {
   ...extensionRouter,
   ...integrationsRouter,
   ...actionLogRouter,
+  ...kamusRouter,
 };
 export type AppRouter = typeof appRouter;
 export type AppRouterClient = RouterClient<typeof appRouter>;
