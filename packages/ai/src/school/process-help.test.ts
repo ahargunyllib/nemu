@@ -10,6 +10,7 @@ import {
   contactForLane,
   explainProcess,
   isParentSafe,
+  screenSymptoms,
   suggestSymptoms,
   type GradeCheck,
   type ProcessIndex,
@@ -435,4 +436,13 @@ test("a phrasing call that fails still answers with the code's drafts", async ()
   if (answer?.status !== "process") return;
   assert.equal(answer.fixer?.name, "Bu Ratna");
   assert.ok(answer.parentReply && isParentSafe(answer.parentReply));
+});
+
+test("routing screens questions in code: clear symptoms and unrelated questions need no model", async () => {
+  const ai = createFixtureSchoolAi();
+  const candidates = candidatesOf(await ai.suggestSymptoms({ graph: await sppGraph() }));
+  assert.equal(screenSymptoms("Kalau bayar tunai, kapan nilainya terbuka?", candidates), "match");
+  assert.equal(screenSymptoms("Berapa KKM untuk kelas 4?", candidates), "none");
+  assert.equal(screenSymptoms("Nilai remedial paling tinggi berapa?", candidates), "none");
+  assert.equal(screenSymptoms("Kalau sudah bayar sebagian kapan terbuka?", candidates), "near");
 });
