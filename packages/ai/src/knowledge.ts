@@ -38,13 +38,20 @@ function tokenize(value: string): string[] {
     .filter((token) => token.length > 1 && !STOP_WORDS.has(token));
 }
 
+// An article label such as "3 ayat 3.2" is matched by its numbers only: its structural words would
+// otherwise make every point of a Pasal look like it mentions "ayat".
+function searchableText(chunk: KnowledgeChunk): string {
+  const label = (chunk.article ?? "").replace(/\b(pasal|ayat|huruf|angka|poin|butir)\b/giu, " ");
+  return `${chunk.title} ${label} ${chunk.text}`;
+}
+
 function calculateIdf(chunks: readonly KnowledgeChunk[]): Map<string, number> {
   const docFreq = new Map<string, number>();
   const activeChunks = chunks.filter((c) => c.active);
   const n = activeChunks.length;
 
   for (const chunk of activeChunks) {
-    const text = `${chunk.title} ${chunk.article ?? ""} ${chunk.text}`;
+    const text = searchableText(chunk);
     const uniqueTokens = new Set(tokenize(text));
     for (const token of uniqueTokens) {
       docFreq.set(token, (docFreq.get(token) ?? 0) + 1);
@@ -63,8 +70,7 @@ function scoreChunk(
   chunk: KnowledgeChunk,
   idfMap: Map<string, number>,
 ): number {
-  const searchableText = `${chunk.title} ${chunk.article ?? ""} ${chunk.text}`;
-  const chunkTokens = tokenize(searchableText);
+  const chunkTokens = tokenize(searchableText(chunk));
   const frequencies = new Map<string, number>();
 
   for (const token of chunkTokens) {
