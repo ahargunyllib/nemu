@@ -30,6 +30,7 @@ import type { ProcessGraph } from "./bpmn/graph.js";
 import { extractSlots, resolveWeekday, slotSpecs, type ExtractSlotsInput } from "./bpmn/plan.js";
 import { F1_DOUBTFUL, F1_REREAD, f1Page } from "./fixtures/f1-photo.js";
 import { F4_2_READING, F4_2_SCRIPT_SHA256 } from "./fixtures/f4-2-script.js";
+import { F2_1_SPP_INDEX, F2_1_SPP_PHRASING, isF21Spp } from "./fixtures/f2-1-spp.js";
 import { fixtureFormPhoto } from "./fixtures/form-photo.js";
 import {
   parseGradeExcel,
@@ -54,10 +55,13 @@ import {
   draftPhrasing,
   explainProcess,
   keywordSymptomMatch,
+  keywordViaMatch,
   matchSymptom,
   suggestSymptoms,
   type ExplainProcessInput,
+  type ProcessIndex,
   type SymptomCandidate,
+  type SymptomMatch,
 } from "./process-help.js";
 import {
   assembleProcedure,
@@ -82,13 +86,16 @@ export type SchoolAi = {
   parseGradeExcel(input: ParseGradeExcelInput): Promise<ParseGradeExcelResult>;
   explainError(input: ExplainErrorInput): Promise<HelpExplanation>;
   answerGrounded(input: AnswerGroundedInput): Promise<GroundedAnswer>;
-  /** F3-11: on BPMN upload, the symptoms a user sees at each task and end event, by element id. */
-  suggestSymptoms(input: { graph: ProcessGraph }): Promise<Record<string, string[]>>;
-  /** F3-12: the stored symptom the teacher's words describe, or null (F3-14). */
+  /**
+   * F3-11: on BPMN upload, per task, event and end event: the symptoms a user sees there, the step
+   * that undoes it and the school role who can help, by element id.
+   */
+  suggestSymptoms(input: { graph: ProcessGraph }): Promise<ProcessIndex>;
+  /** F3-12: the stored symptom the teacher's words describe (and what came first), or null (F3-14). */
   matchSymptom(input: {
     question: string;
     candidates: readonly SymptomCandidate[];
-  }): Promise<SymptomCandidate | null>;
+  }): Promise<SymptomMatch | null>;
   /** F2-08 / F3-12..13: cause, way back, who helps and the parent reply; null if the walk fails. */
   explainProcess(input: ExplainProcessInput): Promise<HelpExplanation | null>;
   extractSlots(input: ExtractSlotsInput): Promise<Record<string, SlotValue>>;
@@ -290,25 +297,63 @@ export function createFixtureSchoolAi(): SchoolAi {
       );
     },
 
-    // Symptoms from the elements' own documentation, matching by shared words, drafts as written.
+    // The official F2-1 SPP file gets the index the live model writes for it (fixtures/f2-1-spp.ts);
+    // any other file gets symptoms from its elements' own documentation. Matching by shared words,
+    // drafts as written.
     suggestSymptoms: (input) =>
       suggestSymptoms(
         {
           llm: codeCall(() => ({
-            elements: Object.entries(documentationSymptoms(input.graph)).map(
-              ([element_id, symptoms]) => ({ element_id, symptoms }),
-            ),
+            elements: isF21Spp(input.graph)
+              ? Object.entries(F2_1_SPP_INDEX).map(([element_id, entry]) => ({
+                  element_id,
+                  ...entry,
+                }))
+              : Object.entries(documentationSymptoms(input.graph)).map(
+                  ([element_id, symptoms]) => ({
+                    element_id,
+                    symptoms,
+                    way_back: null,
+                    role: null,
+                  }),
+                ),
           })),
         },
         input,
       ),
     matchSymptom: (input) =>
       matchSymptom(
-        { llm: codeCall(() => ({ index: keywordSymptomMatch(input.question, input.candidates) })) },
+        {
+          llm: codeCall(() => {
+            const index = keywordSymptomMatch(input.question, input.candidates);
+            return {
+              index,
+              via: index === null ? null : keywordViaMatch(input.question, input.candidates, index),
+            };
+          }),
+        },
         input,
       ),
+    // The official F2-1 walks read as the key phrases them; any other walk keeps the code's drafts.
     explainProcess: (input) =>
-      explainProcess({ llm: codeCall((request) => draftPhrasing(requestText(request))) }, input),
+      explainProcess(
+        {
+          llm: codeCall((request) => {
+            const text = requestText(request);
+            const drafted = draftPhrasing(text);
+            const cause = (JSON.parse(text) as { jalur: Array<{ nama: string }> }).jalur.at(-1);
+            const canned = isF21Spp(input.process.graph)
+              ? F2_1_SPP_PHRASING[cause?.nama ?? ""]
+              : undefined;
+            if (!canned || canned.steps.length !== drafted.steps.length) return drafted;
+            return {
+              ...canned,
+              steps: canned.steps.map((step, index) => ({ index, text: step })),
+            };
+          }),
+        },
+        input,
+      ),
 
     async extractSlots(input) {
       return extractSlots(
