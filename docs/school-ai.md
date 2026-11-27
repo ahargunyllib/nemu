@@ -1,8 +1,8 @@
-# Nemu v2.2 school AI: integration guide
+# Nemu v2.3 school AI: integration guide
 
-The AI side of Nemu v2.2 (AlurSekolah) as built for the MVP. It is for the fullstack side: what to call, in what order, and what you must enforce. The design is in `docs/AI_TECHNICAL_PRD.md`; the decisions are ADR-0009 to ADR-0012.
+The AI side of Nemu v2.3 (AlurSekolah) as built for the MVP. The client is the Nemu Extension for Chrome and Edge; there is no desktop app. It is for the fullstack side: what to call, in what order, and what you must enforce. The design is in `docs/AI_TECHNICAL_PRD.md`; the decisions are ADR-0009 to ADR-0013.
 
-Everything here runs on the synthetic school **SDIT Nusantara**. Replace the synthetic pieces listed at the end once the official `data-uji-mvp-v2` files are in hand.
+Everything here runs on the synthetic school **SDIT Nusantara**. Replace the synthetic pieces listed at the end with the official v2.3 test pack (`00_BACA-DULU.md` and its folders) as each one is brought in.
 
 ## Run it
 
@@ -58,6 +58,8 @@ All are oRPC procedures on the Nemu Service, open to a `W-SEKOLAH` session or to
 `.bpmn` files are accepted by `uploadDocument` and the Admin Workspace picker. On upload each task and end event is stored in `process_element` with the symptoms `SchoolAi.suggestSymptoms` gives it (F3-11; empty if the model fails) and, for a user task, a page taken from its label; the operator corrects both in WS-04 (`listProcessElements`, `saveProcessElement`).
 
 `helpExplain` first matches the teacher's words to those symptoms (F2-08, below). Otherwise it reads only the WS-05 Kamus Kendala table (`kamus_kendala`, citation `docId: "kamus-kendala"`, `article` = the row's code).
+
+The kamus is matched in code first (AI_TECHNICAL_PRD §5.1, `packages/ai/src/school/kamus.ts`): a row matches when every fixed part of its message appears, in order, in one text on the page (`[mapel]`, `…`, `*` stand for the parts that vary). Only when no row matches but some share most of their words with the page does one model call pick a row id, or none, from the three closest rows. Whose fault, who fixes it, **Kenapa?**, the button (`tombol "…"` in the row's fix) and the WhatsApp text all come from the matched row and the WS-06 contacts, never from the model. `pnpm --filter @nemu/ai eval:f2 [-- --live]` runs F2-2, F2-3 and three screens the kamus doesn't cover.
 
 ## Flows
 
@@ -128,10 +130,13 @@ Nothing in the code knows SPP: the school's uploaded `.bpmn`, its WS-04 symptoms
   1. **Selesai** → `procedureRecordingSave`; **Periksa rekaman** opens the Admin Workspace's `/recording?recording=…`, where the operator (signed in) sees `procedureCompile`'s steps, renames inputs and their questions, deletes steps or records again (**Rekam ulang** opens the recorded page), sets who recorded it, and saves (`procedureSave`). Simpan, Kirim, Hapus steps show "dikerjakan guru".
   2. **Unduh BPMN** (the review page or the procedure's row in Pengetahuan sekolah) → `procedureExportBpmn`.
   3. The teacher names the procedure ("Catat ujian tahfidz untuk Fatih"): `helpRoute` picks the active BPMN or procedure title sharing the most words; `procedureRun` → `missing` (ask `parameter.question`, one at a time) or `steps`. The executor clicks by name, fills by label and points at the teacher's step, with "Rekaman Bu Siti, langkah 11 dari 11" behind Sumber.
+- **Quiz script (F4-03, #219).** `quizScriptRead` → `SchoolAi.readQuizScript` with `OPENROUTER_SCHOOL_SCRIPT_MODEL` (default `anthropic/claude-haiku-5.5`: reads PDFs natively, 10/10 on F4-2 in 7/7 live runs at about 8 s, the cheapest model that passed; `google/gemini-3.7-flash` and `google/gemini-4-hydrogen` also pass at 20–30 s). A PDF goes as an `input_file` plus its embedded pictures; a Word file (.docx) is read in code (`quiz/docx.ts`: text with Word's numbering written out, pictures from `word/media`); a photo goes as an image, and a picture inside a photo is asked about, never cropped. Old `.doc` files are refused with a sentence. Check it with `pnpm --filter @nemu/ai eval:quiz -- --live [--runs 3] [--script naskah.docx]`. The F4-01 quiz check stays in the extension's DOM rules; `judgeQuiz` returns no problems (#218).
 
 ### Speech
 
 - `speechTranscribe` before anything else; show `text`.
+- Routing reads spoken Javanese and the recognizer's usual slips as Indonesian first (`normalizeUtterance` in `packages/ai/src/school/commands.ts`): "tulung isiake nilai" is grade entry, "nilaine kok ora metu" is "kenapa". A short control (`pelan`, `ulangi`, `ajari saya`, `lanjut`, `saya saja`) counts only as the whole utterance; "berhenti" counts at the start of anything. "Ajari saya ngisi nilai …" is grade entry, and `gradesParseCommand` returns `cara: 2` for it.
+- F0-2 (10 spoken commands, ≥ 8 right): `pnpm --filter @nemu/ai eval:f0-2` checks the sentences as text; add `-- --audio <folder> [--models a,b]` with recordings named `01.m4a` … `10.m4a` to transcribe and route them.
 - `speechSynthesize(sentence)`. With `timing: "estimated"`, scale every `offsetMs` and `durationMs` by `audio.duration * 1000 / estimatedDurationMs` once the audio loads.
 - With `audioBase64: ""`, speak `text` with `speechSynthesis` (Windows: Microsoft Andika `id-ID`) at `rate = 0.85` and use the same `words`.
 
@@ -158,7 +163,7 @@ The AI never emits a press of Simpan, Kirim, Ajukan or Hapus: those are `human` 
 | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Teacher profile, roster, contacts, KKM  | Done: WS-06 in D1 (`createRegistrySchoolDirectory`), seeded from `profil-sekolah.json` and `daftar-siswa-*.csv`; `createDemoSchoolDirectory()` stays for tests                      | Rosters from the AlurSekolah `/siswa` read (#204) once the school's key is set                                                                       |
 | SOP Penilaian                           | Seed migration, document `sop-penilaian-sdit-nusantara`                                                                                                                             | Upload the official PDF in Admin → Pengetahuan sekolah. Then re-point the four `school.*` Rule Sources at the new SOP and deactivate the seeded one. |
-| Kamus Kendala                           | Seed migrations, rows K-01..K-07 in `kamus_kendala` (K-02 is test F2-3, K-07 is F2-2)                                                                                               | Import the official kamus in Admin → Kamus Kendala (Excel) or type the rows.                                                                         |
+| Kamus Kendala                           | Done: the official `kamus-kendala-sdit-nusantara.json` (v1.1) seeded by `20261127180000_official_kamus`; no. N is K-0N (K-02 is F2-3, K-07 is F2-2), no. 6 is empty on purpose      | A newer kamus: import its JSON or Excel in Admin → Kamus Kendala (a known code is replaced), or type the rows.                                       |
 | SPP BPMN and F2-1 questions             | `packages/ai/src/school/fixtures/F2-1_alur-spp.bpmn`, `F2-1_pertanyaan-dan-kunci.csv` (tests; upload the BPMN in Pengetahuan sekolah for the demo)                                  | The official `03_F2_macet/F2-1_spp/` files                                                                                                           |
 | Izin BPMN                               | `packages/ai/src/school/fixtures/pengajuan-izin-guru.bpmn` (tests only); the official v2.2 `F3-1_pengajuan-izin-guru.bpmn` (`arsip/`) is the regression check next to it            | Upload `F3-1_pengajuan-izin-guru.bpmn`                                                                                                               |
 | Tahfidz BPMN, F3-1 photo and key        | Done: the official `04_F3_workspace/` files in `packages/ai/src/school/fixtures/` (`F3-1_catat-hafalan-tahfidz.bpmn`, `F3-1_foto-buku-setoran-tahfidz-4A.jpg`, `F3-1_kunci.csv`)    | Javan's own "Student Activity Input" BPMN, if they give it                                                                                           |

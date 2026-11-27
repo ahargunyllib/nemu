@@ -1,44 +1,27 @@
-import type { KnowledgeChunk } from "@nemu/ai";
 import { type Grid, readWorkbookGrids } from "@nemu/ai/school/grades/excel";
+import type { KamusRow } from "@nemu/ai/school/kamus";
 
-import type { KamusEntry, KamusFixer, KamusRecord, KamusRepository } from "./repository";
+import type { KamusEntry, KamusFixer, KamusRepository } from "./repository";
 
 /** WS-05 Kamus Kendala: rows the operator types or imports, read by "ini kenapa?" (F2). */
 
-export const KAMUS_DOCUMENT = { docId: "kamus-kendala", title: "Kamus Kendala" } as const;
-
-/**
- * One kamus row as the knowledge chunk F2 cites: `K-03 AlurSekolah: "pesan". Arti. Bukan
- * kesalahan guru. Yang dilakukan.` The quoted message is what the screen is matched against.
- */
-export function kamusChunk(entry: KamusRecord): KnowledgeChunk {
-  const sentence = (text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed) return "";
-    return /[.!?]$/u.test(trimmed) ? trimmed : `${trimmed}.`;
-  };
-  const parts = [
-    `${entry.code} ${entry.app}: "${entry.message.trim()}".`,
-    sentence(entry.meaning),
-    entry.teacherFault ? "" : "Bukan kesalahan guru.",
-    sentence(entry.fix),
-  ].filter(Boolean);
-  return {
-    id: `kamus-${entry.id}`,
-    docId: KAMUS_DOCUMENT.docId,
-    title: KAMUS_DOCUMENT.title,
-    version: "WS-05",
-    article: entry.code,
-    active: true,
-    text: parts.join(" "),
-  };
-}
-
-export async function loadKamusChunks(
+/** The rows "ini kenapa?" matches the page against (`@nemu/ai/school/kamus`). */
+export async function loadKamusRows(
   kamus: Pick<KamusRepository, "list">,
   workspaceId: string,
-): Promise<KnowledgeChunk[]> {
-  return (await kamus.list(workspaceId)).map(kamusChunk);
+): Promise<KamusRow[]> {
+  return (await kamus.list(workspaceId)).map(
+    ({ id, code, app, message, meaning, teacherFault, fixer, fix }) => ({
+      id,
+      code,
+      app,
+      message,
+      meaning,
+      teacherFault,
+      fixer,
+      fix,
+    }),
+  );
 }
 
 const HEADERS: Record<keyof KamusEntry, RegExp> = {
@@ -51,16 +34,32 @@ const HEADERS: Record<keyof KamusEntry, RegExp> = {
   fix: /(dilakukan|langkah|solusi|tindakan|cara)/iu,
 };
 
-/** "Kepala Sekolah" → kepsek; the role a sheet names in its own words. */
+const FIXER_WORDS: Array<[KamusFixer, RegExp]> = [
+  ["kepsek", /kepala|kepsek|atasan/u],
+  ["keuangan", /keuangan|bendahara/u],
+  ["dinas", /dinas|pengawas/u],
+  ["operator", /operator|tata usaha|admin/u],
+  ["guru", /guru/u],
+];
+
+/**
+ * "Kepala Sekolah" → kepsek; the role a sheet names in its own words. The role named first wins:
+ * "Operator sekolah (bersama kepala sekolah …)" is the operator's.
+ */
 export function parseFixer(text: string): KamusFixer | null {
   const value = text.trim().toLowerCase();
-  if (!value) return null;
-  if (/kepala|kepsek|atasan/u.test(value)) return "kepsek";
-  if (/keuangan|bendahara/u.test(value)) return "keuangan";
-  if (/dinas|pengawas/u.test(value)) return "dinas";
-  if (/operator|tata usaha|admin/u.test(value)) return "operator";
-  if (/guru/u.test(value)) return "guru";
-  return null;
+  let first: { role: KamusFixer; at: number } | null = null;
+  for (const [role, pattern] of FIXER_WORDS) {
+    const at = value.search(pattern);
+    if (at >= 0 && (!first || at < first.at)) first = { role, at };
+  }
+  return first?.role ?? null;
+}
+
+/** "7" → "K-07", so an official kamus numbered 1, 2, … lands on the K-xx rows. */
+function kamusCode(raw: string, fallback: number): string {
+  if (/^\d{1,2}$/u.test(raw)) return `K-${raw.padStart(2, "0")}`;
+  return raw || `K-${String(fallback).padStart(2, "0")}`;
 }
 
 export type KamusImportResult = {
@@ -105,7 +104,7 @@ export function parseKamusGrid(grid: Grid): KamusImportResult {
     if (!fixer) return skipped.push({ row: rowNumber, reason: "Yang memperbaiki tidak dikenali" });
     if (!fix) return skipped.push({ row: rowNumber, reason: "Yang dilakukan kosong" });
     entries.push({
-      code: cell(columns.code) || `K-${String(entries.length + 1).padStart(2, "0")}`,
+      code: kamusCode(cell(columns.code), entries.length + 1),
       app: cell(columns.app) || "AlurSekolah",
       message,
       meaning: cell(columns.meaning),
@@ -118,16 +117,45 @@ export function parseKamusGrid(grid: Grid): KamusImportResult {
 }
 
 /**
- * Imports an Excel sheet: a row whose code is already in the kamus replaces it, the rest are
- * added. Returns how many rows went in and which were skipped.
+ * The kamus as JSON, the shape the school's kamus file uses: `{isi: [{no, aplikasi, pesan, arti,
+ * siapa, langkah}]}` or the array itself. Read through the same headers as an Excel sheet.
  */
-export async function importKamusExcel(
+export function parseKamusJson(text: string): KamusImportResult {
+  let value: unknown;
+  try {
+    value = JSON.parse(text);
+  } catch {
+    return { entries: [], skipped: [{ row: 1, reason: "File JSON tidak bisa dibaca" }] };
+  }
+  const list = Array.isArray(value)
+    ? value
+    : value && typeof value === "object" && Array.isArray((value as { isi?: unknown }).isi)
+      ? (value as { isi: unknown[] }).isi
+      : [];
+  const rows = list.filter(
+    (item): item is Record<string, unknown> => !!item && typeof item === "object",
+  );
+  const keys = [...new Set(rows.flatMap((row) => Object.keys(row)))];
+  const asText = (cell: unknown) =>
+    typeof cell === "string" || typeof cell === "number" || typeof cell === "boolean"
+      ? String(cell)
+      : "";
+  return parseKamusGrid([keys, ...rows.map((row) => keys.map((key) => asText(row[key])))]);
+}
+
+/**
+ * Imports a kamus file (Excel, or the JSON the school's kamus comes as): a row whose code is
+ * already in the kamus replaces it, the rest are added. Returns how many rows went in and which
+ * were skipped.
+ */
+export async function importKamusFile(
   kamus: KamusRepository,
   workspaceId: string,
-  bytes: Uint8Array,
+  file: { name: string; bytes: Uint8Array },
 ): Promise<{ imported: number; skipped: KamusImportResult["skipped"] }> {
-  const [sheet] = await readWorkbookGrids(bytes);
-  const { entries, skipped } = parseKamusGrid(sheet?.grid ?? []);
+  const { entries, skipped } = /\.json$/iu.test(file.name)
+    ? parseKamusJson(new TextDecoder().decode(file.bytes))
+    : parseKamusGrid((await readWorkbookGrids(file.bytes))[0]?.grid ?? []);
   const existing = new Map((await kamus.list(workspaceId)).map((row) => [row.code, row.id]));
   for (const entry of entries) {
     const id = existing.get(entry.code);

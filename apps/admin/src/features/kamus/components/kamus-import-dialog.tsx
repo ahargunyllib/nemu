@@ -19,7 +19,7 @@ import { toast } from "sonner";
 
 import { orpc } from "@/shared/api/orpc";
 
-/** Imports Kamus Kendala rows from an Excel sheet; a row with a known code replaces it. */
+/** Imports Kamus Kendala rows from an Excel sheet or JSON file; a row with a known code replaces it. */
 export default function KamusImportDialog() {
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -49,14 +49,15 @@ export default function KamusImportDialog() {
     >
       <DialogTrigger render={<Button variant="outline" />}>
         <FileSpreadsheetIcon />
-        Impor Excel
+        Impor file
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Impor dari Excel</DialogTitle>
+          <DialogTitle>Impor dari Excel atau JSON</DialogTitle>
           <DialogDescription>
             Sheet pertama dengan kolom Kode, Aplikasi, Pesan error, Arti, Kesalahan guru (Ya/Tidak),
-            Yang memperbaiki, dan Yang dilakukan. Kode yang sudah ada diganti.
+            Yang memperbaiki, dan Yang dilakukan, atau file JSON kamus (no, aplikasi, pesan, arti,
+            siapa, langkah). Kode yang sudah ada diganti; no. 7 menjadi K-07.
           </DialogDescription>
         </DialogHeader>
         <form
@@ -67,11 +68,11 @@ export default function KamusImportDialog() {
           }}
         >
           <div className="grid gap-2">
-            <Label htmlFor="kamus-file">File Excel</Label>
+            <Label htmlFor="kamus-file">File Excel atau JSON</Label>
             <Input
               id="kamus-file"
               type="file"
-              accept=".xlsx,.xls"
+              accept=".xlsx,.xls,.json"
               onChange={(event) => setFile(event.target.files?.[0] ?? null)}
             />
           </div>

@@ -3,9 +3,9 @@ import { z } from "zod";
 
 import { schoolAdminProcedure } from "../../index";
 import { createKamusRepository } from "./repository";
-import { importKamusExcel } from "./service";
+import { importKamusFile } from "./service";
 
-const MAX_EXCEL_BYTES = 2 * 1024 * 1024;
+const MAX_FILE_BYTES = 2 * 1024 * 1024;
 
 const kamusEntrySchema = z.object({
   code: z.string().trim().min(1).max(20),
@@ -57,15 +57,17 @@ export const kamusRouter = {
       z.object({
         file: z
           .instanceof(File)
-          .refine((file) => /\.(xlsx|xls)$/iu.test(file.name), "Unggah file Excel (.xlsx)")
-          .refine((file) => file.size <= MAX_EXCEL_BYTES, "File Excel paling besar 2 MB"),
+          .refine(
+            (file) => /\.(xlsx|xls|json)$/iu.test(file.name),
+            "Unggah file Excel (.xlsx) atau JSON",
+          )
+          .refine((file) => file.size <= MAX_FILE_BYTES, "File paling besar 2 MB"),
       }),
     )
     .handler(async ({ context, input }) =>
-      importKamusExcel(
-        createKamusRepository(context.db),
-        context.session.user.workspaceId,
-        new Uint8Array(await input.file.arrayBuffer()),
-      ),
+      importKamusFile(createKamusRepository(context.db), context.session.user.workspaceId, {
+        name: input.file.name,
+        bytes: new Uint8Array(await input.file.arrayBuffer()),
+      }),
     ),
 };
