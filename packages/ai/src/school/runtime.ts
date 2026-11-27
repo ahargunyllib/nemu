@@ -97,7 +97,7 @@ export type SchoolAi = {
   compileProcedure(input: CompileProcedureInput): Promise<Procedure>;
   /**
    * F4-01: quiz checks that need judgement beyond the extension's DOM rules (#218), e.g. whether
-   * a question suits the class. None are built yet, so both runtimes answer with no problems.
+   * a question suits the class. None is needed for F4-1 (#218), so both answer with no problems.
    */
   judgeQuiz(input: QuizJudgeInput): Promise<QuizJudgement>;
   /**
@@ -118,6 +118,8 @@ export type SchoolAiConfig = {
     /** Photo Read B: a different model family. */
     readB: string;
     reread: string;
+    /** F4-03: the teacher's quiz script (a PDF as a file, or a photo), with its pictures. */
+    script: string;
     /** Excel headers, help, grounded answers, slot extraction, procedure compile. */
     text: string;
     transcription: string;
@@ -170,10 +172,9 @@ export function createSchoolAi(config: SchoolAiConfig): SchoolAi {
     readFormPhoto: (input) => readFormPhoto(readers.readA, input),
     matchFields: (input) => matchFields({ llm: text }, input),
     compileProcedure: (input) => compileProcedure({ llm: text }, input),
-    // #218 (Zahra): a model call goes here once a judgement check is agreed with SE.
+    // #218: F4-1's problems are all caught by the extension's DOM rules, so no model check runs.
     judgeQuiz: async () => ({ problems: [] }),
-    // #219 (Zahra): the vision reader also takes the PDF itself (`input_file`).
-    readQuizScript: (input) => readQuizScript({ llm: readers.readA }, input),
+    readQuizScript: (input) => readQuizScript({ llm: caller(config.models.script, "low") }, input),
     transcribe: createOpenRouterTranscriber({
       apiKey: config.apiKey,
       model: config.models.transcription,
