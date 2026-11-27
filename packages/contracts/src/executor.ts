@@ -20,6 +20,9 @@ export const targetRoleSchema = z.enum([
 /**
  * A page element as a person would name it: its label (accessible name), its role, the text it
  * shows, or the table cell in a row (`row`, e.g. the student's name) under a column header.
+ * `near` picks, among controls with the same name, the one in the part of the page that shows
+ * that text, e.g. the "Edit" menu of the activity "Latihan: My Family (has/have)" on a Moodle
+ * course page.
  */
 export const executorTargetSchema = z
   .object({
@@ -28,6 +31,7 @@ export const executorTargetSchema = z
     text: z.string().min(1).optional(),
     row: z.string().min(1).optional(),
     column: z.string().min(1).optional(),
+    near: z.string().min(1).optional(),
   })
   .strict()
   .refine((target) => target.label || target.text || target.row, {
