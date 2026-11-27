@@ -296,15 +296,19 @@ export function createFixtureSchoolAi(): SchoolAi {
                   .toUpperCase() ?? null;
             }
           }
-          return answer;
+          return {
+            isian: Object.entries(answer)
+              .filter(([, value]) => value !== null)
+              .map(([nama, nilai]) => ({ nama, nilai: String(nilai) })),
+          };
         }),
         input,
       );
     },
 
-    // The test photo carries its own reading (fixtures/form-photo.ts); the rest is the real code.
+    // A known test photo reads as its model reading (fixtures/form-photo.ts); the rest is the real code.
     async readFormPhoto(input) {
-      return assembleFormPhoto(input, fixtureFormPhoto(input.image.dataUrl));
+      return assembleFormPhoto(input, await fixtureFormPhoto(input.image.dataUrl));
     },
     async matchFields(input) {
       return matchFieldLabels(input.fields, input.pageLabels);

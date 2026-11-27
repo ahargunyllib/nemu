@@ -41,6 +41,13 @@ const PLAN: BpmnPlan & { tasks: [BpmnPlan["tasks"][number]] } = {
     {
       kind: "fill",
       taskId: "Task_Catat",
+      fields: [{ fieldId: "jenis", label: "Jenis catatan Tahfidz", value: "Setoran" }],
+      sentence: "",
+      because: null,
+    },
+    {
+      kind: "fill",
+      taskId: "Task_Catat",
       fields: [{ fieldId: "tanggal", label: "Tanggal setoran", value: "2026-12-01" }],
       sentence: "",
       because: null,
@@ -134,6 +141,7 @@ describe("F3 process task (#213)", () => {
       { verb: "selectOption", target: { label: "Kelas", role: "combobox" }, option: "4A" },
       { verb: "clickMenu", target: { text: "Setoran baru" } },
     ]);
+    // No "Jenis catatan" field on the page: the "Setoran baru" click is that choice.
     expect(first.continuation?.header.map((field) => field.fieldId)).toEqual(["tanggal"]);
 
     document.body.innerHTML = FORM_PAGE;

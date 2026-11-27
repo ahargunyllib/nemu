@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Def_IzinGuru" targetNamespace="http://sdit-nusantara.contoh/bpmn">
+  <bpmn:process id="pengajuan_izin_guru" name="Pengajuan Izin Guru" isExecutable="true">
+    <bpmn:documentation>DATA UJI SINTETIS SDIT Nusantara, versi 1.0. Proses pengajuan izin tidak masuk bagi guru. Izin diajukan paling lambat 1 hari sebelum tanggal izin, kecuali izin sakit yang boleh diajukan pada hari yang sama.</bpmn:documentation>
+    <bpmn:startEvent id="Start_Izin" name="Guru ingin izin"><bpmn:outgoing>F1</bpmn:outgoing></bpmn:startEvent>
+    <bpmn:userTask id="Task_IsiForm" name="Isi Form Izin" camunda:assignee="${guru}">
+      <bpmn:documentation>Diisi oleh guru. Jenis izin: "sakit" bila guru sendiri yang sakit; "keperluan_keluarga" untuk keperluan keluarga, termasuk merawat atau mengantar anggota keluarga yang sakit; "dinas_luar" untuk tugas di luar sekolah. Jumlah hari dihitung hari sekolah.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="tanggal_mulai" label="Tanggal mulai izin" type="date"><camunda:validation><camunda:constraint name="required" /></camunda:validation></camunda:formField>
+          <camunda:formField id="jumlah_hari" label="Jumlah hari" type="long" defaultValue="1"><camunda:validation><camunda:constraint name="required" /><camunda:constraint name="min" config="1" /></camunda:validation></camunda:formField>
+          <camunda:formField id="jenis_izin" label="Jenis izin" type="enum"><camunda:value id="sakit" name="Sakit" /><camunda:value id="keperluan_keluarga" name="Keperluan keluarga" /><camunda:value id="dinas_luar" name="Dinas luar" /><camunda:validation><camunda:constraint name="required" /></camunda:validation></camunda:formField>
+          <camunda:formField id="alasan" label="Alasan" type="string"><camunda:validation><camunda:constraint name="required" /></camunda:validation></camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>F1</bpmn:incoming>
+      <bpmn:outgoing>F2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gw_Sakit" name="Izin sakit lebih dari 1 hari?"><bpmn:incoming>F2</bpmn:incoming><bpmn:outgoing>F3_ya</bpmn:outgoing><bpmn:outgoing>F3_tidak</bpmn:outgoing></bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_SuratDokter" name="Unggah Surat Dokter" camunda:assignee="${guru}">
+      <bpmn:documentation>Wajib bila izin sakit lebih dari 1 hari sekolah. Unggah foto atau PDF surat keterangan dokter.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="surat_dokter" label="Surat keterangan dokter (foto/PDF)" type="string"><camunda:validation><camunda:constraint name="required" /></camunda:validation></camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>F3_ya</bpmn:incoming>
+      <bpmn:outgoing>F4</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Persetujuan" name="Persetujuan Kepala Sekolah" camunda:candidateGroups="kepala_sekolah">
+      <bpmn:documentation>Kepala sekolah memutuskan paling lambat 1 hari kerja setelah pengajuan masuk.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="keputusan" label="Keputusan" type="enum"><camunda:value id="disetujui" name="Disetujui" /><camunda:value id="ditolak" name="Ditolak" /></camunda:formField>
+          <camunda:formField id="catatan_kepsek" label="Catatan" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>F3_tidak</bpmn:incoming>
+      <bpmn:incoming>F4</bpmn:incoming>
+      <bpmn:outgoing>F5</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gw_Setuju" name="Disetujui?"><bpmn:incoming>F5</bpmn:incoming><bpmn:outgoing>F6_ya</bpmn:outgoing><bpmn:outgoing>F6_tidak</bpmn:outgoing></bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_Rekap" name="Rekap Kehadiran oleh Admin" camunda:candidateGroups="admin">
+      <bpmn:documentation>Admin mencatat izin ke rekap kehadiran guru dan mengatur guru pengganti.</bpmn:documentation>
+      <bpmn:incoming>F6_ya</bpmn:incoming>
+      <bpmn:outgoing>F7</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="End_Setuju" name="Izin tercatat"><bpmn:incoming>F7</bpmn:incoming></bpmn:endEvent>
+    <bpmn:endEvent id="End_Tolak" name="Izin ditolak, guru diberi tahu"><bpmn:incoming>F6_tidak</bpmn:incoming></bpmn:endEvent>
+    <bpmn:sequenceFlow id="F1" sourceRef="Start_Izin" targetRef="Task_IsiForm" />
+    <bpmn:sequenceFlow id="F2" sourceRef="Task_IsiForm" targetRef="Gw_Sakit" />
+    <bpmn:sequenceFlow id="F3_ya" name="Ya" sourceRef="Gw_Sakit" targetRef="Task_SuratDokter"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${jenis_izin == 'sakit' &amp;&amp; jumlah_hari &gt; 1}</bpmn:conditionExpression></bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F3_tidak" name="Tidak" sourceRef="Gw_Sakit" targetRef="Task_Persetujuan"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!(jenis_izin == 'sakit' &amp;&amp; jumlah_hari &gt; 1)}</bpmn:conditionExpression></bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F4" sourceRef="Task_SuratDokter" targetRef="Task_Persetujuan" />
+    <bpmn:sequenceFlow id="F5" sourceRef="Task_Persetujuan" targetRef="Gw_Setuju" />
+    <bpmn:sequenceFlow id="F6_ya" name="Ya" sourceRef="Gw_Setuju" targetRef="Task_Rekap"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${keputusan == 'disetujui'}</bpmn:conditionExpression></bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F6_tidak" name="Tidak" sourceRef="Gw_Setuju" targetRef="End_Tolak"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${keputusan == 'ditolak'}</bpmn:conditionExpression></bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F7" sourceRef="Task_Rekap" targetRef="End_Setuju" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_1">
+    <bpmndi:BPMNPlane id="Plane_1" bpmnElement="pengajuan_izin_guru">
+      <bpmndi:BPMNShape id="S_Start" bpmnElement="Start_Izin"><dc:Bounds x="100" y="182" width="36" height="36" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_Isi" bpmnElement="Task_IsiForm"><dc:Bounds x="190" y="160" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_GwSakit" bpmnElement="Gw_Sakit" isMarkerVisible="true"><dc:Bounds x="365" y="175" width="50" height="50" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_Surat" bpmnElement="Task_SuratDokter"><dc:Bounds x="470" y="40" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_Setuju" bpmnElement="Task_Persetujuan"><dc:Bounds x="650" y="160" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_GwSetuju" bpmnElement="Gw_Setuju" isMarkerVisible="true"><dc:Bounds x="825" y="175" width="50" height="50" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_Rekap" bpmnElement="Task_Rekap"><dc:Bounds x="930" y="160" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_EndOk" bpmnElement="End_Setuju"><dc:Bounds x="1110" y="182" width="36" height="36" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_EndNo" bpmnElement="End_Tolak"><dc:Bounds x="832" y="320" width="36" height="36" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="E1" bpmnElement="F1"><di:waypoint x="136" y="200" /><di:waypoint x="190" y="200" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E2" bpmnElement="F2"><di:waypoint x="310" y="200" /><di:waypoint x="365" y="200" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E3" bpmnElement="F3_ya"><di:waypoint x="390" y="175" /><di:waypoint x="390" y="80" /><di:waypoint x="470" y="80" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E4" bpmnElement="F3_tidak"><di:waypoint x="415" y="200" /><di:waypoint x="650" y="200" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E5" bpmnElement="F4"><di:waypoint x="590" y="80" /><di:waypoint x="710" y="80" /><di:waypoint x="710" y="160" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E6" bpmnElement="F5"><di:waypoint x="770" y="200" /><di:waypoint x="825" y="200" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E7" bpmnElement="F6_ya"><di:waypoint x="875" y="200" /><di:waypoint x="930" y="200" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E8" bpmnElement="F6_tidak"><di:waypoint x="850" y="225" /><di:waypoint x="850" y="320" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E9" bpmnElement="F7"><di:waypoint x="1050" y="200" /><di:waypoint x="1110" y="200" /></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

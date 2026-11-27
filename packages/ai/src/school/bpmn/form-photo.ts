@@ -3,6 +3,7 @@ import type { FormPhotoQuestion, FormTable } from "@nemu/contracts/school";
 import type { JsonCall, LlmContent } from "../llm.js";
 import { matchNames, type RosterStudent } from "../names.js";
 import type { FormField } from "./graph.js";
+import { nullableEnum } from "./fields.js";
 
 /**
  * F3-16: a photo of a book or sheet read against a BPMN task's own form fields, so any process
@@ -65,7 +66,7 @@ function photoSchema(fieldIds: readonly string[]): Record<string, unknown> {
     required: ["readable", "key_field", "header", "rows"],
     properties: {
       readable: { type: "boolean" },
-      key_field: { type: ["string", "null"], enum: [...fieldIds, null] },
+      key_field: nullableEnum(fieldIds),
       header: {
         type: "array",
         items: {

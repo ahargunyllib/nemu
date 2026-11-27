@@ -75,10 +75,12 @@ test("F3-1: 'izin Kamis, anak sakit' → keperluan keluarga, 3 Des, 1 hari, no d
   const graph = await izinGraph();
   const llm = fakeJsonCall({
     form_slots: {
-      jenis_izin: "keperluan_keluarga",
-      tanggal_mulai: "2026-12-04",
-      lama_hari: 1,
-      keterangan: "anak sakit",
+      isian: [
+        { nama: "jenis_izin", nilai: "keperluan_keluarga" },
+        { nama: "tanggal_mulai", nilai: "2026-12-04" },
+        { nama: "lama_hari", nilai: "1" },
+        { nama: "keterangan", nilai: "anak sakit" },
+      ],
     },
   });
   const slots = await extractSlots(llm, {
@@ -160,12 +162,7 @@ test("a missing required field becomes one question before any branch is chosen"
 test("an enum value the model invents is dropped instead of filled", async () => {
   const graph = await izinGraph();
   const llm = fakeJsonCall({
-    form_slots: {
-      jenis_izin: "cuti_tahunan",
-      tanggal_mulai: null,
-      lama_hari: null,
-      keterangan: null,
-    },
+    form_slots: { isian: [{ nama: "jenis_izin", nilai: "cuti_tahunan" }] },
   });
   const slots = await extractSlots(llm, {
     graph,
