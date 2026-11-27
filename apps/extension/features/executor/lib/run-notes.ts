@@ -6,8 +6,8 @@ export type Cara = 1 | 2 | 3;
 export type RunEvent =
   /** Nemu did the step itself (cara 1). `option` is the chosen option of a select. */
   | { kind: "acted"; verb: ExecutorVerb; name: string; option?: string }
-  /** The teacher did it while Nemu pointed and checked (cara 2). */
-  | { kind: "taught"; verb: ExecutorVerb; name: string }
+  /** The teacher did it while Nemu pointed and checked (cara 2); `corrected` when Nemu had to say the right value again. */
+  | { kind: "taught"; verb: ExecutorVerb; name: string; corrected?: boolean }
   /** The teacher pressed what Nemu pointed at; `refused` when Nemu had been asked to press it. */
   | { kind: "pressed"; name: string; refused: boolean }
   /** The teacher did a step Nemu couldn't find or tell apart. */
@@ -21,7 +21,7 @@ function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-function line(event: RunEvent, count: number, teacher: string): string {
+function line(event: RunEvent, count: number, teacher: string, corrected: number): string {
   switch (event.kind) {
     case "acted":
       if (event.verb === "setValue") return `Nemu mengisi ${count} isian`;
@@ -31,7 +31,10 @@ function line(event: RunEvent, count: number, teacher: string): string {
       if (event.verb === "check") return `Nemu mencentang ${event.name}`;
       return `Nemu menggulir ke ${event.name}`;
     case "taught":
-      if (event.verb === "setValue") return `${teacher} mengetik ${count} isian, Nemu memeriksa`;
+      if (event.verb === "setValue")
+        return corrected === 0
+          ? `${teacher} mengetik ${count} isian, Nemu memeriksa`
+          : `${teacher} mengetik ${count} isian, Nemu memeriksa; ${corrected} sempat berbeda dan sudah dibetulkan`;
       if (event.verb === "clickMenu") return `${teacher} membuka ${event.name}`;
       if (event.verb === "selectOption") return `${teacher} memilih ${event.name}`;
       return `${teacher} mencentang ${event.name}`;
@@ -79,7 +82,9 @@ export function stepNotes(input: {
     let count = 1;
     while (input.events[at + count] && sameLine(event, input.events[at + count] as RunEvent))
       count += 1;
-    lines.push(line(event, count, teacher));
+    const group = input.events.slice(at, at + count);
+    const corrected = group.filter((item) => item.kind === "taught" && item.corrected).length;
+    lines.push(line(event, count, teacher, corrected));
   });
   if (input.outcome === "stopped") {
     const total = input.task.steps.length;

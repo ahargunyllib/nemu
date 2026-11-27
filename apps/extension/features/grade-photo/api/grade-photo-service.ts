@@ -96,6 +96,12 @@ async function answer(
         };
       }
     }
+    case "guided-line":
+      return client.gradesGuidedLine({
+        entries: request.entries,
+        studentId: request.studentId,
+        typed: request.typed,
+      });
     case "ack": {
       const result = await client.inboxAck({ jobId: request.jobId });
       if (tabId !== undefined)

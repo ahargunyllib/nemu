@@ -38,5 +38,7 @@ page and the mock AlurSekolah, and saves screenshots to
 `apps/extension/.output/verify/`; look at them before reporting the change as
 verified. Changes to the executor (`features/executor`) also need
 `pnpm --filter extension verify:executor`, which uses a development build for its `?uji-nemu` dock.
+Changes to F1 (`features/grade-photo`) also need `verify:grade-photo` (cara 1) and
+`verify:f1-2` (cara 2).
 Neither is part of `pnpm test` because they need the dev stack running.
 See `apps/extension/README.md`.

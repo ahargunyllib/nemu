@@ -52,6 +52,10 @@ export type NemuServiceClient = {
     ReadbackResult
   >;
   gradesReadback: Call<{ entries: GradeEntry[]; saved: ReadbackRow[] }, ReadbackResult>;
+  gradesGuidedLine: Call<
+    { entries: GradeEntry[]; studentId: string; typed: string | null },
+    { sentence: string; ok: boolean | null }
+  >;
 };
 
 export type ExtensionCredentials = { installCode: string; email?: string | null };

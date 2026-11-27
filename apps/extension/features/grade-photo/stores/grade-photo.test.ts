@@ -3,6 +3,7 @@ import type { GradeSheetReading, InboxJob, VerificationPlan } from "@nemu/contra
 import type { NemuDisplay } from "@nemu/ui/lib/nemu-display";
 import { beforeAll, describe, expect, test, vi } from "vite-plus/test";
 
+import type { CaraTwoGuide, GuidedStep } from "../../executor/lib/run";
 import type { GradePhotoRequest } from "../lib/requests";
 
 const calls: GradePhotoRequest[] = [];
@@ -17,7 +18,9 @@ vi.mock("../api/request-grade-photo", () => ({
 }));
 
 const finishers = new Map<string, (...args: unknown[]) => void>();
+const guides = new Map<string, CaraTwoGuide>();
 const executor = {
+  registerGuide: (kind: string, guide: CaraTwoGuide) => guides.set(kind, guide),
   registerFinisher: (kind: string, finisher: (...args: unknown[]) => void) =>
     finishers.set(kind, finisher),
   start: vi.fn(async () => undefined),
@@ -111,6 +114,12 @@ beforeAll(() => {
     source: "alursekolah",
   });
   replies.ack = () => ({ deleted: true });
+  replies["guided-line"] = (request: { typed: string | null }) =>
+    request.typed === null
+      ? { sentence: "Ketik 86 untuk Alya.", ok: null }
+      : request.typed === "86"
+        ? { sentence: "Sudah pas.", ok: true }
+        : { sentence: "Di buku 86, Bu.", ok: false };
   gradePhoto.connect({
     pageEmail: { kind: "read", email: "siti.aminah@sditnusantara.sch.id" },
     honorific: "Bu",
@@ -190,6 +199,20 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
     expect(view().display).toBeNull();
   });
 
+  test("cara 2 says each grade with gradesGuidedLine and checks what the teacher typed (#208)", async () => {
+    const guide = guides.get("f1-isi-nilai")!;
+    const step = filled!.steps.find((item) => item.verb === "setValue") as GuidedStep;
+    expect(await guide.prompt(step)).toBe("Ketik 86 untuk Alya.");
+    expect(calls).toContainEqual({
+      op: "guided-line",
+      entries: expect.arrayContaining([expect.objectContaining({ studentId: "s-3" })]),
+      studentId: "s-3",
+      typed: null,
+    });
+    expect(await guide.check(step, "68")).toEqual({ ok: false, sentence: "Di buku 86, Bu." });
+    expect(await guide.check(step, "86")).toEqual({ ok: true, sentence: "Sudah pas." });
+  });
+
   test("after the save, the read-back is said in one sentence, the photo deleted, then Catatan langkah", async () => {
     finishers.get("f1-isi-nilai")!(
       { status: "done", startCara: 1, task: { kind: "f1-isi-nilai" } },
@@ -221,5 +244,7 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
       true,
     );
     expect(view().display).toBeNull();
+    // The deleted photo isn't offered again while the next poll is still to come.
+    expect(view().card).toBeNull();
   });
 });
