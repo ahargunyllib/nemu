@@ -3,17 +3,21 @@ import { z } from "zod";
 
 import type { Context } from "../../context";
 import {
+  publicProcedure,
   schoolAdminProcedure,
   schoolFullAdminProcedure,
+  schoolProcedure,
   workspaceAdminProcedure,
 } from "../../index";
 import { createCatalogRepository } from "./catalog-repository";
 import { createDocumentRepository } from "./repository";
 import {
+  createDocumentFileLink,
   deleteDocument,
   documentFormatOf,
   readDocumentFile,
   MAX_DOCUMENT_BYTES,
+  openSignedDocumentFile,
   setDocumentActive,
   uploadDocument,
 } from "./service";
@@ -176,5 +180,49 @@ export const documentsRouter = {
       return new File([result.body], result.document.fileName, {
         type: result.document.contentType,
       });
+    }),
+
+  /**
+   * Sumber (#258): a short-lived link to a document the teacher's school reads. The extension
+   * opens it in a new tab at `#page=<page>`; the tab carries no headers, so the link is signed.
+   */
+  documentFileLink: schoolProcedure.input(documentIdSchema).handler(async ({ context, input }) => {
+    const link = await createDocumentFileLink(
+      { documents: createDocumentRepository(context.db), links: context.documentLinks },
+      context.caller.workspaceId,
+      input.id,
+    );
+    if (!link) throw new ORPCError("NOT_FOUND", { message: "Dokumen tidak ditemukan" });
+    return link;
+  }),
+
+  /** The file behind a Sumber link, inline so the browser's PDF viewer opens it at its page. */
+  documentFile: publicProcedure
+    .route({ method: "GET", path: "/documents/{id}/file" })
+    .input(documentIdSchema.extend({ token: z.string().min(1).max(1000) }))
+    .handler(async ({ context, input }) => {
+      const result = await openSignedDocumentFile(
+        {
+          documents: createDocumentRepository(context.db),
+          files: context.documentFiles,
+          links: context.documentLinks,
+        },
+        input.id,
+        input.token,
+      );
+      switch (result.status) {
+        case "ok":
+          return new File([result.body], result.document.fileName, {
+            type: result.document.contentType,
+          });
+        case "expired":
+          throw new ORPCError("UNAUTHORIZED", {
+            message: "Tautan dokumen sudah kedaluwarsa. Buka lagi lewat Sumber di Nemu.",
+          });
+        case "invalid":
+          throw new ORPCError("UNAUTHORIZED", { message: "Tautan dokumen tidak sah." });
+        case "not_found":
+          throw new ORPCError("NOT_FOUND", { message: "Dokumen tidak ditemukan" });
+      }
     }),
 };

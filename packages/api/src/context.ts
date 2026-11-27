@@ -4,6 +4,7 @@ import type { Database } from "@nemu/db";
 
 import type { InternalCaller } from "./internal-caller";
 import type { AlurSekolahConnector } from "./modules/alursekolah/connector";
+import type { DocumentLinkSigner } from "./modules/documents/file-link";
 import type { SecretCipher } from "./modules/integrations/cipher";
 import type { SchoolDirectory } from "./modules/school/directory";
 import type { WorkspaceId } from "./workspace-ids";
@@ -36,6 +37,8 @@ export type Context = {
   session: Session | null;
   db: Database;
   documentFiles: DocumentFileStore;
+  /** Signs the short-lived links Sumber opens a cited document with (#258). */
+  documentLinks: DocumentLinkSigner;
   school: SchoolServices;
   /** Encrypts WS-07 integration settings with the Worker secret INTEGRATION_SECRETS_KEY. */
   secretCipher: SecretCipher;

@@ -14,6 +14,11 @@ export type DocumentRepository = {
   insert(record: NewDocumentRecord): Promise<DocumentRecord>;
   list(workspaceId: string): Promise<DocumentRecord[]>;
   findById(workspaceId: string, id: string): Promise<DocumentRecord | undefined>;
+  /**
+   * A document Nemu answers the school from, so its teachers may open it: active and ready, the
+   * school's own or in a package marked for all schools (the scope of `listActiveReadyChunks`).
+   */
+  findReadable(workspaceId: string, id: string): Promise<DocumentRecord | undefined>;
   setActive(
     workspaceId: string,
     id: string,
@@ -56,6 +61,25 @@ export function createDocumentRepository(db: Database): DocumentRepository {
         .select()
         .from(knowledgeDocument)
         .where(and(eq(knowledgeDocument.workspaceId, workspaceId), eq(knowledgeDocument.id, id)))
+        .limit(1);
+      return found;
+    },
+    async findReadable(workspaceId, id) {
+      const [found] = await db
+        .select(getColumns(knowledgeDocument))
+        .from(knowledgeDocument)
+        .leftJoin(knowledgePackage, eq(knowledgePackage.id, knowledgeDocument.packageId))
+        .where(
+          and(
+            eq(knowledgeDocument.id, id),
+            or(
+              eq(knowledgeDocument.workspaceId, workspaceId),
+              eq(knowledgePackage.allSchools, true),
+            ),
+            eq(knowledgeDocument.isActive, true),
+            eq(knowledgeDocument.status, "ready"),
+          ),
+        )
         .limit(1);
       return found;
     },

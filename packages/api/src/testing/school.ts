@@ -2,6 +2,7 @@ import { createFixtureSchoolAi, type SchoolAi } from "@nemu/ai/school/runtime";
 
 import type { Context, DocumentFileStore, InboxFileStore } from "../context";
 import { createStoredAlurSekolahConnector } from "../modules/alursekolah/connector";
+import { createDocumentLinkSigner } from "../modules/documents/file-link";
 import { createSecretCipher } from "../modules/integrations/cipher";
 import { createIntegrationSecretRepository } from "../modules/integrations/repository";
 import { saveSecret } from "../modules/integrations/service";
@@ -62,6 +63,7 @@ export async function createSchoolContext(
     db,
     session: { session: {}, user } as unknown as Context["session"],
     documentFiles: createMemoryFileStore(),
+    documentLinks: createDocumentLinkSigner("test-document-link-secret"),
     school: {
       ai,
       directory: createDemoSchoolDirectory(),
