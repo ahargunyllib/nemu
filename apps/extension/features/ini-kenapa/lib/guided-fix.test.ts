@@ -32,7 +32,11 @@ describe("guidedFixTask", () => {
       source: "Kamus Kendala K-02",
       steps: [
         { verb: "clickMenu", target: { label: "E-Kinerja" } },
-        { verb: "point", target: { label: "Sinkro Ruang GTK" }, sentence: "Klik Sinkro Ruang GTK." },
+        {
+          verb: "point",
+          target: { label: "Sinkro Ruang GTK" },
+          sentence: "Klik Sinkro Ruang GTK.",
+        },
       ],
     });
   });
@@ -48,9 +52,9 @@ describe("guidedFixTask", () => {
 describe("menuNamedIn", () => {
   test("takes the menu named after the target when none comes before it", () => {
     document.body.innerHTML = MENU;
-    expect(menuNamedIn(document, "Tekan tombol Sinkro Ruang GTK di E-Kinerja", "Sinkro Ruang GTK")).toBe(
-      "E-Kinerja",
-    );
+    expect(
+      menuNamedIn(document, "Tekan tombol Sinkro Ruang GTK di E-Kinerja", "Sinkro Ruang GTK"),
+    ).toBe("E-Kinerja");
   });
 
   test("names no menu the sentence doesn't mention", () => {

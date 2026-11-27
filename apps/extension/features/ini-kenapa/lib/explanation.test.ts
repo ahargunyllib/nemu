@@ -57,7 +57,10 @@ describe("fromExplanation", () => {
 describe("whatsAppUrl", () => {
   test("opens WhatsApp Web to the contact's number with the whole message", () => {
     const url = new URL(
-      whatsAppUrl({ phone: "+62 812-0000-1003", text: "Saya Siti (NIP 1970). Terima kasih & salam." }),
+      whatsAppUrl({
+        phone: "+62 812-0000-1003",
+        text: "Saya Siti (NIP 1970). Terima kasih & salam.",
+      }),
     );
     expect(`${url.origin}${url.pathname}`).toBe("https://web.whatsapp.com/send");
     expect(url.searchParams.get("phone")).toBe("6281200001003");
