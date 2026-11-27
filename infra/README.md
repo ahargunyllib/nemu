@@ -115,38 +115,41 @@ first. The first start installs Moodle into Postgres. Wait until the log shows `
 `https://nemu-moodle.ahargunyllib.dev`: it shows "Masuk ke situs" once step 8 has run, or the
 English login page before that.
 
-### 8. Prepare the test course
+### 8. Prepare the test course and the F4-1 quiz
 
 ```bash
 ./setup-4a-uji.sh
 ```
 
-It prints one line per step and ends with `Done.`:
+It prints one line per step:
 
 - Indonesian language pack installed and set as the default; outgoing mail turned off.
 - Course `4A-UJI` ("Kelas 4A (uji)") with sections IPAS and Bahasa Inggris, and its default
   question bank.
 - Teacher `siti.aminah` (password `TEACHER_PASSWORD`) and the three students in
   `setup/akun-siswa-uji.csv` (password `Nemu-uji-2026!`), all enrolled.
+- **F4-1** (sections 2 and 3 of `setup/f4-1/F4-1_cara-pasang-di-moodle-uji.md`): the 15 questions
+  of `setup/f4-1/F4-1_kuis-ipas-4a.xml` in Sistem bank soal bersama › Kuis Latihan IPAS 4A, and the
+  quiz "Kuis IPAS 4A: Energi, Gaya, dan Peta" in IPAS (opens Wednesday 2 December 2026 07.00,
+  closes Friday 4 December 2026 21.00, maximum grade 100, Soal 01 to 15 in order). Soal 07 has no
+  correct answer and soal 15 has no `timbangan-3.png` on purpose; if Moodle refuses soal 07, the
+  script uses the guide's fallback (import it with "setrika" at 100%, then set it to 0 in the
+  database). It also sets the site's time zone to Asia/Jakarta.
+- The last line is the F4-1 baseline, for section 4 of the guide and `setup/f4-1/F4-1_kunci.csv`:
+  `F4-1 baseline: timemodified <unix time> (<date>), 15 questions`.
 
-Running it again changes nothing. Check it: sign in as `siti.aminah` and open Kelas 4A (uji). You
-should see the IPAS and Bahasa Inggris sections and a **Bank soal** link.
+Running it again changes nothing: it imports only missing questions and leaves an existing F4-1
+quiz as it is. Check it: sign in as `siti.aminah` and open Kelas 4A (uji). You should see the
+quiz in IPAS, and **Soal** on the quiz page lists 15 questions.
 
-### 9. Set up the quizzes
+### 9. Set up the F4-3 quizzes
 
-Follow the guides in `06_F4_kuis/`, signed in as `siti.aminah` (or the admin):
-
-- **F4-1:** sections 2 to 4 of `F4-1_cara-pasang-di-moodle-uji.md` (import `F4-1_kuis-ipas-4a.xml`,
-  then create "Kuis IPAS 4A: Energi, Gaya, dan Peta" in IPAS with 15 questions). Write down the
-  quiz's last-modified time and question count, as the guide asks.
-- **F4-3:** `F4-3_skenario.md` (import `F4-3_kuis-my-family.xml`, create both quizzes in
-  Bahasa Inggris, then have the three students attempt "Latihan: My Family (has/have)").
+Follow `F4-3_skenario.md` in `06_F4_kuis/` from the team Drive, signed in as `siti.aminah` (or the
+admin): import `F4-3_kuis-my-family.xml`, create both quizzes in Bahasa Inggris, then have the
+three students attempt "Latihan: My Family (has/have)".
 
 Moodle 5.3 differs from the guide in one place: **Bank soal** first lists the course's question
-banks. Open **Sistem bank soal bersama**, then **Impor**.
-
-If Moodle refuses soal 07 because it has no correct answer, the F4-1 guide's fallback edits the
-database directly. Open a database shell with:
+banks. Open **Sistem bank soal bersama**, then **Impor**. A database shell, if you need one:
 
 ```bash
 docker compose exec postgres psql -U moodle -d moodle
@@ -231,7 +234,8 @@ The session lives in the `wa_bot_data` volume, so restarts and updates don't nee
 Everything lives in named volumes (`postgres_data`, `moodledata`, `moodlehtml`, `wa_bot_data`,
 and Caddy's certificates).
 
-- **After a test changes a quiz:** delete the quiz in Moodle and redo its part of step 9.
+- **After a test changes a quiz:** delete the quiz in Moodle, then run `./setup-4a-uji.sh` again
+  (F4-1; it recreates the quiz and prints a new baseline) or redo step 9 (F4-3).
 - **To start over completely:** `docker compose down -v` deletes all data (and unlinks the WhatsApp
   number), then repeat steps 7 to 9 and link the number again.
 
@@ -249,5 +253,17 @@ and Caddy's certificates).
 
 ## Running it on your laptop
 
-Set `MOODLE_DOMAIN=localhost` in `.env` and follow steps 6 to 9. Caddy serves
-`https://localhost` with its own certificate, so the browser warns once.
+Set `MOODLE_DOMAIN=localhost` in `.env` and follow steps 6 to 9, starting only Moodle (wa-bot
+needs the WhatsApp number):
+
+```bash
+docker compose up -d caddy postgres moodle
+```
+
+Caddy serves `https://localhost` with its own certificate, so the browser warns once. The local
+Nemu Service already lists it as an allowed website (`localhost:443`, "Moodle (uji, lokal)"), so
+the Nemu button shows there. `pnpm --filter extension verify:f4-1` checks F4-1 against it (see
+`apps/extension/README.md`). If an earlier stack on this machine left volumes with another
+password, run under another project name, e.g. `COMPOSE_PROJECT_NAME=nemu-f4`, for every
+command including `./setup-4a-uji.sh`. When you're done, `docker compose down -v` removes the
+containers and their data.

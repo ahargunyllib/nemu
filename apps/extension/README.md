@@ -20,8 +20,8 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   tenant is a placeholder**: it takes the first email in the page's header or account area until
   the tenant's markup is known. Replace it with the tenant's own selectors.
 - **Permissions and WS-03 (ADR-0016).** `host_permissions` cover `*.alursekolah.id`, the mock
-  AlurSekolah and Ruang GTK, the Moodle test site, `web.whatsapp.com`, `http://localhost/*` and the
-  Nemu Service. Inside them, the school's WS-03 list from the Nemu Service (`extensionConfig`)
+  AlurSekolah and Ruang GTK, the Moodle test site, `web.whatsapp.com`, `http://localhost/*`,
+  `https://localhost/*` (the Moodle test site run locally from `infra/`) and the Nemu Service. Inside them, the school's WS-03 list from the Nemu Service (`extensionConfig`)
   decides: the content script asks the background first and, off the list, shows and reads
   nothing (e-Rapor is off it on purpose: test WS-1 (a)). The list is read again at most once a
   minute, so a change needs no update. A site the school adds outside the known ones shows
@@ -99,8 +99,6 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   - **Finishers.** A flow that has more to do once its task ends registers
     `executor.registerFinisher(kind, …)`; it gets the notes so far and shows Catatan langkah itself
     with `executor.presentNotes`. F1 uses it to read the grades back after Simpan.
-  - **Not connected yet.** The other flows that build step lists (F3 #213/#214, F4 #209) come
-    later; until then processes still answer that they aren't available.
   - **Dev tools.** In a dev build, an allowed page opened with `?uji-nemu`
     (`http://localhost:3003/?uji-nemu#/beranda`) shows a dock: **Muat respons uji** runs
     `F0-1_respons-ai-palsu.json` (three fake AI responses that try to press; it passes when Nemu
@@ -129,6 +127,27 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     the page shows with `gradesReadback`), says the result in one sentence, calls `inboxAck` and
     offers Catatan langkah. The wait survives a page load.
   - **Nanti** hides the card in this tab; × or Berhenti before the fill lets the photo show again.
+- **F4-1: check a Moodle quiz the way students see it (#209).** `features/quiz-check/`. "Nemu,
+  tolong cek kuis ini" (typed or spoken, on any page of a quiz) is the extension's own command; no
+  route is asked for. One executor task (`lib/quiz-task.ts`, step source per page) opens
+  **Setelan** (open and close times), **Soal** (each slot, the maximum grade, and each question's
+  key, read from its edit form by address without saving anything) and **Kuis**, then points at
+  **Pratinjau kuis**, which the teacher presses (it sends a form, F0-08). On the preview it reads
+  this page's questions and images as shown and the other pages by address. Every step is a menu
+  click or a point, so nothing on the quiz changes.
+  - **DOM rules** (`lib/quiz-rules.ts`): images that don't load, questions whose answers all grade
+    0, question count (none, students seeing a different number, or not the number she said),
+    class (the quiz's name or her words against the course) and times (closing before it opens,
+    or already closed). Moodle markup is read in `lib/moodle-pages.ts` (Moodle 5.3, Indonesian or
+    English labels).
+  - **Judgement (#218).** The extension sends what it read to `quizJudge`, which asks
+    `SchoolAi.judgeQuiz`. No model checks exist yet, so it adds nothing; without the service the
+    rules still stand.
+  - **Pointing.** One Gelembung Jawab per problem, pointed at on the preview: the missing image or
+    the answers when the question is on this page, else its button in Navigasi kuis, with
+    **Berikutnya** / **Selesai**. The list survives a page load, so opening soal 15 from Navigasi
+    kuis moves the pointer to its image. Catatan langkah lists every problem and "Nemu tidak
+    mengubah apa pun di kuis ini."
 - **Contract.** Request and response schemas come from `@nemu/contracts/extension` and
   `@nemu/contracts/school`. Only the background calls the Nemu Service.
 
@@ -213,6 +232,18 @@ types what Nemu says, except where `features/grade-photo/lib/F1-2_cara-2_skenari
 two deliberate mismatches) has her type something else first. It checks that each line is the
 book's grade, that both mismatches get "Di buku …, Bu." and never "salah", Catatan langkah, and 0
 wrong grades saved. Screenshots go to `.output/verify-f1-2/`.
+
+`pnpm --filter extension verify:f4-1` runs F4-1 (#209) on the Moodle test site started from
+`infra/` (README, "Running it on your laptop"): Bu Siti signs in on the mock first (Moodle shows no
+AlurSekolah account), opens the F4-1 quiz as `siti.aminah` (password `TEACHER_PASSWORD` from
+`infra/.env`, or `MOODLE_TEACHER_PASSWORD`), and types "Nemu, tolong cek kuis ini." It checks that
+Nemu opens Setelan, Soal and Kuis itself, points at Pratinjau kuis for her to press, then points at
+soal 7 and soal 15 with the sentences in `infra/setup/f4-1/F4-1_kunci.csv` (and, after she opens
+soal 15, at its missing image), that Catatan langkah says nothing changed, and that the quiz's
+last-modified time and question count in the Moodle database are what they were. `MOODLE_URL`
+(default `https://localhost/`) points it at another Moodle; without the local database only the
+Soal page's count is compared. It skips with a message when Moodle isn't running. Screenshots go
+to `.output/verify-f4-1/`.
 
 It prints one line per check, exits non-zero on a failure, and saves screenshots to
 `.output/verify/` (each open tab is saved too when a check fails). Add `-- --headed` to watch it. `NEMU_SERVER_URL`, `MOCK_ALURSEKOLAH_URL`,

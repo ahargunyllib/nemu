@@ -14,7 +14,8 @@ export function adminUrl(): string {
 
 /**
  * The sites the extension can reach from install (ADR-0016): AlurSekolah tenants, the mocks, the
- * Moodle test site, and WhatsApp Web. `http://localhost/*` covers every local dev port. Inside
+ * Moodle test site, and WhatsApp Web. `http://localhost/*` covers every local dev port, and
+ * `https://localhost/*` the Moodle test site run locally from `infra/`. Inside
  * them the WS-03 list still decides where the Nemu button appears; a site the school adds later
  * is granted from the settings page through `optional_host_permissions`.
  */
@@ -25,6 +26,7 @@ export const KNOWN_SITE_MATCHES: readonly string[] = [
   "https://nemu-moodle.ahargunyllib.dev/*",
   "https://web.whatsapp.com/*",
   "http://localhost/*",
+  "https://localhost/*",
 ];
 
 export const OPTIONAL_SITE_MATCHES: readonly string[] = ["https://*/*"];

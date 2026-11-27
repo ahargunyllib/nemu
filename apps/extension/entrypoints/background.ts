@@ -19,6 +19,10 @@ import {
   forgetProcessRunTabs,
   handleProcessRun,
 } from "../features/process-run/api/process-run-service";
+import {
+  forgetQuizCheckTabs,
+  handleQuizCheck,
+} from "../features/quiz-check/api/quiz-check-service";
 import { forgetRecorderTabs, handleRecorder } from "../features/recorder/api/recorder-service";
 import { identifyTeacher } from "../features/identity/api/identify-teacher";
 import { askNemu } from "../features/nemu-button/api/ask-nemu";
@@ -65,6 +69,8 @@ async function handle(
       return handleProcessRun(message.request, message.pageEmail, tabId);
     case "nemu:recorder":
       return handleRecorder(message.request, message.pageEmail, tabId);
+    case "nemu:quiz-check":
+      return handleQuizCheck(message.request, message.pageEmail, tabId);
   }
 }
 
@@ -89,6 +95,7 @@ export default defineBackground(() => {
   forgetGradePhotoTabs();
   forgetProcessRunTabs();
   forgetRecorderTabs();
+  forgetQuizCheckTabs();
   browser.permissions.onAdded.addListener(syncScripts);
   browser.permissions.onRemoved.addListener(syncScripts);
   browser.runtime.onStartup.addListener(syncScripts);

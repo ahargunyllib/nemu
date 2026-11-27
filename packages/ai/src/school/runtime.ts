@@ -1,3 +1,4 @@
+import type { QuizJudgeInput, QuizJudgement } from "@nemu/contracts/quiz";
 import type {
   GroundedAnswer,
   HelpExplanation,
@@ -92,6 +93,11 @@ export type SchoolAi = {
     pageLabels: readonly string[];
   }): Promise<FieldMatch>;
   compileProcedure(input: CompileProcedureInput): Promise<Procedure>;
+  /**
+   * F4-01: quiz checks that need judgement beyond the extension's DOM rules (#218), e.g. whether
+   * a question suits the class. None are built yet, so both runtimes answer with no problems.
+   */
+  judgeQuiz(input: QuizJudgeInput): Promise<QuizJudgement>;
   transcribe(audio: AudioInput): Promise<Transcript>;
   /** Audio plus word timings; `audioBase64` is "" when the client must use its local voice. */
   synthesize(text: string): Promise<SpeechSynthesis>;
@@ -157,6 +163,8 @@ export function createSchoolAi(config: SchoolAiConfig): SchoolAi {
     readFormPhoto: (input) => readFormPhoto(readers.readA, input),
     matchFields: (input) => matchFields({ llm: text }, input),
     compileProcedure: (input) => compileProcedure({ llm: text }, input),
+    // #218 (Zahra): a model call goes here once a judgement check is agreed with SE.
+    judgeQuiz: async () => ({ problems: [] }),
     transcribe: createOpenRouterTranscriber({
       apiKey: config.apiKey,
       model: config.models.transcription,
@@ -359,6 +367,11 @@ export function createFixtureSchoolAi(): SchoolAi {
           instruction: "",
         })),
       });
+    },
+
+    // The DOM rules find everything F4-1 needs; the offline runtime adds no judgement.
+    async judgeQuiz() {
+      return { problems: [] };
     },
 
     async transcribe() {

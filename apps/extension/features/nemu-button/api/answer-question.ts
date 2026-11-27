@@ -5,6 +5,7 @@ import { fromExplanation, PASSWORD_ON_SCREEN } from "../../ini-kenapa/lib/explan
 import {
   type AskResult,
   fromGroundedAnswer,
+  isQuizCheckCommand,
   NOT_AVAILABLE_YET,
   recordCommand,
 } from "../lib/answer";
@@ -14,7 +15,7 @@ import {
  * school's rules go to `helpAsk`, "kenapa" to `helpExplain` with what the page shows plus a
  * viewport screenshot, and a voice control closes the bubble. `snapshot` is null while a password
  * field is on screen: then "kenapa" reads and sends nothing (F2-07). Grade entry goes to F1
- * (#207); a process the school uploaded as BPMN to F3 (#213).
+ * (#207); a process the school uploaded as BPMN to F3 (#213); checking a Moodle quiz to F4 (#209).
  */
 export async function answerQuestion(
   client: Pick<NemuServiceClient, "helpRoute" | "helpAsk" | "helpExplain">,
@@ -25,6 +26,8 @@ export async function answerQuestion(
   // "Rekam cara …" is the extension's own command; nothing is sent for it.
   const recordTitle = recordCommand(question);
   if (recordTitle !== null) return { kind: "record", title: recordTitle };
+  // "Nemu, tolong cek kuis ini" is checked in the page itself (F4-01, #209).
+  if (isQuizCheckCommand(question)) return { kind: "quiz-check", utterance: question };
   const route = await client.helpRoute({ utterance: question });
   if (route.kind === "control") return { kind: "stop" };
   switch (route.intent) {

@@ -24,6 +24,8 @@ export type AskResult =
   | { kind: "process"; utterance: string; processName: string }
   /** "Rekam cara input ujian": the operator records a procedure (F3-01, #214). */
   | { kind: "record"; title: string }
+  /** "Nemu, tolong cek kuis ini": F4-01 checks the Moodle quiz on the page (#209). */
+  | { kind: "quiz-check"; utterance: string }
   | { kind: "stop" };
 
 /** Grade entry and process runs wait for the executor (#202), whether typed or spoken. */
@@ -52,4 +54,9 @@ export function recordCommand(text: string): string | null {
   const match = text.trim().match(/^(?:nemu[,\s]+)?rekam(?:kan)? cara\b[\s,:]*(.*)$/iu);
   if (!match) return null;
   return (match[1] ?? "").replace(/[.?!]+$/u, "").trim();
+}
+
+/** "Nemu, tolong cek kuis ini." / "periksa kuis IPAS ini": the extension's own quiz check (#209). */
+export function isQuizCheckCommand(text: string): boolean {
+  return /\b(?:cek|cekkan|periksa|periksakan|check)\b[^.?!]*\b(?:kuis|quiz)\b/iu.test(text);
 }

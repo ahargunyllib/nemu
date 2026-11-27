@@ -25,6 +25,8 @@ import { readPageSnapshot } from "../../features/ini-kenapa/lib/page-snapshot";
 import { AskBox } from "../../features/nemu-button/components/ask-box";
 import { useProcessRun } from "../../features/process-run/hooks/use-process-run";
 import { processRun } from "../../features/process-run/stores/process-run";
+import { useQuizCheck } from "../../features/quiz-check/hooks/use-quiz-check";
+import { quizCheck } from "../../features/quiz-check/stores/quiz-check";
 import { useRecorder } from "../../features/recorder/hooks/use-recorder";
 import { recorder } from "../../features/recorder/stores/recorder";
 import { NemuButton } from "../../features/nemu-button/components/nemu-button";
@@ -72,7 +74,21 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     },
     [close],
   );
-  const { state, ask, reset } = useAsk(pageEmail, close, startGrades, startProcess, startRecording);
+  const startQuizCheck = useCallback(
+    (utterance: string) => {
+      close();
+      void quizCheck.start(utterance);
+    },
+    [close],
+  );
+  const { state, ask, reset } = useAsk(
+    pageEmail,
+    close,
+    startGrades,
+    startProcess,
+    startRecording,
+    startQuizCheck,
+  );
   const preview = useDisplayPreview();
   const { voice, working, speak, repeat, stop } = useVoice(pageEmail);
   const run = useExecutor();
@@ -81,6 +97,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
   const grades = useGradePhoto();
   const process = useProcessRun();
   const recording = useRecorder();
+  const quiz = useQuizCheck();
   const talk = useTalk({
     pageEmail,
     shortcut,
@@ -144,6 +161,8 @@ export function NemuApp({ access }: { access: SiteAccess }) {
   useEffect(() => {
     processRun.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
     recorder.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
+    // F4-01 checks a Moodle quiz as this teacher (#209).
+    quizCheck.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
   }, [pageEmail, honorific, speak]);
 
   // A task under way in this tab carries on after a page load (F0-13).
@@ -151,6 +170,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     void executor.restore();
     void gradePhoto.restore();
     void recorder.restore();
+    void quizCheck.restore();
   }, []);
 
   // Another account signed in: the previous teacher's answer goes (ID-04).
@@ -189,6 +209,10 @@ export function NemuApp({ access }: { access: SiteAccess }) {
         {run.display ? (
           <div className="pointer-events-auto">
             <NemuStage display={run.display} target={run.target} />
+          </div>
+        ) : quiz.display ? (
+          <div className="pointer-events-auto">
+            <NemuStage display={withSpokenWord(quiz.display, voice)} target={quiz.target} />
           </div>
         ) : recording.display ? (
           <div className="pointer-events-auto flex flex-col items-end gap-2">
@@ -259,6 +283,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
           !grades.display &&
           !process.active &&
           !preview.display &&
+          !quiz.display &&
           !open &&
           grades.card && (
             <div className="pointer-events-auto">

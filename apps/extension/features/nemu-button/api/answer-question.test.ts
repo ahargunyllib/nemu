@@ -127,4 +127,23 @@ describe("answerQuestion", () => {
     const stop = fakeClient({ kind: "control", control: "berhenti" });
     await expect(answerQuestion(stop, "berhenti", SNAPSHOT)).resolves.toEqual({ kind: "stop" });
   });
+
+  test("'cek kuis ini' is the extension's own quiz check (F4-01): nothing is sent", async () => {
+    const client = fakeClient({ kind: "intent", intent: "unknown", processName: null });
+    for (const words of [
+      "Nemu, tolong cek kuis ini.",
+      "Periksa kuis IPAS 4A ya",
+      "check this quiz",
+    ])
+      await expect(answerQuestion(client, words, SNAPSHOT)).resolves.toEqual({
+        kind: "quiz-check",
+        utterance: words,
+      });
+    expect(client.helpRoute).not.toHaveBeenCalled();
+    await expect(
+      answerQuestion(client, "Kuis IPAS dibuka kapan?", SNAPSHOT),
+    ).resolves.toMatchObject({
+      kind: "answer",
+    });
+  });
 });
