@@ -15,7 +15,8 @@
     "test": "tsc -b && node --test dist/school/*.test.js dist/school/grades/*.test.js dist/school/bpmn/*.test.js dist/school/quiz/*.test.js scripts/rule-sources.test.mjs",
     "eval:school": "tsc -b && node scripts/evaluate-school.mjs",
     "eval:quiz": "tsc -b && node scripts/evaluate-quiz.mjs",
-    "eval:f2": "tsc -b && node scripts/evaluate-f2.mjs"
+    "eval:f2": "tsc -b && node scripts/evaluate-f2.mjs",
+    "eval:f0-2": "tsc -b && node scripts/evaluate-f0-2.mjs"
   },
   "dependencies": {
     "@bpmn-io/feelin": "7.0.0",
