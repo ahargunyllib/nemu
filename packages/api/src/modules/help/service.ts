@@ -17,7 +17,7 @@ import type { CatalogRepository } from "../documents/catalog-repository";
 import { toKnowledgeChunks } from "../documents/knowledge-chunks";
 import type { DocumentRepository } from "../documents/repository";
 import type { KamusRepository } from "../kamus/repository";
-import { loadKamusChunks } from "../kamus/service";
+import { loadKamusRows } from "../kamus/service";
 import { loadSchoolKnowledge } from "../school/knowledge";
 import { checkSavedGrades } from "./grade-check";
 
@@ -111,7 +111,7 @@ export async function explain(
     if (fromProcess.answer) return fromProcess.answer;
     symptoms = fromProcess.symptoms;
   }
-  const kamus = await loadKamusChunks(deps.kamus, workspaceId);
+  const kamus = await loadKamusRows(deps.kamus, workspaceId);
   const explanation = await deps.ai.explainError({
     snapshot: input.snapshot,
     question: input.question,
