@@ -23,6 +23,34 @@ test("exact, reordered and abbreviated names are accepted without asking", () =>
   );
 });
 
+test("a grade-book photo confirms shortened names too (data-uji F1-1)", () => {
+  const roster = [
+    { studentId: "a", name: "Laila Nur Azizah", number: 16 },
+    { studentId: "b", name: "Nabila Putri Ramadhani", number: 18 },
+    { studentId: "c", name: "Taufik Hidayatullah", number: 27 },
+    { studentId: "d", name: "Naufal Akbar", number: 19 },
+  ];
+  const matches = matchNames(
+    [
+      { line: 16, nameRaw: "Laila N.A." },
+      { line: 18, nameRaw: "Nabila" },
+      { line: 27, nameRaw: "Taufik H." },
+      { line: 19, nameRaw: "Naufal Akbar" },
+    ],
+    roster,
+    { confirmAbbreviated: true },
+  );
+  assert.deepEqual(
+    matches.map((match) => [match.studentId, match.status]),
+    [
+      ["a", "ask"],
+      ["b", "ask"],
+      ["c", "ask"],
+      ["d", "auto"],
+    ],
+  );
+});
+
 test("a spelling difference is matched but always confirmed with the teacher", () => {
   const [match] = matchNames([{ line: 10, nameRaw: "Farah Anisa" }], CLASS_4B);
   assert.equal(match?.rosterName, "Farah Annisa");

@@ -78,6 +78,8 @@ type PendingCell = {
   a: NormalizedCell | null;
   b: NormalizedCell | null;
   raw: string;
+  /** Other readings the models listed for this cell (alternatives, a corrected value). */
+  alternatives: string[];
   reasons: Set<FlagReason>;
   bbox: Box | null;
 };
@@ -193,6 +195,7 @@ export function combineReadings({ a, b, columnKey }: CombineInput): PendingCell[
       a: normalizeModelCell(aCell),
       b: normalizeModelCell(bCell),
       raw: aCell?.raw ?? "",
+      alternatives: [...new Set([...(aCell?.alternatives ?? []), ...(bCell?.alternatives ?? [])])],
       reasons: cellReasons(aCell, bCell),
       bbox: cellBox(columnX, row.y),
     } satisfies PendingCell;
@@ -220,6 +223,7 @@ export function resolveCell(
     a: cell.a?.key ?? null,
     b: cell.b?.key ?? null,
     reread: reread === undefined ? null : (reread?.key ?? "?"),
+    ...(cell.alternatives.length ? { alternatives: cell.alternatives } : {}),
   };
 
   if (reasons.size === 0) {
@@ -330,9 +334,12 @@ export async function readGradePhoto(
         const position = cell.bbox
           ? ` (area x=${cell.bbox[0]}–${cell.bbox[2]}, y=${cell.bbox[1]}–${cell.bbox[3]} dari 1000)`
           : "";
+        const seen = [...new Set([cell.a?.key, cell.b?.key, ...cell.alternatives])]
+          .filter((value): value is string => !!value)
+          .join(" / ");
         return {
           id: `${cell.line}`,
-          description: `baris ${cell.line} (${name}), kolom ${header}${input.cropImage ? "" : position}`,
+          description: `baris ${cell.line} (${name}), kolom ${header}${input.cropImage ? "" : position}; pembaca lain melihat: ${seen || "?"}`,
           image: input.cropImage && cell.bbox ? await input.cropImage(cell.bbox) : input.image,
         };
       }),
@@ -353,6 +360,7 @@ export async function readGradePhoto(
       nameAlt: bRows[index]?.name_raw ?? null,
     })),
     input.roster,
+    { confirmAbbreviated: true },
   );
 
   const rows: GradeRow[] = pending.map((cell, index) => {
