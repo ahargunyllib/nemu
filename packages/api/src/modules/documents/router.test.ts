@@ -5,11 +5,16 @@ import { call } from "@orpc/server";
 import { describe, expect, it } from "vite-plus/test";
 
 import { createSchoolContext } from "../../testing/school";
+import { createDocumentRepository } from "./repository";
 import { documentsRouter } from "./router";
 
 const BPMN = join(
   import.meta.dirname,
   "../../../../ai/src/school/fixtures/pengajuan-izin-guru.bpmn",
+);
+const SOP_PENILAIAN_PDF = join(
+  import.meta.dirname,
+  "../../../../ai/src/school/fixtures/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf",
 );
 const OPERATOR = { id: "rizal", role: "operator", workspaceId: "W-SEKOLAH" };
 
@@ -92,5 +97,34 @@ describe("WS-04 knowledge", () => {
       createdByName: "Rizal Hidayat",
       changedByName: "Rizal Hidayat",
     });
+  });
+});
+
+describe("F3-2: the official SOP Penilaian PDF", () => {
+  it("is indexed point by point, each point on its own page, without the running footer", async () => {
+    const context = await operatorContext();
+    const file = new File([await readFile(SOP_PENILAIAN_PDF)], "SOP-Penilaian.pdf", {
+      type: "application/pdf",
+    });
+    const document = await call(
+      documentsRouter.uploadDocument,
+      { title: "SOP Penilaian", version: "2026", isActive: true, file, siteIds: [] },
+      { context },
+    );
+    expect(document.status).toBe("ready");
+
+    const chunks = (
+      await createDocumentRepository(context.db).listActiveReadyChunks("W-SEKOLAH")
+    ).filter((chunk) => chunk.documentId === document.id);
+    const at = (article: string) => chunks.find((chunk) => chunk.article === article);
+
+    expect([at("3.2")?.page, at("3.3")?.page, at("4.1")?.page, at("4.3")?.page]).toEqual([
+      2, 2, 3, 3,
+    ]);
+    expect(at("3.2")?.text).toContain("untuk semua mata pelajaran adalah 75");
+    expect(at("3.3")?.text).not.toContain("3.4");
+    expect(at("4.3")?.text).toContain("Ulangan susulan dilaksanakan paling lambat 14 hari");
+    expect(at("5.2")?.text).toBe("5.2 Wali kelas: memastikan nilai kelasnya lengkap.");
+    expect(chunks.some((chunk) => chunk.text.includes("DATA UJI SINTETIS"))).toBe(false);
   });
 });

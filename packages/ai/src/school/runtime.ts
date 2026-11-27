@@ -229,13 +229,30 @@ export function createFixtureSchoolAi(): SchoolAi {
       const top = context[0];
       if (!top || top.score < 1)
         return { status: "not_in_guide", answer: "Belum ada di panduan sekolah." };
-      // A guide section starts with its Markdown heading; the answer is the first sentence under it.
-      const quote = top.text
+      // The answer is the sentence or numbered point of the chunk that shares most words with the
+      // question (the first one on a tie), without its Markdown heading, point number and full stop.
+      const sentences = top.text
         .replace(/^#{1,6}\s.*$/gmu, "")
         .trim()
-        .split(/(?<=\.)\s+/u)[0]!
-        .replace(/^\d+(\.\d+)*\s+/u, "")
-        .replace(/\.$/u, "");
+        .split(/(?<=\.)\s+|\n(?=\d+(?:\.\d+)+\s)/u)
+        .map((sentence) =>
+          sentence
+            .trim()
+            .replace(/^\d+(\.\d+)*\s+/u, "")
+            .replace(/\.$/u, ""),
+        );
+      const best = retrieveKnowledge(
+        sentences.map((text, index) => ({
+          ...top,
+          id: String(index).padStart(4, "0"),
+          title: "",
+          article: undefined,
+          text,
+        })),
+        input.question,
+        1,
+      )[0];
+      const quote = sentences[Number(best?.id ?? 0)]!;
       return verifyGroundedAnswer(
         {
           status: "answered",

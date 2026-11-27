@@ -15,9 +15,23 @@ function hasSubstantiveText(text) {
   return text.replace(/^```(?:text)?\s*$/gmu, "").trim().length > 0;
 }
 
-/** Deterministically splits a Markdown knowledge source at page, article, or guide boundaries. */
+const NUMBERED_POINT = /^(\d{1,2}(?:\.\d{1,2})+)\.?\s+\p{L}/u;
+const NUMBERED_HEADING = /^(\d{1,2})\.\s+\p{Lu}/u;
+
+/** "5.1 Guru: menilai. 5.2 Wali kelas: …" → one line per point, when a PDF run them together. */
+function splitInlinePoints(line) {
+  return line.split(/(?<=[.;:])\s+(?=\d{1,2}(?:\.\d{1,2})+\s+\p{Lu})/u);
+}
+
+/**
+ * Deterministically splits a Markdown knowledge source at page, article, or guide boundaries.
+ * Numbered points ("3.2 Kriteria …") are points of their own: the article of a document without
+ * Pasal headings ("3.2"), or a decimal ayat inside a Pasal ("3 ayat 3.2").
+ */
 export function chunkKnowledgeDocument(document, markdown) {
-  const lines = markdown.split(/\r?\n/u);
+  const rawLines = markdown.split(/\r?\n/u);
+  const hasNumberedPoints = rawLines.some((line) => NUMBERED_POINT.test(line.trim()));
+  const lines = hasNumberedPoints ? rawLines.flatMap(splitInlinePoints) : rawLines;
   const hasPageMarkers = lines.some((line) => /^\[Halaman \d+(?:-\d+)?\]\s*$/u.test(line.trim()));
   const hasLegalHeadings = lines.some((line) =>
     /^(?:#{1,6}\s+)?Pasal\s+\d+[A-Z]?(?:[.\s].*)?$/iu.test(line.trim()),
@@ -31,6 +45,7 @@ export function chunkKnowledgeDocument(document, markdown) {
   let article;
   let paragraph;
   let section = 0;
+  let headingLine;
 
   function flush() {
     const text = currentLines.join("\n").trim();
@@ -41,7 +56,9 @@ export function chunkKnowledgeDocument(document, markdown) {
 
     const legalLocation = article
       ? paragraph
-        ? `${article} ayat (${paragraph})`
+        ? paragraph.includes(".")
+          ? `${article} ayat ${paragraph}`
+          : `${article} ayat (${paragraph})`
         : article
       : undefined;
     const baseId = page
@@ -80,6 +97,28 @@ export function chunkKnowledgeDocument(document, markdown) {
       flush();
       article = articleMatch[1].toUpperCase();
       paragraph = undefined;
+      headingLine = trimmed;
+      currentLines.push(line);
+      continue;
+    }
+
+    const pointMatch = hasNumberedPoints ? trimmed.match(NUMBERED_POINT) : null;
+    if (pointMatch) {
+      const onlyHeading =
+        currentLines.filter((candidate) => candidate.trim()).length === 1 &&
+        headingLine === currentLines.find((candidate) => candidate.trim())?.trim();
+      if (!onlyHeading) flush();
+      if (hasLegalHeadings && article) paragraph = pointMatch[1];
+      else article = pointMatch[1];
+      currentLines.push(line);
+      continue;
+    }
+
+    if (hasNumberedPoints && !hasLegalHeadings && NUMBERED_HEADING.test(trimmed)) {
+      flush();
+      article = trimmed.match(NUMBERED_HEADING)[1];
+      paragraph = undefined;
+      headingLine = trimmed;
       currentLines.push(line);
       continue;
     }

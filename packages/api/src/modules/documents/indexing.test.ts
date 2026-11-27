@@ -47,6 +47,45 @@ describe("indexMarkdownDocument", () => {
     ]);
   });
 
+  it("keeps numbered points (3.2) as articles, or as decimal ayat inside a Pasal", () => {
+    const sop = indexMarkdownDocument(
+      { ...document, id: "sop" },
+      [
+        "[Halaman 2]",
+        "3. Ketentuan penilaian",
+        "3.1 Nilai ditulis dalam skala 0 sampai 100.",
+        "3.2 KKM adalah 75. Siswa di bawah 75",
+        "wajib remedial.",
+        "5.1 Guru: menilai. 5.2 Wali kelas: memastikan nilai lengkap.",
+      ].join("\n"),
+    );
+    expect(sop.map(({ id, article, page, text }) => [id, article, page, text])).toEqual([
+      [
+        "sop-page-2-pasal-3.1",
+        "3.1",
+        2,
+        "3. Ketentuan penilaian\n3.1 Nilai ditulis dalam skala 0 sampai 100.",
+      ],
+      ["sop-page-2-pasal-3.2", "3.2", 2, "3.2 KKM adalah 75. Siswa di bawah 75\nwajib remedial."],
+      ["sop-page-2-pasal-5.1", "5.1", 2, "5.1 Guru: menilai."],
+      ["sop-page-2-pasal-5.2", "5.2", 2, "5.2 Wali kelas: memastikan nilai lengkap."],
+    ]);
+
+    const legal = indexMarkdownDocument(
+      { ...document, id: "tahfidz" },
+      "[Halaman 1]\nPasal 3. Setoran hafalan\n3.1 Dua kali seminggu.\n3.2 Paling sedikit 3 ayat.",
+    );
+    expect(legal.map(({ article }) => article)).toEqual(["3 ayat 3.1", "3 ayat 3.2"]);
+  });
+
+  it("leaves amounts at the start of a line alone", () => {
+    const chunks = indexMarkdownDocument(
+      { ...document, id: "tarif" },
+      "[Halaman 1]\nTarif harian\n1.500.000 Jakarta\n2.000.000 Papua",
+    );
+    expect(chunks.map(({ article }) => article)).toEqual([null]);
+  });
+
   it("rejects empty Markdown instead of creating an unsearchable ready document", () => {
     expect(() => indexMarkdownDocument(document, " \n\t")).toThrow(
       "The Markdown file has no indexable content.",
