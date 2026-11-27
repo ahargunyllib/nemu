@@ -1,8 +1,8 @@
-import { isAllowedUrl } from "@nemu/contracts/extension";
 import { browser } from "wxt/browser";
 
 import { currentSiteConfig } from "../features/allowed-sites/api/site-config";
 import { syncAddedSiteScripts } from "../features/allowed-sites/api/site-scripts";
+import { siteAccessFor } from "../features/allowed-sites/lib/site-access";
 import { recordActions } from "../features/executor/api/record-actions";
 import {
   forgetClosedTabs,
@@ -25,7 +25,7 @@ async function handle(
   switch (message.type) {
     case "nemu:site-access": {
       const config = await currentSiteConfig();
-      return { allowed: isAllowedUrl(config?.allowedSites ?? [], senderUrl ?? message.url) };
+      return { access: siteAccessFor(config, senderUrl ?? message.url) };
     }
     case "nemu:identify":
       return identifyTeacher(message.pageEmail);

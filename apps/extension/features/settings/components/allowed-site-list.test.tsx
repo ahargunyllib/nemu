@@ -7,8 +7,8 @@ import { AllowedSiteList } from "./allowed-site-list";
 afterEach(cleanup);
 
 const SITES = [
-  { pattern: "*.alursekolah.id", label: "AlurSekolah" },
-  { pattern: "portal.sekolah.sch.id", label: "Portal sekolah" },
+  { pattern: "*.alursekolah.id", label: "AlurSekolah", permission: "read_fill" as const },
+  { pattern: "portal.sekolah.sch.id", label: "Portal sekolah", permission: "read_only" as const },
 ];
 
 describe("AllowedSiteList", () => {
@@ -19,6 +19,7 @@ describe("AllowedSiteList", () => {
     );
 
     expect(screen.getAllByText("Aktif")).toHaveLength(1);
+    expect(screen.getByText(/Baca saja/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Izinkan" }));
     expect(onGrant).toHaveBeenCalledWith(SITES[1]);
   });

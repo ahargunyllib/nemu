@@ -1,6 +1,21 @@
 import { sql } from "drizzle-orm";
 import { index, integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
+import { user } from "./auth";
+
+// WS-02: a knowledge package Javan maintains, such as the built-in AlurSekolah guide. With
+// `allSchools`, Nemu answers every school from its active documents, not only the owner's.
+export const knowledgePackage = sqliteTable("knowledge_package", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  allSchools: integer("all_schools", { mode: "boolean" }).default(false).notNull(),
+  updatedBy: text("updated_by").references(() => user.id, { onDelete: "set null" }),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
 // Metadata for a knowledge document the admin uploads in the Admin Workspace.
 // The file itself lives in the DOCUMENTS R2 bucket under `storageKey`.
 export const knowledgeDocument = sqliteTable(
@@ -18,6 +33,16 @@ export const knowledgeDocument = sqliteTable(
     contentType: text("content_type").notNull(),
     sizeBytes: integer("size_bytes").notNull(),
     storageKey: text("storage_key").notNull(),
+    // WS-04: the WS-03 allowed websites (ids) the document applies to; empty means every site.
+    siteIds: text("site_ids", { mode: "json" })
+      .$type<string[]>()
+      .default(sql`'[]'`)
+      .notNull(),
+    // WS-02: the package the document belongs to, or null for the school's own knowledge.
+    packageId: text("package_id").references(() => knowledgePackage.id, { onDelete: "set null" }),
+    // Who uploaded it, and who last switched it on or off (WS-04 "who and when").
+    createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
+    changedBy: text("changed_by").references(() => user.id, { onDelete: "set null" }),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
@@ -66,4 +91,29 @@ export const ruleSource = sqliteTable(
       .notNull(),
   },
   (table) => [primaryKey({ columns: [table.workspaceId, table.key] })],
+);
+
+// WS-04 / F3-11 / F3-19: each user task and end event of an uploaded BPMN, with the symptoms a
+// teacher would see when the process stops there and the AlurSekolah page the task is done on.
+// Created on upload; the operator corrects them in the Admin Workspace.
+export const processElement = sqliteTable(
+  "process_element",
+  {
+    documentId: text("document_id")
+      .notNull()
+      .references(() => knowledgeDocument.id, { onDelete: "cascade" }),
+    elementId: text("element_id").notNull(),
+    kind: text("kind", { enum: ["task", "end"] }).notNull(),
+    name: text("name").notNull(),
+    sequence: integer("sequence").notNull(),
+    symptoms: text("symptoms", { mode: "json" })
+      .$type<string[]>()
+      .default(sql`'[]'`)
+      .notNull(),
+    // The page (menu label) a user task is done on; null for end events.
+    page: text("page"),
+    // Whether `page` was edited by hand rather than taken from the task label.
+    pageEdited: integer("page_edited", { mode: "boolean" }).default(false).notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.documentId, table.elementId] })],
 );

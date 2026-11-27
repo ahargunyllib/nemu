@@ -15,7 +15,8 @@ export default defineContentScript({
 
   async main(ctx) {
     // WS-1 (a): off the school's WS-03 list nothing appears and nothing on the page is read.
-    if (!(await requestSiteAccess(location.href))) return;
+    const access = await requestSiteAccess(location.href);
+    if (!access) return;
     loadNemuFont();
     const ui = await createShadowRootUi(ctx, {
       name: "nemu-overlay",
@@ -25,7 +26,7 @@ export default defineContentScript({
       isolateEvents: ["keydown", "keyup", "keypress"],
       onMount(container) {
         const root = ReactDOM.createRoot(container);
-        root.render(<NemuApp />);
+        root.render(<NemuApp access={access} />);
         return root;
       },
       onRemove(root) {

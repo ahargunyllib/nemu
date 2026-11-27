@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc -b",
     "check-types": "tsc -b",
-    "test": "tsc -b && node --test dist/extension.test.js"
+    "test": "tsc -b && node --test dist/extension.test.js dist/talk-shortcut.test.js"
   },
   "dependencies": {
     "zod": "catalog:"

@@ -112,3 +112,87 @@ describe("identity from the page email (ID-02, ID-04)", () => {
     ).resolves.toMatchObject({ code: "UNAUTHORIZED" });
   });
 });
+
+describe("WS-03 permissions and WS-08 settings reach the extension without an update", () => {
+  const ADMIN_JAVAN = { id: "javan", role: "admin", workspaceId: "W-SEKOLAH" };
+  const OPERATOR = { id: "rizal", role: "operator", workspaceId: "W-SEKOLAH" };
+
+  async function asAdmin(user = ADMIN_JAVAN) {
+    const context = await createSchoolContext();
+    return {
+      ...context,
+      session: { ...context.session!, user: { ...context.session!.user, ...user } },
+    };
+  }
+
+  it("serves what Admin Javan saves: a new site with its permission and the school's settings", async () => {
+    const admin = await asAdmin();
+    await call(
+      extensionRouter.saveAllowedSite,
+      { id: null, pattern: "https://Portal.Dinas.go.id/login", label: "", permission: "read_only" },
+      { context: admin },
+    );
+    await call(
+      extensionRouter.saveSchoolSettings,
+      { talkShortcut: "alt + shift + n", defaultCara: "tunjuk", fillSpeed: "pelan" },
+      { context: admin },
+    );
+
+    const extension = {
+      ...admin,
+      session: null,
+      extension: { installCode: INSTALL_CODE, email: null },
+    };
+    const config = await call(extensionRouter.extensionConfig, undefined, { context: extension });
+    expect(config.allowedSites).toContainEqual({
+      pattern: "portal.dinas.go.id",
+      label: "portal.dinas.go.id",
+      permission: "read_only",
+    });
+    expect(
+      config.allowedSites.find((site) => site.pattern === "*.alursekolah.id")?.permission,
+    ).toBe("read_fill");
+    expect(config.settings).toEqual({
+      talkShortcut: "Alt+Shift+N",
+      defaultCara: "tunjuk",
+      fillSpeed: "pelan",
+    });
+  });
+
+  it("defaults to Ctrl + Space, cara 1 and normal speed, and refuses a bare key", async () => {
+    const admin = await asAdmin();
+    await expect(
+      call(extensionRouter.getSchoolSettings, undefined, { context: admin }),
+    ).resolves.toEqual({
+      talkShortcut: "Ctrl+Space",
+      defaultCara: "isi",
+      fillSpeed: "normal",
+    });
+    await expect(
+      call(
+        extensionRouter.saveSchoolSettings,
+        { talkShortcut: "Space", defaultCara: "isi", fillSpeed: "normal" },
+        { context: admin },
+      ),
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("refuses a duplicate site, and keeps WS-03 and WS-08 from a school operator", async () => {
+    const admin = await asAdmin();
+    await expect(
+      call(
+        extensionRouter.saveAllowedSite,
+        { id: null, pattern: "*.AlurSekolah.id", label: "Lagi", permission: "read_fill" },
+        { context: admin },
+      ),
+    ).rejects.toMatchObject({ code: "CONFLICT" });
+
+    const operator = await asAdmin(OPERATOR);
+    await expect(
+      call(extensionRouter.deleteAllowedSite, { id: "sekolah-alursekolah" }, { context: operator }),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(
+      call(extensionRouter.getSchoolSettings, undefined, { context: operator }),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+});

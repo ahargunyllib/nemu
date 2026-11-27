@@ -4,6 +4,7 @@ import type {
   ExecutorTask,
   ExecutorVerb,
 } from "@nemu/contracts/executor";
+import type { SitePermission } from "@nemu/contracts/extension";
 import type { NemuDisplay, NemuStatus } from "@nemu/ui/lib/nemu-display";
 
 import { describeTarget, findTarget, type TargetLookup } from "./find-target";
@@ -18,7 +19,7 @@ import {
   typeValue,
 } from "./page-actions";
 import { type Cara, type RunEvent, type RunOutcome, stepNotes } from "./run-notes";
-import { refusalFor } from "./safety";
+import { refusalFor, sitePermits } from "./safety";
 
 /** How long the Nemu cursor glides to the next target (`GLIDE_MS` in `@nemu/ui/nemu/nemu-stage`). */
 export const CURSOR_GLIDE_MS = 600;
@@ -71,6 +72,8 @@ export type RunDeps = {
   honorific: string;
   /** One field per this many ms in cara 1 (WS-08 fill speed); Pelan doubles it. */
   fieldMs: number;
+  /** What the site lets Nemu do (WS-03); a step it doesn't permit is the teacher's. Default read_fill. */
+  permission?: SitePermission;
   render(view: RunView): void;
   speak(text: string): void;
   sleep(ms: number, signal: AbortSignal): Promise<void>;
@@ -388,6 +391,11 @@ export class ExecutorRun {
       element.scrollIntoView({ block: "center", behavior: "smooth" });
       this.deps.log({ action: "scroll", target: name, result: "done" });
       return;
+    }
+    if (!sitePermits(this.deps.permission ?? "read_fill", step.verb)) {
+      // WS-03 "baca saja" / "siapkan pesan": Nemu points and says it; the teacher does it.
+      this.deps.log({ action: step.verb, target: name, result: "refused" });
+      return this.teach2(index, step, element, name, signal);
     }
     if (this.state.cara === 2) return this.teach2(index, step, element, name, signal);
     return this.act(index, step, element, name, signal);

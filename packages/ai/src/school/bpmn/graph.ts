@@ -86,7 +86,7 @@ function kindOf(type: string): ProcessNodeKind {
   if (type === "bpmn:ExclusiveGateway") return "exclusiveGateway";
   if (type === "bpmn:ParallelGateway") return "parallelGateway";
   if (type === "bpmn:InclusiveGateway") return "inclusiveGateway";
-  if (/Task$/u.test(type) || type === "bpmn:SubProcess" || type === "bpmn:CallActivity")
+  if (type.endsWith("Task") || type === "bpmn:SubProcess" || type === "bpmn:CallActivity")
     return "task";
   return "other";
 }

@@ -6,16 +6,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@nemu/ui/components/card";
+import { shortcutKeys } from "@nemu/contracts/talk-shortcut";
 import ReactDOM from "react-dom/client";
 import { browser } from "wxt/browser";
 
-import { shortcutKeys, TALK_SHORTCUT } from "../../features/voice/lib/talk-shortcut";
+import { useSchoolShortcut } from "../../features/voice/hooks/use-school-shortcut";
 import { MicrophoneStep } from "../../features/welcome/components/microphone-step";
 import { useMicrophonePermission } from "../../features/welcome/hooks/use-microphone-permission";
 
 import "./style.css";
-
-const SHORTCUT_KEYS = shortcutKeys(TALK_SHORTCUT);
 
 /**
  * Opens after install (#200): the microphone permission is asked here, once, for the whole
@@ -23,6 +22,7 @@ const SHORTCUT_KEYS = shortcutKeys(TALK_SHORTCUT);
  */
 function WelcomePage() {
   const { permission, ask } = useMicrophonePermission();
+  const shortcut = useSchoolShortcut();
 
   return (
     <main className="flex min-h-svh flex-col items-center gap-6 bg-muted px-6 py-10">
@@ -36,7 +36,7 @@ function WelcomePage() {
         <CardContent>
           <MicrophoneStep
             permission={permission}
-            shortcutKeys={SHORTCUT_KEYS}
+            shortcutKeys={shortcutKeys(shortcut)}
             onAsk={() => void ask()}
           />
         </CardContent>

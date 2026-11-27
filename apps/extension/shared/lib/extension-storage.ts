@@ -1,4 +1,4 @@
-import type { AllowedSite } from "@nemu/contracts/extension";
+import type { ExtensionConfig, SchoolSettings } from "@nemu/contracts/extension";
 import { storage } from "wxt/utils/storage";
 
 /** The school install code the operator typed into the settings page once (ADR-0015). */
@@ -6,8 +6,14 @@ export const installCodeItem = storage.defineItem<string | null>("local:installC
   fallback: null,
 });
 
-/** The school and its WS-03 allowed websites, as last read from the Nemu Service. */
-export type SiteConfig = { schoolName: string; allowedSites: AllowedSite[]; fetchedAt: number };
+/**
+ * The school, its WS-03 allowed websites and its WS-08 settings, as last read from the Nemu
+ * Service. A config cached by an older build has no `settings` (and sites without `permission`).
+ */
+export type SiteConfig = Omit<ExtensionConfig, "settings"> & {
+  settings?: SchoolSettings;
+  fetchedAt: number;
+};
 
 export const siteConfigItem = storage.defineItem<SiteConfig | null>("local:siteConfig", {
   fallback: null,

@@ -13,12 +13,11 @@ function RouteComponent() {
   return (
     <>
       <PageHeading
-        title="Documents"
-        description="Knowledge documents Nemu answers from. Only active, ready documents are used."
-
+        title="Pengetahuan sekolah"
+        description="SOP, proses BPMN, dan rekaman yang menjadi sumber jawaban Nemu. Hanya dokumen aktif dan siap yang dipakai."
         actions={<DocumentUploadDialog />}
       />
-      <DocumentList />
+      <DocumentList title="Dokumen sekolah" />
       <RuleSourceList />
     </>
   );

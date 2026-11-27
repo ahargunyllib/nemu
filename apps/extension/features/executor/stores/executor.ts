@@ -106,7 +106,10 @@ function createExecutor() {
   /** F0-07 and F0-08 while a task is under way: the teacher's input, and every submit. */
   function attachPageGuards(current: ExecutorRun) {
     const onInput = (event: Event) => {
-      if (run === current && isTeacherInput(event, document.querySelector(NEMU_HOST)))
+      if (
+        run === current &&
+        isTeacherInput(event, document.querySelector(NEMU_HOST), settings.talkShortcut)
+      )
         current.interrupt();
     };
     const types = ["mousedown", "keydown", "touchstart"] as const;
@@ -150,6 +153,7 @@ function createExecutor() {
         return context.honorific;
       },
       fieldMs: 1000 / settings.fieldsPerSecond,
+      permission: settings.permission,
       render: (next) => {
         if (run === current) publish(next);
       },
@@ -219,7 +223,7 @@ function createExecutor() {
      */
     async start(untrusted: UntrustedTask, options: { cara?: Cara; continuation?: unknown } = {}) {
       run?.stop(false);
-      settings = executorSettings(await siteConfigItem.getValue());
+      settings = executorSettings(await siteConfigItem.getValue(), location.href);
       const { task, refused } = toSafeTask(untrusted);
       const cara = options.cara ?? ((await wantsToTry(task.kind)) ? 2 : settings.cara);
       const state = createRunState(task, { cara, refused, continuation: options.continuation });
@@ -231,7 +235,7 @@ function createExecutor() {
     async restore() {
       const [state, saved] = await Promise.all([requestLoadRun(), requestLoadNotes()]);
       notes = saved;
-      settings = executorSettings(await siteConfigItem.getValue());
+      settings = executorSettings(await siteConfigItem.getValue(), location.href);
       if (state && state.status !== "done" && state.status !== "stopped") begin(state).restore();
       else publish({});
     },

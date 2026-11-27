@@ -1,5 +1,5 @@
-import { and, type Database, desc, eq, getColumns } from "@nemu/db";
-import { knowledgeChunk, knowledgeDocument } from "@nemu/db/schema/documents";
+import { and, type Database, desc, eq, getColumns, or } from "@nemu/db";
+import { knowledgeChunk, knowledgeDocument, knowledgePackage } from "@nemu/db/schema/documents";
 
 export type DocumentRecord = typeof knowledgeDocument.$inferSelect;
 export type NewDocumentRecord = typeof knowledgeDocument.$inferInsert;
@@ -18,6 +18,8 @@ export type DocumentRepository = {
     workspaceId: string,
     id: string,
     isActive: boolean,
+    /** Who switched it, shown in WS-04. */
+    changedBy?: string,
   ): Promise<DocumentRecord | undefined>;
   setFailed(id: string, failureReason: string): Promise<DocumentRecord | undefined>;
   replaceChunksAndSetReady(
@@ -25,6 +27,7 @@ export type DocumentRepository = {
     chunks: NewKnowledgeChunkRecord[],
     isActive: boolean,
   ): Promise<DocumentRecord>;
+  /** The school's active knowledge, plus that of every package marked for all schools (WS-02). */
   listActiveReadyChunks(workspaceId: string): Promise<ActiveKnowledgeChunkRecord[]>;
   delete(workspaceId: string, id: string): Promise<DocumentRecord | undefined>;
 };
@@ -56,10 +59,10 @@ export function createDocumentRepository(db: Database): DocumentRepository {
         .limit(1);
       return found;
     },
-    async setActive(workspaceId, id, isActive) {
+    async setActive(workspaceId, id, isActive, changedBy) {
       const [updated] = await db
         .update(knowledgeDocument)
-        .set({ isActive })
+        .set({ isActive, ...(changedBy ? { changedBy } : {}) })
         .where(
           and(
             eq(knowledgeDocument.workspaceId, workspaceId),
@@ -109,9 +112,13 @@ export function createDocumentRepository(db: Database): DocumentRepository {
         })
         .from(knowledgeChunk)
         .innerJoin(knowledgeDocument, eq(knowledgeDocument.id, knowledgeChunk.documentId))
+        .leftJoin(knowledgePackage, eq(knowledgePackage.id, knowledgeDocument.packageId))
         .where(
           and(
-            eq(knowledgeDocument.workspaceId, workspaceId),
+            or(
+              eq(knowledgeDocument.workspaceId, workspaceId),
+              eq(knowledgePackage.allSchools, true),
+            ),
             eq(knowledgeDocument.isActive, true),
             eq(knowledgeDocument.status, "ready"),
           ),
