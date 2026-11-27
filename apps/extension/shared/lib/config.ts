@@ -6,7 +6,7 @@ export function serverUrl(): string {
 }
 
 /** Admin Workspace used when `WXT_ADMIN_URL` is not set at build time ("Lihat diagram"). */
-export const DEFAULT_ADMIN_URL = "http://localhost:3001";
+export const DEFAULT_ADMIN_URL = "http://localhost:3002";
 
 export function adminUrl(): string {
   return (import.meta.env.WXT_ADMIN_URL || DEFAULT_ADMIN_URL).replace(/\/$/, "");
