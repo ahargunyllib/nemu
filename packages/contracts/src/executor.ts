@@ -54,6 +54,12 @@ export const executorStepSchema = z.discriminatedUnion("verb", [
       ringkasan: z.string().max(4000).optional(),
       /** Where this step came from, behind Sumber: "Rekaman Pak Rizal, langkah 11 dari 11". */
       sumber: z.string().max(200).optional(),
+      /** The bubble's heading: "Giliran Ibu". */
+      heading: z.string().max(40).optional(),
+      /** A quieter line under the sentence: "Nilai akhir dihitung otomatis …". */
+      detail: z.string().max(300).optional(),
+      /** A small chip under the text: "Belum tersimpan". */
+      chip: z.string().max(40).optional(),
     })
     .strict(),
   /** Types a value into a field. `rowName` (the student) is what Nemu says with it. */

@@ -285,9 +285,18 @@ await check(
   async () => {
     await page.waitForURL(/#\/tahfidz$/u, { timeout: 20_000 });
     await page.locator("#tabel-setoran").waitFor({ timeout: 20_000 });
-    await display("tunjuk").getByText("Silakan Ibu tekan Simpan setoran.").waitFor({
-      timeout: 120_000,
-    });
+    const bubble = display("tunjuk");
+    await bubble.getByText("Silakan Ibu tekan Simpan setoran.").waitFor({ timeout: 120_000 });
+    // F3·07: the teacher's turn, what the system does next (F3-18), and nothing saved yet.
+    expect((await bubble.getByText("Giliran Ibu", { exact: true }).count()) === 1, "no heading");
+    expect(
+      (await bubble
+        .getByText("Sistem AlurSekolah: hitung nilai dan huruf", { exact: false })
+        .count()) === 1,
+      "the system's task isn't named under the sentence",
+    );
+    expect((await bubble.getByText("Belum tersimpan", { exact: true }).count()) === 1, "no chip");
+    expect((await bubble.getByText("Lihat ringkasan").count()) === 0, "Lihat ringkasan is offered");
     await page.screenshot({ path: join(shots, "tunjuk-simpan-setoran.png") });
   },
 );

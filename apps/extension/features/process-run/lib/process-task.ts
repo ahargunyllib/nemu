@@ -34,7 +34,9 @@ export type ProcessContinuation = {
   /** The button only the teacher presses ("Simpan setoran"). */
   action: string;
   sentence: string;
-  ringkasan: string;
+  /** F3·07: "Giliran Ibu", and what the system does once she saves (F3-18). */
+  heading?: string;
+  detail?: string;
 };
 
 export type LabelMatcher = (
@@ -48,19 +50,6 @@ export function pagePath(page: string): string[] {
     .split(/\s*(?:›|»|>|\/)\s*/u)
     .map((segment) => segment.trim())
     .filter(Boolean);
-}
-
-/** "Aisyah Putri Wijaya: An-Naba', dari ayat 1, …": the values behind Lihat ringkasan. */
-export function rowsSummary(rows: RowsFill | null): string {
-  if (!rows) return "";
-  return rows.rows
-    .map((row) => {
-      const values = rows.columns
-        .filter((column) => row.values[column.fieldId])
-        .map((column) => `${column.label} ${row.values[column.fieldId]}`);
-      return `${row.name}: ${values.join(", ")}`;
-    })
-    .join("; ");
 }
 
 /**
@@ -114,7 +103,8 @@ export function processTask(input: {
     rows,
     action,
     sentence: `Silakan ${addressFor(input.honorific)} tekan ${action}.`,
-    ringkasan: rowsSummary(rows),
+    heading: `Giliran ${addressFor(input.honorific)}`,
+    detail: afterLine(plan.announcements),
   };
   const steps: ExecutorStep[] = first ? [{ verb: "clickMenu", target: { text: first } }] : [];
   return {
@@ -281,7 +271,10 @@ export async function nextProcessSteps(
     verb: "point",
     target: actionTarget(doc, continuation.action),
     sentence: continuation.sentence,
-    ...(continuation.ringkasan ? { ringkasan: continuation.ringkasan.slice(0, 4000) } : {}),
+    // F3·07: nothing is saved until she presses it; no Lihat ringkasan, the page shows the rows.
+    chip: "Belum tersimpan",
+    ...(continuation.heading ? { heading: continuation.heading } : {}),
+    ...(continuation.detail ? { detail: continuation.detail.slice(0, 300) } : {}),
   });
   return { steps, continuation: null };
 }
