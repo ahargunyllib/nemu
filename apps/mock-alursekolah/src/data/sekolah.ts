@@ -67,7 +67,8 @@ export const SEKOLAH = {
 export const SEMESTER = "2026/2027 Ganjil";
 export const KKM = 75;
 export const MAPEL = ["Matematika", "IPAS", "Bahasa Indonesia", "Bahasa Inggris"] as const;
-export const JENIS_PENILAIAN = ["Harian", "UTS", "UAS"] as const;
+/** Harian, UTS and UAS are typed on Isi nilai kelas; Kuis comes from Moodle after a sync. */
+export const JENIS_PENILAIAN = ["Harian", "UTS", "UAS", "Kuis"] as const;
 export const KELAS = ["4A", "4B", "5A"] as const;
 
 export function ditugaskan(akun: Akun, kelas: string, mapel: string): boolean {

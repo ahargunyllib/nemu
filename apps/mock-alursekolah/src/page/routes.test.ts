@@ -48,6 +48,27 @@ describe("mock page", () => {
     });
   });
 
+  it("lists saved grades and Moodle's quiz grades for Rekap Nilai", async () => {
+    const mock = createMock();
+    await mock.page("/nilai", { method: "PUT", body: lembar({ "Ahmad Fadli": "80" }) });
+
+    const daftar = await (await mock.page("/daftar-nilai")).json();
+
+    expect(daftar).toEqual([
+      expect.objectContaining({ murid: "Ahmad Fadli", jenis: "UTS", materi: "", nilai: 80 }),
+      expect.objectContaining({
+        murid: "Aisyah Putri Wijaya",
+        kelas: "4A",
+        mapel: "IPAS",
+        jenis: "Kuis",
+        materi: "Latihan IPAS Kelas 4A · Moodle",
+        nilai: 90,
+      }),
+      expect.objectContaining({ murid: "Bagas Pratama", nilai: 70 }),
+      expect.objectContaining({ murid: "Citra Lestari", nilai: 100 }),
+    ]);
+  });
+
   it("refuses IPAS 4A for Bu Siti, who is not assigned to it (F2-2)", async () => {
     const res = await createMock().page("/nilai", {
       method: "PUT",

@@ -1,5 +1,7 @@
 // What the mock pages save, in the mock's own D1 database (never the Nemu Service's).
 
+import { NILAI_MOODLE } from "./data/moodle";
+
 export interface BarisNilai {
   id: number;
   semester: string;
@@ -14,6 +16,8 @@ export interface BarisNilai {
   /** Email of the account that saved it. */
   guru: string;
   tanggal: string;
+  /** What was assessed (the Moodle quiz's name); absent for a sheet saved on Isi nilai kelas. */
+  materi?: string;
 }
 
 export interface BarisHafalan {
@@ -69,6 +73,11 @@ export async function simpanNilai(db: D1Database, baris: readonly NilaiBaru[]): 
 export async function semuaNilai(db: D1Database): Promise<BarisNilai[]> {
   const { results } = await db.prepare("SELECT * FROM nilai ORDER BY id").all<BarisNilai>();
   return results;
+}
+
+/** Every grade AlurSekolah holds: the sheets saved on the page, then what Moodle synced. */
+export async function nilaiTercatat(db: D1Database): Promise<BarisNilai[]> {
+  return [...(await semuaNilai(db)), ...NILAI_MOODLE];
 }
 
 export async function tambahHafalan(db: D1Database, baris: readonly HafalanBaru[]): Promise<void> {

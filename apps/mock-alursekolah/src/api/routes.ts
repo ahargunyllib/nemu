@@ -13,7 +13,7 @@ import {
 import { SISWA } from "../data/siswa";
 import type { MockEnv } from "../env";
 import { setoranApi } from "../hafalan";
-import { semuaHafalan, semuaNilai } from "../store";
+import { nilaiTercatat, semuaHafalan, semuaNilai } from "../store";
 import { GalatIsian, daftar, halamankan, saring } from "./daftar";
 import { rekapNilai, type SatuanRekap } from "./rekap";
 
@@ -53,7 +53,7 @@ const URUT_NILAI = [
 
 api.get("/nilai", async (c) => {
   const q = new URL(c.req.url).searchParams;
-  const rows = (await semuaNilai(c.env.DB)).flatMap((n) =>
+  const rows = (await nilaiTercatat(c.env.DB)).flatMap((n) =>
     n.skor === null
       ? []
       : [
@@ -66,6 +66,7 @@ api.get("/nilai", async (c) => {
             semester: n.semester,
             mapel: n.mapel,
             jenis: n.jenis,
+            ...(n.materi ? { topik: n.materi } : {}),
             skor: n.skor,
             tanggal: n.tanggal,
             catatan: n.catatan,

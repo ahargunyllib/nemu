@@ -135,6 +135,17 @@
   .kerjaan .teks b { display:block; font-size:14px; font-weight:500; }
   .kerjaan .teks small { color:var(--muted); font-size:12px; }
   .hal .btn.kecil { height:30px; padding:0 10px; font-size:13px; border-radius:8px; }
+  .hero { padding:20px 24px; margin-bottom:16px; border-radius:16px; background:linear-gradient(100deg, #e3f1ea, #f5f2e8); }
+  .hero .hero-kecil { margin:0; font-style:italic; color:var(--merek); font-size:14px; }
+  .hero h1 { margin:2px 0 6px; font-size:32px; font-weight:700; }
+  .hero h1 em { font-weight:600; color:var(--merek); }
+  .hero p { margin:0; color:var(--muted); font-size:14px; }
+  .blok-kepala { padding:16px 16px 0; }
+  .blok-kepala h2 { margin:0; font-size:18px; font-weight:600; }
+  .blok-kepala h2 em { font-size:14px; font-weight:500; color:var(--profil-ink); }
+  .blok-kepala .note { margin:2px 0 12px; }
+  .chip.hijau { background:#e3f4ea; color:#1d7a45; font-size:12px; padding:3px 10px; }
+  .di-bawah { color:var(--merah); }
 </style>
 </head>
 <body>
@@ -185,7 +196,7 @@
 <script>
 // Akun, murid, mapel, dan surah datang dari Worker (src/data/). Nilai dan setoran disimpan di Worker,
 // jadi semua browser melihat data yang sama. localStorage hanya menyimpan akun yang sedang masuk.
-let USERS = {}, SEKOLAH = {}, MAPEL = [], SURAH = [], SISWA = {}, NOMOR = {}, KKM = 75;
+let USERS = {}, SEKOLAH = {}, MAPEL = [], SURAH = [], SISWA = {}, NOMOR = {}, KKM = 75, JENIS = [], SEMESTER_AKTIF = "";
 function ditugaskan(u, k, m) { return u.tugas === "semua" || ((u.tugas[k] || []).includes(m)); }
 const store = {
   get(k, d) { try { const v = JSON.parse(localStorage.getItem("as_" + k)); return v === null ? d : v; } catch (e) { return d; } },
@@ -221,7 +232,8 @@ const IKON_STAT = {
   murid: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/>',
   rata: '<path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/>',
   nilai: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M9 11h6M9 15h4"/>',
-  alquran: '<path d="M12 6.5C10 5 7 4.5 3 5v14c4-.5 7 0 9 1.5 2-1.5 5-2 9-1.5V5c-4-.5-7 0-9 1.5Z"/><path d="M12 6.5v14"/>'
+  alquran: '<path d="M12 6.5C10 5 7 4.5 3 5v14c4-.5 7 0 9 1.5 2-1.5 5-2 9-1.5V5c-4-.5-7 0-9 1.5Z"/><path d="M12 6.5v14"/>',
+  tuntas: '<circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/>'
 };
 const ikonStat = n => `<span class="stat-ikon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false">${IKON_STAT[n]}</svg></span>`;
 const angkaId = (n, d = 1) => n.toLocaleString("id-ID", {minimumFractionDigits: d, maximumFractionDigits: d});
@@ -344,16 +356,48 @@ function viewNilai() {
     };
   };
 }
+// Rekap Nilai: Monitoring nilai seperti AlurSekolah asli. Hanya lihat; nilai kuis dari Moodle ikut
+// tampil (masuk lewat modul Moodle setelah sinkron).
 async function viewRekap() {
-  app.innerHTML = `<h1>Rekap Nilai</h1>`;
-  let all;
-  try { all = await server("/nilai"); } catch (e) { app.innerHTML += `<p class="note" role="alert">${e.message}</p>`; return; }
-  const keys = Object.keys(all);
-  app.innerHTML = `<h1>Rekap Nilai</h1>` + (keys.length ? keys.map(key => {
-    const [k, m, j] = key.split("|");
-    return `<h2 style="font-size:18px">${m} - ${j} - Kelas ${k}</h2><table class="tabel-rekap"><tr><th>Nama</th><th>Nilai</th><th>Catatan</th></tr>
-    ${Object.entries(all[key]).map(([n, v]) => `<tr><td>${n}</td><td>${v.nilai}</td><td>${v.catatan}</td></tr>`).join("")}</table>`;
-  }).join("") : `<p class="note">Belum ada nilai tersimpan.</p>`);
+  const u = me();
+  app.innerHTML = `<div class="hal"><div class="hero"><p class="hero-kecil">semua mata pelajaran</p><h1>Monitoring <em>nilai</em></h1>
+    <p>Pantau seluruh nilai dan rekap pencapaian murid per jenjang, kelas, dan mata pelajaran.</p></div><div id="monitoring"></div></div>`;
+  const hash = location.hash;
+  let semua;
+  try { semua = await server("/daftar-nilai"); } catch (e) { return gagal("#monitoring", e); }
+  if (location.hash !== hash || me() !== u) return;
+  semua = semua.filter(n => u.kelas.includes(n.kelas));
+  const opsi = (id, label, semuaLabel, nilai, awal) => `<div class="saring"><label for="${id}">${label}</label><select id="${id}">${semuaLabel ? `<option value="">${semuaLabel}</option>` : ""}${nilai.map(v => `<option${v === awal ? " selected" : ""}>${v}</option>`).join("")}</select></div>`;
+  const semesterList = [...new Set([SEMESTER_AKTIF, ...semua.map(n => n.semester)])];
+  $("#monitoring").innerHTML = `<div class="stat-baris" id="mon-stat"></div>
+    <section class="kartu" aria-labelledby="judul-daftar-nilai"><div class="blok-kepala"><h2 id="judul-daftar-nilai">Daftar Nilai Murid <em id="mon-jumlah"></em></h2>
+      <p class="note">Pantauan menyeluruh nilai murid seluruh mata pelajaran (hanya lihat).</p>
+      <div class="saringan">${opsi("mon-kelas", "Kelas", "Semua kelas", u.kelas, u.wali || "")}${opsi("mon-mapel", "Mata pelajaran", "Semua mapel", MAPEL, "")}${opsi("mon-jenis", "Jenis", "Semua jenis", JENIS, "")}${opsi("mon-semester", "Tahun ajaran", "", semesterList, SEMESTER_AKTIF)}</div></div>
+      <table class="tabel" id="tabel-monitoring"><thead><tr><th>Murid</th><th>Kelas</th><th>Mata pelajaran</th><th>Jenis</th><th>Materi</th><th>Nilai</th><th>Tanggal</th></tr></thead><tbody id="mon-isi"></tbody></table>
+      <div class="kaki"><span>Nilai dari Moodle masuk lewat modul Moodle setelah sinkron.</span></div></section>`;
+  const tampil = () => {
+    const [k, m, j, s] = ["#mon-kelas", "#mon-mapel", "#mon-jenis", "#mon-semester"].map(x => $(x).value);
+    const baris = semua.filter(n => (!k || n.kelas === k) && (!m || n.mapel === m) && (!j || n.jenis === j) && n.semester === s)
+      .sort((a, b) => b.tanggal.localeCompare(a.tanggal) || a.murid.localeCompare(b.murid, "id"));
+    const perMurid = new Map();
+    baris.forEach(n => perMurid.set(n.murid, [...(perMurid.get(n.murid) || []), n.nilai]));
+    const rata = xs => xs.reduce((a, b) => a + b, 0) / xs.length;
+    const tuntas = [...perMurid.values()].filter(xs => rata(xs) >= KKM).length;
+    const lingkup = [j || "", m || "", k || ""].filter(Boolean).join(" ") || "semua mapel";
+    const stat = [
+      {ikon: "nilai", judul: "Total nilai", isi: String(baris.length), sub: lingkup},
+      {ikon: "rata", judul: "Rata-rata nilai", isi: baris.length ? angkaId(rata(baris.map(n => n.nilai))) : "–", sub: `KKM ${KKM}`},
+      {ikon: "tuntas", judul: "Tuntas KKM", isi: String(tuntas), sub: `dari ${perMurid.size} murid`},
+      {ikon: "murid", judul: "Murid tercatat", isi: String(perMurid.size), sub: "Memiliki riwayat nilai"}
+    ];
+    $("#mon-stat").innerHTML = stat.map(x => `<div class="kartu stat"><div class="stat-atas"><span>${x.judul}</span>${ikonStat(x.ikon)}</div><b>${x.isi}</b><small>${x.sub}</small></div>`).join("");
+    $("#mon-jumlah").textContent = `${baris.length} nilai`;
+    $("#mon-isi").innerHTML = baris.length ? baris.map(n => `<tr><td><b>${n.murid}</b></td><td>${n.kelas}</td><td>${n.mapel}</td><td><span class="chip hijau">${n.jenis}</span></td>
+      <td class="redup">${n.materi || "–"}</td><td><b${n.nilai < KKM ? ' class="di-bawah"' : ""}>${angkaId(n.nilai, 0)}</b></td><td class="redup">${new Date(n.tanggal + "T00:00:00").toLocaleDateString("id-ID", {day: "numeric", month: "short"})}</td></tr>`).join("")
+      : `<tr><td colspan="7" class="kosong">Belum ada nilai untuk pilihan ini.</td></tr>`;
+  };
+  ["#mon-kelas", "#mon-mapel", "#mon-jenis", "#mon-semester"].forEach(x => $(x).onchange = tampil);
+  tampil();
 }
 // Pekan sekolah dihitung dari awal semester ganjil (Senin, 13 Juli 2026).
 const AWAL_SEMESTER = Date.UTC(2026, 6, 13);
@@ -519,7 +563,7 @@ function route() {
   ({"#/nilai": viewNilai, "#/rekap": viewRekap, "#/tahfidz": viewTahfidz, "#/profil": viewProfil}[h] || viewBeranda)();
 }
 server("/sekolah").then(d => {
-  USERS = d.akun; SEKOLAH = d.sekolah; MAPEL = d.mapel; SURAH = d.surah; SISWA = d.siswa; NOMOR = d.nomor || {}; KKM = d.kkm || 75;
+  USERS = d.akun; SEKOLAH = d.sekolah; MAPEL = d.mapel; SURAH = d.surah; SISWA = d.siswa; NOMOR = d.nomor || {}; KKM = d.kkm || 75; JENIS = d.jenis || []; SEMESTER_AKTIF = d.semester || "";
   window.addEventListener("hashchange", route); route();
 }).catch(e => { app.innerHTML = `<h1>Tidak dapat memuat</h1><p class="note" role="alert">${e.message}</p>`; });
 </script>

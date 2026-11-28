@@ -70,6 +70,29 @@ describe("AlurSekolah read API", () => {
     });
   });
 
+  it("lists the Moodle quiz grades that came in after a sync as jenis Kuis (F4)", async () => {
+    const mock = createMock();
+    await mock.page("/reset", { method: "POST", body: {} });
+
+    const body = await (await mock.api("/nilai?jenis=Kuis")).json();
+
+    expect(body.meta.total).toBe(3);
+    expect(
+      body.data.map((n: { nama_siswa: string; skor: number }) => [n.nama_siswa, n.skor]),
+    ).toEqual([
+      ["Aisyah Putri Wijaya", 90],
+      ["Bagas Pratama", 70],
+      ["Citra Lestari", 100],
+    ]);
+    expect(body.data[0]).toMatchObject({
+      kelas: "4A",
+      mapel: "IPAS",
+      jenis: "Kuis",
+      topik: "Latihan IPAS Kelas 4A · Moodle",
+      tanggal: "2026-12-10",
+    });
+  });
+
   it("filters, counts, and pages grades the way the spec describes", async () => {
     const mock = createMock();
     await simpanNilai(
@@ -86,7 +109,9 @@ describe("AlurSekolah read API", () => {
     const counted = await (await mock.api("/nilai?nis=0159870001&hitung=mapel")).json();
     expect(counted).toMatchObject({ kelompok: { Matematika: 1, "Bahasa Indonesia": 1 } });
 
-    const paged = await (await mock.api("/nilai?urut=skor&arah=desc&halaman=2&ukuran=1")).json();
+    const paged = await (
+      await mock.api("/nilai?kelas=4B&urut=skor&arah=desc&halaman=2&ukuran=1")
+    ).json();
     expect(paged).toEqual({
       meta: { total: 3, halaman: 2, ukuran: 1 },
       data: [expect.objectContaining({ skor: 80 })],

@@ -36,6 +36,12 @@ One Cloudflare Worker (`src/worker.ts`):
   (default `as_uji_sdit_nusantara_2026`). The key behaves like an admin key, so every class is in
   scope.
 
+Moodle quiz grades: Nemu has no Moodle → AlurSekolah sync yet, so the mock carries the F4
+quiz's synced result as fixed rows (`src/data/moodle.ts`): IPAS 4A, jenis Kuis, "Latihan IPAS
+Kelas 4A · Moodle" on 10 December, Aisyah Putri Wijaya 90, Bagas Pratama 70, Citra Lestari 100.
+They survive "Reset semua data uji" and come through `GET /api/v1/nilai?jenis=Kuis` with the
+quiz name in `topik`. They are not part of `/nilai/rekap`.
+
 Mock-specific choices: KKM is 75 (the test data's value, not the Javan demo's 80); a subject's final
 grade is the plain mean of its assessments; empty grade cells are kept for the page but left out of
 `/nilai`; 4B and 5A only have NISN, so it is used as `nis`.
@@ -71,6 +77,11 @@ boxes, and the table in a white card whose footer counts what is filled.
   disimpan" with Impor Excel (greyed out, does nothing) and Simpan. The field labels, the
   Nilai and Catatan columns and the button names are what the executor targets, so they keep
   the code's wording where the real app's differs ("Keterangan", "Penilaian").
+- **Rekap Nilai** is the real app's "Monitoring nilai" (view only): four figures for the current
+  filters (Total nilai, Rata-rata nilai against KKM 75, Tuntas KKM per student, Murid tercatat),
+  then "Daftar Nilai Murid" with filters Kelas, Mata pelajaran, Jenis and Tahun ajaran and the
+  columns Murid, Kelas, Mata pelajaran, Jenis, Materi, Nilai, Tanggal. It lists every saved grade
+  plus the Moodle quiz grades below.
 - **Al-Quran › Tahfidz**: "Tahfidz · Kelas 4A" with Ujian baru and Setoran baru, filters Kelas
   and Periode (school weeks counted from Monday 13 July 2026; it opens on the latest week with
   records), the history Tanggal, Murid, Surah, Ayat, Nilai akhir, Keterangan ("Terlihat orang

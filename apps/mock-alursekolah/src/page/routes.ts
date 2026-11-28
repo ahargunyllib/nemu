@@ -21,6 +21,7 @@ import { nilaiHafalan } from "../hafalan";
 import {
   hapusSemua,
   semuaHafalan,
+  nilaiTercatat,
   semuaNilai,
   simpanNilai,
   tambahHafalan,
@@ -77,6 +78,8 @@ halaman.get("/sekolah", (c) =>
     /** NIS (4A) or NISN (4B, 5A) by student name, for the grade table's number column. */
     nomor: Object.fromEntries(SISWA.map((s) => [s.nama, s.nis])),
     kkm: KKM,
+    jenis: JENIS_PENILAIAN,
+    semester: SEMESTER,
   }),
 );
 
@@ -102,6 +105,28 @@ halaman.get("/nilai", async (c) => {
   }
   return c.json(semua);
 });
+
+/** Every grade with a score, for Rekap Nilai's monitoring list; Moodle's quiz grades included. */
+halaman.get("/daftar-nilai", async (c) =>
+  c.json(
+    (await nilaiTercatat(c.env.DB)).flatMap((n) =>
+      n.skor === null
+        ? []
+        : [
+            {
+              murid: n.nama_siswa,
+              kelas: n.kelas,
+              mapel: n.mapel,
+              jenis: n.jenis,
+              materi: n.materi ?? "",
+              nilai: n.skor,
+              tanggal: n.tanggal,
+              semester: n.semester,
+            },
+          ],
+    ),
+  ),
+);
 
 const isianNilai = z.object({
   username: z.string(),
