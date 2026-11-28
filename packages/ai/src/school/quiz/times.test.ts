@@ -4,12 +4,19 @@ import test from "node:test";
 import { quizTimesFrom } from "./times.js";
 
 const TODAY = "2026-11-27";
+/** The demo day, Tuesday 1 December 2026 (PRD v2.3). */
+const DEMO_DAY = "2026-12-01";
 
 test("F4-2: dates without a clock time come back with time null (00.00 / 23.59 are the caller's)", () => {
-  assert.deepEqual(
-    quizTimesFrom("Masukkan kuis ini, buka Senin 30 November, tutup Kamis 3 Desember.", TODAY),
-    { opens: { date: "2026-11-30", time: null }, closes: { date: "2026-12-03", time: null } },
-  );
+  for (const today of [TODAY, DEMO_DAY]) {
+    assert.deepEqual(
+      quizTimesFrom(
+        "Nemu, masukkan kuis dari naskah ini ke Moodle. Buka Senin 7 Desember, tutup Kamis 10 Desember.",
+        today,
+      ),
+      { opens: { date: "2026-12-07", time: null }, closes: { date: "2026-12-10", time: null } },
+    );
+  }
 });
 
 test("clock times she says stay with their own date", () => {

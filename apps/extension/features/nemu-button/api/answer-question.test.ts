@@ -175,7 +175,7 @@ describe("answerQuestion", () => {
   test("'masukkan kuis dari naskah ini' is the extension's own F4-03 flow (#210): nothing is sent", async () => {
     const client = fakeClient({ kind: "intent", intent: "unknown", processName: null });
     for (const words of [
-      "Nemu, masukkan kuis dari naskah ini ke Moodle. Buka Senin 30 November, tutup Kamis 3 Desember.",
+      "Nemu, masukkan kuis dari naskah ini ke Moodle. Buka Senin 7 Desember, tutup Kamis 10 Desember.",
       "Buatkan kuis IPAS dari naskah ini",
       "naskah soal ini jadikan kuis di Moodle ya",
       "Pasang soal dari file ini ke Moodle kelas 4A, buka Senin sampai Kamis.",

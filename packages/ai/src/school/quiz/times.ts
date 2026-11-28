@@ -1,7 +1,7 @@
 import type { QuizTime } from "@nemu/contracts/quiz";
 
 /**
- * F4-03: the open and close times a teacher says ("buka Senin 30 November, tutup Kamis 3 Desember
+ * F4-03: the open and close times a teacher says ("buka Senin 7 Desember, tutup Kamis 10 Desember
  * jam 9 malam"). A date she names comes with the clock time she said, or `time: null` when she
  * said none, so the caller can use 00.00 / 23.59 and say so. Nothing is guessed: a time she
  * didn't mention is null.

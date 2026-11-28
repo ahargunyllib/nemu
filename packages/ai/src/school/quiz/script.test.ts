@@ -19,7 +19,7 @@ import { assembleQuizScript, type ModelQuizScript, readQuizScript } from "./scri
 const PACK = join(import.meta.dirname, "../../../../../infra/setup/f4-2");
 const SECTIONS = ["Umum", "IPAS", "Bahasa Inggris"];
 const UTTERANCE =
-  "Nemu, masukkan kuis dari naskah ini ke Moodle. Buka Senin 30 November, tutup Kamis 3 Desember.";
+  "Nemu, masukkan kuis dari naskah ini ke Moodle. Buka Senin 7 Desember, tutup Kamis 10 Desember.";
 
 async function scriptInput(utterance = UTTERANCE): Promise<QuizScriptInput> {
   const pdf = await readFile(join(PACK, "F4-2_naskah-ipas-10-soal.pdf"));
@@ -30,7 +30,7 @@ async function scriptInput(utterance = UTTERANCE): Promise<QuizScriptInput> {
       dataUrl: `data:application/pdf;base64,${bytesToBase64(pdf)}`,
     },
     utterance,
-    today: "2026-11-27",
+    today: "2026-12-01",
     course: "4A-UJI · Kelas 4A (uji)",
     sections: SECTIONS,
   };
@@ -144,7 +144,7 @@ test("the script's pictures come out of the PDF as they are: soal 7's three, (c)
   );
 });
 
-test("F4-2 offline: 10/10 questions match the expected XML, IPAS, 30 Nov to 3 Dec, nothing to ask", async () => {
+test("F4-2 offline: 10/10 questions match the expected XML, IPAS, 7 Dec to 10 Dec, nothing to ask", async () => {
   const result = quizScriptResultSchema.parse(
     await createFixtureSchoolAi().readQuizScript(await scriptInput()),
   );
@@ -154,8 +154,8 @@ test("F4-2 offline: 10/10 questions match the expected XML, IPAS, 30 Nov to 3 De
   assert.equal(result.draft.name, "Latihan IPAS Kelas 4A");
   assert.equal(result.draft.section, "IPAS");
   assert.equal(result.draft.category, "$course$/top/IPAS 4A/Latihan IPAS Kelas 4A");
-  assert.deepEqual(result.draft.opens, { date: "2026-11-30", time: null });
-  assert.deepEqual(result.draft.closes, { date: "2026-12-03", time: null });
+  assert.deepEqual(result.draft.opens, { date: "2026-12-07", time: null });
+  assert.deepEqual(result.draft.closes, { date: "2026-12-10", time: null });
 
   const expectedXml = await readFile(join(PACK, "F4-2_hasil-yang-diharapkan.xml"), "utf8");
   const ours = parseQuestions(moodleXml(applyQuizAnswers(result.draft, [], []).draft));

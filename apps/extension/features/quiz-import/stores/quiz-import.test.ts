@@ -175,14 +175,14 @@ describe("F4-03 in the page (#210)", () => {
       type: "jawab",
       sentence: "Kuisnya dibuka dan ditutup tanggal berapa, Bu.",
     });
-    quizImport.hear("buka Senin 30 November");
+    quizImport.hear("buka Senin 7 Desember");
     expect(view()).toMatchObject({ sentence: "Kuisnya ditutup tanggal berapa, Bu." });
-    quizImport.hear("3 Desember jam 9 malam");
+    quizImport.hear("10 Desember jam 9 malam");
     const ready = view();
     expect(ready).toMatchObject({
       type: "jawab",
       sentence:
-        "Jam bukanya tidak disebut, jadi kuis dibuka 30 November pukul 00.00 dan ditutup 3 Desember pukul 21.00, Bu.",
+        "Jam bukanya tidak disebut, jadi kuis dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember pukul 21.00, Bu.",
       status: { text: "2 soal siap" },
     });
     if (ready.type !== "jawab") return;
@@ -198,8 +198,8 @@ describe("F4-03 in the page (#210)", () => {
     expect(plan).toMatchObject({
       section: "IPAS",
       name: "Latihan IPAS Kelas 4A",
-      opens: { date: "2026-11-30", time: "00:00" },
-      closes: { date: "2026-12-03", time: "21:00" },
+      opens: { date: "2026-12-07", time: "00:00" },
+      closes: { date: "2026-12-10", time: "21:00" },
       fileName: "Latihan IPAS Kelas 4A.xml",
       count: 2,
     });
@@ -230,7 +230,7 @@ describe("F4-03 in the page (#210)", () => {
     await settle();
     expect(quizCheck.start).toHaveBeenCalledWith("cek kuis ini, 2 soal", {
       ready:
-        "Kuis Latihan IPAS Kelas 4A sudah siap: 2 soal, dibuka 30 November pukul 00.00 dan ditutup 3 Desember pukul 21.00, Bu.",
+        "Kuis Latihan IPAS Kelas 4A sudah siap: 2 soal, dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember pukul 21.00, Bu.",
       before: [
         "Nemu membuka Soal",
         "Nemu menaruh berkas Latihan IPAS Kelas 4A.xml di Impor (seret dan lepas)",

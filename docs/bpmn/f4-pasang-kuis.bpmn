@@ -3,7 +3,7 @@
   <bpmn:process id="Process_F4_PasangKuis" name="F4 Pasang Kuis" isExecutable="false">
     <bpmn:documentation>Alur Nemu memasang kuis di Moodle dari naskah guru (F4-03), lalu memeriksanya seperti yang dilihat siswa (F4-1). Tugas pengguna (userTask, grup "guru") dikerjakan guru; tugas layanan (serviceTask) adalah panggilan ke Nemu Service; tugas skrip (scriptTask) dikerjakan Nemu Extension di halaman, selalu dengan cara 1. Nemu tidak pernah mengirim formulir: setiap tombol simpan, impor, dan tambah ditekan guru (F0-08). Nemu tidak pernah menulis soal sendiri. Sumber: apps/extension/features/quiz-import dan features/quiz-check.</bpmn:documentation>
     <bpmn:startEvent id="Start_Perintah" name="Guru meminta Nemu memasukkan kuis dari naskah">
-      <bpmn:documentation>Diketik atau diucapkan, misalnya "Nemu, masukkan kuis dari naskah ini, buka Senin 30 November, tutup Kamis 3 Desember."</bpmn:documentation>
+      <bpmn:documentation>Diketik atau diucapkan, misalnya "Nemu, masukkan kuis dari naskah ini, buka Senin 7 Desember, tutup Kamis 10 Desember."</bpmn:documentation>
       <bpmn:outgoing>Flow_1</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:exclusiveGateway id="Gateway_HalamanKursus" name="Di halaman kursus Moodle?">

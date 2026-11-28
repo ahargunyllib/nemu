@@ -177,7 +177,7 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     called Edit), then a point at **Hapus**: "Kalau jadi dihapus, tekan Hapus sendiri, Bu." She
     presses it or not; Moodle then asks her to confirm. The executor refuses Hapus anyway (F0-08).
 - **F4-03: put a quiz into Moodle from the teacher's script (#210).** `features/quiz-import/`.
-  "Nemu, masukkan kuis dari naskah ini, buka Senin 30 November, tutup Kamis 3 Desember" on a
+  "Nemu, masukkan kuis dari naskah ini, buka Senin 7 Desember, tutup Kamis 10 Desember" on a
   Moodle course page is the extension's own command. She picks the script (PDF, Word or photo) with
   **Pilih naskah**; `quizScriptRead` (`SchoolAi.readQuizScript`, #219) reads it into a draft. Nemu
   never writes a question: each part the reading couldn't place (words, a key, a picture, the
@@ -325,7 +325,7 @@ she pressed. Without the local database it checks the pages only. Screenshots go
 
 `pnpm --filter extension verify:f4-2` runs F4-2 (#210) on the same Moodle. Locally it first removes
 an earlier run's "Latihan IPAS Kelas 4A" (`infra/setup/reset-f4-2.php`). On course 4A-UJI Bu Siti
-asks Nemu to put her script in, opening Monday 30 November and closing Thursday 3 December, and
+asks Nemu to put her script in, opening Monday 7 December and closing Thursday 10 December, and
 picks `infra/setup/f4-2/F4-2_naskah-ipas-10-soal.pdf`. It checks that Nemu asks nothing and says it
 uses 00.00 and 23.59, fills the quiz form itself, drops the XML on Impor's picker, and points at
 Simpan dan tampilkan, Impor, Tambahkan soal terpilih pada kuis and Pratinjau kuis for her to press;
