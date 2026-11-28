@@ -45,12 +45,12 @@ Research behind this document was done on 25 November 2026 against live sources 
 
 ## 2. Decisions needed (AI-relevant)
 
-| #   | Decision                                        | Default                                                                                                        | Why it matters                                                        |
-| --- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| D1  | Strict zero data retention for children's data? | Allow Safety Retention for the synthetic-data MVP; record it in the DPIA                                       | Gemini on OpenRouter is unavailable under strict ZDR since 2026-10-18 |
-| D2  | Cost cap per month or per semester              | Per-semester average                                                                                           | Grade entry bunches at semester end                                   |
-| D3  | Paid providers                                  | OpenRouter only: vision, text, speech-to-text, TTS. Azure Speech is an optional upgrade.                       | AGENTS.md: wire a provider only once chosen                           |
-| D4  | The SPP key scope                               | Ask Javan whether the read key may include `keuangan/spp`. Without it, F2-08 says "kemungkinan" about payment. | F2-08 accuracy                                                        |
+| #   | Decision                                        | Default                                                                                                      | Why it matters                                                        |
+| --- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| D1  | Strict zero data retention for children's data? | Allow Safety Retention for the synthetic-data MVP; record it in the DPIA                                     | Gemini on OpenRouter is unavailable under strict ZDR since 2026-10-18 |
+| D2  | Cost cap per month or per semester              | Per-semester average                                                                                         | Grade entry bunches at semester end                                   |
+| D3  | Paid providers                                  | OpenRouter only: vision, text, speech-to-text, TTS. Azure Speech is an optional upgrade.                     | AGENTS.md: wire a provider only once chosen                           |
+| D4  | The SPP key scope                               | Decided (PRD revision 28 Nov): no finance scope, so F2-08 always says "kemungkinan karena alur SPP sekolah". | F2-08 accuracy                                                        |
 
 ---
 
@@ -159,7 +159,7 @@ Example: a parent asks on WhatsApp "nilai UTS Aisyah kok belum muncul?" and the 
    - Walk the reverse path: `Unlock Student Grades` and its condition (bill paid).
    - Find the role that can fix it: the lane of the reverse path's user task, e.g. finance.
    - The source is the BPMN element IDs, shown to the teacher as 2–4 plain steps with the current one highlighted (W4).
-3. **Certainty:** payment status is outside the requested key scope (D4), so the bubble says "kemungkinan nilai terkunci menunggu administrasi SPP", never as a fact.
+3. **Certainty (PRD revision 28 Nov, P0-1):** the bill can't be checked (no finance scope; AlurSekolah's SPP module is still "Segera hadir"), so an answer about a named pupil opens "Kemungkinan karena alur SPP sekolah: …", enforced in code, never as a fact. A question that names no pupil gets the rule ("menurut alur sekolah, … kalau …").
 4. **Parent reply** (Siapkan balasan):
    - polite, **no amount, no "tunggakan"**, points to the finance office;
    - a code validator rejects digits that look like money, "Rp" and "tunggak*";
