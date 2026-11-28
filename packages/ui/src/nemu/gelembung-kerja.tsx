@@ -1,11 +1,17 @@
 import { Button } from "@nemu/ui/components/button";
 import type { GelembungKerjaProps } from "@nemu/ui/lib/nemu-display";
-import { BIG_BUTTON, NemuBubble, NemuText } from "@nemu/ui/nemu/nemu-frame";
-import { Square, Turtle } from "lucide-react";
+import {
+  NEMU_BUTTON,
+  NEMU_OUTLINE,
+  NemuActionRow,
+  NemuBubble,
+  NemuText,
+} from "@nemu/ui/nemu/nemu-frame";
+import { cn } from "cn";
 
 /**
- * Gelembung Kerja: Nemu is working. The status header with its progress bar, one sentence with an
- * optional detail line, and always [Pelan] [Berhenti].
+ * Gelembung Kerja: Nemu is working. The heading with its progress bar, one sentence with an
+ * optional detail line, and on the right [Pelan] (when Nemu can slow down) and [Berhenti].
  */
 export function GelembungKerja({
   sentence,
@@ -19,22 +25,26 @@ export function GelembungKerja({
   return (
     <NemuBubble display="kerja" label="Nemu bekerja" status={status}>
       <NemuText sentence={sentence} detail={detail} highlightedWord={highlightedWord} />
-      <div className="grid grid-cols-2 gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          aria-pressed={slow ?? false}
-          onClick={onSlow}
-          className={`${BIG_BUTTON} aria-pressed:border-nemu-strong aria-pressed:bg-nemu-subtle`}
-        >
-          <Turtle aria-hidden />
-          Pelan
-        </Button>
-        <Button type="button" variant="outline" onClick={onStop} className={BIG_BUTTON}>
-          <Square aria-hidden />
+      <NemuActionRow>
+        {onSlow && (
+          <Button
+            type="button"
+            variant="outline"
+            aria-pressed={slow ?? false}
+            onClick={onSlow}
+            className={cn(
+              NEMU_BUTTON,
+              NEMU_OUTLINE,
+              "aria-pressed:border-nemu-strong aria-pressed:bg-nemu-subtle",
+            )}
+          >
+            Pelan
+          </Button>
+        )}
+        <Button type="button" onClick={onStop} className={NEMU_BUTTON}>
           Berhenti
         </Button>
-      </div>
+      </NemuActionRow>
     </NemuBubble>
   );
 }

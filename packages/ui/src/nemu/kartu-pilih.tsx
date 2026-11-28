@@ -37,7 +37,7 @@ export function KartuPilih({
       display="pilih"
       label="Pilihan Nemu"
       status={status}
-      className={cn(compact && "w-[300px] gap-3")}
+      className={cn(compact && "w-[300px] gap-3 [--card-spacing:--spacing(5)]")}
     >
       <CardHeader className={cn(compact && image && "flex items-center gap-3")}>
         {compact &&

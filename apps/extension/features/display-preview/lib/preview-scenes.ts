@@ -10,6 +10,7 @@ export const PREVIEW_ENABLED =
 
 export type PreviewScene =
   | "kerja"
+  | "baca-foto"
   | "tunjuk"
   | "jawab"
   | "belum-jelas"
@@ -20,6 +21,7 @@ export type PreviewScene =
 
 export const PREVIEW_SCENES: readonly { scene: PreviewScene; label: string }[] = [
   { scene: "kerja", label: "Kerja" },
+  { scene: "baca-foto", label: "Baca foto" },
   { scene: "tunjuk", label: "Tunjuk" },
   { scene: "jawab", label: "Jawab" },
   { scene: "belum-jelas", label: "Belum jelas" },
@@ -58,6 +60,15 @@ export function sceneDisplay(
         detail: "Klik atau ketik kalau Ibu mau isi sendiri.",
         slow: actions.slow,
         onSlow: actions.toggleSlow,
+        onStop: actions.close,
+      };
+    case "baca-foto":
+      // No onSlow: reading a photo can't go slower, so there is only Berhenti.
+      return {
+        type: "kerja",
+        status: { text: "Nemu membaca foto" },
+        sentence: "Sebentar, Bu. Saya baca 32 nilai.",
+        detail: "Biasanya kurang dari 1 menit.",
         onStop: actions.close,
       };
     case "tunjuk":

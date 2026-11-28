@@ -1,13 +1,14 @@
 import { Button } from "@nemu/ui/components/button";
 import { Skeleton } from "@nemu/ui/components/skeleton";
 import type { GelembungJawabProps } from "@nemu/ui/lib/nemu-display";
-import { BIG_BUTTON, NemuBubble, NemuNoteLinks, NemuText } from "@nemu/ui/nemu/nemu-frame";
+import { NEMU_BUTTON, NemuBubble, NemuNoteLinks, NemuText } from "@nemu/ui/nemu/nemu-frame";
 import { cn } from "cn";
 import { X } from "lucide-react";
 
 /**
- * Gelembung Jawab: an answer or a problem. One sentence with an optional detail line, the
- * Kenapa?, Sumber and Lihat ringkasan links, and at most one action button in Nemu's dark orange.
+ * Gelembung Jawab: an answer or a problem. One sentence with an optional detail line, then one
+ * row: the Kenapa?, Sumber and Lihat ringkasan links on the left and at most one compact black
+ * action button on the right. A round × closes it.
  */
 export function GelembungJawab({
   sentence,
@@ -27,9 +28,9 @@ export function GelembungJawab({
       status={status}
       aria-live="polite"
       // Keep the header and the sentence clear of the × at the top right.
-      className={cn(onClose && "[&_[data-nemu-status]]:mr-16")}
+      className={cn(onClose && "[&_[data-nemu-status]]:mr-12")}
     >
-      <div className={cn(onClose && !status && "pr-10")}>
+      <div className={cn(onClose && !status && "pr-12")}>
         <NemuText
           sentence={sentence}
           detail={detail}
@@ -37,27 +38,27 @@ export function GelembungJawab({
           onRepeat={onRepeat}
         />
       </div>
-      {notes && <NemuNoteLinks notes={notes} onRead={onRead} />}
-      {action && (
-        <Button
-          type="button"
-          onClick={action.onSelect}
-          className={cn(
-            BIG_BUTTON,
-            "w-full bg-nemu-strong text-nemu-strong-foreground hover:bg-nemu-strong hover:brightness-90",
-          )}
-        >
-          {action.label}
-        </Button>
+      {(notes || action) && (
+        <NemuNoteLinks
+          notes={notes ?? {}}
+          onRead={onRead}
+          actions={
+            action && (
+              <Button type="button" onClick={action.onSelect} className={NEMU_BUTTON}>
+                {action.label}
+              </Button>
+            )
+          }
+        />
       )}
       {onClose && (
         <Button
           type="button"
-          variant="ghost"
+          variant="secondary"
           size="icon"
           aria-label="Tutup"
           onClick={onClose}
-          className="absolute top-1.5 right-1.5 size-11 text-foreground [&_svg:not([class*='size-'])]:size-6"
+          className="absolute top-3 right-4 size-11 rounded-full [&_svg:not([class*='size-'])]:size-6"
         >
           <X />
         </Button>

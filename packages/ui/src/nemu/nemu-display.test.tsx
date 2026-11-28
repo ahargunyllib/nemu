@@ -31,12 +31,26 @@ describe("Gelembung Kerja", () => {
     expect(spokenText(kerja)).toBe("Nemu mengisi nilai Aisyah Putri Wijaya: 85.");
   });
 
-  test("always offers Pelan and Berhenti", () => {
+  test("offers Pelan then Berhenti in one row, words only", () => {
     render(<GelembungKerja {...kerja} />);
+    const row = screen.getByRole("region").querySelector("[data-nemu-actions]");
+    const buttons = within(row as HTMLElement).getAllByRole("button");
+    expect(buttons.map((button) => button.textContent)).toEqual(["Pelan", "Berhenti"]);
+    for (const button of buttons) expect(button.querySelector("svg")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Pelan" }));
     fireEvent.click(screen.getByRole("button", { name: "Berhenti" }));
     expect(kerja.onSlow).toHaveBeenCalledOnce();
     expect(kerja.onStop).toHaveBeenCalledOnce();
+  });
+
+  test("has only Berhenti when Nemu can't slow down", () => {
+    const { onSlow: _, ...withoutSlow } = kerja;
+    render(<GelembungKerja {...withoutSlow} />);
+    expect(
+      within(screen.getByRole("region"))
+        .getAllByRole("button")
+        .map((button) => button.textContent),
+    ).toEqual(["Berhenti"]);
   });
 
   test("marks the word Nemu's voice is on", () => {
@@ -143,6 +157,26 @@ describe("Gelembung Jawab", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Buka Rekap Nilai" }));
     expect(onSelect).toHaveBeenCalledOnce();
+  });
+
+  test("puts its links on the left and its action on the right of one row", () => {
+    render(
+      <GelembungJawab
+        sentence="Bukan kesalahan Ibu."
+        notes={{ kenapa: "Nilai masuk lewat alur SPP.", sumber: ["Alur SPP sekolah"] }}
+        action={{ label: "Siapkan balasan", onSelect: vi.fn() }}
+        onClose={vi.fn()}
+      />,
+    );
+    const row = screen.getByRole("region").querySelector("[data-nemu-actions]");
+    expect(
+      within(row as HTMLElement)
+        .getAllByRole("button")
+        .map((button) => button.textContent),
+    ).toEqual(["Kenapa?", "Sumber", "Siapkan balasan"]);
+    // What Kenapa? opens shows under the whole row, not inside it.
+    fireEvent.click(screen.getByRole("button", { name: "Kenapa?" }));
+    expect(row?.contains(screen.getByText("Nilai masuk lewat alur SPP."))).toBe(false);
   });
 });
 
@@ -258,6 +292,23 @@ describe("Kartu Info", () => {
     expect(within(card).getAllByRole("button")).toHaveLength(1);
     fireEvent.click(within(card).getByRole("button", { name: "Tutup" }));
     expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  test("puts its one link and Tutup in one row, the link first", () => {
+    render(
+      <KartuInfo
+        title="Catatan langkah"
+        items={["32 nilai diisi"]}
+        link={{ label: "Coba sendiri", onSelect: vi.fn() }}
+        onClose={vi.fn()}
+      />,
+    );
+    const row = screen.getByRole("region").querySelector("[data-nemu-actions]");
+    expect(
+      within(row as HTMLElement)
+        .getAllByRole("button")
+        .map((button) => button.textContent),
+    ).toEqual(["Coba sendiri", "Tutup"]);
   });
 });
 
