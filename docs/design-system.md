@@ -122,7 +122,7 @@ the page's Shadow DOM.
 | **Gelembung Tunjuk** | The teacher's turn     | One sentence beside the field or button the cursor points at. No buttons, at most one link            |
 | **Gelembung Jawab**  | An answer or a problem | One sentence, the **Kenapa?**, **Sumber** and **Lihat ringkasan** links, at most one action button, × |
 | **Kartu Pilih**      | A decision             | One question, 2–3 equal stacked big buttons, nothing pre-selected or focused                          |
-| **Kartu Info**       | Something to read      | A title, a short list, at most one link (Catatan langkah: "Lain kali coba sendiri"), one **[Tutup]**  |
+| **Kartu Info**       | Something to read      | A title, a short list, at most one link (Catatan langkah: "Coba sendiri"), one **[Tutup]**            |
 
 - **Gelembung** (bubble): white, `rounded-3xl`, a 2 px `nemu` edge, 420 px wide. **Kartu** (card):
   the stock card, 400 px wide, with an 8 px `nemu` band along its top.
@@ -131,7 +131,7 @@ the page's Shadow DOM.
 - **Contrast ≥ 7:1**: text is `foreground` on white, or `nemu-strong` (amber 800, Nemu's dark
   orange) on white or `nemu-subtle`. The one action button in a Gelembung Jawab is a `nemu-strong`
   fill with white text (9.6:1); the main button in a Kartu is the stock black default. The lighter
-  `nemu` (5.0:1) is only for edges, the progress bar, the cursor and the target ring.
+  `nemu` (5.0:1) is only for edges, the progress bar, the cursor's label and the target ring.
 - **Colour is never the only signal**: the header carries an icon and words (pencil "Nemu
   mengisi · 13 dari 32", alert "Belum tersimpan", check "Tersimpan"); a risky choice carries a ⚠
   icon (and "Berisiko" for screen readers); the spoken word is tinted and underlined.
@@ -144,13 +144,17 @@ the page's Shadow DOM.
   in. All choices share one look.
 - **Spoken word** (#200): `highlightedWord` marks the word Nemu's voice is on.
 
-**The Nemu cursor** (F0-16): a 20 px `nemu` dot with a white edge and the Float shadow, click-through
-(`pointer-events: none`). Before a display about a page element appears, the cursor glides there
-in 0.6 s (from where it last stood, or the Nemu button the first time) and rests just right of
-the element, level with its middle. Then the element gets the Sorot arahkan ring and only then
-does the display appear and Nemu speak. The bubble sits on the free side of the cursor: right of
-it, below-right, below, above-right, above, or left of the element, the first that fits in the
-window and covers none of the page's own controls (the field being filled and the ones after it).
+**The Nemu cursor** (F0-16, PRD v2.3 P1-7): the 44 px Nemu mascot (`NemuMascot`, the same idle
+firefly as on the Nemu button), click-through (`pointer-events: none`). While it glides, a "Nemu"
+label sits just right of it: a solid `NemuBadge` with a white edge and the Float shadow. The label
+hides once a bubble is attached to the cursor, so the bubble isn't crowded. Before a display
+about a page element appears, the cursor glides there in 0.6 s (from where it last stood, or the
+Nemu button the first time) and rests just right of the element, level with its middle. Then the
+element gets the Sorot arahkan ring and only then does the display appear and Nemu speak. The
+bubble sits on the free side of the cursor: right of it, below-right, below, above-right, above,
+or left of the element, the first that fits in the window and covers none of the page's own
+controls (the field being filled and the ones after it). It also keeps clear of the whole
+mascot, which stands taller than a short target such as a link.
 A display about no element (an answer to a typed question, most Kartu) sits above the Nemu button.
 
 **Pointing at the browser** (#268): Chrome's microphone prompt is browser UI over the top left

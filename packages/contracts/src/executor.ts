@@ -90,7 +90,7 @@ export const EXECUTOR_VERBS = [
   "clickMenu",
 ] as const;
 
-/** One task for the executor. `kind` groups runs of the same job, e.g. for "Lain kali coba sendiri". */
+/** One task for the executor. `kind` groups runs of the same job, e.g. for "Coba sendiri". */
 export const executorTaskSchema = z
   .object({
     kind: z.string().min(1),

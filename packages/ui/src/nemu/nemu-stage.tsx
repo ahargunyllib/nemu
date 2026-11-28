@@ -14,6 +14,8 @@ import { GelembungKerja } from "@nemu/ui/nemu/gelembung-kerja";
 import { GelembungTunjuk } from "@nemu/ui/nemu/gelembung-tunjuk";
 import { KartuInfo } from "@nemu/ui/nemu/kartu-info";
 import { KartuPilih } from "@nemu/ui/nemu/kartu-pilih";
+import { NemuBadge } from "@nemu/ui/nemu/nemu-badge";
+import { NemuMascot } from "@nemu/ui/nemu/nemu-mascot";
 import { type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 /** How long the cursor takes to glide to its next target (F0-16). */
@@ -118,7 +120,8 @@ function PointedDisplay({ display, target, rest, onShown }: PointedDisplayProps)
   const from = rest.current ?? { x: viewport.width - 52, y: viewport.height - 52 };
   return (
     <>
-      <NemuCursor from={from} to={point} gliding={!arrived} />
+      {/* Once arrived, the bubble sits beside the cursor and the label would only crowd it. */}
+      <NemuCursor from={from} to={point} gliding={!arrived} labelled={!arrived} />
       {arrived && <TargetRing rect={rect} />}
       {arrived && (
         <PlacedBubble target={target} rect={rect} viewport={viewport}>
@@ -129,8 +132,16 @@ function PointedDisplay({ display, target, rest, onShown }: PointedDisplayProps)
   );
 }
 
-/** The Nemu cursor: a small click-through dot that glides to its next point. */
-function NemuCursor({ from, to, gliding }: { from: Point; to: Point; gliding: boolean }) {
+type NemuCursorProps = {
+  from: Point;
+  to: Point;
+  gliding: boolean;
+  /** Shows the "Nemu" label beside the mascot; off while a bubble is attached to the cursor. */
+  labelled: boolean;
+};
+
+/** The Nemu cursor: the 44 px click-through mascot, labelled "Nemu", gliding to its next point. */
+function NemuCursor({ from, to, gliding, labelled }: NemuCursorProps) {
   const [start] = useState(from);
   const [launched, setLaunched] = useState(false);
 
@@ -153,14 +164,21 @@ function NemuCursor({ from, to, gliding }: { from: Point; to: Point; gliding: bo
       data-nemu-cursor={gliding ? "gliding" : "arrived"}
       data-x={at.x}
       data-y={at.y}
-      className="pointer-events-none fixed top-0 left-0 rounded-full border-[3px] border-white bg-nemu shadow-nemu-float"
+      className="pointer-events-none fixed top-0 left-0"
       style={{
         width: CURSOR_SIZE,
         height: CURSOR_SIZE,
         transform: `translate(${at.x - CURSOR_SIZE / 2}px, ${at.y - CURSOR_SIZE / 2}px)`,
         transition: gliding ? `transform ${GLIDE_MS}ms cubic-bezier(0.4, 0, 0.2, 1)` : "none",
       }}
-    />
+    >
+      <NemuMascot />
+      {labelled && (
+        <NemuBadge className="absolute top-1/2 left-full -translate-y-1/2 border-white font-semibold shadow-nemu-float">
+          Nemu
+        </NemuBadge>
+      )}
+    </div>
   );
 }
 

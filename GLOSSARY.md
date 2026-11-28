@@ -69,7 +69,7 @@ How Nemu and the teacher share a task. Cara 1: Nemu fills and stops before Simpa
 _Avoid_: mode, level
 
 **Catatan langkah**:
-The Kartu Info at the end of each task listing what was done and by whom; reopenable from the Nemu button, with "Lain kali coba sendiri" to start in cara 2 next time.
+The Kartu Info at the end of each task listing what was done and by whom; reopenable from the Nemu button, with "Coba sendiri" to start in cara 2 next time.
 _Avoid_: summary, log
 
 **Action log (WS-10)**:

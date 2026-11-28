@@ -67,7 +67,7 @@
       <bpmn:outgoing>Flow_9</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:exclusiveGateway id="Gateway_Cara" name="Cara apa?">
-      <bpmn:documentation>Cara bawaan sekolah (WS-08), atau cara 2 kalau guru memilih "Lain kali coba sendiri".</bpmn:documentation>
+      <bpmn:documentation>Cara bawaan sekolah (WS-08), atau cara 2 kalau guru memilih "Coba sendiri".</bpmn:documentation>
       <bpmn:incoming>Flow_9</bpmn:incoming>
       <bpmn:outgoing>Flow_Cara1</bpmn:outgoing>
       <bpmn:outgoing>Flow_Cara2</bpmn:outgoing>

@@ -15,7 +15,7 @@ import { addressFor } from "../../grade-photo/lib/grade-task";
  * came from behind Sumber: "Rekaman Pak Rizal, langkah 11 dari 11".
  */
 
-/** Every replay is this kind, so "Lain kali coba sendiri" groups them. */
+/** Every replay is this kind, so "Coba sendiri" groups them. */
 export const PROCEDURE_TASK_KIND = "f3-rekaman";
 
 type RunStep = Procedure["steps"][number] & { value: string | null };

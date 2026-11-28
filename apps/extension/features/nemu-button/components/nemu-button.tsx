@@ -1,11 +1,7 @@
 import { Button } from "@nemu/ui/components/button";
 import { Kbd, KbdGroup } from "@nemu/ui/components/kbd";
+import { NemuMascot } from "@nemu/ui/nemu/nemu-mascot";
 import { Fragment, useRef } from "react";
-
-import mascotSvg from "../assets/mascot-idle.svg?raw";
-
-// Drawn inline so it needs no web-accessible file; the class makes it fill its circle.
-const mascot = mascotSvg.replace("<svg", '<svg class="size-full"');
 
 /** A press on the Nemu button longer than this talks instead of opening the type box. */
 const HOLD_DELAY_MS = 350;
@@ -76,11 +72,9 @@ export function NemuButton({
         }}
         className="size-14 rounded-full bg-nemu p-1 text-nemu-foreground shadow-nemu-float hover:bg-nemu-amber-700"
       >
-        <span
-          aria-hidden
-          className="flex size-12 rounded-full bg-nemu-foreground"
-          dangerouslySetInnerHTML={{ __html: mascot }}
-        />
+        <span aria-hidden className="flex size-12 rounded-full bg-nemu-foreground">
+          <NemuMascot />
+        </span>
       </Button>
     </div>
   );

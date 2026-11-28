@@ -10,8 +10,8 @@ export type BubbleSide = "right" | "below-right" | "below" | "above-right" | "ab
 
 /** The highlight ring sits this far outside the target (docs/design-system.md, Sorot arahkan). */
 export const HIGHLIGHT_OFFSET = 4;
-/** Diameter of the Nemu cursor dot. */
-export const CURSOR_SIZE = 20;
+/** Width and height of the Nemu cursor, the 44 px mascot (docs/design-system.md, "The Nemu cursor"). */
+export const CURSOR_SIZE = 44;
 /** Space between the cursor (or the ringed target) and the bubble. */
 export const BUBBLE_GAP = 12;
 /** Nothing Nemu draws comes closer than this to the window's edge. */
@@ -42,13 +42,17 @@ export function cursorPoint(target: Rect, viewport: Size): Point {
   };
 }
 
-/** The area the bubble must stay out of: the ringed target plus the cursor on its right. */
+/**
+ * The area the bubble must stay out of: the ringed target plus the cursor on its right, which
+ * stands taller than a short target (a link, a checkbox).
+ */
 function keepClear(target: Rect): { left: number; top: number; right: number; bottom: number } {
+  const middle = target.top + target.height / 2;
   return {
     left: target.left - HIGHLIGHT_OFFSET,
-    top: target.top - HIGHLIGHT_OFFSET,
+    top: Math.min(target.top - HIGHLIGHT_OFFSET, middle - CURSOR_SIZE / 2),
     right: target.left + target.width + HIGHLIGHT_OFFSET + CURSOR_SIZE + 2,
-    bottom: target.top + target.height + HIGHLIGHT_OFFSET,
+    bottom: Math.max(target.top + target.height + HIGHLIGHT_OFFSET, middle + CURSOR_SIZE / 2),
   };
 }
 

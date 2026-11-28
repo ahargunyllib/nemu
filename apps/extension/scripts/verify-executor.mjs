@@ -114,7 +114,7 @@ await check(
     const notes = overlay.getByRole("region", { name: "Catatan langkah" });
     await notes.getByText("Nemu mengisi 6 isian").waitFor({ timeout: 5_000 });
     await notes.getByText("Bu menekan Simpan").waitFor();
-    await notes.getByRole("button", { name: "Lain kali coba sendiri" }).waitFor();
+    await notes.getByRole("button", { name: "Coba sendiri" }).waitFor();
     await page.screenshot({ path: join(shots, "catatan-langkah.png") });
     await notes.getByRole("button", { name: "Tutup" }).click();
     await overlay.getByRole("button", { name: "Tanya Nemu" }).click();

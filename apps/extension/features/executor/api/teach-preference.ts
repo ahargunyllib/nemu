@@ -1,7 +1,7 @@
 import { storage } from "wxt/utils/storage";
 
 /**
- * F0-14: the kinds of task the teacher asked to try herself next time ("Lain kali coba sendiri").
+ * F0-14: the kinds of task the teacher asked to try herself next time ("Coba sendiri").
  * The next run of such a task starts in cara 2; it stays on this browser.
  */
 const teachNextTimeItem = storage.defineItem<string[]>("local:executorTeachKinds", {

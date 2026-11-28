@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vite-plus/test";
 
-import { type Rect, cursorPoint, overlaps, placeBubble } from "./nemu-placement";
+import { CURSOR_SIZE, type Rect, cursorPoint, overlaps, placeBubble } from "./nemu-placement";
 
 const viewport = { width: 1280, height: 800 };
 const bubble = { width: 420, height: 200 };
@@ -60,6 +60,29 @@ describe("placeBubble", () => {
       for (let top = 0; top <= 760; top += 40) {
         const target = { left, top, width: 180, height: 40 };
         expect(overlaps(bubbleRect(target), target), `target at ${left},${top}`).toBe(false);
+      }
+    }
+  });
+
+  test("never covers the Nemu cursor, even beside a target shorter than the cursor", () => {
+    expect(CURSOR_SIZE).toBe(44);
+    for (const height of [12, 20, 40, 120]) {
+      for (let left = 0; left <= 1100; left += 100) {
+        for (let top = 0; top <= 760; top += 40) {
+          const target = { left, top, width: 180, height };
+          const point = cursorPoint(target, viewport);
+          const cursor = {
+            left: point.x - CURSOR_SIZE / 2,
+            top: point.y - CURSOR_SIZE / 2,
+            width: CURSOR_SIZE,
+            height: CURSOR_SIZE,
+          };
+          const fits = target.left + target.width + CURSOR_SIZE + 8 <= viewport.width;
+          if (!fits) continue;
+          expect(overlaps(bubbleRect(target), cursor), `target ${height} at ${left},${top}`).toBe(
+            false,
+          );
+        }
       }
     }
   });

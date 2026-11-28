@@ -87,7 +87,7 @@ export type KartuPilihProps = {
 export type KartuInfoProps = {
   title: string;
   items: readonly string[];
-  /** At most one small link above Tutup, such as Catatan langkah's "Lain kali coba sendiri". */
+  /** At most one small link above Tutup, such as Catatan langkah's "Coba sendiri". */
   link?: { label: string; onSelect: () => void };
   onClose: () => void;
 };
