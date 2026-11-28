@@ -206,8 +206,11 @@ async function upToTheFill() {
     } else if (/S \(sakit\)/u.test(prompt)) await buttons.filter({ hasText: "Kosongkan" }).click();
     else await buttons.first().click();
   }
+  // The heading counts students: Nemu is on the third, Alya.
   await display("kerja")
-    .getByText(/Nemu mengisi · 3 dari \d+/u)
+    .locator("[data-nemu-status]")
+    .filter({ hasText: "Nemu mengisi" })
+    .filter({ hasText: /(^|\D)3 dari 32/u })
     .waitFor({ timeout: 60_000 });
 }
 
