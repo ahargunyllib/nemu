@@ -237,14 +237,18 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
   test("cara 2 says each grade with gradesGuidedLine and checks what the teacher typed (#208)", async () => {
     const guide = guides.get("f1-isi-nilai")!;
     const step = filled!.steps.find((item) => item.verb === "setValue") as GuidedStep;
-    expect(await guide.prompt(step)).toBe("Ketik 86 untuk Alya.");
+    expect(await guide.prompt(step)).toMatchObject({ sentence: "Ketik 86 untuk Alya." });
     expect(calls).toContainEqual({
       op: "guided-line",
       entries: expect.arrayContaining([expect.objectContaining({ studentId: "s-3" })]),
       studentId: "s-3",
       typed: null,
     });
-    expect(await guide.check(step, "68")).toEqual({ ok: false, sentence: "Di buku 86, Bu." });
+    expect(await guide.check(step, "68")).toEqual({
+      ok: false,
+      sentence: "Di buku 86, Bu.",
+      detail: "Ibu mengetik 68. Ganti dulu, lalu lanjut.",
+    });
     expect(await guide.check(step, "86")).toEqual({ ok: true, sentence: "Sudah pas." });
   });
 

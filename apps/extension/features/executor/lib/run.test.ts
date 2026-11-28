@@ -603,6 +603,8 @@ describe("cara 2 and 3", () => {
       expect(display()).toMatchObject({ sentence: "Ketik 92 untuk Aisyah Zahra." }),
     );
     expect(run.state.ticked).toEqual([0]);
+    // Giliran Ibu, counting the rows (F1·09).
+    expect(display()).toMatchObject({ status: { text: "Giliran Ibu", count: "2 dari 2" } });
   });
 
   test("cara 2 passes over a field that already holds the right value", async () => {

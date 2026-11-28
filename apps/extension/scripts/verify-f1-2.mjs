@@ -214,11 +214,22 @@ async function upToTheFill() {
     .waitFor({ timeout: 60_000 });
 }
 
-/** The words of what Nemu shows while it points. */
+/** The sentence of the Gelembung Tunjuk: without its heading, detail line, chip or links. */
 async function pointing() {
   const text = await display("tunjuk")
     .first()
-    .textContent({ timeout: 500 })
+    .evaluate(
+      (node) => {
+        const copy = node.cloneNode(true);
+        for (const extra of copy.querySelectorAll(
+          "[data-nemu-status], [data-nemu-detail], [data-nemu-chip]",
+        ))
+          extra.remove();
+        return copy.textContent;
+      },
+      null,
+      { timeout: 500 },
+    )
     .catch(() => null);
   return text?.replace(/Lihat ringkasan.*$/su, "").trim() ?? null;
 }
@@ -264,6 +275,12 @@ async function teacherInCaraTwo() {
       value = row.note;
     } else if (correction) {
       expect(row && correction[1] === row.book, `"${sentence}" isn't the book's ${row?.book}`);
+      // F1·10: the line under it says what she typed.
+      const typed = await page.getByLabel(`Nilai ${row.name}`, { exact: true }).inputValue();
+      await display("tunjuk")
+        .getByText(`Ibu mengetik ${typed}. Ganti dulu, lalu lanjut.`)
+        .waitFor({ timeout: 3000 });
+      await page.screenshot({ path: join(shots, `beda-${row.name.split(" ")[0]}.png`) });
       field = `Nilai ${row.name}`;
       value = row.book;
     } else continue;
@@ -295,6 +312,15 @@ async function scenario(how) {
       .getByText(/^(Ketik \d+ untuk|Di Catatan|Untuk )/u)
       .first()
       .waitFor({ timeout: 10_000 });
+    // F1·09: Giliran Ibu counts the students; the line under it names the lit field.
+    await display("tunjuk")
+      .locator("[data-nemu-status]")
+      .filter({ hasText: "Giliran Ibu" })
+      .filter({ hasText: /\d dari 32/u })
+      .waitFor({ timeout: 3000 });
+    await display("tunjuk")
+      .getByText(/Kolom .+ bersinar oranye\.$/u)
+      .waitFor({ timeout: 3000 });
     await page.screenshot({ path: join(shots, `${how}-cara-2.png`) });
   });
 
