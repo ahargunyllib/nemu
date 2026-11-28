@@ -29,7 +29,7 @@ export type NemuMessage =
   // `chrome.storage.session`, which only the background reads; actions go to the action log.
   | { type: "nemu:run-save"; state: unknown }
   | { type: "nemu:run-load" }
-  | { type: "nemu:notes-save"; notes: { title: string; items: string[] } }
+  | { type: "nemu:notes-save"; notes: { title: string; items: string[]; card?: unknown } }
   | { type: "nemu:notes-load" }
   | { type: "nemu:log-actions"; pageEmail: PageEmail; entries: ActionLogEntry[] }
   // F1 (#207): the WhatsApp photo, its questions, the fill's rules and the read-back.

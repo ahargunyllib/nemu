@@ -1,10 +1,17 @@
 import { matchFieldLabels } from "@nemu/ai/school/bpmn/fields";
-import type { BpmnPlan, FormPhotoQuestion, FormTable, InboxJob } from "@nemu/contracts/school";
+import type {
+  BpmnPlan,
+  FormPhotoQuestion,
+  FormTable,
+  FormTableRow,
+  InboxJob,
+} from "@nemu/contracts/school";
 import type { NemuChoice, NemuDisplay } from "@nemu/ui/lib/nemu-display";
 
-import type { ProcessSlots } from "../../../shared/api/nemu-service";
+import type { ProcessReadback, ProcessSlots } from "../../../shared/api/nemu-service";
 import { adminUrl } from "../../../shared/lib/config";
 import type { PageEmail } from "../../../shared/lib/messages";
+import { type NotesCard, recipeCard } from "../../executor/lib/recipe";
 import type { RunState } from "../../executor/lib/run";
 import { executor } from "../../executor/stores/executor";
 import { addressFor } from "../../grade-photo/lib/grade-task";
@@ -55,7 +62,17 @@ type Phase =
   | { name: "running" };
 
 /** Kept in the background while the executor runs, for Catatan langkah after a page load. */
-type Kept = { jobId: string | null; announcements: string[]; processName: string };
+type Kept = {
+  jobId: string | null;
+  announcements: string[];
+  processName: string;
+  /** F3·08: what to read back after she saves, and the steps that become the recipe. */
+  check?: { rows: FormTableRow[]; className: string | null; date: string | null; recipe: string[] };
+};
+
+/** How long Nemu waits for the save to show in AlurSekolah (her press, then the confirmation). */
+const READBACK_TRIES = 15;
+const READBACK_MS = 2000;
 
 type Context = { pageEmail: PageEmail; honorific: string; speak: (text: string) => void };
 
@@ -495,28 +512,99 @@ function createProcessRun() {
       honorific: context.honorific,
       source: jobId ? `Proses ${processName} dan foto dari WhatsApp` : `Proses ${processName}`,
     });
-    kept = { jobId, announcements: plan.announcements, processName };
+    const header = built.continuation.header;
+    kept = {
+      jobId,
+      announcements: plan.announcements,
+      processName,
+      check: {
+        rows: built.continuation.rows?.rows ?? [],
+        className: header.find((field) => /^kelas$/iu.test(field.label))?.value ?? null,
+        date: header.find((field) => /^\d{4}-\d{2}-\d{2}$/u.test(field.value))?.value ?? null,
+        recipe: plan.overview,
+      },
+    };
     void call({ op: "state-save", state: kept });
     setPhase({ name: "running" });
     await executor.start(built.task, { continuation: built.continuation });
   }
 
-  /** The run ended: name what others do next (F3-18), let the photo go, show Catatan langkah. */
+  /**
+   * The run ended: name what others do next (F3-18), let the photo go, and show Catatan langkah.
+   * Once she saved, Nemu reads the rows back from AlurSekolah (F3·08): "Sudah dicek" with the
+   * steps as a recipe, or what differs.
+   */
   function afterRun(ended: RunState, notes: string[], show: boolean) {
     void (async () => {
       kept ??= await loadKept();
       const items = [...notes];
+      let photo: string | null = null;
       if (ended.status === "done" && kept) {
         for (const next of kept.announcements) items.push(`Selanjutnya, ${next}`);
         if (kept.jobId) {
           const acked = await call({ op: "ack", jobId: kept.jobId });
-          items.push(acked.ok ? "Foto dihapus dari Nemu" : "Foto belum terhapus");
+          photo = acked.ok ? "Foto dihapus dari Nemu" : "Foto belum terhapus";
+          items.push(photo);
         }
       }
+      const check = ended.status === "done" ? kept?.check : undefined;
+      const checked = check?.rows.length ? await readBack(check) : null;
       void call({ op: "state-save", state: null });
+      const after = afterLine(kept?.announcements ?? []);
+      const name = kept?.processName ?? processName;
       reset();
-      executor.presentNotes(items, ended.startCara === 1 ? ended.task.kind : null, show);
+      const offer = ended.startCara === 1 ? ended.task.kind : null;
+      if (!checked || !check) return executor.presentNotes(items, offer, show);
+      const detail = [checkedDetail(checked) ?? after, photo && `${photo}.`]
+        .filter(Boolean)
+        .join(" ");
+      const card: NotesCard = recipeCard({
+        checked: { ok: isSame(checked), title: checkedTitle(checked) },
+        detail,
+        recipe: name,
+      });
+      executor.presentNotes(check.recipe, offer, show, card);
     })();
+  }
+
+  /** Reads the saved rows back until the save shows (she confirms after her press), or gives up. */
+  async function readBack(check: NonNullable<Kept["check"]>): Promise<ProcessReadback | null> {
+    const run = generation;
+    setPhase({ name: "working", sentence: "Nemu mencocokkan yang tersimpan dengan buku…" });
+    let last: ProcessReadback | null = null;
+    for (let tries = 0; tries < READBACK_TRIES; tries += 1) {
+      const response = await call({
+        op: "readback",
+        rows: check.rows,
+        className: check.className,
+        date: check.date,
+      });
+      if (run !== generation || !response.ok) return null;
+      last = response.value as ProcessReadback | null;
+      if (!last || last.missing.length < last.total) return last;
+      await new Promise((resolve) => setTimeout(resolve, READBACK_MS));
+      if (run !== generation) return null;
+    }
+    return last;
+  }
+
+  function isSame(result: ProcessReadback): boolean {
+    return result.total > 0 && result.matched === result.total;
+  }
+
+  /** "Setoran 3 murid tersimpan, sama dengan buku." */
+  function checkedTitle(result: ProcessReadback): string {
+    if (isSame(result)) return `Setoran ${result.total} murid tersimpan, sama dengan buku.`;
+    if (result.missing.length === result.total) return "Setoran belum tersimpan di AlurSekolah.";
+    const off = result.total - result.matched;
+    return `Setoran tersimpan, tapi ${off} dari ${result.total} murid belum sama dengan buku.`;
+  }
+
+  /** Who differs and in which cell, when something does. */
+  function checkedDetail(result: ProcessReadback): string | undefined {
+    if (isSame(result)) return undefined;
+    const parts = [...result.different, ...result.missing.map((name) => `${name} belum tersimpan`)];
+    return parts.length ? `${parts.join("; ")}.` : undefined;
   }
 
   async function loadKept(): Promise<Kept | null> {

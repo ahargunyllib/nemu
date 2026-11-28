@@ -102,6 +102,8 @@ const setoranSchema = z.object({
   label: z.string(),
   catatan: z.string().optional(),
   guru: z.string().optional(),
+  /** Each aspect's score by name ("tajwid": 87); null before any is scored. */
+  skor: z.record(z.string(), z.number().nullable()).nullable().optional(),
 });
 const setoranListSchema = z.object({ data: z.array(setoranSchema), meta: metaSchema });
 

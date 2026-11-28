@@ -1,5 +1,6 @@
 // F3-1 on the mock AlurSekolah (#213, #220): a process the school taught Nemu with no code change.
 // Loads a production build of the extension into Playwright's Chromium, then:
+//   0. Admin Javan connects WS-07 to the mock AlurSekolah, for the read-back after Simpan setoran;
 //   1. Pak Rizal uploads the official tahfidz BPMN in Pengetahuan sekolah and, in WS-04, sets the
 //      page of "Isi setoran satu kelas" to "Al-Quran › Setoran baru" (F3-19);
 //   2. the setoran book photo lands in Bu Siti's inbox (from WhatsApp with its thumbnail when
@@ -9,7 +10,8 @@
 //      picks Kelas, opens Setoran baru (the BPMN's "Setoran" choice) and fills it, and stops
 //      pointing at "Simpan setoran";
 //   4. every row is checked against F3-1_kunci.csv (3/3) and nothing is saved until the "teacher"
-//      presses Simpan setoran; then Catatan langkah names the system's tasks;
+//      presses Simpan setoran; then Nemu reads the setoran back from AlurSekolah API v1 and shows
+//      "Sudah dicek" with the steps as a recipe (F3·08);
 //   5. with no page in WS-04 Nemu only explains (cara 3).
 // Needs `NEMU_RESPONDER=fixture pnpm dev` running (with WA_BOT_SECRET=<32+ chars> for the photo's
 // thumbnail on the start card). Screenshots: .output/verify-f3-1/.
@@ -25,6 +27,7 @@ import { chromium } from "playwright-core";
 const SERVER = process.env.NEMU_SERVER_URL ?? "http://localhost:3000";
 const ADMIN = process.env.NEMU_ADMIN_URL ?? "http://localhost:3002/";
 const MOCK = process.env.MOCK_ALURSEKOLAH_URL ?? "http://localhost:3003/";
+const MOCK_KEY = process.env.MOCK_ALURSEKOLAH_API_KEY ?? "as_uji_sdit_nusantara_2026";
 const INSTALL_CODE = process.env.NEMU_INSTALL_CODE ?? "NEMU-SDITN-2026";
 const HEADED = process.argv.includes("--headed");
 const WA_BOT_SECRET = process.env.WA_BOT_SECRET;
@@ -134,6 +137,21 @@ async function setPage(value) {
   await admin.getByText(`${TASK} disimpan`).first().waitFor({ timeout: 10_000 });
   await admin.keyboard.press("Escape");
 }
+
+await check("WS-07: Admin Javan connects AlurSekolah to the mock", async () => {
+  await signIn("javan@nemu.demo", "javan-demo-2026");
+  await admin.goto(new URL("integrations", ADMIN).href);
+  for (const [label, value] of [
+    ["URL API", MOCK.replace(/\/$/u, "")],
+    ["Kunci API", MOCK_KEY],
+  ]) {
+    await admin.getByRole("button", { name: `Ganti ${label}` }).click();
+    const dialog = admin.getByRole("dialog");
+    await dialog.getByLabel(label).fill(value);
+    await dialog.getByRole("button", { name: "Simpan" }).click();
+    await dialog.waitFor({ state: "hidden" });
+  }
+});
 
 let ready = false;
 await check("WS-04: Pak Rizal uploads the tahfidz BPMN and sets its task's page", async () => {
@@ -342,32 +360,45 @@ await check(
   },
 );
 
-await check("the teacher saves; Catatan langkah names the system's tasks", async () => {
-  await page.locator("#btn-simpan-setoran").click();
-  await page.locator("#ya-simpan").click();
-  await page.getByText("Setoran tersimpan untuk 3 murid kelas 4A.").waitFor();
-  const notes = overlay.getByRole("region", { name: "Catatan langkah" });
-  await notes.waitFor({ timeout: 10_000 });
-  const items = await notes.locator("li > span:last-child").allInnerTexts();
-  console.log(`  ${items.join(" | ")}`);
-  expect(
-    items.some((item) => /Ibu menekan Simpan setoran|Bu menekan Simpan setoran/u.test(item)),
-    "no 'menekan Simpan setoran'",
-  );
-  expect(
-    items.some((item) => /Sistem AlurSekolah: hitung nilai dan huruf/u.test(item)),
-    "the system's score task isn't named",
-  );
-  expect(
-    items.some((item) => /Sistem AlurSekolah: tampilkan di aplikasi orang tua/u.test(item)),
-    "the system's parent-app task isn't named",
-  );
-  expect(items.includes("Foto dihapus dari Nemu"), "the photo wasn't deleted");
-  const left = await siti.inboxJobs();
-  expect(!left.some((job) => job.jobId === jobId), "the photo is still in the inbox");
-  await page.screenshot({ path: join(shots, "catatan-langkah.png") });
-  await notes.getByRole("button", { name: "Tutup" }).click();
-});
+await check(
+  "the teacher saves; Nemu reads the setoran back from AlurSekolah: Sudah dicek and the recipe",
+  async () => {
+    await page.locator("#btn-simpan-setoran").click();
+    await page.locator("#ya-simpan").click();
+    await page.getByText("Setoran tersimpan untuk 3 murid kelas 4A.").waitFor();
+    const notes = overlay.getByRole("region", {
+      name: "Setoran 3 murid tersimpan, sama dengan buku.",
+    });
+    await notes.waitFor({ timeout: 40_000 });
+    expect(
+      (await notes.getByText("Sudah dicek", { exact: true }).count()) === 1,
+      "no Sudah dicek heading",
+    );
+    expect(
+      (await notes.getByText("Catatan langkah · Cara catat hafalan tahfidz").count()) === 1,
+      "the recipe isn't labelled",
+    );
+    const items = await notes.locator("li > span:last-child").allInnerTexts();
+    console.log(`  ${items.join(" | ")}`);
+    expect(
+      items.join(" | ") ===
+        "Pilih Setoran, kelas 4A | Isi surah, ayat, 4 skor per murid | Ibu tekan Simpan setoran",
+      "the recipe isn't the three steps",
+    );
+    const detail = await notes.locator("[data-nemu-detail]").innerText();
+    expect(
+      /Sistem AlurSekolah: hitung nilai dan huruf, lalu tampilkan di aplikasi orang tua/u.test(
+        detail,
+      ),
+      `the system's tasks aren't named: ${detail}`,
+    );
+    expect(/Foto dihapus dari Nemu/u.test(detail), `the photo wasn't deleted: ${detail}`);
+    const left = await siti.inboxJobs();
+    expect(!left.some((job) => job.jobId === jobId), "the photo is still in the inbox");
+    await page.screenshot({ path: join(shots, "catatan-langkah.png") });
+    await notes.getByRole("button", { name: "Tutup" }).click();
+  },
+);
 
 await check("F3-19: with no page in WS-04, Nemu only explains (cara 3)", async () => {
   await setPage("");

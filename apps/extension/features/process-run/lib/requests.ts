@@ -1,8 +1,9 @@
-import type { BpmnPlan, FormPhotoResult, InboxJob } from "@nemu/contracts/school";
+import type { BpmnPlan, FormPhotoResult, FormTableRow, InboxJob } from "@nemu/contracts/school";
 
 import type {
   NemuServiceClient,
   ProcessPlanInput,
+  ProcessReadback,
   ProcessSlots,
 } from "../../../shared/api/nemu-service";
 
@@ -25,6 +26,8 @@ export type ProcessRunRequest =
   | { op: "crops"; jobId: string; boxes: (readonly [number, number, number, number] | null)[] }
   | { op: "match-fields"; fields: Array<{ id: string; label: string }>; pageLabels: string[] }
   | { op: "ack"; jobId: string }
+  /** F3·08: after Simpan setoran, the rows as AlurSekolah stored them; null when not connected. */
+  | { op: "readback"; rows: FormTableRow[]; className: string | null; date: string | null }
   /** The flow's state for this tab, kept across page loads (F0-13). */
   | { op: "state-save"; state: unknown }
   | { op: "state-load" };
@@ -39,6 +42,7 @@ export type ProcessRunValue = {
   crops: (string | null)[];
   "match-fields": Record<string, string | null>;
   ack: { deleted: boolean };
+  readback: ProcessReadback | null;
   "state-save": null;
   "state-load": unknown;
 };
