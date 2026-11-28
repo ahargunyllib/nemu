@@ -49,9 +49,14 @@ const ROLE_NAMES: Record<string, string> = {
   keuangan: "bagian keuangan",
 };
 
+/** A contact's role as a teacher says it: "operator" → "operator sekolah". */
+export function roleName(role: string): string {
+  return ROLE_NAMES[role] ?? role;
+}
+
 /** The detail under the sentence: who the helper is, "Pak Rizal operator sekolah." */
 export function helperDetail(contact: Contact): string {
-  return `${contact.name} ${ROLE_NAMES[contact.role] ?? contact.role}.`;
+  return `${contact.name} ${roleName(contact.role)}.`;
 }
 
 /** The snapshot's text, alerts first: what the kamus is matched against. */

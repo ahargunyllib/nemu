@@ -206,14 +206,19 @@ test("F2-1: 3/3 official questions with the fixture responder, Bu Ratna and a sa
     assert.ok(fromKey.length >= 3, `Q${row.no} cites ${fromKey.join(", ")}`);
     assert.ok(answer.steps.length >= 2 && answer.steps.length <= 4);
     assert.equal(answer.fixer?.name, "Bu Ratna");
-    assert.match(answer.sentence, /Yang bisa membantu: Bu Ratna \(keuangan\)\.$/u);
     assert.ok(answer.parentReply && isParentSafe(answer.parentReply), answer.parentReply ?? "");
     assert.match(answer.parentReply, /Bu Ratna/u);
-    if (expected.gradeCheck.status === "saved")
-      assert.match(
-        answer.sentence,
-        /^Nilai Aisyah Putri Wijaya sudah tersimpan\. Bukan kesalahan Ibu\. Kemungkinan karena alur SPP sekolah: nilai murid dikunci otomatis kalau ada tagihan SPP bulanan/u,
-      );
+    if (expected.gradeCheck.status === "saved") {
+      // Q1 is about one pupil: the bubble says only "kemungkinan", her saved grade sits under it,
+      // and the cause (lulus_jika 2) and Bu Ratna (lulus_jika 4) are in Kenapa?.
+      assert.equal(answer.sentence, "Bukan kesalahan Ibu. Kemungkinan karena alur SPP sekolah.");
+      assert.equal(answer.detail, "Nilai Aisyah sudah tersimpan.");
+      assert.match(answer.why, /tagihan reguler lewat jatuh tempo/u);
+      assert.match(answer.why, /Yang bisa membantu: Bu Ratna \(bagian keuangan\)\.$/u);
+    } else {
+      assert.match(answer.sentence, /Yang bisa membantu: Bu Ratna \(keuangan\)\.$/u);
+      assert.equal(answer.detail, undefined);
+    }
   }
 });
 
@@ -234,7 +239,9 @@ test("F3-13: no AlurSekolah data for a named student means 'kemungkinan'", async
   });
   assert.equal(answer?.status, "process");
   if (answer?.status !== "process") return;
-  assert.match(answer.sentence, /^Kemungkinan karena alur SPP sekolah: /u);
+  // Not checked, so neither "Bukan kesalahan Ibu" nor a saved grade: only the likely cause.
+  assert.equal(answer.sentence, "Kemungkinan karena alur SPP sekolah.");
+  assert.equal(answer.detail, undefined);
 });
 
 test("F3-13: grades AlurSekolah doesn't have mean the process isn't the cause", async () => {
@@ -314,9 +321,11 @@ test("a model reply with an amount, 'tunggakan' or no helper is replaced by the 
     assert.ok(answer.parentReply && isParentSafe(answer.parentReply));
     assert.ok(answer.parentReply.startsWith("Assalamu'alaikum, Bapak/Ibu."));
     assert.match(answer.parentReply, /Bu Ratna/u);
+    assert.equal(answer.sentence, "Bukan kesalahan Ibu. Kemungkinan karena alur SPP sekolah.");
+    assert.equal(answer.detail, "Nilai Aisyah sudah tersimpan.");
     assert.equal(
-      answer.sentence,
-      "Nilai Aisyah Putri Wijaya sudah tersimpan. Bukan kesalahan Ibu. Kemungkinan karena alur SPP sekolah: nilai dikunci kalau tagihan reguler lewat jatuh tempo. Yang bisa membantu: Bu Ratna (keuangan).",
+      answer.why,
+      "Tagihan reguler lewat jatuh tempo, jadi nilai dikunci. Yang bisa membantu: Bu Ratna (bagian keuangan).",
     );
   }
   assert.equal(isParentSafe("Mohon dilunasi 350 ribu"), false);
@@ -378,46 +387,40 @@ test("F2-08: one pupil's case is never a sure cause, since the bill can't be che
       },
     );
     assert.equal(result?.status, "process");
-    return result?.status === "process" ? result.sentence : "";
+    return result?.status === "process" ? { sentence: result.sentence, detail: result.detail } : {};
   };
   const saved: GradeCheck = { status: "saved", student: "Aisyah Putri Wijaya" };
 
-  assert.match(
-    await ask("Nilai terkunci menunggu administrasi SPP.", "Alur SPP", saved),
-    /Bukan kesalahan Ibu\. Kemungkinan karena alur SPP sekolah: nilai terkunci menunggu administrasi SPP\./u,
-  );
-  assert.match(
-    await ask("Kemungkinan nilai dikunci.", "Alur SPP", { status: "unknown" }),
-    /^Kemungkinan karena alur SPP sekolah: nilai dikunci\./u,
-  );
+  // Whatever the model says, the bubble says only the likely cause; the rule is in Kenapa?.
+  assert.deepEqual(await ask("Nilai pasti dikunci karena SPP.", "Alur SPP", saved), {
+    sentence: "Bukan kesalahan Ibu. Kemungkinan karena alur SPP sekolah.",
+    detail: "Nilai Aisyah sudah tersimpan.",
+  });
+  // The kind of grade is named only when AlurSekolah has it (F3-13).
+  assert.deepEqual(await ask("Nilai dikunci.", "Alur SPP", { ...saved, assessment: "UTS" }), {
+    sentence: "Bukan kesalahan Ibu. Kemungkinan karena alur SPP sekolah.",
+    detail: "Nilai UTS Aisyah sudah tersimpan.",
+  });
+  assert.deepEqual(await ask("Nilai dikunci.", "Alur SPP", { status: "unknown" }), {
+    sentence: "Kemungkinan karena alur SPP sekolah.",
+    detail: undefined,
+  });
   // A title without "Alur", or one already naming the school, reads as a process of the school.
-  assert.match(
-    await ask("Nilai dikunci.", "Pembayaran SPP", saved),
-    /Kemungkinan karena alur Pembayaran SPP sekolah: nilai dikunci\./u,
+  assert.equal(
+    (await ask("Nilai dikunci.", "Pembayaran SPP", saved)).sentence,
+    "Bukan kesalahan Ibu. Kemungkinan karena alur Pembayaran SPP sekolah.",
   );
-  assert.match(
-    await ask("Nilai dikunci.", "Alur SPP Sekolah", saved),
-    /Kemungkinan karena alur SPP Sekolah: nilai dikunci\./u,
-  );
-  // The opening said twice is said once.
-  assert.match(
-    await ask(
-      "Kemungkinan karena alur SPP sekolah: menurut alur, nilai dikunci.",
-      "Alur SPP",
-      saved,
-    ),
-    /Kemungkinan karena alur SPP sekolah: nilai dikunci\./u,
-  );
-  // A cause the model gives after "kemungkinan karena" stays.
-  assert.match(
-    await ask("Kemungkinan karena tagihan lewat jatuh tempo, nilai dikunci.", "Alur SPP", saved),
-    /Kemungkinan karena alur SPP sekolah: karena tagihan lewat jatuh tempo, nilai dikunci\./u,
+  assert.equal(
+    (await ask("Nilai dikunci.", "Alur SPP Sekolah", saved)).sentence,
+    "Bukan kesalahan Ibu. Kemungkinan karena alur SPP Sekolah.",
   );
   // A question about the rule names no pupil: the rule is said as the rule.
   assert.match(
-    await ask("Menurut alur sekolah, nilai dikunci kalau lewat jatuh tempo.", "Alur SPP", {
-      status: "not_asked",
-    }),
+    (
+      await ask("Menurut alur sekolah, nilai dikunci kalau lewat jatuh tempo.", "Alur SPP", {
+        status: "not_asked",
+      })
+    ).sentence ?? "",
     /^Menurut alur sekolah, nilai dikunci/u,
   );
 });

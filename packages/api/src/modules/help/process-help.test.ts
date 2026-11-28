@@ -133,10 +133,14 @@ describe("F2-08: nilai tidak muncul, from the uploaded SPP BPMN", () => {
         fixer: { name: "Bu Ratna", role: "keuangan" },
       });
       if (answer.status !== "process") continue;
-      if (expected.saved)
-        expect(answer.sentence).toMatch(
-          /^Nilai Aisyah Putri Wijaya sudah tersimpan\. Bukan kesalahan Ibu\. Kemungkinan karena alur SPP sekolah: /u,
-        );
+      if (expected.saved) {
+        // Q1 names UTS, and AlurSekolah has Aisyah's UTS grade: the detail says so.
+        expect(answer).toMatchObject({
+          sentence: "Bukan kesalahan Ibu. Kemungkinan karena alur SPP sekolah.",
+          detail: "Nilai UTS Aisyah sudah tersimpan.",
+        });
+        expect(answer.why).toMatch(/Yang bisa membantu: Bu Ratna \(bagian keuangan\)\.$/u);
+      }
       expect(answer.steps.length).toBeGreaterThanOrEqual(2);
       expect(answer.steps.length).toBeLessThanOrEqual(4);
       expect(answer.steps.flatMap((step) => step.elementIds)).toEqual(
@@ -184,8 +188,10 @@ describe("F2-08: nilai tidak muncul, from the uploaded SPP BPMN", () => {
       { snapshot: PAGE, question: "Nilai UTS Aisyah kok tidak muncul di aplikasi orang tua?" },
       { context: siti },
     );
-    expect(answer).toMatchObject({ status: "process" });
-    expect(answer.sentence).toMatch(/^Kemungkinan karena alur SPP sekolah: /u);
+    expect(answer).toMatchObject({
+      status: "process",
+      sentence: "Kemungkinan karena alur SPP sekolah.",
+    });
   });
 
   it("F3-13: grades AlurSekolah doesn't have are named, not blamed on the process", async () => {
@@ -292,8 +298,13 @@ describe("F2-08 with the seeded WS-06 teacher and the mock's pupils", () => {
       { snapshot: PAGE, question: "Nilai UTS Aisyah kok tidak muncul di aplikasi orang tua?" },
       { context: siti },
     );
-    expect(answer).toMatchObject({ status: "process" });
-    expect(answer.sentence).toMatch(/^Nilai Aisyah Putri Wijaya sudah tersimpan\./u);
+    expect(answer).toMatchObject({
+      status: "process",
+      sentence: "Bukan kesalahan Ibu. Kemungkinan karena alur SPP sekolah.",
+    });
+    expect(answer.status === "process" && answer.detail).toMatch(
+      /^Nilai (UTS )?Aisyah sudah tersimpan\.$/u,
+    );
   });
 
   it("Q3: a process question without 'kenapa' is routed to the process, not the SOP", async () => {

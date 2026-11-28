@@ -306,6 +306,8 @@ export const helpExplanationSchema = z.discriminatedUnion("status", [
     .object({
       status: z.literal("process"),
       sentence: z.string(),
+      /** Under the sentence, not spoken: her grade is saved ("Nilai UTS Aisyah sudah tersimpan."). */
+      detail: z.string().optional(),
       why: z.string(),
       process: z
         .object({ documentId: z.string(), title: z.string(), version: z.string() })

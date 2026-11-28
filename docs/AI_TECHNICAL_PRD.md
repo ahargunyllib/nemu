@@ -164,7 +164,7 @@ Example: a parent asks on WhatsApp "nilai UTS Aisyah kok belum muncul?" and the 
    - Walk the reverse path: `Unlock Student Grades` and its condition (bill paid).
    - Find the role that can fix it: the lane of the reverse path's user task, e.g. finance.
    - The source is the BPMN element IDs, shown to the teacher as 2–4 plain steps with the current one highlighted (W4).
-3. **Certainty (PRD revision 28 Nov, P0-1):** the bill can't be checked (no finance scope; AlurSekolah's SPP module is still "Segera hadir"), so an answer about a named pupil opens "Kemungkinan karena alur SPP sekolah: …", enforced in code, never as a fact. A question that names no pupil gets the rule ("menurut alur sekolah, … kalau …").
+3. **Certainty (PRD revision 28 Nov, P0-1):** the bill can't be checked (no finance scope; AlurSekolah's SPP module is still "Segera hadir"), so the bubble about a named pupil says only "Bukan kesalahan Ibu. Kemungkinan karena alur SPP sekolah.", written by code, never the cause as a fact; "Nilai UTS Aisyah sudah tersimpan." is its detail line, and the cause and "Yang bisa membantu: Bu Ratna" are in Kenapa?. A question that names no pupil gets the rule ("menurut alur sekolah, … kalau …").
 4. **Parent reply** (Siapkan balasan):
    - polite, **no amount, no "tunggakan"**, points to the finance office;
    - a code validator rejects digits that look like money, "Rp" and "tunggak*";

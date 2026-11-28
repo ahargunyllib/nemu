@@ -33,6 +33,7 @@ export function fromExplanation(explanation: HelpExplanation): AskResult {
     return {
       kind: "answer",
       text: explanation.sentence,
+      detail: explanation.detail,
       why: explanation.why || undefined,
       sources: explanation.steps.map((step) => step.text),
       diagram: {

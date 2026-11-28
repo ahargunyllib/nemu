@@ -93,18 +93,18 @@ const ai = live
     })
   : createFixtureSchoolAi();
 
-// From the CSV's `lulus_jika`: what Sumber must point at, and what the sentence must say.
+// From the CSV's `lulus_jika`: what Sumber must point at, and what the answer must say. The
+// answer is the sentence, its detail line and Kenapa?: about one pupil the bubble says only
+// "Kemungkinan karena alur SPP sekolah." (P0-1), her saved grade is the detail, and the cause and
+// Bu Ratna are in Kenapa?.
 const EXPECTED = {
   1: {
     cause: ["Task_LockGrades", "End_GradesLocked"],
     cite: [["Task_LockGrades", "Timer_DueDateReached"]],
-    gradeCheck: { status: "saved", student: "Aisyah Putri Wijaya" },
-    sentence: [
-      /sudah tersimpan/u,
-      /Kemungkinan karena alur SPP sekolah: /u,
-      /jatuh tempo/iu,
-      /reguler|bulanan/iu,
-    ],
+    gradeCheck: { status: "saved", student: "Aisyah Putri Wijaya", assessment: "UTS" },
+    sentence: [/^Bukan kesalahan Ibu\. Kemungkinan karena alur SPP sekolah\.$/u],
+    detail: [/^Nilai UTS Aisyah sudah tersimpan\.$/u],
+    why: [/jatuh tempo/iu, /reguler|bulanan/iu, /Bu Ratna/u],
   },
   2: {
     cause: ["Task_UpdatePartiallyPaid", "End_InvoicesPartiallyPaid"],
@@ -166,6 +166,10 @@ for (const row of rows) {
     if (answer.fixer?.name !== "Bu Ratna") problems.push(`fixer ${answer.fixer?.name}`);
     for (const pattern of expected.sentence)
       if (!pattern.test(answer.sentence)) problems.push(`sentence lacks ${pattern}`);
+    for (const pattern of expected.detail ?? [])
+      if (!pattern.test(answer.detail ?? "")) problems.push(`detail lacks ${pattern}`);
+    for (const pattern of expected.why ?? [])
+      if (!pattern.test(answer.why)) problems.push(`Kenapa? lacks ${pattern}`);
     if (/\bsalah\b/iu.test(answer.sentence)) problems.push("sentence says salah");
     if (!answer.parentReply || !isParentSafe(answer.parentReply)) problems.push("unsafe reply");
     if (!/Bu Ratna/u.test(answer.parentReply ?? "")) problems.push("reply lacks Bu Ratna");
@@ -178,13 +182,19 @@ for (const row of rows) {
   if (found) console.log(`  match: ${found.match.elementId} via ${found.via?.elementId ?? "-"}`);
   if (answer?.status === "process") {
     console.log(`  sentence: ${answer.sentence}`);
+    if (answer.detail) console.log(`  detail: ${answer.detail}`);
     console.log(`  why: ${answer.why}`);
     for (const step of answer.steps)
       console.log(`  - ${step.text} [${step.elementIds.join(", ")}]`);
     console.log(`  reply: ${answer.parentReply}`);
     if (lastPhrasing && lastPhrasing.parent_reply !== answer.parentReply)
       console.log(`  (model reply replaced by the safe draft: ${lastPhrasing.parent_reply})`);
-    if (lastPhrasing && !answer.sentence.includes(lastPhrasing.answer.trim()))
+    // About one pupil the bubble leaves the model's answer out (P0-1), so there is nothing to compare.
+    if (
+      lastPhrasing &&
+      !/Kemungkinan karena alur/u.test(answer.sentence) &&
+      !answer.sentence.includes(lastPhrasing.answer.trim())
+    )
       console.log(`  (model answer replaced by the draft: ${lastPhrasing.answer})`);
   }
   lastPhrasing = null;
