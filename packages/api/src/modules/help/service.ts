@@ -24,6 +24,7 @@ import type { DocumentRepository } from "../documents/repository";
 import type { KamusRepository } from "../kamus/repository";
 import { loadKamusRows } from "../kamus/service";
 import { loadSchoolKnowledge } from "../school/knowledge";
+import type { TeacherQuestionRepository } from "../teacher-questions/repository";
 import { checkSavedGrades } from "./grade-check";
 
 /**
@@ -46,6 +47,9 @@ export type ProcessHelpDeps = {
 };
 
 type ExplainInput = { snapshot: PageSnapshot; question: string | null };
+
+/** Where each teacher question is counted for the Admin Workspace (ADR-0022). */
+export type QuestionLog = Pick<TeacherQuestionRepository, "record">;
 
 /** The active, ready BPMNs, their WS-04 elements and every symptom as a match candidate. */
 async function processSymptoms(
@@ -119,7 +123,25 @@ async function explainFromProcess(
   return { answer, symptoms: true };
 }
 
+/** F2 "ini kenapa?" for a teacher, counted as one "kenapa" question (ADR-0022). */
 export async function explain(
+  deps: HelpDeps & { processes?: ProcessHelpDeps; questions: QuestionLog },
+  teacher: TeacherProfile,
+  workspaceId: string,
+  input: ExplainInput,
+): Promise<HelpExplanation> {
+  const explanation = await explainPage(deps, teacher, workspaceId, input);
+  await deps.questions.record({
+    workspaceId,
+    teacherId: teacher.teacherId,
+    kind: "kenapa",
+    answered: explanation.status !== "not_in_guide",
+    askedAt: new Date(),
+  });
+  return explanation;
+}
+
+async function explainPage(
   deps: HelpDeps & { processes?: ProcessHelpDeps },
   teacher: TeacherProfile,
   workspaceId: string,
@@ -165,6 +187,24 @@ export async function ask(
 ): Promise<GroundedAnswer> {
   const chunks = await loadSchoolKnowledge(deps.documents, workspaceId);
   return deps.ai.answerGrounded({ question, chunks });
+}
+
+/** F3 `ask` for a teacher, counted as one "tanya" question (ADR-0022). */
+export async function askTeacher(
+  deps: HelpDeps & { questions: QuestionLog },
+  teacher: TeacherProfile,
+  workspaceId: string,
+  question: string,
+): Promise<GroundedAnswer> {
+  const answer = await ask(deps, workspaceId, question);
+  await deps.questions.record({
+    workspaceId,
+    teacherId: teacher.teacherId,
+    kind: "tanya",
+    answered: answer.status === "answered",
+    askedAt: new Date(),
+  });
+  return answer;
 }
 
 /**

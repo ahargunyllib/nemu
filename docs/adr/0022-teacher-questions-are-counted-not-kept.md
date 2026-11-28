@@ -1,0 +1,9 @@
+# Teacher questions are counted, not kept
+
+The Admin Workspace shows the operator how much teachers lean on Nemu: "Pertanyaan guru 47 · pekan ini · 3 belum terjawab" on the knowledge page, and the same unanswered count as a badge on Uji jawaban. Until now nothing recorded a teacher's question.
+
+Each question a teacher asks Nemu now adds one `teacher_question` row: the school (Knowledge Workspace), the WS-06 teacher, the time, the kind (`tanya` for a question to the school's guides, `kenapa` for "ini kenapa?" on a page) and whether Nemu answered. It is unanswered when Nemu said the question isn't in the school's guide or process (`not_in_guide`). The row is written by the Nemu Service after it answers `helpAsk` or `helpExplain`, never by the extension, so a client can't inflate or hide the count. Routing a sentence (`helpRoute`) and the operator's own Uji jawaban runs are not teacher questions and aren't counted. "Pekan ini" starts on Monday at 00.00 WIB. The counts are open to the operator and Admin Javan (`schoolAdminProcedure`), not to teachers.
+
+We keep neither the question's words nor Nemu's answer. A teacher asks in her own words, often about her pay, her leave or a student by name, and the counts need none of it. The operator learns what is missing from the guides by testing questions in Uji jawaban, not by reading what a teacher said. The page snapshot sent with "ini kenapa?" isn't kept either.
+
+We accept that the badge says how many questions went unanswered but not which ones. If a later page must list them, keeping a question's text is a new decision with its own retention period, not an extra column. A removed teacher's rows keep counting, with the teacher cleared, so the week's numbers don't change after the fact. No demo rows are seeded: a fresh stack shows 0 until a teacher asks.

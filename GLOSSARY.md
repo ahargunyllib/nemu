@@ -130,6 +130,10 @@ _Avoid_: FAQ, error list
 Asking a question in the Admin Workspace and seeing the answer and sources Nemu would give if chosen inactive documents were active. It runs the same answering as the teacher's question, so activating the document changes nothing about the answer.
 _Avoid_: preview, sandbox
 
+**Pertanyaan guru**:
+A question a teacher asks Nemu: a `tanya` question to the school's guides (F3) or "ini kenapa?" on a page (F2). The Admin Workspace counts this week's, and the unanswered ones ("belum terjawab", when Nemu said it isn't in the guide), but never keeps the words (ADR-0022).
+_Avoid_: chat log, query
+
 **Paket AlurSekolah (WS-02)**:
 Javan's built-in knowledge on how AlurSekolah works. With "berlaku untuk semua sekolah", its active documents answer every school, not only Javan's own.
 _Avoid_: global knowledge, template

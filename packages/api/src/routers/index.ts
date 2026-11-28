@@ -15,6 +15,7 @@ import { referenceTablesRouter } from "../modules/reference-tables/router";
 import { ruleSourcesRouter } from "../modules/rule-sources/router";
 import { schoolRouter } from "../modules/school/router";
 import { speechRouter } from "../modules/speech/router";
+import { teacherQuestionsRouter } from "../modules/teacher-questions/router";
 import { waBotRouter } from "../modules/wa-bot/router";
 
 export const appRouter = {
@@ -34,6 +35,7 @@ export const appRouter = {
   ...actionLogRouter,
   ...kamusRouter,
   ...quizRouter,
+  ...teacherQuestionsRouter,
 };
 export type AppRouter = typeof appRouter;
 export type AppRouterClient = RouterClient<typeof appRouter>;
