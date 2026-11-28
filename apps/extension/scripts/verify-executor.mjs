@@ -132,13 +132,13 @@ await check("F0-07: the teacher's own click stops Nemu and asks how to go on", a
     .waitFor({ timeout: 15_000 });
   await page.locator("h1").click();
   const card = display("pilih");
-  await card.getByText(/Nemu berhenti karena Bu memakai halaman/u).waitFor({ timeout: 3_000 });
-  for (const choice of ["Saya isi sendiri", "Nemu lanjut", "Berhenti"])
+  await card.getByText("Ibu mau isi sendiri?").waitFor({ timeout: 3_000 });
+  for (const choice of ["Ya, saya isi sendiri", "Nemu saja yang lanjut", "Berhenti"])
     await card.getByRole("button", { name: choice }).waitFor();
   await page.screenshot({ path: join(shots, "f0-07-kartu-pilih.png") });
-  // Saya isi sendiri: cara 2 from the same step; values already right are passed over, and Nemu
+  // Ya, saya isi sendiri: cara 2 from the same step; values already right are passed over, and Nemu
   // points at the first field still to fill and says its value.
-  await card.getByRole("button", { name: "Saya isi sendiri" }).click();
+  await card.getByRole("button", { name: "Ya, saya isi sendiri" }).click();
   await display("tunjuk")
     .getByText(/^(Klik|Ketik|Pilih|Silakan) /u)
     .waitFor({ timeout: 5_000 });
@@ -167,7 +167,7 @@ async function pressBerhenti() {
   await bubble.getByText("Mengisi Nilai Ahmad Fadli.").waitFor({ timeout: 15_000 });
   await bubble.getByRole("button", { name: "Berhenti" }).click();
   const card = display("pilih");
-  await card.getByText("Nemu berhenti. Bu mau isi sendiri?").waitFor({ timeout: 3_000 });
+  await card.getByText("Ibu mau isi sendiri?").waitFor({ timeout: 3_000 });
   const labels = await card.getByRole("button").allInnerTexts();
   expect(
     labels.map((label) => label.trim()).join(" | ") === "Ya, saya isi sendiri | Tidak, berhenti",

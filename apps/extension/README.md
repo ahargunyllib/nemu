@@ -91,9 +91,9 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     cursor while naming them, never by opening a URL. The run is kept per tab in
     `chrome.storage.session` (through the background), so it carries on after a page load.
   - **Safety, in the extension (F0-07, F0-08).** A real mouse press or key while Nemu acts stops it
-    and asks: Saya isi sendiri / Nemu lanjut / Berhenti. `isDeniedActionName` runs on every target:
-    Simpan, Kirim, Hapus and the like are pointed at, never pressed, whatever verb asked for it, and
-    so is anything that would submit a form. Any verb outside the six becomes pointing. Nemu
+    and asks "Ibu mau isi sendiri?": Ya, saya isi sendiri / Nemu saja yang lanjut / Berhenti.
+    `isDeniedActionName` runs on every target: Simpan, Kirim, Hapus and the like are pointed at,
+    never pressed, whatever verb asked for it, and so is anything that would submit a form. Any verb outside the six becomes pointing. Nemu
     dispatches no key, so never Enter, and cancels every submit while it acts (untrusted ones for
     the whole task).
   - **F0-09.** Steps that come in parts (`registerStepSource`) are retried twice with a plain
@@ -298,7 +298,7 @@ gets 404 for it, and that it is gone after the save (#278).
 
 `pnpm --filter extension verify:f1-2` runs F1-2 (#208, cara 2) on the same stack with a
 development build. It runs the F1 flow twice: Nemu starts filling in cara 1, then the rest
-switches to cara 2, once because the teacher takes over ("Saya isi sendiri") and once by "Ajari
+switches to cara 2, once because the teacher takes over ("Ya, saya isi sendiri") and once by "Ajari
 saya" (the `?uji-nemu` dock's button, since the test microphone can't say it). The "teacher"
 types what Nemu says, except where `features/grade-photo/lib/F1-2_cara-2_skenario.csv` (the
 official F1-1 values, with data-uji F1-2's two deliberate mismatches: Bagas 86 for 68, Budi 71 for 77) has her type something else first. It checks that each line is the

@@ -13,6 +13,8 @@ describe("matchShortCommand", () => {
     ["ajarin saya dong", "ajari_saya"],
     ["Lanjut", "lanjut"],
     ["lanjutkan saja", "lanjut"],
+    ["Nemu saja yang lanjut", "lanjut"],
+    ["Nemu lanjut", "lanjut"],
     ["Berhenti!", "berhenti"],
     ["stop", "berhenti"],
     ["sudah dulu", "berhenti"],

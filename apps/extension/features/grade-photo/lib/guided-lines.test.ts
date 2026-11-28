@@ -188,7 +188,7 @@ describe("F1 cara 2 (F1-2)", () => {
     );
   });
 
-  test("the teacher taking over (Saya isi sendiri) switches the remaining rows to cara 2", async () => {
+  test("the teacher taking over (Ya, saya isi sendiri) switches the remaining rows to cara 2", async () => {
     // Nemu waits once Ahmad is filled, so she takes over before Bagas, the first row off.
     let hold = true;
     const { run, spoken, display, teacherTypes } = harness(1, (_ms, signal) =>
