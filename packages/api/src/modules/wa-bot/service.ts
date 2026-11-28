@@ -16,7 +16,12 @@ export async function isRegisteredSender(
   return (await teacherForSender(directory, phone)) !== null;
 }
 
-export type WhatsAppPhotoInput = { phone: string; messageId: string; bytes: Uint8Array };
+export type WhatsAppPhotoInput = {
+  phone: string;
+  messageId: string;
+  bytes: Uint8Array;
+  thumbnail?: Uint8Array;
+};
 
 export type WhatsAppPhotoResult =
   | { status: "queued"; jobId: string }
@@ -35,6 +40,7 @@ export async function receiveWhatsAppPhoto(
       source: "whatsapp",
       bytes: input.bytes,
       messageId: input.messageId,
+      thumbnail: input.thumbnail,
     },
   );
   return result.status === "queued"

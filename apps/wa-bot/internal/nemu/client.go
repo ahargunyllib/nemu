@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/ahargunyllib/nemu/apps/wa-bot/internal/bot"
+	"github.com/ahargunyllib/nemu/apps/wa-bot/internal/thumbnail"
 )
 
 type Client struct {
@@ -44,6 +45,7 @@ func (c *Client) IsRegistered(ctx context.Context, phone string) (bool, error) {
 	return answer.Registered, err
 }
 
+// HandOver posts the photo, and a thumbnail of it for the extension's card, to the inbox.
 func (c *Client) HandOver(ctx context.Context, phone, messageID, path string) (bot.Outcome, error) {
 	photo, err := os.Open(path)
 	if err != nil {
@@ -65,6 +67,19 @@ func (c *Client) HandOver(ctx context.Context, phone, messageID, path string) (b
 	}
 	if _, err := io.Copy(part, photo); err != nil {
 		return "", err
+	}
+	// #278: the card's thumbnail. A photo Go can't decode is handed over without one.
+	if _, err := photo.Seek(0, io.SeekStart); err != nil {
+		return "", err
+	}
+	if thumb, err := thumbnail.Make(photo); err == nil {
+		part, err := writer.CreateFormFile("thumbnail", "thumbnail")
+		if err != nil {
+			return "", err
+		}
+		if _, err := part.Write(thumb); err != nil {
+			return "", err
+		}
 	}
 	if err := writer.Close(); err != nil {
 		return "", err

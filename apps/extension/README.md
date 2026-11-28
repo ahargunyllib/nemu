@@ -113,7 +113,10 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
 - **F1: grade-book photo from WhatsApp (#207).** `features/grade-photo/`. The visible allowed tab
   polls `inboxJobs` every 4 s through the background, which claims each photo for one tab (a
   12 s lease its polling renews, held once the teacher starts), so the small Kartu Pilih **Foto
-  dari WhatsApp · Mulai / Nanti** shows above the Nemu button in one tab only.
+  dari WhatsApp · Mulai / Nanti** shows above the Nemu button in one tab only, with the photo's
+  thumbnail beside its title (#278: `inboxThumbnail`, made by `apps/wa-bot` at hand-off; a
+  Skeleton while it loads, no picture when the photo came without one). Nothing is read before
+  Mulai.
   - **Mulai** asks what the grades are; the answer, typed in the type box or spoken, goes to
     `gradesParseCommand` until the class, subject and assessment are known. "masukkan nilai …"
     asked from the panel (helpRoute `input_nilai`) starts the same flow, and asks for the photo
@@ -288,7 +291,10 @@ the card in one of two tabs only, Mulai and "Ini nilai apa, Bu?" with the photo'
 doubtful cells, 5 names, 1 S) with their crops, the cara 1 fill of all 32 students with notes,
 Lihat ringkasan beside Simpan, the read-back sentence after the save, the photo gone from the
 inbox, Catatan langkah, and every saved grade right in under 5 minutes. Screenshots go to
-`.output/verify-grade-photo/`.
+`.output/verify-grade-photo/`. It also hands over the photo's thumbnail
+(`f1-1-buku-nilai-4b-thumbnail.jpg`, what `apps/wa-bot/internal/thumbnail` makes of it) and
+checks that the card shows it with the job still queued, that Bu Dewi (another seeded teacher)
+gets 404 for it, and that it is gone after the save (#278).
 
 `pnpm --filter extension verify:f1-2` runs F1-2 (#208, cara 2) on the same stack with a
 development build. It runs the F1 flow twice: Nemu starts filling in cara 1, then the rest

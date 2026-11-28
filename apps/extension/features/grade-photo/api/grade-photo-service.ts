@@ -4,7 +4,7 @@ import { browser } from "wxt/browser";
 import { failureMessage } from "../../../shared/api/nemu-service";
 import type { PageEmail } from "../../../shared/lib/messages";
 import { teacherClient } from "../../identity/api/teacher-client";
-import { cropPhoto } from "../lib/crop";
+import { cropPhoto, imageDataUrl } from "../lib/crop";
 import { claimJobs, holdJob, type InboxClaims, releaseJobs } from "../lib/inbox-claims";
 import type { GradePhotoRequest, GradePhotoResponse, GradePhotoValue } from "../lib/requests";
 
@@ -63,6 +63,14 @@ async function answer(
       await saveClaims(claimed.claims);
       return claimed.mine;
     }
+    case "thumbnail":
+      try {
+        return await imageDataUrl(await client.inboxThumbnail({ jobId: request.jobId }));
+      } catch (error) {
+        // A photo handed over without one (or already gone): the card shows its title alone.
+        if (error instanceof ORPCError && error.code === "NOT_FOUND") return null;
+        throw error;
+      }
     case "title":
       return client.inboxReadTitle({ jobId: request.jobId });
     case "command":

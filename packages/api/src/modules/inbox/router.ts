@@ -7,6 +7,7 @@ import {
   ackJob,
   enqueuePhoto,
   jobPhoto,
+  jobThumbnail,
   listJobs,
   processJob,
   readTitle,
@@ -88,7 +89,22 @@ export const inboxRouter = {
     return new File([photo.body], "photo", { type: photo.contentType });
   }),
 
-  /** After the teacher saved (or cancelled): delete the photo and its job. */
+  /**
+   * #278: the small copy the "Foto dari WhatsApp" card shows before Mulai. It starts no read, and
+   * goes with the photo on `inboxAck`.
+   */
+  inboxThumbnail: schoolProcedure.input(jobIdSchema).handler(async ({ context, input }) => {
+    const teacher = await context.caller.requireTeacher();
+    const thumbnail = await jobThumbnail(
+      { store: context.school.inbox },
+      teacher.teacherId,
+      input.jobId,
+    );
+    if (!thumbnail) throw new ORPCError("NOT_FOUND", { message: "Thumbnail not found" });
+    return new File([thumbnail.body], "thumbnail", { type: thumbnail.contentType });
+  }),
+
+  /** After the teacher saved (or cancelled): delete the photo, its thumbnail and its job. */
   inboxAck: schoolProcedure.input(jobIdSchema).handler(async ({ context, input }) => {
     const teacher = await context.caller.requireTeacher();
     return {

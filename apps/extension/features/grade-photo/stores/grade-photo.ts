@@ -117,6 +117,11 @@ function createGradePhoto() {
   /** Photos this tab may offer (claimed for it), and those the teacher put off with Nanti. */
   let jobs: InboxJob[] = [];
   const dismissed = new Set<string>();
+  /**
+   * #278: each offered photo's thumbnail as a data URL: undefined while it loads, null when the
+   * photo came without one. Fetching it reads nothing; the read waits for Mulai.
+   */
+  const thumbnails = new Map<string, string | null | undefined>();
   /** What the teacher asked for, and the words so far while Nemu asks for the rest. */
   let target: GradeTarget | null = null;
   /** 2 when she asked to be taught ("Ajari saya ngisi nilai"): the fill starts in cara 2 (F1-11). */
@@ -143,15 +148,32 @@ function createGradePhoto() {
 
   // --- What the page shows ----------------------------------------------------------------------
 
-  function cardFor(): NemuDisplay | null {
-    const offered = jobs.find(
-      (candidate) => !dismissed.has(candidate.jobId) && candidate.jobId !== job?.jobId,
+  /** The photo the small card offers, if Nemu is free to offer one. */
+  function offeredJob(): InboxJob | null {
+    if (phase.name !== "idle" && phase.name !== "notice") return null;
+    return (
+      jobs.find((candidate) => !dismissed.has(candidate.jobId) && candidate.jobId !== job?.jobId) ??
+      null
     );
-    if (!offered || (phase.name !== "idle" && phase.name !== "notice")) return null;
+  }
+
+  async function loadThumbnail(jobId: string) {
+    thumbnails.set(jobId, undefined);
+    const response = await call({ op: "thumbnail", jobId });
+    thumbnails.set(jobId, response.ok ? (response.value as GradePhotoValue["thumbnail"]) : null);
+    publish();
+  }
+
+  function cardFor(): NemuDisplay | null {
+    const offered = offeredJob();
+    if (!offered) return null;
+    const thumbnail = thumbnails.get(offered.jobId);
     return {
       type: "pilih",
       compact: true,
       question: "Foto dari WhatsApp",
+      image:
+        thumbnail === null ? undefined : { src: thumbnail, alt: "Foto buku nilai dari WhatsApp" },
       choices: [
         { id: "mulai", label: "Mulai" },
         { id: "nanti", label: "Nanti" },
@@ -285,6 +307,8 @@ function createGradePhoto() {
   }
 
   function publish() {
+    const offered = offeredJob();
+    if (offered && !thumbnails.has(offered.jobId)) void loadThumbnail(offered.jobId);
     view = {
       display: displayFor(),
       card: cardFor(),
@@ -315,6 +339,8 @@ function createGradePhoto() {
     const changed =
       next.length !== jobs.length || next.some((item, at) => item.jobId !== jobs[at]?.jobId);
     jobs = next;
+    for (const jobId of thumbnails.keys())
+      if (!next.some((item) => item.jobId === jobId)) thumbnails.delete(jobId);
     if (changed) publish();
   }
 

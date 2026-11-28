@@ -3,7 +3,15 @@ import { describe, expect, it, vi } from "vite-plus/test";
 
 import { createMemoryFileStore } from "../../testing/school";
 import { createDemoSchoolDirectory } from "../school/directory";
-import { ackJob, enqueuePhoto, listJobs, processJob, readTitle, teacherForSender } from "./service";
+import {
+  ackJob,
+  enqueuePhoto,
+  jobThumbnail,
+  listJobs,
+  processJob,
+  readTitle,
+  teacherForSender,
+} from "./service";
 
 const JPEG = new Uint8Array([0xff, 0xd8, 0xff, 0xda, 0x00, 0x02, 0x01, 0xff, 0xd9]);
 
@@ -170,5 +178,49 @@ describe("photo inbox", () => {
     expect(ai.readPhotoTitle).toHaveBeenCalledWith({
       image: expect.objectContaining({ type: "image" }),
     });
+  });
+
+  it("keeps the bot's thumbnail beside the photo, for its own teacher only, and deletes both on ack (#278)", async () => {
+    const store = createMemoryFileStore();
+    const thumbnail = new Uint8Array([0xff, 0xd8, 0xff, 0xda, 0x00, 0x02, 0x07, 0xff, 0xd9]);
+    const queued = await enqueuePhoto(
+      { store },
+      { teacherId: "siti", source: "whatsapp", bytes: JPEG, messageId: "wamid.t", thumbnail },
+    );
+    const jobId = queued.status === "queued" ? queued.job.jobId : "";
+
+    const served = await jobThumbnail({ store }, "siti", jobId);
+    expect(served?.contentType).toBe("image/jpeg");
+    expect([...new Uint8Array(served!.body)]).toEqual([...thumbnail]);
+    expect(await jobThumbnail({ store }, "other", jobId)).toBeNull();
+    // Showing the thumbnail starts no read.
+    expect(await listJobs({ store }, "siti")).toMatchObject([{ jobId, status: "queued" }]);
+
+    expect(await ackJob({ store }, "siti", jobId)).toBe(true);
+    expect(await jobThumbnail({ store }, "siti", jobId)).toBeNull();
+    expect(await store.list("inbox/")).toEqual([]);
+  });
+
+  it("queues the photo without a thumbnail when the bot sent none or a broken one", async () => {
+    const store = createMemoryFileStore();
+    const none = await enqueuePhoto(
+      { store },
+      { teacherId: "siti", source: "upload", bytes: JPEG },
+    );
+    const broken = await enqueuePhoto(
+      { store },
+      {
+        teacherId: "siti",
+        source: "whatsapp",
+        bytes: JPEG,
+        messageId: "wamid.b",
+        thumbnail: new TextEncoder().encode("%PDF-1.7"),
+      },
+    );
+    for (const result of [none, broken]) {
+      expect(result.status).toBe("queued");
+      const jobId = result.status === "queued" ? result.job.jobId : "";
+      expect(await jobThumbnail({ store }, "siti", jobId)).toBeNull();
+    }
   });
 });

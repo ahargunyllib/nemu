@@ -75,8 +75,11 @@ export type KartuPilihProps = {
   question: string;
   choices: readonly [NemuChoice, NemuChoice] | readonly [NemuChoice, NemuChoice, NemuChoice];
   onChoose: (id: string) => void;
-  /** What the question is about, enlarged: the cell of the grade-book photo (W5). */
-  image?: { src: string; alt: string };
+  /**
+   * What the question is about: the enlarged cell of the grade-book photo (W5), or on a `compact`
+   * card the photo's thumbnail beside the question (#278). No `src` yet: a Skeleton of its shape.
+   */
+  image?: { src?: string; alt: string };
   /** One quiet line under the choices: "Pertanyaan 1 dari 10 · 22 nilai lain sudah cocok." */
   note?: string;
   /** A small card that waits beside the Nemu button, such as "Foto dari WhatsApp". */
