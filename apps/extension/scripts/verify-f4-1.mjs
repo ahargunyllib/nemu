@@ -1,10 +1,11 @@
 // Loads a production build of the extension into Playwright's Chromium and checks F4-1 (#209) end
 // to end on the Moodle test site (infra/): Bu Siti asks "Nemu, tolong cek kuis ini." on the quiz
 // page, Nemu opens Setelan, Soal and the quiz page through the menus, points at Pratinjau kuis
-// (she presses it), and then points at soal 7 (no key) and soal 15 (missing image) with one
-// sentence each, as setup/f4-1/F4-1_kunci.csv expects, and then says one closing sentence
-// ("Selain dua hal itu, kuisnya sudah siap, Bu.", #256). Afterwards the quiz's last-modified time
-// and question count are what they were (read from the Moodle database when it runs locally).
+// (she presses it), and then points at soal 7 (no key, "… Ibu isi kuncinya lewat Edit soal.",
+// #267) and soal 15 (missing image), as setup/f4-1/F4-1_kunci.csv expects, and then says one
+// closing sentence ("Selain dua hal itu, kuisnya sudah siap, Bu.", #256). Afterwards the quiz's
+// last-modified time and question count are what they were (read from the Moodle database when it
+// runs locally).
 // Needs `NEMU_RESPONDER=fixture pnpm dev` (the Nemu Service and the mock AlurSekolah, where Bu
 // Siti's email is read) and the Moodle test site; skips with a message when Moodle isn't running.
 // Screenshots: .output/verify-f4-1/.
@@ -218,7 +219,14 @@ const [header, ...rows] = readFileSync(join(infra, "setup/f4-1/F4-1_kunci.csv"),
   .split("\n")
   .map(csvCells);
 const sentenceColumn = header.indexOf("kalimat_nemu_yang_diharapkan");
-const kunci = rows.map((row) => row[sentenceColumn]).filter((text) => /^Soal \d+ /u.test(text));
+// PRD v2.3 (#267): a question with no key also says where to fill it, and Nemu proposes no key.
+// The updated key file isn't in infra/ yet, so its old no-key sentence gets the new ending here.
+const EDIT_SOAL = "Ibu isi kuncinya lewat Edit soal.";
+const NO_KEY = `Soal 7 belum ada kunci jawabannya, Bu. ${EDIT_SOAL}`;
+const kunci = rows
+  .map((row) => row[sentenceColumn])
+  .filter((text) => /^Soal \d+ /u.test(text))
+  .map((text) => (text.endsWith("kunci jawabannya, Bu.") ? `${text} ${EDIT_SOAL}` : text));
 
 await check(
   "F4-1: soal 7 (no key) and soal 15 (no image), one sentence each, pointed at",
@@ -260,6 +268,11 @@ await check(
     console.log(`  Nemu said: ${sentences.join(" | ")}`);
     for (const expected of kunci)
       expect(sentences.includes(expected), `Nemu didn't say “${expected}”`);
+    expect(sentences.includes(NO_KEY), `Nemu didn't say “${NO_KEY}”`);
+    expect(
+      !sentences.some((sentence) => /\?/u.test(sentence)),
+      "Nemu asked about a key instead of pointing to Edit soal",
+    );
     const closesAt = new Date(2026, 11, 4, 21, 0);
     if (new Date() < closesAt)
       expect(
