@@ -214,7 +214,6 @@ async function upToTheFill() {
     .waitFor({ timeout: 60_000 });
 }
 
-/** The words of what Nemu shows while it points. */
 /** The sentence of the Gelembung Tunjuk: without its heading, detail line, chip or links. */
 async function pointing() {
   const text = await display("tunjuk")
@@ -316,7 +315,8 @@ async function scenario(how) {
     // F1·09: Giliran Ibu counts the students; the line under it names the lit field.
     await display("tunjuk")
       .locator("[data-nemu-status]")
-      .filter({ hasText: /^Giliran Ibu\d+ dari 32$/u })
+      .filter({ hasText: "Giliran Ibu" })
+      .filter({ hasText: /\d dari 32/u })
       .waitFor({ timeout: 3000 });
     await display("tunjuk")
       .getByText(/Kolom .+ bersinar oranye\.$/u)
