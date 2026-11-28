@@ -1,7 +1,8 @@
 // Loads a production build of the extension into Playwright's Chromium and checks #199 and #200 end
-// to end: the install code, the Nemu button on allowed sites only, identity from the page email, a
-// typed question answered through helpRoute, and holding Ctrl + Space (or the Nemu button) to talk
-// with a fake microphone. #268: unclear words are shown back, not acted on; and in a second, headed
+// to end: the install code, the Nemu button on allowed sites only, identity from the page email
+// (an unregistered account gets a WhatsApp message to the operator, ID-02; web.whatsapp.com is
+// answered locally, so nothing is sent), a typed question answered through helpRoute, and holding
+// Ctrl + Space (or the Nemu button) to talk with a fake microphone. #268: unclear words are shown back, not acted on; and in a second, headed
 // window without the auto-answer flag, the first hold points at Chrome's real prompt, refusing or
 // blocking the microphone shows the three steps, and talking works once it is allowed and the page
 // reloaded (#280).
@@ -64,6 +65,10 @@ const context = await chromium.launchPersistentContext(mkdtempSync(join(tmpdir()
     "--use-fake-device-for-media-stream",
   ],
 });
+// Never reach WhatsApp: the operator link (ID-02) is only opened and read.
+await context.route("https://web.whatsapp.com/**", (route) =>
+  route.fulfill({ contentType: "text/html", body: "<title>WhatsApp (uji)</title>" }),
+);
 const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
 const extensionId = new URL(worker.url()).host;
 
@@ -183,14 +188,40 @@ async function holdToTalk(target, ms = 1_000) {
   await target.keyboard.up("Control");
 }
 
-await check("switching to an unregistered account shows the operator to contact", async () => {
-  await signIn("rizal.operator");
-  await openNemu(page);
-  await bubble(page).getByText("Akun ini belum didaftarkan. Hubungi Pak Rizal.").waitFor({
-    timeout: 10_000,
-  });
-  await page.screenshot({ path: join(shots, "unregistered.png") });
-});
+await check(
+  "ID-02: an unregistered account gets the sentence and a WhatsApp message to the operator",
+  async () => {
+    await signIn("rizal.operator");
+    await openNemu(page);
+    await bubble(page).getByText("Akun Ibu belum didaftarkan di Nemu.").waitFor({
+      timeout: 10_000,
+    });
+    expect(
+      (await overlay(page).getByLabel("Pertanyaan untuk Nemu").count()) === 0,
+      "an unregistered account still has the type box",
+    );
+    await page.screenshot({ path: join(shots, "unregistered.png") });
+
+    const [whatsapp] = await Promise.all([
+      context.waitForEvent("page"),
+      bubble(page).getByRole("button", { name: "Siapkan pesan WA ke operator" }).click(),
+    ]);
+    await whatsapp.waitForLoadState();
+    const url = new URL(whatsapp.url());
+    const text = url.searchParams.get("text") ?? "";
+    console.log(`  ${url.origin}${url.pathname}?phone=${url.searchParams.get("phone")}`);
+    console.log(`  text: ${JSON.stringify(text)}`);
+    expect(`${url.origin}${url.pathname}` === "https://web.whatsapp.com/send", "not WhatsApp Web");
+    expect(url.searchParams.get("phone") === "6281200001003", "not Pak Rizal's number (WS-06)");
+    expect(text.startsWith("Assalamualaikum Pak Rizal."), "the greeting is missing");
+    expect(text.includes("Mohon daftarkan akun saya di Nemu."), "no request to be registered");
+    expect(text.includes("rizal.operator@sditnusantara.sch.id"), "no account email");
+    expect(text.includes(`Halaman: Beranda (${new URL(MOCK).origin}/`), "no page");
+    // Nemu only opens the chat; the teacher presses Kirim. The mock page stays as it was.
+    expect(!page.isClosed(), "the AlurSekolah page was closed");
+    await whatsapp.close();
+  },
+);
 
 await check("switching back to a registered teacher brings the type box back", async () => {
   await signIn("dewi.lestari");

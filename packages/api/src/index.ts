@@ -116,9 +116,9 @@ async function extensionCaller(context: Context): Promise<SchoolCaller> {
     school,
     email,
   );
-  if ("message" in identity) {
+  if ("unregistered" in identity) {
     throw new ORPCError("FORBIDDEN", {
-      message: identity.message,
+      message: identity.unregistered.message,
       data: { reason: EXTENSION_REFUSALS.unregistered },
     });
   }

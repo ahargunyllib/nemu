@@ -21,29 +21,46 @@ export type IdentifyDeps = {
   school: Pick<SchoolRepository, "listContacts">;
 };
 
-/** ID-02: who to ask when the page's account isn't a registered teacher: the school's operator. */
-async function unregisteredMessage(
+type Unregistered = Extract<ExtensionIdentity, { status: "unregistered" }>;
+
+/**
+ * ID-02: the sentence for an account that isn't a registered teacher, and the school's operator,
+ * whom the extension offers a ready WhatsApp message to (F2-05 hand-off).
+ */
+async function unregistered(
   school: IdentifyDeps["school"],
   workspaceId: string,
-): Promise<string> {
+  email: string,
+): Promise<Omit<Unregistered, "status">> {
   const operator = (await school.listContacts(workspaceId)).find(
     (contact) => contact.role === "operator",
   );
-  return `Akun ini belum didaftarkan. Hubungi ${operator ? contactCallName(operator) : "operator sekolah"}.`;
+  if (!operator) {
+    return {
+      message: "Akun Ibu belum didaftarkan di Nemu. Minta operator sekolah mendaftarkannya.",
+      email,
+      operator: null,
+    };
+  }
+  return {
+    message: "Akun Ibu belum didaftarkan di Nemu.",
+    email,
+    operator: { name: contactCallName(operator), phone: operator.phone },
+  };
 }
 
-/** The WS-06 teacher behind the email on the page, or the sentence to show when there is none. */
+/** The WS-06 teacher behind the email on the page, or why Nemu can't help that account yet. */
 export async function identifyTeacher(
   deps: IdentifyDeps,
   school: InstalledSchool,
   email: string,
-): Promise<{ teacher: TeacherProfile } | { message: string }> {
+): Promise<{ teacher: TeacherProfile } | { unregistered: Omit<Unregistered, "status"> }> {
   const teacher = await deps.directory.teacherByEmail(school.workspaceId, email);
   if (teacher) return { teacher };
-  return { message: await unregisteredMessage(deps.school, school.workspaceId) };
+  return { unregistered: await unregistered(deps.school, school.workspaceId, email) };
 }
 
 export function toIdentity(result: Awaited<ReturnType<typeof identifyTeacher>>): ExtensionIdentity {
-  if ("message" in result) return { status: "unregistered", message: result.message };
+  if ("unregistered" in result) return { status: "unregistered", ...result.unregistered };
   return { status: "registered", name: result.teacher.name, honorific: result.teacher.honorific };
 }
