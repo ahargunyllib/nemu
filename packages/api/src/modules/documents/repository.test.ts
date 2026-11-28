@@ -91,7 +91,9 @@ describe("document repository on D1", () => {
     await documents.replaceChunksAndSetReady("doc-1", [chunk("doc-1", 3)], true);
 
     const stored = await documents.listActiveReadyChunks("W-TEST");
-    expect(stored.map(({ sequence }) => sequence)).toEqual([3]);
+    expect(
+      stored.filter(({ documentId }) => documentId === "doc-1").map(({ sequence }) => sequence),
+    ).toEqual([3]);
   });
 
   it("keeps the earlier chunks and status when replacing them fails", async () => {
@@ -111,7 +113,9 @@ describe("document repository on D1", () => {
     expect(await documents.findById("W-TEST", "doc-1")).toMatchObject({ isActive: false });
     await documents.setActive("W-TEST", "doc-1", true);
     const stored = await documents.listActiveReadyChunks("W-TEST");
-    expect(stored.map(({ sequence }) => sequence)).toEqual([1]);
+    expect(
+      stored.filter(({ documentId }) => documentId === "doc-1").map(({ sequence }) => sequence),
+    ).toEqual([1]);
   });
 
   it("fails when the document disappeared while indexing", async () => {
@@ -123,6 +127,10 @@ describe("document repository on D1", () => {
     await expect(
       documents.replaceChunksAndSetReady("gone", [chunk("gone", 1)], true),
     ).rejects.toThrow();
-    expect(await documents.listActiveReadyChunks("W-TEST")).toEqual([]);
+    expect(
+      (await documents.listActiveReadyChunks("W-TEST")).filter(
+        ({ documentId }) => documentId === "gone",
+      ),
+    ).toEqual([]);
   });
 });

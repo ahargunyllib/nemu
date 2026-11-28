@@ -144,6 +144,11 @@ Nothing in the code knows SPP: the school's uploaded `.bpmn`, its WS-04 index an
 - Sumber opens the cited PDF at its page (#258, ADR-0018): the extension asks `documentFileLink {id}` for a 10-minute signed path and opens `<Nemu Service>/api-reference/documents/<id>/file?token=…#page=<page>` in a new tab. Only active, ready PDFs the school reads get a link.
 - The seed stores the PDF's metadata only; the file goes in the documents bucket at `seed/sekolah/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf`. `pnpm dev` puts it in the local bucket (the `SeedDocumentFiles` action in `packages/infra/alchemy.run.ts`, dev only). Production needs it once, by hand: find the bucket with `pnpm dlx wrangler@4 r2 bucket list` (the `documents` bucket of the `prod` stage), then `pnpm dlx wrangler@4 r2 object put <documents bucket>/seed/sekolah/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf --file packages/ai/src/school/fixtures/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf --content-type application/pdf --remote`. Uploading the PDF in Pengetahuan sekolah instead makes a new document; re-point the Rule Sources at it.
 
+Paket AlurSekolah is seeded with **Tentang Nemu** (#305, `20261129000000_seed_tentang_nemu`, source `packages/ai/src/school/fixtures/tentang-nemu.md`): what Nemu can help with, talking to it, and allowing the microphone in Chrome. Questions about Nemu itself ("Mikrofon Chrome-nya di mana?", "Apa yang anda ketahui?") are answered from it instead of "Belum ada di panduan sekolah."
+
+- After editing the guide, regenerate the seed: `UPDATE_TENTANG_NEMU_SEED=1 pnpm --filter @nemu/api exec vp test run src/modules/help/tentang-nemu.test.ts`. Keep SOP words out of it ("berapa", "bawah", "KKM"): they would pull SOP questions toward the guide.
+- The file goes in the documents bucket at `seed/alursekolah/tentang-nemu.md`; `pnpm dev` puts it there, production needs it once like the SOP PDF (`--content-type "text/markdown; charset=utf-8"`).
+
 ### Speech
 
 - `speechTranscribe` before anything else; show `text`.
