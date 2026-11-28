@@ -248,6 +248,15 @@ const heading = (type, text, count) => {
   const words = display(type).locator("[data-nemu-status]").filter({ hasText: text });
   return count ? words.filter({ hasText: new RegExp(`(^|\\D)${count}`, "u") }) : words;
 };
+/** A display is placed once it is measured and fades in: wait until all of it is on screen. */
+async function settled(locator) {
+  for (let tries = 0; tries < 30; tries += 1) {
+    const box = await locator.boundingBox();
+    if (box && box.y >= 0 && box.y + box.height <= page.viewportSize().height) break;
+    await page.waitForTimeout(100);
+  }
+  await page.waitForTimeout(300);
+}
 const typeBox = overlay.getByRole("textbox");
 const started = Date.now();
 
@@ -366,6 +375,7 @@ await check(
     const bubble = display("tunjuk");
     await heading("tunjuk", "Giliran Ibu").waitFor();
     await bubble.getByText("Belum tersimpan").waitFor();
+    await settled(bubble);
     await page.screenshot({ path: join(shots, "tunjuk-simpan.png") });
     await bubble.getByRole("button", { name: "Lihat ringkasan" }).click();
     const card = display("info");
@@ -382,6 +392,7 @@ await check(
       `Ringkasan: ${items.join(" | ")}`,
     );
     await card.getByText("Ringkasan · Matematika 4B, UTS").waitFor();
+    await settled(card);
     await page.screenshot({ path: join(shots, "ringkasan.png") });
     await card.getByRole("button", { name: "Kembali" }).click();
     await bubble.getByText("Silakan Ibu tekan Simpan.").waitFor({ timeout: 3000 });
