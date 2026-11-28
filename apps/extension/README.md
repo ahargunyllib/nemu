@@ -117,8 +117,13 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   thumbnail beside its title (#278: `inboxThumbnail`, made by `apps/wa-bot` at hand-off; a
   Skeleton while it loads, no picture when the photo came without one). Nothing is read before
   Mulai.
-  - **Mulai** asks what the grades are; the answer, typed in the type box or spoken, goes to
-    `gradesParseCommand` until the class, subject and assessment are known. "masukkan nilai …"
+  - **Mulai** reads the photo's title (`inboxReadTitle`, #270) and asks **Ini nilai apa, Bu?** as
+    a Kartu Pilih: the title as she would say it ("UTS Matematika 4B"), **Pilih yang lain** and
+    **Nanti saja**. With two titles on the photo, Nanti saja makes way (at most 3 choices). It is
+    answered with a click, so no type box shows; saying a title, "pilih yang lain" or "nanti saja"
+    with the talk combination works too. Pilih yang lain (or no readable title) asks what the
+    grades are; the answer, typed in the type box or spoken, goes to `gradesParseCommand` until
+    the class, subject and assessment are known. "masukkan nilai …"
     asked from the panel (helpRoute `input_nilai`) starts the same flow, and asks for the photo
     over WhatsApp when none is waiting. Then `inboxProcess` reads it (Gelembung Kerja meanwhile).
   - **W5.** One Kartu Pilih per question with the cell cropped from `inboxPhoto` in the background
@@ -135,7 +140,8 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     grades back with `gradesReadbackAlurSekolah` (or, when WS-07 isn't connected, compares what
     the page shows with `gradesReadback`), says the result in one sentence, calls `inboxAck` and
     offers Catatan langkah. The wait survives a page load.
-  - **Nanti** hides the card in this tab; × or Berhenti before the fill lets the photo show again.
+  - **Nanti** (or **Nanti saja** on Ini nilai apa, Bu?) hides the photo in this tab; × or Berhenti
+    before the fill lets the photo show again.
 - **F4-1: check a Moodle quiz the way students see it (#209).** `features/quiz-check/`. "Nemu,
   tolong cek kuis ini" (typed or spoken, on any page of a quiz) is the extension's own command; no
   route is asked for. One executor task (`lib/quiz-task.ts`, step source per page) opens
