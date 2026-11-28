@@ -111,6 +111,30 @@
   .hal .form-kartu select, .hal .form-kartu input { font-size:14px; padding:7px 10px; border:1px solid #cfd4da; border-radius:8px; }
   .form-kartu .row { gap:16px; align-items:flex-end; }
   .hal .form-kartu .btn { margin-top:16px; }
+  .hal a.btn { display:inline-flex; align-items:center; text-decoration:none; }
+  .hal-kepala .sub { margin:4px 0 0; color:var(--muted); font-size:14px; }
+  .stat-baris { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:16px; }
+  .stat { padding:14px 16px; display:flex; flex-direction:column; gap:2px; }
+  .stat-atas { display:flex; align-items:center; justify-content:space-between; font-size:13px; color:var(--muted); }
+  .stat-ikon { display:grid; place-items:center; width:30px; height:30px; border-radius:8px; background:var(--biru-muda); color:var(--biru-ink); }
+  .stat b { font-size:26px; font-weight:600; }
+  .stat small { font-size:12px; color:var(--muted); }
+  .beranda-isi { display:grid; grid-template-columns:minmax(0, 2fr) minmax(260px, 1fr); gap:16px; align-items:start; }
+  .blok { padding:16px; }
+  .blok h2 { margin:0 0 12px; font-size:16px; font-weight:600; }
+  .kelas-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:12px; }
+  .kelas-kartu { display:flex; flex-direction:column; gap:2px; padding:12px; border:1px solid var(--kartu-garis); border-top:3px solid var(--biru); border-radius:10px; font-size:13px; color:var(--muted); }
+  .kelas-kartu b { color:var(--ink); font-size:14px; font-weight:600; }
+  .kelas-kartu .kecil { margin-top:8px; font-size:12px; }
+  .bilah { display:block; height:5px; border-radius:999px; background:#eceef1; overflow:hidden; margin-top:4px; }
+  .bilah i { display:block; height:100%; background:var(--biru); }
+  .kerjaan { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px; }
+  .kerjaan li { display:flex; align-items:center; gap:10px; }
+  .kerjaan .kode { display:grid; place-items:center; width:32px; height:32px; flex:none; border-radius:8px; background:#5a6470; color:#fff; font-size:11px; font-weight:600; }
+  .kerjaan .teks { flex:1; min-width:0; }
+  .kerjaan .teks b { display:block; font-size:14px; font-weight:500; }
+  .kerjaan .teks small { color:var(--muted); font-size:12px; }
+  .hal .btn.kecil { height:30px; padding:0 10px; font-size:13px; border-radius:8px; }
 </style>
 </head>
 <body>
@@ -192,10 +216,65 @@ function viewLogin() {
     catch (e) { $("#login-error").textContent = e.message; }
   };
 }
-function viewBeranda() {
+const SINGKAT = {"Matematika": "Mat", "Bahasa Indonesia": "B. Indo", "Bahasa Inggris": "B. Ing", "IPAS": "IPAS"};
+const IKON_STAT = {
+  murid: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/>',
+  rata: '<path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/>',
+  nilai: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M9 11h6M9 15h4"/>',
+  alquran: '<path d="M12 6.5C10 5 7 4.5 3 5v14c4-.5 7 0 9 1.5 2-1.5 5-2 9-1.5V5c-4-.5-7 0-9 1.5Z"/><path d="M12 6.5v14"/>'
+};
+const ikonStat = n => `<span class="stat-ikon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false">${IKON_STAT[n]}</svg></span>`;
+const angkaId = (n, d = 1) => n.toLocaleString("id-ID", {minimumFractionDigits: d, maximumFractionDigits: d});
+function salam() { const j = new Date().getHours(); return j < 11 ? "pagi" : j < 15 ? "siang" : j < 18 ? "sore" : "malam"; }
+// Beranda dibangun dari data tiruan yang ada: penugasan, murid, nilai tersimpan, dan setoran.
+// Tidak ada data presensi atau PR di tiruan, jadi kartu itu tidak ditampilkan.
+async function viewBeranda() {
   const u = me();
-  app.innerHTML = `<h1>Beranda</h1><p>Selamat datang, ${u.nama}.</p><p>${SEKOLAH.nama}, tahun ajaran 2026/2027, semester ganjil.</p>
-  ${u.wali ? `<p>Wali kelas: <b>${u.wali}</b></p>` : ""}`;
+  const tanggal = new Date().toLocaleDateString("id-ID", {weekday: "long", day: "numeric", month: "long", year: "numeric"});
+  const kepala = `<div class="hal-kepala"><div><h1>Selamat ${salam()}, ${u.panggilan || u.nama}</h1><p class="sub">${tanggal}${u.wali ? ` · Wali kelas ${u.wali}` : ""}</p></div>
+      <div class="aksi"><button class="btn garis" type="button" disabled title="Belum ada di tiruan">Presensi hari ini</button><a class="btn" href="#/nilai" id="beranda-isi-nilai">${PLUS}Isi nilai</a></div></div>`;
+  app.innerHTML = `<div class="hal beranda">${kepala}</div>`;
+  const hash = location.hash;
+  let nilai = {}, riwayat = [];
+  try { [nilai, riwayat] = await Promise.all([server("/nilai"), server("/tahfidz")]); } catch (e) { nilai = {}; riwayat = []; }
+  // Ibu sudah pindah halaman selagi data dimuat: jangan timpa halaman itu.
+  if (location.hash !== hash || me() !== u) return;
+  const tugas = u.tugas === "semua" ? u.kelas.flatMap(k => MAPEL.map(m => [k, m])) : Object.entries(u.tugas).flatMap(([k, ms]) => ms.map(m => [k, m]));
+  const jumlah = k => (SISWA[k] || []).length;
+  const terisiUts = (k, m) => Object.values(nilai[`${k}|${m}|UTS`] || {}).filter(v => v.nilai !== "").length;
+  const skor = Object.entries(nilai).filter(([key]) => tugas.some(([k, m]) => key.startsWith(`${k}|${m}|`)))
+    .flatMap(([, lembar]) => Object.values(lembar).filter(v => v.nilai !== "").map(v => Number(v.nilai)));
+  const belumUts = tugas.filter(([k, m]) => m !== "Tahfidz" && terisiUts(k, m) < jumlah(k));
+  const kelasAQ = kelasTahfidz(u);
+  const kelasUtama = u.wali && kelasAQ.includes(u.wali) ? u.wali : kelasAQ[0];
+  const pekanIni = pekanDari(new Date().toISOString().slice(0, 10));
+  const pekanTerakhir = k => { const p = riwayat.filter(x => x.kelas === k).map(x => pekanDari(x.tanggal)); return p.length ? Math.max(...p) : pekanIni; };
+  const sudahSetor = (k, p) => new Set(riwayat.filter(x => x.kelas === k && x.jenis === "Setoran" && pekanDari(x.tanggal) === p).map(x => x.murid)).size;
+  const kelasWali = u.wali || u.kelas[0];
+  const stat = [
+    {ikon: "murid", judul: u.wali ? `Murid kelas ${u.wali}` : "Murid", isi: String(u.wali ? jumlah(u.wali) : u.kelas.reduce((n, k) => n + jumlah(k), 0)), sub: u.wali ? `Wali kelas ${u.wali}` : `Kelas ${u.kelas.join(", ")}`},
+    {ikon: "rata", judul: "Rata-rata nilai", isi: skor.length ? angkaId(skor.reduce((a, b) => a + b, 0) / skor.length) : "–",
+      sub: belumUts.length ? `Belum diinput: ${belumUts.slice(0, 2).map(([k, m]) => `UTS ${SINGKAT[m] || m} ${k}`).join(", ")}${belumUts.length > 2 ? ", …" : ""}` : "Semua nilai UTS terisi"},
+    {ikon: "nilai", judul: "Nilai tersimpan", isi: String(skor.length), sub: `${Object.keys(nilai).filter(key => tugas.some(([k, m]) => key.startsWith(`${k}|${m}|`))).length} lembar penilaian`},
+    ...(kelasUtama ? [(() => { const p = pekanTerakhir(kelasUtama), s = sudahSetor(kelasUtama, p);
+      return {ikon: "alquran", judul: `Setoran tahfidz pekan ${p}`, isi: `${s}/${jumlah(kelasUtama)}`, sub: `${jumlah(kelasUtama) - s} murid belum setor · ${kelasUtama}`}; })()] : [])
+  ];
+  const kartuKelas = tugas.map(([k, m]) => {
+    const n = jumlah(k);
+    const [teks, isi] = m === "Tahfidz" ? (() => { const p = pekanTerakhir(k), s = sudahSetor(k, p); return [`Setoran pekan ${p} · ${s} dari ${n}`, s]; })() : [`Nilai UTS · ${terisiUts(k, m)} dari ${n}`, terisiUts(k, m)];
+    return `<div class="kelas-kartu"><b>${m}</b><span>Kelas ${k} · ${n} murid</span><span class="kecil">${teks}</span><span class="bilah" aria-hidden="true"><i style="width:${n ? Math.round(100 * isi / n) : 0}%"></i></span></div>`;
+  }).join("");
+  const kerjaan = [
+    ...belumUts.map(([k, m]) => ({kode: "NL", judul: `Input nilai UTS ${m}`, sub: `${k} · ${terisiUts(k, m)} dari ${jumlah(k)} terisi`, href: "#/nilai", aksi: "Isi nilai"})),
+    ...kelasAQ.map(k => { const p = pekanTerakhir(k), s = sudahSetor(k, p); return s < jumlah(k) ? {kode: "TF", judul: `Setoran tahfidz pekan ${p}`, sub: `${k} · ${jumlah(k) - s} murid belum setor`, href: "#/tahfidz", aksi: "Catat"} : null; }).filter(Boolean)
+  ];
+  app.innerHTML = `<div class="hal beranda">${kepala}
+    <div class="stat-baris">${stat.map(s => `<div class="kartu stat"><div class="stat-atas"><span>${s.judul}</span>${ikonStat(s.ikon)}</div><b>${s.isi}</b><small>${s.sub}</small></div>`).join("")}</div>
+    <div class="beranda-isi">
+      <section class="kartu blok" aria-labelledby="judul-kelas-saya"><h2 id="judul-kelas-saya">Kelas saya</h2><div class="kelas-grid">${kartuKelas || `<p class="note">Belum ada penugasan mapel.</p>`}</div></section>
+      <section class="kartu blok" aria-labelledby="judul-kerjaan"><h2 id="judul-kerjaan">Perlu dikerjakan</h2>
+        ${kerjaan.length ? `<ul class="kerjaan">${kerjaan.map(x => `<li><span class="kode" aria-hidden="true">${x.kode}</span><span class="teks"><b>${x.judul}</b><small>${x.sub}</small></span><a class="btn garis kecil" href="${x.href}">${x.aksi}</a></li>`).join("")}</ul>` : `<p class="note">Semua sudah beres.</p>`}
+      </section></div></div>`;
 }
 function viewProfil() {
   const u = me();

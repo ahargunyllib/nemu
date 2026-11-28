@@ -8,6 +8,8 @@ export type Penugasan = Readonly<Record<string, readonly string[]>> | "semua";
 
 export interface Akun {
   readonly nama: string;
+  /** How the school addresses the account, for the Beranda greeting ("Bu Siti"). */
+  readonly panggilan: string;
   readonly email: string;
   readonly peran: "guru" | "operator";
   readonly wali?: string;
@@ -23,6 +25,7 @@ export const AKUN: Readonly<Record<string, Akun>> = {
   // IPAS 4A SENGAJA belum ditugaskan ke Bu Siti (kasus uji F2-2).
   "siti.aminah": {
     nama: "Siti Aminah, S.Pd.",
+    panggilan: "Bu Siti",
     email: "siti.aminah@sditnusantara.sch.id",
     peran: "guru",
     wali: "4A",
@@ -33,6 +36,7 @@ export const AKUN: Readonly<Record<string, Akun>> = {
   },
   "dewi.lestari": {
     nama: "Dewi Lestari, S.Pd.",
+    panggilan: "Bu Dewi",
     email: "dewi.lestari@sditnusantara.sch.id",
     peran: "guru",
     wali: "5A",
@@ -42,6 +46,7 @@ export const AKUN: Readonly<Record<string, Akun>> = {
   },
   "rizal.operator": {
     nama: "Rizal Pratama",
+    panggilan: "Pak Rizal",
     email: "rizal.operator@sditnusantara.sch.id",
     peran: "operator",
     kelas: ["4A", "4B", "5A"],

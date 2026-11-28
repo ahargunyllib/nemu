@@ -59,6 +59,12 @@ the bell do nothing.
 The page contents follow the real AlurSekolah too: a small trail above the title, filters in
 boxes, and the table in a white card whose footer counts what is filled.
 
+- **Beranda**: "Selamat siang, Bu Siti" with the date and "Wali kelas 4A", Presensi hari ini
+  (greyed out) and Isi nilai, four figures from the mock's own data (the class's students, the
+  mean of saved grades with the UTS sheets still missing, how many grades are saved, and the
+  latest tahfidz week's "3/10" setoran), a "Kelas saya" card per assigned subject and class with
+  its UTS or setoran progress, and "Perlu dikerjakan" with links to Nilai and Al-Quran. The real
+  app's attendance, homework and attendance-trend cards are left out: the mock has no such data.
 - **Nilai** (Isi nilai kelas): filters Kelas, Mata Pelajaran and Jenis Penilaian with
   Tampilkan Siswa, a "KKM 75 · Semester ganjil" chip, the table No, NIS/NISN, Nama murid,
   Nilai, Catatan (a green check once a Nilai is typed), and a footer "3 dari 32 terisi · belum
