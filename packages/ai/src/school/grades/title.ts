@@ -64,7 +64,8 @@ export async function readPhotoTitle(
     schemaName: "grade_book_title",
     schema: TITLE_JSON_SCHEMA,
     parse: (value) => modelSchema.parse(value),
-    maxOutputTokens: 400,
+    // The reader's reasoning counts against this budget too (#315).
+    maxOutputTokens: 2_000,
   });
   if (!heading?.trim()) return [];
 
