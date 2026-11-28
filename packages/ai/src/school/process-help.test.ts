@@ -597,3 +597,51 @@ test("#308: the answer-only call keeps the draft answer when the model fails", a
   );
   assert.ok(answer.detailsRequest);
 });
+
+test("#317: a live index still sends the F2-1 cash question to the model, and SOP questions to none", async () => {
+  const index: ProcessIndex = JSON.parse(
+    await readFile(join(FIXTURES, "f2-1-spp-live-index.json"), "utf8"),
+  );
+  const candidates = candidatesOf(index);
+  const questions = [
+    "Kalau bayar tunai, kapan nilainya terbuka?",
+    "Berapa KKM untuk kelas 4?",
+    "Nilai di bawah berapa harus remedial?",
+    "Nilai UTS paling lambat dimasukkan kapan?",
+    "Anak yang tidak ikut ulangan diberi nilai berapa?",
+    "Cuti melahirkan berapa lama?",
+  ];
+  const screened = Object.fromEntries(
+    questions.map((question) => [question, screenSymptoms(question, candidates)]),
+  );
+  const [cash, ...sop] = questions;
+  assert.deepEqual(
+    {
+      cash: screened[cash!] === "none" ? "none" : "near or match",
+      ...Object.fromEntries(sop.map((question) => [question, screened[question]])),
+    },
+    {
+      cash: "near or match",
+      ...Object.fromEntries(sop.map((question) => [question, "none"])),
+    },
+    JSON.stringify(screened),
+  );
+});
+
+test("#317: a keyword match made only of words most symptoms share is not a match", () => {
+  const candidates = [
+    "nilai anak tidak muncul di aplikasi orang tua",
+    "nilai anak tetap tidak muncul di aplikasi orang tua sampai tagihan dilunasi",
+    "nilai anak masih tidak muncul walau sebagian tagihan sudah dibayar",
+    "nilai anak muncul lagi di aplikasi orang tua",
+    "orang tua membayar tunai di sekolah",
+    "tagihan baru muncul di aplikasi orang tua",
+    "status tagihan berubah menjadi lunas",
+    "saldo E-Saku anak bertambah",
+  ].map((symptom, at) => ({ documentId: "d", elementId: `E${at}`, symptom }));
+  assert.equal(
+    screenSymptoms("Anak yang tidak ikut ulangan diberi nilai berapa?", candidates),
+    "none",
+  );
+  assert.equal(screenSymptoms("Kalau bayar tunai, kapan nilainya terbuka?", candidates), "near");
+});

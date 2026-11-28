@@ -236,16 +236,49 @@ export function keywordSymptomMatch(
 }
 
 /**
+ * A word's root, roughly: "membayar", "dibayar" and "pembayaran" are "bayar"; "terbuka" and
+ * "membuka" are "buka". Both sides are stemmed the same way, so a wrong root only joins words
+ * that already share it.
+ */
+function stem(word: string): string {
+  let root = word.replace(/(kan|an)$/u, (end) => (word.length - end.length >= 4 ? "" : end));
+  const prefix = root.match(/^(meng|meny|mem|men|me|peng|pem|pen|pe|ber|ter|di)(?=.{3})/u)?.[0];
+  if (prefix) root = root.slice(prefix.length);
+  return root;
+}
+
+function stems(text: string): Set<string> {
+  return new Set([...contentWords(text)].map(stem));
+}
+
+/**
  * Routing screens a question before any model call (PRD voice ≤ 4 s): a clear keyword match is a
- * symptom, a question sharing fewer than two content words with every symptom is not, and only a
- * near miss in between ("kalau bayar tunai, kapan nilainya terbuka?") is worth asking the model.
+ * symptom; a near miss ("kalau bayar tunai, kapan nilainya terbuka?") is worth asking the model;
+ * anything else is not. The index is the model's wording, so words are compared by root, and a
+ * root most symptoms share ("nilai", "anak", "orang tua") says nothing about which one is meant
+ * (#317). Near: two roots the symptom shares that aren't that common, or one only it has.
  */
 export function screenSymptoms(
   question: string,
   candidates: readonly SymptomCandidate[],
 ): "match" | "near" | "none" {
-  if (keywordSymptomMatch(question, candidates) !== null) return "match";
-  return candidates.some((candidate) => sharedWords(question, candidate.symptom).shared >= 2)
+  const symptoms = candidates.map((candidate) => stems(candidate.symptom));
+  const spread = new Map<string, number>();
+  for (const roots of symptoms) {
+    for (const root of roots) spread.set(root, (spread.get(root) ?? 0) + 1);
+  }
+  const asked = stems(question);
+  const common = (root: string) => spread.get(root)! > symptoms.length / 4;
+  const telling = (roots: Set<string>) =>
+    [...roots].filter((root) => asked.has(root) && !common(root));
+  // "Anak yang tidak ikut ulangan diberi nilai berapa?" shares only common words with "nilai anak
+  // masih tidak muncul": not a match.
+  const matched = keywordSymptomMatch(question, candidates);
+  if (matched !== null && telling(symptoms[matched]!).length) return "match";
+  return symptoms.some((roots) => {
+    const shared = telling(roots);
+    return shared.length >= 2 || shared.some((root) => spread.get(root) === 1);
+  })
     ? "near"
     : "none";
 }

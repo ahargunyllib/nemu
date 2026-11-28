@@ -1,0 +1,83 @@
+{
+  "Start_InvoiceIssued": {
+    "symptoms": ["tagihan baru muncul di aplikasi orang tua"],
+    "wayBack": null,
+    "role": "bagian keuangan"
+  },
+  "Task_PayInvoice": {
+    "symptoms": ["orang tua membayar tagihan lewat aplikasi"],
+    "wayBack": null,
+    "role": "bagian keuangan"
+  },
+  "Timer_DueDateReached": {
+    "symptoms": ["tagihan belum dibayar sudah melewati jatuh tempo"],
+    "wayBack": null,
+    "role": "bagian keuangan"
+  },
+  "Boundary_PaidInCash": {
+    "symptoms": ["orang tua membayar tunai di sekolah"],
+    "wayBack": null,
+    "role": "bagian keuangan"
+  },
+  "Task_LockGrades": {
+    "symptoms": [
+      "nilai anak tidak muncul di aplikasi orang tua",
+      "guru tidak bisa mengubah nilai anak"
+    ],
+    "wayBack": "Task_UnlockGrades",
+    "role": "bagian keuangan"
+  },
+  "End_GradesLocked": {
+    "symptoms": ["nilai anak tetap terkunci sampai tagihan reguler dilunasi"],
+    "wayBack": "Task_UnlockGrades",
+    "role": "bagian keuangan"
+  },
+  "End_NotRegularInvoice": {
+    "symptoms": ["nilai anak tetap tampil walau tagihan sudah lewat jatuh tempo"],
+    "wayBack": null,
+    "role": "bagian keuangan"
+  },
+  "Catch_PaymentSent": {
+    "symptoms": ["pembayaran sudah terkirim dan menunggu pengecekan"],
+    "wayBack": null,
+    "role": "bagian keuangan"
+  },
+  "Task_CheckInvoices": {
+    "symptoms": ["status tagihan masih belum berubah selama pemeriksaan"],
+    "wayBack": null,
+    "role": "bagian keuangan"
+  },
+  "Task_UpdatePartiallyPaid": {
+    "symptoms": ["status tagihan berubah menjadi sebagian lunas, nilai anak masih terkunci"],
+    "wayBack": null,
+    "role": "bagian keuangan"
+  },
+  "End_InvoicesPartiallyPaid": {
+    "symptoms": ["tagihan tercatat sebagian lunas, nilai anak tetap terkunci"],
+    "wayBack": null,
+    "role": "bagian keuangan"
+  },
+  "Task_UnlockGrades": {
+    "symptoms": [
+      "nilai anak muncul lagi di aplikasi orang tua",
+      "guru bisa mengubah nilai anak lagi"
+    ],
+    "wayBack": null,
+    "role": "bagian keuangan"
+  },
+  "Task_UpdateFullyPaid": {
+    "symptoms": ["status tagihan berubah menjadi lunas"],
+    "wayBack": null,
+    "role": "bagian keuangan"
+  },
+  "End_InvoicePaid": {
+    "symptoms": ["tagihan tercatat lunas"],
+    "wayBack": null,
+    "role": "bagian keuangan"
+  },
+  "Task_CreditESaku": {
+    "symptoms": ["saldo E-Saku anak bertambah"],
+    "wayBack": null,
+    "role": "bagian keuangan"
+  }
+}
