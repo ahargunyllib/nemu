@@ -178,8 +178,9 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     Hapus; Nemu hanya menunjuknya."
   - **Tunjukkan tombol Hapus** runs a second task: back to the course, **Mode Edit** on if it is
     off, the quiz's own **Edit** menu (`near` the quiz's name, since every activity's menu is
-    called Edit), then a point at **Hapus**: "Kalau jadi dihapus, tekan Hapus sendiri, Bu." She
-    presses it or not; Moodle then asks her to confirm. The executor refuses Hapus anyway (F0-08).
+    called Edit), then a point at **Hapus**: "Tombol Hapus ada di sini, Bu. Nemu tidak menghapus
+    apa pun." She presses it or not; Moodle then asks her to confirm. The executor refuses Hapus
+    anyway (F0-08).
 - **F4-03: put a quiz into Moodle from the teacher's script (#210).** `features/quiz-import/`.
   "Nemu, masukkan kuis dari naskah ini, buka Senin 7 Desember, tutup Kamis 10 Desember" on a
   Moodle course page is the extension's own command. She picks the script (PDF, Word or photo) with

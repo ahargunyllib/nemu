@@ -179,7 +179,7 @@ describe("Tunjukkan tombol Hapus (F4-06)", () => {
       {
         verb: "point",
         target: { role: "menuitem", text: "Hapus", near: QUIZ.name },
-        sentence: "Kalau jadi dihapus, tekan Hapus sendiri, Bu.",
+        sentence: "Tombol Hapus ada di sini, Bu. Nemu tidak menghapus apa pun.",
       },
     ]);
     // The Edit menu is this quiz's, not the decoy's.
@@ -196,7 +196,7 @@ describe("Tunjukkan tombol Hapus (F4-06)", () => {
     );
     expect(steps.steps.map((step) => step.verb)).toEqual(["clickMenu", "point"]);
     expect((steps.steps[1] as Extract<ExecutorStep, { verb: "point" }>).sentence).toBe(
-      "Kalau jadi dihapus, tekan Hapus sendiri.",
+      "Tombol Hapus ada di sini. Nemu tidak menghapus apa pun.",
     );
   });
 
