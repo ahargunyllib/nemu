@@ -27,6 +27,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { type Fixer, FIXERS } from "@/features/kamus/lib/fixers";
+import { nextCode } from "@/features/kamus/lib/next-code";
 import { orpc } from "@/shared/api/orpc";
 
 export type KamusEntry = {
@@ -56,14 +57,8 @@ function fieldsOf({ code, app, message, meaning, teacherFault, fixer, fix }: Kam
   return { code, app, message, meaning, teacherFault, fixer, fix };
 }
 
-/** Adds a Kamus Kendala row by hand, or changes one. */
-export default function KamusDialog({
-  entry,
-  nextCode,
-}: {
-  entry?: KamusEntry;
-  nextCode?: string;
-}) {
+/** Adds a Kamus Kendala row by hand (starting at the next free code), or changes one. */
+export default function KamusDialog({ entry }: { entry?: KamusEntry }) {
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState<KamusFields>(EMPTY);
   const queryClient = useQueryClient();
@@ -88,7 +83,12 @@ export default function KamusDialog({
       open={open}
       onOpenChange={(next) => {
         setOpen(next);
-        if (next) setValues(entry ? fieldsOf(entry) : { ...EMPTY, code: nextCode ?? "" });
+        if (!next) return;
+        if (entry) setValues(fieldsOf(entry));
+        else {
+          const rows = queryClient.getQueryData(orpc.listKamus.queryKey()) ?? [];
+          setValues({ ...EMPTY, code: nextCode(rows.map((row) => row.code)) });
+        }
       }}
     >
       {entry ? (
@@ -100,12 +100,12 @@ export default function KamusDialog({
       ) : (
         <DialogTrigger render={<Button />}>
           <PlusIcon />
-          Tambah entri
+          Tambah kendala
         </DialogTrigger>
       )}
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{entry ? `Ubah ${entry.code}` : "Tambah entri kamus"}</DialogTitle>
+          <DialogTitle>{entry ? `Ubah ${entry.code}` : "Tambah kendala"}</DialogTitle>
           <DialogDescription>
             Nemu menjawab "ini kenapa?" hanya dari kamus ini. Tulis pesan error persis seperti di
             layar.

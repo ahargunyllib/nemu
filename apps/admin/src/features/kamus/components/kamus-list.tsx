@@ -13,7 +13,6 @@ import { Badge } from "@nemu/ui/components/badge";
 import { Button } from "@nemu/ui/components/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -42,17 +41,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import KamusDialog from "@/features/kamus/components/kamus-dialog";
-import KamusImportDialog from "@/features/kamus/components/kamus-import-dialog";
 import { fixerLabel } from "@/features/kamus/lib/fixers";
 import { orpc } from "@/shared/api/orpc";
 
 const SKELETON_ROWS = ["a", "b", "c"];
-
-/** "K-03" → "K-04": the code a new row starts with. */
-function nextCode(codes: string[]): string {
-  const numbers = codes.map((code) => Number(code.match(/(\d+)$/u)?.[1] ?? 0));
-  return `K-${String(Math.max(0, ...numbers) + 1).padStart(2, "0")}`;
-}
 
 /** WS-05: the school's error dictionary, the only source of "ini kenapa?". */
 export default function KamusList() {
@@ -61,16 +53,11 @@ export default function KamusList() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Kamus Kendala</CardTitle>
+        <CardTitle>Pesan error dan siapa yang memperbaiki</CardTitle>
         <CardDescription>
-          {kamus.data
-            ? `${kamus.data.length} pesan error`
-            : "Arti pesan error dan siapa yang memperbaikinya."}
+          Dipakai Nemu untuk menjelaskan error ke guru.
+          {kamus.data && ` ${kamus.data.length} kendala.`}
         </CardDescription>
-        <CardAction className="flex gap-2">
-          <KamusImportDialog />
-          <KamusDialog nextCode={nextCode(kamus.data?.map((row) => row.code) ?? [])} />
-        </CardAction>
       </CardHeader>
       <CardContent>
         {kamus.data?.length === 0 ? (
@@ -89,32 +76,31 @@ export default function KamusList() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Kode</TableHead>
-                <TableHead>Pesan error</TableHead>
-                <TableHead>Kesalahan siapa</TableHead>
+                <TableHead>Aplikasi · pesan error</TableHead>
+                <TableHead>Arti untuk guru</TableHead>
                 <TableHead>Yang memperbaiki</TableHead>
-                <TableHead>Yang dilakukan</TableHead>
-                <TableHead className="w-0" />
+                <TableHead className="w-0">
+                  <span className="sr-only">Ubah atau hapus</span>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {kamus.data
                 ? kamus.data.map((entry) => (
                     <TableRow key={entry.id}>
-                      <TableCell className="font-medium">{entry.code}</TableCell>
                       <TableCell className="whitespace-normal">
-                        <div>"{entry.message}"</div>
-                        <div className="text-muted-foreground">{entry.app}</div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary">{entry.app || entry.code}</Badge>
+                          {entry.app && (
+                            <span className="text-xs text-muted-foreground">{entry.code}</span>
+                          )}
+                        </div>
+                        <div className="mt-1">{entry.message}</div>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant={entry.teacherFault ? "default" : "secondary"}>
-                          {entry.teacherFault ? "Guru" : "Bukan guru"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{fixerLabel(entry.fixer)}</TableCell>
                       <TableCell className="whitespace-normal text-muted-foreground">
-                        {entry.fix}
+                        {entry.meaning || "—"}
                       </TableCell>
+                      <TableCell className="font-semibold">{fixerLabel(entry.fixer)}</TableCell>
                       <TableCell>
                         <div className="flex justify-end gap-1">
                           <KamusDialog entry={entry} />
@@ -125,7 +111,7 @@ export default function KamusList() {
                   ))
                 : SKELETON_ROWS.map((key) => (
                     <TableRow key={key}>
-                      <TableCell colSpan={6}>
+                      <TableCell colSpan={4}>
                         <Skeleton className="h-6 w-full" />
                       </TableCell>
                     </TableRow>

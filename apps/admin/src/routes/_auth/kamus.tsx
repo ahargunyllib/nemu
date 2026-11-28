@@ -1,6 +1,8 @@
 import { PageHeading } from "@nemu/ui/shell/page-heading";
 import { createFileRoute } from "@tanstack/react-router";
 
+import KamusDialog from "@/features/kamus/components/kamus-dialog";
+import KamusImportDialog from "@/features/kamus/components/kamus-import-dialog";
 import KamusList from "@/features/kamus/components/kamus-list";
 
 export const Route = createFileRoute("/_auth/kamus")({
@@ -11,8 +13,13 @@ function RouteComponent() {
   return (
     <>
       <PageHeading
-        title="Kamus Kendala"
-        description='Saat guru bertanya "ini kenapa?", Nemu menjawab hanya dari kamus ini.'
+        title="Kamus kendala"
+        actions={
+          <>
+            <KamusImportDialog />
+            <KamusDialog />
+          </>
+        }
       />
       <KamusList />
     </>

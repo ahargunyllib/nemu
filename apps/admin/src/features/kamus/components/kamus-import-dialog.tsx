@@ -49,7 +49,7 @@ export default function KamusImportDialog() {
     >
       <DialogTrigger render={<Button variant="outline" />}>
         <FileSpreadsheetIcon />
-        Impor file
+        Impor Excel
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
