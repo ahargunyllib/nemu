@@ -364,13 +364,13 @@ await check(
   "Nemu points at Simpan, not yet saved; Lihat ringkasan shows the counts (F1·11, 11a)",
   async () => {
     const bubble = display("tunjuk");
-    await heading("tunjuk", /^Giliran Ibu$/u).waitFor();
+    await heading("tunjuk", "Giliran Ibu").waitFor();
     await bubble.getByText("Belum tersimpan").waitFor();
     await page.screenshot({ path: join(shots, "tunjuk-simpan.png") });
     await bubble.getByRole("button", { name: "Lihat ringkasan" }).click();
     const card = display("info");
     await card.getByText("31 dari 32 terisi, belum tersimpan.").waitFor({ timeout: 3000 });
-    await heading("info", /^Ringkasan$/u).waitFor();
+    await heading("info", "Ringkasan").waitFor();
     const items = await card.getByRole("listitem").allTextContents();
     expect(
       JSON.stringify(items) ===
