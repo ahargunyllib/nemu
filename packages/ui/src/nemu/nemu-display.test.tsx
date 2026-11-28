@@ -256,6 +256,71 @@ describe("Kartu Pilih for W5 and the inbox", () => {
     for (const button of buttons) expect(document.activeElement).not.toBe(button);
   });
 
+  test("a start card numbers its steps and puts Sumber, Nanti and a black Mulai in one row", () => {
+    const onChoose = vi.fn();
+    const onSource = vi.fn();
+    render(
+      <KartuPilih
+        layout="row"
+        status={{ text: "Dari alur sekolah", count: "Catat Hafalan" }}
+        question="Mulai dari foto ini, Bu?"
+        steps={["Pilih Setoran, kelas 4A", "Isi surah, ayat, 4 skor per murid"]}
+        link={{ label: "Sumber", onSelect: onSource }}
+        choices={[
+          { id: "nanti", label: "Nanti" },
+          { id: "mulai", label: "Mulai" },
+        ]}
+        onChoose={onChoose}
+      />,
+    );
+    const steps = screen.getAllByRole("listitem").map((item) => item.textContent);
+    expect(steps).toEqual(["1Pilih Setoran, kelas 4A", "2Isi surah, ayat, 4 skor per murid"]);
+    const row = screen.getByRole("button", { name: "Sumber" }).closest("[data-nemu-actions]");
+    expect(row?.contains(screen.getByRole("button", { name: "Mulai" }))).toBe(true);
+    // Nanti is the outlined one; Mulai, the last, the black main button.
+    expect(screen.getByRole("button", { name: "Nanti" }).className).toMatch(/border-2/u);
+    expect(screen.getByRole("button", { name: "Mulai" }).className).not.toMatch(/border-2/u);
+    fireEvent.click(screen.getByRole("button", { name: "Sumber" }));
+    expect(onSource).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Mulai" }));
+    expect(onChoose).toHaveBeenCalledWith("mulai");
+  });
+
+  test("a start card shows the file it is about as a chip under the question (F4·06)", () => {
+    render(
+      <KartuPilih
+        layout="row"
+        status={{ text: "Naskah masuk", count: "10 soal" }}
+        question="Pasang kuis dari naskah ini?"
+        file={{ name: "naskah-ipas-10-soal.pdf", meta: "10 soal · 4 halaman", kind: "PDF" }}
+        steps={["Buat kuis di bagian IPAS"]}
+        choices={[
+          { id: "nanti", label: "Nanti" },
+          { id: "mulai", label: "Mulai" },
+        ]}
+        onChoose={vi.fn()}
+      />,
+    );
+    const chip = document.querySelector("[data-nemu-file]");
+    expect(chip?.textContent).toBe("PDFnaskah-ipas-10-soal.pdf10 soal · 4 halaman");
+    // The chip sits between the question and the steps.
+    const question = screen.getByText("Pasang kuis dari naskah ini?");
+    const list = screen.getByRole("list");
+    expect(question.compareDocumentPosition(chip!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(chip!.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(
+      spokenText({
+        type: "pilih",
+        question: "Pasang kuis dari naskah ini?",
+        choices: [
+          { id: "a", label: "A" },
+          { id: "b", label: "B" },
+        ],
+        onChoose: vi.fn(),
+      }),
+    ).toBe("Pasang kuis dari naskah ini?");
+  });
+
   test("the compact card puts its two choices side by side", () => {
     const onChoose = vi.fn();
     render(

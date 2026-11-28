@@ -128,6 +128,20 @@ export type KartuPilihProps = {
   image?: { src?: string; alt: string };
   /** One quiet line under the choices: "Pertanyaan 1 dari 10 · 22 nilai lain sudah cocok." */
   note?: string;
+  /**
+   * The file the question is about, as a chip under it (F4·06): "naskah-ipas-10-soal.pdf" over
+   * "10 soal · 4 halaman". `kind` is the short type on its tile ("PDF", "DOCX", "FOTO").
+   */
+  file?: { name: string; meta?: string; kind: string };
+  /** The steps Nemu is about to take, numbered, under the picture (F3·03). */
+  steps?: readonly string[];
+  /** One small link left of the buttons, such as "Sumber". Needs `layout: "row"`. */
+  link?: { label: string; onSelect: () => void };
+  /**
+   * `row`: a start card's choices as the compact buttons of the action row, the last one the
+   * main (black) one: [Nanti] [Mulai]. Default `stack`: equal, stacked big buttons.
+   */
+  layout?: "stack" | "row";
   /** A small card that waits beside the Nemu button, such as "Foto dari WhatsApp". */
   compact?: boolean;
   /** The heading: "NEMU BERHENTI · 3 dari 32", "HATI-HATI · My Family". */

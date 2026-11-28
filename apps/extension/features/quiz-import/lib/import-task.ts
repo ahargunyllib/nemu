@@ -26,6 +26,22 @@ import { type ImportPlan, type SetTime, spokenTime } from "./plan";
 
 export const QUIZ_IMPORT_KIND = "f4-masukkan-kuis";
 
+/**
+ * The task's stages in the order it runs them, as the start card lists them before Mulai
+ * (F4·06): add the quiz in its section, set its times, her Simpan dan tampilkan, Bank soal ›
+ * Impor with the Moodle XML, and Soal › Tambah dari bank soal.
+ */
+export function importStages(section: string, honorific: string): string[] {
+  const who = honorific === "Bu" ? "Ibu" : honorific === "Pak" ? "Bapak" : "";
+  return [
+    `Buat kuis di bagian ${section}`,
+    "Atur waktu buka dan tutup",
+    who ? `${who} tekan Simpan dan tampilkan` : "Tekan Simpan dan tampilkan",
+    "Bank soal › Impor, format Moodle XML",
+    "Soal › Tambah dari bank soal",
+  ];
+}
+
 type Phase =
   | "edit-mode"
   | "settings"

@@ -16,6 +16,7 @@ import { answerFrom, choicesFor } from "../lib/answers";
 import {
   type ImportContinuation,
   type ImportOutcome,
+  importStages,
   nextImportSteps,
   QUIZ_IMPORT_KIND,
   quizImportTask,
@@ -28,12 +29,15 @@ import {
   timesSentence,
   withDefaults,
 } from "../lib/plan";
+import { dataUrlBytes, fileKind, fileMeta, pdfPageCount } from "../lib/script-file";
 
 /**
  * F4-03 (#210): "Nemu, masukkan kuis dari naskah ini, buka Senin 7 Desember, tutup Kamis 10
  * Desember." on the course page. She picks the script; the Nemu Service reads it (#219); Nemu asks
  * about every part it couldn't read (Kartu Pilih, as F1 does) and about a date she didn't say,
- * says the times it will set, and then puts the quiz into Moodle in cara 1 (`import-task`). After
+ * then asks "Pasang kuis dari naskah ini?" on a start card with the script, the times it will set
+ * and the stages it will take (F4·06), and on Mulai puts the quiz into Moodle in cara 1
+ * (`import-task`). After
  * she adds the questions, the F4-1 check (#209) runs on the new quiz and Nemu reports in one
  * sentence.
  */
@@ -48,7 +52,7 @@ type Phase =
   | { name: "reading" }
   | { name: "asking"; index: number; message?: string }
   | { name: "times"; message?: string }
-  | { name: "ready" };
+  | { name: "ready"; summary?: boolean };
 
 const ACCEPT = ".pdf,.doc,.docx,image/*,application/pdf";
 
@@ -96,6 +100,8 @@ function createQuizImport() {
   let skipped: number[] = [];
   let opens: QuizTime | null = null;
   let closes: QuizTime | null = null;
+  /** The script she picked, for the start card's chip. */
+  let script: { name: string; kind: string; pages: number | null } | null = null;
   /** How the import ended on this page, for the finisher. */
   let finished: { outcome: ImportOutcome; plan: ImportPlan; honorific: string } | null = null;
 
@@ -116,6 +122,7 @@ function createQuizImport() {
   function close() {
     phase = { name: "idle" };
     draft = null;
+    script = null;
     questions = [];
     answers = [];
     show(null);
@@ -183,32 +190,51 @@ function createQuizImport() {
       }
       case "ready": {
         if (!draft || !opens || !closes) return close();
+        const count = draft.questions.length;
+        const heading = { text: "Naskah masuk", count: `${count} soal` };
+        const section = draft.section ?? course?.sections[0] ?? "";
+        // Lihat ringkasan: the questions Nemu read, until Tutup brings the start card back.
+        if (phase.summary)
+          return show({
+            type: "info",
+            status: heading,
+            title: `${draft.name} · bagian ${section}`,
+            ...(skipped.length ? { detail: `Dilewati: soal ${skipped.join(", ")}` } : {}),
+            items: draft.questions.map((question) => question.text || "(gambar)"),
+            onClose: () => setPhase({ name: "ready" }),
+          });
         const times = withDefaults(opens, closes);
-        const sentence = timesSentence(times.opens, times.closes, times.defaulted, honorific());
-        const list = draft.questions
-          .map((question) => `${question.number}. ${question.text || "(gambar)"}`)
-          .join("\n");
+        const question = "Pasang kuis dari naskah ini?";
         return show(
           {
-            type: "jawab",
-            sentence,
-            status: { tone: "working", text: `${draft.questions.length} soal siap` },
-            notes: {
-              ringkasan: `${draft.name} · bagian ${draft.section ?? ""}\n${list}${
-                skipped.length ? `\nDilewati: soal ${skipped.join(", ")}` : ""
-              }`,
-              ...(times.defaulted
-                ? {
-                    kenapa:
-                      "Kalau jamnya tidak disebut, Nemu memakai 00.00 untuk buka dan 23.59 untuk tutup, supaya kuis terbuka sepanjang hari itu.",
-                  }
-                : {}),
+            type: "pilih",
+            layout: "row",
+            status: heading,
+            question,
+            // The times aren't spoken any more, but she still reads which ones Nemu chose.
+            detail: timesSentence(times.opens, times.closes, times.defaulted, ""),
+            ...(script
+              ? {
+                  file: {
+                    name: script.name,
+                    kind: script.kind,
+                    meta: fileMeta(count, script.pages),
+                  },
+                }
+              : {}),
+            steps: importStages(section, honorific()),
+            link: {
+              label: "Lihat ringkasan",
+              onSelect: () => setPhase({ name: "ready", summary: true }),
             },
-            action: { label: "Masukkan ke Moodle", onSelect: () => void begin() },
-            onClose: close,
+            choices: [
+              { id: "nanti", label: "Nanti" },
+              { id: "mulai", label: "Mulai" },
+            ],
+            onChoose: (id) => (id === "mulai" ? void begin() : close()),
           },
           false,
-          sentence,
+          question,
         );
       }
     }
@@ -237,6 +263,12 @@ function createQuizImport() {
         name: "pick",
         message: say("Berkasnya tidak bisa dibuka. Pilih lagi", honorific()),
       });
+    const kind = fileKind(file.name, file.type);
+    script = {
+      name: file.name,
+      kind,
+      pages: kind === "PDF" ? pdfPageCount(dataUrlBytes(dataUrl)) : null,
+    };
     const response = await requestQuizImport(context.pageEmail, {
       op: "read",
       input: {
