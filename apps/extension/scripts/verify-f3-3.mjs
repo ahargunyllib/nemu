@@ -101,15 +101,7 @@ await settings.getByLabel("Kode pemasangan sekolah").fill(INSTALL_CODE);
 await settings.getByRole("button", { name: "Simpan" }).click();
 await settings.getByText(/^Terpasang untuk /u).waitFor();
 await settings.close();
-for (const open of context.pages()) {
-  if (!open.url().includes("welcome")) continue;
-  const allow = open.getByRole("button", { name: "Izinkan mikrofon" });
-  const ready = open.getByText("Mikrofon siap.", { exact: false });
-  await allow.or(ready).first().waitFor();
-  if (await allow.isVisible()) await allow.click();
-  await ready.waitFor();
-  await open.close();
-}
+for (const open of context.pages()) if (open.url().includes("welcome")) await open.close();
 
 // Pak Rizal is signed in to the Admin Workspace, where recordings are reviewed.
 const admin = await context.newPage();

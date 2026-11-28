@@ -38,6 +38,7 @@ import { recorder } from "../../features/recorder/stores/recorder";
 import { NemuButton } from "../../features/nemu-button/components/nemu-button";
 import { type AskState, useAsk } from "../../features/nemu-button/hooks/use-ask";
 import type { SourceFile } from "../../features/nemu-button/lib/answer";
+import { MicrophoneDisplay } from "../../features/voice/components/microphone-display";
 import { HeardBubble, ListeningBubble } from "../../features/voice/components/talk-bubbles";
 import { useTalk } from "../../features/voice/hooks/use-talk";
 import { useVoice, type VoiceState } from "../../features/voice/hooks/use-voice";
@@ -136,6 +137,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     pageEmail,
     shortcut,
     enabled: identity?.status === "registered",
+    honorific: identity?.status === "registered" ? identity.honorific : "",
     isWorking: () => working || voiceCommands.isWorking(),
     onStart: () => {
       pressSnapshot.current = readPageSnapshot(document, location.href);
@@ -145,18 +147,16 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     // While F1, F3 or F4-06 waits for an answer (a photo question, a number, a choice), the words
     // are that answer.
     // While "Rekam cara" records, the words are the operator's narration.
-    onQuestion: (question) => {
-      if (recorder.narrate(question)) return;
-      if (
-        !gradePhoto.hear(question) &&
-        !processRun.hear(question) &&
-        !quizDelete.hear(question) &&
-        !quizImport.hear(question)
-      )
-        void ask(question, pressSnapshot.current);
-    },
+    onAnswer: (words) =>
+      recorder.narrate(words) ||
+      gradePhoto.hear(words) ||
+      processRun.hear(words) ||
+      quizDelete.hear(words) ||
+      quizImport.hear(words),
+    onQuestion: (question) => void ask(question, pressSnapshot.current),
   });
   const { dismiss } = talk;
+  const speakLine = useCallback((text: string) => void speak(text), [speak]);
 
   const askTyped = useCallback(
     (question: string) => {
@@ -249,7 +249,15 @@ export function NemuApp({ access }: { access: SiteAccess }) {
           if (event.key === "Escape") close();
         }}
       >
-        {run.display ? (
+        {talk.state.phase === "asking" || talk.state.phase === "blocked" ? (
+          // The microphone comes first: nothing else can go on until Nemu can hear (PRD v2.3).
+          <MicrophoneDisplay
+            phase={talk.state.phase}
+            honorific={honorific}
+            onClose={dismiss}
+            speak={speakLine}
+          />
+        ) : run.display ? (
           <div className="pointer-events-auto">
             <NemuStage display={run.display} target={run.target} />
           </div>
@@ -403,7 +411,7 @@ function sumberEntries(
   });
 }
 
-/** One display at a time: a talk failure, else the answer (or its Skeleton). */
+/** One display at a time: a talk notice, else the answer (or its Skeleton). */
 function NemuPanel({
   identity,
   state,
@@ -424,7 +432,7 @@ function NemuPanel({
     <>
       {talk.phase === "transcribing" && <HeardBubble text={null} />}
       {heard !== null && <HeardBubble text={heard} />}
-      {talk.phase === "failed" ? (
+      {talk.phase === "notice" ? (
         <GelembungJawab sentence={talk.message} onClose={onDismiss} />
       ) : (
         <>

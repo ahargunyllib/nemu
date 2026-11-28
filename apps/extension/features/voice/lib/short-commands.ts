@@ -31,7 +31,8 @@ const LOOKUP = new Map<string, ShortCommand>(
 const LEADING = new Set(["nemu", "tolong", "coba", "ya", "eh", "oke", "ok", "bu", "pak"]);
 const TRAILING = new Set(["ya", "dong", "nemu", "deh", "sih", "lagi", "saja", "aja", "dulu"]);
 
-function words(text: string): string[] {
+/** The utterance as lower-case words, punctuation dropped. */
+export function words(text: string): string[] {
   return text
     .toLocaleLowerCase("id-ID")
     .replace(/[^\p{L}\p{N}]+/gu, " ")

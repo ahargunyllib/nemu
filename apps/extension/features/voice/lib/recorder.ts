@@ -1,4 +1,5 @@
 import type { RecordStart, Recording } from "../../../shared/lib/messages";
+import { isRefusal } from "./microphone";
 import { bytesToBase64, encodeWav, mixToMono, TRANSCRIBE_SAMPLE_RATE } from "./wav";
 
 /** `speechTranscribe` takes at most 15 s; a longer hold keeps the first 15 s. */
@@ -30,7 +31,7 @@ async function toTranscribable(blob: Blob): Promise<Recording> {
   }
 }
 
-/** Offscreen document: records the microphone between `start` and `stop`. */
+/** Content script: records the site's microphone between `start` and `stop` (ADR-0019). */
 export function createRecorder() {
   let session: Session | null = null;
   let starting: Promise<RecordStart> = Promise.resolve("unavailable");
@@ -43,10 +44,7 @@ export function createRecorder() {
         audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true },
       });
     } catch (error) {
-      // Not allowed yet: the offscreen document can't show the prompt; the welcome page asks.
-      return error instanceof DOMException && error.name === "NotAllowedError"
-        ? "denied"
-        : "unavailable";
+      return isRefusal(error) ? "denied" : "unavailable";
     }
     const recorder = new MediaRecorder(stream);
     const chunks: Blob[] = [];

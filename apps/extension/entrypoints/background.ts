@@ -28,7 +28,6 @@ import { forgetRecorderTabs, handleRecorder } from "../features/recorder/api/rec
 import { identifyTeacher } from "../features/identity/api/identify-teacher";
 import { askNemu } from "../features/nemu-button/api/ask-nemu";
 import { openSourceForPage } from "../features/nemu-button/api/open-source-for-page";
-import { cancelRecording, startRecording } from "../features/voice/api/microphone";
 import { synthesizeSentence, transcribeRecording } from "../features/voice/api/speech";
 import { isNemuMessage, type NemuMessage } from "../shared/lib/messages";
 
@@ -49,12 +48,8 @@ async function handle(
       return askNemu(message, tab);
     case "nemu:open-source":
       return openSourceForPage(message, tab);
-    case "nemu:listen-start":
-      return startRecording();
-    case "nemu:listen-stop":
-      return transcribeRecording(message.pageEmail);
-    case "nemu:listen-cancel":
-      return cancelRecording();
+    case "nemu:transcribe":
+      return transcribeRecording(message.pageEmail, message.recording);
     case "nemu:speak":
       return synthesizeSentence(message.pageEmail, message.text);
     case "nemu:run-save":
@@ -107,7 +102,7 @@ export default defineBackground(() => {
   browser.runtime.onStartup.addListener(syncScripts);
   browser.runtime.onInstalled.addListener(({ reason }) => {
     syncScripts();
-    // The welcome page asks for the microphone once and leads on to the settings page.
+    // The welcome page says how to talk to Nemu and leads on to the settings page.
     if (reason === "install")
       void browser.tabs.create({ url: browser.runtime.getURL("/welcome.html") });
   });

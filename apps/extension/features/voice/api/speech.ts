@@ -1,9 +1,8 @@
 import type { SpeechSynthesis } from "@nemu/contracts/school";
 
 import { failureMessage } from "../../../shared/api/nemu-service";
-import type { PageEmail } from "../../../shared/lib/messages";
+import type { PageEmail, Recording } from "../../../shared/lib/messages";
 import { teacherClient } from "../../identity/api/teacher-client";
-import { stopRecording } from "./microphone";
 
 /** What the teacher said, or the sentence to show instead (nothing heard, no install code…). */
 export type Heard = { kind: "heard"; text: string } | { kind: "notice"; text: string };
@@ -11,9 +10,11 @@ export type Heard = { kind: "heard"; text: string } | { kind: "notice"; text: st
 export const NOTHING_HEARD =
   "Nemu tidak mendengar suara. Tahan tombolnya sambil bicara, lalu lepaskan.";
 
-/** Background: stops the recording and sends it to `speechTranscribe` (F0-04). */
-export async function transcribeRecording(pageEmail: PageEmail): Promise<Heard> {
-  const recording = await stopRecording();
+/** Background: sends the page's recording to `speechTranscribe` (F0-04). */
+export async function transcribeRecording(
+  pageEmail: PageEmail,
+  recording: Recording,
+): Promise<Heard> {
   if (!recording) return { kind: "notice", text: NOTHING_HEARD };
   const teacher = await teacherClient(pageEmail);
   if ("notice" in teacher) return { kind: "notice", text: teacher.notice };

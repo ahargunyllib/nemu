@@ -21,10 +21,9 @@ export type NemuMessage =
   | { type: "nemu:ask"; pageEmail: PageEmail; question: string; snapshot: PageSnapshot | null }
   // Sumber (#258): open a cited document at its page in a new tab.
   | { type: "nemu:open-source"; pageEmail: PageEmail; docId: string; page: number | null }
-  // Hold to talk (#200): the background records through the offscreen document.
-  | { type: "nemu:listen-start" }
-  | { type: "nemu:listen-stop"; pageEmail: PageEmail }
-  | { type: "nemu:listen-cancel" }
+  // Hold to talk (#200): the page records on its own microphone (ADR-0019); the background
+  // sends the recording to `speechTranscribe`.
+  | { type: "nemu:transcribe"; pageEmail: PageEmail; recording: Recording }
   | { type: "nemu:speak"; pageEmail: PageEmail; text: string }
   // The executor (#202): its run per tab and the last Catatan langkah live in
   // `chrome.storage.session`, which only the background reads; actions go to the action log.
@@ -49,9 +48,7 @@ const TYPES: ReadonlySet<string> = new Set([
   "nemu:identify",
   "nemu:ask",
   "nemu:open-source",
-  "nemu:listen-start",
-  "nemu:listen-stop",
-  "nemu:listen-cancel",
+  "nemu:transcribe",
   "nemu:speak",
   "nemu:run-save",
   "nemu:run-load",
@@ -75,23 +72,8 @@ export function isNemuMessage(message: unknown): message is NemuMessage {
   );
 }
 
-/** Messages from the background to the offscreen document, which holds the microphone. */
-export type OffscreenMessage = {
-  target: "nemu-offscreen";
-  type: "record-start" | "record-stop" | "record-cancel";
-};
-
-export function isOffscreenMessage(message: unknown): message is OffscreenMessage {
-  return (
-    typeof message === "object" &&
-    message !== null &&
-    "target" in message &&
-    message.target === "nemu-offscreen"
-  );
-}
-
-/** What the offscreen document answers to `record-start`. */
+/** What opening the microphone gave: recording, refused by the browser, or no microphone. */
 export type RecordStart = "recording" | "denied" | "unavailable";
 
-/** What it answers to `record-stop`: the recording ready for `speechTranscribe`, or nothing. */
+/** The recording ready for `speechTranscribe`, or nothing. */
 export type Recording = { audioBase64: string; format: "wav" | "webm" } | null;
