@@ -1,7 +1,7 @@
 import type { QuizQuestion, QuizSnapshot } from "@nemu/contracts/quiz";
 import { describe, expect, test } from "vite-plus/test";
 
-import { checkQuiz, classIn, closingSentence } from "./quiz-rules";
+import { checkQuiz, classIn, reportTitle, verifiedLine } from "./quiz-rules";
 
 const question = (slot: number, change: Partial<QuizQuestion> = {}): QuizQuestion => ({
   slot,
@@ -53,6 +53,7 @@ describe("checkQuiz (F4-01 DOM rules)", () => {
         slot: 15,
         sentence: "Soal 15 belum ada gambarnya, Bu.",
         why: "Di pratinjau, Gambar (3) tidak tampil. Siswa hanya melihat tempatnya kosong.",
+        item: "Soal 15: gambar (3) belum ada.",
       },
       {
         kind: "no_key",
@@ -60,6 +61,7 @@ describe("checkQuiz (F4-01 DOM rules)", () => {
         sentence: "Soal 7 belum ada kunci jawabannya, Bu.",
         detail: "Ibu isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.",
         why: "Semua pilihan di Soal 7 bernilai 0, jadi siswa yang menjawab benar pun mendapat 0.",
+        item: "Soal 7: belum ada kunci jawaban.",
       },
     ]);
   });
@@ -164,24 +166,56 @@ describe("checkQuiz (F4-01 DOM rules)", () => {
   });
 });
 
-describe("closingSentence: what Nemu says after the last problem (#256)", () => {
-  test("names how many problems there were, as the official F4-1 key does", () => {
-    expect(closingSentence(2, "Bu")).toBe("Selain dua hal itu, kuisnya sudah siap, Bu.");
+describe("the report after the last problem (#256, F4·05)", () => {
+  test("F4-1: the official key's example sentence, what the check found right, one line each", () => {
+    const problems = checkQuiz(f41(), BEFORE_TEST);
+    // F4-1_kunci.csv row 4: “Ada 2 hal yang perlu Ibu perbaiki: soal 15 dan soal 7.”
+    expect(reportTitle(problems, "Bu")).toBe(
+      "Ada 2 hal yang perlu Ibu perbaiki: soal 15 dan soal 7.",
+    );
+    expect(verifiedLine(f41(), problems)).toBe(
+      "Yang lain sudah benar: 15 soal, kelas 4A, buka Rabu 2 Des 07.00.",
+    );
+    expect(problems.map((problem) => problem.item)).toEqual([
+      "Soal 15: gambar (3) belum ada.",
+      "Soal 7: belum ada kunci jawaban.",
+    ]);
   });
 
-  test("fits the count: one problem is just “hal itu”, more are written in words", () => {
-    expect(closingSentence(1, "Bu")).toBe("Selain hal itu, kuisnya sudah siap, Bu.");
-    expect(closingSentence(3, "Pak")).toBe("Selain tiga hal itu, kuisnya sudah siap, Pak.");
-    expect(closingSentence(11, "Bu")).toBe("Selain sebelas hal itu, kuisnya sudah siap, Bu.");
-    expect(closingSentence(14, "Bu")).toBe("Selain empat belas hal itu, kuisnya sudah siap, Bu.");
-    expect(closingSentence(25, "Bu")).toBe("Selain 25 hal itu, kuisnya sudah siap, Bu.");
+  test("fits the teacher and the count; a problem about the whole quiz is named by its part", () => {
+    const one = checkQuiz(f41({ questions: [question(3, { hasKey: false })], listed: 1 }), {
+      ...BEFORE_TEST,
+      honorific: "Pak",
+    });
+    expect(reportTitle(one, "Pak")).toBe("Ada 1 hal yang perlu Bapak perbaiki: soal 3.");
+    const quizWide = checkQuiz(
+      f41({ name: "Kuis IPAS 4B", questions: [], listed: 0 }),
+      BEFORE_TEST,
+    );
+    expect(reportTitle(quizWide, "")).toBe(
+      "Ada 2 hal yang perlu diperbaiki: jumlah soal dan kelas.",
+    );
   });
 
-  test("without a known honorific the sentence still ends cleanly", () => {
-    expect(closingSentence(2, "")).toBe("Selain dua hal itu, kuisnya sudah siap.");
+  test("a missing image without alt text is just “gambarnya”", () => {
+    const [problem] = checkQuiz(
+      f41({ questions: [question(4, { images: [{ alt: "", loaded: false }] })], listed: 1 }),
+      BEFORE_TEST,
+    );
+    expect(problem?.item).toBe("Soal 4: gambarnya belum ada.");
   });
 
-  test("says nothing when there were no problems", () => {
-    expect(closingSentence(0, "Bu")).toBeNull();
+  test("claims only what was checked and found right", () => {
+    const quiz = f41({ name: "Kuis IPAS 4B", closes: "2026-12-01T21:00" });
+    // The class and the times have a problem; the count is still right.
+    expect(verifiedLine(quiz, checkQuiz(quiz, BEFORE_TEST))).toBe(
+      "Yang lain sudah benar: 15 soal.",
+    );
+    // No open time set: it isn't claimed.
+    expect(verifiedLine(f41({ opens: null }), [])).toBe(
+      "Yang lain sudah benar: 15 soal, kelas 4A.",
+    );
+    const empty = f41({ course: "IPAS", opens: null, listed: 0, questions: [] });
+    expect(verifiedLine(empty, checkQuiz(empty, BEFORE_TEST))).toBeNull();
   });
 });

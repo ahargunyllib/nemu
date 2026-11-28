@@ -28,15 +28,58 @@ function countWord(count: number): string {
   return String(count);
 }
 
+/** What a problem about the whole quiz is called in the report's title. */
+const QUIZ_PART: Record<QuizProblem["kind"], string> = {
+  missing_image: "gambar",
+  no_key: "kunci jawaban",
+  question_count: "jumlah soal",
+  class: "kelas",
+  times: "waktu kuis",
+  judgement: "isi kuis",
+};
+
 /**
- * The one sentence after the last problem (#256), built from the count with no model call
- * (#218): "Selain dua hal itu, kuisnya sudah siap, Bu." Null when nothing was found, because the
- * quiz-ready sentence already says it.
+ * The report's one sentence after the last problem (F4-1_kunci.csv row 4, #256), built from the
+ * problems with no model call (#218): "Ada 2 hal yang perlu Ibu perbaiki: soal 15 dan soal 7."
+ * Only after at least one problem: with none, the quiz-ready sentence says so instead.
  */
-export function closingSentence(count: number, honorific: string): string | null {
-  if (count <= 0) return null;
-  const things = count === 1 ? "hal itu" : `${countWord(count)} hal itu`;
-  return say(`Selain ${things}, kuisnya sudah siap`, honorific);
+export function reportTitle(problems: QuizProblem[], honorific: string): string {
+  const names = [
+    ...new Set(
+      problems.map((problem) =>
+        problem.slot === null ? QUIZ_PART[problem.kind] : `soal ${problem.slot}`,
+      ),
+    ),
+  ];
+  const who = honorific === "Bu" ? "Ibu " : honorific === "Pak" ? "Bapak " : "";
+  const fix = who ? `${who}perbaiki` : "diperbaiki";
+  return `Ada ${problems.length} hal yang perlu ${fix}: ${listed(names)}.`;
+}
+
+/** "2026-12-02T07:00" → "Rabu 2 Des 07.00" */
+function shortTime(value: string): string {
+  const time = localTime(value);
+  const weekday = time.toLocaleDateString("id-ID", { weekday: "long" });
+  const month = time.toLocaleDateString("id-ID", { month: "short" });
+  const clock = time.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+  return `${weekday} ${time.getDate()} ${month} ${clock}`;
+}
+
+/**
+ * The report's detail line: only what the check itself verified and found nothing wrong with,
+ * "Yang lain sudah benar: 15 soal, kelas 4A, buka Rabu 2 Des 07.00." The count when students see
+ * every listed question (and it is the number she said), the class when the course names one and
+ * the quiz agrees, the open time when it is set and the times are in order. Null when none holds.
+ */
+export function verifiedLine(quiz: QuizSnapshot, problems: QuizProblem[]): string | null {
+  const found = new Set(problems.map((problem) => problem.kind));
+  const courseClass = classIn(quiz.course);
+  const right = [
+    ...(quiz.listed > 0 && !found.has("question_count") ? [`${quiz.listed} soal`] : []),
+    ...(courseClass && !found.has("class") ? [`kelas ${courseClass}`] : []),
+    ...(quiz.opens && !found.has("times") ? [`buka ${shortTime(quiz.opens)}`] : []),
+  ];
+  return right.length ? `Yang lain sudah benar: ${right.join(", ")}.` : null;
 }
 
 /** ["Gambar (2)", "Gambar (3)"] → "Gambar (2) dan Gambar (3)" */
@@ -57,6 +100,12 @@ function missingImageWhy(alts: string[]): string {
       ? "gambar di soal ini"
       : `${countWord(alts.length)} gambar di soal ini`;
   return `Di pratinjau, ${what} tidak tampil. Siswa hanya melihat tempatnya kosong.`;
+}
+
+/** The report's line for a missing image: "gambar (3)", or "gambarnya" when one has no alt text. */
+function missingImageItem(alts: string[]): string {
+  if (!alts.every(Boolean)) return "gambarnya";
+  return listed(alts.map((alt) => `${alt.charAt(0).toLowerCase()}${alt.slice(1)}`));
 }
 
 /** A class the way schools write it ("4A", "10 IPA" is not one): a grade and a letter. */
@@ -96,11 +145,13 @@ export function checkQuiz(
   for (const question of bySlot) {
     const missing = question.images.filter((image) => !image.loaded);
     if (missing.length === 0) continue;
+    const alts = missing.map((image) => image.alt.trim());
     problems.push({
       kind: "missing_image",
       slot: question.slot,
       sentence: say(`Soal ${question.slot} belum ada gambarnya`, honorific),
-      why: missingImageWhy(missing.map((image) => image.alt.trim())),
+      why: missingImageWhy(alts),
+      item: `Soal ${question.slot}: ${missingImageItem(alts)} belum ada.`,
     });
   }
   for (const question of bySlot) {
@@ -113,6 +164,7 @@ export function checkQuiz(
       sentence: say(`Soal ${question.slot} belum ada kunci jawabannya`, honorific),
       detail: `${ask("isi kuncinya lewat Edit soal", honorific)} Nemu tidak mengubahnya.`,
       why: `Semua pilihan di Soal ${question.slot} bernilai 0, jadi siswa yang menjawab benar pun mendapat 0.`,
+      item: `Soal ${question.slot}: belum ada kunci jawaban.`,
     });
   }
 

@@ -164,12 +164,17 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     has **Lanjut**, also the last one, and no ×. A missing image or key also has **Kenapa?**, built
     from what the check saw (the images' alt text, or every answer grading 0), since the extension
     doesn't have the key file's `yang_terlihat_siswa` column. The list survives a page load, so
-    opening soal 15 from Navigasi kuis moves the pointer to its image. After the last problem one
-    more Gelembung Jawab, about no element, says the closing sentence (#256), built in code from
-    the count with no model call: "Selain dua hal itu, kuisnya sudah siap, Bu."
-    (`closingSentence`). With no problems Nemu says only that the quiz is ready; a check stopped
-    early gets none. Its **Catatan langkah** lists every problem and "Nemu tidak mengubah apa pun
-    di kuis ini."
+    opening soal 15 from Navigasi kuis moves the pointer to its image. After the last problem a
+    Kartu Info under **Hasil pemeriksaan**, about no element, reports them (#256), built in code
+    with no model call: the title is the key file's one-sentence report, "Ada 2 hal yang perlu Ibu
+    perbaiki: soal 15 dan soal 7." (`reportTitle`); the detail line names only what the check
+    verified and found right, "Yang lain sudah benar: 15 soal, kelas 4A, buka Rabu 2 Des 07.00."
+    (`verifiedLine`: the count, the course's class, the open time); and the list has one line per
+    problem ("Soal 15: gambar (3) belum ada.", "Soal 7: belum ada kunci jawaban."). **Tunjukkan
+    lagi** points at them again from the first; **Tutup** keeps them in **Catatan langkah**, which
+    the Nemu button reopens (Lihat catatan langkah). With no problems Nemu says only that the quiz
+    is ready; a check stopped early gets none. Catatan langkah lists every problem and "Nemu tidak
+    mengubah apa pun di kuis ini."
 - **F4-06: warn before deleting a quiz students took (#211).** `features/quiz-delete/`. "Tolong
   hapus latihan bahasa Inggris yang kemarin" (typed or spoken; "hapus"/"ganti" with "kuis",
   "latihan" or "ulangan") is the extension's own command. Nemu never presses Hapus.
@@ -322,7 +327,9 @@ AlurSekolah account), opens the F4-1 quiz as `siti.aminah` (password `TEACHER_PA
 Nemu opens Setelan, Soal and Kuis itself, points at Pratinjau kuis for her to press, then points at
 soal 15 and soal 7 with the sentences in `infra/setup/f4-1/F4-1_kunci.csv`, in its order (and,
 after she opens soal 15, at its missing image), with soal 7's Edit soal line under its sentence,
-that Catatan langkah says nothing changed, and that the quiz's
+that the report's title is the key's one-sentence example ("Ada 2 hal yang perlu Ibu perbaiki:
+soal 15 dan soal 7.") with what was right and one line per problem, that Catatan langkah (from
+the Nemu button after Tutup) says nothing changed, and that the quiz's
 last-modified time and question count in the Moodle database are what they were. `MOODLE_URL`
 (default `https://localhost/`) points it at another Moodle; without the local database only the
 Soal page's count is compared. It skips with a message when Moodle isn't running. Screenshots go
