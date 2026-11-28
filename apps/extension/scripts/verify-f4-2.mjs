@@ -210,6 +210,50 @@ page.on("framenavigated", (frame) => {
   if (frame === page.mainFrame()) visited.push(new URL(frame.url()).pathname);
 });
 
+/**
+ * F4·07a–09: while Nemu works, each Gelembung Kerja names its stage of the start card's five.
+ * Watched in the background from Mulai on, since each shows only while its steps run.
+ */
+const STAGE_LINES = [
+  {
+    sentence: "Buka 7 Des, tutup 10 Des.",
+    detail: "Senin pukul 00.00 sampai Kamis pukul 23.59.",
+    heading: "Nemu mengisi · Langkah 2 dari 5",
+    shot: "2b-waktu.png",
+  },
+  {
+    sentence: "Ini menu Bank soal, lalu Impor.",
+    detail: "Tempat menyimpan soal sebelum dipakai kuis.",
+    heading: "Nemu bekerja · Langkah 4 dari 5",
+    shot: "3b-bank-soal.png",
+  },
+  {
+    sentence: "Saya pilih format Moodle XML.",
+    detail: "Naskah Ibu sudah saya ubah jadi berkas Moodle XML.",
+    heading: "Nemu bekerja · Langkah 4 dari 5",
+    shot: "3c-moodle-xml.png",
+  },
+];
+let stagesSeen = Promise.resolve([]);
+function watchStages() {
+  stagesSeen = Promise.all(
+    STAGE_LINES.map(async (line) => {
+      const kerja = display("kerja").filter({ hasText: line.sentence });
+      const shown = await kerja
+        .waitFor({ timeout: 180_000 })
+        .then(() => true)
+        .catch(() => false);
+      if (!shown) return { ...line, seen: null };
+      const heading = (await kerja.locator("[data-nemu-status] p").allTextContents())
+        .map((text) => text.trim())
+        .join(" · ");
+      const detail = (await kerja.locator("[data-nemu-detail]").innerText()).trim();
+      await page.screenshot({ path: join(shots, line.shot) });
+      return { ...line, seen: { heading, detail } };
+    }),
+  );
+}
+
 await check("Bu Siti asks on the course page and picks her script", async () => {
   const closed = overlay.locator("button[aria-label='Tanya Nemu']");
   await closed.waitFor({ timeout: 15_000 });
@@ -257,6 +301,7 @@ await check(
     expect(!(await card.getByRole("button", { name: "Ajari saya" }).count()), "Ajari saya shows");
     await page.screenshot({ path: join(shots, "2-siap.png") });
     await card.getByRole("button", { name: "Mulai" }).click();
+    watchStages();
   },
 );
 
@@ -326,6 +371,15 @@ await check(
     expect(listed === 10, `Soal lists ${listed} questions`);
   },
 );
+
+await check("Each working bubble named its stage: Langkah n dari 5 (F4·07a–09)", async () => {
+  for (const line of await stagesSeen) {
+    expect(line.seen, `Nemu never said “${line.sentence}”`);
+    console.log(`  ${line.seen.heading}: ${line.sentence} / ${line.seen.detail}`);
+    expect(line.seen.heading === line.heading, `the heading says “${line.seen.heading}”`);
+    expect(line.seen.detail === line.detail, `the detail line says “${line.seen.detail}”`);
+  }
+});
 
 const ready =
   "Kuis Latihan IPAS Kelas 4A sudah siap: 10 soal, dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember pukul 23.59, Bu.";

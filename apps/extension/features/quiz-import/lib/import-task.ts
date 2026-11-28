@@ -12,7 +12,7 @@ import {
   pickedFile,
   quizModule,
 } from "./moodle-course";
-import { type ImportPlan, type SetTime, spokenTime } from "./plan";
+import { type ImportPlan, type SetTime, spokenTime, timesLines } from "./plan";
 
 /**
  * F4-03 as one executor task (#210), in cara 1: from the course page Nemu turns on Mode Edit,
@@ -40,6 +40,42 @@ export function importStages(section: string, honorific: string): string[] {
     "Bank soal › Impor, format Moodle XML",
     "Soal › Tambah dari bank soal",
   ];
+}
+
+/** Each stage's number in `importStages`, for the working bubbles' "Langkah 4 dari 5". */
+const STAGE = { quiz: 1, times: 2, save: 3, import: 4, add: 5 } as const;
+const STAGES = importStages("", "").length;
+
+/** F4·08: what the Bank soal menus are. */
+const BANK = {
+  sentence: "Ini menu Bank soal, lalu Impor.",
+  detail: "Tempat menyimpan soal sebelum dipakai kuis.",
+};
+/** F4·07a: the format Nemu picks, and why it can. */
+function xmlLines(honorific: string) {
+  const who = honorific === "Bu" ? "Ibu" : honorific === "Pak" ? "Bapak" : "";
+  return {
+    sentence: "Saya pilih format Moodle XML.",
+    detail: `${who ? `Naskah ${who}` : "Naskahnya"} sudah saya ubah jadi berkas Moodle XML.`,
+  };
+}
+
+/**
+ * The stage's count on every step Nemu does itself ("Nemu bekerja · Langkah 4 dari 5"), with the
+ * task's own words when the stage has them; without them the executor says its own line
+ * ("Membuka Tambah…"). Her presses (point) keep their own bubble.
+ */
+function inStage(
+  n: number,
+  steps: ExecutorStep[],
+  lines: { sentence?: string; detail?: string; label?: string } = {},
+): ExecutorStep[] {
+  const { label, ...words } = lines;
+  return steps.map((step) =>
+    step.verb === "point" || step.verb === "scroll"
+      ? step
+      : { ...step, ...words, stage: { n, of: STAGES, ...(label ? { label } : {}) } },
+  );
 }
 
 type Phase =
@@ -123,12 +159,14 @@ export function quizImportTask(
   });
   if (!course.editing)
     return {
-      task: task([
-        { verb: "check", target: { role: "checkbox", label: "Mode Edit" }, checked: true },
-      ]),
+      task: task(
+        inStage(STAGE.quiz, [
+          { verb: "check", target: { role: "checkbox", label: "Mode Edit" }, checked: true },
+        ]),
+      ),
       continuation: { ...continuation, phase: "edit-mode" },
     };
-  return { task: task(addQuizSteps(plan)), continuation };
+  return { task: task(inStage(STAGE.quiz, addQuizSteps(plan))), continuation };
 }
 
 /**
@@ -215,16 +253,25 @@ export async function nextImportSteps(
   switch (continuation.phase) {
     case "edit-mode": {
       await arrive(io, () => !!coursePage(io.doc, io.url())?.editing, "The course in Mode Edit");
-      return { steps: addQuizSteps(plan), continuation: next("settings") };
+      return { steps: inStage(STAGE.quiz, addQuizSteps(plan)), continuation: next("settings") };
     }
     case "settings": {
       await arrive(io, () => isNewQuizForm(io.doc, io.url()), "The new quiz's form");
       const timing = collapsedHeaderFor(io.doc, "id_timeopen");
       const steps: ExecutorStep[] = [
-        { verb: "setValue", target: { role: "textbox", label: "Nama" }, value: plan.name },
-        ...(timing ? [clickMenu({ role: "button", text: timing })] : []),
-        ...timeSteps(io.doc, "timeopen", plan.opens),
-        ...timeSteps(io.doc, "timeclose", plan.closes),
+        ...inStage(STAGE.quiz, [
+          { verb: "setValue", target: { role: "textbox", label: "Nama" }, value: plan.name },
+        ]),
+        // F4·09: one line for all the time fields, under "Nemu mengisi".
+        ...inStage(
+          STAGE.times,
+          [
+            ...(timing ? [clickMenu({ role: "button", text: timing })] : []),
+            ...timeSteps(io.doc, "timeopen", plan.opens),
+            ...timeSteps(io.doc, "timeclose", plan.closes),
+          ],
+          { ...timesLines(plan.opens, plan.closes), label: "Nemu mengisi" },
+        ),
         {
           verb: "point",
           target: { role: "button", text: "Simpan dan tampilkan" },
@@ -238,7 +285,7 @@ export async function nextImportSteps(
       await arrive(io, () => onQuizPage(io, null, "/mod/quiz/view.php"), "The new quiz's page");
       const cmid = quizModule(io.doc, io.url())!.cmid;
       return {
-        steps: [clickMenu({ role: "link", text: "Bank soal" })],
+        steps: inStage(STAGE.import, [clickMenu({ role: "link", text: "Bank soal" })], BANK),
         continuation: next("bank", { cmid }),
       };
     }
@@ -251,10 +298,14 @@ export async function nextImportSteps(
         "The quiz's Bank soal",
       );
       return {
-        steps: [
-          clickMenu({ role: "combobox", text: "Soal-soal" }),
-          clickMenu({ role: "menuitem", text: "Impor" }),
-        ],
+        steps: inStage(
+          STAGE.import,
+          [
+            clickMenu({ role: "combobox", text: "Soal-soal" }),
+            clickMenu({ role: "menuitem", text: "Impor" }),
+          ],
+          BANK,
+        ),
         continuation: next("import-form"),
       };
     }
@@ -263,14 +314,26 @@ export async function nextImportSteps(
       const general = collapsedHeaderFor(io.doc, "id_catfromfile");
       return {
         steps: [
-          { verb: "check", target: { role: "radio", label: "Format XML Moodle" }, checked: true },
-          ...(general ? [clickMenu({ role: "button", text: general })] : []),
-          // The questions go into the quiz's own bank, where Tambah › dari bank soal opens.
-          {
-            verb: "check",
-            target: { role: "checkbox", label: "Dapatkan kategori dari berkas" },
-            checked: false,
-          },
+          ...inStage(
+            STAGE.import,
+            [
+              {
+                verb: "check",
+                target: { role: "radio", label: "Format XML Moodle" },
+                checked: true,
+              },
+            ],
+            xmlLines(honorific),
+          ),
+          ...inStage(STAGE.import, [
+            ...(general ? [clickMenu({ role: "button", text: general })] : []),
+            // The questions go into the quiz's own bank, where Tambah › dari bank soal opens.
+            {
+              verb: "check",
+              target: { role: "checkbox", label: "Dapatkan kategori dari berkas" },
+              checked: false,
+            },
+          ]),
         ],
         continuation: next("drop"),
       };
@@ -307,7 +370,7 @@ export async function nextImportSteps(
       const result = importResult(io.doc, io.url())!;
       if (result.status === "error") return done({ status: "error", message: result.message });
       return {
-        steps: [clickMenu({ role: "link", text: "Soal" })],
+        steps: inStage(STAGE.add, [clickMenu({ role: "link", text: "Soal" })]),
         continuation: next("questions"),
       };
     }
@@ -315,9 +378,11 @@ export async function nextImportSteps(
       await arrive(io, () => onQuizPage(io, continuation.cmid, "/mod/quiz/edit.php"), "Soal");
       return {
         steps: [
-          clickMenu({ role: "button", label: "Tambah" }),
-          clickMenu({ role: "menuitem", text: "dari bank soal" }),
-          { verb: "check", target: { role: "checkbox", label: "Pilih semua" }, checked: true },
+          ...inStage(STAGE.add, [
+            clickMenu({ role: "button", label: "Tambah" }),
+            clickMenu({ role: "menuitem", text: "dari bank soal" }),
+            { verb: "check", target: { role: "checkbox", label: "Pilih semua" }, checked: true },
+          ]),
           {
             verb: "point",
             target: { role: "button", text: "Tambahkan soal terpilih pada kuis" },

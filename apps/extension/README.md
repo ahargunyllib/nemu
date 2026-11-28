@@ -127,8 +127,9 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     daftar** on names. Holding the talk combination answers too: "delapan puluh enam", "86",
     "kosongkan", a name on the card.
   - `gradesFinalize`'s entries become one cara 1 task (`lib/grade-task.ts`): the Nilai menu,
-    Kelas, Mata Pelajaran and Jenis Penilaian (UH, tugas and PR are **Harian**), Tampilkan Siswa,
-    then each student's **Nilai** found by the row's name and the column header, **Catatan**
+    Kelas, Mata Pelajaran and Jenis Penilaian (UH, tugas and PR are **Harian**), Tampilkan Siswa
+    (each step in its own words under "Nemu bekerja · Langkah 1/2 dari 3": "Saya buka menu Nilai,
+    Bu.", "Ini menu Nilai.", "Ini Isi nilai kelas 4B."), then each student's **Nilai** found by the row's name and the column header, **Catatan**
     "remedial" below KKM and "tidak hadir" for S/I/A (value left blank). It ends pointing at
     Simpan: "Silakan Ibu tekan Simpan.", with every value behind **Lihat ringkasan**.
   - **After Simpan** Nemu waits for the page's saved message (or **Sudah tersimpan**), reads the
@@ -219,6 +220,13 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     goes to Unduhan and Nemu points at **Pilih berkas …**. She presses **Impor**.
   - **Soal** › Tambah › dari bank soal › Pilih semua; she presses **Tambahkan soal terpilih pada
     kuis**. Every form submit is hers (F0-08); Nemu only opens menus, fills and ticks.
+  - Every step Nemu does itself carries its stage of the start card's five (the executor's act
+    step `stage`), so the Gelembung Kerja heading reads "Nemu bekerja · Langkah 4 dari 5". The
+    times say "Buka 7 Des, tutup 10 Des." with "Senin pukul 00.00 sampai Kamis pukul 23.59." under
+    **Nemu mengisi · Langkah 2 dari 5** (F4·09, `timesLines`); the Bank soal menus "Ini menu Bank
+    soal, lalu Impor." with "Tempat menyimpan soal sebelum dipakai kuis." (F4·08); the format
+    "Saya pilih format Moodle XML." with "Naskah Ibu sudah saya ubah jadi berkas Moodle XML."
+    (F4·07a). Steps without words of their own keep the executor's ("Membuka Tambah…").
   - The F4-1 check then runs on the new quiz with the number of questions it should have; when it
     finds nothing Nemu says one sentence ("Kuis … sudah siap: 10 soal, dibuka … dan ditutup …"),
     and Catatan langkah holds the import's steps (with the drop) and the check's.
@@ -310,7 +318,7 @@ read-back, WS-07 connected to the mock (Admin › Integrasi: URL `http://localho
 `as_uji_sdit_nusantara_2026`). It sends the official F1-1 grade-book photo
 (`packages/ai/src/school/fixtures/f1-1-buku-nilai-4b.jpg`) the way `apps/wa-bot` does and checks:
 the card in one of two tabs only, Mulai and "Ini nilai apa, Bu?" with the photo's title picked (#270), the 10 W5 questions (4
-doubtful cells, 5 names, 1 S) with their crops, the cara 1 fill of all 32 students with notes,
+doubtful cells, 5 names, 1 S) with their crops, the navigation lines (Langkah 1 and 2 of 3), the cara 1 fill of all 32 students with notes,
 Lihat ringkasan beside Simpan, the read-back sentence after the save, the photo gone from the
 inbox, Catatan langkah, and every saved grade right in under 5 minutes. Screenshots go to
 `.output/verify-grade-photo/`. It also hands over the photo's thumbnail
@@ -363,6 +371,8 @@ picks `infra/setup/f4-2/F4-2_naskah-ipas-10-soal.pdf`. It checks that Nemu asks 
 start card asks "Pasang kuis dari naskah ini?" with 00.00 and 23.59 on its detail line, the
 script's chip and the five stages (she presses Mulai), that it fills the quiz form itself, drops the XML on Impor's picker, and points at
 Simpan dan tampilkan, Impor, Tambahkan soal terpilih pada kuis and Pratinjau kuis for her to press;
+that the times, Bank soal and Moodle XML bubbles name their stage ("Langkah 2 dari 5", "Langkah 4
+dari 5") with their detail lines;
 that the F4-1 check ends with the one sentence; and, in the Moodle database, that the quiz is in
 IPAS with those times (Asia/Jakarta) and its 10 questions match
 `infra/setup/f4-2/F4-2_hasil-yang-diharapkan.xml` (words without punctuation, choices, key, and
