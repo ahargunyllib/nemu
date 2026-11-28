@@ -14,12 +14,23 @@ import {
   NemuActionRow,
   NemuCard,
 } from "@nemu/ui/nemu/nemu-frame";
+import { useId } from "react";
 
 /**
- * Kartu Info: something to read. A title with an optional detail line, a short list, then one
- * row: at most one link on the left and a compact black [Tutup] on the right. No ×.
+ * Kartu Info: something to read. A title with an optional detail line, a short numbered list
+ * (small amber circles 1, 2, 3, under an optional label), then one row: at most one link on the
+ * left and a compact black [Tutup] on the right. No ×.
  */
-export function KartuInfo({ status, title, detail, items, link, onClose }: KartuInfoProps) {
+export function KartuInfo({
+  status,
+  title,
+  detail,
+  items,
+  itemsLabel,
+  link,
+  onClose,
+}: KartuInfoProps) {
+  const labelId = useId();
   return (
     <NemuCard display="info" label={title} status={status}>
       <CardHeader className="gap-1.5">
@@ -30,12 +41,26 @@ export function KartuInfo({ status, title, detail, items, link, onClose }: Kartu
           </CardDescription>
         )}
       </CardHeader>
-      <CardContent>
-        <ul className="flex list-disc flex-col gap-2 pl-6 text-xl leading-7">
-          {items.map((item) => (
-            <li key={item}>{item}</li>
+      <CardContent className="flex flex-col gap-1.5">
+        {itemsLabel && (
+          <p id={labelId} className="text-base leading-5 font-semibold text-nemu-secondary">
+            {itemsLabel}
+          </p>
+        )}
+        <ol aria-labelledby={itemsLabel ? labelId : undefined} className="flex flex-col">
+          {items.map((item, index) => (
+            <li key={item} className="flex items-start gap-3 py-1 text-xl leading-7">
+              <span
+                aria-hidden
+                data-nemu-step
+                className="flex size-[30px] shrink-0 items-center justify-center rounded-full border border-nemu-amber-200 bg-nemu-subtle text-[15px] leading-5 font-bold text-nemu-strong"
+              >
+                {index + 1}
+              </span>
+              <span className="pt-px">{item}</span>
+            </li>
           ))}
-        </ul>
+        </ol>
       </CardContent>
       <CardFooter>
         <NemuActionRow
