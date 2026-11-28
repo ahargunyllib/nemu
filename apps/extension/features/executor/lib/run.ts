@@ -437,6 +437,7 @@ export class ExecutorRun {
         signal,
         step.ringkasan,
         step.sumber,
+        step,
       );
     if (step.verb === "scroll") {
       element.scrollIntoView({ block: "center", behavior: "smooth" });
@@ -488,11 +489,14 @@ export class ExecutorRun {
     signal: AbortSignal,
     ringkasan?: string,
     sumber?: string,
+    turn: { heading?: string; detail?: string; chip?: string } = {},
   ) {
     this.waiting = { refused };
     // Gelembung Tunjuk carries one link: the numbers behind it, else where the step came from.
     const note = ringkasan ? { ringkasan } : sumber ? { sumber: [sumber] } : undefined;
-    this.render({ type: "tunjuk", sentence, note }, element);
+    const status = turn.heading ? { text: turn.heading } : undefined;
+    const { detail, chip } = turn;
+    this.render({ type: "tunjuk", sentence, note, status, detail, chip }, element);
     this.deps.speak(sentence);
     await waitForEvent(
       this.deps.doc,

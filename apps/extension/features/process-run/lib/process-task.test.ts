@@ -120,8 +120,9 @@ describe("F3 process task (#213)", () => {
       segments: ["Setoran baru"],
       action: "Simpan setoran",
       sentence: "Silakan Ibu tekan Simpan setoran.",
+      heading: "Giliran Ibu",
+      detail: "Sesudah itu, Sistem AlurSekolah: hitung nilai hafalan.",
     });
-    expect(continuation.ringkasan).toContain("Citra Lestari: Surah 'Abasa, Tajwid 87");
   });
 
   test("no page for a task means only explaining", () => {
@@ -171,7 +172,10 @@ describe("F3 process task (#213)", () => {
         verb: "point",
         target: { role: "button", text: "Simpan setoran" },
         sentence: "Silakan Ibu tekan Simpan setoran.",
-        ringkasan: expect.stringContaining("Bagas Pratama: Surah An-Nazi'at"),
+        // F3·07: the teacher's turn, what the system does next, and that nothing is saved yet.
+        heading: "Giliran Ibu",
+        detail: "Sesudah itu, Sistem AlurSekolah: hitung nilai hafalan.",
+        chip: "Belum tersimpan",
       },
     ]);
   });

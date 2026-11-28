@@ -265,6 +265,38 @@ describe("pointing at Simpan", () => {
     });
     run.stop(false);
   });
+
+  test("a point step can carry its heading, detail line and chip (F3·07)", async () => {
+    gradePage();
+    const { run, display } = harness(
+      createRunState(
+        {
+          ...GRADES,
+          steps: [
+            {
+              verb: "point",
+              target: { role: "button", text: "Simpan" },
+              sentence: "Silakan Ibu tekan Simpan.",
+              heading: "Giliran Ibu",
+              detail: "Sesudah itu, Sistem AlurSekolah: hitung nilai.",
+              chip: "Belum tersimpan",
+            },
+          ],
+        },
+        { cara: 1 },
+      ),
+    );
+    void run.run();
+    await vi.waitFor(() => expect(run.waiting).toEqual({ refused: false }));
+    expect(display()).toEqual({
+      type: "tunjuk",
+      sentence: "Silakan Ibu tekan Simpan.",
+      status: { text: "Giliran Ibu" },
+      detail: "Sesudah itu, Sistem AlurSekolah: hitung nilai.",
+      chip: "Belum tersimpan",
+    });
+    run.stop(false);
+  });
 });
 
 describe("F0-1: a fake AI response that tries to press", () => {
