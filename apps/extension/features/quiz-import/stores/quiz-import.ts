@@ -9,6 +9,9 @@ import type {
 import type { NemuDisplay } from "@nemu/ui/lib/nemu-display";
 
 import type { PageEmail } from "../../../shared/lib/messages";
+import { wantsToTry } from "../../executor/api/teach-preference";
+import { recipeOf, stoppedDetail } from "../../executor/lib/recipe-steps";
+import type { RunState } from "../../executor/lib/run";
 import { executor } from "../../executor/stores/executor";
 import { quizCheck } from "../../quiz-check/stores/quiz-check";
 import { requestQuizImport } from "../api/request-quiz-import";
@@ -16,6 +19,7 @@ import { answerFrom, choicesFor } from "../lib/answers";
 import {
   type ImportContinuation,
   type ImportOutcome,
+  IMPORT_STAGE,
   nextImportSteps,
   QUIZ_IMPORT_KIND,
   quizImportTask,
@@ -324,14 +328,27 @@ function createQuizImport() {
     close();
     if (!started) return;
     // Cara 1: Nemu opens every menu and fills every field; each form submit is hers (F0-08).
-    await executor.start(started.task, { cara: 1, continuation: started.continuation });
+    // After "Coba sendiri" she does them herself while Nemu points (cara 2).
+    const cara = (await wantsToTry(QUIZ_IMPORT_KIND)) ? 2 : 1;
+    await executor.start(started.task, { cara, continuation: started.continuation });
   }
 
-  /** The import ended: the F4-1 check on the new quiz, then one sentence (#210). */
-  function afterRun(status: string, notes: string[], showNotes: boolean) {
+  /**
+   * The import ended: the F4-1 check on the new quiz, then one Sudah dicek card with the recipe
+   * Cara pasang kuis (#210, F4·11).
+   */
+  function afterRun(ended: RunState, notes: string[], showNotes: boolean) {
     const done = finished;
     finished = null;
-    if (status !== "done" || !done) return executor.presentNotes(notes, null, showNotes);
+    const run = recipeOf(ended.task);
+    // Reading the script came before the run.
+    const recipe = { ...run, items: [IMPORT_STAGE.script, ...run.items] };
+    if (ended.status !== "done" || !done)
+      return executor.presentRecipe(recipe, {
+        show: showNotes,
+        detail: stoppedDetail(ended),
+        log: notes,
+      });
     const { outcome, plan } = done;
     const teacher = done.honorific || context.honorific;
     if (outcome.status === "error") {
@@ -349,8 +366,10 @@ function createQuizImport() {
     const impor = notes.findIndex((line) => line.endsWith("menekan Impor"));
     const before = impor < 0 ? [...notes, dropped] : notes.toSpliced(impor, 0, dropped);
     void quizCheck.start(`cek kuis ini, ${plan.count} soal`, {
-      ready: readySentence(plan, outcome.listed, teacher),
+      ready: readySentence(outcome.listed),
       before,
+      recipe,
+      offer: ended.startCara === 1 ? QUIZ_IMPORT_KIND : null,
     });
   }
 
@@ -373,7 +392,7 @@ function createQuizImport() {
   });
   executor.registerFinisher(QUIZ_IMPORT_KIND, (ended, notes, showNotes) => {
     // The check starts its own run; this one has just ended.
-    setTimeout(() => afterRun(ended.status, notes, showNotes), 0);
+    setTimeout(() => afterRun(ended, notes, showNotes), 0);
   });
 
   return {

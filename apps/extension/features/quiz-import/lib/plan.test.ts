@@ -34,20 +34,8 @@ describe("F4-03's times (#210)", () => {
     expect(timesInOrder(times.closes, times.opens)).toBe(false);
   });
 
-  test("the one sentence after the F4-1 check finds nothing", () => {
-    const plan = {
-      courseId: 2,
-      section: "IPAS",
-      name: "Latihan IPAS Kelas 4A",
-      opens: { date: "2026-12-07", time: "00:00" },
-      closes: { date: "2026-12-10", time: "23:59" },
-      xml: "",
-      fileName: "Latihan IPAS Kelas 4A.xml",
-      count: 10,
-    };
-    expect(readySentence(plan, 10, "Bu")).toBe(
-      "Kuis Latihan IPAS Kelas 4A sudah siap: 10 soal, dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember pukul 23.59, Bu.",
-    );
+  test("the Sudah dicek title after the F4-1 check finds nothing (F4·11)", () => {
+    expect(readySentence(10)).toBe("Kuis terpasang, 10 soal siap.");
   });
 });
 

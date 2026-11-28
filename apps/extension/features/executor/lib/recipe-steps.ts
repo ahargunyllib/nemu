@@ -1,7 +1,7 @@
 import type { ExecutorStep, ExecutorTask } from "@nemu/contracts/executor";
 
 import { describeTarget } from "./find-target";
-import { recipeName } from "./recipe";
+import { type NotesCard, recipeCard, recipeName } from "./recipe";
 import type { RunState } from "./run";
 
 /**
@@ -89,6 +89,21 @@ export function recipeOf(task: ExecutorTask, savedAt: Date = new Date()): Recipe
     title: task.recipe ? recipeName(task.recipe.name) : `Cara ${lowerFirst(task.title)}`,
     subtitle: `Disimpan dari ${from}, ${shortDate(savedAt)}.`,
     items: recipeItems(task.steps),
+  };
+}
+
+/**
+ * `recipeCard` for a recipe already named (F4·11): "Sudah dicek" or "Belum sama", the check's
+ * title and detail, and "Catatan langkah · Cara pasang kuis" above the steps.
+ */
+export function checkedCard(
+  recipe: Recipe,
+  checked: { ok: boolean; title: string },
+  detail?: string,
+): NotesCard {
+  return {
+    ...recipeCard({ checked, recipe: "", ...(detail ? { detail } : {}) }),
+    itemsLabel: `Catatan langkah · ${recipe.title}`,
   };
 }
 

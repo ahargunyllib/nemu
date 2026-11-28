@@ -208,8 +208,11 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   - **Soal** › Tambah › dari bank soal › Pilih semua; she presses **Tambahkan soal terpilih pada
     kuis**. Every form submit is hers (F0-08); Nemu only opens menus, fills and ticks.
   - The F4-1 check then runs on the new quiz with the number of questions it should have; when it
-    finds nothing Nemu says one sentence ("Kuis … sudah siap: 10 soal, dibuka … dan ditutup …"),
-    and Catatan langkah holds the import's steps (with the drop) and the check's.
+    finds nothing Nemu ends on one Kartu Info (F4·11): **Sudah dicek**, "Kuis terpasang, 10 soal
+    siap." (said aloud), what the check confirmed ("Gambar dan kunci semua soal lengkap."), then
+    "Catatan langkah · Cara pasang kuis" with the import's stages and **Coba sendiri**, which
+    starts the next import in cara 2. The run's own lines (with the drop) stay in the kept notes'
+    `log`.
 - **Contract.** Request and response schemas come from `@nemu/contracts/extension` and
   `@nemu/contracts/school`. Only the background calls the Nemu Service.
 
@@ -348,7 +351,8 @@ asks Nemu to put her script in, opening Monday 7 December and closing Thursday 1
 picks `infra/setup/f4-2/F4-2_naskah-ipas-10-soal.pdf`. It checks that Nemu asks nothing and says it
 uses 00.00 and 23.59, fills the quiz form itself, drops the XML on Impor's picker, and points at
 Simpan dan tampilkan, Impor, Tambahkan soal terpilih pada kuis and Pratinjau kuis for her to press;
-that the F4-1 check ends with the one sentence; and, in the Moodle database, that the quiz is in
+that the F4-1 check ends on one Sudah dicek card ("Kuis terpasang, 10 soal siap." and Cara pasang
+kuis, with Coba sendiri, also when the Nemu button reopens it); and, in the Moodle database, that the quiz is in
 IPAS with those times (Asia/Jakarta) and its 10 questions match
 `infra/setup/f4-2/F4-2_hasil-yang-diharapkan.xml` (words without punctuation, choices, key, and
 soal 7's three pictures pixel for pixel). Screenshots go to `.output/verify-f4-2/`.

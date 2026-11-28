@@ -147,7 +147,7 @@
       <bpmn:outgoing>Flow_22</bpmn:outgoing>
     </bpmn:scriptTask>
     <bpmn:scriptTask id="Task_KuisSiap" name="Nemu menyampaikan kuis siap">
-      <bpmn:documentation>Satu kalimat: "Kuis … sudah siap: 10 soal, dibuka … dan ditutup …"</bpmn:documentation>
+      <bpmn:documentation>Satu Kartu Info "Sudah dicek": "Kuis terpasang, 10 soal siap.", yang sudah dicek ("Gambar dan kunci semua soal lengkap."), lalu Catatan langkah · Cara pasang kuis dan Coba sendiri.</bpmn:documentation>
       <bpmn:incoming>Flow_21b</bpmn:incoming>
       <bpmn:outgoing>Flow_23</bpmn:outgoing>
     </bpmn:scriptTask>
@@ -157,7 +157,7 @@
       <bpmn:outgoing>Flow_24</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:scriptTask id="Task_CatatanLangkah" name="Nemu menampilkan Catatan langkah">
-      <bpmn:documentation>F0-14: langkah memasukkan kuis (termasuk cara berkas sampai ke Impor) dan langkah pemeriksaan. Setiap tindakan juga tercatat di log tindakan (WS-10).</bpmn:documentation>
+      <bpmn:documentation>F0-14: resep Cara pasang kuis (tahap-tahap rencananya), di kartu yang sama bila pemeriksaan tidak menemukan masalah. Setiap tindakan tercatat di log tindakan (WS-10).</bpmn:documentation>
       <bpmn:incoming>Flow_24</bpmn:incoming>
       <bpmn:outgoing>Flow_25</bpmn:outgoing>
     </bpmn:scriptTask>

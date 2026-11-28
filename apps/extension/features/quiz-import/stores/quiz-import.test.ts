@@ -28,8 +28,14 @@ const executor = {
     async (_task: ExecutorTask, _options: { cara?: number; continuation?: unknown }) => {},
   ),
   presentNotes: vi.fn(),
+  presentRecipe: vi.fn(),
 };
 vi.mock("../../executor/stores/executor", () => ({ executor }));
+// "Coba sendiri" chosen for F4-2 after an earlier import, or not.
+let tryKinds: string[] = [];
+vi.mock("../../executor/api/teach-preference", () => ({
+  wantsToTry: async (kind: string) => tryKinds.includes(kind),
+}));
 const quizCheck = { start: vi.fn(async () => undefined) };
 vi.mock("../../quiz-check/stores/quiz-check", () => ({ quizCheck }));
 
@@ -223,20 +229,62 @@ describe("F4-03 in the page (#210)", () => {
     });
     expect(added).toEqual({ steps: [], continuation: null });
     finishers.get(QUIZ_IMPORT_KIND)!(
-      { status: "done" },
+      { status: "done", startCara: 1, task },
       ["Nemu membuka Soal", "Bu menekan Impor"],
       true,
     );
     await settle();
+    // F4·11: the check ends on one Sudah dicek card, its title and the recipe handed over here.
     expect(quizCheck.start).toHaveBeenCalledWith("cek kuis ini, 2 soal", {
-      ready:
-        "Kuis Latihan IPAS Kelas 4A sudah siap: 2 soal, dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember pukul 21.00, Bu.",
+      ready: "Kuis terpasang, 2 soal siap.",
       before: [
         "Nemu membuka Soal",
         "Nemu menaruh berkas Latihan IPAS Kelas 4A.xml di Impor (seret dan lepas)",
         "Bu menekan Impor",
       ],
+      recipe: {
+        title: "Cara pasang kuis",
+        subtitle: expect.stringMatching(/^Disimpan dari pemasangan Latihan IPAS Kelas 4A, /u),
+        items: ["Naskah diubah jadi soal Moodle", "Buat kuis di bagian IPAS"],
+      },
+      offer: QUIZ_IMPORT_KIND,
     });
+  });
+
+  test("after Coba sendiri the next import starts in cara 2, not cara 1", async () => {
+    tryKinds = [QUIZ_IMPORT_KIND];
+    executor.start.mockClear();
+    goTo(URLS.course);
+    const parsed = new DOMParser().parseFromString(coursePageHtml(true), "text/html");
+    document.body.innerHTML = parsed.body.innerHTML;
+    document.body.className = parsed.body.className;
+    reading = {
+      status: "ok",
+      draft: {
+        ...DRAFT,
+        questions: DRAFT.questions.slice(0, 1),
+        section: "IPAS",
+        opens: { date: "2026-12-07", time: null },
+        closes: { date: "2026-12-10", time: null },
+      },
+      questions: [],
+    };
+    quizImport.start("Nemu, masukkan kuis dari naskah ini.");
+    const pick = view();
+    if (pick.type !== "jawab") throw new Error("no pick");
+    pick.action!.onSelect();
+    const input = document.querySelector<HTMLInputElement>("input[type=file]")!;
+    Object.defineProperty(input, "files", {
+      value: [new File(["%PDF-1.4"], "naskah.pdf", { type: "application/pdf" })],
+    });
+    input.dispatchEvent(new Event("change"));
+    await settle();
+    const ready = view();
+    if (ready.type !== "jawab") throw new Error("no plan");
+    ready.action!.onSelect();
+    await settle();
+    expect(executor.start.mock.calls[0]?.[1].cara).toBe(2);
+    tryKinds = [];
   });
 
   test("off a course page Nemu asks her to open the course first", async () => {
