@@ -173,7 +173,8 @@ the page's Shadow DOM.
 - **Links**: Kenapa?, Sumber and Lihat ringkasan are small underlined `nemu-strong` links. What is
   behind them shows in a `nemu-subtle` box and is read (`onRead`) only once the teacher clicks.
 - **Kartu Pilih**: a risky choice gets ⚠ and goes under the safe one, whatever order it was given
-  in. All choices share one look. The **compact** Kartu Pilih (300 px, 44 px buttons side by side)
+  in. All choices share one look. An enlarged photo crop can carry a caption under it
+  (`image.caption`, 16 px semibold `nemu-secondary`): "Potongan foto · Citra, Tajwid". The **compact** Kartu Pilih (300 px, 44 px buttons side by side)
   waits beside the Nemu button, such as "Foto dari WhatsApp · Mulai / Nanti". Its picture is a
   64 px square thumbnail left of the title (`rounded-xl`, 2 px `border`, cropped from the top so
   the photo's heading shows), and a `Skeleton` of that square while it loads (#278).

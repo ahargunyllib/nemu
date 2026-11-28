@@ -184,7 +184,13 @@ for (const reader of readers) {
       continue;
     }
     const result = score(reading);
-    const tajwidAsked = result.asked.some((prompt) => /Tajwid Citra Lestari/u.test(prompt));
+    // "Skor Tajwid Citra?": the question is about Citra Lestari's Tajwid cell.
+    const tajwidAsked = (result.questions ?? []).some(
+      (question) =>
+        question.kind === "value" &&
+        question.rowName === "Citra Lestari" &&
+        question.fieldId === "tajwid",
+    );
     report(
       result.right === result.cells && tajwidAsked && result.asked.length === ASKED.length,
       `${live ? models[reader] : "fixture"} run ${run + 1}: ${result.right}/${result.cells} cells match the kunci; asked: ${result.asked.join(" | ") || "nothing"}${result.wrong.length ? `; wrong: ${result.wrong.join(", ")}` : ""}`,

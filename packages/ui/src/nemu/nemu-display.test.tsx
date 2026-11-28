@@ -256,6 +256,26 @@ describe("Kartu Pilih for W5 and the inbox", () => {
     for (const button of buttons) expect(document.activeElement).not.toBe(button);
   });
 
+  test("a caption names the crop under the enlarged photo", () => {
+    render(
+      <KartuPilih
+        question="Skor Tajwid Citra?"
+        choices={[
+          { id: "ketik", label: "Ucapkan atau ketik angkanya" },
+          { id: "kosong", label: "Kosongkan dulu" },
+        ]}
+        onChoose={vi.fn()}
+        image={{
+          src: "data:image/jpeg;base64,AA",
+          alt: "Foto, baris Citra Lestari",
+          caption: "Potongan foto · Citra, Tajwid",
+        }}
+      />,
+    );
+    const crop = screen.getByRole("img", { name: "Foto, baris Citra Lestari" });
+    expect(crop.closest("figure")?.textContent).toContain("Potongan foto · Citra, Tajwid");
+  });
+
   test("the compact card puts its two choices side by side", () => {
     const onChoose = vi.fn();
     render(

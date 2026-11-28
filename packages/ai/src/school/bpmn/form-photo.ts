@@ -122,6 +122,18 @@ function clean(value: string | null | undefined): string | null {
   return trimmed ? trimmed : null;
 }
 
+/**
+ * The question for a value the photo didn't show clearly, short enough to say: "Skor Tajwid
+ * Citra?" for a number, "Surah Citra?" for words. The student goes by the first name; the crop's
+ * caption and the row say which line it is.
+ */
+export function valueQuestion(field: Pick<FormField, "label" | "type">, name: string): string {
+  const firstName = name.split(/\s+/u)[0] ?? name;
+  return field.type === "long"
+    ? `Skor ${field.label} ${firstName}?`
+    : `${field.label} ${firstName}?`;
+}
+
 /** Pure: the model's reading → header, table rows by roster name, and the teacher's questions. */
 export function assembleFormPhoto(
   input: Pick<FormPhotoInput, "fields" | "roster" | "honorific">,
@@ -176,7 +188,7 @@ export function assembleFormPhoto(
           rowName: name,
           fieldId: cell.field,
           label: field.label,
-          prompt: `${field.label} ${name} tidak terbaca jelas. Berapa, ${input.honorific}?`,
+          prompt: valueQuestion(field, name),
           candidates: cell.candidates
             .map((candidate) => candidate.trim())
             .filter(Boolean)

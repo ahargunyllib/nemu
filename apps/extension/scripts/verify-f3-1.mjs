@@ -226,19 +226,25 @@ await check(
   "F3-16: Citra's scribbled Tajwid is asked with the photo crop, never guessed",
   async () => {
     const card = display("pilih");
-    await card.getByText("Tajwid Citra Lestari tidak terbaca jelas", { exact: false }).waitFor({
-      timeout: 30_000,
-    });
+    await card.getByText("Skor Tajwid Citra?", { exact: true }).waitFor({ timeout: 30_000 });
     const labels = await card.getByRole("group").getByRole("button").allTextContents();
-    expect(labels.includes("Angka lain"), `choices: ${labels.join(", ")}`);
+    expect(labels.includes("Ucapkan atau ketik angkanya"), `choices: ${labels.join(", ")}`);
+    expect(labels.includes("Kosongkan dulu"), `choices: ${labels.join(", ")}`);
     expect((await card.getByRole("img").count()) === 1, "no crop of the cell");
+    expect(
+      (await card.getByText("Potongan foto · Citra, Tajwid", { exact: true }).count()) === 1,
+      "the crop has no caption",
+    );
     await page.screenshot({ path: join(shots, "tanya-tajwid.png") });
     // The test teacher's answer (F3-1_kunci.csv): a choice when offered, else typed.
     const truth = KUNCI.find((row) => row.murid === "Citra Lestari").tajwid;
     if (labels.includes(truth)) {
       await card.getByRole("group").getByRole("button", { name: truth, exact: true }).click();
     } else {
-      await card.getByRole("group").getByRole("button", { name: "Angka lain" }).click();
+      await card
+        .getByRole("group")
+        .getByRole("button", { name: "Ucapkan atau ketik angkanya" })
+        .click();
       await overlay.getByLabel("Pertanyaan untuk Nemu").fill(truth);
       await overlay.getByRole("button", { name: "Kirim" }).click();
     }
