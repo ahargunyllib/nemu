@@ -341,6 +341,83 @@ describe("F0-07: the teacher's own input stops Nemu", () => {
   });
 });
 
+describe("F0-11: Berhenti in the Gelembung Kerja asks whether she fills the rest herself", () => {
+  /** Nemu holds on Aisyah Zahra's row, after filling Ahmad Fadli's; Berhenti is pressed there. */
+  async function pressBerhenti() {
+    const { run, display, ended, log } = harness(createRunState(GRADES, { cara: 1 }), {
+      sleep: holdWhen(() => run.state.index === 3),
+    });
+    void run.run();
+    await vi.waitFor(() =>
+      expect(display()).toMatchObject({ type: "kerja", sentence: "Mengisi Nilai Aisyah Zahra." }),
+    );
+    const bubble = display();
+    if (bubble?.type !== "kerja") throw new Error("expected Gelembung Kerja");
+    bubble.onStop();
+    return { run, display, ended, log };
+  }
+
+  test("Nemu stops acting and asks one Kartu Pilih, Ya first and nothing risky", async () => {
+    const { run, display, ended } = await pressBerhenti();
+    expect(run.state.status).toBe("asking");
+    expect(run.isActing()).toBe(false);
+    expect(ended).not.toHaveBeenCalled();
+    expect(display()).toEqual({
+      type: "pilih",
+      question: "Nemu berhenti. Bu mau isi sendiri?",
+      choices: [
+        { id: "sendiri", label: "Ya, saya isi sendiri" },
+        { id: "berhenti", label: "Tidak, berhenti" },
+      ],
+      onChoose: expect.any(Function),
+    });
+  });
+
+  test("Ya, saya isi sendiri goes on in cara 2 from the row Nemu was on", async () => {
+    const { run, display, ended } = await pressBerhenti();
+    const card = display();
+    if (card?.type !== "pilih") throw new Error("expected Kartu Pilih");
+    card.onChoose("sendiri");
+    await vi.waitFor(() =>
+      expect(display()).toMatchObject({ type: "tunjuk", sentence: "Ketik 92 untuk Aisyah Zahra." }),
+    );
+    expect(run.state.cara).toBe(2);
+    expect(run.state.status).toBe("running");
+    expect(field("Ahmad Fadli").value).toBe("80");
+    typeAsTeacher(field("Aisyah Zahra"), "92");
+    await vi.waitFor(() =>
+      expect(display()).toMatchObject({ type: "tunjuk", sentence: "Silakan Bu tekan Simpan." }),
+    );
+    expect(presses.simpan).toBe(0);
+    expect(ended).not.toHaveBeenCalled();
+  });
+
+  test("Tidak, berhenti ends as before: inputs kept, Catatan langkah, nothing pressed", async () => {
+    const { run, display, ended, log } = await pressBerhenti();
+    const card = display();
+    if (card?.type !== "pilih") throw new Error("expected Kartu Pilih");
+    card.onChoose("berhenti");
+    expect(run.state.status).toBe("stopped");
+    expect(field("Ahmad Fadli").value).toBe("80");
+    expect(presses.simpan).toBe(0);
+    expect(ended).toHaveBeenCalledOnce();
+    expect(ended.mock.calls[0]?.[2]).toBe(true);
+    expect(ended.mock.calls[0]?.[1].at(-1)).toBe("Berhenti di langkah 4 dari 5; isian tetap ada");
+    expect(log.at(-1)).toEqual({ action: "stop", target: "", result: "stopped" });
+  });
+
+  test("the voice command and the other Berhenti buttons still end at once", async () => {
+    const { run, ended } = harness(createRunState(GRADES, { cara: 1 }), {
+      sleep: holdWhen(() => run.state.index === 3),
+    });
+    void run.run();
+    await vi.waitFor(() => expect(run.state.index).toBe(3));
+    run.stop();
+    expect(run.state.status).toBe("stopped");
+    expect(ended).toHaveBeenCalledOnce();
+  });
+});
+
 describe("F0-06: a missing or ambiguous target", () => {
   test("stops and asks instead of guessing", async () => {
     document.body.insertAdjacentHTML("beforeend", "<a href='#/lain'>Nilai</a>");

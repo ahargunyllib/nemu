@@ -1,7 +1,8 @@
 // Loads a development build of the extension into Playwright's Chromium and checks the executor
 // (#202) on the mock AlurSekolah through its dev-only dock (`?uji-nemu`): cara 1 visible
-// navigation and fill that stops at Simpan, the teacher's own click stopping Nemu (F0-07), F0-1
-// (Muat respons uji), F0-09 (Koneksi putus), a page load mid-task, and Catatan langkah.
+// navigation and fill that stops at Simpan, the teacher's own click stopping Nemu (F0-07), a page
+// load mid-task, Berhenti asking whether she fills the rest herself (F0-11), F0-1 (Muat respons
+// uji), F0-09 (Koneksi putus), and Catatan langkah.
 // Playwright's clicks are real (isTrusted) input. Needs `NEMU_RESPONDER=fixture pnpm dev` running.
 // Screenshots go to .output/verify-executor/.
 import { execFileSync } from "node:child_process";
@@ -154,6 +155,50 @@ await check("a task under way carries on after the page loads again", async () =
     .waitFor({ timeout: 10_000 });
   await page.screenshot({ path: join(shots, "after-reload.png") });
   await overlay.locator("[data-nemu-display]").first().waitFor();
+});
+
+/**
+ * Starts cara 1, presses Berhenti in the Gelembung Kerja while Nemu fills Ahmad Fadli's row, and
+ * returns the Kartu Pilih it asks.
+ */
+async function pressBerhenti() {
+  await dock.getByRole("button", { name: "Contoh cara 1" }).click();
+  const bubble = display("kerja");
+  await bubble.getByText("Mengisi Nilai Ahmad Fadli.").waitFor({ timeout: 15_000 });
+  await bubble.getByRole("button", { name: "Berhenti" }).click();
+  const card = display("pilih");
+  await card.getByText("Nemu berhenti. Bu mau isi sendiri?").waitFor({ timeout: 3_000 });
+  const labels = await card.getByRole("button").allInnerTexts();
+  expect(
+    labels.map((label) => label.trim()).join(" | ") === "Ya, saya isi sendiri | Tidak, berhenti",
+    `unexpected choices: ${labels.join(" | ")}`,
+  );
+  return card;
+}
+
+await check("F0-11: Berhenti asks; Ya, saya isi sendiri goes on in cara 2", async () => {
+  const card = await pressBerhenti();
+  await page.screenshot({ path: join(shots, "berhenti-kartu-pilih.png") });
+  // Earlier checks left the right values on the page; empty the row Nemu stopped on, so cara 2
+  // has to point at it rather than pass over it.
+  await grade("Ahmad Fadli").fill("");
+  await card.getByRole("button", { name: "Ya, saya isi sendiri" }).click();
+  await display("tunjuk").getByText("Ketik 80 untuk Ahmad Fadli.").waitFor({ timeout: 5_000 });
+  expect((await grade("Ahmad Fadli").inputValue()) === "", "Nemu typed after Berhenti");
+  expect(!(await page.locator("#konfirmasi").isVisible()), "Simpan was pressed");
+  await page.screenshot({ path: join(shots, "berhenti-ya-cara-2.png") });
+});
+
+await check("F0-11: Berhenti then Tidak, berhenti ends with Catatan langkah", async () => {
+  const card = await pressBerhenti();
+  await card.getByRole("button", { name: "Tidak, berhenti" }).click();
+  const notes = overlay.getByRole("region", { name: "Catatan langkah" });
+  await notes
+    .getByText(/^Berhenti di langkah \d+ dari \d+; isian tetap ada$/u)
+    .waitFor({ timeout: 5_000 });
+  expect(!(await page.locator("#konfirmasi").isVisible()), "Simpan was pressed");
+  await page.screenshot({ path: join(shots, "berhenti-tidak-catatan.png") });
+  await notes.getByRole("button", { name: "Tutup" }).click();
 });
 
 await check("F0-1: Muat respons uji passes 3/3, nothing pressed, Nemu points instead", async () => {

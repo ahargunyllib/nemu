@@ -226,7 +226,7 @@ export class ExecutorRun {
       status: { tone: "working", text: "Berhenti sebentar" },
       slow: this.state.slow,
       onSlow: () => this.setSlow(!this.state.slow),
-      onStop: () => this.stop(),
+      onStop: () => this.askToStop(),
     });
   }
 
@@ -249,6 +249,27 @@ export class ExecutorRun {
   /** Berhenti: the task ends where it is, inputs kept; Catatan langkah unless `showNotes` is false. */
   stop(showNotes = true) {
     if (this.isActive()) this.end("stopped", showNotes);
+  }
+
+  /**
+   * Berhenti in the Gelembung Kerja (F0-11): Nemu stops acting and asks whether she fills the rest
+   * herself (cara 2 from the current step) or ends the task. Nothing is saved or pressed either way.
+   * The voice command "berhenti" is a short command (F0-15) and ends at once with `stop`.
+   */
+  askToStop() {
+    if (!this.isActive()) return;
+    if (this.state.cara !== 1) return this.stop();
+    this.halt("asking");
+    const teacher = this.deps.honorific || "Anda";
+    this.render({
+      type: "pilih",
+      question: `Nemu berhenti. ${teacher} mau isi sendiri?`,
+      choices: [
+        { id: "sendiri", label: "Ya, saya isi sendiri" },
+        { id: "berhenti", label: "Tidak, berhenti" },
+      ],
+      onChoose: (id) => (id === "sendiri" ? this.teach() : this.stop()),
+    });
   }
 
   /** F0-07: the teacher's own mouse or key stops Nemu and asks how to go on. */
@@ -360,7 +381,7 @@ export class ExecutorRun {
           status: { tone: "unsaved", text: "Menyambung lagi" },
           slow: this.state.slow,
           onSlow: () => this.setSlow(!this.state.slow),
-          onStop: () => this.stop(),
+          onStop: () => this.askToStop(),
         });
         await this.sleep(RETRY_MS * (attempt + 1), signal);
       }
@@ -534,7 +555,7 @@ export class ExecutorRun {
         status,
         slow: this.state.slow,
         onSlow: () => this.setSlow(!this.state.slow),
-        onStop: () => this.stop(),
+        onStop: () => this.askToStop(),
       },
       element,
     );
