@@ -297,14 +297,14 @@ export const helpExplanationSchema = z.discriminatedUnion("status", [
     .strict(),
   /**
    * F2-08 / F3-12: the teacher's question matched a symptom of an uploaded BPMN, and the walk found
-   * the cause and the way back. `certainty` is "likely" when AlurSekolah gave no data (F3-13).
+   * the cause and the way back. About one pupil, `sentence` says the cause is "kemungkinan": only
+   * her grades can be checked, never what the process depends on (F3-13).
    */
   z
     .object({
       status: z.literal("process"),
       sentence: z.string(),
       why: z.string(),
-      certainty: z.enum(["confirmed", "likely"]),
       process: z
         .object({ documentId: z.string(), title: z.string(), version: z.string() })
         .strict(),

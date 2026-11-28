@@ -99,7 +99,12 @@ const EXPECTED = {
     cause: ["Task_LockGrades", "End_GradesLocked"],
     cite: [["Task_LockGrades", "Timer_DueDateReached"]],
     gradeCheck: { status: "saved", student: "Aisyah Putri Wijaya" },
-    sentence: [/sudah tersimpan/u, /jatuh tempo/iu, /reguler|bulanan/iu],
+    sentence: [
+      /sudah tersimpan/u,
+      /Kemungkinan karena alur SPP sekolah: /u,
+      /jatuh tempo/iu,
+      /reguler|bulanan/iu,
+    ],
   },
   2: {
     cause: ["Task_UpdatePartiallyPaid", "End_InvoicesPartiallyPaid"],

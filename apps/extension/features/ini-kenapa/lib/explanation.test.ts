@@ -59,7 +59,6 @@ describe("fromExplanation", () => {
       status: "process",
       sentence: "Nilai Budi Santoso sudah tersimpan. … Yang bisa membantu: Bu Ratna (keuangan).",
       why: "Di Alur Pembayaran SPP, …",
-      certainty: "confirmed",
       process: { documentId: "doc-spp", title: "Alur Pembayaran SPP", version: "1" },
       elementId: "Task_KunciNilai",
       steps: [

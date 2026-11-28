@@ -193,13 +193,17 @@ await page.locator("#btn-masuk").click();
 await page.locator("#menu-email").filter({ hasText: "@" }).waitFor();
 
 await check(
-  "F2-1 Q1: Aisyah's grade is saved, so the cause is certain; Bu Ratna helps",
+  "F2-1 Q1: Aisyah's grade is saved, the cause is only 'kemungkinan'; Bu Ratna helps",
   async () => {
     expect(documentReady, "the SPP BPMN isn't uploaded");
     await ask(page, "Nilai UTS Aisyah kok tidak muncul di aplikasi orang tua?");
     await bubble(page)
       .getByText("Nilai Aisyah Putri Wijaya sudah tersimpan.", { exact: false })
       .waitFor({ timeout: 15_000 });
+    await bubble(page)
+      .getByText("Kemungkinan karena alur SPP sekolah:", { exact: false })
+      .waitFor();
+    await page.screenshot({ path: join(shots, "q1-sentence.png") });
     await bubble(page)
       .getByText("Yang bisa membantu: Bu Ratna (keuangan).", { exact: false })
       .waitFor();
