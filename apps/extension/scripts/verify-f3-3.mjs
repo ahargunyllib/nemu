@@ -115,12 +115,14 @@ await admin.waitForURL((url) => !url.pathname.startsWith("/login"));
 await admin.goto(new URL("documents", ADMIN).href);
 await admin.getByRole("row").nth(1).waitFor();
 await admin.waitForLoadState("networkidle");
+// A row's status reads Aktif; its switch is in the panel the row opens.
 const old = admin
   .getByRole("row")
   .filter({ hasText: TITLE })
-  .filter({ has: admin.getByRole("switch", { name: "Aktif", checked: true }) });
+  .filter({ has: admin.getByText("Aktif", { exact: true }) });
 while (await old.count()) {
-  await old.first().getByRole("switch", { name: "Aktif" }).click();
+  await old.first().click();
+  await admin.getByRole("switch", { name: "Aktif", checked: true }).click();
   await admin.waitForTimeout(800);
 }
 

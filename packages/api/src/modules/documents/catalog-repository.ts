@@ -15,14 +15,15 @@ export type CatalogDocument = DocumentRecord & {
 };
 export type ProcessElementRecord = typeof processElement.$inferSelect;
 export type PackageRecord = { id: string; title: string; allSchools: boolean; updatedAt: Date };
+/** The school's own documents (`packageId` null), one package's, or both (`all`). */
+export type DocumentListScope = { packageId: string | null } | "all";
 
 /**
  * What the Admin Workspace shows and edits about knowledge beyond the file itself: who uploaded
  * and switched it (WS-04), the websites it applies to, the package (WS-02), and BPMN elements.
  */
 export type CatalogRepository = {
-  /** The school's own documents (`packageId` null) or one package's documents. */
-  listDocuments(workspaceId: string, packageId: string | null): Promise<CatalogDocument[]>;
+  listDocuments(workspaceId: string, scope: DocumentListScope): Promise<CatalogDocument[]>;
   setSites(workspaceId: string, id: string, siteIds: string[]): Promise<boolean>;
   /** Chunks of ready documents, active or not, for Uji jawaban (WS-09). */
   listReadyChunks(
@@ -58,16 +59,18 @@ async function ownsDocument(db: Database, workspaceId: string, documentId: strin
 
 export function createCatalogRepository(db: Database): CatalogRepository {
   return {
-    async listDocuments(workspaceId, packageId) {
+    async listDocuments(workspaceId, scope) {
       const documents = await db
         .select()
         .from(knowledgeDocument)
         .where(
           and(
             eq(knowledgeDocument.workspaceId, workspaceId),
-            packageId === null
-              ? isNull(knowledgeDocument.packageId)
-              : eq(knowledgeDocument.packageId, packageId),
+            scope === "all"
+              ? undefined
+              : scope.packageId === null
+                ? isNull(knowledgeDocument.packageId)
+                : eq(knowledgeDocument.packageId, scope.packageId),
           ),
         )
         .orderBy(desc(knowledgeDocument.createdAt));

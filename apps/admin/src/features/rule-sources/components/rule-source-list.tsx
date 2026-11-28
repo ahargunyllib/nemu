@@ -1,92 +1,72 @@
 import { Badge } from "@nemu/ui/components/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@nemu/ui/components/card";
 import { Skeleton } from "@nemu/ui/components/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@nemu/ui/components/table";
 import { useQuery } from "@tanstack/react-query";
 
 import RuleSourceDialog from "@/features/rule-sources/components/rule-source-dialog";
 import { orpc } from "@/shared/api/orpc";
 
-const SKELETON_ROWS = ["a", "b", "c", "d"];
+const SKELETON_ROWS = ["a", "b", "c"];
 
 function formatLocation(article: string | null, page: number | null) {
-  return [article, page && `p. ${page}`].filter(Boolean).join(" · ");
+  return [article, page && `hlm. ${page}`].filter(Boolean).join(" · ");
 }
 
-export default function RuleSourceList() {
+/**
+ * The calculation rules and the document each cites (Dokumen dan alur's panel). With
+ * `documentId`, only the rules citing that document; otherwise every rule, with its document.
+ */
+export default function RuleSourceList({ documentId }: { documentId?: string }) {
   const sources = useQuery(orpc.listRuleSources.queryOptions());
-  const missing = sources.data?.filter((source) => !source.citationId).length ?? 0;
+  const shown = sources.data?.filter(
+    (source) => documentId === undefined || source.documentId === documentId,
+  );
+  const missing = shown?.filter((source) => !source.citationId).length ?? 0;
 
+  if (!shown) {
+    return (
+      <div className="grid gap-2">
+        {SKELETON_ROWS.map((key) => (
+          <Skeleton key={key} className="h-10 w-full" />
+        ))}
+      </div>
+    );
+  }
+  if (!shown.length) {
+    return (
+      <p className="text-muted-foreground">Belum ada aturan hitung yang mengutip dokumen ini.</p>
+    );
+  }
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Rule sources</CardTitle>
-        <CardDescription>
-          {missing > 0
-            ? `${missing} rule${missing === 1 ? " has" : "s have"} no active source, so Nemu can't run ${missing === 1 ? "its calculation" : "their calculations"}.`
-            : "The document each calculation cites. Point a rule at the new document when a regulation changes."}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Rule</TableHead>
-              <TableHead>Document</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-0" />
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sources.data
-              ? sources.data.map((source) => (
-                  <TableRow key={source.key}>
-                    <TableCell className="font-medium">{source.label}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span>{source.documentTitle ?? source.documentId}</span>
-                        {source.isDefault && <Badge variant="outline">Default</Badge>}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {formatLocation(source.article, source.page) || "Whole document"}
-                    </TableCell>
-                    <TableCell>
-                      {source.citationId ? (
-                        <Badge variant="secondary">Found</Badge>
-                      ) : (
-                        <Badge variant="destructive">Not found</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <RuleSourceDialog source={source} />
-                    </TableCell>
-                  </TableRow>
-                ))
-              : SKELETON_ROWS.map((key) => (
-                  <TableRow key={key}>
-                    <TableCell colSpan={5}>
-                      <Skeleton className="h-6 w-full" />
-                    </TableCell>
-                  </TableRow>
-                ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+    <div className="grid gap-3">
+      {missing > 0 && (
+        <p className="text-destructive">
+          {missing} aturan tidak menemukan sumber aktif, jadi Nemu tidak bisa menghitungnya.
+        </p>
+      )}
+      <ul className="grid gap-2">
+        {shown.map((source) => (
+          <li key={source.key} className="flex items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="font-medium">{source.label}</div>
+              <div className="text-muted-foreground">
+                {[
+                  documentId === undefined && (source.documentTitle ?? source.documentId),
+                  formatLocation(source.article, source.page) || "Seluruh dokumen",
+                  source.isDefault && "bawaan",
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </div>
+            </div>
+            {source.citationId ? (
+              <Badge variant="secondary">Ditemukan</Badge>
+            ) : (
+              <Badge variant="destructive">Tidak ditemukan</Badge>
+            )}
+            <RuleSourceDialog source={source} />
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

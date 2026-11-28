@@ -2,6 +2,7 @@ import { documentFileLinkSchema } from "@nemu/contracts/school";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 
+import { canManagePackages } from "../../authorization";
 import type { Context } from "../../context";
 import {
   publicProcedure,
@@ -13,10 +14,12 @@ import {
 import { createCatalogRepository } from "./catalog-repository";
 import { createDocumentRepository } from "./repository";
 import {
+  canEditDocument,
   createDocumentFileLink,
   deleteDocument,
   documentFormatOf,
   knowledgeStats,
+  listKnowledge,
   readDocumentFile,
   MAX_DOCUMENT_BYTES,
   openSignedDocumentFile,
@@ -53,24 +56,55 @@ const uploadDocumentInputSchema = z.object({
 
 const documentIdSchema = z.object({ id: z.string().min(1) });
 
+const PACKAGE_READ_ONLY = "Dokumen paket bawaan hanya bisa diubah Admin Javan.";
+
+/** FORBIDDEN for an operator changing a package document: they read it in WS-04, never edit it. */
+async function requireEditable(
+  context: Pick<Context, "db"> & { session: { user: { workspaceId: string; role: string } } },
+  id: string,
+) {
+  const editable = await canEditDocument(
+    { documents: createDocumentRepository(context.db) },
+    context.session.user.workspaceId,
+    id,
+    canManagePackages(context.session.user),
+  );
+  if (!editable) throw new ORPCError("FORBIDDEN", { message: PACKAGE_READ_ONLY });
+}
+
 export const documentsRouter = {
   uploadDocument: workspaceAdminProcedure
     .input(uploadDocumentInputSchema)
-    .handler(({ context, input }) =>
-      uploadDocument(documentDeps(context), {
+    .handler(({ context, input }) => {
+      if (input.packageId && !canManagePackages(context.session.user)) {
+        throw new ORPCError("FORBIDDEN", { message: PACKAGE_READ_ONLY });
+      }
+      return uploadDocument(documentDeps(context), {
         ...input,
         workspaceId: context.session.user.workspaceId,
         createdBy: context.session.user.id,
-      }),
-    ),
+      });
+    }),
 
-  /** WS-04: the school's own documents, newest first, with who uploaded and switched them. */
+  /**
+   * WS-04: the school's own documents (or WS-02's package), newest first, with who uploaded and
+   * switched them. `withPackages` adds the package documents, read-only for an operator.
+   */
   listDocuments: workspaceAdminProcedure
-    .input(z.object({ packageId: z.literal(ALURSEKOLAH_PACKAGE).nullable() }).optional())
+    .input(
+      z
+        .object({
+          packageId: z.literal(ALURSEKOLAH_PACKAGE).nullable(),
+          withPackages: z.boolean().optional(),
+        })
+        .optional(),
+    )
     .handler(({ context, input }) =>
-      createCatalogRepository(context.db).listDocuments(
+      listKnowledge(
+        { catalog: createCatalogRepository(context.db) },
         context.session.user.workspaceId,
-        input?.packageId ?? null,
+        input?.withPackages ? "all" : { packageId: input?.packageId ?? null },
+        canManagePackages(context.session.user),
       ),
     ),
 
@@ -90,6 +124,7 @@ export const documentsRouter = {
   setDocumentSites: workspaceAdminProcedure
     .input(documentIdSchema.extend({ siteIds: z.array(z.string().min(1)).max(50) }))
     .handler(async ({ context, input }) => {
+      await requireEditable(context, input.id);
       const updated = await createCatalogRepository(context.db).setSites(
         context.session.user.workspaceId,
         input.id,
@@ -159,6 +194,7 @@ export const documentsRouter = {
   setDocumentActive: workspaceAdminProcedure
     .input(documentIdSchema.extend({ isActive: z.boolean() }))
     .handler(async ({ context, input }) => {
+      await requireEditable(context, input.id);
       const document = await setDocumentActive(
         documentDeps(context),
         context.session.user.workspaceId,
@@ -173,6 +209,7 @@ export const documentsRouter = {
   deleteDocument: workspaceAdminProcedure
     .input(documentIdSchema)
     .handler(async ({ context, input }) => {
+      await requireEditable(context, input.id);
       const document = await deleteDocument(
         documentDeps(context),
         context.session.user.workspaceId,

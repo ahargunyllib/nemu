@@ -108,11 +108,11 @@ await check("WS-1: Pak Rizal uploads the SOP Setoran Tahfidz PDF, active", async
     await dialog.getByRole("button", { name: "Unggah" }).click();
     await dialog.waitFor({ state: "hidden", timeout: 20_000 });
   }
-  const activeRows = rows.filter({
-    has: admin.getByRole("switch", { name: "Aktif", checked: true }),
-  });
+  // A row's status reads Aktif; its switch is in the panel the row opens.
+  const activeRows = rows.filter({ has: admin.getByText("Aktif", { exact: true }) });
   if (!(await activeRows.count())) {
-    await rows.first().getByRole("switch", { name: "Aktif" }).click();
+    await rows.first().click();
+    await admin.getByRole("switch", { name: "Aktif" }).click();
     await activeRows.first().waitFor();
   }
   await admin.screenshot({ path: join(shots, "ws1-pengetahuan-sekolah.png") });

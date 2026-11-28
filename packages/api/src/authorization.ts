@@ -14,6 +14,11 @@ export function requireWorkspaceAdmin(user: WorkspaceUser): string {
   return user.workspaceId;
 }
 
+/** Whether the user may change a package's documents (WS-02); an operator only reads them. */
+export function canManagePackages(user: Pick<WorkspaceUser, "role">): boolean {
+  return FULL_ADMIN_ROLES.has(user.role);
+}
+
 /** For pages outside a school operator's scope: the school list, integrations. */
 export function requireFullAdmin(user: WorkspaceUser): string {
   if (!FULL_ADMIN_ROLES.has(user.role)) {
