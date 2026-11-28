@@ -242,6 +242,21 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     [dismissAll, close],
   );
 
+  // The talk hint shows only while nothing else does beside the Nemu button (F1-01).
+  const idle =
+    !open &&
+    talk.state.phase !== "asking" &&
+    talk.state.phase !== "blocked" &&
+    !run.display &&
+    !quiz.display &&
+    !quizDeletion.display &&
+    !importing.display &&
+    !recording.display &&
+    !grades.display &&
+    !grades.card &&
+    !process.display &&
+    !preview.display;
+
   return (
     <>
       <div
@@ -364,6 +379,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
         <div className="pointer-events-auto">
           <NemuButton
             open={open}
+            idle={idle}
             shortcutKeys={shortcutKeys(shortcut)}
             onToggle={() => setOpen((current) => !current)}
             onHoldStart={talk.press}

@@ -160,6 +160,14 @@ controls (the field being filled and the ones after it). It also keeps clear of 
 mascot, which stands taller than a short target such as a link.
 A display about no element (an answer to a typed question, most Kartu) sits above the Nemu button.
 
+**Talk hint** (F1-01): while Nemu is idle, a dark pill left of the Nemu button says how to talk:
+"Tahan **Ctrl + Spasi** untuk bicara". It is the inverse of the page, `primary` fill with
+`primary-foreground` text (the stock default Button's colours), fully rounded, `text-sm`, with the
+Float shadow. The keys are `Kbd`s drawn as bold text on the pill, and they come from the school's
+talk shortcut (WS-08), not a fixed "Ctrl + Spasi". The hint hides whenever anything else shows
+beside the button (the type box, an answer, a Kartu such as "Foto dari WhatsApp", a bubble), so
+it never crowds a display.
+
 **Pointing at the browser** (#268): Chrome's microphone prompt is browser UI over the top left
 of the page, which Nemu can't see. The first time the teacher talks on a site, the cursor glides to
 the prompt's measured place instead: just right of its edge, level with its top **Izinkan** button.

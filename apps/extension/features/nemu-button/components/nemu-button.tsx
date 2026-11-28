@@ -8,6 +8,8 @@ const HOLD_DELAY_MS = 350;
 
 type NemuButtonProps = {
   open: boolean;
+  /** Nothing shows beside the button (no panel, card or bubble), so the talk hint does. */
+  idle: boolean;
   /** The talk combination's keys for the hint, e.g. ["Ctrl", "Spasi"]. */
   shortcutKeys: readonly string[];
   onToggle: () => void;
@@ -18,9 +20,11 @@ type NemuButtonProps = {
 /**
  * The Nemu button at the bottom right of every allowed page: the dark orange `nemu` disc with the
  * mascot. A click opens the type box; pressing and holding it talks, like the combination.
+ * While Nemu is idle, a dark pill beside it says how to talk: "Tahan **Ctrl + Spasi** untuk bicara".
  */
 export function NemuButton({
   open,
+  idle,
   shortcutKeys,
   onToggle,
   onHoldStart,
@@ -36,14 +40,16 @@ export function NemuButton({
 
   return (
     <div className="flex items-center gap-2">
-      {!open && (
-        <p className="rounded-full bg-background px-3 py-1.5 text-xs text-muted-foreground shadow-nemu-float">
+      {idle && (
+        <p className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground shadow-nemu-float">
           Tahan{" "}
-          <KbdGroup>
+          <KbdGroup className="font-semibold">
             {shortcutKeys.map((key, index) => (
               <Fragment key={key}>
                 {index > 0 && "+"}
-                <Kbd>{key}</Kbd>
+                <Kbd className="h-auto min-w-0 bg-transparent px-0 text-sm font-semibold text-primary-foreground">
+                  {key}
+                </Kbd>
               </Fragment>
             ))}
           </KbdGroup>{" "}

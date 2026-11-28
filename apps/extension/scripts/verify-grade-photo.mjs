@@ -217,6 +217,11 @@ await check(
       job?.jobId === jobId && job.status === "queued" && job.reading === null,
       `job ${job?.status}`,
     );
+    // The talk hint is for an idle Nemu: it hides beside the card.
+    expect(
+      (await page.locator("nemu-overlay").getByText("untuk bicara").count()) === 0,
+      "the talk hint shows beside the card",
+    );
     await page.screenshot({ path: join(shots, "kartu-foto.png") });
     await cardIn(page).screenshot({ path: join(shots, "kartu-foto-dekat.png") });
   },
