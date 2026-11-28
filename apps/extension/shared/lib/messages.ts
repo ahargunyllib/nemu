@@ -1,6 +1,7 @@
 import type { ActionLogEntry } from "@nemu/contracts/executor";
 import type { PageSnapshot } from "@nemu/contracts/school";
 
+import type { StepNotes } from "../../features/executor/api/request-run-storage";
 import type { GradePhotoRequest } from "../../features/grade-photo/lib/requests";
 import type { ProcessRunRequest } from "../../features/process-run/lib/requests";
 import type { QuizCheckRequest } from "../../features/quiz-check/lib/requests";
@@ -29,7 +30,7 @@ export type NemuMessage =
   // `chrome.storage.session`, which only the background reads; actions go to the action log.
   | { type: "nemu:run-save"; state: unknown }
   | { type: "nemu:run-load" }
-  | { type: "nemu:notes-save"; notes: { title: string; items: string[] } }
+  | { type: "nemu:notes-save"; notes: StepNotes }
   | { type: "nemu:notes-load" }
   | { type: "nemu:log-actions"; pageEmail: PageEmail; entries: ActionLogEntry[] }
   // F1 (#207): the WhatsApp photo, its questions, the fill's rules and the read-back.

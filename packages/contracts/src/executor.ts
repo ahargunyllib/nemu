@@ -41,6 +41,13 @@ export const executorTargetSchema = z
     message: "A target needs a label, a text or a row",
   });
 
+/**
+ * The recipe line a step belongs to (F1·12): the plan names its stages ("Menu Nilai",
+ * "Pilih kelas, mapel, penilaian", "Ketik nilai per murid", "Tekan Simpan"), and Catatan langkah
+ * lists them in order, once each, as "Cara …". A step without one gets a plain line from its verb.
+ */
+const stage = z.string().min(1).max(80).optional();
+
 export const executorStepSchema = z.discriminatedUnion("verb", [
   /**
    * The teacher's turn: Nemu points and waits for her to press it (Simpan, Kirim, uploads).
@@ -49,6 +56,7 @@ export const executorStepSchema = z.discriminatedUnion("verb", [
   z
     .object({
       verb: z.literal("point"),
+      stage,
       target: executorTargetSchema,
       sentence: z.string(),
       ringkasan: z.string().max(4000).optional(),
@@ -60,24 +68,31 @@ export const executorStepSchema = z.discriminatedUnion("verb", [
   z
     .object({
       verb: z.literal("setValue"),
+      stage,
       target: executorTargetSchema,
       value: z.string(),
       rowName: z.string().optional(),
     })
     .strict(),
   z
-    .object({ verb: z.literal("selectOption"), target: executorTargetSchema, option: z.string() })
+    .object({
+      verb: z.literal("selectOption"),
+      stage,
+      target: executorTargetSchema,
+      option: z.string(),
+    })
     .strict(),
   z
     .object({
       verb: z.literal("check"),
+      stage,
       target: executorTargetSchema,
       checked: z.boolean().default(true),
     })
     .strict(),
-  z.object({ verb: z.literal("scroll"), target: executorTargetSchema }).strict(),
+  z.object({ verb: z.literal("scroll"), stage, target: executorTargetSchema }).strict(),
   /** Visible navigation (F0-13): Nemu clicks a menu, link or tab with the cursor, naming it. */
-  z.object({ verb: z.literal("clickMenu"), target: executorTargetSchema }).strict(),
+  z.object({ verb: z.literal("clickMenu"), stage, target: executorTargetSchema }).strict(),
 ]);
 
 /** The six step verbs; anything else a model or recording sends is never run (F0-08). */
@@ -90,6 +105,15 @@ export const EXECUTOR_VERBS = [
   "clickMenu",
 ] as const;
 
+/**
+ * What Catatan langkah calls the job: `name` for every run of it ("Isi nilai kelas" → "Cara isi
+ * nilai kelas"), `from` for this run ("pengisian Matematika 4B" → "Disimpan dari pengisian
+ * Matematika 4B, 1 Des 2026."). Without it the task's title stands in for both.
+ */
+export const executorRecipeSchema = z
+  .object({ name: z.string().min(1).max(80), from: z.string().min(1).max(120).optional() })
+  .strict();
+
 /** One task for the executor. `kind` groups runs of the same job, e.g. for "Coba sendiri". */
 export const executorTaskSchema = z
   .object({
@@ -97,6 +121,7 @@ export const executorTaskSchema = z
     title: z.string().min(1),
     /** Where the steps came from, shown in Catatan langkah ("Rekaman Pak Rizal"). */
     source: z.string().optional(),
+    recipe: executorRecipeSchema.optional(),
     steps: z.array(executorStepSchema),
   })
   .strict();
@@ -150,6 +175,7 @@ export type ExecutorTarget = z.infer<typeof executorTargetSchema>;
 export type ExecutorStep = z.infer<typeof executorStepSchema>;
 export type ExecutorVerb = ExecutorStep["verb"];
 export type ExecutorTask = z.infer<typeof executorTaskSchema>;
+export type ExecutorRecipe = z.infer<typeof executorRecipeSchema>;
 export type UntrustedStep = z.infer<typeof untrustedStepSchema>;
 export type UntrustedTask = z.infer<typeof untrustedTaskSchema>;
 export type ActionResult = z.infer<typeof actionResultSchema>;

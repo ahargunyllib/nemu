@@ -28,6 +28,7 @@ const executor = {
     finishers.set(kind, finisher),
   start: vi.fn(async () => undefined),
   presentNotes: vi.fn(),
+  presentRecipe: vi.fn(),
 };
 vi.mock("../../executor/stores/executor", () => ({ executor }));
 
@@ -249,8 +250,17 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
   });
 
   test("after the save, the read-back is said in one sentence, the photo deleted, then Catatan langkah", async () => {
+    const task = {
+      kind: "f1-isi-nilai",
+      title: "Isi nilai UTS Matematika 4B",
+      recipe: { name: "Isi nilai kelas", from: "pengisian Matematika 4B" },
+      steps: [
+        { verb: "clickMenu", stage: "Menu Nilai", target: { role: "link", text: "Nilai" } },
+        { verb: "point", stage: "Tekan Simpan", target: { text: "Simpan" }, sentence: "" },
+      ],
+    };
     finishers.get("f1-isi-nilai")!(
-      { status: "done", startCara: 1, task: { kind: "f1-isi-nilai" } },
+      { status: "done", startCara: 1, task },
       ["Sumber: Foto buku nilai dari WhatsApp", "Nemu mengisi 3 isian", "Bu menekan Simpan"],
       true,
     );
@@ -266,17 +276,25 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
     const done = view().display;
     if (done?.type !== "jawab") throw new Error("no answer");
     done.action?.onSelect();
-    expect(executor.presentNotes).toHaveBeenCalledWith(
-      [
-        "Sumber: Foto buku nilai dari WhatsApp",
-        "Bu menjawab 2 pertanyaan tentang foto",
-        "Nemu mengisi 3 isian",
-        "Bu menekan Simpan",
-        "Nemu membaca ulang 2 nilai dari AlurSekolah: semua sesuai",
-        "Foto buku nilai dihapus dari Nemu",
-      ],
-      "f1-isi-nilai",
-      true,
+    // She sees the recipe (F1·12); who did what is kept as its log.
+    expect(executor.presentRecipe).toHaveBeenCalledWith(
+      {
+        title: "Cara isi nilai kelas",
+        subtitle: expect.stringMatching(/^Disimpan dari pengisian Matematika 4B, /u),
+        items: ["Menu Nilai", "Tekan Simpan"],
+      },
+      {
+        offer: "f1-isi-nilai",
+        show: true,
+        log: [
+          "Sumber: Foto buku nilai dari WhatsApp",
+          "Bu menjawab 2 pertanyaan tentang foto",
+          "Nemu mengisi 3 isian",
+          "Bu menekan Simpan",
+          "Nemu membaca ulang 2 nilai dari AlurSekolah: semua sesuai",
+          "Foto buku nilai dihapus dari Nemu",
+        ],
+      },
     );
     expect(view().display).toBeNull();
     // The deleted photo isn't offered again while the next poll is still to come.

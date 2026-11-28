@@ -207,7 +207,7 @@ async function upToTheFill() {
     else await buttons.first().click();
   }
   await display("kerja")
-    .getByText(/Nemu mengisi · 3 dari \d+/u)
+    .getByRole("progressbar", { name: /Nemu mengisi · 3 dari \d+/u })
     .waitFor({ timeout: 60_000 });
 }
 
@@ -332,12 +332,9 @@ async function scenario(how) {
       const left = await service({ name: "inboxJobs" });
       expect(!left.some((job) => job.jobId === jobId), "the photo is still in the inbox");
       await answer.getByRole("button", { name: "Catatan langkah" }).click();
-      const notes = overlay.getByRole("region", { name: "Catatan langkah" });
-      await notes
-        .getByText(
-          /^Bu mengetik \d+ isian, Nemu memeriksa; 2 sempat berbeda dan sudah dibetulkan$/u,
-        )
-        .waitFor({ timeout: 5000 });
+      // The recipe (F1·12); her two corrections stay in the kept notes' log.
+      const notes = overlay.getByRole("region", { name: "Cara isi nilai kelas" });
+      await notes.getByText("Ketik nilai per murid", { exact: true }).waitFor({ timeout: 5000 });
       await page.screenshot({ path: join(shots, `${how}-catatan-langkah.png`) });
       await notes.getByRole("button", { name: "Tutup" }).click();
     },

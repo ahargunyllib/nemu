@@ -175,10 +175,12 @@ await check("F2-3: Nemu points at E-Kinerja, then Sinkro Ruang GTK; she clicks",
   );
   await gtk.locator("#btn-sinkro-ruang-gtk").click();
   await gtk.getByText("Sinkronisasi berhasil", { exact: false }).waitFor();
-  // Catatan langkah names the Kamus Kendala entry and what she pressed.
+  // Catatan langkah: the recipe, saved from the Kamus Kendala entry (F1·12).
   const notes = display(gtk, "info");
-  await notes.getByText("Sumber: Kamus Kendala K-02").waitFor({ timeout: 10_000 });
-  await notes.getByText("menekan Sinkro Ruang GTK", { exact: false }).waitFor();
+  await notes
+    .getByText("Disimpan dari Kamus Kendala K-02", { exact: false })
+    .waitFor({ timeout: 10_000 });
+  await notes.getByText("Tekan Sinkro Ruang GTK", { exact: true }).waitFor();
   await gtk.screenshot({ path: join(shots, "f2-3-notes.png") });
   await notes.getByRole("button", { name: "Tutup" }).click();
 });

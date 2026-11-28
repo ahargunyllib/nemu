@@ -8,6 +8,7 @@ import type {
 import type { KartuPilihProps, NemuDisplay } from "@nemu/ui/lib/nemu-display";
 
 import type { PageEmail } from "../../../shared/lib/messages";
+import { type Recipe, recipeOf, stoppedDetail } from "../../executor/lib/recipe-steps";
 import type { RunState } from "../../executor/lib/run";
 import { executor } from "../../executor/stores/executor";
 import { requestGradePhoto } from "../api/request-grade-photo";
@@ -69,8 +70,11 @@ type Kept = {
   target: GradeTarget;
   entries: GradeEntry[];
   questions: number;
+  /** What happened, for the kept notes' `log`; she sees the `recipe` (F1·12). */
   notes: string[];
   offer: string | null;
+  /** Catatan langkah · Cara isi nilai kelas, from the fill's plan, once it ended. */
+  recipe?: Recipe;
 };
 
 type Context = {
@@ -528,7 +532,11 @@ function createGradePhoto() {
         if (kept) void call({ op: "release", jobId: kept.jobId });
         void call({ op: "state-save", state: null });
         reset();
-        executor.presentNotes(notes, null, show);
+        executor.presentRecipe(recipeOf(ended.task), {
+          show,
+          detail: stoppedDetail(ended),
+          log: notes,
+        });
         return;
       }
       const teacher = capitalize(context.honorific || "Anda");
@@ -537,6 +545,7 @@ function createGradePhoto() {
         phase: "saving",
         notes: withAnswered(notes, `${teacher} menjawab ${kept.questions} pertanyaan tentang foto`),
         offer: ended.startCara === 1 ? ended.task.kind : null,
+        recipe: recipeOf(ended.task),
       };
       void call({ op: "state-save", state: kept });
       waitForSave(false);
@@ -611,8 +620,10 @@ function createGradePhoto() {
   function showNotes(show: boolean) {
     const notes = kept?.notes ?? [];
     const offer = kept?.offer ?? null;
+    const recipe = kept?.recipe;
     reset();
-    executor.presentNotes(notes, offer, show);
+    if (recipe) executor.presentRecipe(recipe, { offer, show, log: notes });
+    else executor.presentNotes(notes, offer, show);
   }
 
   function reset() {

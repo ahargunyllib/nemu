@@ -1,5 +1,7 @@
 import { browser } from "wxt/browser";
 
+import type { StepNotes } from "./request-run-storage";
+
 /**
  * Background: the executor's run for each tab, and the last Catatan langkah, in
  * `chrome.storage.session` (F0-13). The content script reaches it only through messages, so the
@@ -19,11 +21,11 @@ export async function loadRun(tabId: number | undefined): Promise<unknown> {
   return (await browser.storage.session.get(runKey(tabId)))[runKey(tabId)] ?? null;
 }
 
-export async function saveNotes(notes: { title: string; items: string[] }): Promise<void> {
+export async function saveNotes(notes: StepNotes): Promise<void> {
   await browser.storage.session.set({ [NOTES_KEY]: notes });
 }
 
-export async function loadNotes(): Promise<{ title: string; items: string[] } | null> {
+export async function loadNotes(): Promise<StepNotes | null> {
   return ((await browser.storage.session.get(NOTES_KEY))[NOTES_KEY] as never) ?? null;
 }
 

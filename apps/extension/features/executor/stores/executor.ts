@@ -21,6 +21,8 @@ import {
   type RunState,
   type StepSource,
 } from "../lib/run";
+import type { NotesCard } from "../lib/recipe";
+import { type Recipe, recipeOf, stoppedDetail } from "../lib/recipe-steps";
 import type { Cara } from "../lib/run-notes";
 import { guardSubmits, isTeacherInput, toSafeTask } from "../lib/safety";
 
@@ -139,18 +141,29 @@ function createExecutor() {
     };
   }
 
-  function showNotes(items: string[], offerToTry: string | null) {
+  /**
+   * Catatan langkah as a Kartu Info. A recipe (F1·12b) reads "Cara isi nilai kelas", where it was
+   * saved from, the numbered steps and "Coba sendiri" when the task can be tried in cara 2; a
+   * task's own lines (F4-1's problems) keep the plain "Catatan langkah". `live` is the moment the
+   * task ends, when a read-back's card ("Sudah dicek", F1·12) and the run's own `detail` (where it
+   * stopped) show; the Nemu button reopens it without them.
+   */
+  function showNotes(saved: StepNotes, live: { detail?: string } | null = null) {
     const close = () => publish({ display: null, target: null });
+    const offer = saved.offer ?? null;
     publish({
       display: {
         type: "info",
-        title: "Catatan langkah",
-        items,
-        link: offerToTry
+        ...(saved.subtitle !== undefined ? { status: { text: "Catatan langkah" } } : {}),
+        title: saved.title,
+        detail: live?.detail ?? saved.subtitle,
+        ...(live ? saved.card : undefined),
+        items: saved.items,
+        link: offer
           ? {
               label: "Coba sendiri",
               onSelect: () => {
-                void tryNextTime(offerToTry);
+                void tryNextTime(offer);
                 close();
               },
             }
@@ -160,6 +173,33 @@ function createExecutor() {
       target: null,
       ticks: [],
     });
+  }
+
+  function keepNotes(next: StepNotes) {
+    notes = next;
+    requestSaveNotes(next);
+  }
+
+  /** The recipe of a run that ended, kept for the Nemu button and shown unless `show` is false. */
+  function presentRecipe(
+    recipe: Recipe,
+    options: {
+      offer?: string | null;
+      show?: boolean;
+      card?: NotesCard;
+      detail?: string;
+      log?: string[];
+    } = {},
+  ) {
+    const next: StepNotes = {
+      ...recipe,
+      offer: options.offer ?? null,
+      ...(options.card ? { card: options.card } : {}),
+      ...(options.log ? { log: options.log } : {}),
+    };
+    keepNotes(next);
+    if (options.show === false) return publish({});
+    showNotes(next, { detail: options.detail });
   }
 
   function begin(state: RunState) {
@@ -187,16 +227,17 @@ function createExecutor() {
         flushLog();
         detach?.();
         detach = null;
-        notes = { title: "Catatan langkah", items };
-        requestSaveNotes(notes);
+        const recipe = recipeOf(ended.task);
+        const offer = ended.startCara === 1 ? ended.task.kind : null;
         const finisher = finishers.get(ended.task.kind);
         if (finisher) {
+          keepNotes({ ...recipe, offer, log: items });
           publish({ display: null, target: null, ticks: [] });
           return finisher(ended, items, show);
         }
-        const offer = ended.startCara === 1 ? ended.task.kind : null;
-        if (show) showNotes(items, offer);
-        else publish({ display: null, target: null, ticks: [] });
+        if (!show) publish({ display: null, target: null, ticks: [] });
+        // F1·12: she sees the recipe; who did what stays in the action log and in `log`.
+        presentRecipe(recipe, { offer, show, detail: stoppedDetail(ended), log: items });
       },
     });
     run = current;
@@ -250,13 +291,27 @@ function createExecutor() {
       guides.set(kind, guide);
     },
 
-    /** A finisher's last word: Catatan langkah with its own lines added, kept for the Nemu button. */
-    presentNotes(items: string[], offerToTry: string | null = null, show = true) {
-      notes = { title: "Catatan langkah", items };
-      requestSaveNotes(notes);
-      if (show) showNotes(items, offerToTry);
+    /**
+     * A finisher's last word as its own lines (F4-1's problems): "Catatan langkah" with `items`,
+     * kept for the Nemu button. `card` turns it into a checked list (`recipeCard`).
+     */
+    presentNotes(items: string[], offerToTry: string | null = null, show = true, card?: NotesCard) {
+      const next: StepNotes = {
+        title: "Catatan langkah",
+        items,
+        offer: offerToTry,
+        ...(card ? { card } : {}),
+      };
+      keepNotes(next);
+      if (show) showNotes(next, {});
       else publish({});
     },
+
+    /**
+     * A finisher's last word as the run's recipe (`recipeOf`): "Cara …", the steps, "Coba sendiri"
+     * when `offer` names the task kind; `card` for a read-back's "Sudah dicek" (F1·12).
+     */
+    presentRecipe,
 
     /**
      * Runs a task. Every task is checked first (`toSafeTask`): steps with verbs outside the
@@ -297,9 +352,9 @@ function createExecutor() {
       publish({ display: null, target: null, ticks: [] });
     },
 
-    /** Reopens the last Catatan langkah from the Nemu button (F0-14). */
+    /** Reopens the last Catatan langkah from the Nemu button (F0-14, F1·12b), Coba sendiri too. */
     showNotes() {
-      if (notes) showNotes(notes.items, null);
+      if (notes) showNotes(notes);
     },
   };
 }

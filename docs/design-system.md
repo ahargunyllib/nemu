@@ -181,6 +181,11 @@ the page's Shadow DOM.
   (`nemu-subtle` fill, 1 px `nemu-amber-200` edge, 15 px bold `nemu-strong`) and 20 px regular
   text. An optional label sits above it (`itemsLabel`, 16 px semibold `nemu-secondary`):
   "Catatan langkah · Cara isi nilai kelas". The label also names the list for screen readers.
+- **Catatan langkah** is a recipe, not a log: heading "Catatan langkah", title "Cara isi nilai
+  kelas", detail "Disimpan dari pengisian Matematika 4B, 1 Des 2026.", the task's stages as the
+  numbered list ("Menu Nilai", "Pilih kelas, mapel, penilaian", "Ketik nilai per murid", "Tekan
+  Simpan"), and "Coba sendiri" left of [Tutup], also when the Nemu button reopens it. Items are
+  plain strings, so the on-screen labels in them ("Nilai", "Simpan") are not bold.
 - **Gelembung Tunjuk extras**: an optional **chip** under the text (`chip`, a `subtle`
   `NemuBadge` pill 34 px tall with a `nemu-amber-200` edge and 16 px semibold text: "Belum
   tersimpan") and an optional **cancel link** at the bottom (`cancel`, a `nemu-strong` link:
