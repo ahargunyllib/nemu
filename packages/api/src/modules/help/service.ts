@@ -24,6 +24,8 @@ import type { DocumentRepository } from "../documents/repository";
 import type { KamusRepository } from "../kamus/repository";
 import { loadKamusRows } from "../kamus/service";
 import { loadSchoolKnowledge } from "../school/knowledge";
+import type { SchoolRepository } from "../school/repository";
+import { contactsByRole } from "../school/service";
 import { checkSavedGrades } from "./grade-check";
 
 /**
@@ -227,4 +229,90 @@ export async function route(
     }
   }
   return routed;
+}
+
+/** What the BPMN panel's answer test shows: the element Nemu matched and what it would say. */
+export type ProcessTryAnswer =
+  | {
+      status: "matched";
+      elementId: string;
+      elementName: string;
+      symptom: string;
+      /** Nemu's first sentence to a teacher, or null when it couldn't walk the file to a cause. */
+      sentence: string | null;
+    }
+  | { status: "no_match" };
+
+/**
+ * "Uji jawaban sebelum diaktifkan" for one BPMN (WS-04, F2-08): a teacher's question against this
+ * file's symptoms only, active or not, and the explanation she would get. AlurSekolah isn't asked
+ * about any pupil, and a stand-in teacher with the school's WS-06 contacts hears it.
+ */
+export async function tryProcessAnswer(
+  deps: {
+    ai: Pick<SchoolAi, "matchSymptom" | "explainProcess">;
+    documents: Pick<DocumentRepository, "findById">;
+    catalog: Pick<CatalogRepository, "listProcessElements">;
+    files: DocumentFileStore;
+    school: Pick<SchoolRepository, "listContacts" | "schoolName">;
+  },
+  workspaceId: string,
+  documentId: string,
+  question: string,
+): Promise<ProcessTryAnswer | undefined> {
+  const document = await deps.documents.findById(workspaceId, documentId);
+  if (document?.format !== "bpmn" || document.status !== "ready") return undefined;
+  const elements = await deps.catalog.listProcessElements(workspaceId, documentId);
+  const candidates: SymptomCandidate[] = elements.flatMap((element) =>
+    element.symptoms.map((symptom) => ({ documentId, elementId: element.elementId, symptom })),
+  );
+  const found = candidates.length ? await deps.ai.matchSymptom({ question, candidates }) : null;
+  const element = elements.find((item) => item.elementId === found?.match.elementId);
+  if (!found || !element) return { status: "no_match" };
+
+  const [body, contacts, schoolName] = await Promise.all([
+    deps.files.get(document.storageKey),
+    deps.school.listContacts(workspaceId),
+    deps.school.schoolName(workspaceId),
+  ]);
+  // No teacher is asking: a stand-in with the school's contacts, so the helper is named as she'd hear.
+  const teacher: TeacherProfile = {
+    teacherId: "uji-jawaban",
+    name: "Guru",
+    honorific: "Bu",
+    nip: "",
+    phone: "",
+    schoolName: schoolName ?? workspaceId,
+    classes: [],
+    subjects: [],
+    contacts: contactsByRole(contacts),
+  };
+  const answer = body
+    ? await deps.ai.explainProcess({
+        question,
+        process: {
+          documentId,
+          title: document.title,
+          version: document.version,
+          graph: await importBpmn(new TextDecoder().decode(body)),
+          index: Object.fromEntries(
+            elements.map((item) => [
+              item.elementId,
+              { symptoms: item.symptoms, wayBack: item.wayBack, role: item.role },
+            ]),
+          ),
+        },
+        match: found.match,
+        via: found.via,
+        gradeCheck: { status: "not_asked" },
+        teacher,
+      })
+    : null;
+  return {
+    status: "matched",
+    elementId: element.elementId,
+    elementName: element.name,
+    symptom: found.match.symptom,
+    sentence: answer && "sentence" in answer ? answer.sentence : null,
+  };
 }

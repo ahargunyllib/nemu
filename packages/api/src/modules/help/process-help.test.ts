@@ -96,6 +96,40 @@ const EXPECTED = [
   },
 ] as const;
 
+describe("Dokumen dan alur: Uji jawaban sebelum diaktifkan", () => {
+  it("matches a parent's question to Lock Student Grades and says what a teacher would hear", async () => {
+    const { context, document } = await withSppProcess();
+    await call(
+      documentsRouter.setDocumentActive,
+      { id: document.id, isActive: false },
+      { context },
+    );
+
+    const result = await call(
+      helpRouter.helpTryProcess,
+      {
+        documentId: document.id,
+        question: "Nilai UTS Aisyah kok tidak muncul di aplikasi orang tua?",
+      },
+      { context },
+    );
+    expect(result).toMatchObject({
+      status: "matched",
+      elementId: "Task_LockGrades",
+      elementName: "Lock Student Grades",
+    });
+    expect(result.status === "matched" && result.sentence).toMatch(/alur SPP sekolah/u);
+
+    await expect(
+      call(
+        helpRouter.helpTryProcess,
+        { documentId: document.id, question: "Cuti melahirkan berapa lama?" },
+        { context },
+      ),
+    ).resolves.toEqual({ status: "no_match" });
+  });
+});
+
 describe("F2-08: nilai tidak muncul, from the uploaded SPP BPMN", () => {
   it("F3-11: upload indexes symptoms, way back and role the operator can read and correct", async () => {
     const { elements } = await withSppProcess();

@@ -125,15 +125,13 @@ await check(
       await admin.getByRole("switch", { name: "Aktif" }).click();
       await activeRows.first().waitFor();
     }
+    // The row opens its panel, where "Gejala yang dikenali Nemu" lists the suggested symptoms.
     await activeRows.first().click();
-    await admin.getByRole("button", { name: "Gejala dan halaman Alur SPP" }).click();
-    const sheet = admin.getByRole("dialog");
-    await sheet
-      .getByText("nilai tidak muncul di aplikasi orang tua", { exact: false })
+    await admin
+      .getByText("tidak muncul di aplikasi orang tua", { exact: false })
       .first()
       .waitFor({ timeout: 10_000 });
     await admin.screenshot({ path: join(shots, "ws04-symptoms.png") });
-    await admin.keyboard.press("Escape");
     documentReady = true;
   },
 );

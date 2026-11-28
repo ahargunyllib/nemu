@@ -113,6 +113,16 @@ export function contactCallName(contact: Pick<ContactRecord, "name" | "honorific
   return `${contact.honorific} ${firstName}`;
 }
 
+/** The school's WS-06 contacts by role, as a teacher profile carries them. */
+export function contactsByRole(contacts: readonly ContactRecord[]): Record<string, Contact> {
+  return Object.fromEntries(
+    contacts.map((contact): [string, Contact] => [
+      contact.role,
+      { name: contactCallName(contact), role: contact.role, phone: contact.phone },
+    ]),
+  );
+}
+
 /** A WS-06 teacher as the school AI reads it (L-02), with the school's contacts by role. */
 export function toTeacherProfile(
   teacher: TeacherRecord,
@@ -128,11 +138,6 @@ export function toTeacherProfile(
     schoolName,
     classes: teacher.classes,
     subjects: teacher.subjects,
-    contacts: Object.fromEntries(
-      contacts.map((contact): [string, Contact] => [
-        contact.role,
-        { name: contactCallName(contact), role: contact.role, phone: contact.phone },
-      ]),
-    ),
+    contacts: contactsByRole(contacts),
   };
 }

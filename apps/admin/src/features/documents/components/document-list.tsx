@@ -1,4 +1,5 @@
 import { Badge } from "@nemu/ui/components/badge";
+import { Button } from "@nemu/ui/components/button";
 import {
   Card,
   CardAction,
@@ -25,7 +26,8 @@ import {
   TableRow,
 } from "@nemu/ui/components/table";
 import { useQuery } from "@tanstack/react-query";
-import { FileTextIcon, SearchIcon } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { FileTextIcon, SearchIcon, WorkflowIcon } from "lucide-react";
 import { useState } from "react";
 
 import {
@@ -41,7 +43,6 @@ import {
 import DocumentSitesDialog from "@/features/documents/components/document-sites-dialog";
 import DocumentStatusBadge from "@/features/documents/components/document-status-badge";
 import DocumentUploadDialog from "@/features/documents/components/document-upload-dialog";
-import ProcessElementsSheet from "@/features/documents/components/process-elements-sheet";
 import { formatDate, formatLabel, formatSize } from "@/features/documents/lib/format";
 
 const SKELETON_ROWS = ["a", "b", "c"];
@@ -158,7 +159,15 @@ export default function DocumentList({
                       <TableCell>
                         <div className="flex justify-end gap-1">
                           {document.format === "bpmn" && document.status === "ready" && (
-                            <ProcessElementsSheet id={document.id} title={document.title} />
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={`Gejala dan halaman ${document.title}`}
+                              nativeButton={false}
+                              render={<Link to="/documents" search={{ dokumen: document.id }} />}
+                            >
+                              <WorkflowIcon />
+                            </Button>
                           )}
                           {document.format !== "procedure" && (
                             <DocumentUploadDialog
