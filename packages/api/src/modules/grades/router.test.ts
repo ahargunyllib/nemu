@@ -91,7 +91,7 @@ describe("F1 through the API (offline AI, seeded SDIT Nusantara)", () => {
       { entries: result.entries, saved },
       { context },
     );
-    expect(check.sentence).toBe("Sudah saya cek, sama dengan buku.");
+    expect(check.sentence).toBe("Tersimpan, sama dengan buku.");
 
     await call(inboxRouter.inboxAck, { jobId: queued.jobId }, { context });
     expect(context.school.inbox.objects.size).toBe(0);
@@ -229,7 +229,7 @@ describe("F1-10 read-back from AlurSekolah API v1", () => {
     await expect(readback(context, { className: "4b" })).resolves.toEqual({
       match: true,
       mismatches: [],
-      sentence: "Sudah saya cek, sama dengan buku.",
+      sentence: "Tersimpan, sama dengan buku.",
     });
     const asked = fake.requests.map(({ url }) => url.pathname + decodeURIComponent(url.search));
     expect(asked).toContain("/api/v1/nilai?kelas=4B&mapel=Matematika&jenis=UTS");

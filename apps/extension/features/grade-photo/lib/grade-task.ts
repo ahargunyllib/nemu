@@ -11,6 +11,38 @@ export const GRADE_TASK_KIND = "f1-isi-nilai";
 export const REMEDIAL_NOTE = "remedial";
 export const ABSENT_NOTE = "tidak hadir";
 
+/** What Catatan langkah calls F1's job: "Cara isi nilai kelas". */
+export const GRADE_RECIPE = "Isi nilai kelas";
+
+const ABSENT_WORD = { S: "sakit", I: "izin", A: "alpa" } as const;
+
+function joinNames(names: readonly string[]): string {
+  return names.length < 2
+    ? (names[0] ?? "")
+    : `${names.slice(0, -1).join(", ")} dan ${names.at(-1)}`;
+}
+
+/**
+ * The detail line under "Tersimpan, sama dengan buku." (F1·12): how many grades Nemu read back
+ * and who was left blank, by first name: "31 nilai sudah Nemu baca ulang. Raka dikosongkan
+ * (sakit)."
+ */
+export function readBackDetail(entries: readonly GradeEntry[]): string {
+  const read = entries.filter((entry) => entry.value !== null).length;
+  const absent = entries.flatMap((entry) =>
+    entry.status === "S" || entry.status === "I" || entry.status === "A"
+      ? [{ name: entry.name.split(/\s+/u)[0] ?? entry.name, why: ABSENT_WORD[entry.status] }]
+      : [],
+  );
+  const lines = [`${read} nilai sudah Nemu baca ulang.`];
+  const reasons = [...new Set(absent.map((entry) => entry.why))];
+  if (reasons.length === 1)
+    lines.push(`${joinNames(absent.map((entry) => entry.name))} dikosongkan (${reasons[0]}).`);
+  else if (reasons.length > 1)
+    lines.push(`${joinNames(absent.map((entry) => `${entry.name} (${entry.why})`))} dikosongkan.`);
+  return lines.join(" ");
+}
+
 /** "Ibu" / "Bapak" in a full sentence, from WS-06's "Bu" / "Pak". */
 export function addressFor(honorific: string): string {
   if (honorific === "Bu") return "Ibu";
@@ -122,7 +154,7 @@ export function gradeTask(input: {
     kind: GRADE_TASK_KIND,
     title: `Isi nilai ${command.assessment} ${command.subject} ${command.className}`,
     source: "Foto buku nilai dari WhatsApp",
-    recipe: { name: "Isi nilai kelas", from: `pengisian ${command.subject} ${command.className}` },
+    recipe: { name: GRADE_RECIPE, from: `pengisian ${command.subject} ${command.className}` },
     steps: [...open, ...fill, save],
   };
 }

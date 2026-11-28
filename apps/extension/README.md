@@ -140,8 +140,11 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     Simpan: "Silakan Ibu tekan Simpan.", with every value behind **Lihat ringkasan**.
   - **After Simpan** Nemu waits for the page's saved message (or **Sudah tersimpan**), reads the
     grades back with `gradesReadbackAlurSekolah` (or, when WS-07 isn't connected, compares what
-    the page shows with `gradesReadback`), says the result in one sentence, calls `inboxAck` and
-    offers Catatan langkah. The wait survives a page load.
+    the page shows with `gradesReadback`), calls `inboxAck` and ends with one Kartu Info (F1·12):
+    **Sudah dicek**, "Tersimpan, sama dengan buku." (said aloud), "31 nilai sudah Nemu baca
+    ulang. Raka dikosongkan (sakit).", then "Catatan langkah · Cara isi nilai kelas" with the
+    recipe, **Coba sendiri** and **Tutup**. A mismatch turns it into **Belum sama** with the
+    differing grades as the detail line. The wait survives a page load.
   - **Nanti** hides the card in this tab; × or Berhenti before the fill lets the photo show again.
 - **F4-1: check a Moodle quiz the way students see it (#209).** `features/quiz-check/`. "Nemu,
   tolong cek kuis ini" (typed or spoken, on any page of a quiz) is the extension's own command; no
@@ -296,8 +299,9 @@ read-back, WS-07 connected to the mock (Admin › Integrasi: URL `http://localho
 (`packages/ai/src/school/fixtures/f1-1-buku-nilai-4b.jpg`) the way `apps/wa-bot` does and checks:
 the card in one of two tabs only, Mulai and "Ini nilai apa, Bu?" with the photo's title picked (#270), the 10 W5 questions (4
 doubtful cells, 5 names, 1 S) with their crops, the cara 1 fill of all 32 students with notes,
-Lihat ringkasan beside Simpan, the read-back sentence after the save, the photo gone from the
-inbox, Catatan langkah, and every saved grade right in under 5 minutes. Screenshots go to
+Lihat ringkasan beside Simpan, the Sudah dicek card after the save, the photo gone from the
+inbox, Catatan langkah reopened from the Nemu button, and every saved grade right in under 5
+minutes. Screenshots go to
 `.output/verify-grade-photo/`. It also hands over the photo's thumbnail
 (`f1-1-buku-nilai-4b-thumbnail.jpg`, what `apps/wa-bot/internal/thumbnail` makes of it) and
 checks that the card shows it with the job still queued, that Bu Dewi (another seeded teacher)

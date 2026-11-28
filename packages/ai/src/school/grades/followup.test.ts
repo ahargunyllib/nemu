@@ -19,7 +19,7 @@ test("read-back matches when Rekap Nilai shows the same values and blanks", () =
     { name: "Raka Aditya", value: "-" },
     { name: "Budi Hartono", value: "64,00" },
   ]);
-  assert.deepEqual([result.match, result.sentence], [true, "Sudah saya cek, sama dengan buku."]);
+  assert.deepEqual([result.match, result.sentence], [true, "Tersimpan, sama dengan buku."]);
 });
 
 test("read-back names the first mismatched student and never says 'salah'", () => {

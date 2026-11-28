@@ -2,7 +2,13 @@ import type { GradeEntry } from "@nemu/contracts/school";
 import { describe, expect, test } from "vite-plus/test";
 
 import { recipeOf } from "../../executor/lib/recipe-steps";
-import { addressFor, formAssessment, GRADE_TASK_KIND, gradeTask } from "./grade-task";
+import {
+  addressFor,
+  formAssessment,
+  GRADE_TASK_KIND,
+  gradeTask,
+  readBackDetail,
+} from "./grade-task";
 
 const ENTRIES: GradeEntry[] = [
   { studentId: "s-1", name: "Ahmad Fadli", value: 82, status: "value", remedial: false },
@@ -95,6 +101,19 @@ describe("the F1 fill task (cara 1)", () => {
       subtitle: "Disimpan dari pengisian Matematika 4B, 1 Des 2026.",
       items: [MENU, PICK, FILL, "Tekan Simpan"],
     });
+  });
+
+  test("the Sudah dicek detail counts what was read back and names who was left blank", () => {
+    expect(readBackDetail(ENTRIES)).toBe(
+      "2 nilai sudah Nemu baca ulang. Putra dikosongkan (sakit).",
+    );
+    expect(
+      readBackDetail([
+        ...ENTRIES,
+        { studentId: "s-9", name: "Raka Aditya", value: null, status: "I", remedial: false },
+      ]),
+    ).toBe("2 nilai sudah Nemu baca ulang. Putra (sakit) dan Raka (izin) dikosongkan.");
+    expect(readBackDetail(ENTRIES.slice(0, 2))).toBe("2 nilai sudah Nemu baca ulang.");
   });
 
   test("names the assessment as Jenis Penilaian lists it, and addresses the teacher in full", () => {
