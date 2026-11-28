@@ -126,6 +126,9 @@ function AnswerCard({ pending, answer }: { pending: boolean; answer: GroundedAns
               </Badge>
             </div>
             <p className="text-base">{answer.answer}</p>
+            {answer.status === "answered" && answer.detail && (
+              <p className="text-muted-foreground">{answer.detail}</p>
+            )}
             {answer.status === "answered" && (
               <div className="grid gap-2">
                 <span className="font-medium">Sumber</span>

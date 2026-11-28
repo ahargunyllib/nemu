@@ -132,6 +132,24 @@ describe("Gelembung Jawab", () => {
     expect(onOpen).toHaveBeenCalledOnce();
   });
 
+  test("one cited document opens in one click, with no Sumber list (F3·09)", () => {
+    const onRead = vi.fn();
+    const onOpen = vi.fn();
+    render(
+      <GelembungJawab
+        status={{ text: "Jawaban" }}
+        sentence="Di bawah 75, Bu. Itu wajib remedial."
+        detail="KKM 75 berlaku untuk semua mapel."
+        notes={{ sumberFile: { label: "Sumber: SOP Penilaian, hlm. 2", onOpen } }}
+        onRead={onRead}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: "Sumber" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Sumber: SOP Penilaian, hlm. 2" }));
+    expect(onOpen).toHaveBeenCalledOnce();
+    expect(onRead).not.toHaveBeenCalled();
+  });
+
   test("says its sentence again when the sentence is clicked", () => {
     const onRepeat = vi.fn();
     render(

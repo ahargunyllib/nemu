@@ -118,9 +118,10 @@ await check(
     await openNemu(page);
     await overlay(page).getByLabel("Pertanyaan untuk Nemu").fill("KKM nilai berapa?");
     await overlay(page).getByRole("button", { name: "Kirim" }).click();
-    // The source is behind the Sumber link (#201): read only once it is clicked.
-    await bubble(page).getByRole("button", { name: "Sumber" }).click({ timeout: 15_000 });
-    await bubble(page).getByText("SOP Penilaian SDIT Nusantara", { exact: false }).waitFor();
+    // One cited document is one link that opens it at its page (F3·09); verify:sumber opens it.
+    await bubble(page)
+      .getByRole("button", { name: "Sumber: SOP Penilaian, hlm. 2" })
+      .waitFor({ timeout: 15_000 });
     expect((await bubble(page).innerText()).includes("75"), "the answer doesn't name the KKM");
     await page.screenshot({ path: join(shots, "answer.png") });
   },

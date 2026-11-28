@@ -47,8 +47,8 @@ export const helpRouter = {
   helpAsk: schoolProcedure
     .input(z.object({ question: z.string().trim().min(1).max(500) }))
     .handler(async ({ context, input }) => {
-      await context.caller.requireTeacher();
-      return ask(helpDeps(context), context.caller.workspaceId, input.question);
+      const teacher = await context.caller.requireTeacher();
+      return ask(helpDeps(context), context.caller.workspaceId, input.question, teacher);
     }),
 
   /** WS-09 Uji jawaban (operator or Admin Javan): the answer with chosen inactive documents. */
