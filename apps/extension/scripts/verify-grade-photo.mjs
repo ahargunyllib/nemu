@@ -260,6 +260,19 @@ await check(
     await page.screenshot({ path: join(shots, "pilih-judul.png") });
     await pick.screenshot({ path: join(shots, "pilih-judul-dekat.png") });
     await pick.getByRole("button", { name: "UTS · Matematika · 4B" }).click();
+    // While the photo is read: one sentence and only Berhenti (no Pelan).
+    const reading = display("kerja");
+    if (
+      await reading.waitFor({ timeout: 5000 }).then(
+        () => true,
+        () => false,
+      )
+    ) {
+      await page.screenshot({ path: join(shots, "membaca.png") });
+      await reading.screenshot({ path: join(shots, "membaca-dekat.png") }).catch(() => undefined);
+      const buttons = await reading.getByRole("button").allTextContents();
+      expect(!buttons.includes("Pelan"), `the read offers ${buttons.join(", ")}`);
+    } else console.log("  (the read went by too fast for a screenshot)");
     await display("pilih").filter({ hasNotText: "Ini nilai apa" }).waitFor({ timeout: 60_000 });
   },
 );
