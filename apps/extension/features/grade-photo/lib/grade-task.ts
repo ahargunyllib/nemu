@@ -1,6 +1,8 @@
 import type { ExecutorStep, ExecutorTask } from "@nemu/contracts/executor";
 import type { GradeEntry } from "@nemu/contracts/school";
 
+import { spokenName } from "@nemu/ai/school/grades/guided";
+
 import { addressFor } from "../../executor/lib/address";
 
 /** The grades the teacher asked for: "masukkan nilai UTS Matematika 4B". */
@@ -31,13 +33,37 @@ export function noteFor(entry: GradeEntry): string | null {
   return null;
 }
 
-/** "Ahmad Fadli 82, …, Putra Wijaya kosong (tidak hadir)": the numbers behind Lihat ringkasan. */
-export function gradeSummary(summarySentence: string, entries: readonly GradeEntry[]): string {
-  const lines = entries.map((entry) => {
-    const note = noteFor(entry);
-    return `${entry.name} ${entry.value ?? "kosong"}${note ? ` (${note})` : ""}`;
+const ABSENCE: Record<string, string> = { S: "sakit", I: "izin", A: "alpa" };
+
+/**
+ * Lihat ringkasan beside Simpan (F1·11a): counts, not every grade. "31 dari 32 terisi, belum
+ * tersimpan." over Terisi, Dikosongkan (who and why) and the students under KKM.
+ */
+export function gradeSummary(input: {
+  command: GradeTarget;
+  entries: readonly GradeEntry[];
+  kkm: number;
+}): { title: string; itemsLabel: string; items: string[] } {
+  const { command, entries } = input;
+  const filled = entries.filter((entry) => entry.status === "value" && entry.value !== null);
+  const blank = entries.filter((entry) => !filled.includes(entry));
+  const remedial = filled.filter((entry) => entry.remedial).length;
+  const why = blank.map((entry) => {
+    const name = spokenName(entry, entries);
+    const reason = ABSENCE[entry.status];
+    return reason ? `${name}, ${reason}` : name;
   });
-  return `${summarySentence} ${lines.join(", ")}.`;
+  return {
+    title: `${filled.length} dari ${entries.length} terisi, belum tersimpan.`,
+    itemsLabel: `Ringkasan · ${command.subject} ${command.className}, ${command.assessment}`,
+    items: [
+      `Terisi: ${filled.length} murid`,
+      ...(blank.length ? [`Dikosongkan: ${blank.length} murid (${why.join("; ")})`] : []),
+      ...(remedial
+        ? [`Di bawah KKM ${input.kkm}: ${remedial} murid, diberi catatan ${REMEDIAL_NOTE}`]
+        : []),
+    ],
+  };
 }
 
 /**
@@ -50,7 +76,8 @@ export function gradeSummary(summarySentence: string, entries: readonly GradeEnt
 export function gradeTask(input: {
   command: GradeTarget;
   entries: readonly GradeEntry[];
-  summarySentence: string;
+  /** The KKM `gradesFinalize` used, for Ringkasan. */
+  kkm: number;
   honorific: string;
 }): ExecutorTask {
   const { command, entries } = input;
@@ -118,8 +145,11 @@ export function gradeTask(input: {
   const save: ExecutorStep = {
     verb: "point",
     target: { role: "button", text: "Simpan" },
-    sentence: `Silakan ${addressFor(input.honorific)} tekan Simpan.`,
-    ringkasan: gradeSummary(input.summarySentence, entries),
+    sentence: `Silakan ${address} tekan Simpan.`,
+    // F1·11: her turn, nothing saved yet; the counts behind Lihat ringkasan (F1·11a).
+    heading: `Giliran ${address}`,
+    chip: "Belum tersimpan",
+    ringkasanCard: gradeSummary({ command, entries, kkm: input.kkm }),
   };
   return {
     kind: GRADE_TASK_KIND,

@@ -386,6 +386,62 @@ describe("pointing at Simpan", () => {
     });
     run.stop(false);
   });
+
+  test("Giliran Ibu with Belum tersimpan; Lihat ringkasan opens its card and Kembali comes back (F1·11, 11a)", async () => {
+    const { run, display, spoken, ended } = harness(
+      createRunState(
+        {
+          ...GRADES,
+          steps: [
+            {
+              verb: "point",
+              target: { role: "button", text: "Simpan" },
+              sentence: "Silakan Ibu tekan Simpan.",
+              heading: "Giliran Ibu",
+              chip: "Belum tersimpan",
+              ringkasanCard: {
+                title: "2 dari 2 terisi, belum tersimpan.",
+                itemsLabel: "Ringkasan · Matematika 4B, UTS",
+                items: ["Terisi: 2 murid"],
+              },
+            },
+          ],
+        },
+        { cara: 1 },
+      ),
+    );
+    void run.run();
+    await vi.waitFor(() => expect(run.waiting).toEqual({ refused: false }));
+    const bubble = display();
+    expect(bubble).toMatchObject({
+      type: "tunjuk",
+      status: { text: "Giliran Ibu" },
+      chip: "Belum tersimpan",
+      link: { label: "Lihat ringkasan" },
+    });
+    if (bubble?.type !== "tunjuk" || !bubble.link) throw new Error("expected Lihat ringkasan");
+
+    bubble.link.onSelect();
+    const card = display();
+    expect(card).toMatchObject({
+      type: "info",
+      status: { text: "Ringkasan" },
+      title: "2 dari 2 terisi, belum tersimpan.",
+      itemsLabel: "Ringkasan · Matematika 4B, UTS",
+      items: ["Terisi: 2 murid"],
+      closeLabel: "Kembali",
+    });
+    expect(spoken.at(-1)).toBe("2 dari 2 terisi, belum tersimpan.");
+    if (card?.type !== "info") throw new Error("expected Kartu Info");
+    card.onClose();
+    expect(display()).toMatchObject({ type: "tunjuk", chip: "Belum tersimpan" });
+
+    // Nemu kept waiting for her press the whole time.
+    expect(run.waiting).toEqual({ refused: false });
+    press(document.getElementById("simpan") as Element);
+    await vi.waitFor(() => expect(ended).toHaveBeenCalled());
+    expect(presses.simpan).toBe(1);
+  });
 });
 
 describe("F0-1: a fake AI response that tries to press", () => {

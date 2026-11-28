@@ -165,6 +165,8 @@ export const gradeRulesResultSchema = z.discriminatedUnion("status", [
       /** Rule key → active knowledge chunk id it cites. */
       citations: z.record(z.string(), z.string()),
       summarySentence: z.string(),
+      /** The KKM the remedial count used, for "Di bawah KKM 75" in Ringkasan (F1·11a). */
+      kkm: z.number().min(0).max(100),
     })
     .strict(),
   z
