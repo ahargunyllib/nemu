@@ -3,7 +3,8 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import test from "node:test";
 
-import { importBpmn } from "./bpmn/graph.js";
+import type { KnowledgeChunk } from "../knowledge.js";
+import { bpmnKnowledgeTexts, importBpmn } from "./bpmn/graph.js";
 import { planBpmnStep } from "./bpmn/plan.js";
 import { F2_2_PAGE, F2_3_PAGE, KAMUS_ROWS, NOT_IN_GUIDE_PAGES } from "./fixtures/kamus.js";
 import { BU_SITI, SOP_CHUNKS } from "./fixtures/sdit-nusantara.js";
@@ -141,6 +142,104 @@ test("offline mode answers from the SOP with a verified quote, and abstains othe
     chunks: SOP_CHUNKS,
   });
   assert.equal(cuti.status, "not_in_guide");
+});
+
+const sopTahfidzPoint = (article: string, text: string): KnowledgeChunk => ({
+  id: `sop-tahfidz-page-1-pasal-${article.split(" ")[0]}-ayat-${article.split(" ").at(-1)}`,
+  docId: "sop-tahfidz",
+  title: "SOP Tahfidz",
+  version: "2026",
+  article,
+  page: 1,
+  active: true,
+  text,
+});
+
+const SOP_TAHFIDZ_CHUNKS = [
+  sopTahfidzPoint(
+    "1 ayat 1.1",
+    "Pasal 1. Tujuan\n1.1 Menjadi pedoman guru dalam menyimak, menilai, dan mencatat setoran hafalan Al-Quran\nmurid di AlurSekolah.",
+  ),
+  sopTahfidzPoint(
+    "2 ayat 2.1",
+    "Pasal 2. Ruang lingkup\n2.1 Berlaku untuk setoran hafalan dan ujian tahfidz murid kelas 1 sampai 6.",
+  ),
+  sopTahfidzPoint("2 ayat 2.2", "2.2 Berlaku untuk wali kelas dan guru tahfidz."),
+  sopTahfidzPoint(
+    "3 ayat 3.1",
+    "Pasal 3. Setoran hafalan\n3.1 Setoran dilakukan paling sedikit 2 kali dalam seminggu.",
+  ),
+  sopTahfidzPoint(
+    "3 ayat 3.2",
+    "3.2 Setiap setoran paling sedikit 3 ayat. Surah yang kurang dari 3 ayat disetorkan utuh.",
+  ),
+  sopTahfidzPoint(
+    "3 ayat 3.3",
+    "3.3 Setoran dicatat di buku setoran pada saat menyimak, lalu dimasukkan ke AlurSekolah\n(menu Al-Quran › Tahfidz › Setoran baru) pada hari yang sama.",
+  ),
+  sopTahfidzPoint(
+    "3 ayat 3.4",
+    "3.4 Murid yang tidak setor pada hari itu dibiarkan kosong, tidak diberi skor 0.",
+  ),
+  sopTahfidzPoint(
+    "4 ayat 4.1",
+    "Pasal 4. Penilaian setoran\n4.1 Setiap setoran dinilai pada empat aspek: Fashohah 30%, Tartil 30%, Tajwid 30%, dan\nAdab 10%.",
+  ),
+  sopTahfidzPoint("4 ayat 4.2", "4.2 Skor tiap aspek ditulis dalam skala 0 sampai 100."),
+  sopTahfidzPoint("4 ayat 4.3", "4.3 Aspek Adab dinilai oleh wali kelas."),
+  sopTahfidzPoint(
+    "4 ayat 4.4",
+    "4.4 Skor yang tidak terbaca di buku setoran tidak boleh ditebak. Tanyakan ke guru yang\nmenyimak sebelum dimasukkan.",
+  ),
+  sopTahfidzPoint(
+    "5 ayat 5.1",
+    "Pasal 5. Ujian tahfidz\n5.1 Ujian dilakukan per juz, setelah murid menyelesaikan setoran satu juz.",
+  ),
+  sopTahfidzPoint(
+    "5 ayat 5.2",
+    "5.2 Ujian dicatat satu murid per form melalui menu Al-Quran › Tahfidz › Ujian baru.",
+  ),
+  sopTahfidzPoint(
+    "5 ayat 5.3",
+    "5.3 Murid dinyatakan lulus ujian juz jika nilai akhirnya paling rendah 75. Murid yang belum\nlulus mengulang paling cepat 7 hari setelah ujian.",
+  ),
+  sopTahfidzPoint(
+    "6 ayat 6.1",
+    "Pasal 6. Penanggung jawab\n6.1 Guru tahfidz: menyimak, menilai, dan mencatat setoran.",
+  ),
+  sopTahfidzPoint(
+    "6 ayat 6.2",
+    "6.2 Wali kelas: menilai Adab dan memastikan setoran kelasnya tercatat.",
+  ),
+  sopTahfidzPoint("6 ayat 6.3", "6.3 Koordinator Tahfidz: menjadwalkan ujian juz."),
+];
+
+test("a rule question cites the SOP point, not a recorded procedure's field list (#264)", async () => {
+  const graph = await importBpmn(
+    await readFile(
+      join(import.meta.dirname, "../../src/school/fixtures/F3-1_catat-hafalan-tahfidz.bpmn"),
+      "utf8",
+    ),
+  );
+  const procedure = bpmnKnowledgeTexts(graph).map((item, sequence): KnowledgeChunk => ({
+    id: `f3-1-tahfidz-task-${sequence + 1}`,
+    docId: "f3-1-tahfidz",
+    title: "Catat hafalan tahfidz",
+    version: "2026",
+    article: item.article,
+    active: true,
+    text: item.text,
+  }));
+
+  const result = await ai.answerGrounded({
+    question: "Setoran minimal berapa ayat?",
+    chunks: [...SOP_TAHFIDZ_CHUNKS, ...procedure],
+  });
+
+  assert.equal(result.status, "answered");
+  if (result.status !== "answered") return;
+  assert.equal(result.citations[0]?.chunkId, "sop-tahfidz-page-1-pasal-3-ayat-3.2");
+  assert.match(result.answer, /3 ayat/u);
 });
 
 test("offline slot extraction plans F3-1 the same way the real model is expected to", async () => {
