@@ -1,7 +1,7 @@
 import type { GradeEntry } from "@nemu/contracts/school";
 import { describe, expect, test } from "vite-plus/test";
 
-import { addressFor, formAssessment, GRADE_TASK_KIND, gradeTask } from "./grade-task";
+import { addressFor, formAssessment, GRADE_TASK_KIND, gradeSummary, gradeTask } from "./grade-task";
 
 const ENTRIES: GradeEntry[] = [
   { studentId: "s-1", name: "Ahmad Fadli", value: 82, status: "value", remedial: false },
@@ -12,7 +12,7 @@ const ENTRIES: GradeEntry[] = [
 const task = gradeTask({
   command: { className: "4B", subject: "Matematika", assessment: "UTS" },
   entries: ENTRIES,
-  summarySentence: "3 nilai, 1 remedial, 1 kosong.",
+  kkm: 75,
   honorific: "Bu",
 });
 
@@ -44,7 +44,7 @@ describe("the F1 fill task (cara 1)", () => {
     const other = gradeTask({
       command: { className: "5A", subject: "IPAS", assessment: "UH 2" },
       entries: ENTRIES,
-      summarySentence: "",
+      kkm: 75,
       honorific: "Pak",
     });
     expect(other.steps[0]).toMatchObject({
@@ -93,16 +93,44 @@ describe("the F1 fill task (cara 1)", () => {
     ]);
   });
 
-  test("ends pointing at Simpan, which the teacher presses, with the numbers behind Lihat ringkasan", () => {
-    const last = task.steps.at(-1);
-    expect(last).toMatchObject({
+  test("ends at Simpan, the teacher's turn, not yet saved, with the counts behind Lihat ringkasan (F1·11, 11a)", () => {
+    expect(task.steps.at(-1)).toEqual({
       verb: "point",
       target: { role: "button", text: "Simpan" },
       sentence: "Silakan Ibu tekan Simpan.",
+      heading: "Giliran Ibu",
+      chip: "Belum tersimpan",
+      ringkasanCard: {
+        title: "2 dari 3 terisi, belum tersimpan.",
+        itemsLabel: "Ringkasan · Matematika 4B, UTS",
+        items: [
+          "Terisi: 2 murid",
+          "Dikosongkan: 1 murid (Putra, sakit)",
+          "Di bawah KKM 75: 1 murid, diberi catatan remedial",
+        ],
+      },
     });
-    expect(last && "ringkasan" in last && last.ringkasan).toBe(
-      "3 nilai, 1 remedial, 1 kosong. Ahmad Fadli 82, Bagas Saputra 58 (remedial), Putra Wijaya kosong (tidak hadir).",
-    );
+  });
+
+  test("Ringkasan leaves out what doesn't apply and names who is blank and why", () => {
+    const all = gradeSummary({
+      command: { className: "4B", subject: "Matematika", assessment: "UTS" },
+      entries: ENTRIES.slice(0, 1),
+      kkm: 70,
+    });
+    expect(all.items).toEqual(["Terisi: 1 murid"]);
+    const absent = gradeSummary({
+      command: { className: "5A", subject: "IPAS", assessment: "UH 2" },
+      entries: [
+        ...ENTRIES,
+        { studentId: "s-22", name: "Putra Pratama", value: null, status: "I", remedial: false },
+      ],
+      kkm: 70,
+    });
+    expect(absent.itemsLabel).toBe("Ringkasan · IPAS 5A, UH 2");
+    // Two Putras: the full names tell them apart.
+    expect(absent.items[1]).toBe("Dikosongkan: 2 murid (Putra Wijaya, sakit; Putra Pratama, izin)");
+    expect(absent.items[2]).toBe("Di bawah KKM 70: 1 murid, diberi catatan remedial");
   });
 
   test("names the assessment as Jenis Penilaian lists it, and addresses the teacher in full", () => {

@@ -123,6 +123,7 @@ beforeAll(() => {
     summary: { filled: 1, blank: 1, remedial: 0 },
     citations: {},
     summarySentence: "1 nilai, 1 kosong.",
+    kkm: 75,
   });
   replies.readback = () => ({
     match: true,
@@ -223,13 +224,16 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
     });
   });
 
-  test("the executor fills in cara 1 and stops at Simpan; Lihat ringkasan holds the numbers", () => {
+  test("the executor fills in cara 1 and stops at Simpan; Lihat ringkasan holds the counts", () => {
     const task = filled!;
     expect(task.kind).toBe("f1-isi-nilai");
     expect(task.steps.at(-1)).toMatchObject({
       verb: "point",
       sentence: "Silakan Ibu tekan Simpan.",
-      ringkasan: "1 nilai, 1 kosong. Alya Nur Fitri 86, Putra Wijaya kosong (tidak hadir).",
+      ringkasanCard: {
+        title: "1 dari 2 terisi, belum tersimpan.",
+        items: ["Terisi: 1 murid", "Dikosongkan: 1 murid (Putra, sakit)"],
+      },
     });
     expect(view().display).toBeNull();
   });

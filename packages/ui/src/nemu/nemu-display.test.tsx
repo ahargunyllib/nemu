@@ -96,6 +96,24 @@ describe("Gelembung Tunjuk", () => {
     fireEvent.click(cancel);
     expect(onSelect).toHaveBeenCalledOnce();
   });
+
+  test("puts a link to a card of its own under the chip, such as Lihat ringkasan (F1·11)", () => {
+    const onSelect = vi.fn();
+    render(
+      <GelembungTunjuk
+        status={{ text: "Giliran Ibu" }}
+        sentence="Silakan Ibu tekan Simpan."
+        chip="Belum tersimpan"
+        link={{ label: "Lihat ringkasan", onSelect }}
+      />,
+    );
+    const bubble = screen.getByRole("region", { name: "Petunjuk Nemu" });
+    const link = within(bubble).getByRole("button", { name: "Lihat ringkasan" });
+    expect(follows(within(bubble).getByText("Belum tersimpan"), link)).toBe(true);
+    expect(within(bubble).getAllByRole("button")).toEqual([link]);
+    fireEvent.click(link);
+    expect(onSelect).toHaveBeenCalledOnce();
+  });
 });
 
 describe("Gelembung Jawab", () => {
@@ -355,6 +373,28 @@ describe("Kartu Info", () => {
         .getAllByRole("button")
         .map((button) => button.textContent),
     ).toEqual(["Coba sendiri", "Tutup"]);
+  });
+
+  test("names its button Kembali when it goes back to a bubble (F1·11a)", () => {
+    const onClose = vi.fn();
+    render(
+      <KartuInfo
+        status={{ text: "Ringkasan" }}
+        title="31 dari 32 terisi, belum tersimpan."
+        itemsLabel="Ringkasan · Matematika 4B, UTS"
+        items={["Terisi: 31 murid"]}
+        onClose={onClose}
+        closeLabel="Kembali"
+      />,
+    );
+    const card = screen.getByRole("region", { name: "31 dari 32 terisi, belum tersimpan." });
+    expect(
+      within(card)
+        .getAllByRole("button")
+        .map((button) => button.textContent),
+    ).toEqual(["Kembali"]);
+    fireEvent.click(within(card).getByRole("button", { name: "Kembali" }));
+    expect(onClose).toHaveBeenCalledOnce();
   });
 });
 

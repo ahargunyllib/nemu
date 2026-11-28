@@ -55,5 +55,6 @@ export function applySchoolRules(
     summary: { filled, blank, remedial },
     citations: usedCitations,
     summarySentence: `${parts.join(", ")}.`,
+    kkm: config.kkm,
   };
 }

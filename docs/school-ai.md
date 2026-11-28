@@ -77,7 +77,7 @@ The kamus is matched in code first (AI_TECHNICAL_PRD §5.1, `packages/ai/src/sch
    - Absence: "Kosongkan" or a number.
    - Footer: `verification.acceptedSentence`.
 4. `gradesFinalize` with `{questionId, answer}` for every question.
-   - `ok`: `entries` (one per student: `value`, `status`, `remedial`), `summarySentence` for **Lihat ringkasan**, `citations` (rule key → knowledge chunk id) for **Sumber**.
+   - `ok`: `entries` (one per student: `value`, `status`, `remedial`), `summary` counts and `kkm` for the Ringkasan card behind **Lihat ringkasan**, `summarySentence`, `citations` (rule key → knowledge chunk id) for **Sumber**.
    - `needs_source`: the SOP isn't active or its Rule Sources aren't pointed at it (see below).
 5. Fill AlurSekolah with the extension from `entries` (blank for `S/I/A/blank`; "remedial" note where `remedial`). Point at **Simpan**; the teacher presses it.
 6. After the save, call `gradesReadbackAlurSekolah` with the entries, class, subject and assessment; speak `sentence`. Then `inboxAck`.

@@ -360,13 +360,33 @@ await check("cara 1 opens Isi nilai kelas through the menu and fills every value
   }
 });
 
-await check("Nemu points at Simpan; the numbers are behind Lihat ringkasan", async () => {
-  await display("tunjuk").getByRole("button", { name: "Lihat ringkasan" }).click();
-  await display("tunjuk")
-    .getByText(/Ahmad Fadli 62 \(remedial\), Aisyah Zahra 82/u)
-    .waitFor();
-  await page.screenshot({ path: join(shots, "tunjuk-simpan.png") });
-});
+await check(
+  "Nemu points at Simpan, not yet saved; Lihat ringkasan shows the counts (F1·11, 11a)",
+  async () => {
+    const bubble = display("tunjuk");
+    await heading("tunjuk", "Giliran Ibu").waitFor();
+    await bubble.getByText("Belum tersimpan").waitFor();
+    await page.screenshot({ path: join(shots, "tunjuk-simpan.png") });
+    await bubble.getByRole("button", { name: "Lihat ringkasan" }).click();
+    const card = display("info");
+    await card.getByText("31 dari 32 terisi, belum tersimpan.").waitFor({ timeout: 3000 });
+    await heading("info", "Ringkasan").waitFor();
+    const items = await card.getByRole("listitem").allTextContents();
+    expect(
+      JSON.stringify(items) ===
+        JSON.stringify([
+          "1Terisi: 31 murid",
+          "2Dikosongkan: 1 murid (Raka, sakit)",
+          "3Di bawah KKM 75: 13 murid, diberi catatan remedial",
+        ]),
+      `Ringkasan: ${items.join(" | ")}`,
+    );
+    await card.getByText("Ringkasan · Matematika 4B, UTS").waitFor();
+    await page.screenshot({ path: join(shots, "ringkasan.png") });
+    await card.getByRole("button", { name: "Kembali" }).click();
+    await bubble.getByText("Silakan Ibu tekan Simpan.").waitFor({ timeout: 3000 });
+  },
+);
 
 await check(
   "the teacher saves; the read-back is said in one sentence and the photo is deleted",

@@ -101,6 +101,8 @@ export type GelembungTunjukProps = BubbleBase & {
   chip?: string;
   /** A way out as a link at the bottom, such as "Batal, jangan hapus". */
   cancel?: { label: string; onSelect: () => void };
+  /** A link at the bottom that opens a card of its own, such as "Lihat ringkasan" (F1·11). */
+  link?: { label: string; onSelect: () => void };
 };
 
 /** Gelembung Jawab: an answer or a problem, with at most one (black) action button. */
@@ -148,6 +150,8 @@ export type KartuInfoProps = {
   /** At most one small link left of Tutup, such as Catatan langkah's "Coba sendiri". */
   link?: { label: string; onSelect: () => void };
   onClose: () => void;
+  /** The black button's words; default "Tutup". "Kembali" when it goes back to a bubble. */
+  closeLabel?: string;
 };
 
 export type NemuDisplay =

@@ -19,7 +19,7 @@ import { useId } from "react";
 /**
  * Kartu Info: something to read. A title with an optional detail line, a short numbered list
  * (small amber circles 1, 2, 3, under an optional label), then one row: at most one link on the
- * left and a compact black [Tutup] on the right. No ×.
+ * left and a compact black [Tutup] (or `closeLabel`, such as [Kembali]) on the right. No ×.
  */
 export function KartuInfo({
   status,
@@ -29,6 +29,7 @@ export function KartuInfo({
   itemsLabel,
   link,
   onClose,
+  closeLabel = "Tutup",
 }: KartuInfoProps) {
   const labelId = useId();
   return (
@@ -73,7 +74,7 @@ export function KartuInfo({
           }
         >
           <Button type="button" onClick={onClose} className={NEMU_BUTTON}>
-            Tutup
+            {closeLabel}
           </Button>
         </NemuActionRow>
       </CardFooter>

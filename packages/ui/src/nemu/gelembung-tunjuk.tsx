@@ -12,8 +12,8 @@ import {
 /**
  * Gelembung Tunjuk: the teacher's turn. It sits beside the button or field the cursor points at
  * and says one sentence, with an optional detail line under it. No buttons: at most one link, an
- * optional amber chip ("Belum tersimpan") and an optional way out as a link at the bottom
- * ("Batal, jangan hapus").
+ * optional amber chip ("Belum tersimpan"), and at the bottom an optional link to a card of its
+ * own ("Lihat ringkasan") and an optional way out ("Batal, jangan hapus").
  */
 export function GelembungTunjuk({
   sentence,
@@ -23,6 +23,7 @@ export function GelembungTunjuk({
   note,
   chip,
   cancel,
+  link,
   onRead,
 }: GelembungTunjukProps) {
   return (
@@ -38,13 +39,22 @@ export function GelembungTunjuk({
         </NemuBadge>
       )}
       {note && <NemuNoteLinks notes={note} onRead={onRead} />}
-      {cancel && (
+      {(link || cancel) && (
         <NemuActionRow
-          links={
-            <Button type="button" variant="link" onClick={cancel.onSelect} className={NEMU_LINK}>
-              {cancel.label}
-            </Button>
-          }
+          links={[link, cancel].map(
+            (item) =>
+              item && (
+                <Button
+                  key={item.label}
+                  type="button"
+                  variant="link"
+                  onClick={item.onSelect}
+                  className={NEMU_LINK}
+                >
+                  {item.label}
+                </Button>
+              ),
+          )}
         />
       )}
     </NemuBubble>

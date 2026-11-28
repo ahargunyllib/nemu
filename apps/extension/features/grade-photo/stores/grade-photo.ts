@@ -503,7 +503,7 @@ function createGradePhoto() {
     const task = gradeTask({
       command: target,
       entries: result.entries,
-      summarySentence: result.summarySentence,
+      kkm: result.kkm,
       honorific: context.honorific,
     });
     kept = {

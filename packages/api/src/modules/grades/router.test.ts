@@ -77,6 +77,7 @@ describe("F1 through the API (offline AI, seeded SDIT Nusantara)", () => {
     expect(result.status).toBe("ok");
     if (result.status !== "ok") return;
     expect(result.summary).toEqual({ filled: 31, blank: 1, remedial: 13 });
+    expect(result.kkm).toBe(75);
     expect(result.citations).toEqual({
       "school.kkm": "sop-penilaian-sdit-nusantara-page-2-pasal-3.2",
       "school.absence_blank": "sop-penilaian-sdit-nusantara-page-3-pasal-4.3",

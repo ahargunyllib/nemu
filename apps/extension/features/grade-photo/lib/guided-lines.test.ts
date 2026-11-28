@@ -58,7 +58,7 @@ const field = (column: string, name: string) =>
 const TASK = gradeTask({
   command: { className: "4B", subject: "Matematika", assessment: "UTS" },
   entries: ENTRIES,
-  summarySentence: "32 nilai.",
+  kkm: 75,
   honorific: "Bu",
 });
 const FILL = { ...TASK, steps: TASK.steps.slice(5) };

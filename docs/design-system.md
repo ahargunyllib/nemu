@@ -183,8 +183,11 @@ the page's Shadow DOM.
   "Catatan langkah · Cara isi nilai kelas". The label also names the list for screen readers.
 - **Gelembung Tunjuk extras**: an optional **chip** under the text (`chip`, a `subtle`
   `NemuBadge` pill 34 px tall with a `nemu-amber-200` edge and 16 px semibold text: "Belum
-  tersimpan") and an optional **cancel link** at the bottom (`cancel`, a `nemu-strong` link:
-  "Batal, jangan hapus"). Still no buttons.
+  tersimpan") and, at the bottom, an optional **link to a card of its own** (`link`: "Lihat
+  ringkasan" opens the Ringkasan Kartu Info, F1·11a) and an optional **cancel link** (`cancel`, a
+  `nemu-strong` link: "Batal, jangan hapus"). Still no buttons.
+- **Kartu Info button**: `closeLabel` renames [Tutup] when the card goes back to a bubble
+  instead of ending: Ringkasan's **[Kembali]** returns to "Silakan Ibu tekan Simpan."
 - **Spoken word** (#200): `highlightedWord` marks the word Nemu's voice is on.
 
 **The Nemu cursor** (F0-16, PRD v2.3 P1-7): the 44 px Nemu mascot (`NemuMascot`, the same idle

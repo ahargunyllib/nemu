@@ -71,6 +71,9 @@ export type StepSource = (
   continuation: unknown,
 ) => Promise<{ steps: ExecutorStep[]; continuation: unknown }>;
 
+/** Lihat ringkasan as its own Kartu Info (F1·11a). */
+type RingkasanCard = NonNullable<Extract<ExecutorStep, { verb: "point" }>["ringkasanCard"]>;
+
 /** A value step in cara 2. */
 export type GuidedStep = Extract<ExecutorStep, { verb: "setValue" }>;
 
@@ -456,6 +459,7 @@ export class ExecutorRun {
         signal,
         step.ringkasan,
         step.sumber,
+        step,
       );
     if (step.verb === "scroll") {
       element.scrollIntoView({ block: "center", behavior: "smooth" });
@@ -507,11 +511,38 @@ export class ExecutorRun {
     signal: AbortSignal,
     ringkasan?: string,
     sumber?: string,
+    turn: { heading?: string; detail?: string; chip?: string; ringkasanCard?: RingkasanCard } = {},
   ) {
     this.waiting = { refused };
     // Gelembung Tunjuk carries one link: the numbers behind it, else where the step came from.
     const note = ringkasan ? { ringkasan } : sumber ? { sumber: [sumber] } : undefined;
-    this.render({ type: "tunjuk", sentence, note }, element);
+    const status = turn.heading ? { text: turn.heading } : undefined;
+    const { detail, chip, ringkasanCard: card } = turn;
+    const bubble = (): NemuDisplay => ({
+      type: "tunjuk",
+      sentence,
+      note,
+      status,
+      detail,
+      chip,
+      // F1·11a: Lihat ringkasan opens its own Kartu Info; Kembali comes back here. Nemu keeps
+      // waiting for her press on the target the whole time.
+      ...(card ? { link: { label: "Lihat ringkasan", onSelect: () => showCard(card) } } : {}),
+    });
+    const showCard = (summary: RingkasanCard) => {
+      this.render(
+        {
+          type: "info",
+          status: { text: "Ringkasan" },
+          ...summary,
+          closeLabel: "Kembali",
+          onClose: () => this.render(bubble(), element),
+        },
+        element,
+      );
+      this.deps.speak(summary.title);
+    };
+    this.render(bubble(), element);
     this.deps.speak(sentence);
     await waitForEvent(
       this.deps.doc,

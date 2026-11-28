@@ -114,6 +114,8 @@ test("answers plus KKM 75 give 13 remedial and an empty value for the sick stude
   assert.equal(ruled.status, "ok");
   if (ruled.status !== "ok") return;
   assert.deepEqual(ruled.summary, { filled: 31, blank: 1, remedial: 13 });
+  // Ringkasan names the KKM the remedial count used (F1·11a).
+  assert.equal(ruled.kkm, 75);
   const raka = ruled.entries.find((entry) => entry.name === "Raka Aditya");
   assert.deepEqual([raka?.value, raka?.status, raka?.remedial], [null, "S", false]);
   assert.equal(
