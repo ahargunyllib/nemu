@@ -52,7 +52,7 @@ async function fromExtension(clock = testClock()) {
   return { context, pdf, clock };
 }
 
-/** Pak Rizal (operator) uploads an active document in Pengetahuan sekolah (WS-04). */
+/** Pak Rizal (operator) uploads an active document in Dokumen dan alur (WS-04). */
 function uploadAsOperator(context: SchoolTestContext, file: File) {
   const operator = {
     ...context,

@@ -16,6 +16,7 @@ import {
   createDocumentFileLink,
   deleteDocument,
   documentFormatOf,
+  knowledgeStats,
   readDocumentFile,
   MAX_DOCUMENT_BYTES,
   openSignedDocumentFile,
@@ -72,6 +73,18 @@ export const documentsRouter = {
         input?.packageId ?? null,
       ),
     ),
+
+  /** Dokumen dan alur's stat cards: active knowledge, BPMN tasks and recordings. */
+  knowledgeStats: workspaceAdminProcedure.handler(({ context }) =>
+    knowledgeStats(
+      {
+        documents: createDocumentRepository(context.db),
+        files: context.documentFiles,
+        catalog: createCatalogRepository(context.db),
+      },
+      context.session.user.workspaceId,
+    ),
+  ),
 
   /** WS-04: the WS-03 websites a document applies to; empty for every site. */
   setDocumentSites: workspaceAdminProcedure

@@ -1,3 +1,4 @@
+import { importBpmn } from "@nemu/ai/school/bpmn/graph";
 import type { SchoolAi } from "@nemu/ai/school/runtime";
 
 import type { DocumentFileStore } from "../../context";
@@ -6,6 +7,7 @@ import type { CatalogRepository } from "./catalog-repository";
 import type { DocumentLinkSigner } from "./file-link";
 import { indexBpmnDocument, indexMarkdownDocument, pdfToMarkdown } from "./indexing";
 import { bpmnProcessElements } from "./process-elements";
+import { summarizeProcess } from "./process-summary";
 import type { DocumentRecord, DocumentRepository, NewKnowledgeChunkRecord } from "./repository";
 
 /** What an admin can upload. "procedure" documents are created from recordings, not uploaded. */
@@ -275,4 +277,77 @@ export async function openSignedDocumentFile(
   if (!document) return { status: "not_found" };
   const body = await files.get(document.storageKey);
   return body ? { status: "ok", document, body } : { status: "not_found" };
+}
+
+/** Dokumen dan alur's stat cards (WS-04): what Nemu answers from today, school and package. */
+export type KnowledgeStats = {
+  active: { total: number; package: number; school: number };
+  processes: { count: number; tasks: number; unmappedTasks: number };
+  /** `latestSteps` is the newest active recording's step count, null without one. */
+  recordings: { count: number; latestSteps: number | null };
+};
+
+export async function knowledgeStats(
+  {
+    documents,
+    files,
+    catalog,
+  }: {
+    documents: Pick<DocumentRepository, "list">;
+    files: DocumentFileStore;
+    catalog: Pick<CatalogRepository, "listProcessElements">;
+  },
+  workspaceId: string,
+): Promise<KnowledgeStats> {
+  const active = (await documents.list(workspaceId)).filter(
+    (document) => document.isActive && document.status === "ready",
+  );
+  const processes = active.filter((document) => document.format === "bpmn");
+  const recordings = active.filter((document) => document.format === "procedure");
+
+  const summaries = await Promise.all(
+    processes.map(async (document) => {
+      const [body, elements] = await Promise.all([
+        files.get(document.storageKey),
+        catalog.listProcessElements(workspaceId, document.id),
+      ]);
+      if (!body) return null;
+      try {
+        return summarizeProcess(await importBpmn(new TextDecoder().decode(body)), elements);
+      } catch (error) {
+        console.error("Reading a BPMN for the knowledge stats failed", error);
+        return null;
+      }
+    }),
+  );
+
+  // `list` is newest first.
+  const latest = recordings[0];
+  const latestBody = latest ? await files.get(latest.storageKey) : null;
+
+  return {
+    active: {
+      total: active.length,
+      package: active.filter((document) => document.packageId !== null).length,
+      school: active.filter((document) => document.packageId === null).length,
+    },
+    processes: {
+      count: processes.length,
+      tasks: summaries.reduce((sum, summary) => sum + (summary?.taskCount ?? 0), 0),
+      unmappedTasks: summaries.reduce((sum, summary) => sum + (summary?.unmappedTasks ?? 0), 0),
+    },
+    recordings: {
+      count: recordings.length,
+      latestSteps: latestBody ? procedureStepCount(latestBody) : null,
+    },
+  };
+}
+
+function procedureStepCount(body: ArrayBuffer): number | null {
+  try {
+    const steps = (JSON.parse(new TextDecoder().decode(body)) as { steps?: unknown }).steps;
+    return Array.isArray(steps) ? steps.length : null;
+  } catch {
+    return null;
+  }
 }

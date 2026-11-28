@@ -3,7 +3,7 @@
 // - F3-2: "Nilai di bawah berapa harus remedial?" opens the seeded SOP Penilaian at page 2, and
 //   "Nilai UTS paling lambat dimasukkan kapan?" at page 3 (F3-2_pertanyaan-dan-kunci.csv:
 //   "sumber membuka halaman 2/3").
-// - WS-1: Pak Rizal uploads the SOP Setoran Tahfidz in Pengetahuan sekolah; "Setoran minimal
+// - WS-1: Pak Rizal uploads the SOP Setoran Tahfidz in Dokumen dan alur; "Setoran minimal
 //   berapa ayat?" opens it at page 1.
 // The tab carries no Nemu headers, so it opens a short-lived signed link; the script checks the
 // URL, `#page=`, and that the Nemu Service served `application/pdf` inline.
@@ -98,7 +98,7 @@ await check("WS-1: Pak Rizal uploads the SOP Setoran Tahfidz PDF, active", async
   await admin.waitForLoadState("networkidle");
   const rows = admin.getByRole("row").filter({ hasText: TAHFIDZ_TITLE });
   if (!(await rows.count())) {
-    await admin.getByRole("button", { name: "Unggah dokumen" }).click();
+    await admin.getByRole("button", { name: "Unggah PDF" }).click();
     const dialog = admin.getByRole("dialog");
     await dialog.getByLabel("File").setInputFiles(tahfidzPdf);
     await dialog.getByLabel("Judul").fill(TAHFIDZ_TITLE);

@@ -5,6 +5,7 @@ import { call } from "@orpc/server";
 import { describe, expect, it } from "vite-plus/test";
 
 import { createSchoolContext } from "../../testing/school";
+import { processesRouter } from "../processes/router";
 import { createDocumentRepository } from "./repository";
 import { documentsRouter } from "./router";
 
@@ -12,6 +13,7 @@ const BPMN = join(
   import.meta.dirname,
   "../../../../ai/src/school/fixtures/pengajuan-izin-guru.bpmn",
 );
+const FIXTURES = join(import.meta.dirname, "../../../../ai/src/school/fixtures");
 const SOP_PENILAIAN_PDF = join(
   import.meta.dirname,
   "../../../../ai/src/school/fixtures/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf",
@@ -97,6 +99,84 @@ describe("WS-04 knowledge", () => {
       createdByName: "Rizal Hidayat",
       changedByName: "Rizal Hidayat",
     });
+  });
+});
+
+describe("Dokumen dan alur stats", () => {
+  it("counts active knowledge by package and school, BPMN tasks, and the newest recording's steps", async () => {
+    const context = await operatorContext();
+    const bpmn = async (name: string) =>
+      new File([await readFile(join(FIXTURES, name))], name, { type: "application/xml" });
+    await call(
+      documentsRouter.uploadDocument,
+      {
+        title: "Alur SPP",
+        version: "1",
+        isActive: true,
+        file: await bpmn("F2-1_alur-spp.bpmn"),
+        siteIds: [],
+        packageId: "alursekolah",
+      },
+      { context },
+    );
+    await call(
+      documentsRouter.uploadDocument,
+      {
+        title: "Catat Hafalan Tahfidz",
+        version: "1",
+        isActive: true,
+        file: await bpmn("F3-1_catat-hafalan-tahfidz.bpmn"),
+        siteIds: [],
+      },
+      { context },
+    );
+    // An inactive BPMN counts nowhere.
+    await call(
+      documentsRouter.uploadDocument,
+      {
+        title: "Pengajuan Izin Guru",
+        version: "1",
+        isActive: false,
+        file: await bpmn("pengajuan-izin-guru.bpmn"),
+        siteIds: [],
+      },
+      { context },
+    );
+    const procedure = await call(
+      processesRouter.procedureCompile,
+      {
+        title: "Input nilai per kelas",
+        events: ["Nilai", "Tampilkan", "Simpan"].map((name, t) => ({
+          t,
+          type: "click" as const,
+          url: "https://alursekolah.example/#/nilai",
+          locator: {
+            role: "button",
+            name,
+            label: name,
+            placeholder: null,
+            css: null,
+            relX: null,
+            relY: null,
+          },
+          value: null,
+        })),
+        narration: [],
+      },
+      { context },
+    );
+    await call(
+      processesRouter.procedureSave,
+      { title: "Input nilai per kelas", version: "1", isActive: true, procedure },
+      { context },
+    );
+
+    const stats = await call(documentsRouter.knowledgeStats, undefined, { context });
+    // The seeded SOP Penilaian, the tahfidz BPMN and the recording are the school's own.
+    expect(stats.active).toEqual({ total: 4, package: 1, school: 3 });
+    // Alur SPP has 7 tasks, tahfidz 5; each person's task has a page taken from its label.
+    expect(stats.processes).toEqual({ count: 2, tasks: 12, unmappedTasks: 0 });
+    expect(stats.recordings).toEqual({ count: 1, latestSteps: procedure.steps.length });
   });
 });
 

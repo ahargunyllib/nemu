@@ -28,6 +28,7 @@ import { toast } from "sonner";
 
 import { DocumentExportBpmnButton } from "@/features/documents/components/document-row-controls";
 import { deleteStep, renameParameter, valueText } from "@/features/recording/lib/edit-procedure";
+import { invalidateKnowledge } from "@/features/documents/api/invalidate-knowledge";
 import { orpc } from "@/shared/api/orpc";
 
 const ACTIONS: Record<Procedure["steps"][number]["action"], string> = {
@@ -68,7 +69,7 @@ export default function RecordingReview({ recordingId }: { recordingId: string }
         toast.success(`${document.title} disimpan`);
       },
       onError: (error) => toast.error(error.message),
-      onSettled: () => queryClient.invalidateQueries({ queryKey: orpc.listDocuments.key() }),
+      onSettled: () => invalidateKnowledge(queryClient),
     }),
   );
 
@@ -215,7 +216,7 @@ export default function RecordingReview({ recordingId }: { recordingId: string }
         {savedId ? (
           <>
             <Button variant="outline" nativeButton={false} render={<Link to="/documents" />}>
-              Lihat di Pengetahuan sekolah
+              Lihat di Dokumen dan alur
             </Button>
             <DocumentExportBpmnButton id={savedId} title={draft.title} withLabel />
           </>

@@ -271,7 +271,7 @@ a page load mid-task, F0-1 (3/3), F0-09 and cara 3, saving screenshots to `.outp
 
 `pnpm --filter extension verify:f2-08` runs F2-1 end to end (#206, #217): Admin Javan connects
 WS-07 to the mock, Pak Rizal uploads the official `packages/ai/src/school/fixtures/F2-1_alur-spp.bpmn`
-as "Alur SPP" in Pengetahuan sekolah (once; later runs reuse it) and sees the suggested symptoms,
+as "Alur SPP" in Dokumen dan alur (once; later runs reuse it) and sees the suggested symptoms,
 Aisyah's UTS grade (4A) is saved in the mock, and the three questions of
 `F2-1_pertanyaan-dan-kunci.csv` are asked: the answer ("sudah tersimpan", the partly-paid branch,
 paying in cash), Kenapa?, Sumber with 2–4 steps, **Lihat diagram** (bpmn-js in the Admin Workspace
