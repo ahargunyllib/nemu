@@ -167,7 +167,7 @@ async function ask(page, question) {
 async function parentReply(page) {
   const [whatsapp] = await Promise.all([
     context.waitForEvent("page"),
-    bubble(page).getByRole("button", { name: "Buka balasan untuk orang tua" }).click(),
+    bubble(page).getByRole("button", { name: "Siapkan balasan" }).click(),
   ]);
   await whatsapp.waitForLoadState();
   const url = new URL(whatsapp.url());
@@ -221,7 +221,7 @@ await check(
 await check(
   "Lihat diagram: bpmn-js draws the SPP process with Lock Student Grades highlighted",
   async () => {
-    const link = bubble(page).getByRole("link", { name: "Lihat diagram Alur SPP" });
+    const link = bubble(page).getByRole("link", { name: "Lihat diagram (operator)" });
     const [diagram] = await Promise.all([context.waitForEvent("page"), link.click()]);
     await diagram.waitForLoadState();
     console.log(`  ${diagram.url()}`);

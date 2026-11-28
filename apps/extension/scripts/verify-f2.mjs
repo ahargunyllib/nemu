@@ -127,7 +127,7 @@ await check(
 await check("F2-2: the button opens WhatsApp Web to Pak Rizal with the polite text", async () => {
   const [whatsapp] = await Promise.all([
     context.waitForEvent("page"),
-    bubble(page).getByRole("button", { name: "Buka WhatsApp ke Pak Rizal" }).click(),
+    bubble(page).getByRole("button", { name: "Siapkan pesan WA" }).click(),
   ]);
   await whatsapp.waitForLoadState();
   const url = new URL(whatsapp.url());

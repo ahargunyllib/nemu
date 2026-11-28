@@ -5,7 +5,7 @@ import type { IdentityResult } from "./identity";
 export type RequestPage = { name: string; url: string };
 
 /**
- * ID-02: "Siapkan pesan WA ke operator" for an account that isn't in WS-06. Like the F2-05
+ * ID-02: "Siapkan pesan WA" for an account that isn't in WS-06. Like the F2-05
  * hand-off, it only opens WhatsApp Web with the message ready; the teacher presses Kirim.
  */
 export function operatorRequest(
@@ -22,7 +22,7 @@ export function operatorRequest(
     "Terima kasih.",
   ].join("\n");
   return {
-    label: "Siapkan pesan WA ke operator",
+    label: "Siapkan pesan WA",
     url: whatsAppUrl({ phone: identity.operator.phone, text }),
   };
 }

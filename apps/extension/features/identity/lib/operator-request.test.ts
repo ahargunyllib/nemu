@@ -21,7 +21,7 @@ describe("operatorRequest (ID-02)", () => {
       PAGE,
     );
 
-    expect(request?.label).toBe("Siapkan pesan WA ke operator");
+    expect(request?.label).toBe("Siapkan pesan WA");
     expect(request?.url.startsWith("https://web.whatsapp.com/send?phone=6281200001003&")).toBe(
       true,
     );
