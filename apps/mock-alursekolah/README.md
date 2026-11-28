@@ -42,6 +42,18 @@ grade is the plain mean of its assessments; empty grade cells are kept for the p
 
 The mock's data is a separate fake system and never touches the Nemu Service's D1 schema.
 
+## Page shell
+
+The page copies the real AlurSekolah's layout: a cream side menu in groups (Utama, Akademik,
+Keislaman, E-learning, Bantuan, Akun), a white panel with a top bar (location trail such as
+"SDIT Nusantara › Akademik › Nilai", search, semester, bell, the signed-in teacher) and the account
+card with `#menu-email` at the bottom of the menu. Only the pages the mock has are links (Beranda,
+Nilai, Rekap Nilai, Al-Quran, Profil, Keluar). The real app's other items (Kelas saya, Presensi,
+Jadwal, PR & Agenda, Moodle, Panduan Pengguna, Support) are greyed-out text, not links or buttons,
+so the executor and "ini kenapa?" never pick them, and the trail is plain text, so "Nilai" names
+one link only. The school stays SDIT Nusantara, the tenant the test data and Moodle use. Search and
+the bell do nothing.
+
 ## Run and deploy
 
 `pnpm dev` starts it with the rest of the stack at <http://localhost:3003> (Ruang GTK at 3004,
