@@ -81,17 +81,17 @@ async function f21Questions() {
 const EXPECTED = [
   {
     elementId: "Task_LockGrades",
-    certainty: "confirmed",
+    saved: true,
     cites: ["Timer_DueDateReached", "Gw_IsRegularInvoice", "Task_LockGrades", "Task_UnlockGrades"],
   },
   {
     elementId: "Task_UpdatePartiallyPaid",
-    certainty: "likely",
+    saved: false,
     cites: ["Task_CheckInvoices", "Flow_10", "Task_UpdatePartiallyPaid", "Task_UnlockGrades"],
   },
   {
     elementId: "Task_UnlockGrades",
-    certainty: "likely",
+    saved: false,
     cites: ["Boundary_PaidInCash", "Task_CheckInvoices", "Flow_12", "Task_UnlockGrades"],
   },
 ] as const;
@@ -128,14 +128,15 @@ describe("F2-08: nilai tidak muncul, from the uploaded SPP BPMN", () => {
       );
       expect(answer, question).toMatchObject({
         status: "process",
-        certainty: expected.certainty,
         process: { documentId: document.id, title: "Alur SPP", version: "1" },
         elementId: expected.elementId,
         fixer: { name: "Bu Ratna", role: "keuangan" },
       });
       if (answer.status !== "process") continue;
-      if (expected.certainty === "confirmed")
-        expect(answer.sentence).toMatch(/^Nilai Aisyah Putri Wijaya sudah tersimpan\./u);
+      if (expected.saved)
+        expect(answer.sentence).toMatch(
+          /^Nilai Aisyah Putri Wijaya sudah tersimpan\. Bukan kesalahan Ibu\. Kemungkinan karena alur SPP sekolah: /u,
+        );
       expect(answer.steps.length).toBeGreaterThanOrEqual(2);
       expect(answer.steps.length).toBeLessThanOrEqual(4);
       expect(answer.steps.flatMap((step) => step.elementIds)).toEqual(
@@ -183,8 +184,8 @@ describe("F2-08: nilai tidak muncul, from the uploaded SPP BPMN", () => {
       { snapshot: PAGE, question: "Nilai UTS Aisyah kok tidak muncul di aplikasi orang tua?" },
       { context: siti },
     );
-    expect(answer).toMatchObject({ status: "process", certainty: "likely" });
-    expect(answer.sentence).toMatch(/^Kemungkinan\b/u);
+    expect(answer).toMatchObject({ status: "process" });
+    expect(answer.sentence).toMatch(/^Kemungkinan karena alur SPP sekolah: /u);
   });
 
   it("F3-13: grades AlurSekolah doesn't have are named, not blamed on the process", async () => {
@@ -291,7 +292,7 @@ describe("F2-08 with the seeded WS-06 teacher and the mock's pupils", () => {
       { snapshot: PAGE, question: "Nilai UTS Aisyah kok tidak muncul di aplikasi orang tua?" },
       { context: siti },
     );
-    expect(answer).toMatchObject({ status: "process", certainty: "confirmed" });
+    expect(answer).toMatchObject({ status: "process" });
     expect(answer.sentence).toMatch(/^Nilai Aisyah Putri Wijaya sudah tersimpan\./u);
   });
 

@@ -4,6 +4,7 @@
 //   pnpm --filter @nemu/ai eval:school -- --live [--photo <jpg>] [--truth <csv|json>] [--roster <csv|json>]
 //        [--assessment UTS] [--kkm 75] [--audio clip.wav]
 //
+// Also reads the photo's heading first (#269): the official page should give UTS · Matematika · 4B.
 // Defaults are the official F1-1 files in src/school/fixtures: the photo, F1-1_kunci-jawaban.csv
 // and daftar-siswa-4B.csv. --truth also takes {"10": 71, "23": "S", …} keyed by line.
 // --roster also takes [{"studentId": "…", "name": "…", "number": 1}, …].
@@ -152,6 +153,14 @@ const bytes = stripJpegMetadata(new Uint8Array(await readFile(photoPath)));
 const mime = extname(photoPath).toLowerCase() === ".png" ? "image/png" : "image/jpeg";
 const image = { type: "image", dataUrl: imageDataUrl(bytes, mime) };
 
+// #269: the heading, read before the full read for "Ini nilai apa, Bu?".
+const titleStarted = performance.now();
+const titleCandidates = await ai.readPhotoTitle({ image });
+const title = {
+  candidates: titleCandidates.map((c) => [c.assessment, c.subject, c.className].join(" · ")),
+  seconds: Math.round((performance.now() - titleStarted) / 100) / 10,
+};
+
 const started = performance.now();
 const result = await ai.readGradePhoto({
   image,
@@ -185,6 +194,7 @@ const report = {
     ]),
   ),
   accepted: plan.acceptedSentence,
+  title,
 };
 
 const studentByName = new Map(roster.map((student) => [student.name, student.studentId]));

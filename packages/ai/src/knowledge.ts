@@ -123,6 +123,13 @@ export function retrieveKnowledge(
     }
   }
 
+  // Rule questions ask "minimal"/"maksimal"; an SOP writes "paling sedikit"/"paling banyak".
+  if (/\b(minimal|minimum|sekurang)/iu.test(query)) {
+    for (const t of tokenize("paling sedikit")) expandedTokens.add(t);
+  }
+  if (/\b(maksimal|maksimum|sebanyak)/iu.test(query)) {
+    for (const t of tokenize("paling banyak")) expandedTokens.add(t);
+  }
   if (/batal/i.test(query)) {
     for (const t of tokenize("pembatalan dibatalkan surat pernyataan pembebanan pasal 33")) {
       expandedTokens.add(t);
