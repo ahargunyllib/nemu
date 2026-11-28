@@ -1,6 +1,7 @@
 import type { ExecutorStep, ExecutorTask } from "@nemu/contracts/executor";
 import type { QuizQuestion, QuizSnapshot } from "@nemu/contracts/quiz";
 
+import { addressFor } from "../../grade-photo/lib/grade-task";
 import {
   type ListedQuestion,
   MENU,
@@ -260,13 +261,12 @@ export async function nextQuizSteps(
     case "preview-start": {
       await arrive(io, cmid, ["view"]);
       const button = previewButton(io.doc) ?? "Pratinjau kuis";
-      const teacher = continuation.honorific ? `, ${continuation.honorific}` : "";
       return {
         steps: [
           {
             verb: "point",
             target: { role: "button", text: button },
-            sentence: `Tekan ${button}${teacher}. Nemu melihat kuis ini seperti siswa melihatnya.`,
+            sentence: `Silakan ${addressFor(continuation.honorific)} tekan ${button}. Nemu melihat kuis ini seperti siswa melihatnya.`,
           },
         ],
         continuation: next("preview", {}),

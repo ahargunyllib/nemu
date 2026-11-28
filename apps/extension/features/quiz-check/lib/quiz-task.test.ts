@@ -92,7 +92,7 @@ describe("F4-01 as an executor task (#209)", () => {
       );
       if (next.steps[0]?.verb === "point")
         expect(next.steps[0].sentence).toBe(
-          "Tekan Pratinjau kuis, Bu. Nemu melihat kuis ini seperti siswa melihatnya.",
+          "Silakan Ibu tekan Pratinjau kuis. Nemu melihat kuis ini seperti siswa melihatnya.",
         );
       continuation = next.continuation;
     }
