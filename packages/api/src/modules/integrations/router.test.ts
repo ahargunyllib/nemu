@@ -73,20 +73,46 @@ describe("WS-07 integration secrets", () => {
     });
   });
 
-  it("is Admin Javan's page: an operator and a teacher get FORBIDDEN", async () => {
-    for (const user of [OPERATOR, undefined]) {
-      const context = await createSchoolContext(user);
-      await expect(
-        call(integrationsRouter.listIntegrationSecrets, undefined, { context }),
-      ).rejects.toMatchObject({ code: "FORBIDDEN" });
-      await expect(
-        call(
-          integrationsRouter.saveIntegrationSecret,
-          { name: "alursekolah_api_key", value: "as_x" },
-          { context },
-        ),
-      ).rejects.toMatchObject({ code: "FORBIDDEN" });
-    }
+  it("shows a school operator the masked list; only Admin Javan enters or checks keys (ADR-0022)", async () => {
+    const admin = await createSchoolContext(ADMIN_JAVAN);
+    await call(
+      integrationsRouter.saveIntegrationSecret,
+      { name: "alursekolah_api_key", value: "as_kunci-rahasia-wxyz" },
+      { context: admin },
+    );
+
+    // The operator reads the same database: "set or not" and the last four, never the value.
+    const operator = { ...admin, session: (await createSchoolContext(OPERATOR)).session };
+    const list = await call(integrationsRouter.listIntegrationSecrets, undefined, {
+      context: operator,
+    });
+    expect(list.find((secret) => secret.name === "alursekolah_api_key")?.lastFour).toBe("wxyz");
+    expect(JSON.stringify(list)).not.toContain("rahasia");
+
+    await expect(
+      call(
+        integrationsRouter.saveIntegrationSecret,
+        { name: "alursekolah_api_key", value: "as_x" },
+        { context: operator },
+      ),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(
+      call(integrationsRouter.checkAlurSekolahConnection, undefined, { context: operator }),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+
+  it("keeps WS-07 from a teacher", async () => {
+    const context = await createSchoolContext();
+    await expect(
+      call(integrationsRouter.listIntegrationSecrets, undefined, { context }),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(
+      call(
+        integrationsRouter.saveIntegrationSecret,
+        { name: "alursekolah_api_key", value: "as_x" },
+        { context },
+      ),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
 
   it("checks the AlurSekolah connection with the stored URL and key", async () => {

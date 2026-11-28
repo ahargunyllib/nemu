@@ -54,8 +54,8 @@ export const extensionRouter = {
     }),
 
   /**
-   * WS-03: the school's allowed websites and what Nemu may do on each. Admin Javan edits them; the
-   * operator reads them to say which websites a document applies to (WS-04).
+   * WS-03: the school's allowed websites and what Nemu may do on each. The operator and Admin Javan
+   * both add, change and remove them (ADR-0022); WS-04 reads them to say where a document applies.
    */
   listAllowedSites: schoolAdminProcedure
     .output(z.array(allowedSiteSchema.extend({ id: z.string() })))
@@ -63,7 +63,7 @@ export const extensionRouter = {
       createExtensionRepository(context.db).listAllowedSites(context.session.user.workspaceId),
     ),
 
-  saveAllowedSite: schoolFullAdminProcedure
+  saveAllowedSite: schoolAdminProcedure
     .input(
       z.object({
         id: z.string().min(1).nullable(),
@@ -91,7 +91,7 @@ export const extensionRouter = {
         throw new ORPCError("NOT_FOUND", { message: "Situs tidak ditemukan" });
     }),
 
-  deleteAllowedSite: schoolFullAdminProcedure
+  deleteAllowedSite: schoolAdminProcedure
     .input(z.object({ id: z.string().min(1) }))
     .handler(async ({ context, input }) => {
       const deleted = await createExtensionRepository(context.db).deleteAllowedSite(
@@ -101,13 +101,14 @@ export const extensionRouter = {
       if (!deleted) throw new ORPCError("NOT_FOUND", { message: "Situs tidak ditemukan" });
     }),
 
-  /** WS-08 (Admin Javan): how Nemu works for every teacher of the school. */
-  getSchoolSettings: schoolFullAdminProcedure
+  /** WS-08: how Nemu works for every teacher of the school. The operator reads it (ADR-0022). */
+  getSchoolSettings: schoolAdminProcedure
     .output(schoolSettingsSchema)
     .handler(({ context }) =>
       createExtensionRepository(context.db).schoolSettings(context.session.user.workspaceId),
     ),
 
+  /** Only Admin Javan changes WS-08 (ADR-0022). */
   saveSchoolSettings: schoolFullAdminProcedure
     .input(schoolSettingsSchema.extend({ talkShortcut: z.string().trim().min(1).max(40) }))
     .output(schoolSettingsSchema)

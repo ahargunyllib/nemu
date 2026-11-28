@@ -85,7 +85,7 @@ The `admin` role: Javan's staff, who see every page and every school in the Admi
 _Avoid_: superadmin
 
 **Operator**:
-The `operator` role: a school's administrator, tied to one school's Knowledge Workspace. Sees only that school's knowledge, Kamus Kendala, Uji jawaban and Teachers & contacts pages. Also the contact teachers are sent to for account and class problems.
+The `operator` role: a school's administrator, tied to one school's Knowledge Workspace. Sees that school's Ringkasan, knowledge, Kamus Kendala, Uji jawaban, Teachers & contacts and Allowed websites pages, and reads its Integrations (masked) and Action log; not the school list, the package, Tables or Nemu settings (ADR-0022). Also the contact teachers are sent to for account and class problems.
 _Avoid_: school admin
 
 **Knowledge Workspace**:
@@ -107,7 +107,7 @@ The school's teacher registry: name, AlurSekolah email, WhatsApp number, classes
 _Avoid_: user profiles, guru list
 
 **Integrations (WS-07)**:
-Admin Javan's page for a school's integration settings: the AlurSekolah API base URL and key, the Moodle URL and token, and the Nemu WhatsApp number. Values are stored encrypted and never shown again, only "terpasang · …last 4" (ADR-0014). The AlurSekolah base URL decides whether Nemu reads the mock or the school's real tenant.
+The page where Admin Javan enters a school's integration settings: the AlurSekolah API base URL and key, the Moodle URL and token, and the Nemu WhatsApp number. Values are stored encrypted and never shown again, only "terpasang · …last 4" (ADR-0014); the school operator sees that masked list and can't change it (ADR-0022). The AlurSekolah base URL decides whether Nemu reads the mock or the school's real tenant.
 _Avoid_: credentials page, API settings
 
 **Photo Job**:

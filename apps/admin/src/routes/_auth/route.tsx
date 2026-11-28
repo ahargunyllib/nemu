@@ -18,9 +18,9 @@ export const Route = createFileRoute("/_auth")({
         to: "/login",
       });
     }
-    // A school operator sees only its school's pages; anything else sends them to WS-06.
+    // A school operator sees only its school's pages; anything else sends them to Ringkasan.
     const role = session.data.user.role;
-    if (!canOpen(role, location.pathname)) throw redirect({ to: homePath(role) });
+    if (!canOpen(role, location.pathname)) throw redirect({ to: homePath() });
     return { session };
   },
 });

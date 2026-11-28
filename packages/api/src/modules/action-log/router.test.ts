@@ -88,8 +88,9 @@ describe("action log (WS-10)", () => {
 describe("WS-10 action log page", () => {
   const ADMIN_JAVAN = { id: "javan", role: "admin", workspaceId: "W-SEKOLAH" };
   const OPERATOR = { id: "rizal", role: "operator", workspaceId: "W-SEKOLAH" };
+  const TEACHER = { id: "siti", role: "guru", workspaceId: "W-SEKOLAH" };
 
-  it("shows Admin Javan what the executor recorded, newest first, and keeps it from an operator", async () => {
+  it("shows Admin Javan and the school operator what the executor recorded, newest first", async () => {
     const extension = await fromExtension({ installCode: INSTALL_CODE, email: BU_SITI });
     await call(
       actionLogRouter.actionLogRecord,
@@ -116,8 +117,12 @@ describe("WS-10 action log page", () => {
       { action: "setValue", target: "Nilai Budi Santoso", cara: 1, result: "done" },
     ]);
 
+    // ADR-0022: the operator reads the same log, and there is nothing on it to change.
     await expect(
       call(actionLogRouter.listActionLog, undefined, { context: await signedIn(OPERATOR) }),
+    ).resolves.toEqual(rows);
+    await expect(
+      call(actionLogRouter.listActionLog, undefined, { context: await signedIn(TEACHER) }),
     ).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
 });

@@ -15,11 +15,11 @@ The OpenRouter key in `apps/server/.env` had **expired** on 25 Nov 2026 (HTTP 40
 
 Accounts (seeded by `packages/db/src/migrations/20261125120000_seed_school_workspace` and `20261126080000_seed_school_directory`, workspace `W-SEKOLAH`, demo date Tuesday 1 Dec 2026):
 
-| Who                             | Email             | Password          | Role                                                            |
-| ------------------------------- | ----------------- | ----------------- | --------------------------------------------------------------- |
-| Bu Siti (teacher, classes 4A/B) | `siti@nemu.demo`  | `siti-demo-2026`  | `guru`                                                          |
-| Pak Rizal (operator)            | `rizal@nemu.demo` | `rizal-demo-2026` | `operator` (uploads documents, saves procedures, manages WS-06) |
-| Admin Javan                     | `javan@nemu.demo` | `javan-demo-2026` | `admin` (every page, including the school list)                 |
+| Who                             | Email             | Password          | Role                                                                                                              |
+| ------------------------------- | ----------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Bu Siti (teacher, classes 4A/B) | `siti@nemu.demo`  | `siti-demo-2026`  | `guru`                                                                                                            |
+| Pak Rizal (operator)            | `rizal@nemu.demo` | `rizal-demo-2026` | `operator` (uploads documents, saves procedures, manages WS-06 and WS-03, reads WS-07, WS-08 and WS-10; ADR-0022) |
+| Admin Javan                     | `javan@nemu.demo` | `javan-demo-2026` | `admin` (every page, including the school list)                                                                   |
 
 ## Procedures
 
