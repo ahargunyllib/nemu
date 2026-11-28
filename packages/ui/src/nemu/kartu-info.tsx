@@ -14,9 +14,9 @@ import { cn } from "cn";
  * Kartu Info: something to read. A title with an optional detail line, a short list, at most one
  * link, and one [Tutup].
  */
-export function KartuInfo({ title, detail, items, link, onClose }: KartuInfoProps) {
+export function KartuInfo({ status, title, detail, items, link, onClose }: KartuInfoProps) {
   return (
-    <NemuCard display="info" label={title}>
+    <NemuCard display="info" label={title} status={status}>
       <CardHeader className="gap-1.5">
         <CardTitle className="text-xl leading-7 font-semibold">{title}</CardTitle>
         {detail && (

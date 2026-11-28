@@ -6,12 +6,15 @@ import {
   type NemuNoteKind,
   type NemuNotes,
   type NemuStatus,
+  type NemuTone,
   noteText,
   sourceName,
+  statusCount,
   statusText,
+  statusTone,
 } from "@nemu/ui/lib/nemu-display";
+import { NemuMascot, type NemuMascotMood } from "@nemu/ui/nemu/nemu-mascot";
 import { cn } from "cn";
-import { CircleAlert, CircleCheck, PencilLine } from "lucide-react";
 import { type ComponentProps, Fragment, useState } from "react";
 
 /*
@@ -51,7 +54,7 @@ export function NemuBubble({
       )}
       {...props}
     >
-      {status && <NemuStatusHeader status={status} />}
+      {status && <NemuHeading status={status} className="mx-5" />}
       <div className="flex flex-col gap-4 px-5">{children}</div>
     </Card>
   );
@@ -60,10 +63,11 @@ export function NemuBubble({
 type NemuCardProps = ComponentProps<typeof Card> & {
   display: "pilih" | "info";
   label: string;
+  status?: NemuStatus;
 };
 
 /** A Kartu: a card with a dark orange band along its top, for deciding or reading. */
-export function NemuCard({ display, label, className, children, ...props }: NemuCardProps) {
+export function NemuCard({ display, label, status, className, children, ...props }: NemuCardProps) {
   return (
     <Card
       role="region"
@@ -76,34 +80,59 @@ export function NemuCard({ display, label, className, children, ...props }: Nemu
       {...props}
     >
       <div aria-hidden className="h-2 bg-nemu" />
+      {status && <NemuHeading status={status} className="px-(--card-spacing)" />}
       {children}
     </Card>
   );
 }
 
-const STATUS_ICONS = { working: PencilLine, unsaved: CircleAlert, saved: CircleCheck };
+const TONE_TEXT: Record<NemuTone, string> = {
+  nemu: "text-nemu-strong",
+  muted: "text-nemu-secondary",
+  danger: "text-nemu-danger-strong",
+  warning: "text-nemu-danger-strong",
+  success: "text-nemu-success-strong",
+};
+
+const TONE_MOOD: Record<NemuTone, NemuMascotMood> = {
+  nemu: "idle",
+  muted: "idle",
+  danger: "idle",
+  warning: "warning",
+  success: "success",
+};
 
 /**
- * The bubble header: "Nemu mengisi · 13 dari 32", "Belum tersimpan", "Tersimpan", with a
- * progress bar. It is never read aloud; the icon and the words carry the state, not the colour.
+ * The heading on top of every display (Kepala): a 28 px mascot, the label in 14 px bold
+ * capitals coloured by its tone, a count on the right ("3 dari 32", "10.02") and, with progress,
+ * a thin bar under it. It is never read aloud; the words carry the state, not the colour.
  */
-export function NemuStatusHeader({ status }: { status: NemuStatus }) {
-  const Icon = STATUS_ICONS[status.tone];
-  const text = statusText(status);
+export function NemuHeading({ status, className }: { status: NemuStatus; className?: string }) {
+  const tone = statusTone(status);
+  const count = statusCount(status);
   const progress = status.progress;
   return (
-    <div
-      data-nemu-status={status.tone}
-      className="mx-5 flex flex-col gap-2 rounded-2xl bg-nemu-subtle px-4 py-2.5 text-lg font-semibold text-nemu-strong"
-    >
-      <p className="flex items-center gap-2">
-        <Icon aria-hidden className="size-5 shrink-0" />
-        {text}
-      </p>
+    <div data-nemu-status={tone} className={cn("flex flex-col gap-3", className)}>
+      <div className="flex min-h-7 items-center gap-2.5">
+        <NemuMascot mood={TONE_MOOD[tone]} className="size-7 shrink-0" />
+        <p
+          className={cn(
+            "min-w-0 flex-1 text-sm leading-[18px] font-bold tracking-[0.06em] uppercase",
+            TONE_TEXT[tone],
+          )}
+        >
+          {status.text}
+        </p>
+        {count && (
+          <p className="shrink-0 text-base leading-5 font-semibold text-nemu-secondary tabular-nums">
+            {count}
+          </p>
+        )}
+      </div>
       {progress && (
         <Progress
           value={progress.total > 0 ? (progress.done / progress.total) * 100 : 0}
-          aria-label={text}
+          aria-label={statusText(status)}
           className="[&_[data-slot=progress-indicator]]:bg-nemu [&_[data-slot=progress-track]]:h-2 [&_[data-slot=progress-track]]:bg-nemu-amber-100"
         />
       )}

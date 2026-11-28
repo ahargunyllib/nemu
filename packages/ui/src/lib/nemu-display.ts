@@ -4,15 +4,47 @@
  * components in `@nemu/ui/nemu/*` draw them.
  */
 
-/** The bubble header: what Nemu is doing or whether the page is saved. Never read aloud. */
+/**
+ * The heading's colour, picked by the situation. The words always say it too, so colour is never
+ * the only signal: `nemu` amber (GILIRAN IBU, NEMU MENGISI, JAWABAN), `muted` grey (NEMU
+ * BERHENTI, MIKROFON TERBLOKIR), `danger` red (BELUM JELAS), `warning` red with the warning
+ * mascot (HATI-HATI), `success` green with the success mascot (SUDAH DICEK).
+ */
+export type NemuTone = "nemu" | "muted" | "danger" | "warning" | "success";
+
+/**
+ * The heading on top of every display (Kepala): a small mascot, a short label in capitals, an
+ * optional count on the right and an optional thin progress bar under it. Never read aloud.
+ */
 export type NemuStatus = {
-  /** Picks the icon; the text always says the same thing, so colour is never the only signal. */
-  tone: "working" | "unsaved" | "saved";
-  /** "Nemu mengisi", "Belum tersimpan", "Tersimpan". */
+  /**
+   * Default `nemu`. The older `working` and `unsaved` draw as `nemu`, and `saved` as `success`,
+   * so existing callers keep their meaning.
+   */
+  tone?: NemuTone | "working" | "unsaved" | "saved";
+  /** "Nemu mengisi", "Giliran Ibu", "Belum jelas": drawn in capitals. */
   text: string;
-  /** Adds "· 13 dari 32" to the text and a progress bar under it. */
+  /** On the right: "1 dari 2", "10.02", "My Family". */
+  count?: string;
+  /** A thin progress bar under the heading; without `count`, also "13 dari 32" on the right. */
   progress?: { done: number; total: number };
 };
+
+const LEGACY_TONES = { working: "nemu", unsaved: "nemu", saved: "success" } as const;
+
+/** The tone a heading draws in. */
+export function statusTone(status: NemuStatus): NemuTone {
+  const tone = status.tone ?? "nemu";
+  return tone in LEGACY_TONES
+    ? LEGACY_TONES[tone as keyof typeof LEGACY_TONES]
+    : (tone as NemuTone);
+}
+
+/** What the heading shows on its right: the `count`, else "13 dari 32" from the progress. */
+export function statusCount(status: NemuStatus): string | undefined {
+  if (status.count) return status.count;
+  return status.progress ? `${status.progress.done} dari ${status.progress.total}` : undefined;
+}
 
 /** A source Nemu can open, such as a cited PDF at its page (#258). */
 export type NemuSourceLink = { label: string; onOpen: () => void };
@@ -91,10 +123,14 @@ export type KartuPilihProps = {
   note?: string;
   /** A small card that waits beside the Nemu button, such as "Foto dari WhatsApp". */
   compact?: boolean;
+  /** The heading: "NEMU BERHENTI · 3 dari 32", "HATI-HATI · My Family". */
+  status?: NemuStatus;
 };
 
 /** Kartu Info: something to read, a title, a short list and one [Tutup]. */
 export type KartuInfoProps = {
+  /** The heading: "MIKROFON TERBLOKIR", "HASIL PEMERIKSAAN", "SUDAH DICEK". */
+  status?: NemuStatus;
   title: string;
   /** A quieter line under the title: "Yang lain sudah benar: 15 soal, kelas 4A." Not read aloud. */
   detail?: string;
@@ -138,11 +174,10 @@ export function noteText(kind: NemuNoteKind, notes: NemuNotes): string {
   return notes[kind] ?? "";
 }
 
-/** "Nemu mengisi · 13 dari 32" */
+/** The whole heading as one line, for screen readers: "Nemu mengisi · 13 dari 32". */
 export function statusText(status: NemuStatus): string {
-  return status.progress
-    ? `${status.text} · ${status.progress.done} dari ${status.progress.total}`
-    : status.text;
+  const count = statusCount(status);
+  return count ? `${status.text} · ${count}` : status.text;
 }
 
 /** Safe choices first, risky ones (⚠) under them; otherwise the order given. */

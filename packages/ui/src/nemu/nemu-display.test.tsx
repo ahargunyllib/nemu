@@ -20,11 +20,14 @@ describe("Gelembung Kerja", () => {
     onStop: vi.fn(),
   };
 
-  test("shows its progress in the header, which Nemu doesn't say", () => {
+  test("shows its progress in the heading, which Nemu doesn't say", () => {
     render(<GelembungKerja {...kerja} />);
     const bubble = screen.getByRole("region", { name: "Nemu bekerja" });
-    expect(within(bubble).getByText("Nemu mengisi · 13 dari 32")).toBeTruthy();
-    expect(within(bubble).getByRole("progressbar")).toBeTruthy();
+    expect(within(bubble).getByText("Nemu mengisi")).toBeTruthy();
+    expect(within(bubble).getByText("13 dari 32")).toBeTruthy();
+    expect(within(bubble).getByRole("progressbar").getAttribute("aria-label")).toBe(
+      "Nemu mengisi · 13 dari 32",
+    );
     expect(spokenText(kerja)).toBe("Nemu mengisi nilai Aisyah Putri Wijaya: 85.");
   });
 
@@ -255,6 +258,90 @@ describe("Kartu Info", () => {
     expect(within(card).getAllByRole("button")).toHaveLength(1);
     fireEvent.click(within(card).getByRole("button", { name: "Tutup" }));
     expect(onClose).toHaveBeenCalledOnce();
+  });
+});
+
+describe("The heading", () => {
+  test("labels Kartu Pilih and Kartu Info too, with a count and no progress bar", () => {
+    render(
+      <>
+        <KartuPilih
+          status={{ tone: "muted", text: "Nemu berhenti", count: "3 dari 32" }}
+          question="Ibu mau isi sendiri?"
+          choices={[
+            { id: "ya", label: "Ya, saya isi sendiri" },
+            { id: "lanjut", label: "Nemu saja yang lanjut" },
+          ]}
+          onChoose={vi.fn()}
+        />
+        <KartuInfo
+          status={{ tone: "muted", text: "Mikrofon terblokir" }}
+          title="Nemu belum bisa mendengar Ibu."
+          items={["Klik ikon gembok di kiri alamat situs"]}
+          onClose={vi.fn()}
+        />
+      </>,
+    );
+    const pilih = screen.getByRole("region", { name: "Pilihan Nemu" });
+    expect(within(pilih).getByText("Nemu berhenti")).toBeTruthy();
+    expect(within(pilih).getByText("3 dari 32")).toBeTruthy();
+    expect(within(pilih).queryByRole("progressbar")).toBeNull();
+    const info = screen.getByRole("region", { name: "Nemu belum bisa mendengar Ibu." });
+    expect(within(info).getByText("Mikrofon terblokir")).toBeTruthy();
+    // The heading comes first, above the title.
+    expect(
+      follows(within(info).getByText("Mikrofon terblokir"), within(info).getByText(/belum bisa/u)),
+    ).toBe(true);
+  });
+
+  test("takes its tone from the situation; the older tones keep their meaning", () => {
+    const tones = [
+      [undefined, "nemu"],
+      ["working", "nemu"],
+      ["unsaved", "nemu"],
+      ["saved", "success"],
+      ["danger", "danger"],
+      ["warning", "warning"],
+    ] as const;
+    for (const [tone, drawn] of tones) {
+      const { container, unmount } = render(
+        <GelembungTunjuk status={{ tone, text: "Giliran Ibu" }} sentence="Tekan Simpan." />,
+      );
+      expect(container.querySelector("[data-nemu-status]")?.getAttribute("data-nemu-status")).toBe(
+        drawn,
+      );
+      unmount();
+    }
+  });
+
+  test("a warning or success heading changes the mascot too, so colour isn't the only signal", () => {
+    const { container, rerender } = render(
+      <GelembungJawab
+        status={{ tone: "warning", text: "Hati-hati" }}
+        sentence="Kuis ini dipakai."
+      />,
+    );
+    expect(container.querySelector("[data-nemu-mascot]")?.getAttribute("data-nemu-mascot")).toBe(
+      "warning",
+    );
+    rerender(
+      <GelembungJawab status={{ tone: "success", text: "Sudah dicek" }} sentence="Tersimpan." />,
+    );
+    expect(container.querySelector("[data-nemu-mascot]")?.getAttribute("data-nemu-mascot")).toBe(
+      "success",
+    );
+  });
+
+  test("is never said", () => {
+    expect(
+      spokenText({
+        type: "info",
+        status: { text: "Hasil pemeriksaan" },
+        title: "Ada 2 hal yang perlu Ibu perbaiki.",
+        items: [],
+        onClose: vi.fn(),
+      }),
+    ).toBe("Ada 2 hal yang perlu Ibu perbaiki.");
   });
 });
 

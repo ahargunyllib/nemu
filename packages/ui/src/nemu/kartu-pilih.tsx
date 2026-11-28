@@ -29,10 +29,16 @@ export function KartuPilih({
   image,
   note,
   compact = false,
+  status,
 }: KartuPilihProps) {
   const questionId = useId();
   return (
-    <NemuCard display="pilih" label="Pilihan Nemu" className={cn(compact && "w-[300px] gap-3")}>
+    <NemuCard
+      display="pilih"
+      label="Pilihan Nemu"
+      status={status}
+      className={cn(compact && "w-[300px] gap-3")}
+    >
       <CardHeader className={cn(compact && image && "flex items-center gap-3")}>
         {compact &&
           image &&
