@@ -213,6 +213,10 @@ or left of the element, the first that fits in the window and covers none of the
 controls (the field being filled and the ones after it). It also keeps clear of the whole
 mascot, which stands taller than a short target such as a link.
 A display about no element (an answer to a typed question, most Kartu) sits above the Nemu button.
+An "ini kenapa?" answer is about the message it explains (F2 · 02): the cursor glides to that
+message on the page (the first error read when she asked, else the first message), rings it, and
+the Gelembung Jawab sits beside it, Kenapa? and Sumber cards included. If the message is gone or
+out of view, the answer sits above the Nemu button.
 
 **Pointing at the browser** (#268): Chrome's microphone prompt is browser UI over the top left
 of the page, which Nemu can't see. The first time the teacher talks on a site, the cursor glides to

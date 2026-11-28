@@ -120,6 +120,16 @@ await check(
     await bubble(page)
       .getByText("Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).")
       .waitFor({ timeout: 15_000 });
+    // The answer points at the message it explains (F2 · 02): the ring on it, the cursor beside
+    // it, and the bubble next to it instead of above the Nemu button.
+    await overlay(page).locator("[data-nemu-ring]").waitFor();
+    await overlay(page).locator("[data-nemu-cursor='arrived']").waitFor();
+    const message = await page.locator("#area-tabel [role=alert]").boundingBox();
+    const answer = await bubble(page).boundingBox();
+    expect(
+      message && answer && Math.abs(answer.y - message.y) < 200,
+      `the answer isn't beside the message (message y ${message?.y}, answer y ${answer?.y})`,
+    );
     await page.screenshot({ path: join(shots, "f2-2-answer.png") });
     await bubble(page).getByRole("button", { name: "Kenapa?" }).click();
     const kenapa = noteCard(page, "kenapa");

@@ -21,6 +21,8 @@ export type AskResult =
       why?: string;
       /** The Kenapa? card's title: "Kenapa muncul pesan ini?" for a message on the page (F2). */
       whyTitle?: string;
+      /** It explains a message on the page, so Nemu points at that message (F2 · 02). */
+      aboutMessage?: boolean;
       next?: AnswerNext;
       /** "Lihat diagram (operator)" on the Sumber card, for a BPMN-backed answer (F2-08). */
       diagram?: { label: string; href: string };

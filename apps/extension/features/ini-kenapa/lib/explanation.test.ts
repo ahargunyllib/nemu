@@ -34,6 +34,7 @@ describe("fromExplanation", () => {
       text: "Ibu bisa memperbaikinya sendiri, saya tunjukkan caranya.",
       why: "Akun Ibu belum ditandai sebagai User Ruang GTK.",
       whyTitle: "Kenapa muncul pesan ini?",
+      aboutMessage: true,
       sources: ["Kamus Kendala · K-02"],
       next: { kind: "fix", target: "Sinkro Ruang GTK", how: CITATION.quote, entryId: "K-02" },
     });

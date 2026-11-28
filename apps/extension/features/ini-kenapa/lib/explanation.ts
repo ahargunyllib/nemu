@@ -91,6 +91,7 @@ export function fromExplanation(explanation: HelpExplanation): AskResult {
     why: explanation.why || undefined,
     // The Kamus Kendala entry explains a message the page shows (F2 · 03).
     whyTitle: KENAPA_MESSAGE,
+    aboutMessage: true,
     sources: [sourceLabel(explanation.citation)],
     next,
   };
