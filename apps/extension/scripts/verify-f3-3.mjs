@@ -1,7 +1,8 @@
 // F3-3 on the mock AlurSekolah (#214): "Rekam cara", review, BPMN export and 5 replays.
 // Loads a production build of the extension into Playwright's Chromium (with a fake microphone):
 //   1. Bu Siti types "Rekam cara Catat ujian tahfidz" and does the Ujian baru form once on the
-//      mock, holding Ctrl + Space once to explain a step (narration on the recording's clock);
+//      mock, holding Ctrl + Space once to explain a step (narration on the recording's clock),
+//      and types one date during Jeda, which isn't recorded;
 //   2. Selesai hands it over; "Periksa rekaman" opens the Admin Workspace, where Pak Rizal (signed
 //      in) sees the steps with Simpan ujian "dikerjakan guru", renames an input, tries deleting a
 //      step, and saves it; the steps match F3-3_langkah-yang-diharapkan.json;
@@ -151,7 +152,8 @@ async function ask(question) {
 let review = null;
 await check("Rekam cara records the Ujian baru form and one spoken explanation", async () => {
   await ask(`Rekam cara ${TITLE}`);
-  const bubble = display("jawab").filter({ hasText: "Nemu merekam" });
+  const bubble = overlay.getByRole("region", { name: "Nemu merekam" });
+  const pill = overlay.locator("[data-nemu-recording]");
   await bubble.waitFor({ timeout: 10_000 });
   await page.locator("#menu-alquran").click();
   await page.locator("#tf-kelas").selectOption("4A");
@@ -165,6 +167,18 @@ await check("Rekam cara records the Ujian baru form and one spoken explanation",
   await page.keyboard.up("Control");
   await overlay.getByRole("region", { name: "Yang Nemu dengar" }).waitFor({ timeout: 15_000 });
   await page.locator("#uj-jenis").selectOption("Ujian Juz 30");
+  // Jeda: a date typed while paused isn't recorded; Lanjut records again from the same step.
+  const counted = await pill.innerText();
+  await bubble.getByRole("button", { name: "Jeda" }).click();
+  await bubble.getByText("Rekaman dijeda.").waitFor();
+  await page.locator("#uj-tanggal").fill("2026-11-30");
+  const paused = await pill.innerText();
+  expect(
+    paused === counted.replace("Merekam cara", "Dijeda"),
+    `paused pill "${paused}" after "${counted}"`,
+  );
+  await page.screenshot({ path: join(shots, "dijeda.png") });
+  await bubble.getByRole("button", { name: "Lanjut" }).click();
   await page.locator("#uj-tanggal").fill("2026-12-01");
   for (const [id, value] of [
     ["uj-fashohah", "90"],
@@ -175,7 +189,7 @@ await check("Rekam cara records the Ujian baru form and one spoken explanation",
     await page.locator(`#${id}`).fill(value);
   await page.locator("#btn-simpan-ujian").click();
   await page.getByText("Ujian Aisyah Putri Wijaya tersimpan.", { exact: false }).waitFor();
-  await bubble.getByText("Merekam · 11 langkah").waitFor({ timeout: 5000 });
+  await pill.getByText("Merekam cara · langkah 11").waitFor({ timeout: 5000 });
   await page.screenshot({ path: join(shots, "merekam.png") });
   await bubble.getByRole("button", { name: "Selesai" }).click();
   const saved = display("jawab").filter({ hasText: "Rekaman tersimpan: 11 langkah." });

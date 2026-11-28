@@ -198,6 +198,17 @@ the prompt's measured place instead: just right of its edge, level with its top 
 The Gelembung Tunjuk beside it names the button, "Tekan Izinkan yang paling atas di kotak Chrome
 supaya Nemu bisa mendengar, Bu.", in case the cursor stands a little off (ADR-0019).
 
+**Rekam cara** (F3-01): while an operator records a task, the extension's recording bubble (the
+Gelembung surface, 420 px) sits above the Nemu button: heading **MEREKAM** with the operator's
+first name on the right, the latest explanation in quotes as the sentence ("“Isi nilai satu per
+satu sesuai buku.”"), the detail "Klik dan isian ikut tercatat.", and **[Jeda]** (outline) then
+**[Selesai]** (black); no ×. Before anything is explained the sentence names the recording and the
+detail adds the talk combination ("Tahan Ctrl + Spasi untuk menjelaskan."). **Jeda** stops
+recording clicks, typing and talk: the heading turns muted **DIJEDA**, the sentence says "Rekaman
+dijeda." and the outline button becomes **[Lanjut]**. A click-through pill at the top centre of the
+page says "● Merekam cara · langkah 6" (white on `nemu-danger-strong`), or "Dijeda · langkah 6" on
+`nemu-secondary` during Jeda.
+
 **Preview**: in a dev build, open an allowed page with `?pratinjau-nemu` (for example
 `http://localhost:3003/?pratinjau-nemu#/nilai` on the mock AlurSekolah). A dock at the bottom left
 shows each type with sample content; **Gerak kursor** moves the cursor between Kelas and
