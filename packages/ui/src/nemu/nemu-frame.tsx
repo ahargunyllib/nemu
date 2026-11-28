@@ -210,6 +210,12 @@ export function NemuNoteLinks({
         <div className="rounded-2xl bg-nemu-subtle px-4 py-3 text-xl leading-7 text-nemu-subtle-foreground">
           {open === "sumber" ? (
             <>
+              {notes.sumberTitle && (
+                <p className="text-2xl leading-8 font-semibold text-foreground">
+                  {notes.sumberTitle}
+                </p>
+              )}
+              {notes.sumberNote && <p className="mb-2">{notes.sumberNote}</p>}
               <ul className="flex list-disc flex-col gap-1 pl-5">
                 {notes.sumber?.map((source) => (
                   <li key={sourceName(source)}>

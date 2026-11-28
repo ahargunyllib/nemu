@@ -460,6 +460,8 @@ function NemuPanel({
                   ? {
                       kenapa: state.result.why,
                       sumber: sumberEntries(state.result.sources, state.result.files, onOpenSource),
+                      sumberTitle: state.result.sourcesTitle,
+                      sumberNote: state.result.sourcesNote,
                       sumberLink: state.result.diagram,
                     }
                   : undefined

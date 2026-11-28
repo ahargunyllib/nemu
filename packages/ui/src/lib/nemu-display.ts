@@ -26,6 +26,9 @@ export function sourceName(source: NemuSource): string {
 export type NemuNotes = {
   kenapa?: string;
   sumber?: readonly NemuSource[];
+  /** A title and a short note over the Sumber list ("Kenapa nilai bisa belum tampil?"). */
+  sumberTitle?: string;
+  sumberNote?: string;
   /** A link under the Sumber list, such as "Lihat diagram" for a BPMN-backed answer. */
   sumberLink?: { label: string; href: string };
   ringkasan?: string;
@@ -122,7 +125,14 @@ export const NOTE_LABELS: Record<NemuNoteKind, string> = {
 
 /** The text a link reads out once it is opened. */
 export function noteText(kind: NemuNoteKind, notes: NemuNotes): string {
-  if (kind === "sumber") return `Sumber: ${(notes.sumber ?? []).map(sourceName).join("; ")}`;
+  if (kind === "sumber")
+    return [
+      notes.sumberTitle,
+      notes.sumberNote,
+      `Sumber: ${(notes.sumber ?? []).map(sourceName).join("; ")}`,
+    ]
+      .filter(Boolean)
+      .join(" ");
   return notes[kind] ?? "";
 }
 

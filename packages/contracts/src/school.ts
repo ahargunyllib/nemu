@@ -310,6 +310,12 @@ export const helpExplanationSchema = z.discriminatedUnion("status", [
         .strict(),
       /** The task or end event the symptom belongs to; highlighted in Lihat diagram. */
       elementId: z.string(),
+      /**
+       * Over the Sumber steps, for an answer about one pupil whose cause is only "kemungkinan"
+       * (P0-1): a title ("Kenapa nilai bisa belum tampil?") and what Nemu can't see.
+       */
+      sourceTitle: z.string().optional(),
+      sourceNote: z.string().optional(),
       /** Sumber for the teacher: 2–4 plain-language steps, each with its BPMN element ids. */
       steps: z
         .array(z.object({ text: z.string(), elementIds: z.array(z.string()).min(1) }).strict())

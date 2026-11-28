@@ -14,6 +14,9 @@ export type AskResult =
       sources: string[];
       /** The sources Sumber can open: a cited document at its page (#258). */
       files?: SourceFile[];
+      /** Over the Sumber list: a title and what Nemu can't see (F2-08, P0-1). */
+      sourcesTitle?: string;
+      sourcesNote?: string;
       why?: string;
       next?: AnswerNext;
       /** "Lihat diagram" under Sumber, for a BPMN-backed answer (F2-08). */

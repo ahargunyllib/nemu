@@ -210,6 +210,10 @@ await check(
     await bubble(page).getByRole("button", { name: "Kenapa?" }).click();
     await bubble(page).getByText("Jalan kembalinya:", { exact: false }).waitFor();
     await bubble(page).getByRole("button", { name: "Sumber" }).click();
+    await bubble(page).getByText("Kenapa nilai bisa belum tampil?").waitFor();
+    await bubble(page)
+      .getByText("Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan.")
+      .waitFor();
     const steps = bubble(page).locator("li");
     const count = await steps.count();
     console.log(`  Sumber: ${(await steps.allInnerTexts()).join(" | ")}`);

@@ -35,6 +35,8 @@ export function fromExplanation(explanation: HelpExplanation): AskResult {
       text: explanation.sentence,
       why: explanation.why || undefined,
       sources: explanation.steps.map((step) => step.text),
+      sourcesTitle: explanation.sourceTitle,
+      sourcesNote: explanation.sourceNote,
       diagram: {
         label: `Lihat diagram ${explanation.process.title}`,
         href: processDiagramUrl(explanation),

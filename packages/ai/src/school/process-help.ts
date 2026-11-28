@@ -457,6 +457,18 @@ function likelyLead(gradeCheck: GradeCheck, title: string): string | null {
   return `Kemungkinan karena alur ${name}${/\bsekolah$/iu.test(name) ? "" : " sekolah"}`;
 }
 
+/**
+ * What Sumber says over the steps when the cause is only "kemungkinan" (P0-1). These two belong
+ * to the SPP case: the bill is the only state a process depends on that Nemu can't check today
+ * (no AlurSekolah finance scope, the SPP module is still "Segera hadir"), and the lead is only
+ * written for a question about a pupil's grades. A process that depends on another unchecked
+ * state needs its own words here.
+ */
+const LIKELY_SOURCE = {
+  sourceTitle: "Kenapa nilai bisa belum tampil?",
+  sourceNote: "Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan.",
+} as const;
+
 function withLead(answer: string, lead: string): string {
   let rest = answer;
   while (LEAD.test(rest)) rest = rest.replace(LEAD, "");
@@ -670,6 +682,7 @@ export async function explainProcess(
     why: clean(response.why, draft.why, 500),
     process: { documentId: process.documentId, title: process.title, version: process.version },
     elementId: trace.cause.id,
+    ...(lead ? LIKELY_SOURCE : {}),
     steps,
     fixer,
     parentReply: replyOk ? reply : draft.parentReply,
