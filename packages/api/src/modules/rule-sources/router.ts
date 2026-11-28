@@ -36,10 +36,10 @@ export const ruleSourcesRouter = {
         input,
       );
       if (result === "rule_not_found") {
-        throw new ORPCError("NOT_FOUND", { message: "Rule not found in this workspace" });
+        throw new ORPCError("NOT_FOUND", { message: "Aturan tidak ditemukan di workspace ini" });
       }
       if (result === "document_not_found") {
-        throw new ORPCError("NOT_FOUND", { message: "Document not found in this workspace" });
+        throw new ORPCError("NOT_FOUND", { message: "Dokumen tidak ditemukan di workspace ini" });
       }
     }),
 

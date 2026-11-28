@@ -186,7 +186,8 @@ export async function explainError(
     schemaName: "kamus_pick",
     schema: MODEL_PICK_JSON_SCHEMA,
     parse: (value) => modelPickSchema.parse(value),
-    maxOutputTokens: 300,
+    // The text model reasons before it answers; a small budget ends inside the reasoning (#315).
+    maxOutputTokens: 2_000,
   });
   const row = match.rows.find((candidate) => candidate.id === response.row_id);
   return row ? answerFromRow(row, snapshot.alerts[0] ?? "", input) : notInGuide(input);

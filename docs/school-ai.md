@@ -11,6 +11,8 @@ Everything here runs on the synthetic school **SDIT Nusantara**. Replace the syn
 | Offline | `NEMU_RESPONDER=fixture` in `apps/server/.env`, then `pnpm dev` | None. Every photo reads as the official F1-1 page (4 doubtful digits, 5 names spelled differently, Raka's S), help and answers come from rules. Shapes are real, so the UI can be built against it. |
 | Live    | `NEMU_RESPONDER=ai` and a valid `OPENROUTER_API_KEY`            | The `OPENROUTER_SCHOOL_*` models in `apps/server/.env.schema`                                                                                                                                       |
 
+The text model (`anthropic/claude-haiku-5.5`) reasons before it answers, and on OpenRouter those reasoning tokens count against `maxOutputTokens`: a call that uses up its budget reasoning comes back with no text ("OpenRouter Responses API did not contain output text"). Measured live, a symptom match reasons 235–946 tokens for about 10 of answer. So every model call gets at least 2000 (#315); a small cap saves nothing, since it is only a ceiling.
+
 The OpenRouter key in `apps/server/.env` had **expired** on 25 Nov 2026 (HTTP 401), so nothing live was run. Renew it before live testing.
 
 Accounts (seeded by `packages/db/src/migrations/20261125120000_seed_school_workspace` and `20261126080000_seed_school_directory`, workspace `W-SEKOLAH`, demo date Tuesday 1 Dec 2026):
@@ -144,6 +146,11 @@ Nothing in the code knows SPP: the school's uploaded `.bpmn`, its WS-04 index an
 - Eval over the five test-pack questions (`F3-2_pertanyaan-dan-kunci.csv`): `pnpm --filter @nemu/api exec vp test run src/modules/help/f3-2-sop.test.ts` (fixture), with `NEMU_LIVE_EVAL=1` and `--silent=false` for the configured text model and its answers.
 - Sumber opens the cited PDF at its page (#258, ADR-0018): the extension asks `documentFileLink {id}` for a 10-minute signed path and opens `<Nemu Service>/api-reference/documents/<id>/file?token=…#page=<page>` in a new tab. Only active, ready PDFs the school reads get a link.
 - The seed stores the PDF's metadata only; the file goes in the documents bucket at `seed/sekolah/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf`. `pnpm dev` puts it in the local bucket (the `SeedDocumentFiles` action in `packages/infra/alchemy.run.ts`, dev only). Production needs it once, by hand: find the bucket with `pnpm dlx wrangler@4 r2 bucket list` (the `documents` bucket of the `prod` stage), then `pnpm dlx wrangler@4 r2 object put <documents bucket>/seed/sekolah/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf --file packages/ai/src/school/fixtures/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf --content-type application/pdf --remote`. Uploading the PDF in Pengetahuan sekolah instead makes a new document; re-point the Rule Sources at it.
+
+Paket AlurSekolah is seeded with **Tentang Nemu** (#305, `20261129000000_seed_tentang_nemu`, source `packages/ai/src/school/fixtures/tentang-nemu.md`): what Nemu can help with, talking to it, and allowing the microphone in Chrome. Questions about Nemu itself ("Mikrofon Chrome-nya di mana?", "Apa yang anda ketahui?") are answered from it instead of "Belum ada di panduan sekolah."
+
+- After editing the guide, regenerate the seed: `UPDATE_TENTANG_NEMU_SEED=1 pnpm --filter @nemu/api exec vp test run src/modules/help/tentang-nemu.test.ts`. Keep SOP words out of it ("berapa", "bawah", "KKM"): they would pull SOP questions toward the guide.
+- The file goes in the documents bucket at `seed/alursekolah/tentang-nemu.md`; `pnpm dev` puts it there, production needs it once like the SOP PDF (`--content-type "text/markdown; charset=utf-8"`).
 
 ### Speech
 

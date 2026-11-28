@@ -118,7 +118,8 @@ async function mapHeadersWithModel(call: JsonCall, grid: Grid): Promise<HeaderMa
     schemaName: "grade_sheet_header_map",
     schema: HEADER_MAP_JSON_SCHEMA,
     parse: (value) => headerMapSchema.parse(value),
-    maxOutputTokens: 600,
+    // The text model reasons before it answers; a small budget ends inside the reasoning (#315).
+    maxOutputTokens: 2_000,
   });
   return {
     headerRow: response.header_row,
