@@ -8,13 +8,23 @@ import type { NemuDisplay } from "@nemu/ui/lib/nemu-display";
 export const PREVIEW_ENABLED =
   import.meta.env.DEV && new URLSearchParams(location.search).has("pratinjau-nemu");
 
-export type PreviewScene = "kerja" | "tunjuk" | "jawab" | "pilih" | "info" | "kursor";
+export type PreviewScene =
+  | "kerja"
+  | "tunjuk"
+  | "jawab"
+  | "belum-jelas"
+  | "pilih"
+  | "hati-hati"
+  | "info"
+  | "kursor";
 
 export const PREVIEW_SCENES: readonly { scene: PreviewScene; label: string }[] = [
   { scene: "kerja", label: "Kerja" },
   { scene: "tunjuk", label: "Tunjuk" },
   { scene: "jawab", label: "Jawab" },
+  { scene: "belum-jelas", label: "Belum jelas" },
   { scene: "pilih", label: "Pilih" },
+  { scene: "hati-hati", label: "Hati-hati" },
   { scene: "info", label: "Info" },
   { scene: "kursor", label: "Gerak kursor" },
 ];
@@ -53,7 +63,7 @@ export function sceneDisplay(
     case "tunjuk":
       return {
         type: "tunjuk",
-        status: { tone: "unsaved", text: "Belum tersimpan" },
+        status: { text: "Giliran Ibu" },
         sentence: "Sekarang tekan Tampilkan Siswa.",
         detail: "Nemu menunggu sampai daftar murid muncul.",
         note: { kenapa: "Daftar murid kelas 4A muncul setelah tombol ini ditekan." },
@@ -67,7 +77,7 @@ export function sceneDisplay(
     case "jawab":
       return {
         type: "jawab",
-        status: { tone: "saved", text: "Tersimpan" },
+        status: { text: "Jawaban" },
         sentence: "KKM semua mata pelajaran di SDIT Nusantara adalah 75.",
         detail: "Berlaku untuk semester ganjil 2026/2027.",
         notes: {
@@ -78,9 +88,30 @@ export function sceneDisplay(
         action: { label: "Buka Rekap Nilai", onSelect: actions.close },
         onClose: actions.close,
       };
+    case "belum-jelas":
+      return {
+        type: "jawab",
+        status: { tone: "danger", text: "Belum jelas" },
+        sentence: "Maaf, Bu. Nemu belum dengar jelas.",
+        detail:
+          'Terdengar: "...nilai... foto..." Tahan Ctrl + Spasi lagi, lalu ulangi lebih dekat.',
+        onClose: actions.close,
+      };
+    case "hati-hati":
+      return {
+        type: "pilih",
+        status: { tone: "warning", text: "Hati-hati", count: "UTS Matematika 4B" },
+        question: "Rekap nilai ini sudah dikunci. Kalau dibuka, nilainya bisa berubah.",
+        choices: [
+          { id: "buka", label: "Buka kunci rekap", risky: true },
+          { id: "biarkan", label: "Biarkan terkunci" },
+        ],
+        onChoose: actions.close,
+      };
     case "pilih":
       return {
         type: "pilih",
+        status: { tone: "muted", text: "Nemu berhenti", count: "13 dari 32" },
         question: "Nilai Bagas Pratama 58, di bawah KKM 75. Tetap simpan?",
         detail: "Pilih salah satu, Nemu menunggu.",
         choices: [
@@ -92,6 +123,7 @@ export function sceneDisplay(
     case "info":
       return {
         type: "info",
+        status: { tone: "success", text: "Sudah dicek" },
         title: "Catatan langkah",
         detail: "Yang Nemu dan Ibu kerjakan di halaman ini.",
         items: [

@@ -41,6 +41,9 @@
   --nemu-strong-foreground: #ffffff;
   /* text/secondary: the detail line under a display's sentence (7.7:1 on white). */
   --nemu-secondary: #52525b;
+  /* A display heading's red (BELUM JELAS, HATI-HATI) and green (SUDAH DICEK), both above 7:1. */
+  --nemu-danger-strong: #991b1b;
+  --nemu-success-strong: #065f46;
 
   /* bg/success, text/success: "Kamu yang mengirim" label, success Answer Card. */
   --nemu-success: #10b981;
@@ -83,6 +86,8 @@
   --color-nemu-strong: var(--nemu-strong);
   --color-nemu-strong-foreground: var(--nemu-strong-foreground);
   --color-nemu-secondary: var(--nemu-secondary);
+  --color-nemu-danger-strong: var(--nemu-danger-strong);
+  --color-nemu-success-strong: var(--nemu-success-strong);
   --color-nemu-success: var(--nemu-success);
   --color-nemu-success-foreground: var(--nemu-success-foreground);
   --color-nemu-success-subtle: var(--nemu-success-subtle);

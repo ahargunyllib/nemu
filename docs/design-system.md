@@ -20,6 +20,8 @@ The tokens live in `packages/ui/src/styles/nemu.css` and are Tailwind colours:
 | `nemu-text`                                 | amber 700 `#8F460A`                         | Nemu links ("Rincian", "Tutup", "Lihat detail") and outline button text (6.9:1).                    |
 | `nemu-subtle` / `nemu-subtle-foreground`    | amber 50 / amber 800                        | Citation chips ("PMK 119/2023 · Ps. 8 ayat (5)").                                                   |
 | `nemu-secondary`                            | zinc 600 `#52525B`                          | text/secondary: the detail line under a display's sentence (7.7:1).                                 |
+| `nemu-danger-strong`                        | `#991B1B`                                   | The red display heading (BELUM JELAS, HATI-HATI), 8.9:1.                                            |
+| `nemu-success-strong`                       | `#065F46`                                   | The green display heading (SUDAH DICEK), 7.6:1.                                                     |
 | `nemu-ring`                                 | amber 500 `#E07A16`                         | Mascot orbit ring, click ripple. Lines only (Sorot arahkan is `nemu-amber-600`).                    |
 | `nemu-glow`                                 | amber 400 `#F59331`                         | Mascot glow, loading shimmer.                                                                       |
 | `nemu-success*`                             | `#10B981`, subtle `#ECFDF5`, text `#047857` | "Kamu yang mengirim" label, success card.                                                           |
@@ -77,6 +79,9 @@ amber wings (amber 100 ellipses tilted up behind the body), soft amber glow. Sev
 - **success**: green body, happy closed eyes (^ ^), dark green check badge bottom-right.
 - **warning**: red body, red "!" badge bottom-right.
 
+`NemuMascot` draws idle, success and warning (`mood`); a display heading picks the mood from its
+tone.
+
 ## Composer (Komposer · Tanya Nemu)
 
 A 300px pill (its own width, not the Answer Card panel's), full `nemu` fill, rounded-2xl,
@@ -119,7 +124,7 @@ the page's Shadow DOM.
 
 | Type                 | When                   | Shape                                                                                                 |
 | -------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------- |
-| **Gelembung Kerja**  | Nemu is working        | Status header with a progress bar, one sentence and its detail line, always **[Pelan] [Berhenti]**    |
+| **Gelembung Kerja**  | Nemu is working        | Heading with a count and progress bar, one sentence and its detail line, **[Pelan] [Berhenti]**       |
 | **Gelembung Tunjuk** | The teacher's turn     | One sentence beside the field or button the cursor points at. No buttons, at most one link            |
 | **Gelembung Jawab**  | An answer or a problem | One sentence, the **Kenapa?**, **Sumber** and **Lihat ringkasan** links, at most one action button, × |
 | **Kartu Pilih**      | A decision             | One question, a detail line, 2–3 equal stacked big buttons, nothing pre-selected or focused           |
@@ -127,6 +132,16 @@ the page's Shadow DOM.
 
 - **Gelembung** (bubble): white, `rounded-3xl`, a 2 px `nemu` edge, 420 px wide. **Kartu** (card):
   the stock card, 400 px wide, with an 8 px `nemu` band along its top.
+- **Heading** (Kepala, `status`): every display can open with one row: the 28 px mascot, a short
+  label in Label/Caps (14 px bold, +6% tracking, uppercase), and on the right an optional count in
+  16 px semibold `nemu-secondary` ("3 dari 32", "1 dari 2", "10.02"). With `progress` an 8 px bar
+  (`nemu` on `nemu-amber-100`) runs under it and the count defaults to "13 dari 32". The label's
+  colour follows the situation (`tone`): **nemu** amber 800 for Nemu's own work and the teacher's
+  turn (NEMU MENGISI, GILIRAN IBU, JAWABAN); **muted** `nemu-secondary` grey when Nemu is held up
+  (NEMU BERHENTI, MIKROFON TERBLOKIR); **danger** `nemu-danger-strong` `#991B1B` red (BELUM
+  JELAS); **warning** the same red with the warning mascot (HATI-HATI); **success**
+  `nemu-success-strong` `#065F46` green with the success mascot (SUDAH DICEK). The older tones
+  still work: `working` and `unsaved` draw as nemu, `saved` as success. All five types take it.
 - **Text**: every display leads with one bold line, the sentence of a Gelembung (24 px semibold),
   the question of a Kartu Pilih or the title of a Kartu Info (20 px semibold). Under it can sit one
   quieter **detail** line (`detail`, 18/26 regular, `nemu-secondary` `#52525B`, 7.7:1): "Klik atau
@@ -134,17 +149,17 @@ the page's Shadow DOM.
   between the question and the choices. It is never read aloud and is not part of the sentence
   that says itself again.
 - **Sizes**: the sentence is 24 px (semibold), card text 20 px, the detail line and links 18 px,
-  the header 18 px. Every button and link is at least 44 px tall; the big buttons are 48 px with
+  the heading label 14 px bold capitals. Every button and link is at least 44 px tall; the big buttons are 48 px with
   20 px text.
 - **Contrast ≥ 7:1**: text is `foreground` on white, or `nemu-strong` (amber 800, Nemu's dark
   orange) on white or `nemu-subtle`. The one action button in a Gelembung Jawab is a `nemu-strong`
   fill with white text (9.6:1); the main button in a Kartu is the stock black default. The lighter
   `nemu` (5.0:1) is only for edges, the progress bar, the cursor's label and the target ring.
-- **Colour is never the only signal**: the header carries an icon and words (pencil "Nemu
-  mengisi · 13 dari 32", alert "Belum tersimpan", check "Tersimpan"); a risky choice carries a ⚠
-  icon (and "Berisiko" for screen readers); the spoken word is tinted and underlined.
-- **Header**: what Nemu is doing or whether the page is saved, on `nemu-subtle`. It is never read
-  aloud: Nemu says only the sentence (`spokenText`), the question of a Kartu Pilih, or the title
+- **Colour is never the only signal**: the heading's words say the state ("Nemu mengisi",
+  "Belum jelas", "Sudah dicek") and the warning and success headings change the mascot too; a
+  risky choice carries a ⚠ icon (and "Berisiko" for screen readers); the spoken word is tinted
+  and underlined.
+- **Never read aloud**: the heading, the links and the buttons. Nemu says only the sentence (`spokenText`), the question of a Kartu Pilih, or the title
   of a Kartu Info, never the detail line under it.
 - **Links**: Kenapa?, Sumber and Lihat ringkasan are small underlined `nemu-strong` links. What is
   behind them shows in a `nemu-subtle` box and is read (`onRead`) only once the teacher clicks.
