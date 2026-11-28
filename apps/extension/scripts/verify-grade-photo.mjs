@@ -343,7 +343,7 @@ await check("cara 1 opens Isi nilai kelas through the menu and fills every value
   const working = display("kerja");
   await working.getByText("Alya Nur Fitri, 90.").waitFor({ timeout: 30_000 });
   await working.getByText("Klik atau ketik kalau Ibu mau isi sendiri.").waitFor();
-  await heading("kerja", /^Nemu mengisi3 dari 32$/u).waitFor();
+  await heading("kerja", "Nemu mengisi", "3 dari 32").waitFor();
   await page.waitForURL(/#\/nilai$/u);
   await page.screenshot({ path: join(shots, "mengisi.png") });
   await working.getByText("Sisanya saya isi lebih cepat, Bu.").waitFor({ timeout: 15_000 });

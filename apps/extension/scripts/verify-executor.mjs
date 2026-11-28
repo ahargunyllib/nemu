@@ -92,7 +92,8 @@ await check(
     // The heading counts the students (5), not the values and notes Nemu types.
     await display("kerja")
       .locator("[data-nemu-status]")
-      .filter({ hasText: /^Nemu mengisi\d dari 5$/u })
+      .filter({ hasText: "Nemu mengisi" })
+      .filter({ hasText: /\d dari 5/u })
       .waitFor({ timeout: 15_000 });
     await page.screenshot({ path: join(shots, "cara-1-filling.png") });
     await display("tunjuk").getByText("Silakan tekan Simpan.").waitFor({ timeout: 30_000 });
