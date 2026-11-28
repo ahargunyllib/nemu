@@ -81,7 +81,9 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     Ibu mau isi sendiri." under it), then "Sisanya saya isi lebih cepat, Bu." The heading counts
     students ("Nemu mengisi · 3 dari 32"), not their notes. **Pelan** halves the speed and keeps
     each student's line; it stops before Simpan and points at
-    it. **Cara 2** points, says the value and checks what the teacher typed. **Cara 3** waits for
+    it. **Cara 2** points, says the value and checks what the teacher typed, under a "Giliran Ibu" heading
+    that counts the students ("4 dari 32"); F1's lines carry a detail under them ("Alya 90 sudah
+    benar. Kolom Bagas bersinar oranye.", "Ibu mengetik 86. Ganti dulu, lalu lanjut."). **Cara 3** waits for
     Simpan and then checks every value. "Ajari saya" switches to cara 2 at any time (F0-11). The
     default cara and the cara 1 fill speed are the school's WS-08 settings (pelan 2 s, normal 1 s,
     cepat 0.5 s per field), read by `executorSettings` (`lib/executor-settings.ts`) from the
@@ -306,7 +308,8 @@ switches to cara 2, once because the teacher takes over ("Saya isi sendiri") and
 saya" (the `?uji-nemu` dock's button, since the test microphone can't say it). The "teacher"
 types what Nemu says, except where `features/grade-photo/lib/F1-2_cara-2_skenario.csv` (the
 official F1-1 values, with data-uji F1-2's two deliberate mismatches: Bagas 86 for 68, Budi 71 for 77) has her type something else first. It checks that each line is the
-book's grade, that both mismatches get "Di buku …, Bu." and never "salah", Catatan langkah, and 0
+book's grade, the Giliran Ibu heading and the line under it, that both mismatches get "Di buku …,
+Bu." with "Ibu mengetik …. Ganti dulu, lalu lanjut." under it and never "salah", Catatan langkah, and 0
 wrong grades saved. Screenshots go to `.output/verify-f1-2/`.
 
 `pnpm --filter extension verify:f4-1` runs F4-1 (#209) on the Moodle test site started from

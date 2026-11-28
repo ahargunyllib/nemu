@@ -80,9 +80,12 @@ export type GuidedStep = Extract<ExecutorStep, { verb: "setValue" }>;
  * failure) falls back to the executor's own words and check.
  */
 export type CaraTwoGuide = {
-  prompt(step: GuidedStep): Promise<string | null>;
-  check(step: GuidedStep, typed: string): Promise<{ ok: boolean; sentence: string } | null>;
+  prompt(step: GuidedStep): Promise<GuideLine | null>;
+  check(step: GuidedStep, typed: string): Promise<(GuideLine & { ok: boolean }) | null>;
 };
+
+/** What Nemu says (`sentence`) and the quieter line under it (`detail`, not spoken). */
+export type GuideLine = { sentence: string; detail?: string };
 
 export type RunView = { display: NemuDisplay | null; target: Element | null; ticks: Element[] };
 
@@ -724,8 +727,19 @@ export class ExecutorRun {
     name: string,
     signal: AbortSignal,
   ) {
-    const say = (sentence: string) => {
-      this.render({ type: "tunjuk", sentence }, element);
+    // Giliran Ibu (F1·09): the stage's "Langkah 1 dari 3", or for a student's value the row,
+    // "4 dari 32".
+    const progress = step.verb === "setValue" && !step.stage ? this.progress(index) : undefined;
+    const status: NemuStatus = {
+      text: `Giliran ${addressFor(this.deps.honorific)}`,
+      ...(step.stage
+        ? { count: `Langkah ${step.stage.n} dari ${step.stage.of}` }
+        : progress
+          ? { count: `${progress.done} dari ${progress.total}` }
+          : {}),
+    };
+    const say = (sentence: string, detail?: string) => {
+      this.render({ type: "tunjuk", sentence, ...(detail ? { detail } : {}), status }, element);
       this.deps.speak(sentence);
     };
     this.waiting = { refused: false };
@@ -813,17 +827,18 @@ export class ExecutorRun {
     element: Element,
     name: string,
     guide: CaraTwoGuide,
-    say: (sentence: string) => void,
+    say: (sentence: string, detail?: string) => void,
     signal: AbortSignal,
   ): Promise<boolean> {
     const prompt = await guide.prompt(step).catch(() => null);
     if (signal.aborted) throw new Interrupted();
-    say(
-      prompt ??
-        (step.rowName
+    if (prompt) say(prompt.sentence, prompt.detail);
+    else
+      say(
+        step.rowName
           ? `Ketik ${step.value} untuk ${step.rowName}.`
-          : `Ketik ${step.value} di ${name}.`),
-    );
+          : `Ketik ${step.value} di ${name}.`,
+      );
     const left = async () => {
       await waitForEvent(element, ["change"], () => true, signal);
       return currentValue(element);
@@ -831,7 +846,9 @@ export class ExecutorRun {
     let corrected = false;
     let typed = await left();
     for (;;) {
-      const verdict = (await guide.check(step, typed).catch(() => null)) ?? {
+      const verdict: GuideLine & { ok: boolean } = (await guide
+        .check(step, typed)
+        .catch(() => null)) ?? {
         ok: sameValue(typed, step.value),
         sentence: `Di daftar tertulis ${step.value}.`,
       };
@@ -844,7 +861,7 @@ export class ExecutorRun {
       }
       if (verdict.ok) return corrected;
       corrected = true;
-      say(verdict.sentence);
+      say(verdict.sentence, verdict.detail);
       typed = await left();
     }
   }

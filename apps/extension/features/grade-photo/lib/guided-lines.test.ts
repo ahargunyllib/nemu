@@ -103,13 +103,14 @@ function harness(cara: Cara, sleep?: RunDeps["sleep"]) {
     sleep: sleep ?? (() => new Promise((resolve) => setTimeout(resolve, 0))),
     log: () => undefined,
     save: () => undefined,
-    guide: gradeGuide({ entries: async () => ENTRIES, line: serviceLine }),
+    guide: gradeGuide({ entries: async () => ENTRIES, line: serviceLine, address: () => "Ibu" }),
     onEnd: ended,
     isTrusted: () => true,
   });
   return {
     run,
     spoken,
+    shown,
     ended,
     display: () => shown.at(-1) ?? null,
     teacherTypes: () => (typing = true),
@@ -151,6 +152,33 @@ describe("F1 cara 2 (F1-2)", () => {
     expect(corrections).toEqual(["Di buku 68, Bu.", "Di buku 77, Bu."]);
     expect(spoken.some((line) => /salah/iu.test(line))).toBe(false);
     expect(wrongOnPage()).toEqual([]);
+  });
+
+  test("Giliran Ibu counts the students; the line under it confirms the row above and names the lit field (F1·09, F1·10)", async () => {
+    const { run, shown, display, teacherTypes } = harness(2);
+    teacherTypes();
+    void run.run();
+    await vi.waitFor(() => expect(display()).toMatchObject(SAVE), { timeout: 5000 });
+
+    const turns = shown.flatMap((item) => (item?.type === "tunjuk" ? [item] : []));
+    const said = (sentence: string) => turns.find((turn) => turn.sentence === sentence);
+    expect(said("Ketik 62 untuk Ahmad.")).toMatchObject({
+      status: { text: "Giliran Ibu", count: "1 dari 32" },
+      detail: "Kolom Ahmad bersinar oranye.",
+    });
+    expect(said("Di Catatan Ahmad Fadli, tulis remedial.")).toMatchObject({
+      status: { text: "Giliran Ibu", count: "1 dari 32" },
+      detail: "Ahmad 62 sudah benar. Kolom Catatan Ahmad bersinar oranye.",
+    });
+    expect(said("Ketik 68 untuk Bagas.")).toMatchObject({
+      status: { text: "Giliran Ibu", count: "4 dari 32" },
+      detail: "Alya 90 sudah benar. Kolom Bagas bersinar oranye.",
+    });
+    // F1-2's first deliberate mismatch: she typed 86 for Bagas's 68.
+    expect(said("Di buku 68, Bu.")).toMatchObject({
+      status: { text: "Giliran Ibu", count: "4 dari 32" },
+      detail: "Ibu mengetik 86. Ganti dulu, lalu lanjut.",
+    });
   });
 
   test("'Ajari saya' in the middle of the cara 1 fill switches the remaining rows to cara 2", async () => {
@@ -219,7 +247,11 @@ describe("F1 cara 2 (F1-2)", () => {
   });
 
   test("without the Nemu Service Nemu falls back to its own words and check", async () => {
-    const offline = gradeGuide({ entries: async () => ENTRIES, line: async () => null });
+    const offline = gradeGuide({
+      entries: async () => ENTRIES,
+      line: async () => null,
+      address: () => "Ibu",
+    });
     const step = FILL.steps[0];
     if (step?.verb !== "setValue") throw new Error("expected a value step");
     expect(await offline.prompt(step)).toBeNull();

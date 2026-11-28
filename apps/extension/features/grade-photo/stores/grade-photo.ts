@@ -654,6 +654,7 @@ function createGradePhoto() {
         const response = await call({ op: "guided-line", entries, studentId, typed });
         return response.ok ? (response.value as GradePhotoValue["guided-line"]) : null;
       },
+      address,
     }),
   );
   // Visible again: ask for photos now rather than at the next tick.
