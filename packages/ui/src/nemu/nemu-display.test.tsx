@@ -76,6 +76,23 @@ describe("Gelembung Tunjuk", () => {
     ).toEqual(["Kenapa?"]);
   });
 
+  test("its link opens a card in its place, and Tutup brings it back", () => {
+    const onRead = vi.fn();
+    render(
+      <GelembungTunjuk
+        sentence="Tekan Tampilkan Siswa."
+        note={{ kenapa: "Daftar murid muncul setelah tombol ini ditekan." }}
+        onRead={onRead}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Kenapa?" }));
+    expect(screen.queryByRole("region", { name: "Petunjuk Nemu" })).toBeNull();
+    const card = screen.getByRole("region", { name: "Kenapa?" });
+    expect(onRead).toHaveBeenLastCalledWith("Daftar murid muncul setelah tombol ini ditekan.");
+    fireEvent.click(within(card).getByRole("button", { name: "Tutup" }));
+    expect(screen.getByRole("region", { name: "Petunjuk Nemu" })).toBeTruthy();
+  });
+
   test("shows a chip under its text and a cancel link at the bottom, still no buttons", () => {
     const onSelect = vi.fn();
     render(
@@ -99,7 +116,7 @@ describe("Gelembung Tunjuk", () => {
 });
 
 describe("Gelembung Jawab", () => {
-  test("reads Kenapa? and Sumber only once they are clicked", () => {
+  test("a link opens its card in the bubble's place, read only then; Tutup brings the bubble back", () => {
     const onRead = vi.fn();
     render(
       <GelembungJawab
@@ -116,12 +133,139 @@ describe("Gelembung Jawab", () => {
     expect(onRead).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: "Kenapa?" }));
-    expect(screen.getByText("Sekolah menetapkan satu KKM untuk semua mapel.")).toBeTruthy();
+    expect(screen.queryByRole("region", { name: "Jawaban Nemu" })).toBeNull();
+    const kenapa = screen.getByRole("region", { name: "Kenapa?" });
+    expect(kenapa.getAttribute("data-nemu-note")).toBe("kenapa");
+    // One paragraph, not numbered: the reason isn't a list of steps.
+    expect(within(kenapa).getByText("Sekolah menetapkan satu KKM untuk semua mapel.").tagName).toBe(
+      "P",
+    );
+    expect(kenapa.querySelector("[data-nemu-step]")).toBeNull();
     expect(onRead).toHaveBeenLastCalledWith("Sekolah menetapkan satu KKM untuk semua mapel.");
 
+    fireEvent.click(within(kenapa).getByRole("button", { name: "Tutup" }));
+    expect(screen.getByRole("region", { name: "Jawaban Nemu" })).toBeTruthy();
+
     fireEvent.click(screen.getByRole("button", { name: "Sumber" }));
-    expect(screen.getByText("SOP Penilaian SDIT Nusantara · hlm. 2")).toBeTruthy();
+    const sumber = screen.getByRole("region", { name: "Sumber" });
+    expect(within(sumber).getByText("SOP Penilaian SDIT Nusantara · hlm. 2")).toBeTruthy();
     expect(onRead).toHaveBeenLastCalledWith("Sumber: SOP Penilaian SDIT Nusantara · hlm. 2");
+  });
+
+  test("the Kenapa? card has its title, and its Sumber link opens the Sumber card (F2 · 03)", () => {
+    const onRead = vi.fn();
+    render(
+      <GelembungJawab
+        status={{ text: "Jawaban" }}
+        sentence="Bukan kesalahan Ibu. Yang bisa membantu: Pak Rizal."
+        notes={{
+          kenapa: "Penugasan guru per mapel dan kelas diatur admin sekolah.",
+          kenapaTitle: "Kenapa muncul pesan ini?",
+          sumber: ["Kamus Kendala · K-07"],
+        }}
+        onRead={onRead}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Kenapa?" }));
+    const card = screen.getByRole("region", { name: "Kenapa muncul pesan ini?" });
+    expect(within(card).getByText("Kenapa?")).toBeTruthy();
+    expect(onRead).toHaveBeenLastCalledWith(
+      "Kenapa muncul pesan ini? Penugasan guru per mapel dan kelas diatur admin sekolah.",
+    );
+    const links = within(card).getAllByRole("button");
+    expect(links.map((button) => button.textContent)).toEqual([
+      "Sumber: Kamus Kendala · K-07",
+      "Tutup",
+    ]);
+
+    fireEvent.click(links[0] as HTMLElement);
+    expect(screen.getByRole("region", { name: "Sumber" })).toBeTruthy();
+    expect(onRead).toHaveBeenLastCalledWith("Sumber: Kamus Kendala · K-07");
+  });
+
+  test("a process's Sumber card numbers its steps under the title and note (F2 · 06)", () => {
+    const onRead = vi.fn();
+    render(
+      <GelembungJawab
+        sentence="Bukan kesalahan Ibu. Kemungkinan karena alur SPP sekolah."
+        notes={{
+          sumber: [
+            "Tagihan SPP lewat jatuh tempo.",
+            "Sistem mengunci nilai di aplikasi orang tua.",
+            "Nilai terbuka lagi setelah tagihan lunas.",
+          ],
+          sumberSteps: true,
+          sumberName: "Alur SPP sekolah",
+          sumberTitle: "Kenapa nilai bisa belum tampil?",
+          sumberNote: "Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan.",
+          sumberLink: { label: "Lihat diagram (operator)", href: "https://admin.test/diagram" },
+        }}
+        onRead={onRead}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Sumber" }));
+    const card = screen.getByRole("region", { name: "Kenapa nilai bisa belum tampil?" });
+    // The heading: "SUMBER" with the process on the right.
+    expect(card.querySelector("[data-nemu-status]")?.textContent).toBe("SumberAlur SPP sekolah");
+    const title = within(card).getByText("Kenapa nilai bisa belum tampil?");
+    const note = within(card).getByText(
+      "Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan.",
+    );
+    const steps = within(card).getAllByRole("listitem");
+    expect(follows(title, note) && follows(note, steps[0] as HTMLElement)).toBe(true);
+    expect(steps.map((step) => step.textContent)).toEqual([
+      "1Tagihan SPP lewat jatuh tempo.",
+      "2Sistem mengunci nilai di aplikasi orang tua.",
+      "3Nilai terbuka lagi setelah tagihan lunas.",
+    ]);
+    expect(
+      within(card).getByRole("link", { name: "Lihat diagram (operator)" }).getAttribute("href"),
+    ).toBe("https://admin.test/diagram");
+    expect(onRead).toHaveBeenLastCalledWith(
+      "Kenapa nilai bisa belum tampil? Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan. Tagihan SPP lewat jatuh tempo. Sistem mengunci nilai di aplikasi orang tua. Nilai terbuka lagi setelah tagihan lunas.",
+    );
+  });
+
+  test("without a Sumber title the process names the card once, as its title", () => {
+    render(
+      <GelembungJawab
+        sentence="Menurut alur sekolah, nilai dikunci."
+        notes={{
+          sumber: ["Tagihan lewat.", "Nilai dikunci."],
+          sumberSteps: true,
+          sumberName: "Alur SPP",
+        }}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Sumber" }));
+    const card = screen.getByRole("region", { name: "Alur SPP" });
+    expect(card.querySelector("[data-nemu-status]")?.textContent).toBe("Sumber");
+    expect(card.querySelectorAll("[data-nemu-step]")).toHaveLength(2);
+  });
+
+  test("Lihat ringkasan opens under the links, so the sentence stays in view", () => {
+    const onRead = vi.fn();
+    render(
+      <GelembungJawab
+        sentence="Tekan Simpan, Bu."
+        notes={{ ringkasan: "Ahmad Fadli 82, Aisyah Zahra 90." }}
+        onRead={onRead}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Lihat ringkasan" }));
+    const bubble = screen.getByRole("region", { name: "Jawaban Nemu" });
+    expect(within(bubble).getByText("Ahmad Fadli 82, Aisyah Zahra 90.")).toBeTruthy();
+    expect(within(bubble).getByText("Tekan Simpan, Bu.")).toBeTruthy();
+    expect(onRead).toHaveBeenLastCalledWith("Ahmad Fadli 82, Aisyah Zahra 90.");
+  });
+
+  test("the next answer shows as a bubble, not the card left open", () => {
+    const notes = { kenapa: "Sekolah menetapkan satu KKM." };
+    const { rerender } = render(<GelembungJawab sentence="KKM 75." notes={notes} />);
+    fireEvent.click(screen.getByRole("button", { name: "Kenapa?" }));
+    expect(screen.queryByRole("region", { name: "Jawaban Nemu" })).toBeNull();
+    rerender(<GelembungJawab sentence="Remedial wajib di bawah 75." notes={notes} />);
+    expect(screen.getByRole("region", { name: "Jawaban Nemu" })).toBeTruthy();
   });
 
   test("opens a source that has its document, and reads its name with the others", () => {
@@ -145,6 +289,10 @@ describe("Gelembung Jawab", () => {
     );
     expect(
       screen.queryByRole("button", { name: "Rekaman Pak Rizal, langkah 4 dari 4" }),
+    ).toBeNull();
+    // Sources aren't steps, so they aren't numbered.
+    expect(
+      screen.getByRole("region", { name: "Sumber" }).querySelector("[data-nemu-step]"),
     ).toBeNull();
 
     fireEvent.click(
@@ -195,9 +343,6 @@ describe("Gelembung Jawab", () => {
         .getAllByRole("button")
         .map((button) => button.textContent),
     ).toEqual(["Kenapa?", "Sumber", "Siapkan balasan"]);
-    // What Kenapa? opens shows under the whole row, not inside it.
-    fireEvent.click(screen.getByRole("button", { name: "Kenapa?" }));
-    expect(row?.contains(screen.getByText("Nilai masuk lewat alur SPP."))).toBe(false);
   });
 });
 

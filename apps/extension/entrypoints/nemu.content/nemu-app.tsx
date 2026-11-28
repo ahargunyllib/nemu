@@ -459,7 +459,10 @@ function NemuPanel({
                 state.result.kind === "answer"
                   ? {
                       kenapa: state.result.why,
+                      kenapaTitle: state.result.whyTitle,
                       sumber: sumberEntries(state.result.sources, state.result.files, onOpenSource),
+                      sumberName: state.result.sourcesName,
+                      sumberSteps: state.result.sourceSteps,
                       sumberLink: state.result.diagram,
                     }
                   : undefined

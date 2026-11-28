@@ -118,11 +118,17 @@ await check(
     await openNemu(page);
     await overlay(page).getByLabel("Pertanyaan untuk Nemu").fill("KKM nilai berapa?");
     await overlay(page).getByRole("button", { name: "Kirim" }).click();
-    // The source is behind the Sumber link (#201): read only once it is clicked.
-    await bubble(page).getByRole("button", { name: "Sumber" }).click({ timeout: 15_000 });
-    await bubble(page).getByText("SOP Penilaian SDIT Nusantara", { exact: false }).waitFor();
+    // The source is behind the Sumber link (#201): read only once it is clicked, on its own card.
+    const sumber = bubble(page).getByRole("button", { name: "Sumber" });
+    await sumber.waitFor({ timeout: 15_000 });
     expect((await bubble(page).innerText()).includes("75"), "the answer doesn't name the KKM");
     await page.screenshot({ path: join(shots, "answer.png") });
+    await sumber.click();
+    const card = overlay(page).locator("[data-nemu-note='sumber']");
+    await card.getByText("SOP Penilaian SDIT Nusantara", { exact: false }).waitFor();
+    await page.screenshot({ path: join(shots, "answer-sumber.png") });
+    await card.getByRole("button", { name: "Tutup" }).click();
+    await bubble(page).waitFor();
   },
 );
 

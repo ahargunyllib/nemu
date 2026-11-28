@@ -23,6 +23,9 @@ export type AnswerNext =
 export const PASSWORD_ON_SCREEN =
   "Ada kolom kata sandi di layar, jadi Nemu tidak membaca atau mengirim apa pun dari halaman ini.";
 
+/** The Kenapa? card's title when the answer explains a message on the page. */
+export const KENAPA_MESSAGE = "Kenapa muncul pesan ini?";
+
 /** helpExplain's answer as the Gelembung Jawab: sentence, Kenapa?, Sumber and one next step. */
 export function fromExplanation(explanation: HelpExplanation): AskResult {
   if (explanation.status === "grades_not_saved") {
@@ -35,8 +38,11 @@ export function fromExplanation(explanation: HelpExplanation): AskResult {
       text: explanation.sentence,
       why: explanation.why || undefined,
       sources: explanation.steps.map((step) => step.text),
+      sourcesName: explanation.process.title,
+      sourceSteps: true,
+      // The diagram is drawn in the Admin Workspace, where operators are signed in.
       diagram: {
-        label: `Lihat diagram ${explanation.process.title}`,
+        label: "Lihat diagram (operator)",
         href: processDiagramUrl(explanation),
       },
       next: explanation.parentReply
@@ -83,6 +89,8 @@ export function fromExplanation(explanation: HelpExplanation): AskResult {
     kind: "answer",
     text: explanation.sentence,
     why: explanation.why || undefined,
+    // The Kamus Kendala entry explains a message the page shows (F2 · 03).
+    whyTitle: KENAPA_MESSAGE,
     sources: [sourceLabel(explanation.citation)],
     next,
   };

@@ -54,15 +54,34 @@ export function sourceName(source: NemuSource): string {
   return typeof source === "string" ? source : source.label;
 }
 
-/** The small links under a sentence. Each is read only once the teacher clicks it. */
+/**
+ * The small links under a sentence, each read only once the teacher clicks it. Kenapa? and Sumber
+ * open their own card in the bubble's place, with [Tutup] back to the bubble; Lihat ringkasan
+ * opens under the links, so the bubble's sentence stays in view.
+ */
 export type NemuNotes = {
+  /** The reason, one paragraph on the Kenapa? card. */
   kenapa?: string;
+  /** The Kenapa? card's title, such as "Kenapa muncul pesan ini?". Without it, the reason alone. */
+  kenapaTitle?: string;
   sumber?: readonly NemuSource[];
-  /** A link under the Sumber list, such as "Lihat diagram" for a BPMN-backed answer. */
+  /**
+   * What the Sumber list comes from, such as the process "Alur SPP sekolah": on the Sumber card's
+   * heading, and its title when there is no `sumberTitle`.
+   */
+  sumberName?: string;
+  /** The Sumber list is steps in order (a process), so the card numbers them 1, 2, 3. */
+  sumberSteps?: boolean;
+  /** A title and a short note over the Sumber list ("Kenapa nilai bisa belum tampil?"). */
+  sumberTitle?: string;
+  sumberNote?: string;
+  /** A link at the bottom of the Sumber card, such as "Lihat diagram (operator)". */
   sumberLink?: { label: string; href: string };
   ringkasan?: string;
 };
 export type NemuNoteKind = "kenapa" | "sumber" | "ringkasan";
+/** The links that open their own card in the bubble's place; Lihat ringkasan opens under it. */
+export type NemuCardNoteKind = Exclude<NemuNoteKind, "ringkasan">;
 
 /** Gelembung Tunjuk carries at most one link. */
 export type NemuSingleNote =
@@ -134,7 +153,10 @@ export type KartuPilihProps = {
   status?: NemuStatus;
 };
 
-/** Kartu Info: something to read, a title, a short list and one [Tutup]. */
+/**
+ * Kartu Info: something to read, a title, a short list and one [Tutup]. A link's card (Kenapa?,
+ * Sumber) has the same look; see `noteCard`.
+ */
 export type KartuInfoProps = {
   /** The heading: "MIKROFON TERBLOKIR", "HASIL PEMERIKSAAN", "SUDAH DICEK". */
   status?: NemuStatus;
@@ -178,10 +200,71 @@ export const NOTE_LABELS: Record<NemuNoteKind, string> = {
   ringkasan: "Lihat ringkasan",
 };
 
-/** The text a link reads out once it is opened. */
+/**
+ * What a link's card shows: a heading, an optional title and detail line, then a paragraph, the
+ * numbered steps of a process, or a list of sources. Only a real step list is numbered.
+ */
+export type NemuNoteCardContent = {
+  kind: NemuCardNoteKind;
+  status: NemuStatus;
+  title?: string;
+  detail?: string;
+  /** One paragraph: the Kenapa? reason. */
+  text?: string;
+  /** Steps in order, numbered in amber circles. */
+  steps?: readonly string[];
+  /** Sources, not numbered; one Nemu can open is a link. */
+  sources?: readonly NemuSource[];
+};
+
+/** The card a link opens: "Kenapa?", or "Sumber · Alur SPP sekolah" with its steps. */
+export function noteCard(kind: NemuCardNoteKind, notes: NemuNotes): NemuNoteCardContent {
+  if (kind === "kenapa") {
+    return {
+      kind,
+      status: { text: NOTE_LABELS.kenapa },
+      title: notes.kenapaTitle,
+      text: notes.kenapa,
+    };
+  }
+  const sumber = notes.sumber ?? [];
+  // The process names the card once: on the heading, or as the title when there is no other.
+  const title = notes.sumberTitle ?? notes.sumberName;
+  return {
+    kind,
+    status: {
+      text: NOTE_LABELS.sumber,
+      count: notes.sumberTitle ? notes.sumberName : undefined,
+    },
+    title,
+    detail: notes.sumberNote,
+    ...(notes.sumberSteps ? { steps: sumber.map(sourceName) } : { sources: sumber }),
+  };
+}
+
+/**
+ * The text a link reads out once it is opened: the card's title, then its detail line and its
+ * paragraph or list ("Kenapa nilai bisa belum tampil? Nemu tidak bisa … 1 … 2 …").
+ */
 export function noteText(kind: NemuNoteKind, notes: NemuNotes): string {
-  if (kind === "sumber") return `Sumber: ${(notes.sumber ?? []).map(sourceName).join("; ")}`;
-  return notes[kind] ?? "";
+  if (kind === "ringkasan") return notes.ringkasan ?? "";
+  const card = noteCard(kind, notes);
+  const body = card.steps
+    ? card.steps.join(" ")
+    : card.sources
+      ? `Sumber: ${card.sources.map(sourceName).join("; ")}`
+      : card.text;
+  return [card.title, card.detail, body].filter(Boolean).join(" ");
+}
+
+/**
+ * The link at the bottom of the Kenapa? card that opens Sumber, named after it when it is one
+ * thing: "Sumber: Kamus Kendala · K-07", "Sumber: Alur SPP sekolah".
+ */
+export function sumberLinkLabel(notes: NemuNotes): string {
+  const only = notes.sumber?.length === 1 ? notes.sumber[0] : undefined;
+  const name = notes.sumberName ?? (only === undefined ? undefined : sourceName(only));
+  return name ? `${NOTE_LABELS.sumber}: ${name}` : NOTE_LABELS.sumber;
 }
 
 /** The whole heading as one line, for screen readers: "Nemu mengisi · 13 dari 32". */

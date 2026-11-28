@@ -71,6 +71,12 @@ for (const open of context.pages()) if (open.url().includes("welcome")) await op
 const overlay = (page) => page.locator("nemu-overlay");
 const bubble = (page) => overlay(page).getByRole("region", { name: "Jawaban Nemu" });
 const display = (page, type) => overlay(page).locator(`[data-nemu-display='${type}']`);
+/** The card Kenapa? or Sumber opens in the bubble's place, closed again with Tutup. */
+const noteCard = (page, kind) => overlay(page).locator(`[data-nemu-note='${kind}']`);
+async function closeCard(page, kind) {
+  await noteCard(page, kind).getByRole("button", { name: "Tutup" }).click();
+  await bubble(page).waitFor();
+}
 async function ask(page, question) {
   const closed = overlay(page).locator("button[aria-label='Tanya Nemu']");
   await closed.or(overlay(page).locator("button[aria-label='Tutup Nemu']")).waitFor({
@@ -114,13 +120,19 @@ await check(
     await bubble(page)
       .getByText("Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).")
       .waitFor({ timeout: 15_000 });
+    await page.screenshot({ path: join(shots, "f2-2-answer.png") });
     await bubble(page).getByRole("button", { name: "Kenapa?" }).click();
-    await bubble(page)
+    const kenapa = noteCard(page, "kenapa");
+    await kenapa.getByText("Kenapa muncul pesan ini?").waitFor();
+    await kenapa
       .getByText("Penugasan guru per mapel dan kelas diatur admin sekolah", { exact: false })
       .waitFor();
-    await bubble(page).getByRole("button", { name: "Sumber" }).click();
-    await bubble(page).getByText("Kamus Kendala · K-07", { exact: false }).waitFor();
-    await page.screenshot({ path: join(shots, "f2-2-answer.png") });
+    await page.screenshot({ path: join(shots, "f2-2-kenapa.png") });
+    // The Kenapa? card's own link opens Sumber.
+    await kenapa.getByRole("button", { name: /^Sumber: Kamus Kendala · K-07/u }).click();
+    await noteCard(page, "sumber").getByText("Kamus Kendala · K-07", { exact: false }).waitFor();
+    await page.screenshot({ path: join(shots, "f2-2-sumber.png") });
+    await closeCard(page, "sumber");
   },
 );
 
@@ -152,7 +164,8 @@ await check("F2-3: Ruang GTK → Nemu offers cara 2, with no WhatsApp", async ()
     .getByText("Ibu bisa memperbaikinya sendiri, saya tunjukkan caranya.")
     .waitFor({ timeout: 15_000 });
   await bubble(gtk).getByRole("button", { name: "Sumber" }).click();
-  await bubble(gtk).getByText("Kamus Kendala · K-02", { exact: false }).waitFor();
+  await noteCard(gtk, "sumber").getByText("Kamus Kendala · K-02", { exact: false }).waitFor();
+  await closeCard(gtk, "sumber");
   expect(
     (await bubble(gtk)
       .getByRole("button", { name: /WhatsApp/u })

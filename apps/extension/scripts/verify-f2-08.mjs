@@ -156,6 +156,8 @@ expect(saved.ok, `saving the mock grades failed: HTTP ${saved.status}`);
 
 const overlay = (page) => page.locator("nemu-overlay");
 const bubble = (page) => overlay(page).getByRole("region", { name: "Jawaban Nemu" });
+/** The card Kenapa? or Sumber opens in the bubble's place, closed again with Tutup. */
+const noteCard = (page, kind) => overlay(page).locator(`[data-nemu-note='${kind}']`);
 async function ask(page, question) {
   const closed = overlay(page).locator("button[aria-label='Tanya Nemu']");
   const close = overlay(page).locator("button[aria-label='Tutup Nemu']");
@@ -208,12 +210,21 @@ await check(
       .getByText("Yang bisa membantu: Bu Ratna (keuangan).", { exact: false })
       .waitFor();
     await bubble(page).getByRole("button", { name: "Kenapa?" }).click();
-    await bubble(page).getByText("Jalan kembalinya:", { exact: false }).waitFor();
-    await bubble(page).getByRole("button", { name: "Sumber" }).click();
-    const steps = bubble(page).locator("li");
+    await noteCard(page, "kenapa").getByText("Jalan kembalinya:", { exact: false }).waitFor();
+    // The Kenapa? card's link opens Sumber, named after the process.
+    await noteCard(page, "kenapa")
+      .getByRole("button", { name: /^Sumber: Alur SPP/u })
+      .click();
+    const sumber = noteCard(page, "sumber");
+    const steps = sumber.locator("li");
+    await steps.first().waitFor();
     const count = await steps.count();
     console.log(`  Sumber: ${(await steps.allInnerTexts()).join(" | ")}`);
     expect(count >= 2 && count <= 4, `Sumber has ${count} steps`);
+    expect(
+      (await sumber.locator("[data-nemu-step]").count()) === count,
+      "the process steps aren't numbered",
+    );
     await page.screenshot({ path: join(shots, "q1-answer.png") });
   },
 );
@@ -221,7 +232,7 @@ await check(
 await check(
   "Lihat diagram: bpmn-js draws the SPP process with Lock Student Grades highlighted",
   async () => {
-    const link = bubble(page).getByRole("link", { name: "Lihat diagram Alur SPP" });
+    const link = noteCard(page, "sumber").getByRole("link", { name: "Lihat diagram (operator)" });
     const [diagram] = await Promise.all([context.waitForEvent("page"), link.click()]);
     await diagram.waitForLoadState();
     console.log(`  ${diagram.url()}`);
@@ -235,6 +246,9 @@ await check(
     expect(stroke === "4px", `the cause isn't outlined (stroke ${stroke})`);
     await diagram.screenshot({ path: join(shots, "lihat-diagram.png") });
     await diagram.close();
+    // Tutup brings the answer back, with its Siapkan balasan.
+    await noteCard(page, "sumber").getByRole("button", { name: "Tutup" }).click();
+    await bubble(page).waitFor();
   },
 );
 

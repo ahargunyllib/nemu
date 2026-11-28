@@ -1,14 +1,22 @@
 import { Button } from "@nemu/ui/components/button";
 import { Skeleton } from "@nemu/ui/components/skeleton";
 import type { GelembungJawabProps } from "@nemu/ui/lib/nemu-display";
-import { NEMU_BUTTON, NemuBubble, NemuNoteLinks, NemuText } from "@nemu/ui/nemu/nemu-frame";
+import {
+  NEMU_BUTTON,
+  NemuBubble,
+  NemuNoteCard,
+  NemuNoteLinks,
+  NemuText,
+  useNemuNote,
+} from "@nemu/ui/nemu/nemu-frame";
 import { cn } from "cn";
 import { X } from "lucide-react";
 
 /**
  * Gelembung Jawab: an answer or a problem. One sentence with an optional detail line, then one
  * row: the Kenapa?, Sumber and Lihat ringkasan links on the left and at most one compact black
- * action button on the right. A round × closes it.
+ * action button on the right. A round × closes it. Kenapa? and Sumber open their card in the
+ * bubble's place; the card's [Tutup] brings the bubble back.
  */
 export function GelembungJawab({
   sentence,
@@ -21,6 +29,10 @@ export function GelembungJawab({
   onClose,
   onRepeat,
 }: GelembungJawabProps) {
+  const note = useNemuNote(notes, onRead, sentence);
+  if (notes && note.open) {
+    return <NemuNoteCard kind={note.open} notes={notes} onOpen={note.show} onClose={note.close} />;
+  }
   return (
     <NemuBubble
       display="jawab"
@@ -41,6 +53,7 @@ export function GelembungJawab({
       {(notes || action) && (
         <NemuNoteLinks
           notes={notes ?? {}}
+          onOpen={note.show}
           onRead={onRead}
           actions={
             action && (
