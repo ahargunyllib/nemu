@@ -21,7 +21,6 @@ import {
 import DocumentSitesDialog from "@/features/documents/components/document-sites-dialog";
 import DocumentUploadDialog from "@/features/documents/components/document-upload-dialog";
 import KnowledgeStatusBadge from "@/features/documents/components/knowledge-status-badge";
-import ProcessElementsSheet from "@/features/documents/components/process-elements-sheet";
 import { formatDay } from "@/features/documents/lib/format";
 import { sourceLine } from "@/features/documents/lib/knowledge";
 import type { KnowledgeDocument } from "@/features/documents/types/knowledge";
@@ -83,17 +82,14 @@ export default function KnowledgePanel({
         )}
         <div className="ml-auto flex gap-1">
           {ready && document.format === "bpmn" && (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                nativeButton={false}
-                render={<Link to="/process-diagram" search={{ document: document.id }} />}
-              >
-                Lihat diagram
-              </Button>
-              <ProcessElementsSheet id={document.id} title={document.title} />
-            </>
+            <Button
+              variant="ghost"
+              size="sm"
+              nativeButton={false}
+              render={<Link to="/process-diagram" search={{ document: document.id }} />}
+            >
+              Lihat diagram
+            </Button>
           )}
           {!document.readOnly && document.format !== "procedure" && (
             <DocumentUploadDialog

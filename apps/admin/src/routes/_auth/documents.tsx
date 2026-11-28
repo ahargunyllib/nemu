@@ -10,8 +10,8 @@ import KnowledgePanel from "@/features/documents/components/knowledge-panel";
 import KnowledgePanelEmpty from "@/features/documents/components/knowledge-panel-empty";
 import KnowledgeStats from "@/features/documents/components/knowledge-stats";
 import PanelSection from "@/features/documents/components/panel-section";
+import ProcessPanelBody from "@/features/documents/components/process-panel-body";
 import ProcessSummaryLine from "@/features/documents/components/process-summary-line";
-import ProcessTaskList from "@/features/documents/components/process-task-list";
 import RecordProcedureDialog from "@/features/documents/components/record-procedure-dialog";
 import RuleSourceList from "@/features/rule-sources/components/rule-source-list";
 
@@ -59,11 +59,7 @@ function RouteComponent() {
               ) : undefined
             }
           >
-            {isProcess && (
-              <PanelSection title="Task dan halamannya · bisa dikoreksi">
-                <ProcessTaskList documentId={selected.id} />
-              </PanelSection>
-            )}
+            {isProcess && <ProcessPanelBody documentId={selected.id} />}
             {(selected.format === "pdf" || selected.format === "md") && (
               <PanelSection title="Aturan hitung yang mengutip dokumen ini">
                 <RuleSourceList documentId={selected.id} />

@@ -1,4 +1,5 @@
 import { pageSnapshotSchema } from "@nemu/contracts/school";
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 
 import type { Context } from "../../context";
@@ -6,7 +7,8 @@ import { schoolAdminProcedure, schoolProcedure } from "../../index";
 import { createCatalogRepository } from "../documents/catalog-repository";
 import { createDocumentRepository } from "../documents/repository";
 import { createKamusRepository } from "../kamus/repository";
-import { ask, explain, route, tryAnswer } from "./service";
+import { createSchoolRepository } from "../school/repository";
+import { ask, explain, route, tryAnswer, tryProcessAnswer } from "./service";
 
 function helpDeps(context: Pick<Context, "db" | "school">) {
   return {
@@ -67,6 +69,31 @@ export const helpRouter = {
         input.documentIds,
       ),
     ),
+
+  /** Dokumen dan alur's BPMN panel: a question against this BPMN's symptoms, before it is active. */
+  helpTryProcess: schoolAdminProcedure
+    .input(
+      z.object({
+        documentId: z.string().min(1),
+        question: z.string().trim().min(1).max(500),
+      }),
+    )
+    .handler(async ({ context, input }) => {
+      const result = await tryProcessAnswer(
+        {
+          ai: context.school.ai,
+          documents: createDocumentRepository(context.db),
+          catalog: createCatalogRepository(context.db),
+          files: context.documentFiles,
+          school: createSchoolRepository(context.db),
+        },
+        context.session.user.workspaceId,
+        input.documentId,
+        input.question,
+      );
+      if (!result) throw new ORPCError("NOT_FOUND", { message: "Alur BPMN tidak ditemukan" });
+      return result;
+    }),
 
   /**
    * Routes a transcript to a feature; voice controls are recognized without a model call. A
