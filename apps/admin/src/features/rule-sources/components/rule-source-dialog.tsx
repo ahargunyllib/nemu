@@ -47,7 +47,7 @@ export default function RuleSourceDialog({ source }: { source: RuleSource }) {
     .filter((document) => document.status === "ready")
     .map((document) => ({
       value: document.id,
-      label: document.isActive ? document.title : `${document.title} (inactive)`,
+      label: document.isActive ? document.title : `${document.title} (nonaktif)`,
     }));
 
   const onSettled = () => queryClient.invalidateQueries({ queryKey: orpc.listRuleSources.key() });
@@ -55,7 +55,7 @@ export default function RuleSourceDialog({ source }: { source: RuleSource }) {
     orpc.setRuleSource.mutationOptions({
       onSuccess: () => {
         setOpen(false);
-        toast.success(`Saved the source for ${source.label}`);
+        toast.success(`Sumber ${source.label} disimpan`);
       },
       onError: (error) => toast.error(error.message),
       onSettled,
@@ -65,7 +65,7 @@ export default function RuleSourceDialog({ source }: { source: RuleSource }) {
     orpc.resetRuleSource.mutationOptions({
       onSuccess: () => {
         setOpen(false);
-        toast.success(`${source.label} cites its default source again`);
+        toast.success(`${source.label} kembali ke sumber bawaan`);
       },
       onError: (error) => toast.error(error.message),
       onSettled,
@@ -88,7 +88,7 @@ export default function RuleSourceDialog({ source }: { source: RuleSource }) {
       }}
     >
       <DialogTrigger
-        render={<Button variant="ghost" size="icon-sm" aria-label={`Edit ${source.label}`} />}
+        render={<Button variant="ghost" size="icon-sm" aria-label={`Ubah ${source.label}`} />}
       >
         <PencilIcon />
       </DialogTrigger>
@@ -96,8 +96,8 @@ export default function RuleSourceDialog({ source }: { source: RuleSource }) {
         <DialogHeader>
           <DialogTitle>{source.label}</DialogTitle>
           <DialogDescription>
-            Choose the document and the article or page Nemu cites for this calculation. It must be
-            in an active document.
+            Pilih dokumen serta pasal atau halaman yang dikutip Nemu untuk perhitungan ini.
+            Dokumennya harus aktif.
           </DialogDescription>
         </DialogHeader>
         <form
@@ -114,14 +114,14 @@ export default function RuleSourceDialog({ source }: { source: RuleSource }) {
           }}
         >
           <div className="grid gap-2">
-            <Label htmlFor={`${source.key}-document`}>Document</Label>
+            <Label htmlFor={`${source.key}-document`}>Dokumen</Label>
             <Select
               items={options}
               value={documentId || null}
               onValueChange={(next) => setDocumentId(next ?? "")}
             >
               <SelectTrigger id={`${source.key}-document`} className="w-full">
-                <SelectValue placeholder="Choose a document" />
+                <SelectValue placeholder="Pilih dokumen" />
               </SelectTrigger>
               <SelectContent>
                 {options.map((option) => (
@@ -134,7 +134,7 @@ export default function RuleSourceDialog({ source }: { source: RuleSource }) {
           </div>
           <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
             <div className="grid gap-2">
-              <Label htmlFor={`${source.key}-article`}>Article or section</Label>
+              <Label htmlFor={`${source.key}-article`}>Pasal atau bagian</Label>
               <Input
                 id={`${source.key}-article`}
                 placeholder="8 ayat (5)"
@@ -143,7 +143,7 @@ export default function RuleSourceDialog({ source }: { source: RuleSource }) {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor={`${source.key}-page`}>Page</Label>
+              <Label htmlFor={`${source.key}-page`}>Halaman</Label>
               <Input
                 id={`${source.key}-page`}
                 inputMode="numeric"
@@ -153,7 +153,7 @@ export default function RuleSourceDialog({ source }: { source: RuleSource }) {
               />
             </div>
           </div>
-          {pageInvalid && <p className="text-sm text-destructive">Page must be a whole number.</p>}
+          {pageInvalid && <p className="text-sm text-destructive">Halaman harus bilangan bulat.</p>}
           <DialogFooter>
             {!source.isDefault && (
               <Button
@@ -164,13 +164,13 @@ export default function RuleSourceDialog({ source }: { source: RuleSource }) {
                 onClick={() => reset.mutate({ key: source.key })}
               >
                 {reset.isPending && <Spinner />}
-                Use default
+                Pakai bawaan
               </Button>
             )}
-            <DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose>
+            <DialogClose render={<Button type="button" variant="outline" />}>Batal</DialogClose>
             <Button type="submit" disabled={pending || !documentId || pageInvalid}>
               {save.isPending && <Spinner />}
-              Save
+              Simpan
             </Button>
           </DialogFooter>
         </form>

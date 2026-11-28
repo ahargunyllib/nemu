@@ -135,6 +135,7 @@ describe("WS-02: the built-in AlurSekolah package for every school", () => {
     );
     expect(inPackage).toEqual([
       expect.objectContaining({ id: sop.id, createdByName: "Admin Javan" }),
+      expect.objectContaining({ id: "tentang-nemu" }),
     ]);
   });
 

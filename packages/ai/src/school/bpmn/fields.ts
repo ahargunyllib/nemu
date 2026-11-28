@@ -108,7 +108,8 @@ Pakai hanya label dari daftar. Kalau tidak ada yang artinya sama, label null. Sa
         },
       },
       parse: (value) => value as { matches: Array<{ field: string; label: string | null }> },
-      maxOutputTokens: 600,
+      // The text model reasons before it answers; a small budget ends inside the reasoning (#315).
+      maxOutputTokens: 2_000,
     });
     for (const match of answer.matches) {
       if (!(match.field in result) || result[match.field] || !match.label) continue;

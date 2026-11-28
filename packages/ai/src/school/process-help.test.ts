@@ -9,6 +9,7 @@ import { BU_SITI } from "./fixtures/sdit-nusantara.js";
 import {
   contactForLane,
   explainProcess,
+  explainProcessDetails,
   isParentSafe,
   screenSymptoms,
   suggestSymptoms,
@@ -509,6 +510,94 @@ test("routing screens questions in code: clear symptoms and unrelated questions 
   assert.equal(screenSymptoms("Nilai remedial paling tinggi berapa?", candidates), "none");
   assert.equal(screenSymptoms("Kalau sudah bayar sebagian kapan terbuka?", candidates), "near");
 });
+
+test("#308: answerFirst words only the spoken answer; the details come from a second call", async () => {
+  const graph = await sppGraph();
+  const index = await createFixtureSchoolAi().suggestSymptoms({ graph });
+  const input = {
+    question: "Nilai UTS Aisyah kok tidak muncul di aplikasi orang tua?",
+    process: { documentId: "d", title: "Alur SPP", version: "1", graph, index },
+    match: { documentId: "d", elementId: "Task_LockGrades", symptom: "nilai tidak muncul" },
+    gradeCheck: { status: "saved", student: "Aisyah Putri Wijaya" } as const,
+    teacher: BU_SITI,
+  };
+  const llm = fakeJsonCall({
+    process_answer: {
+      answer: "Menurut alur sekolah, nilai dikunci kalau tagihan lewat jatuh tempo.",
+    },
+    process_details: (request) => {
+      const data = JSON.parse((request.content[0] as { text: string }).text);
+      return {
+        why: "Tagihan reguler lewat jatuh tempo, jadi nilai dikunci.",
+        steps: data.draf_langkah.map((step: { index: number }) => ({
+          index: step.index,
+          text: `Langkah ${step.index + 1}.`,
+        })),
+        parent_reply: "Assalamu'alaikum, Bapak/Ibu. Silakan hubungi Bu Ratna di bagian keuangan.",
+      };
+    },
+  });
+
+  const first = await explainProcess({ llm }, input, { answerFirst: true });
+  assert.deepEqual(
+    llm.calls.map((call) => call.schemaName),
+    ["process_answer"],
+  );
+  assert.equal(first?.status, "process");
+  if (first?.status !== "process") return;
+  assert.equal(
+    first.sentence,
+    "Nilai Aisyah Putri Wijaya sudah tersimpan. Bukan kesalahan Ibu. Kemungkinan karena alur SPP sekolah: nilai dikunci kalau tagihan lewat jatuh tempo. Yang bisa membantu: Bu Ratna (keuangan).",
+  );
+  assert.equal(first.steps[0]!.text, "Due Date Reached.");
+  assert.deepEqual(first.detailsRequest, {
+    question: input.question,
+    documentId: "d",
+    match: { elementId: "Task_LockGrades", symptom: "nilai tidak muncul" },
+    via: null,
+  });
+
+  const details = await explainProcessDetails({ llm }, input);
+  assert.deepEqual(
+    llm.calls.map((call) => call.schemaName),
+    ["process_answer", "process_details"],
+  );
+  assert.equal(details?.why, "Tagihan reguler lewat jatuh tempo, jadi nilai dikunci.");
+  assert.deepEqual(
+    details?.steps.map((step) => step.text),
+    first.steps.map((_, at) => `Langkah ${at + 1}.`),
+  );
+  assert.deepEqual(
+    details?.steps.map((step) => step.elementIds),
+    first.steps.map((step) => step.elementIds),
+  );
+  assert.match(details?.parentReply ?? "", /Bu Ratna/u);
+});
+
+test("#308: the answer-only call keeps the draft answer when the model fails", async () => {
+  const graph = await sppGraph();
+  const index = await createFixtureSchoolAi().suggestSymptoms({ graph });
+  const llm = fakeJsonCall({});
+  const answer = await explainProcess(
+    { llm },
+    {
+      question: "Nilai UTS Aisyah kok tidak muncul di aplikasi orang tua?",
+      process: { documentId: "d", title: "Alur SPP", version: "1", graph, index },
+      match: { documentId: "d", elementId: "Task_LockGrades", symptom: "nilai tidak muncul" },
+      gradeCheck: { status: "unknown" },
+      teacher: BU_SITI,
+    },
+    { answerFirst: true },
+  );
+  assert.equal(answer?.status, "process");
+  if (answer?.status !== "process") return;
+  assert.match(
+    answer.sentence,
+    /^Kemungkinan karena alur SPP sekolah: langkah "Lock Student Grades" berjalan/u,
+  );
+  assert.ok(answer.detailsRequest);
+});
+
 test("#317: a live index still sends the F2-1 cash question to the model, and SOP questions to none", async () => {
   const index: ProcessIndex = JSON.parse(
     await readFile(join(FIXTURES, "f2-1-spp-live-index.json"), "utf8"),

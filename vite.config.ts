@@ -44,6 +44,8 @@ export default defineConfig({
       // Ported from the test-data mocks; kept as written so they diff cleanly against the originals.
       "apps/mock-alursekolah/public/**",
       "apps/mock-portals/**",
+      // A knowledge source the chunker reads as written; a list reflow would change its seeded chunks.
+      "packages/ai/src/school/fixtures/tentang-nemu.md",
     ],
     singleQuote: false,
     semi: true,
