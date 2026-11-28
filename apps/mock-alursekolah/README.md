@@ -54,6 +54,18 @@ so the executor and "ini kenapa?" never pick them, and the trail is plain text, 
 one link only. The school stays SDIT Nusantara, the tenant the test data and Moodle use. Search and
 the bell do nothing.
 
+## Pages
+
+The page contents follow the real AlurSekolah too: a small trail above the title, filters in
+boxes, and the table in a white card whose footer counts what is filled.
+
+- **Nilai** (Isi nilai kelas): filters Kelas, Mata Pelajaran and Jenis Penilaian with
+  Tampilkan Siswa, a "KKM 75 · Semester ganjil" chip, the table No, NIS/NISN, Nama murid,
+  Nilai, Catatan (a green check once a Nilai is typed), and a footer "3 dari 32 terisi · belum
+  disimpan" with Impor Excel (greyed out, does nothing) and Simpan. The field labels, the
+  Nilai and Catatan columns and the button names are what the executor targets, so they keep
+  the code's wording where the real app's differs ("Keterangan", "Penilaian").
+
 ## Run and deploy
 
 `pnpm dev` starts it with the rest of the stack at <http://localhost:3003> (Ruang GTK at 3004,

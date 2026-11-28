@@ -59,6 +59,40 @@
   .note { color:var(--muted); font-size:14px; }
   dialog { border:1px solid #333; border-radius:6px; padding:24px; }
   .hidden { display:none; }
+  /* Isi halaman seperti AlurSekolah asli: judul dengan jejak kecil, saringan dalam kotak,
+     tabel di kartu putih dengan kaki (penghitung dan tombol). */
+  .hal { --biru:#1f6fe5; --biru-muda:#e8f1fd; --biru-ink:#1a56b3; --kartu-garis:#e6e8ec; --hijau:#1f9d55; --merah:#c62828; }
+  main:has(.hal) { max-width:none; }
+  .hal-kepala { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:16px; }
+  .hal-kepala .jejak { margin:0 0 2px; font-size:13px; color:var(--muted); }
+  .hal-kepala h1 { margin:0; font-size:24px; font-weight:600; }
+  .hal-kepala .aksi { display:flex; gap:10px; flex-wrap:wrap; }
+  .chip { display:inline-block; padding:5px 12px; border-radius:999px; background:var(--biru-muda); color:var(--biru-ink); font-size:13px; font-weight:500; white-space:nowrap; }
+  .saringan { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:16px; }
+  .saring { display:flex; align-items:center; gap:6px; padding:0 4px 0 12px; height:40px; border:1px solid var(--kartu-garis); border-radius:10px; background:#fff; }
+  .hal .saring label { display:inline; margin:0; font-weight:400; font-size:13px; color:var(--muted); white-space:nowrap; }
+  .hal .saring select, .hal .saring input { min-width:0; border:0; background:transparent; font:inherit; font-size:14px; padding:6px 4px; color:var(--ink); }
+  .hal .btn { margin:0; height:40px; padding:0 16px; border-radius:10px; font-size:14px; font-weight:500; border:1px solid var(--biru); background:var(--biru); color:#fff; }
+  .hal .btn.garis { background:#fff; color:var(--ink); border-color:#cfd4da; }
+  .hal .btn:disabled { cursor:default; }
+  .hal .btn.garis:disabled { color:var(--muted); }
+  .kartu { background:#fff; border:1px solid var(--kartu-garis); border-radius:14px; overflow:hidden; }
+  .hal table.tabel { margin:0; font-size:14px; }
+  .hal .tabel th, .hal .tabel td { border:0; border-bottom:1px solid #f0f1f3; padding:8px 16px; vertical-align:middle; }
+  .hal .tabel th { font-weight:500; font-size:13px; color:var(--muted); background:#fff; }
+  .hal .tabel tbody tr:last-child td { border-bottom:0; }
+  .hal .tabel td.redup { color:var(--muted); font-variant-numeric:tabular-nums; }
+  .hal .tabel td input[type=number], .hal .tabel td input[type=text], .hal .tabel td select { font-size:14px; height:34px; padding:4px 10px; border:1px solid #cfd4da; border-radius:8px; background:#fff; min-width:0; }
+  .hal .tabel td input.nilai { width:140px; }
+  .hal .tabel td input.catatan { width:220px; }
+  .ket { display:flex; align-items:center; gap:10px; }
+  .cek { display:inline-flex; color:var(--hijau); }
+  .cek.kosong { visibility:hidden; }
+  .kaki { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; border-top:1px solid var(--kartu-garis); background:#fafbfc; font-size:13px; color:var(--muted); }
+  .kaki .aksi { display:flex; gap:10px; }
+  .peringatan { margin-top:4px; padding:12px 16px; border:1px solid #f1b4b4; border-radius:12px; background:#fdf1f1; font-size:14px; }
+  .peringatan b { color:var(--merah); }
+  .hal .toast { margin:12px 0 0; border-radius:12px; font-size:14px; }
 </style>
 </head>
 <body>
@@ -109,7 +143,7 @@
 <script>
 // Akun, murid, mapel, dan surah datang dari Worker (src/data/). Nilai dan setoran disimpan di Worker,
 // jadi semua browser melihat data yang sama. localStorage hanya menyimpan akun yang sedang masuk.
-let USERS = {}, SEKOLAH = {}, MAPEL = [], SURAH = [], SISWA = {};
+let USERS = {}, SEKOLAH = {}, MAPEL = [], SURAH = [], SISWA = {}, NOMOR = {}, KKM = 75;
 function ditugaskan(u, k, m) { return u.tugas === "semua" || ((u.tugas[k] || []).includes(m)); }
 const store = {
   get(k, d) { try { const v = JSON.parse(localStorage.getItem("as_" + k)); return v === null ? d : v; } catch (e) { return d; } },
@@ -158,26 +192,45 @@ function viewProfil() {
     try { await server("/reset", {}); alert("Data uji direset."); } catch (e) { alert(e.message); }
   };
 }
+const CEK = '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="m7.5 12.5 3 3 6-6.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const jam = () => new Date().toLocaleTimeString("id-ID", {hour: "2-digit", minute: "2-digit"});
 function viewNilai() {
   const u = me();
-  app.innerHTML = `<h1>Isi nilai kelas</h1><div class="row">
-    <div><label for="pilih-kelas">Kelas</label><select id="pilih-kelas"><option value="">Pilih kelas</option>${u.kelas.map(k => `<option>${k}</option>`).join("")}</select></div>
-    <div><label for="pilih-mapel">Mata Pelajaran</label><select id="pilih-mapel"><option value="">Pilih mata pelajaran</option>${MAPEL.map(m => `<option>${m}</option>`).join("")}</select></div>
-    <div><label for="pilih-jenis">Jenis Penilaian</label><select id="pilih-jenis"><option value="">Pilih jenis</option><option>Harian</option><option>UTS</option><option>UAS</option></select></div></div>
-    <button id="btn-tampilkan">Tampilkan Siswa</button><div id="area-tabel"></div>`;
+  // Label isian, tombol, dan kolom dipakai ekstensi dan skrip verify (Kelas, Mata Pelajaran,
+  // Jenis Penilaian, Tampilkan Siswa, Nilai, Catatan, Simpan): jangan diganti.
+  app.innerHTML = `<div class="hal">
+    <div class="hal-kepala"><div><p class="jejak">Nilai › Isi nilai kelas</p><h1 id="judul-nilai">Isi nilai kelas</h1></div>
+      <span class="chip">KKM ${KKM} · Semester ganjil</span></div>
+    <div class="saringan">
+      <div class="saring"><label for="pilih-kelas">Kelas</label><select id="pilih-kelas"><option value="">Pilih kelas</option>${u.kelas.map(k => `<option>${k}</option>`).join("")}</select></div>
+      <div class="saring"><label for="pilih-mapel">Mata Pelajaran</label><select id="pilih-mapel"><option value="">Pilih mata pelajaran</option>${MAPEL.map(m => `<option>${m}</option>`).join("")}</select></div>
+      <div class="saring"><label for="pilih-jenis">Jenis Penilaian</label><select id="pilih-jenis"><option value="">Pilih jenis</option><option>Harian</option><option>UTS</option><option>UAS</option></select></div>
+      <button id="btn-tampilkan" class="btn garis">Tampilkan Siswa</button></div>
+    <div id="area-tabel"></div></div>`;
   $("#btn-tampilkan").onclick = async () => {
     const k = $("#pilih-kelas").value, m = $("#pilih-mapel").value, j = $("#pilih-jenis").value;
     if (!k || !m || !j) { $("#area-tabel").innerHTML = `<p class="note">Pilih kelas, mata pelajaran, dan jenis penilaian dulu.</p>`; return; }
-    if (!ditugaskan(u, k, m)) { $("#area-tabel").innerHTML = `<div role="alert" style="margin-top:16px;border:1px solid #c62828;background:#fdecea;padding:12px 16px"><b style="color:#b71c1c">Tidak dapat menampilkan siswa</b><br>Anda belum ditugaskan mengampu ${m} di kelas ${k}. Hubungi admin sekolah.</div>`; return; }
+    if (!ditugaskan(u, k, m)) { $("#area-tabel").innerHTML = `<div role="alert" class="peringatan"><b>Tidak dapat menampilkan siswa</b><br>Anda belum ditugaskan mengampu ${m} di kelas ${k}. Hubungi admin sekolah.</div>`; return; }
     let saved;
     try { saved = (await server("/nilai"))[`${k}|${m}|${j}`] || {}; } catch (e) { return gagal("#area-tabel", e); }
-    $("#area-tabel").innerHTML = `<table id="tabel-nilai"><thead><tr><th>No</th><th>Nama Siswa</th><th>Nilai</th><th>Catatan</th></tr></thead><tbody>
-      ${SISWA[k].map((n, i) => `<tr><td>${i + 1}</td><td>${n}</td>
+    $("#judul-nilai").textContent = `Isi nilai · ${m} ${k}`;
+    const nomor = k === "4A" ? "NIS" : "NISN";
+    $("#area-tabel").innerHTML = `<div class="kartu"><table id="tabel-nilai" class="tabel"><thead><tr><th>No</th><th>${nomor}</th><th>Nama murid</th><th>Nilai</th><th>Catatan</th></tr></thead><tbody>
+      ${SISWA[k].map((n, i) => `<tr><td class="redup">${i + 1}</td><td class="redup">${NOMOR[n] || ""}</td><td>${n}</td>
       <td><input type="number" min="0" max="100" aria-label="Nilai ${n}" data-nama="${n}" class="nilai" value="${saved[n] ? saved[n].nilai : ""}"></td>
-      <td><input type="text" aria-label="Catatan ${n}" data-nama="${n}" class="catatan" value="${saved[n] ? saved[n].catatan : ""}"></td></tr>`).join("")}
-      </tbody></table><button id="btn-simpan">Simpan</button><div id="hasil"></div>`;
+      <td><span class="ket"><span class="cek kosong">${CEK}</span><input type="text" aria-label="Catatan ${n}" data-nama="${n}" class="catatan" value="${saved[n] ? saved[n].catatan : ""}"></span></td></tr>`).join("")}
+      </tbody></table>
+      <div class="kaki"><span id="hitung-terisi"></span><span class="aksi"><button class="btn garis" type="button" disabled title="Belum ada di tiruan">Impor Excel</button><button id="btn-simpan" class="btn">Simpan</button></span></div></div>
+      <div id="hasil"></div>`;
+    const terisiSekarang = () => [...document.querySelectorAll("input.nilai")].filter(x => x.value !== "").length;
+    const hitung = status => {
+      document.querySelectorAll("#tabel-nilai input.nilai").forEach(x => x.closest("tr").querySelector(".cek").classList.toggle("kosong", x.value === ""));
+      $("#hitung-terisi").textContent = `${terisiSekarang()} dari ${SISWA[k].length} terisi · ${status}`;
+    };
+    hitung(Object.keys(saved).length ? "tersimpan" : "belum disimpan");
+    $("#tabel-nilai").addEventListener("input", () => hitung("belum disimpan"));
     $("#btn-simpan").onclick = () => {
-      const terisi = [...document.querySelectorAll("input.nilai")].filter(x => x.value !== "").length;
+      const terisi = terisiSekarang();
       $("#konfirmasi-teks").textContent = `Simpan nilai untuk semua siswa? ${terisi} dari ${SISWA[k].length} nilai terisi.`;
       $("#konfirmasi").showModal();
       $("#ya-simpan").onclick = async () => {
@@ -187,6 +240,7 @@ function viewNilai() {
         $("#konfirmasi").close();
         try { await server("/nilai", {username: store.get("user", ""), kelas: k, mapel: m, jenis: j, baris}, "PUT"); }
         catch (e) { return gagal("#hasil", e); }
+        hitung(`tersimpan ${jam()}`);
         $("#hasil").innerHTML = `<div class="toast" role="status">Nilai tersimpan. ${terisi} nilai ${m} ${j} kelas ${k}.</div>`;
       };
       $("#batal-simpan").onclick = () => $("#konfirmasi").close();
@@ -314,7 +368,7 @@ function route() {
   ({"#/nilai": viewNilai, "#/rekap": viewRekap, "#/tahfidz": viewTahfidz, "#/profil": viewProfil}[h] || viewBeranda)();
 }
 server("/sekolah").then(d => {
-  USERS = d.akun; SEKOLAH = d.sekolah; MAPEL = d.mapel; SURAH = d.surah; SISWA = d.siswa;
+  USERS = d.akun; SEKOLAH = d.sekolah; MAPEL = d.mapel; SURAH = d.surah; SISWA = d.siswa; NOMOR = d.nomor || {}; KKM = d.kkm || 75;
   window.addEventListener("hashchange", route); route();
 }).catch(e => { app.innerHTML = `<h1>Tidak dapat memuat</h1><p class="note" role="alert">${e.message}</p>`; });
 </script>

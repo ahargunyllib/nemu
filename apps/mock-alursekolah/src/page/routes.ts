@@ -2,10 +2,12 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { SURAH, JUMLAH_AYAT, nomorSurah } from "../data/quran";
+import { SISWA } from "../data/siswa";
 import {
   AKUN,
   JENIS_PENILAIAN,
   KATA_SANDI,
+  KKM,
   MAPEL,
   SEKOLAH,
   SEMESTER,
@@ -72,6 +74,9 @@ halaman.get("/sekolah", (c) =>
     mapel: MAPEL,
     surah: SURAH,
     siswa: Object.fromEntries(["4A", "4B", "5A"].map((k) => [k, siswaKelas(k).map((s) => s.nama)])),
+    /** NIS (4A) or NISN (4B, 5A) by student name, for the grade table's number column. */
+    nomor: Object.fromEntries(SISWA.map((s) => [s.nama, s.nis])),
+    kkm: KKM,
   }),
 );
 
