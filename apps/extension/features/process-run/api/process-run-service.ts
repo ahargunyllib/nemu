@@ -1,8 +1,9 @@
+import { ORPCError } from "@orpc/client";
 import { browser } from "wxt/browser";
 
 import { failureMessage } from "../../../shared/api/nemu-service";
 import type { PageEmail } from "../../../shared/lib/messages";
-import { cropPhoto } from "../../grade-photo/lib/crop";
+import { cropPhoto, imageDataUrl } from "../../grade-photo/lib/crop";
 import { teacherClient } from "../../identity/api/teacher-client";
 import type { ProcessRunRequest, ProcessRunResponse, ProcessRunValue } from "../lib/requests";
 
@@ -52,6 +53,14 @@ async function answer(
       return client.processPlan(request.input);
     case "jobs":
       return client.inboxJobs();
+    case "thumbnail":
+      try {
+        return await imageDataUrl(await client.inboxThumbnail({ jobId: request.jobId }));
+      } catch (error) {
+        // An upload has no thumbnail (only WhatsApp sends one): the card shows no picture.
+        if (error instanceof ORPCError && error.code === "NOT_FOUND") return null;
+        throw error;
+      }
     case "read-photo":
       return client.processReadPhoto({
         documentId: request.documentId,

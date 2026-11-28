@@ -2,14 +2,17 @@
 // Loads a production build of the extension into Playwright's Chromium, then:
 //   1. Pak Rizal uploads the official tahfidz BPMN in Pengetahuan sekolah and, in WS-04, sets the
 //      page of "Isi setoran satu kelas" to "Al-Quran › Setoran baru" (F3-19);
-//   2. the setoran book photo lands in Bu Siti's inbox (as an upload, like a WhatsApp photo);
-//   3. Bu Siti types "Catat setoran hafalan 4A hari ini" on the mock: the steps show first (2–6),
-//      Mulai, Citra's scribbled Tajwid is asked (never guessed), the executor picks Kelas, opens
-//      Setoran baru (the BPMN's "Setoran" choice) and fills it, and stops pointing at "Simpan setoran";
+//   2. the setoran book photo lands in Bu Siti's inbox (from WhatsApp with its thumbnail when
+//      WA_BOT_SECRET is set, else as an upload);
+//   3. Bu Siti types "Catat setoran hafalan 4A hari ini" on the mock: the start card shows the
+//      steps first (F3·03), Mulai, Citra's scribbled Tajwid is asked (never guessed), the executor
+//      picks Kelas, opens Setoran baru (the BPMN's "Setoran" choice) and fills it, and stops
+//      pointing at "Simpan setoran";
 //   4. every row is checked against F3-1_kunci.csv (3/3) and nothing is saved until the "teacher"
 //      presses Simpan setoran; then Catatan langkah names the system's tasks;
 //   5. with no page in WS-04 Nemu only explains (cara 3).
-// Needs `NEMU_RESPONDER=fixture pnpm dev` running. Screenshots: .output/verify-f3-1/.
+// Needs `NEMU_RESPONDER=fixture pnpm dev` running (with WA_BOT_SECRET=<32+ chars> for the photo's
+// thumbnail on the start card). Screenshots: .output/verify-f3-1/.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -24,6 +27,9 @@ const ADMIN = process.env.NEMU_ADMIN_URL ?? "http://localhost:3002/";
 const MOCK = process.env.MOCK_ALURSEKOLAH_URL ?? "http://localhost:3003/";
 const INSTALL_CODE = process.env.NEMU_INSTALL_CODE ?? "NEMU-SDITN-2026";
 const HEADED = process.argv.includes("--headed");
+const WA_BOT_SECRET = process.env.WA_BOT_SECRET;
+// Bu Siti's WhatsApp number in WS-06 (synthetic).
+const PHONE = "6281200001001";
 // Bu Siti's AlurSekolah email in WS-06 (synthetic).
 const EMAIL = "siti.aminah@sditnusantara.sch.id";
 const TITLE = "Catat Hafalan Tahfidz";
@@ -35,6 +41,8 @@ const root = resolve(import.meta.dirname, "..");
 const fixtures = resolve(root, "../../packages/ai/src/school/fixtures");
 const bpmn = join(fixtures, "F3-1_catat-hafalan-tahfidz.bpmn");
 const photo = join(fixtures, "F3-1_foto-buku-setoran-tahfidz-4A.jpg");
+// What apps/wa-bot's internal/thumbnail makes of that photo (320 px on its long side).
+const thumbnail = join(fixtures, "f3-1-buku-setoran-4a-thumbnail.jpg");
 const extension = join(root, ".output/chrome-mv3");
 const shots = join(root, ".output/verify-f3-1");
 mkdirSync(shots, { recursive: true });
@@ -168,9 +176,26 @@ await fetch(new URL("_mock/reset", MOCK), {
 
 let jobId = null;
 await check("the setoran book photo lands in Bu Siti's inbox", async () => {
-  const job = await siti.inboxUploadPhoto({
-    file: new File([readFileSync(photo)], "buku-setoran-4A.jpg", { type: "image/jpeg" }),
-  });
+  let job;
+  if (WA_BOT_SECRET) {
+    // apps/wa-bot's call: the photo from Bu Siti's number, with its thumbnail.
+    const form = new FormData();
+    form.set("phone", PHONE);
+    form.set("messageId", `verify-f3-1-${Date.now()}`);
+    form.set("photo", new Blob([readFileSync(photo)], { type: "image/jpeg" }), "buku.jpg");
+    form.set("thumbnail", new Blob([readFileSync(thumbnail)], { type: "image/jpeg" }), "thumb");
+    job = await (
+      await fetch(`${SERVER}/api-reference/wa-bot/photos`, {
+        method: "POST",
+        headers: { authorization: `Bearer ${WA_BOT_SECRET}` },
+        body: form,
+      })
+    ).json();
+  } else {
+    job = await siti.inboxUploadPhoto({
+      file: new File([readFileSync(photo)], "buku-setoran-4A.jpg", { type: "image/jpeg" }),
+    });
+  }
   expect(job.status === "queued", `the photo is ${job.status}`);
   jobId = job.jobId;
 });
@@ -194,32 +219,35 @@ async function ask(question) {
 }
 
 await check(
-  "F3-15: the steps show first, in 2–6 plain steps, before Nemu does anything",
+  "F3-15: the start card shows the steps first, in 2–6 plain steps, before Nemu does anything",
   async () => {
     expect(ready, "the BPMN isn't uploaded");
     await ask("Catat setoran hafalan 4A hari ini");
-    const steps = overlay.getByRole("region", { name: `Langkah ${TITLE}` });
-    await steps.waitFor({ timeout: 15_000 });
-    // The list numbers its steps in a circle beside the text; only the text is the step.
-    const items = await steps.locator("li > span:last-child").allInnerTexts();
+    const card = display("pilih").filter({ hasText: "Mulai dari foto ini, Ibu?" });
+    await card.waitFor({ timeout: 15_000 });
+    expect(
+      (await card.getByText("Dari alur sekolah", { exact: true }).count()) === 1,
+      "no Dari alur sekolah heading",
+    );
+    const items = await card.locator("li > span:last-child").allInnerTexts();
     console.log(`  ${items.join(" | ")}`);
     expect(items.length >= 2 && items.length <= 6, `${items.length} steps`);
-    expect(items[0] === `Buka ${PAGE}.`, `first step: ${items[0]}`);
+    expect(items[0] === "Pilih Setoran, kelas 4A", `first step: ${items[0]}`);
     expect(
-      items.some((item) => /Simpan setoran; Nemu berhenti sebelum itu/u.test(item)),
-      "the steps don't say the teacher presses Simpan setoran",
+      items.includes("Isi surah, ayat, 4 skor per murid"),
+      "the steps don't say what the setoran form needs",
     );
-    expect(
-      items.some((item) => /^Pilih jenis catatan: kelas 4A, Setoran\.$/u.test(item)),
-      "the steps don't say Kelas 4A and Setoran are picked",
-    );
-    expect(
-      items.some((item) => /Sistem AlurSekolah: hitung nilai dan huruf/u.test(item)),
-      "the system's task isn't announced (F3-18)",
-    );
+    expect(items.at(-1) === "Ibu tekan Simpan setoran", `last step: ${items.at(-1)}`);
+    expect((await card.getByRole("button", { name: "Sumber" }).count()) === 1, "no Sumber");
+    expect((await card.getByText("Ajari saya").count()) === 0, "Ajari saya is offered");
+    if (WA_BOT_SECRET)
+      await card
+        .getByRole("img", { name: "Foto dari WhatsApp" })
+        .waitFor({ timeout: 10_000 })
+        .catch(() => expect(false, "the photo's thumbnail isn't on the card"));
     expect((await page.locator("#tf-kelas").count()) === 0, "Nemu moved before Mulai");
     await page.screenshot({ path: join(shots, "langkah.png") });
-    await steps.getByRole("button", { name: "Mulai" }).click();
+    await card.getByRole("button", { name: "Mulai" }).click();
   },
 );
 
