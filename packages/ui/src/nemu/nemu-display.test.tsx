@@ -276,6 +276,36 @@ describe("Kartu Pilih for W5 and the inbox", () => {
     expect(crop.closest("figure")?.textContent).toContain("Potongan foto · Citra, Tajwid");
   });
 
+  test("a start card numbers its steps and puts Sumber, Nanti and a black Mulai in one row", () => {
+    const onChoose = vi.fn();
+    const onSource = vi.fn();
+    render(
+      <KartuPilih
+        layout="row"
+        status={{ text: "Dari alur sekolah", count: "Catat Hafalan" }}
+        question="Mulai dari foto ini, Ibu?"
+        steps={["Pilih Setoran, kelas 4A", "Isi surah, ayat, 4 skor per murid"]}
+        link={{ label: "Sumber", onSelect: onSource }}
+        choices={[
+          { id: "nanti", label: "Nanti" },
+          { id: "mulai", label: "Mulai" },
+        ]}
+        onChoose={onChoose}
+      />,
+    );
+    const steps = screen.getAllByRole("listitem").map((item) => item.textContent);
+    expect(steps).toEqual(["1Pilih Setoran, kelas 4A", "2Isi surah, ayat, 4 skor per murid"]);
+    const row = screen.getByRole("button", { name: "Sumber" }).closest("[data-nemu-actions]");
+    expect(row?.contains(screen.getByRole("button", { name: "Mulai" }))).toBe(true);
+    // Nanti is the outlined one; Mulai, the last, the black main button.
+    expect(screen.getByRole("button", { name: "Nanti" }).className).toMatch(/border-2/u);
+    expect(screen.getByRole("button", { name: "Mulai" }).className).not.toMatch(/border-2/u);
+    fireEvent.click(screen.getByRole("button", { name: "Sumber" }));
+    expect(onSource).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Mulai" }));
+    expect(onChoose).toHaveBeenCalledWith("mulai");
+  });
+
   test("the compact card puts its two choices side by side", () => {
     const onChoose = vi.fn();
     render(

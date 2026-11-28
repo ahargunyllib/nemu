@@ -5,6 +5,7 @@ import { describe, expect, test } from "vite-plus/test";
 
 import {
   actionTarget,
+  afterLine,
   canRun,
   nextProcessSteps,
   pagePath,
@@ -186,5 +187,27 @@ describe("F3 process task (#213)", () => {
   test("a page whose button is named differently still ends on the one button only she presses", () => {
     document.body.innerHTML = `${MENU}<button>Batal</button><button>Simpan</button>`;
     expect(actionTarget(document, "Simpan setoran")).toEqual({ role: "button", text: "Simpan" });
+  });
+});
+
+describe("what others do after the teacher's part (F3-18)", () => {
+  test("one doer's tasks read as one line", () => {
+    expect(
+      afterLine([
+        "Sistem AlurSekolah: hitung nilai dan huruf.",
+        "Sistem AlurSekolah: tampilkan di aplikasi orang tua.",
+      ]),
+    ).toBe(
+      "Sesudah itu, Sistem AlurSekolah: hitung nilai dan huruf, lalu tampilkan di aplikasi orang tua.",
+    );
+    expect(
+      afterLine([
+        "Kepala sekolah: persetujuan Kepala Sekolah.",
+        "Admin: rekap Kehadiran oleh Admin.",
+      ]),
+    ).toBe(
+      "Sesudah itu, Kepala sekolah: persetujuan Kepala Sekolah; Admin: rekap Kehadiran oleh Admin.",
+    );
+    expect(afterLine([])).toBeUndefined();
   });
 });

@@ -63,6 +63,28 @@ export function rowsSummary(rows: RowsFill | null): string {
     .join("; ");
 }
 
+/**
+ * F3-18 in one line: what others do after the teacher's part, the same doer's tasks joined:
+ * "Sesudah itu, Sistem AlurSekolah: hitung nilai dan huruf, lalu tampilkan di aplikasi orang tua."
+ */
+export function afterLine(announcements: readonly string[]): string | undefined {
+  const groups: Array<{ who: string; what: string[] }> = [];
+  for (const announcement of announcements) {
+    const text = announcement.replace(/\.$/u, "");
+    const at = text.indexOf(": ");
+    const who = at > 0 ? text.slice(0, at) : "";
+    const what = at > 0 ? text.slice(at + 2) : text;
+    const last = groups.at(-1);
+    if (last && last.who === who) last.what.push(what);
+    else groups.push({ who, what: [what] });
+  }
+  if (!groups.length) return undefined;
+  const parts = groups.map(({ who, what }) =>
+    who ? `${who}: ${what.join(", lalu ")}` : what.join(", lalu "),
+  );
+  return `Sesudah itu, ${parts.join("; ")}.`;
+}
+
 /** True when the plan has a page for every teacher task, so Nemu can do it, not just explain. */
 export function canRun(plan: Pick<BpmnPlan, "tasks">): boolean {
   return plan.tasks.length > 0 && plan.tasks.every((task) => task.page);

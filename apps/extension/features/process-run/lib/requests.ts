@@ -18,6 +18,8 @@ export type ProcessRunRequest =
   | { op: "plan"; input: ProcessPlanInput }
   /** Photos waiting in the teacher's inbox (WhatsApp or upload), newest first. */
   | { op: "jobs" }
+  /** F3·03: the waiting photo's thumbnail for the start card, before Mulai; null without one. */
+  | { op: "thumbnail"; jobId: string }
   | { op: "read-photo"; documentId: string; jobId: string; taskId: string; slots: ProcessSlots }
   /** The cell each question is about, cut from the photo (`null` where there is no box). */
   | { op: "crops"; jobId: string; boxes: (readonly [number, number, number, number] | null)[] }
@@ -32,6 +34,7 @@ export type ProcessRunValue = {
   "run-procedure": Awaited<ReturnType<NemuServiceClient["procedureRun"]>>;
   plan: BpmnPlan & { documentId: string };
   jobs: InboxJob[];
+  thumbnail: string | null;
   "read-photo": FormPhotoResult;
   crops: (string | null)[];
   "match-fields": Record<string, string | null>;

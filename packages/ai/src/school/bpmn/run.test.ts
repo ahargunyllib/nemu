@@ -95,12 +95,14 @@ test("the sentence picks class, Setoran and today; the steps show 3 teacher line
     "Gw_Jenis",
     "Task_Setoran",
   ]);
+  // F3·03: a three-step recipe; the date Nemu has, and the note, are left out.
   assert.deepEqual(plan.overview, [
-    "Buka Al-Quran › Setoran baru.",
-    "Pilih jenis catatan: kelas 4A, Setoran.",
-    "Isi setoran satu kelas: tanggal setoran 1 Desember 2026, surah, dari ayat, sampai ayat, fashohah, tartil, tajwid, adab, catatan.",
-    "Ibu sendiri yang menekan Simpan setoran; Nemu berhenti sebelum itu.",
-    "Sesudah itu, Sistem AlurSekolah: hitung nilai dan huruf.",
+    "Pilih Setoran, kelas 4A",
+    "Isi surah, ayat, 4 skor per murid",
+    "Ibu tekan Simpan setoran",
+  ]);
+  assert.deepEqual(plan.announcements, [
+    "Sistem AlurSekolah: hitung nilai dan huruf.",
     "Sistem AlurSekolah: tampilkan di aplikasi orang tua.",
   ]);
 });

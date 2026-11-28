@@ -174,7 +174,12 @@ the page's Shadow DOM.
   behind them shows in a `nemu-subtle` box and is read (`onRead`) only once the teacher clicks.
 - **Kartu Pilih**: a risky choice gets ⚠ and goes under the safe one, whatever order it was given
   in. All choices share one look. An enlarged photo crop can carry a caption under it
-  (`image.caption`, 16 px semibold `nemu-secondary`): "Potongan foto · Citra, Tajwid". The **compact** Kartu Pilih (300 px, 44 px buttons side by side)
+  (`image.caption`, 16 px semibold `nemu-secondary`): "Potongan foto · Citra, Tajwid". A **start
+  card** (`layout: "row"`) asks before Nemu begins a flow ("Mulai dari foto ini, Ibu?"): the
+  picture, the `steps` Nemu will take as a numbered list (the same 30 px amber circles as the
+  Kartu Info list, `NemuSteps`), then the action row with one `link` on the left ("Sumber") and
+  its choices as compact buttons on the right, the last one the black main one: **Nanti**
+  **Mulai**. Never "Ajari saya". The **compact** Kartu Pilih (300 px, 44 px buttons side by side)
   waits beside the Nemu button, such as "Foto dari WhatsApp · Mulai / Nanti". Its picture is a
   64 px square thumbnail left of the title (`rounded-xl`, 2 px `border`, cropped from the top so
   the photo's heading shows), and a `Skeleton` of that square while it loads (#278).

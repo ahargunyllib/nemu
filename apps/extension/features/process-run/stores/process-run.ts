@@ -3,6 +3,7 @@ import type { BpmnPlan, FormPhotoQuestion, FormTable, InboxJob } from "@nemu/con
 import type { NemuChoice, NemuDisplay } from "@nemu/ui/lib/nemu-display";
 
 import type { ProcessSlots } from "../../../shared/api/nemu-service";
+import { adminUrl } from "../../../shared/lib/config";
 import type { PageEmail } from "../../../shared/lib/messages";
 import type { RunState } from "../../executor/lib/run";
 import { executor } from "../../executor/stores/executor";
@@ -10,6 +11,7 @@ import { addressFor } from "../../grade-photo/lib/grade-task";
 import { requestProcessRun } from "../api/request-process-run";
 import { findTarget } from "../../executor/lib/find-target";
 import {
+  afterLine,
   canRun,
   type LabelMatcher,
   nextProcessSteps,
@@ -79,6 +81,8 @@ function createProcessRun() {
   let slots: ProcessSlots = {};
   let table: FormTable | null = null;
   let overviewShown = false;
+  /** F3·03: the photo waiting in the inbox when the steps show, and its thumbnail. */
+  let waitingPhoto: { thumbnail: string | null } | null = null;
   let jobId: string | null = null;
   let questions: FormPhotoQuestion[] = [];
   let crops: (string | null)[] = [];
@@ -138,6 +142,24 @@ function createProcessRun() {
         return { type: "jawab", sentence: phase.question, onClose: close };
       case "overview": {
         const runnable = !!plan && canRun(plan) && !phase.missingMenu;
+        // F3·03: the steps as a start card; Mulai is the teacher's go-ahead, Nanti lets it go.
+        if (runnable && plan)
+          return {
+            type: "pilih",
+            layout: "row",
+            status: { text: "Dari alur sekolah", count: processName },
+            question: overviewQuestion(),
+            image: waitingPhoto?.thumbnail
+              ? { src: waitingPhoto.thumbnail, alt: "Foto dari WhatsApp" }
+              : undefined,
+            steps: plan.overview,
+            link: { label: "Sumber", onSelect: () => openSource() },
+            choices: [
+              { id: "nanti", label: "Nanti" },
+              { id: "mulai", label: "Mulai" },
+            ],
+            onChoose: (id) => (id === "mulai" ? void begin() : close()),
+          };
         const items = [...(plan?.overview ?? [])];
         if (phase.missingMenu)
           items.push(
@@ -148,9 +170,9 @@ function createProcessRun() {
         return {
           type: "info",
           title: `Langkah ${processName}`,
+          detail: afterLine(plan?.announcements ?? []),
           items,
-          link: runnable ? { label: "Mulai", onSelect: () => void begin() } : undefined,
-          onClose: runnable ? close : () => reset(),
+          onClose: () => reset(),
         };
       }
       case "photo":
@@ -194,6 +216,19 @@ function createProcessRun() {
         };
       }
     }
+  }
+
+  /** "Mulai dari foto ini, Ibu?": the photo already in the inbox is what Nemu starts from. */
+  function overviewQuestion(): string {
+    return waitingPhoto ? `Mulai dari foto ini, ${address()}?` : `Mulai sekarang, ${address()}?`;
+  }
+
+  /** Sumber: the uploaded BPMN, drawn in the Admin Workspace with this run's path marked. */
+  function openSource() {
+    const url = new URL("/process-diagram", adminUrl());
+    url.searchParams.set("document", documentId);
+    if (plan?.path.length) url.searchParams.set("path", plan.path.join(","));
+    window.open(url.href, "_blank", "noopener");
   }
 
   function publish() {
@@ -284,7 +319,7 @@ function createProcessRun() {
       return setPhase({ name: "asking", question: step.question, slot: step.slot }, step.question);
     if (!overviewShown) {
       overviewShown = true;
-      return setPhase({ name: "overview" }, `Ini langkah ${processName}, ${address()}.`);
+      return void showOverview();
     }
     if (step.kind === "ask") {
       // A field the photo didn't have: asked one at a time, as typed or spoken words.
@@ -296,6 +331,30 @@ function createProcessRun() {
       return void needData(step.question, step.slot);
     }
     void execute();
+  }
+
+  /**
+   * F3·03: the steps, with the photo already in the inbox as a thumbnail. Only the thumbnail is
+   * fetched here; the photo is read after Mulai.
+   */
+  async function showOverview() {
+    const run = generation;
+    const response = canRun(plan ?? { tasks: [] }) ? await call({ op: "jobs" }) : null;
+    if (run !== generation) return;
+    const waiting = response?.ok
+      ? (response.value as InboxJob[]).find((job) => job.status === "queued")
+      : undefined;
+    waitingPhoto = waiting ? { thumbnail: null } : null;
+    const runnable = !!plan && canRun(plan);
+    setPhase(
+      { name: "overview" },
+      runnable ? overviewQuestion() : `Ini langkah ${processName}, ${address()}.`,
+    );
+    if (!waiting) return;
+    const thumbnail = await call({ op: "thumbnail", jobId: waiting.jobId });
+    if (run !== generation || !waitingPhoto) return;
+    waitingPhoto = { thumbnail: thumbnail.ok ? (thumbnail.value as string | null) : null };
+    publish();
   }
 
   /** Mulai: the overview was read. */
@@ -474,6 +533,7 @@ function createProcessRun() {
     slots = {};
     table = null;
     overviewShown = false;
+    waitingPhoto = null;
     jobId = null;
     questions = [];
     crops = [];

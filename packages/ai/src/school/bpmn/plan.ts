@@ -282,22 +282,79 @@ function shortDate(value: string): string {
   return formatIndonesianDate(value).replace(/^\p{L}+,\s*/u, "");
 }
 
+function isMissing(value: SlotValue | undefined): boolean {
+  return value === undefined || value === null || value === "";
+}
+
+/** A free-text note ("Catatan") is never what a step is about, so the steps leave it out. */
+const NOTE_FIELD = /^(catatan|keterangan)\b/iu;
+
 /**
- * A teacher task in one plain line: its name, then its fields, each with its value when known
- * ("Pilih jenis catatan: kelas 4A, Setoran."), so the line says what the form needs.
+ * A form in one recipe line, choices first, each field with its value when Nemu has it:
+ * "Pilih Setoran, kelas 4A", "Isi tanggal mulai 3 Desember 2026, jumlah hari 1".
  */
-function taskLine(node: ProcessNode, slots: Readonly<Record<string, SlotValue>>): string {
-  const parts = node.formFields
-    .filter((field) => field.type !== "file")
-    .map((field) => {
-      const value = slots[field.id];
-      const label = field.label.toLocaleLowerCase("id-ID");
-      if (value === undefined || value === null || value === "") return label;
-      if (field.type === "enum") return displayValue(field, value);
-      if (field.type === "date" && typeof value === "string") return `${label} ${shortDate(value)}`;
-      return `${label} ${displayValue(field, value)}`;
-    });
-  return parts.length ? `${node.name}: ${parts.join(", ")}.` : `${node.name}.`;
+function valuesLine(node: ProcessNode, slots: Readonly<Record<string, SlotValue>>): string {
+  const choices: string[] = [];
+  const others: string[] = [];
+  for (const field of node.formFields) {
+    if (field.type === "file") continue;
+    const value = slots[field.id];
+    const label = field.label.toLocaleLowerCase("id-ID");
+    if (isMissing(value)) others.push(label);
+    else if (field.type === "enum") choices.push(displayValue(field, value!));
+    else if (field.type === "date" && typeof value === "string")
+      others.push(`${label} ${shortDate(value)}`);
+    else others.push(`${label} ${displayValue(field, value!)}`);
+  }
+  const parts = [...choices, ...others];
+  if (!parts.length) return node.name;
+  return `${choices.length ? "Pilih" : "Isi"} ${parts.join(", ")}`;
+}
+
+/**
+ * A form that still needs most of its fields (a book page answers them), in one line of what it
+ * asks for: fields that share a last word go as that word ("Dari ayat", "Sampai ayat" → ayat),
+ * a run of number fields as a count ("4 skor"), and "per murid" when its documentation says so:
+ * "Isi surah, ayat, 4 skor per murid". Fields Nemu already has (the date) it fills itself.
+ */
+function neededLine(node: ProcessNode, slots: Readonly<Record<string, SlotValue>>): string {
+  const fields = node.formFields.filter(
+    (field) => field.type !== "file" && !NOTE_FIELD.test(field.label),
+  );
+  const needed = fields.filter((field) => isMissing(slots[field.id]));
+  if (!needed.length) return valuesLine(node, slots);
+  const labelOf = (field: FormField) => field.label.toLocaleLowerCase("id-ID");
+  const lastWord = (field: FormField) => labelOf(field).split(/\s+/u).at(-1) ?? "";
+  const multiWord = (field: FormField) => /\s/u.test(labelOf(field));
+  const unit = /\bskor\b/iu.test(node.documentation) ? "skor" : "angka";
+  const parts: string[] = [];
+  const merged = new Set<string>();
+  let numbers: string[] = [];
+  const flush = () => {
+    if (numbers.length >= 2) parts.push(`${numbers.length} ${unit}`);
+    else parts.push(...numbers);
+    numbers = [];
+  };
+  for (const field of needed) {
+    const word = lastWord(field);
+    const shared =
+      multiWord(field) &&
+      needed.some((other) => other !== field && multiWord(other) && lastWord(other) === word);
+    if (shared) {
+      if (merged.has(word)) continue;
+      flush();
+      merged.add(word);
+      parts.push(word);
+    } else if (field.type === "long") {
+      numbers.push(labelOf(field));
+    } else {
+      flush();
+      parts.push(labelOf(field));
+    }
+  }
+  flush();
+  const per = node.documentation.match(/\b(?:diisi|isi)\s+per\s+(\p{L}+)/iu)?.[1];
+  return `Isi ${parts.join(", ")}${per ? ` per ${per.toLocaleLowerCase("id-ID")}` : ""}`;
 }
 
 /** Who does a task that isn't the teacher's: its lane, else "Sistem" or its group. */
@@ -363,10 +420,11 @@ export function announcementsFrom(
 }
 
 /**
- * F3-15: what Nemu shows before it does anything, in 2–6 plain steps: for each teacher task its
- * page, what each form on the way needs (with the values Nemu already has) and the button only
- * the teacher presses; then the other roles' and the system's tasks (F3-18). Nothing here knows
- * any one process.
+ * F3-15: what Nemu shows before it does anything, as a short recipe of 2–6 steps: what each form
+ * on the way needs (the choices with the values Nemu already has, then what the task's own form
+ * asks for) and the button only the teacher presses: "Pilih Setoran, kelas 4A", "Isi surah,
+ * ayat, 4 skor per murid", "Ibu tekan Simpan setoran". The other roles' and the system's tasks
+ * (F3-18) stay in `announcements`. Nothing here knows any one process.
  */
 export function overviewLines(input: {
   graph: ProcessGraph;
@@ -374,33 +432,21 @@ export function overviewLines(input: {
   /** Teacher tasks with no button of their own, done on the way to the task they lead into. */
   leadIns?: Readonly<Record<string, readonly string[]>>;
   slots?: Readonly<Record<string, SlotValue>>;
-  announcements: readonly string[];
   honorific: "Bu" | "Pak";
 }): string[] {
   const lines: string[] = [];
   const slots = input.slots ?? {};
+  const address = input.honorific === "Bu" ? "Ibu" : "Bapak";
   for (const task of input.tasks) {
     const node = input.graph.nodes[task.taskId];
-    if (task.page) lines.push(`Buka ${task.page}.`);
     for (const id of input.leadIns?.[task.taskId] ?? []) {
       const leadIn = input.graph.nodes[id];
-      if (leadIn) lines.push(taskLine(leadIn, slots));
+      if (leadIn) lines.push(valuesLine(leadIn, slots));
     }
-    if (node) lines.push(taskLine(node, slots));
-    const address = input.honorific === "Bu" ? "Ibu" : "Bapak";
-    lines.push(`${address} sendiri yang menekan ${task.action}; Nemu berhenti sebelum itu.`);
+    if (node) lines.push(neededLine(node, slots));
+    lines.push(`${address} tekan ${task.action}`);
   }
-  const room = Math.max(1, 6 - lines.length);
-  if (input.announcements.length) {
-    const [first, ...rest] = input.announcements;
-    const after = [`Sesudah itu, ${first}`, ...rest];
-    lines.push(
-      ...(after.length <= room
-        ? after
-        : [...after.slice(0, room - 1), after.slice(room - 1).join(" ")]),
-    );
-  }
-  if (lines.length < 2) lines.push(`Proses ${input.graph.name} selesai di sini.`);
+  if (lines.length < 2) lines.push(`Proses ${input.graph.name} selesai di sini`);
   return lines.slice(0, 6);
 }
 
@@ -462,7 +508,6 @@ export function planBpmnStep(input: PlanBpmnInput): BpmnPlan {
         tasks,
         leadIns,
         slots,
-        announcements,
         honorific: input.honorific,
       }),
       tasks,
