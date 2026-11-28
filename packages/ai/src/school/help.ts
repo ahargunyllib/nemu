@@ -1,11 +1,16 @@
 import { z } from "zod";
 
-import type { Contact, HelpExplanation, PageSnapshot } from "@nemu/contracts/school";
+import type {
+  Contact,
+  GroundedAnswer,
+  HelpExplanation,
+  PageSnapshot,
+} from "@nemu/contracts/school";
 
 import { guidedTargetOf, matchKamus, requestFromFix, type KamusRow } from "./kamus.js";
 import type { JsonCall } from "./llm.js";
 import type { TeacherProfile } from "./profile.js";
-import { mentionsSecret, NOT_IN_GUIDE_SENTENCE } from "./safety.js";
+import { mentionsSecret, NOT_IN_GUIDE_SENTENCE, notInGuideSentence } from "./safety.js";
 
 /**
  * F2 "Nemu, ini kenapa?" (AI_TECHNICAL_PRD §5.1): match the page's error against the school's
@@ -65,15 +70,47 @@ function whatsappDraft(
   errorText: string,
   request: string,
 ): { phone: string; text: string } {
-  const greeting = `Assalamualaikum ${to.name}.`;
-  const intro = `Saya ${teacher.name} (NIP ${teacher.nip}).`;
   const place = where.page ? `Di ${where.app}, halaman "${where.page}",` : `Di ${where.app}`;
   const problem = errorText
     ? `${place} muncul pesan: "${errorText.slice(0, 200).replace(/[.!?\s]+$/u, "")}".`
     : `Saya mengalami kendala di ${where.app}.`;
+  return draftTo(teacher, to, `${problem} ${request}`);
+}
+
+/** A WhatsApp message from the teacher to a contact: greeting, who she is, `body`, thanks. */
+function draftTo(
+  teacher: TeacherProfile,
+  to: Contact,
+  body: string,
+): { phone: string; text: string } {
+  const greeting = `Assalamualaikum ${to.name}.`;
+  const intro = `Saya ${teacher.name} (NIP ${teacher.nip}).`;
+  return { phone: to.phone, text: `${greeting} ${intro} ${body} Terima kasih.` };
+}
+
+/**
+ * F3·11: a question the school's guides don't answer. Nemu invents nothing; it names who can
+ * answer (the WS-06 operator, or the principal) and drafts her question to the operator, which
+ * she sends herself from WhatsApp.
+ */
+export function notInGuideAnswer(teacher: TeacherProfile, question: string): GroundedAnswer {
+  const operator = teacher.contacts.operator ?? null;
+  const text = question.trim().slice(0, 300).replace(/\s+/gu, " ");
+  const asked = /[.?!]$/u.test(text) ? `"${text}"` : `"${text}".`;
   return {
-    phone: to.phone,
-    text: `${greeting} ${intro} ${problem} ${request} Terima kasih.`,
+    status: "not_in_guide",
+    answer: notInGuideSentence(teacher.honorific),
+    detail: operator
+      ? `Yang bisa menjawab: ${operator.name} atau kepala sekolah.`
+      : "Yang bisa menjawab: kepala sekolah.",
+    offerOperator: operator,
+    waDraft: operator
+      ? draftTo(
+          teacher,
+          operator,
+          `Saya mau bertanya: ${asked} Ini belum ada di panduan sekolah. Mohon bantuannya.`,
+        )
+      : null,
   };
 }
 

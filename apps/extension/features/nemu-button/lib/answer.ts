@@ -2,6 +2,7 @@ import type { GroundedAnswer, SourceCitation } from "@nemu/contracts/school";
 import type { NemuStatus } from "@nemu/ui/lib/nemu-display";
 
 import type { AnswerNext } from "../../ini-kenapa/lib/explanation";
+import { whatsAppUrl } from "../../ini-kenapa/lib/whatsapp";
 
 /**
  * What the Gelembung Jawab shows for a question: an answer with its sources (and, for "ini
@@ -78,7 +79,21 @@ function sourceFiles(citations: readonly SourceCitation[]): SourceFile[] {
 }
 
 export function fromGroundedAnswer(answer: GroundedAnswer): AskResult {
-  if (answer.status !== "answered") return { kind: "answer", text: answer.answer, sources: [] };
+  if (answer.status === "not_in_guide") {
+    // F3·11: nothing invented; who can answer, and her question ready for the operator.
+    return {
+      kind: "answer",
+      text: answer.answer,
+      status: { text: "Belum ada", tone: "muted" },
+      ...(answer.detail ? { detail: answer.detail } : {}),
+      sources: [],
+      ...(answer.waDraft
+        ? {
+            next: { kind: "whatsapp", label: "Siapkan pesan WA", url: whatsAppUrl(answer.waDraft) },
+          }
+        : {}),
+    };
+  }
   const files = sourceFiles(answer.citations);
   return {
     kind: "answer",

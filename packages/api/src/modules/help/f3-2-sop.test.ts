@@ -119,7 +119,16 @@ describe(`F3-2: the official SOP Penilaian answers with its page and point (${li
       }
 
       if (point === null) {
-        expect(answer).toEqual({ status: "not_in_guide", answer: "Belum ada di panduan sekolah." });
+        // No number from general knowledge and no source; it offers to ask the operator or the
+        // principal (F3·11).
+        expect(answer).toMatchObject({
+          status: "not_in_guide",
+          answer: "Ini belum ada di panduan sekolah, Bu.",
+          detail: "Yang bisa menjawab: Pak Rizal atau kepala sekolah.",
+          offerOperator: { name: "Pak Rizal" },
+        });
+        expect(`${answer.answer} ${answer.detail}`).not.toMatch(/\d/u);
+        expect(answer).not.toHaveProperty("citations");
         return;
       }
       expect(answer.status).toBe("answered");

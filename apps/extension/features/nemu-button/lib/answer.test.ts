@@ -1,6 +1,40 @@
 import { describe, expect, test } from "vite-plus/test";
 
-import { singleSourceFile, type SourceFile, sourceLinkLabel } from "./answer";
+import { fromGroundedAnswer, singleSourceFile, type SourceFile, sourceLinkLabel } from "./answer";
+
+describe("fromGroundedAnswer: not in the guide (F3·11)", () => {
+  test("says who can answer and offers her question to the operator on WhatsApp", () => {
+    expect(
+      fromGroundedAnswer({
+        status: "not_in_guide",
+        answer: "Ini belum ada di panduan sekolah, Bu.",
+        detail: "Yang bisa menjawab: Pak Rizal atau kepala sekolah.",
+        offerOperator: { name: "Pak Rizal", role: "operator", phone: "6281200000002" },
+        waDraft: { phone: "6281200000002", text: "Assalamualaikum Pak Rizal." },
+      }),
+    ).toEqual({
+      kind: "answer",
+      text: "Ini belum ada di panduan sekolah, Bu.",
+      status: { text: "Belum ada", tone: "muted" },
+      detail: "Yang bisa menjawab: Pak Rizal atau kepala sekolah.",
+      sources: [],
+      next: {
+        kind: "whatsapp",
+        label: "Siapkan pesan WA",
+        url: "https://web.whatsapp.com/send?phone=6281200000002&text=Assalamualaikum%20Pak%20Rizal.",
+      },
+    });
+  });
+
+  test("without an operator there is no button", () => {
+    const result = fromGroundedAnswer({
+      status: "not_in_guide",
+      answer: "Belum ada di panduan sekolah.",
+    });
+    expect(result).toMatchObject({ kind: "answer", sources: [] });
+    expect(result).not.toHaveProperty("next");
+  });
+});
 
 const SOP: SourceFile = {
   label: "SOP Penilaian SDIT Nusantara · hlm. 2 · 3.2",
