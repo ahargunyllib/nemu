@@ -1,5 +1,6 @@
 import type { ExecutorStep, ExecutorTarget, ExecutorTask } from "@nemu/contracts/executor";
 
+import { addressFor } from "../../grade-photo/lib/grade-task";
 import {
   collapsedHeaderFor,
   coursePage,
@@ -175,6 +176,8 @@ export async function nextImportSteps(
 ): Promise<{ steps: ExecutorStep[]; continuation: ImportContinuation | null }> {
   const { plan, honorific } = continuation;
   const teacher = teacherOf(honorific);
+  // Where she presses, Nemu asks: "Silakan Ibu tekan Impor."
+  const press = (button: string) => `Silakan ${addressFor(honorific)} tekan ${button}.`;
   const next = (phase: Phase, more: Partial<ImportContinuation> = {}): ImportContinuation => ({
     ...continuation,
     ...more,
@@ -189,7 +192,7 @@ export async function nextImportSteps(
       {
         verb: "point" as const,
         target: { role: "button" as const, text: "Impor" },
-        sentence: `Tekan Impor${teacher}. Isinya ${plan.count} soal dari naskah.`,
+        sentence: `${press("Impor")} Isinya ${plan.count} soal dari naskah.`,
         sumber: `Naskah ${plan.fileName.replace(/\.xml$/u, "")}`,
       },
     ],
@@ -212,7 +215,7 @@ export async function nextImportSteps(
         {
           verb: "point",
           target: { role: "button", text: "Simpan dan tampilkan" },
-          sentence: `Tekan Simpan dan tampilkan${teacher}. Kuis dibuka ${spokenTime(plan.opens)}, ditutup ${spokenTime(plan.closes)}.`,
+          sentence: press("Simpan dan tampilkan"),
           ringkasan: `${plan.name} di bagian ${plan.section}: dibuka ${spokenTime(plan.opens)}, ditutup ${spokenTime(plan.closes)}.`,
         },
       ];
@@ -305,7 +308,7 @@ export async function nextImportSteps(
           {
             verb: "point",
             target: { role: "button", text: "Tambahkan soal terpilih pada kuis" },
-            sentence: `Tekan Tambahkan soal terpilih pada kuis${teacher}. Nemu sudah memilih ${plan.count} soalnya.`,
+            sentence: `${press("Tambahkan soal terpilih pada kuis")} Nemu sudah memilih ${plan.count} soalnya.`,
           },
         ],
         continuation: next("added"),

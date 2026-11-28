@@ -126,8 +126,10 @@ describe("F4-03 as one executor task (#210)", () => {
     expect(steps.at(-1)).toMatchObject({
       verb: "point",
       target: { role: "button", text: "Simpan dan tampilkan" },
-      sentence:
-        "Tekan Simpan dan tampilkan, Bu. Kuis dibuka 7 Desember pukul 00.00, ditutup 10 Desember pukul 23.59.",
+      sentence: "Silakan Ibu tekan Simpan dan tampilkan.",
+      // The times she checks before pressing stay behind Lihat ringkasan.
+      ringkasan:
+        "Latihan IPAS Kelas 4A di bagian IPAS: dibuka 7 Desember pukul 00.00, ditutup 10 Desember pukul 23.59.",
     });
     expect(continuation?.phase).toBe("saved");
     // Waktu Pengerjaan already open: it isn't clicked shut.
@@ -167,6 +169,12 @@ describe("F4-03 as one executor task (#210)", () => {
       "Simpan dan tampilkan",
       "Impor",
       "Tambahkan soal terpilih pada kuis",
+    ]);
+    // Every press is hers, asked the same way: "Silakan Ibu tekan …".
+    expect(all.flatMap((step) => (step.verb === "point" ? [step.sentence] : []))).toEqual([
+      "Silakan Ibu tekan Simpan dan tampilkan.",
+      "Silakan Ibu tekan Impor. Isinya 10 soal dari naskah.",
+      "Silakan Ibu tekan Tambahkan soal terpilih pada kuis. Nemu sudah memilih 10 soalnya.",
     ]);
     expect(
       all

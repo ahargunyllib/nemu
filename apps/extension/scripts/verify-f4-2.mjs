@@ -238,7 +238,7 @@ await check(
     await page.waitForURL(/\/course\/modedit\.php/u, { timeout: 60_000 });
     const save = page.getByRole("button", { name: "Simpan dan tampilkan", exact: true });
     await display("tunjuk")
-      .getByText("Tekan Simpan dan tampilkan, Bu.", { exact: false })
+      .getByText("Silakan Ibu tekan Simpan dan tampilkan.", { exact: false })
       .waitFor({ timeout: 90_000 });
     const values = await page.evaluate(() => {
       const value = (id) => document.getElementById(id)?.value;
@@ -258,7 +258,7 @@ await check(
     expect(values.name === QUIZ, `the name is ${values.name}`);
     expect(values.open === "2026-12-7-0-0", `opens ${values.open}`);
     expect(values.close === "2026-12-10-23-59", `closes ${values.close}`);
-    await shePresses("Tekan Simpan dan tampilkan, Bu.", save, "3-simpan-dan-tampilkan.png");
+    await shePresses("Silakan Ibu tekan Simpan dan tampilkan.", save, "3-simpan-dan-tampilkan.png");
     await page.waitForURL(/\/mod\/quiz\/view\.php/u, { timeout: 20_000 });
   },
 );
@@ -269,13 +269,13 @@ await check(
     await page.waitForURL(/\/question\/bank\/importquestions\/import\.php/u, { timeout: 60_000 });
     const impor = page.getByRole("button", { name: "Impor", exact: true });
     await display("tunjuk")
-      .getByText("Tekan Impor, Bu.", { exact: false })
+      .getByText("Silakan Ibu tekan Impor.", { exact: false })
       .waitFor({ timeout: 90_000 });
     const picked = await page.locator(".filepicker-filelist .filepicker-filename").innerText();
     console.log(`  Picker holds: ${picked.trim()}`);
     expect(picked.includes(`${QUIZ}.xml`), "the XML isn't in the picker");
     expect(await page.locator("#id_format_xml").isChecked(), "Format XML Moodle isn't picked");
-    await shePresses("Tekan Impor, Bu.", impor, "4-impor.png");
+    await shePresses("Silakan Ibu tekan Impor.", impor, "4-impor.png");
     await page.getByText("Mengimpor 10 soal dari berkas").waitFor({ timeout: 30_000 });
   },
 );
@@ -285,13 +285,17 @@ await check(
   async () => {
     const add = page.getByRole("button", { name: "Tambahkan soal terpilih pada kuis" });
     await display("tunjuk")
-      .getByText("Tekan Tambahkan soal terpilih pada kuis, Bu.", { exact: false })
+      .getByText("Silakan Ibu tekan Tambahkan soal terpilih pada kuis.", { exact: false })
       .waitFor({ timeout: 90_000 });
     const ticked = await page
       .locator(".modal.show input[name^='q'][type=checkbox]:checked")
       .count();
     console.log(`  Ticked in the bank: ${ticked}`);
-    await shePresses("Tekan Tambahkan soal terpilih pada kuis, Bu.", add, "5-tambahkan.png");
+    await shePresses(
+      "Silakan Ibu tekan Tambahkan soal terpilih pada kuis.",
+      add,
+      "5-tambahkan.png",
+    );
     await page.waitForURL(/\/mod\/quiz\/edit\.php/u, { timeout: 30_000 });
     await page.locator("li.slot").first().waitFor({ timeout: 30_000 });
     const listed = await page.locator("li.slot").count();

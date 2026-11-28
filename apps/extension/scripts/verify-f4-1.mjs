@@ -195,12 +195,18 @@ await check("Bu Siti asks on the quiz page; Nemu opens Setelan, Soal and Kuis it
 });
 
 await check("Nemu points at Pratinjau kuis, and Bu Siti presses it herself", async () => {
-  const sentence = display("tunjuk").getByText("Tekan Pratinjau kuis, Bu.", { exact: false });
+  const sentence = display("tunjuk").getByText("Silakan Ibu tekan Pratinjau kuis.", {
+    exact: false,
+  });
   const button = page.getByRole("button", {
     name: /^(Pratinjau kuis|Lanjutkan pratinjau terakhir)$/u,
   });
   await sentence
-    .or(display("tunjuk").getByText("Tekan Lanjutkan pratinjau terakhir", { exact: false }))
+    .or(
+      display("tunjuk").getByText("Silakan Ibu tekan Lanjutkan pratinjau terakhir", {
+        exact: false,
+      }),
+    )
     .waitFor({ timeout: 20_000 });
   await page.waitForTimeout(800);
   expect(await ringsOn(button), "the ring isn't on the preview button");
