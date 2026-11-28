@@ -284,6 +284,7 @@ export class ExecutorRun {
     this.halt("asking");
     this.render({
       type: "pilih",
+      ...this.stopped(),
       question: `${this.address()} mau isi sendiri?`,
       choices: [
         { id: "sendiri", label: "Ya, saya isi sendiri" },
@@ -304,6 +305,7 @@ export class ExecutorRun {
   private askHowToGoOn() {
     this.render({
       type: "pilih",
+      ...this.stopped(),
       question: `${this.address()} mau isi sendiri?`,
       choices: [
         { id: "sendiri", label: "Ya, saya isi sendiri" },
@@ -316,6 +318,28 @@ export class ExecutorRun {
         else this.stop();
       },
     });
+  }
+
+  /**
+   * The heading and detail line of both stop cards (F1·08): "Nemu berhenti", grey, with the row
+   * Nemu was on ("3 dari 32") when the task fills rows, and "Pilih salah satu, Nemu menunggu."
+   */
+  private stopped(): { status: NemuStatus; detail: string } {
+    const steps = this.state.task.steps;
+    // Before the first row (the menu, the filters) there is no row to count yet.
+    const first = steps.findIndex((step) => rowOf(step) !== undefined);
+    const at =
+      first >= 0 && this.state.index >= first
+        ? this.progress(Math.min(this.state.index, steps.length - 1))
+        : undefined;
+    return {
+      status: {
+        tone: "muted",
+        text: "Nemu berhenti",
+        ...(at ? { count: `${at.done} dari ${at.total}` } : {}),
+      },
+      detail: "Pilih salah satu, Nemu menunggu.",
+    };
   }
 
   /** The teacher as a sentence's subject: "Ibu" / "Bapak" from WS-06's "Bu" / "Pak". */

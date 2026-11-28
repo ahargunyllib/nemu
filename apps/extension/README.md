@@ -96,7 +96,9 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     cursor while naming them, never by opening a URL. The run is kept per tab in
     `chrome.storage.session` (through the background), so it carries on after a page load.
   - **Safety, in the extension (F0-07, F0-08).** A real mouse press or key while Nemu acts stops it
-    and asks "Ibu mau isi sendiri?": Ya, saya isi sendiri / Nemu saja yang lanjut / Berhenti.
+    and asks "Ibu mau isi sendiri?": Ya, saya isi sendiri / Nemu saja yang lanjut / Berhenti,
+    under a grey "Nemu berhenti" heading with the row it was on ("3 dari 32") and "Pilih salah
+    satu, Nemu menunggu." (the Berhenti button's card too).
     `isDeniedActionName` runs on every target: Simpan, Kirim, Hapus and the like are pointed at,
     never pressed, whatever verb asked for it, and so is anything that would submit a form. Any verb outside the six becomes pointing. Nemu
     dispatches no key, so never Enter, and cancels every submit while it acts (untrusted ones for

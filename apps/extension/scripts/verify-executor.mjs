@@ -135,6 +135,12 @@ await check("F0-07: the teacher's own click stops Nemu and asks how to go on", a
   await page.locator("h1").click();
   const card = display("pilih");
   await card.getByText("Ibu mau isi sendiri?").waitFor({ timeout: 3_000 });
+  // F1·08: grey Nemu berhenti, with the row Nemu was on once it fills rows.
+  await card
+    .locator("[data-nemu-status]")
+    .filter({ hasText: /^Nemu berhenti(\d dari 5)?$/u })
+    .waitFor();
+  await card.getByText("Pilih salah satu, Nemu menunggu.").waitFor();
   for (const choice of ["Ya, saya isi sendiri", "Nemu saja yang lanjut", "Berhenti"])
     await card.getByRole("button", { name: choice }).waitFor();
   await page.screenshot({ path: join(shots, "f0-07-kartu-pilih.png") });
@@ -170,6 +176,11 @@ async function pressBerhenti() {
   await bubble.getByRole("button", { name: "Berhenti" }).click();
   const card = display("pilih");
   await card.getByText("Ibu mau isi sendiri?").waitFor({ timeout: 3_000 });
+  await card
+    .locator("[data-nemu-status]")
+    .filter({ hasText: /^Nemu berhenti1 dari 5$/u })
+    .waitFor();
+  await card.getByText("Pilih salah satu, Nemu menunggu.").waitFor();
   const labels = await card.getByRole("button").allInnerTexts();
   expect(
     labels.map((label) => label.trim()).join(" | ") === "Ya, saya isi sendiri | Tidak, berhenti",

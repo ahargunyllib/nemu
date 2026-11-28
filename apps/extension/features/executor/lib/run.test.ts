@@ -487,6 +487,8 @@ describe("F0-07: the teacher's own input stops Nemu", () => {
     const card = display();
     expect(card).toMatchObject({
       type: "pilih",
+      status: { tone: "muted", text: "Nemu berhenti" },
+      detail: "Pilih salah satu, Nemu menunggu.",
       question: "Ibu mau isi sendiri?",
       choices: [
         { id: "sendiri", label: "Ya, saya isi sendiri" },
@@ -542,6 +544,9 @@ describe("F0-11: Berhenti in the Gelembung Kerja asks whether she fills the rest
     expect(ended).not.toHaveBeenCalled();
     expect(display()).toEqual({
       type: "pilih",
+      // F1·08: grey "Nemu berhenti" with the row Nemu was on, and what Nemu waits for.
+      status: { tone: "muted", text: "Nemu berhenti", count: "2 dari 2" },
+      detail: "Pilih salah satu, Nemu menunggu.",
       question: "Ibu mau isi sendiri?",
       choices: [
         { id: "sendiri", label: "Ya, saya isi sendiri" },
