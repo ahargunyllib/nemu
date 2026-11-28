@@ -41,6 +41,19 @@ export const ROLE_ALIASES: Record<string, string[]> = {
   guru: ["guru", "ibu/bapak guru"],
 };
 
+/** How the detail line names a contact's role: "Pak Rizal operator sekolah." */
+const ROLE_NAMES: Record<string, string> = {
+  kepsek: "kepala sekolah",
+  operator: "operator sekolah",
+  dinas: "dinas pendidikan",
+  keuangan: "bagian keuangan",
+};
+
+/** The detail under the sentence: who the helper is, "Pak Rizal operator sekolah." */
+export function helperDetail(contact: Contact): string {
+  return `${contact.name} ${ROLE_NAMES[contact.role] ?? contact.role}.`;
+}
+
 /** The snapshot's text, alerts first: what the kamus is matched against. */
 export function pageLines(snapshot: PageSnapshot): string[] {
   return [
@@ -116,7 +129,7 @@ export function answerFromRow(
       : `${who} bisa memperbaikinya sendiri.`
     : row.teacherFault
       ? `Perlu dibetulkan. Yang bisa membantu: ${fixer?.name ?? "operator sekolah"}.`
-      : `Bukan kesalahan ${who}. Yang bisa memperbaiki: ${fixer ? `${fixer.name} (${fixer.role})` : "operator sekolah"}.`;
+      : `Bukan kesalahan ${who}. Yang bisa membantu: ${fixer?.name ?? "operator sekolah"}.`;
   const meaning = row.meaning
     .replace(/Ibu\/Bapak|Bapak\/Ibu/gu, who)
     .replace(/\bsalah\b/giu, "keliru")
@@ -127,6 +140,7 @@ export function answerFromRow(
     status: "matched",
     entryId: row.code,
     sentence,
+    ...(fixer ? { detail: helperDetail(fixer) } : {}),
     why: mentionsSecret(meaning) ? "" : meaning,
     teacherFault: row.teacherFault,
     canSelfFix,

@@ -273,6 +273,8 @@ export const helpExplanationSchema = z.discriminatedUnion("status", [
       entryId: z.string(),
       /** The one bubble sentence: whose fault + the named person who can fix it. */
       sentence: z.string(),
+      /** The quieter line under it, not spoken: who that person is ("Pak Rizal operator sekolah."). */
+      detail: z.string().optional(),
       /** Shown behind "Kenapa?". */
       why: z.string(),
       teacherFault: z.boolean(),

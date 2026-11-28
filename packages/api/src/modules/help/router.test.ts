@@ -26,7 +26,8 @@ describe("F2 and school questions through the API (seeded kamus and SOP)", () =>
     );
     expect(result).toMatchObject({
       status: "matched",
-      sentence: "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Ahmad (kepsek).",
+      sentence: "Bukan kesalahan Ibu. Yang bisa membantu: Pak Ahmad.",
+      detail: "Pak Ahmad kepala sekolah.",
       citation: { docId: "kamus-kendala", article: "K-01" },
       waDraft: { phone: "6281200000001" },
     });
@@ -56,7 +57,8 @@ describe("F2 and school questions through the API (seeded kamus and SOP)", () =>
     );
     expect(result).toMatchObject({
       status: "matched",
-      sentence: "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).",
+      sentence: "Bukan kesalahan Ibu. Yang bisa membantu: Pak Rizal.",
+      detail: "Pak Rizal operator sekolah.",
       canSelfFix: false,
       citation: { docId: "kamus-kendala", article: "K-07" },
       waDraft: {

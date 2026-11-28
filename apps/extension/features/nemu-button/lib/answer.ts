@@ -11,6 +11,8 @@ export type AskResult =
   | {
       kind: "answer";
       text: string;
+      /** The quieter line under the sentence, not spoken ("Pak Rizal operator sekolah."). */
+      detail?: string;
       sources: string[];
       /** The sources Sumber can open: a cited document at its page (#258). */
       files?: SourceFile[];

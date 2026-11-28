@@ -92,7 +92,7 @@ The Nemu Extension does this (#205, `apps/extension/features/ini-kenapa`):
 1. When the talk combination goes down (or a question is typed), the page script reads the page: title, URL, `role=alert` text, toasts and error messages, headings, and field labels with their visible values (`readPageSnapshot`). With a password field on screen it reads nothing, and "kenapa" answers that it won't read the page; nothing is captured or sent.
 2. If `helpRoute` says `kenapa`, the service worker adds a viewport JPEG (`captureVisibleTab`, ≤1280 px) and calls `helpExplain({snapshot, question: transcript})`. Chrome only allows `captureVisibleTab` with `<all_urls>` or an `activeTab` grant (ADR-0004, ADR-0016), so on the known sites the screenshot is `null` today and F2 runs on the page text.
 3. The answer:
-   - `matched`: the Gelembung Jawab shows `sentence`; **Kenapa?** shows `why`; **Sumber** shows the Kamus Kendala entry.
+   - `matched`: the Gelembung Jawab, headed **Jawaban**, shows `sentence` ("Bukan kesalahan Ibu. Yang bisa membantu: Pak Rizal.") with `detail` under it ("Pak Rizal operator sekolah.", the WS-06 contact's role); **Kenapa?** shows `why`; **Sumber** shows the Kamus Kendala entry.
    - If `canSelfFix`, **Tunjukkan caranya** starts cara 2: the executor points at `guidedTarget`, found by label, role or text. When it isn't on the page, Nemu first points at the menu the kamus sentence (`citation.quote`) names on the way ("buka menu E-Kinerja"). The teacher clicks.
    - Else **Buka WhatsApp ke …** opens `https://web.whatsapp.com/send?phone=…&text=…` from `waDraft`, with no screenshot. **The teacher presses Kirim.**
    - `not_in_guide`: speak `sentence` ("Belum ada di panduan sekolah. …"); **Ya, tanyakan ke …** opens `waDraft` to the operator.

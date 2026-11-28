@@ -453,7 +453,9 @@ function NemuPanel({
           {state.status === "asking" && <GelembungJawabSkeleton />}
           {state.status === "answered" && (
             <GelembungJawab
+              status={{ text: "Jawaban" }}
               sentence={state.result.text}
+              detail={state.result.kind === "answer" ? state.result.detail : undefined}
               highlightedWord={spokenWordIn(state.result.text, voice)}
               notes={
                 state.result.kind === "answer"

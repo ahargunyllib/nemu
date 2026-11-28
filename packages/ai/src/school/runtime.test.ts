@@ -94,10 +94,8 @@ test("F2-2 offline: IPAS 4A not assigned is Pak Rizal's to fix (K-07), with a Wh
   assert.equal(result.status, "matched");
   if (result.status !== "matched") return;
   assert.equal(result.entryId, "K-07");
-  assert.equal(
-    result.sentence,
-    "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).",
-  );
+  assert.equal(result.sentence, "Bukan kesalahan Ibu. Yang bisa membantu: Pak Rizal.");
+  assert.equal(result.detail, "Pak Rizal operator sekolah.");
   assert.equal(result.canSelfFix, false);
   assert.equal(result.waDraft?.phone, "6281200000002");
   assert.match(result.waDraft?.text ?? "", /^Assalamualaikum Pak Rizal\./u);

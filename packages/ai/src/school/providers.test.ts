@@ -139,7 +139,7 @@ test("speech returns the exact text with word timings for the highlight", async 
 
 test("word timings are monotonic and pause after punctuation", () => {
   const { words, durationMs } = estimateWordTimings(
-    "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Ahmad.",
+    "Bukan kesalahan Ibu. Yang bisa membantu: Pak Ahmad.",
   );
   for (let index = 1; index < words.length; index += 1) {
     assert.ok(words[index]!.offsetMs >= words[index - 1]!.offsetMs + words[index - 1]!.durationMs);
@@ -163,8 +163,5 @@ test("sentences that say 'salah', ask for a secret, or run long are flagged", ()
   assert.ok(mentionsSecret("Masukkan kode OTP Ibu"));
   assert.ok(mentionsSecret("kata sandi"));
   assert.ok(!mentionsSecret("Kode kelas 4B"));
-  assert.deepEqual(
-    sentenceIssues("Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Ahmad (kepsek)."),
-    [],
-  );
+  assert.deepEqual(sentenceIssues("Bukan kesalahan Ibu. Yang bisa membantu: Pak Ahmad."), []);
 });
