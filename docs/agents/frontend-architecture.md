@@ -32,7 +32,9 @@ Extension), and to any mock app added under `apps/`. Shared UI primitives live i
 - The shared signed-in layout (`AppShell`,
   `AppSidebar`, `AppHeader`, `PageHeading`, `AccountMenu`) lives in
   `packages/ui/src/shell` and is imported as `@nemu/ui/shell/<name>`. Each app
-  fills it with its own menu items, account details, and pages.
+  fills its slots (the side menu's items and footer, the top bar's `start` and
+  `end`, the breadcrumb above the page) with its own controls, account
+  details, and pages; the shell never imports an app.
 - Keep domain-specific reusable code inside its feature. For example, Action
   Level labels belong in that feature's `lib/`, not in `shared/`.
 - Shared code is a dependency leaf and must not import from `features/` or

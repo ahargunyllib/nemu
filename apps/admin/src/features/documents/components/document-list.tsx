@@ -53,12 +53,15 @@ const SKELETON_ROWS = ["a", "b", "c"];
 export default function DocumentList({
   packageId = null,
   title,
+  initialQuery = "",
 }: {
   packageId?: DocumentScope;
   title: string;
+  /** What the search box starts with, such as a title picked in the top bar's search. */
+  initialQuery?: string;
 }) {
   const documents = useQuery(listDocumentsQueryOptions(packageId));
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
 
   const filtered = documents.data?.filter((document) =>
     `${document.title} ${document.fileName}`.toLowerCase().includes(query.trim().toLowerCase()),

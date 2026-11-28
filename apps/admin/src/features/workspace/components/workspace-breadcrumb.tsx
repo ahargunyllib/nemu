@@ -9,20 +9,20 @@ import { useRouterState } from "@tanstack/react-router";
 
 import { findNavLocation } from "@/features/workspace/lib/nav-items";
 
-/** Where the admin is, for the top bar: the section, then the page. */
+/** Where the admin is, above the page's title: Workspace, the section, then the page. */
 export default function WorkspaceBreadcrumb() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const location = findNavLocation(pathname);
 
   return (
     <Breadcrumb>
-      <BreadcrumbList className="flex-nowrap">
-        <BreadcrumbItem className="hidden xl:inline-flex">Workspace</BreadcrumbItem>
+      <BreadcrumbList>
+        <BreadcrumbItem>Workspace</BreadcrumbItem>
         {location && (
           <>
-            <BreadcrumbSeparator className="hidden xl:inline-flex" />
-            <BreadcrumbItem className="hidden md:inline-flex">{location.group}</BreadcrumbItem>
-            <BreadcrumbSeparator className="hidden md:inline-flex" />
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>{location.group}</BreadcrumbItem>
+            <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbPage>{location.item}</BreadcrumbPage>
             </BreadcrumbItem>

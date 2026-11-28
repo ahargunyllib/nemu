@@ -49,6 +49,13 @@ function throwUnlessSaved(result: TeacherWriteResult) {
 
 /** WS-01 (school list, Admin Javan only) and WS-06 (teachers and contacts, operator or admin). */
 export const schoolRouter = {
+  /** The school the signed-in operator or admin works in, for the Workspace top bar and side menu. */
+  currentSchool: schoolAdminProcedure.handler(async ({ context }) => {
+    const id = context.session.user.workspaceId;
+    const name = await createSchoolRepository(context.db).schoolName(id);
+    return { id, name: name ?? id };
+  }),
+
   listSchools: fullAdminProcedure.handler(({ context }) =>
     createSchoolRepository(context.db).listSchools(),
   ),

@@ -11,7 +11,7 @@ import { LogOutIcon } from "lucide-react";
 import { authClient } from "@/features/auth/api/auth-client";
 import { roleLabel } from "@/features/workspace/lib/roles";
 
-/** The signed-in admin at the bottom of the side menu; it opens the account menu. */
+/** The signed-in admin at the right of the top bar: name and role; it opens the account menu. */
 export default function UserMenu() {
   const navigate = useNavigate();
   const { data: session, isPending } = authClient.useSession();
@@ -21,7 +21,7 @@ export default function UserMenu() {
   const { name, email, role } = session.user;
 
   return (
-    <AccountMenu name={name} detail={roleLabel(role)} aria-label={`Account menu for ${name}`}>
+    <AccountMenu name={name} detail={roleLabel(role)} aria-label={`Akun ${name}`}>
       <DropdownMenuGroup>
         <DropdownMenuLabel>{email}</DropdownMenuLabel>
         <DropdownMenuSeparator />

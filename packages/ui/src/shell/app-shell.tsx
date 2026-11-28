@@ -6,6 +6,8 @@ type AppShellProps = {
   sidebar: ReactNode;
   /** An `AppHeader`. */
   header: ReactNode;
+  /** Where the page sits in the menu, shown just above the page's title. */
+  breadcrumb?: ReactNode;
   children: ReactNode;
 };
 
@@ -13,7 +15,7 @@ type AppShellProps = {
  * The signed-in layout the Demo App and the Admin Workspace share: the dark side menu, a white top
  * bar, and the page on a muted background.
  */
-export function AppShell({ sidebar, header, children }: AppShellProps) {
+export function AppShell({ sidebar, header, breadcrumb, children }: AppShellProps) {
   return (
     <SidebarProvider>
       {sidebar}
@@ -21,7 +23,11 @@ export function AppShell({ sidebar, header, children }: AppShellProps) {
         {header}
         {/* The page fills the width with the same `px-6` gutter as `AppHeader`, so its edges line
             up with the top bar's, and grows to the bottom so a page can fill the height. */}
-        <div className="flex flex-1 flex-col gap-6 p-6">{children}</div>
+        <div className="flex flex-1 flex-col gap-6 p-6">
+          {/* The breadcrumb hugs the title under it: the negative margin takes back most of the gap. */}
+          {breadcrumb && <div className="-mb-5">{breadcrumb}</div>}
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

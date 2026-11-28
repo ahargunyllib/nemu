@@ -4,10 +4,13 @@ import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 
 import { authClient } from "@/features/auth/api/auth-client";
 import UserMenu from "@/features/auth/components/user-menu";
+import SchoolCard from "@/features/school/components/school-card";
+import SchoolSwitcher from "@/features/school/components/school-switcher";
 import WorkspaceBreadcrumb from "@/features/workspace/components/workspace-breadcrumb";
+import WorkspaceSearch from "@/features/workspace/components/workspace-search";
 import WorkspaceSidebar from "@/features/workspace/components/workspace-sidebar";
 import { canOpen } from "@/features/workspace/lib/nav-items";
-import { homePath } from "@/features/workspace/lib/roles";
+import { homePath, isFullAdmin } from "@/features/workspace/lib/roles";
 
 export const Route = createFileRoute("/_auth")({
   component: AuthLayout,
@@ -27,11 +30,23 @@ export const Route = createFileRoute("/_auth")({
 
 function AuthLayout() {
   const { session } = Route.useRouteContext();
+  const role = session.data?.user.role;
 
   return (
     <AppShell
-      sidebar={<WorkspaceSidebar role={session.data?.user.role} footer={<UserMenu />} />}
-      header={<AppHeader start={<WorkspaceBreadcrumb />} end={session.data?.user.email} />}
+      sidebar={<WorkspaceSidebar role={role} footer={<SchoolCard />} />}
+      header={
+        <AppHeader
+          start={<WorkspaceSearch />}
+          end={
+            <>
+              <SchoolSwitcher fullAdmin={isFullAdmin(role)} />
+              <UserMenu />
+            </>
+          }
+        />
+      }
+      breadcrumb={<WorkspaceBreadcrumb />}
     >
       <Outlet />
     </AppShell>
