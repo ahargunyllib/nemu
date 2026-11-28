@@ -309,9 +309,10 @@ await micCheck("the first hold on a site points at Izinkan in Chrome's prompt", 
   await untilRegistered();
 
   await holdToTalk(mic, 600);
-  await pointer
-    .getByText("Tekan Izinkan yang paling atas di kotak Chrome", { exact: false })
-    .waitFor({ timeout: 5_000 });
+  await pointer.getByText("Klik Izinkan, Bu.", { exact: true }).waitFor({ timeout: 5_000 });
+  // Chrome shows two Izinkan; only the top one lasts beyond this visit (ADR-0019).
+  await pointer.getByText("Pilih Izinkan yang paling atas", { exact: false }).waitFor();
+  await pointer.getByText("Giliran Ibu", { exact: true }).waitFor();
   // She let go to press Izinkan: Nemu keeps pointing until Chrome has an answer.
   const cursor = overlay(mic).locator("[data-nemu-cursor='arrived']");
   await cursor.waitFor();
