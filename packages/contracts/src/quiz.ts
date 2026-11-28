@@ -49,6 +49,8 @@ export const quizProblemSchema = z
     detail: z.string().min(1).max(300).optional(),
     /** What Kenapa? reads: what Nemu saw that makes it a problem, when it can say more. */
     why: z.string().min(1).max(300).optional(),
+    /** Its line in the report after the last problem: "Soal 15: gambar (3) belum ada." */
+    item: z.string().min(1).max(300).optional(),
   })
   .strict();
 

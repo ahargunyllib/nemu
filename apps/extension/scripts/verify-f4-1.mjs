@@ -4,8 +4,9 @@
 // (she presses it), and then points at soal 15 (missing image) and soal 7 (no key, with "Ibu isi
 // kuncinya lewat Edit soal. Nemu tidak mengubahnya." on the detail line, #267), each saying
 // setup/f4-1/F4-1_kunci.csv's sentence in its order, under "Memeriksa kuis · 1 dari 2" with Kenapa?
-// and Lanjut, and then says one
-// closing sentence ("Selain dua hal itu, kuisnya sudah siap, Bu.", #256). Afterwards the quiz's
+// and Lanjut, and then reports under "Hasil pemeriksaan" with the key's one-sentence example ("Ada
+// 2 hal yang perlu Ibu perbaiki: soal 15 dan soal 7.", #256), what was right and one line per
+// problem; after Tutup, Catatan langkah opens from the Nemu button. Afterwards the quiz's
 // last-modified time and question count are what they were (read from the Moodle database when it
 // runs locally).
 // Needs `NEMU_RESPONDER=fixture pnpm dev` (the Nemu Service and the mock AlurSekolah, where Bu
@@ -277,8 +278,9 @@ await check(
         expect(await jawab.getByRole("button", { name: "Kenapa?" }).count(), "no Kenapa? link");
       }
       await jawab.getByRole("button", { name: "Lanjut" }).click();
-      // After the last problem the closing sentence comes, with Catatan langkah behind it.
-      if (await jawab.getByRole("button", { name: "Catatan langkah" }).count()) break;
+      // After the last problem the report (Kartu Info) comes instead.
+      await page.waitForTimeout(300);
+      if (await display("info").count()) break;
     }
     console.log(`  Nemu said: ${sentences.join(" | ")}`);
     const order = kunci.map((expected) => sentences.indexOf(expected));
@@ -306,36 +308,54 @@ await check(
   },
 );
 
+// The key's last row asks for a one-sentence report and gives its example ("mis. “…”").
+const reportRow = rows.find((row) => (row[sentenceColumn] ?? "").startsWith("Laporan akhir"));
+const REPORT = reportRow?.[sentenceColumn]?.match(/"([^"]+)"/u)?.[1];
+const VERIFIED = "Yang lain sudah benar: 15 soal, kelas 4A, buka Rabu 2 Des 07.00.";
+const ITEMS = ["Soal 15: gambar (3) belum ada.", "Soal 7: belum ada kunci jawaban."];
+
 await check(
-  "After the last problem Nemu says one closing sentence, about no element (#256)",
+  "After the last problem the report lists them in one sentence, about no element (#256)",
   async () => {
-    const jawab = display("jawab");
-    // The issue's example for the official key's two problems.
-    const expected = "Selain dua hal itu, kuisnya sudah siap, Bu.";
-    const texts = (await jawab.locator("p").allInnerTexts()).map((text) => text.trim());
-    const closing = texts.find((text) => text.startsWith("Selain ")) ?? texts.join(" ");
-    console.log(`  Nemu closed with: ${closing}`);
+    const info = display("info");
+    await info.waitFor({ timeout: 10_000 });
+    const title = (await info.locator("[data-slot=card-title]").innerText()).trim();
+    const detail = (await info.locator("[data-nemu-detail]").innerText()).trim();
+    const items = (await info.locator("ol li").allInnerTexts()).map((text) =>
+      text.replace(/^\d+\s*/u, "").trim(),
+    );
+    console.log(`  Report: ${title} | ${detail} | ${items.join(" | ")}`);
+    const heading = (await info.locator("[data-nemu-status] p").allTextContents()).join(" ");
+    expect(heading.trim() === "Hasil pemeriksaan", `the heading says “${heading}”`);
     const closesAt = new Date(2026, 11, 4, 21, 0);
-    if (new Date() < closesAt) expect(closing === expected, `Nemu didn't close with “${expected}”`);
-    else
-      expect(/^Selain .+ hal itu, kuisnya sudah siap, Bu\.$/u.test(closing), "no closing sentence");
+    if (new Date() < closesAt) {
+      expect(REPORT && title === REPORT, `the report says “${title}”, the key “${REPORT}”`);
+      expect(detail === VERIFIED, `the detail line says “${detail}”`);
+      expect(JSON.stringify(items) === JSON.stringify(ITEMS), "the report's lines differ");
+    } else expect(/^Ada \d+ hal yang perlu Ibu perbaiki: /u.test(title), "no report");
     await page.waitForTimeout(900);
     expect(
       !(await overlay.locator("[data-nemu-ring]").count()),
-      "the closing sentence still rings an element",
+      "the report still rings an element",
     );
     await page.screenshot({ path: join(shots, "4-penutup.png") });
-    await jawab.getByRole("button", { name: "Catatan langkah" }).click();
+    expect(await info.getByRole("button", { name: "Tunjukkan lagi" }).count(), "no Tunjukkan lagi");
+    await info.getByRole("button", { name: "Tutup" }).click();
   },
 );
 
-await check("Catatan langkah lists the problems and says nothing was changed", async () => {
-  const info = display("info");
-  await info.getByText("Nemu tidak mengubah apa pun di kuis ini.").waitFor({ timeout: 10_000 });
-  await info.getByText("Masalah: Soal 15 belum ada gambarnya, Bu.").waitFor();
-  await page.screenshot({ path: join(shots, "5-catatan-langkah.png") });
-  console.log(`  Pages opened: ${[...new Set(visited)].join(" → ")}`);
-});
+await check(
+  "Catatan langkah, from the Nemu button, lists the problems; nothing changed",
+  async () => {
+    await overlay.locator("button[aria-label='Tanya Nemu']").click();
+    await overlay.getByRole("button", { name: "Lihat catatan langkah" }).click();
+    const info = display("info");
+    await info.getByText("Nemu tidak mengubah apa pun di kuis ini.").waitFor({ timeout: 10_000 });
+    await info.getByText("Masalah: Soal 15 belum ada gambarnya, Bu.").waitFor();
+    await page.screenshot({ path: join(shots, "5-catatan-langkah.png") });
+    console.log(`  Pages opened: ${[...new Set(visited)].join(" → ")}`);
+  },
+);
 
 await check("Nothing changed: same question count on Soal, and in the database", async () => {
   await page.goto(quizUrl.replace("view.php?id=", "edit.php?cmid="));

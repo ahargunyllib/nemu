@@ -6,7 +6,7 @@ import type { RunState } from "../../executor/lib/run";
 import { executor } from "../../executor/stores/executor";
 import { requestQuizCheck } from "../api/request-quiz-check";
 import { imageLoaded, quizHeading, questionTarget } from "../lib/moodle-pages";
-import { checkQuiz, closingSentence } from "../lib/quiz-rules";
+import { checkQuiz, reportTitle, verifiedLine } from "../lib/quiz-rules";
 import {
   nextQuizSteps,
   type QuizAsked,
@@ -28,15 +28,18 @@ export type QuizCheckView = { display: NemuDisplay | null; target: Element | nul
 /**
  * The problems being pointed at, kept in the background so a page load carries on (F0-13).
  * `changed` is true after F4-03 put the quiz in: then the notes don't say nothing changed.
- * `closing` is the sentence after the last problem (#256), shown when `index` passes it.
+ * `report` is the Kartu Info after the last problem (#256), shown when `index` passes it.
  */
 type Pointing = {
   problems: QuizProblem[];
   index: number;
   notes: string[];
   changed?: boolean;
-  closing?: string | null;
+  report?: Report | null;
 };
+
+/** "Ada 2 hal yang perlu Ibu perbaiki: soal 15 dan soal 7." and what the check found right. */
+type Report = { title: string; detail: string | null };
 
 type Context = { pageEmail: PageEmail; honorific: string; speak: (text: string) => void };
 
@@ -105,14 +108,14 @@ function createQuizCheck() {
 
   /**
    * One problem at a time, pointed at on the page, with the next one behind Lanjut, also on the
-   * last one. After it Nemu says the closing sentence (#256), about no element, and Catatan
-   * langkah follows. Kenapa? reads what the check saw, when it can say more than the sentence.
+   * last one. After it the report (#256) lists them, about no element. Kenapa? reads what the
+   * check saw, when it can say more than the sentence.
    */
   function show() {
     if (!pointing) return publish({ display: null, target: null });
-    const { problems, index, closing } = pointing;
+    const { problems, index, report } = pointing;
     const problem = problems[index];
-    if (!problem) return closing && index === problems.length ? showReady(closing) : finish();
+    if (!problem) return report && index === problems.length ? showReport(report) : finish();
     publish({
       display: {
         type: "jawab",
@@ -128,7 +131,36 @@ function createQuizCheck() {
     context.speak(problem.sentence);
   }
 
-  /** The quiz is ready: with no problems, or apart from those just shown. Catatan langkah follows. */
+  /**
+   * Hasil pemeriksaan (F4·05): one title naming what to fix, what the check found right, and one
+   * line per problem. Tunjukkan lagi points at them again from the first; Tutup keeps them in
+   * Catatan langkah, which the Nemu button reopens.
+   */
+  function showReport({ title, detail }: Report) {
+    const problems = pointing?.problems ?? [];
+    publish({
+      display: {
+        type: "info",
+        status: { text: "Hasil pemeriksaan" },
+        title,
+        ...(detail ? { detail } : {}),
+        items: problems.map((problem) => problem.item ?? problem.sentence),
+        link: { label: "Tunjukkan lagi", onSelect: again },
+        onClose: close,
+      },
+      target: null,
+    });
+    context.speak(title);
+  }
+
+  function again() {
+    if (!pointing) return;
+    pointing = { ...pointing, index: 0 };
+    save();
+    show();
+  }
+
+  /** The quiz is ready, with no problems. Catatan langkah follows. */
   function showReady(sentence: string) {
     publish({
       display: {
@@ -169,8 +201,8 @@ function createQuizCheck() {
   }
 
   /**
-   * × on the closing or quiz-ready bubble (the problem bubbles have none, only Lanjut): the
-   * problems are kept in Catatan langkah, which the Nemu button reopens.
+   * Tutup on the report, or × on the quiz-ready bubble (the problem bubbles have neither, only
+   * Lanjut): the problems are kept in Catatan langkah, which the Nemu button reopens.
    */
   function close() {
     const state = pointing;
@@ -208,14 +240,14 @@ function createQuizCheck() {
       utterance: found.utterance,
     });
     // #218: judgement checks from the Nemu Service; without them the rules still stand. The
-    // judge only needs what was found, not the detail line or Kenapa?, so a service without
-    // `detail` and `why` accepts it too.
+    // judge only needs what was found, not the detail line, Kenapa? or the report's line, so a
+    // service without `detail`, `why` and `item` accepts it too.
     const judged = await requestQuizCheck(context.pageEmail, {
       op: "judge",
       input: {
         quiz: found.quiz,
         utterance: found.utterance,
-        found: problems.map(({ why: _why, detail: _detail, ...problem }) => problem),
+        found: problems.map(({ kind, slot, sentence }) => ({ kind, slot, sentence })),
       },
     });
     const all = [...problems, ...(judged.ok ? judged.value.problems : [])];
@@ -229,7 +261,10 @@ function createQuizCheck() {
       index: 0,
       notes,
       changed,
-      closing: closingSentence(all.length, honorific),
+      report: {
+        title: reportTitle(all, honorific),
+        detail: verifiedLine(found.quiz, all),
+      },
     };
     save();
     show();
