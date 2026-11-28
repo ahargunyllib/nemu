@@ -86,6 +86,7 @@ function createKeylessSchoolAi(): SchoolAi {
     suggestSymptoms: missing,
     matchSymptom: missing,
     explainProcess: missing,
+    explainProcessDetails: missing,
     extractSlots: missing,
     readFormPhoto: missing,
     // Matching a form field to its page label works in code without a model.

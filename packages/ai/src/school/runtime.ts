@@ -7,6 +7,7 @@ import type {
 import type {
   GroundedAnswer,
   HelpExplanation,
+  ProcessDetails,
   PhotoTitleCandidate,
   Procedure,
   SpeechSynthesis,
@@ -56,6 +57,7 @@ import {
   documentationSymptoms,
   draftPhrasing,
   explainProcess,
+  explainProcessDetails,
   keywordSymptomMatch,
   keywordViaMatch,
   matchSymptom,
@@ -105,7 +107,12 @@ export type SchoolAi = {
     candidates: readonly SymptomCandidate[];
   }): Promise<SymptomMatch | null>;
   /** F2-08 / F3-12..13: cause, way back, who helps and the parent reply; null if the walk fails. */
-  explainProcess(input: ExplainProcessInput): Promise<HelpExplanation | null>;
+  explainProcess(
+    input: ExplainProcessInput,
+    options?: { answerFirst?: boolean },
+  ): Promise<HelpExplanation | null>;
+  /** #308: the why, steps and parent reply an `answerFirst` explanation left as drafts. */
+  explainProcessDetails(input: ExplainProcessInput): Promise<ProcessDetails | null>;
   extractSlots(input: ExtractSlotsInput): Promise<Record<string, SlotValue>>;
   /** F3-16: a photo read against a BPMN task's fields; unreadable values become questions. */
   readFormPhoto(input: FormPhotoInput): Promise<FormPhotoReading>;
@@ -188,7 +195,8 @@ export function createSchoolAi(config: SchoolAiConfig): SchoolAi {
     answerGrounded: (input) => answerGrounded({ llm: text }, input),
     suggestSymptoms: (input) => suggestSymptoms({ llm: text }, input),
     matchSymptom: (input) => matchSymptom({ llm: text }, input),
-    explainProcess: (input) => explainProcess({ llm: text }, input),
+    explainProcess: (input, options) => explainProcess({ llm: text }, input, options),
+    explainProcessDetails: (input) => explainProcessDetails({ llm: text }, input),
     extractSlots: (input) => extractSlots(text, input),
     readFormPhoto: (input) => readFormPhoto(readers.readA, input),
     matchFields: (input) => matchFields({ llm: text }, input),
@@ -217,6 +225,18 @@ function requestText(request: JsonCallRequest<unknown>): string {
 }
 
 const FAMILY = /\b(anak|suami|istri|ibu saya|bapak saya|orang tua|keluarga|mertua)\b/iu;
+
+/** The offline phrasing of a process answer: the F2-1 key's words, else the code's drafts. */
+function fixturePhrasing(input: ExplainProcessInput): JsonCall {
+  return codeCall((request) => {
+    const text = requestText(request);
+    const drafted = draftPhrasing(text);
+    const cause = (JSON.parse(text) as { jalur: Array<{ nama: string }> }).jalur.at(-1);
+    const canned = isF21Spp(input.process.graph) ? F2_1_SPP_PHRASING[cause?.nama ?? ""] : undefined;
+    if (!canned || canned.steps.length !== drafted.steps.length) return drafted;
+    return { ...canned, steps: canned.steps.map((step, index) => ({ index, text: step })) };
+  });
+}
 
 /**
  * Offline school AI for development and UI work (`NEMU_RESPONDER=fixture`). Deterministic and
@@ -323,25 +343,9 @@ export function createFixtureSchoolAi(): SchoolAi {
         input,
       ),
     // The official F2-1 walks read as the key phrases them; any other walk keeps the code's drafts.
-    explainProcess: (input) =>
-      explainProcess(
-        {
-          llm: codeCall((request) => {
-            const text = requestText(request);
-            const drafted = draftPhrasing(text);
-            const cause = (JSON.parse(text) as { jalur: Array<{ nama: string }> }).jalur.at(-1);
-            const canned = isF21Spp(input.process.graph)
-              ? F2_1_SPP_PHRASING[cause?.nama ?? ""]
-              : undefined;
-            if (!canned || canned.steps.length !== drafted.steps.length) return drafted;
-            return {
-              ...canned,
-              steps: canned.steps.map((step, index) => ({ index, text: step })),
-            };
-          }),
-        },
-        input,
-      ),
+    explainProcess: (input, options) =>
+      explainProcess({ llm: fixturePhrasing(input) }, input, options),
+    explainProcessDetails: (input) => explainProcessDetails({ llm: fixturePhrasing(input) }, input),
 
     async extractSlots(input) {
       return extractSlots(

@@ -266,6 +266,30 @@ export const contactSchema = z
   .object({ name: z.string(), role: z.string(), phone: z.string() })
   .strict();
 
+const processStepsSchema = z
+  .array(z.object({ text: z.string(), elementIds: z.array(z.string()).min(1) }).strict())
+  .min(2)
+  .max(4);
+
+const symptomRefSchema = z
+  .object({ elementId: z.string().min(1), symptom: z.string().min(1).max(300) })
+  .strict();
+
+/** #308: what `helpExplainDetails` needs to walk the same BPMN again without matching again. */
+export const processDetailsRequestSchema = z
+  .object({
+    question: z.string().trim().min(1).max(500),
+    documentId: z.string().min(1),
+    match: symptomRefSchema,
+    via: symptomRefSchema.nullable(),
+  })
+  .strict();
+
+/** #308: the parts of a process explanation that `answerFirst` leaves as the code's drafts. */
+export const processDetailsSchema = z
+  .object({ why: z.string(), steps: processStepsSchema, parentReply: z.string().nullable() })
+  .strict();
+
 export const helpExplanationSchema = z.discriminatedUnion("status", [
   z
     .object({
@@ -311,13 +335,15 @@ export const helpExplanationSchema = z.discriminatedUnion("status", [
       /** The task or end event the symptom belongs to; highlighted in Lihat diagram. */
       elementId: z.string(),
       /** Sumber for the teacher: 2–4 plain-language steps, each with its BPMN element ids. */
-      steps: z
-        .array(z.object({ text: z.string(), elementIds: z.array(z.string()).min(1) }).strict())
-        .min(2)
-        .max(4),
+      steps: processStepsSchema,
       fixer: contactSchema.nullable(),
       /** A polite WhatsApp reply the teacher sends the parent herself: no amounts, no "tunggakan". */
       parentReply: z.string().nullable(),
+      /**
+       * #308, only when `helpExplain` was asked `answerFirst`: `why`, `steps` and `parentReply`
+       * are the code's drafts; send this to `helpExplainDetails` for them in plain words.
+       */
+      detailsRequest: processDetailsRequestSchema.optional(),
     })
     .strict(),
   /** F3-13: AlurSekolah says the student's grades aren't saved, so the process isn't the cause. */
@@ -656,6 +682,8 @@ export type SourceCitation = z.infer<typeof sourceCitationSchema>;
 export type DocumentFileLink = z.infer<typeof documentFileLinkSchema>;
 export type Contact = z.infer<typeof contactSchema>;
 export type HelpExplanation = z.infer<typeof helpExplanationSchema>;
+export type ProcessDetailsRequest = z.infer<typeof processDetailsRequestSchema>;
+export type ProcessDetails = z.infer<typeof processDetailsSchema>;
 export type GroundedAnswer = z.infer<typeof groundedAnswerSchema>;
 export type BpmnStep = z.infer<typeof bpmnStepSchema>;
 export type ProcedureRecording = z.infer<typeof procedureRecordingSchema>;
