@@ -7,7 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@nemu/ui/components/card";
+import { Button } from "@nemu/ui/components/button";
 import { Label } from "@nemu/ui/components/label";
+import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
 import {
@@ -53,7 +55,7 @@ export default function KnowledgePanel({
           <div>
             {document.packageId
               ? `Paket bawaan · dipasang ${by}, ${formatDay(document.createdAt)}`
-              : `${document.format === "procedure" ? "Direkam" : "Diunggah"} ${by}, ${formatDay(document.createdAt)}`}
+              : `${document.format === "procedure" ? "Direkam" : "Diunggah"} ${by}, ${formatDay(document.createdAt)}${document.format === "bpmn" ? " · tanpa ubah kode" : ""}`}
           </div>
           {document.status === "failed" && document.failureReason && (
             <div className="text-destructive">{document.failureReason}</div>
@@ -81,7 +83,17 @@ export default function KnowledgePanel({
         )}
         <div className="ml-auto flex gap-1">
           {ready && document.format === "bpmn" && (
-            <ProcessElementsSheet id={document.id} title={document.title} />
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                nativeButton={false}
+                render={<Link to="/process-diagram" search={{ document: document.id }} />}
+              >
+                Lihat diagram
+              </Button>
+              <ProcessElementsSheet id={document.id} title={document.title} />
+            </>
           )}
           {!document.readOnly && document.format !== "procedure" && (
             <DocumentUploadDialog

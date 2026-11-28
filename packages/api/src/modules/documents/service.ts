@@ -7,7 +7,7 @@ import type { CatalogDocument, CatalogRepository, DocumentListScope } from "./ca
 import type { DocumentLinkSigner } from "./file-link";
 import { indexBpmnDocument, indexMarkdownDocument, pdfToMarkdown } from "./indexing";
 import { bpmnProcessElements } from "./process-elements";
-import { summarizeProcess } from "./process-summary";
+import { describeProcessElements, type ProcessDetail, summarizeProcess } from "./process-summary";
 import type { DocumentRecord, DocumentRepository, NewKnowledgeChunkRecord } from "./repository";
 
 /** What an admin can upload. "procedure" documents are created from recordings, not uploaded. */
@@ -385,4 +385,32 @@ function procedureStepCount(body: ArrayBuffer): number | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * The knowledge panel for one BPMN (WS-04, F3-19): its task and gateway counts and every stored
+ * element with its performer, lane, branch and BPMN link. Undefined for a document that isn't a
+ * ready BPMN of this workspace or whose file is gone.
+ */
+export async function describeProcess(
+  {
+    documents,
+    files,
+    catalog,
+  }: {
+    documents: Pick<DocumentRepository, "findById">;
+    files: DocumentFileStore;
+    catalog: Pick<CatalogRepository, "listProcessElements">;
+  },
+  workspaceId: string,
+  id: string,
+): Promise<ProcessDetail | undefined> {
+  const document = await documents.findById(workspaceId, id);
+  if (document?.format !== "bpmn" || document.status !== "ready") return undefined;
+  const [body, elements] = await Promise.all([
+    files.get(document.storageKey),
+    catalog.listProcessElements(workspaceId, id),
+  ]);
+  if (!body) return undefined;
+  return describeProcessElements(await importBpmn(new TextDecoder().decode(body)), elements);
 }

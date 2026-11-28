@@ -10,6 +10,8 @@ import KnowledgePanel from "@/features/documents/components/knowledge-panel";
 import KnowledgePanelEmpty from "@/features/documents/components/knowledge-panel-empty";
 import KnowledgeStats from "@/features/documents/components/knowledge-stats";
 import PanelSection from "@/features/documents/components/panel-section";
+import ProcessSummaryLine from "@/features/documents/components/process-summary-line";
+import ProcessTaskList from "@/features/documents/components/process-task-list";
 import RecordProcedureDialog from "@/features/documents/components/record-procedure-dialog";
 import RuleSourceList from "@/features/rule-sources/components/rule-source-list";
 
@@ -26,6 +28,7 @@ function RouteComponent() {
   const navigate = Route.useNavigate();
   const documents = useQuery(listKnowledgeQueryOptions());
   const selected = documents.data?.find((document) => document.id === dokumen);
+  const isProcess = selected?.format === "bpmn" && selected.status === "ready";
 
   return (
     <>
@@ -47,7 +50,20 @@ function RouteComponent() {
           onSelect={(id) => navigate({ search: { dokumen: id }, replace: true })}
         />
         {selected ? (
-          <KnowledgePanel key={selected.id} document={selected}>
+          <KnowledgePanel
+            key={selected.id}
+            document={selected}
+            summary={
+              isProcess ? (
+                <ProcessSummaryLine id={selected.id} version={selected.version} />
+              ) : undefined
+            }
+          >
+            {isProcess && (
+              <PanelSection title="Task dan halamannya · bisa dikoreksi">
+                <ProcessTaskList documentId={selected.id} />
+              </PanelSection>
+            )}
             {(selected.format === "pdf" || selected.format === "md") && (
               <PanelSection title="Aturan hitung yang mengutip dokumen ini">
                 <RuleSourceList documentId={selected.id} />

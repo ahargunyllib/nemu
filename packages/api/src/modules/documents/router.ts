@@ -17,6 +17,7 @@ import {
   canEditDocument,
   createDocumentFileLink,
   deleteDocument,
+  describeProcess,
   documentFormatOf,
   knowledgeStats,
   listKnowledge,
@@ -163,6 +164,23 @@ export const documentsRouter = {
         input.id,
       ),
     ),
+
+  /** Dokumen dan alur's BPMN panel: task and gateway counts, and each element's lane and branch. */
+  getProcessDetail: schoolAdminProcedure
+    .input(documentIdSchema)
+    .handler(async ({ context, input }) => {
+      const detail = await describeProcess(
+        {
+          documents: createDocumentRepository(context.db),
+          files: context.documentFiles,
+          catalog: createCatalogRepository(context.db),
+        },
+        context.session.user.workspaceId,
+        input.id,
+      );
+      if (!detail) throw new ORPCError("NOT_FOUND", { message: "Alur BPMN tidak ditemukan" });
+      return detail;
+    }),
 
   saveProcessElement: schoolAdminProcedure
     .input(

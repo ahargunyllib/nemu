@@ -43,3 +43,39 @@ export function summarizeProcess(
     ).length,
   };
 }
+
+/** A WS-04 element as the knowledge panel shows it, with what the BPMN file says about it. */
+export type ProcessElementDetail = ProcessElementRecord & {
+  /** For a task: a person's or the system's. Null for events. */
+  performer: TaskPerformer | null;
+  lane: string | null;
+  /** The gateway branch that leads here ("Setoran"), when the flow into it is named. */
+  branch: string | null;
+  /** The page the BPMN itself names (`camunda:formKey` or a `halaman` property); it wins over `page`. */
+  link: string | null;
+};
+
+export type ProcessDetail = ProcessSummary & { elements: ProcessElementDetail[] };
+
+/** The stored WS-04 elements, each with its task performer, lane, branch and BPMN link. */
+export function describeProcessElements(
+  graph: ProcessGraph,
+  elements: ProcessElementRecord[],
+): ProcessDetail {
+  return {
+    ...summarizeProcess(graph, elements),
+    elements: elements.map((element) => {
+      const node = graph.nodes[element.elementId];
+      const branch = node?.incoming
+        .map((flowId) => graph.flows[flowId])
+        .find((flow) => flow?.name && graph.nodes[flow.source]?.bpmnType.endsWith("Gateway"));
+      return {
+        ...element,
+        performer: node && element.kind === "task" ? taskPerformer(node) : null,
+        lane: node?.lane ?? null,
+        branch: branch?.name ?? null,
+        link: node?.link ?? null,
+      };
+    }),
+  };
+}
