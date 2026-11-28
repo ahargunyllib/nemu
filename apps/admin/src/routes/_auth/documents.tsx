@@ -13,6 +13,8 @@ import PanelSection from "@/features/documents/components/panel-section";
 import ProcessPanelBody from "@/features/documents/components/process-panel-body";
 import ProcessSummaryLine from "@/features/documents/components/process-summary-line";
 import RecordProcedureDialog from "@/features/documents/components/record-procedure-dialog";
+import RecordingSteps from "@/features/documents/components/recording-steps";
+import RecordingSummaryLine from "@/features/documents/components/recording-summary-line";
 import RuleSourceList from "@/features/rule-sources/components/rule-source-list";
 
 /** `dokumen`: the row open in the panel beside the list. */
@@ -28,7 +30,9 @@ function RouteComponent() {
   const navigate = Route.useNavigate();
   const documents = useQuery(listKnowledgeQueryOptions());
   const selected = documents.data?.find((document) => document.id === dokumen);
-  const isProcess = selected?.format === "bpmn" && selected.status === "ready";
+  const ready = selected?.status === "ready";
+  const isProcess = ready && selected?.format === "bpmn";
+  const isRecording = ready && selected?.format === "procedure";
 
   return (
     <>
@@ -56,10 +60,13 @@ function RouteComponent() {
             summary={
               isProcess ? (
                 <ProcessSummaryLine id={selected.id} version={selected.version} />
+              ) : isRecording ? (
+                <RecordingSummaryLine id={selected.id} version={selected.version} />
               ) : undefined
             }
           >
             {isProcess && <ProcessPanelBody documentId={selected.id} />}
+            {isRecording && <RecordingSteps documentId={selected.id} title={selected.title} />}
             {(selected.format === "pdf" || selected.format === "md") && (
               <PanelSection title="Aturan hitung yang mengutip dokumen ini">
                 <RuleSourceList documentId={selected.id} />

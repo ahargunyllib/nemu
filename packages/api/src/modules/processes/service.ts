@@ -250,7 +250,14 @@ export function compileRecording(
 export async function saveProcedure(
   deps: Pick<ProcessDeps, "documents" | "files">,
   workspaceId: string,
-  input: { title: string; version: string; isActive: boolean; procedure: Procedure },
+  input: {
+    title: string;
+    version: string;
+    isActive: boolean;
+    procedure: Procedure;
+    /** The operator who saved it, shown as "Direkam …" in Dokumen dan alur. */
+    createdBy?: string;
+  },
 ): Promise<DocumentRecord> {
   const id = crypto.randomUUID();
   const storageKey = `${id}.procedure.json`;
@@ -269,6 +276,8 @@ export async function saveProcedure(
     contentType: "application/json",
     sizeBytes: bytes.byteLength,
     storageKey,
+    createdBy: input.createdBy ?? null,
+    changedBy: input.createdBy ?? null,
   });
   const chunks = procedureKnowledgeTexts(input.procedure).map((item, sequence) => ({
     id: `${id}-step-${sequence + 1}`,

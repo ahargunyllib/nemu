@@ -222,7 +222,7 @@ export default function RecordingReview({ recordingId }: { recordingId: string }
             >
               Lihat di Dokumen dan alur
             </Button>
-            <DocumentExportBpmnButton id={savedId} title={draft.title} withLabel />
+            <DocumentExportBpmnButton id={savedId} title={draft.title} label="Unduh BPMN" />
           </>
         ) : (
           <Button
