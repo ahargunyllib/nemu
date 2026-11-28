@@ -1,7 +1,8 @@
 // Loads a production build of the extension into Playwright's Chromium and checks F4-2 (#210) end
 // to end on the Moodle test site (infra/): on course 4A-UJI Bu Siti says "Nemu, masukkan kuis dari
 // naskah ini ke Moodle. Buka Senin 7 Desember, tutup Kamis 10 Desember." and picks Richard's
-// script (infra/setup/f4-2/F4-2_naskah-ipas-10-soal.pdf). Nemu says it uses 00.00 and 23.59, then in
+// script (infra/setup/f4-2/F4-2_naskah-ipas-10-soal.pdf). Nemu asks "Pasang kuis dari naskah ini?"
+// with 00.00 and 23.59 on the detail line, the script's chip and the five stages; on Mulai, in
 // cara 1 turns on Mode Edit, adds a Kuis in IPAS, fills its name and times and points at Simpan dan
 // tampilkan, which she presses. It opens the quiz's Bank soal › Impor, drops the XML on the picker
 // (the spike) and points at Impor; then Soal › Tambah › dari bank soal, and she presses Tambahkan.
@@ -222,15 +223,42 @@ await check("Bu Siti asks on the course page and picks her script", async () => 
   await chooser.setFiles(join(pack, "F4-2_naskah-ipas-10-soal.pdf"));
 });
 
-await check("Nemu reads 10 questions, asks nothing, and says it uses 00.00 and 23.59", async () => {
-  const sentence =
-    "Jamnya tidak disebut, jadi kuis dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember pukul 23.59, Bu.";
-  await display("jawab").getByText(sentence).waitFor({ timeout: 30_000 });
-  await display("jawab").getByText("10 soal siap", { exact: false }).waitFor();
-  expect(!(await display("pilih").count()), "Nemu asked about the script");
-  await page.screenshot({ path: join(shots, "2-siap.png") });
-  await display("jawab").getByRole("button", { name: "Masukkan ke Moodle" }).click();
-});
+await check(
+  "Nemu reads 10 questions, asks nothing, and asks “Pasang kuis dari naskah ini?” with 00.00 and 23.59",
+  async () => {
+    const card = display("pilih");
+    await card.getByText("Pasang kuis dari naskah ini?").waitFor({ timeout: 30_000 });
+    const times =
+      "Jamnya tidak disebut, jadi kuis dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember pukul 23.59.";
+    const detail = (await card.locator("[data-nemu-detail]").innerText()).trim();
+    expect(detail === times, `the detail line says “${detail}”`);
+    const heading = (await card.locator("[data-nemu-status] p").allTextContents()).join(" · ");
+    expect(heading === "Naskah masuk · 10 soal", `the heading says “${heading}”`);
+    const chip = (await card.locator("[data-nemu-file]").innerText()).replace(/\s+/gu, " ");
+    expect(
+      chip.includes("F4-2_naskah-ipas-10-soal.pdf") && chip.includes("10 soal · 4 halaman"),
+      `the file chip says “${chip}”`,
+    );
+    const steps = (await card.locator("ol li").allInnerTexts()).map((text) =>
+      text.replace(/^\d+\s*/u, "").trim(),
+    );
+    console.log(`  Steps: ${steps.join(" | ")}`);
+    expect(
+      JSON.stringify(steps) ===
+        JSON.stringify([
+          "Buat kuis di bagian IPAS",
+          "Atur waktu buka dan tutup",
+          "Ibu tekan Simpan dan tampilkan",
+          "Bank soal › Impor, format Moodle XML",
+          "Soal › Tambah dari bank soal",
+        ]),
+      "the steps aren't the task's five stages",
+    );
+    expect(!(await card.getByRole("button", { name: "Ajari saya" }).count()), "Ajari saya shows");
+    await page.screenshot({ path: join(shots, "2-siap.png") });
+    await card.getByRole("button", { name: "Mulai" }).click();
+  },
+);
 
 await check(
   "Cara 1: Mode Edit, Tambahkan konten in IPAS, Kuis; name and times filled; she presses Simpan dan tampilkan",

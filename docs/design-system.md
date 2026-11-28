@@ -173,7 +173,14 @@ the page's Shadow DOM.
 - **Links**: Kenapa?, Sumber and Lihat ringkasan are small underlined `nemu-strong` links. What is
   behind them shows in a `nemu-subtle` box and is read (`onRead`) only once the teacher clicks.
 - **Kartu Pilih**: a risky choice gets ⚠ and goes under the safe one, whatever order it was given
-  in. All choices share one look. The **compact** Kartu Pilih (300 px, 44 px buttons side by side)
+  in. All choices share one look. A **start card** (`layout: "row"`) asks before Nemu begins a
+  flow ("Pasang kuis dari naskah ini?"): the `file` it is about as a chip under the question (a
+  `muted` box with a 1 px `border`, `rounded-2xl`; a 36 px `destructive`-tinted tile with the
+  file's type, "PDF"; the name in 16 px semibold and a 14 px `nemu-secondary` line under it, "10
+  soal · 4 halaman"), the `steps` Nemu will take as a numbered list (the same 30 px amber circles
+  as the Kartu Info list, `NemuSteps`), then the action row with at most one `link` on the left
+  and its choices as compact buttons on the right, the last one the black main one: **Nanti**
+  **Mulai**. Never "Ajari saya". The **compact** Kartu Pilih (300 px, 44 px buttons side by side)
   waits beside the Nemu button, such as "Foto dari WhatsApp · Mulai / Nanti". Its picture is a
   64 px square thumbnail left of the title (`rounded-xl`, 2 px `border`, cropped from the top so
   the photo's heading shows), and a `Skeleton` of that square while it loads (#278).
@@ -181,6 +188,7 @@ the page's Shadow DOM.
   (`nemu-subtle` fill, 1 px `nemu-amber-200` edge, 15 px bold `nemu-strong`) and 20 px regular
   text. An optional label sits above it (`itemsLabel`, 16 px semibold `nemu-secondary`):
   "Catatan langkah · Cara isi nilai kelas". The label also names the list for screen readers.
+  A start card's steps share this list (`NemuSteps`).
 - **Gelembung Tunjuk extras**: an optional **chip** under the text (`chip`, a `subtle`
   `NemuBadge` pill 34 px tall with a `nemu-amber-200` edge and 16 px semibold text: "Belum
   tersimpan") and an optional **cancel link** at the bottom (`cancel`, a `nemu-strong` link:

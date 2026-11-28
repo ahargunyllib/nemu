@@ -201,8 +201,15 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   **Pilih naskah**; `quizScriptRead` (`SchoolAi.readQuizScript`, #219) reads it into a draft. Nemu
   never writes a question: each part the reading couldn't place (words, a key, a picture, the
   section) is asked on Kartu Pilih, or typed or said. A date she didn't say is asked; a clock time
-  she didn't say becomes 00.00 (open) or 23.59 (close), and Nemu says so. **Masukkan ke Moodle**
-  then runs one executor task in cara 1 (`lib/import-task.ts`, step source per page):
+  she didn't say becomes 00.00 (open) or 23.59 (close). Then a start card (Kartu Pilih, F4·06)
+  asks "Pasang kuis dari naskah ini?" under **Naskah masuk · 10 soal**: the times on its detail
+  line ("Jamnya tidak disebut, jadi kuis dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember
+  pukul 23.59."), the script as a chip ("10 soal · 4 halaman", the pages read from the PDF's page
+  tree, `lib/script-file.ts`), the task's five stages in the order it runs them
+  (`importStages`), **Lihat ringkasan** (a Kartu Info with the questions read and any skipped)
+  and **Nanti** / **Mulai**. She picks the script herself, so the chip doesn't say "dari
+  WhatsApp". **Mulai** then runs one executor task in cara 1 (`lib/import-task.ts`, step source
+  per page):
   - Mode Edit, the section's **Tambahkan konten** › Aktivitas atau sumber daya › Semua › Kuis ›
     Tambahkan; Nama, Waktu Pengerjaan and both dates (targets named by group, "Hari" in
     "Kuis dimulai"); Nemu points at **Simpan dan tampilkan**, which she presses.
@@ -352,8 +359,9 @@ she pressed. Without the local database it checks the pages only. Screenshots go
 `pnpm --filter extension verify:f4-2` runs F4-2 (#210) on the same Moodle. Locally it first removes
 an earlier run's "Latihan IPAS Kelas 4A" (`infra/setup/reset-f4-2.php`). On course 4A-UJI Bu Siti
 asks Nemu to put her script in, opening Monday 7 December and closing Thursday 10 December, and
-picks `infra/setup/f4-2/F4-2_naskah-ipas-10-soal.pdf`. It checks that Nemu asks nothing and says it
-uses 00.00 and 23.59, fills the quiz form itself, drops the XML on Impor's picker, and points at
+picks `infra/setup/f4-2/F4-2_naskah-ipas-10-soal.pdf`. It checks that Nemu asks nothing, that the
+start card asks "Pasang kuis dari naskah ini?" with 00.00 and 23.59 on its detail line, the
+script's chip and the five stages (she presses Mulai), that it fills the quiz form itself, drops the XML on Impor's picker, and points at
 Simpan dan tampilkan, Impor, Tambahkan soal terpilih pada kuis and Pratinjau kuis for her to press;
 that the F4-1 check ends with the one sentence; and, in the Moodle database, that the quiz is in
 IPAS with those times (Asia/Jakarta) and its 10 questions match

@@ -178,16 +178,49 @@ describe("F4-03 in the page (#210)", () => {
     quizImport.hear("buka Senin 7 Desember");
     expect(view()).toMatchObject({ sentence: "Kuisnya ditutup tanggal berapa, Bu." });
     quizImport.hear("10 Desember jam 9 malam");
+    // F4·06: the start card, with the script, the times and the stages in the task's order.
     const ready = view();
-    expect(ready).toMatchObject({
-      type: "jawab",
-      sentence:
-        "Jam bukanya tidak disebut, jadi kuis dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember pukul 21.00, Bu.",
-      status: { text: "2 soal siap" },
+    expect(ready).toEqual({
+      type: "pilih",
+      layout: "row",
+      status: { text: "Naskah masuk", count: "2 soal" },
+      question: "Pasang kuis dari naskah ini?",
+      detail:
+        "Jam bukanya tidak disebut, jadi kuis dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember pukul 21.00.",
+      // The test file has no readable page tree, so the chip leaves the pages out.
+      file: { name: "naskah.pdf", kind: "PDF", meta: "2 soal" },
+      steps: [
+        "Buat kuis di bagian IPAS",
+        "Atur waktu buka dan tutup",
+        "Ibu tekan Simpan dan tampilkan",
+        "Bank soal › Impor, format Moodle XML",
+        "Soal › Tambah dari bank soal",
+      ],
+      link: { label: "Lihat ringkasan", onSelect: expect.any(Function) },
+      choices: [
+        { id: "nanti", label: "Nanti" },
+        { id: "mulai", label: "Mulai" },
+      ],
+      onChoose: expect.any(Function),
     });
-    if (ready.type !== "jawab") return;
-    expect(ready.notes?.ringkasan).toContain("Dilewati: soal 7");
-    ready.action!.onSelect();
+    if (ready.type !== "pilih") return;
+    // Lihat ringkasan lists what Nemu read; Tutup brings the start card back.
+    ready.link!.onSelect();
+    const summary = view();
+    expect(summary).toMatchObject({
+      type: "info",
+      title: "Latihan IPAS Kelas 4A · bagian IPAS",
+      detail: "Dilewati: soal 7",
+      items: [
+        "Tarikan atau dorongan pada suatu benda disebut ....",
+        "Energi yang tersimpan di dalam makanan disebut energi ....",
+      ],
+    });
+    if (summary.type !== "info") return;
+    summary.onClose();
+    expect(view()).toMatchObject({ type: "pilih", question: "Pasang kuis dari naskah ini?" });
+    expect(executor.start).not.toHaveBeenCalled();
+    ready.onChoose("mulai");
     await settle();
 
     expect(executor.start).toHaveBeenCalledTimes(1);
@@ -237,6 +270,44 @@ describe("F4-03 in the page (#210)", () => {
         "Bu menekan Impor",
       ],
     });
+  });
+
+  test("Nanti on the start card puts nothing in", async () => {
+    goTo(URLS.course);
+    const parsed = new DOMParser().parseFromString(coursePageHtml(true), "text/html");
+    document.body.innerHTML = parsed.body.innerHTML;
+    document.body.className = parsed.body.className;
+    executor.start.mockClear();
+    reading = {
+      status: "ok",
+      draft: {
+        ...DRAFT,
+        section: "IPAS",
+        opens: { date: "2026-12-07", time: null },
+        closes: { date: "2026-12-10", time: null },
+      },
+      questions: [],
+    };
+    quizImport.start("Nemu, masukkan kuis dari naskah ini.");
+    const pick = view();
+    if (pick.type !== "jawab") return;
+    pick.action!.onSelect();
+    const input = document.querySelector<HTMLInputElement>("input[type=file]")!;
+    Object.defineProperty(input, "files", {
+      value: [new File(["%PDF-1.4"], "naskah.pdf", { type: "application/pdf" })],
+    });
+    input.dispatchEvent(new Event("change"));
+    await settle();
+    const ready = view();
+    expect(ready).toMatchObject({
+      type: "pilih",
+      detail:
+        "Jamnya tidak disebut, jadi kuis dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember pukul 23.59.",
+    });
+    if (ready.type !== "pilih") return;
+    ready.onChoose("nanti");
+    expect(quizImport.getView().display).toBeNull();
+    expect(executor.start).not.toHaveBeenCalled();
   });
 
   test("off a course page Nemu asks her to open the course first", async () => {
