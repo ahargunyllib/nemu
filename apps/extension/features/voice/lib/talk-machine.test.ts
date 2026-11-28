@@ -39,6 +39,16 @@ describe("talkReducer", () => {
     expect(talkReducer(transcribing, { type: "cancel" })).toBe(transcribing);
   });
 
+  test("unclear words stay shown until the next press", () => {
+    const unclear = run([
+      { type: "press", working: false, at: 0 },
+      { type: "release", at: 900 },
+      { type: "unclear", words: "nilai" },
+    ]);
+    expect(unclear).toEqual({ phase: "unclear", words: "nilai" });
+    expect(talkReducer(unclear, { type: "press", working: false, at: 10 }).phase).toBe("listening");
+  });
+
   test("a notice shows its message until the next press", () => {
     const notice = run([
       { type: "press", working: false, at: 0 },

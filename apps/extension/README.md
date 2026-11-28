@@ -45,8 +45,9 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   to `helpRoute` like a typed question. The content script records on the site itself, so each
   school site asks for the microphone once (ADR-0019): on the first hold, Nemu's cursor and a
   Gelembung Tunjuk point at Izinkan in Chrome's prompt; a blocked microphone gets a Kartu Info
-  with three steps to allow it again; words too unclear to act on show as "Nemu menangkap: “…”.
-  Bisa diulang, Bu?" and nothing is done with them (#268). Holds under 300 ms send nothing;
+  with three steps to allow it again; words too unclear to act on show as "Maaf, Bu. Nemu belum
+  dengar jelas." with what Nemu heard and the keys to hold again, and nothing is done with them
+  (#268). Holds under 300 ms send nothing;
   recordings stop at 15 s. The combination is the school's WS-08 setting,
   read with the WS-03 list (`extensionConfig.settings.talkShortcut`); a page picks it up on its
   next load, and Ctrl + Spasi stands in when the school has none.
@@ -259,8 +260,8 @@ or the site settings would:
 
 - the first hold points the Nemu cursor just right of Chrome's prompt, level with Izinkan, with a
   Gelembung Tunjuk; allowing it says "Mikrofon sudah siap…";
-- words the school AI caught as only "nilai" show "Nemu menangkap: “nilai”. Bisa diulang, Bu?"
-  and nothing is done with them;
+- words the school AI caught as only "nilai" show "Maaf, Bu. Nemu belum dengar jelas." with
+  `Terdengar: "nilai". Tahan Ctrl + Spasi lagi, …` under it, and nothing is done with them;
 - refusing in the prompt (on Ruang GTK, a site Chrome hasn't asked about) shows the three steps;
 - a blocked microphone shows the three steps with only Tutup, and talking works once it is
   allowed again.

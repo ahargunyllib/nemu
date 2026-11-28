@@ -348,9 +348,17 @@ await micCheck(
       await mic.reload();
       await untilRegistered();
       await holdToTalk(mic);
-      await bubble(mic)
-        .getByText("Nemu menangkap: “nilai”. Bisa diulang, Bu?")
+      const unclear = bubble(mic);
+      await unclear
+        .getByText("Maaf, Bu. Nemu belum dengar jelas.", { exact: true })
         .waitFor({ timeout: 15_000 });
+      await unclear.getByText("Belum jelas", { exact: true }).waitFor();
+      await unclear
+        .getByText('Terdengar: "nilai". Tahan Ctrl + Spasi lagi, lalu ulangi lebih dekat.', {
+          exact: true,
+        })
+        .waitFor();
+      expect((await unclear.getByRole("button").count()) === 0, "the unclear bubble has a button");
       await mic.waitForTimeout(1_500);
       expect(
         (await overlay(mic)

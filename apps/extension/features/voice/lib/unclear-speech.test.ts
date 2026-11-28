@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vite-plus/test";
 
-import { isUnclear, unclearMessage } from "./unclear-speech";
+import { isUnclear, unclearSpeech } from "./unclear-speech";
 
 describe("isUnclear", () => {
   test.each([
@@ -29,12 +29,18 @@ describe("isUnclear", () => {
   );
 });
 
-describe("unclearMessage", () => {
-  test("quotes what Nemu caught and asks the teacher to say it again", () => {
-    expect(unclearMessage("nilai", "Bu")).toBe("Nemu menangkap: “nilai”. Bisa diulang, Bu?");
+describe("unclearSpeech", () => {
+  test("says sorry, quotes what Nemu caught and how to try again with the school's keys", () => {
+    expect(unclearSpeech(" nilai ", "Bu", "Ctrl + Spasi")).toEqual({
+      status: { text: "Belum jelas", tone: "danger" },
+      sentence: "Maaf, Bu. Nemu belum dengar jelas.",
+      detail: 'Terdengar: "nilai". Tahan Ctrl + Spasi lagi, lalu ulangi lebih dekat.',
+    });
   });
 
-  test("without an honorific it still asks", () => {
-    expect(unclearMessage("eh", "")).toBe("Nemu menangkap: “eh”. Bisa diulang?");
+  test("without an honorific it still says sorry, with another combination", () => {
+    const { sentence, detail } = unclearSpeech("eh", "", "Alt + N");
+    expect(sentence).toBe("Maaf. Nemu belum dengar jelas.");
+    expect(detail).toBe('Terdengar: "eh". Tahan Alt + N lagi, lalu ulangi lebih dekat.');
   });
 });
