@@ -142,7 +142,7 @@
       <bpmn:outgoing>Flow_21b</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:scriptTask id="Task_TunjukMasalah" name="Nemu menunjuk setiap masalah">
-      <bpmn:documentation>Satu Gelembung Jawab per masalah, menunjuk soalnya di pratinjau atau tombolnya di Navigasi kuis, dengan Berikutnya dan Selesai.</bpmn:documentation>
+      <bpmn:documentation>Satu Gelembung Jawab per masalah, menunjuk soalnya di pratinjau atau tombolnya di Navigasi kuis, dengan Lanjut.</bpmn:documentation>
       <bpmn:incoming>Flow_21a</bpmn:incoming>
       <bpmn:outgoing>Flow_22</bpmn:outgoing>
     </bpmn:scriptTask>

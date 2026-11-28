@@ -41,6 +41,8 @@ type Pointing = {
 type Context = { pageEmail: PageEmail; honorific: string; speak: (text: string) => void };
 
 const NOTHING_CHANGED = "Nemu tidak mengubah apa pun di kuis ini.";
+/** The header over the working bubble and each problem: "Memeriksa kuis · 1 dari 2". */
+const CHECKING = "Memeriksa kuis";
 
 function say(sentence: string, honorific: string): string {
   return honorific ? `${sentence}, ${honorific}.` : `${sentence}.`;
@@ -102,26 +104,27 @@ function createQuizCheck() {
   }
 
   /**
-   * One problem at a time, pointed at on the page, with the next one behind Berikutnya. After the
-   * last one Nemu says the closing sentence (#256), about no element, and Catatan langkah follows.
+   * One problem at a time, pointed at on the page, with the next one behind Lanjut, also on the
+   * last one. After it Nemu says the closing sentence (#256), about no element, and Catatan
+   * langkah follows. Kenapa? reads what the check saw, when it can say more than the sentence.
    */
   function show() {
     if (!pointing) return publish({ display: null, target: null });
     const { problems, index, closing } = pointing;
     const problem = problems[index];
     if (!problem) return closing && index === problems.length ? showReady(closing) : finish();
-    const last = index === problems.length - 1 && !closing;
     publish({
       display: {
         type: "jawab",
         sentence: problem.sentence,
         status: {
           tone: "unsaved",
-          text: "Masalah di kuis",
+          text: CHECKING,
           progress: { done: index + 1, total: problems.length },
         },
-        action: { label: last ? "Selesai" : "Berikutnya", onSelect: last ? finish : next },
-        onClose: close,
+        ...(problem.why ? { notes: { kenapa: problem.why } } : {}),
+        onRead: (text) => context.speak(text),
+        action: { label: "Lanjut", onSelect: next },
       },
       target: targetFor(problem),
     });
@@ -166,7 +169,10 @@ function createQuizCheck() {
     if (state) executor.presentNotes(lines(state));
   }
 
-  /** ×: the problems are kept in Catatan langkah, which the Nemu button reopens. */
+  /**
+   * × on the closing or quiz-ready bubble (the problem bubbles have none, only Lanjut): the
+   * problems are kept in Catatan langkah, which the Nemu button reopens.
+   */
   function close() {
     const state = pointing;
     pointing = null;
@@ -186,8 +192,11 @@ function createQuizCheck() {
     publish({
       display: {
         type: "kerja",
-        sentence: "Nemu memeriksa soal-soalnya…",
-        status: { tone: "working", text: "Nemu mengecek kuis" },
+        // After F4-03 put the quiz in, Nemu did change it, so it doesn't say otherwise here.
+        sentence: changed
+          ? "Saya lihat seperti siswa melihatnya."
+          : "Saya lihat seperti siswa melihatnya. Nemu tidak mengubah apa pun.",
+        status: { tone: "working", text: CHECKING },
         onSlow: () => undefined,
         onStop: () => publish({ display: null, target: null }),
       },
@@ -200,10 +209,15 @@ function createQuizCheck() {
       honorific,
       utterance: found.utterance,
     });
-    // #218: judgement checks from the Nemu Service; without them the rules still stand.
+    // #218: judgement checks from the Nemu Service; without them the rules still stand. The
+    // judge only needs what was found, not Kenapa?, so a service without `why` accepts it too.
     const judged = await requestQuizCheck(context.pageEmail, {
       op: "judge",
-      input: { quiz: found.quiz, utterance: found.utterance, found: problems },
+      input: {
+        quiz: found.quiz,
+        utterance: found.utterance,
+        found: problems.map(({ why: _why, ...problem }) => problem),
+      },
     });
     const all = [...problems, ...(judged.ok ? judged.value.problems : [])];
     if (all.length === 0) {

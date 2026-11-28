@@ -1,8 +1,9 @@
 // Loads a production build of the extension into Playwright's Chromium and checks F4-1 (#209) end
 // to end on the Moodle test site (infra/): Bu Siti asks "Nemu, tolong cek kuis ini." on the quiz
 // page, Nemu opens Setelan, Soal and the quiz page through the menus, points at Pratinjau kuis
-// (she presses it), and then points at soal 7 (no key, "… Ibu isi kuncinya lewat Edit soal.",
-// #267) and soal 15 (missing image), as setup/f4-1/F4-1_kunci.csv expects, and then says one
+// (she presses it), and then points at soal 15 (missing image) and soal 7 (no key, "… Ibu isi
+// kuncinya lewat Edit soal. Nemu tidak mengubahnya.", #267), in setup/f4-1/F4-1_kunci.csv's order,
+// each under "Memeriksa kuis · 1 dari 2" with Kenapa? and Lanjut, and then says one
 // closing sentence ("Selain dua hal itu, kuisnya sudah siap, Bu.", #256). Afterwards the quiz's
 // last-modified time and question count are what they were (read from the Moodle database when it
 // runs locally).
@@ -221,7 +222,7 @@ const [header, ...rows] = readFileSync(join(infra, "setup/f4-1/F4-1_kunci.csv"),
 const sentenceColumn = header.indexOf("kalimat_nemu_yang_diharapkan");
 // PRD v2.3 (#267): a question with no key also says where to fill it, and Nemu proposes no key.
 // The updated key file isn't in infra/ yet, so its old no-key sentence gets the new ending here.
-const EDIT_SOAL = "Ibu isi kuncinya lewat Edit soal.";
+const EDIT_SOAL = "Ibu isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.";
 const NO_KEY = `Soal 7 belum ada kunci jawabannya, Bu. ${EDIT_SOAL}`;
 const kunci = rows
   .map((row) => row[sentenceColumn])
@@ -229,7 +230,7 @@ const kunci = rows
   .map((text) => (text.endsWith("kunci jawabannya, Bu.") ? `${text} ${EDIT_SOAL}` : text));
 
 await check(
-  "F4-1: soal 7 (no key) and soal 15 (no image), one sentence each, pointed at",
+  "F4-1: soal 15 (no image), then soal 7 (no key), one sentence each, pointed at",
   async () => {
     const jawab = display("jawab");
     await jawab.waitFor({ timeout: 30_000 });
@@ -261,11 +262,27 @@ await check(
         );
         await page.screenshot({ path: join(shots, "3-soal-15-gambar.png") });
       }
-      await jawab.getByRole("button", { name: "Berikutnya" }).click();
+      if (slot) {
+        const header = (await jawab.locator("[data-nemu-status]").innerText()).replace(
+          /\s+/gu,
+          " ",
+        );
+        expect(
+          header.toLowerCase().includes(`memeriksa kuis · ${index + 1} dari `),
+          `the header says “${header}”`,
+        );
+        expect(await jawab.getByRole("button", { name: "Kenapa?" }).count(), "no Kenapa? link");
+      }
+      await jawab.getByRole("button", { name: "Lanjut" }).click();
       // After the last problem the closing sentence comes, with Catatan langkah behind it.
       if (await jawab.getByRole("button", { name: "Catatan langkah" }).count()) break;
     }
     console.log(`  Nemu said: ${sentences.join(" | ")}`);
+    const order = kunci.map((expected) => sentences.indexOf(expected));
+    expect(
+      order.every((at, index) => index === 0 || at > (order[index - 1] ?? -1)),
+      "the problems aren't in F4-1_kunci.csv's order",
+    );
     for (const expected of kunci)
       expect(sentences.includes(expected), `Nemu didn't say “${expected}”`);
     expect(sentences.includes(NO_KEY), `Nemu didn't say “${NO_KEY}”`);

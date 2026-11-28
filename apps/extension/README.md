@@ -152,14 +152,20 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   - **Judgement (#218).** The extension sends what it read to `quizJudge`, which asks
     `SchoolAi.judgeQuiz`. No model checks exist yet, so it adds nothing; without the service the
     rules still stand.
-  - **Pointing.** One Gelembung Jawab per problem, pointed at on the preview: the missing image or
-    the answers when the question is on this page, else its button in Navigasi kuis, with
-    **Berikutnya**. The list survives a page load, so opening soal 15 from Navigasi kuis moves the
-    pointer to its image. After the last problem one more Gelembung Jawab, about no element, says
-    the closing sentence (#256), built in code from the count with no model call:
-    "Selain dua hal itu, kuisnya sudah siap, Bu." (`closingSentence`). With no problems Nemu says
-    only that the quiz is ready; a check stopped early, or problems closed with ×, get none. Its
-    **Catatan langkah** lists every problem and "Nemu tidak mengubah apa pun di kuis ini."
+  - **Pointing.** While the rules run, Gelembung Kerja says "Saya lihat seperti siswa melihatnya.
+    Nemu tidak mengubah apa pun." under **Memeriksa kuis**. Then one Gelembung Jawab per problem,
+    missing images first and missing keys after them, each by question number (F4-1: soal 15,
+    then soal 7), under "Memeriksa kuis · 1 dari 2". It is pointed at on the preview: the missing
+    image or the answers when the question is on this page, else its button in Navigasi kuis. Each
+    has **Lanjut**, also the last one, and no ×. A missing image or key also has **Kenapa?**, built
+    from what the check saw (the images' alt text, or every answer grading 0), since the extension
+    doesn't have the key file's `yang_terlihat_siswa` column. The list survives a page load, so
+    opening soal 15 from Navigasi kuis moves the pointer to its image. After the last problem one
+    more Gelembung Jawab, about no element, says the closing sentence (#256), built in code from
+    the count with no model call: "Selain dua hal itu, kuisnya sudah siap, Bu."
+    (`closingSentence`). With no problems Nemu says only that the quiz is ready; a check stopped
+    early gets none. Its **Catatan langkah** lists every problem and "Nemu tidak mengubah apa pun
+    di kuis ini."
 - **F4-06: warn before deleting a quiz students took (#211).** `features/quiz-delete/`. "Tolong
   hapus latihan bahasa Inggris yang kemarin" (typed or spoken; "hapus"/"ganti" with "kuis",
   "latihan" or "ulangan") is the extension's own command. Nemu never presses Hapus.
