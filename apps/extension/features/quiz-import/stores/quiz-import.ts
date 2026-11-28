@@ -149,7 +149,6 @@ function createQuizImport() {
           type: "kerja",
           sentence: "Nemu membaca naskahnya…",
           status: { tone: "working", text: "Membaca naskah" },
-          onSlow: () => undefined,
           onStop: close,
         });
       case "asking": {

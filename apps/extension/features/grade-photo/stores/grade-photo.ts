@@ -219,7 +219,6 @@ function createGradePhoto() {
           type: "kerja",
           sentence: "Nemu membaca judul foto…",
           status: { tone: "working", text: "Nemu membaca foto" },
-          onSlow: () => undefined,
           onStop: close,
         };
       case "picking": {
@@ -248,9 +247,9 @@ function createGradePhoto() {
       case "reading":
         return {
           type: "kerja",
-          sentence: "Nemu membaca foto buku nilai…",
+          sentence: readingSentence(),
+          detail: "Biasanya kurang dari 1 menit.",
           status: { tone: "working", text: "Nemu membaca foto" },
-          onSlow: () => undefined,
           onStop: close,
         };
       case "verifying": {
@@ -286,7 +285,6 @@ function createGradePhoto() {
           type: "kerja",
           sentence: "Nemu menerapkan aturan sekolah…",
           status: { tone: "working", text: "Nemu menghitung" },
-          onSlow: () => undefined,
           onStop: close,
         };
       case "saving":
@@ -302,7 +300,6 @@ function createGradePhoto() {
           type: "kerja",
           sentence: "Nemu membaca ulang nilai yang tersimpan…",
           status: { tone: "working", text: "Nemu memeriksa" },
-          onSlow: () => undefined,
           onStop: () => finishWithoutReadback(),
         };
       case "done":
@@ -364,6 +361,16 @@ function createGradePhoto() {
   }
 
   // --- The flow ---------------------------------------------------------------------------------
+
+  /**
+   * "Sebentar, Bu. Saya baca 32 nilai." The count is known only when the photo was read before
+   * (Coba lagi); the first read says "nilainya".
+   */
+  function readingSentence() {
+    const rows = job?.reading?.rows.length;
+    const what = rows ? `${rows} nilai` : "nilainya";
+    return `Sebentar, ${context.honorific || address()}. Saya baca ${what}.`;
+  }
 
   function pickQuestion() {
     return `Ini nilai apa, ${context.honorific || address()}?`;

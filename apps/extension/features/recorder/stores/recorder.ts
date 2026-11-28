@@ -70,7 +70,6 @@ function createRecorder() {
           type: "kerja",
           sentence: "Nemu menyimpan rekamannya…",
           status: { tone: "working", text: "Menyimpan" },
-          onSlow: () => undefined,
           onStop: () => undefined,
         };
       case "saved": {

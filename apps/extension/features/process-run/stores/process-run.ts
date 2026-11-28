@@ -116,7 +116,6 @@ function createProcessRun() {
           type: "kerja",
           sentence: phase.sentence,
           status: { tone: "working", text: "Nemu membaca" },
-          onSlow: () => undefined,
           onStop: close,
         };
       case "notice":

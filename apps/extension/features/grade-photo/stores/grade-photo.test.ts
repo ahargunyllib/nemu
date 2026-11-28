@@ -198,8 +198,22 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
     choose(view().display, "UTS · Matematika");
     await until(() => spoken.at(-1) === "Nilai kelas berapa, Bu?");
     expect(view().display).toMatchObject({ type: "jawab", sentence: "Nilai kelas berapa, Bu?" });
+    const shown: NemuDisplay[] = [];
+    const stop = gradePhoto.subscribe(() => {
+      const display = view().display;
+      if (display) shown.push(display);
+    });
     gradePhoto.hear("4B");
     await until(() => question() === "Nilai Alya Nur Fitri: 86 atau 88?");
+    stop();
+    // While the photo is read: one sentence, how long it takes, and only Berhenti (no Pelan).
+    const reading = shown.find((display) => display.type === "kerja");
+    expect(reading).toMatchObject({
+      sentence: "Sebentar, Bu. Saya baca nilainya.",
+      detail: "Biasanya kurang dari 1 menit.",
+      status: { text: "Nemu membaca foto" },
+    });
+    expect(reading).not.toHaveProperty("onSlow");
     expect(calls).toContainEqual({
       op: "command",
       utterance: "UTS Matematika 4B",

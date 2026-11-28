@@ -188,7 +188,6 @@ function createQuizCheck() {
         type: "kerja",
         sentence: "Nemu memeriksa soal-soalnya…",
         status: { tone: "working", text: "Nemu mengecek kuis" },
-        onSlow: () => undefined,
         onStop: () => publish({ display: null, target: null }),
       },
       target: null,
