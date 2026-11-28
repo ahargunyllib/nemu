@@ -56,6 +56,7 @@ const TEACHER = {
   ...BU_SITI,
   name: "Siti Aminah, S.Pd.",
   nip: "197003152000032001",
+  classes: ["4A", "4B"],
   contacts: {
     kepsek: { name: "Pak Ahmad", role: "kepsek", phone: "6281200001002" },
     operator: { name: "Pak Rizal", role: "operator", phone: "6281200001003" },
@@ -82,9 +83,13 @@ const cases = [
       r.fixer?.name === "Pak Rizal" &&
       r.waDraft?.phone === "6281200001003" &&
       !!r.waDraft &&
-      ["Siti Aminah", "Isi nilai kelas", "IPAS", "4A", "menambahkan penugasan"].every((part) =>
-        r.waDraft.text.includes(part),
-      ),
+      // Name, page, the error and what is needed (AI_TECHNICAL_PRD §5.1), in the design's short form.
+      [
+        "Assalamualaikum Pak Rizal, saya Siti (4A).",
+        "Saat membuka Isi nilai kelas 4A",
+        '"Anda belum ditugaskan mengampu IPAS di kelas 4A"',
+        "Mohon dibantu menambahkan penugasan",
+      ].every((part) => r.waDraft.text.includes(part)),
   },
   {
     name: "F2-3 Ruang GTK bukan user",

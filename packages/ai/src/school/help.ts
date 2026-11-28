@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import type { Contact, HelpExplanation, PageSnapshot } from "@nemu/contracts/school";
 
-import { guidedTargetOf, matchKamus, requestFromFix, type KamusRow } from "./kamus.js";
+import { guidedTargetOf, matchKamus, quotedError, requestFromFix, type KamusRow } from "./kamus.js";
 import type { JsonCall } from "./llm.js";
 import type { TeacherProfile } from "./profile.js";
 import { mentionsSecret, NOT_IN_GUIDE_SENTENCE } from "./safety.js";
@@ -76,22 +76,37 @@ export type ExplainErrorInput = {
   teacher: TeacherProfile;
 };
 
+/** Where it happened, as the teacher says it: "Saat membuka Isi nilai kelas 4A", "Saat masuk Info GTK". */
+function wherePhrase(where: { app: string; page: string | null }): string {
+  const page = where.page?.trim();
+  if (!page) return `Saat membuka ${where.app}`;
+  // A page named for what she was doing ("Masuk Info GTK") is said as that.
+  return /^masuk\b/iu.test(page)
+    ? `Saat ${page.charAt(0).toLocaleLowerCase("id-ID")}${page.slice(1)}`
+    : `Saat membuka ${page}`;
+}
+
+/**
+ * The short WhatsApp message the teacher sends herself (F2-02): her first name and class, where,
+ * the error in her words, what is needed, thanks. "Assalamualaikum Pak Rizal, saya Siti (4A). Saat
+ * membuka … muncul "…". Mohon dibantu …. Terima kasih."
+ */
 function whatsappDraft(
   teacher: TeacherProfile,
   to: Contact,
   where: { app: string; page: string | null },
-  errorText: string,
+  error: string,
   request: string,
 ): { phone: string; text: string } {
-  const greeting = `Assalamualaikum ${to.name}.`;
-  const intro = `Saya ${teacher.name} (NIP ${teacher.nip}).`;
-  const place = where.page ? `Di ${where.app}, halaman "${where.page}",` : `Di ${where.app}`;
-  const problem = errorText
-    ? `${place} muncul pesan: "${errorText.slice(0, 200).replace(/[.!?\s]+$/u, "")}".`
+  const firstName = teacher.name.trim().split(/[\s,]+/u)[0] ?? teacher.name;
+  const homeroom = teacher.classes[0];
+  const intro = `Assalamualaikum ${to.name}, saya ${firstName}${homeroom ? ` (${homeroom})` : ""}.`;
+  const problem = error
+    ? `${wherePhrase(where)} muncul "${error}".`
     : `Saya mengalami kendala di ${where.app}.`;
   return {
     phone: to.phone,
-    text: `${greeting} ${intro} ${problem} ${request} Terima kasih.`,
+    text: `${intro} ${problem} ${request} Terima kasih.`,
   };
 }
 
@@ -109,8 +124,8 @@ function notInGuide(input: ExplainErrorInput): HelpExplanation {
           teacher,
           operator,
           { app: snapshot.title.trim() || "aplikasi", page: null },
-          snapshot.alerts[0] ?? "",
-          "Mohon bantuannya, belum ada di panduan sekolah.",
+          quotedError(snapshot.alerts[0] ?? "", null),
+          "Mohon dibantu, belum ada di panduan sekolah.",
         )
       : null,
   };
@@ -165,10 +180,9 @@ export function answerFromRow(
             teacher,
             fixer,
             { app: row.app, page: snapshot.headings[0] ?? null },
-            errorText,
-            request && !mentionsSecret(request)
-              ? `Mohon bantuannya ${request}.`
-              : "Mohon bantuannya untuk memperbaiki.",
+            quotedError(errorText, row.message),
+            // What is needed stays (AI_TECHNICAL_PRD §5.1), after the design's "Mohon dibantu".
+            request && !mentionsSecret(request) ? `Mohon dibantu ${request}.` : "Mohon dibantu.",
           )
         : null,
   };

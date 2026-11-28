@@ -8,7 +8,7 @@ export type TeacherProfile = {
   name: string;
   /** How Nemu addresses the teacher: "Bu" or "Pak". */
   honorific: "Bu" | "Pak";
-  /** Added to WhatsApp drafts by code; never sent to a model. */
+  /** Never sent to a model, and not in the WhatsApp draft (it names her by first name and class). */
   nip: string;
   /** The teacher's registered WhatsApp number (E.164 without "+"); photos from it are theirs (F1-01). */
   phone: string;

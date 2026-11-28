@@ -41,6 +41,24 @@ function hasInOrder(segments: readonly string[], text: string): boolean {
   return true;
 }
 
+/**
+ * The sentence of the page's error the WhatsApp draft quotes: the one that says the kamus
+ * message's first sentence ("Anda belum ditugaskan mengampu IPAS di kelas 4A"), without the
+ * page's lead-in or its "Hubungi admin sekolah". Without one, the whole error.
+ */
+export function quotedError(errorText: string, message: string | null): string {
+  const sentences = errorText
+    .split(/(?<=[.!?])\s+|\n+/u)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+  const first = message?.split(/(?<=[.!?])\s+/u)[0] ?? "";
+  const segments = segmentsOf(first);
+  const hit = segments.length
+    ? sentences.find((sentence) => hasInOrder(segments, words(sentence)))
+    : undefined;
+  return (hit ?? errorText.replace(/\s*\n+\s*/gu, ". ")).slice(0, 200).replace(/[.!?\s]+$/u, "");
+}
+
 const SHORT_WORDS = new Set(["dan", "yang", "di", "ke", "dari", "ini", "itu", "anda", "untuk"]);
 
 function contentWords(text: string): Set<string> {

@@ -137,9 +137,13 @@ await check("F2-2: the button opens WhatsApp Web to Pak Rizal with the polite te
   console.log(`  text: ${text}`);
   expect(`${url.origin}${url.pathname}` === "https://web.whatsapp.com/send", "not WhatsApp Web");
   expect(url.searchParams.get("phone") === "6281200001003", "not Pak Rizal's number");
-  expect(text.startsWith("Assalamualaikum Pak Rizal."), "the greeting is missing");
+  expect(text.startsWith("Assalamualaikum Pak Rizal, saya Siti (4A)."), "the greeting is missing");
   expect(text.includes("Anda belum ditugaskan mengampu IPAS di kelas 4A"), "no error text");
-  expect(text.includes("menambahkan penugasan guru"), "no request from Kamus Kendala K-07");
+  expect(
+    text.includes("Mohon dibantu menambahkan penugasan guru"),
+    "no request from Kamus Kendala K-07",
+  );
+  expect(!/NIP/u.test(text), "the message still carries the NIP");
   expect(!/screenshot/iu.test(text), "the message promises a screenshot");
   await whatsapp.close();
 });
