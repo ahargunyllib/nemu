@@ -100,9 +100,17 @@ function createProcessRun() {
       if (options.length < 1) rest.push({ id: AS_WRITTEN, label: "Biarkan seperti tertulis" });
       return [...options, ...rest].slice(0, 3) as [NemuChoice, NemuChoice];
     }
-    const rest = [{ id: OTHER_NUMBER, label: "Angka lain" }];
-    if (options.length < 2) rest.push({ id: LEAVE_EMPTY, label: "Kosongkan" });
+    // F3·06: say or type the number, or leave it for later (the BPMN's "belum dinilai").
+    const rest = [{ id: OTHER_NUMBER, label: "Ucapkan atau ketik angkanya" }];
+    if (options.length < 2) rest.push({ id: LEAVE_EMPTY, label: "Kosongkan dulu" });
     return [...options, ...rest].slice(0, 3) as [NemuChoice, NemuChoice];
+  }
+
+  /** "Potongan foto · Citra, Tajwid": which cell the crop is. */
+  function cropCaption(question: FormPhotoQuestion): string {
+    if (question.kind === "name") return `Potongan foto · ${question.rowName}`;
+    const firstName = question.rowName.split(/\s+/u)[0] ?? question.rowName;
+    return `Potongan foto · ${firstName}, ${question.label}`;
   }
 
   function displayFor(): NemuDisplay | null {
@@ -159,13 +167,17 @@ function createProcessRun() {
         const question = questions[index];
         if (!question) return null;
         const crop = crops[index];
+        // Only the crop reaches the page, never the whole photo, so there is no "Lihat foto utuh".
         return {
           type: "pilih",
-          question: phase.misheard ? `Nemu belum menangkap. ${question.prompt}` : question.prompt,
+          status: { text: "Memeriksa foto", count: `${index + 1} dari ${questions.length}` },
+          question: question.prompt,
+          detail: phase.misheard ? "Nemu belum menangkap jawabannya." : undefined,
           choices: questionChoices(question) as unknown as readonly [NemuChoice, NemuChoice],
           onChoose: (id) => choose(index, id),
-          image: crop ? { src: crop, alt: `Foto, baris ${question.rowName}` } : undefined,
-          note: `Pertanyaan ${index + 1} dari ${questions.length}.`,
+          image: crop
+            ? { src: crop, alt: `Foto, baris ${question.rowName}`, caption: cropCaption(question) }
+            : undefined,
         };
       }
       case "number": {

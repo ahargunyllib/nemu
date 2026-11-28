@@ -17,8 +17,9 @@ import { useId } from "react";
  * Kartu Pilih: a decision. One question, an optional detail line ("Pilih salah satu, Nemu
  * menunggu."), and two or three equal, stacked big buttons. Nothing is
  * pre-selected or focused; a risky choice carries ⚠ and sits under the safe one. An `image`
- * shows what the question is about (W5's photo crop); `compact` is the small card that waits
- * beside the Nemu button, with 44 px buttons, and its `image` is a thumbnail beside the question
+ * shows what the question is about (W5's photo crop, with an optional caption under it);
+ * `compact` is the small card that waits beside the Nemu button, with 44 px buttons, and its
+ * `image` is a thumbnail beside the question
  * ("Foto dari WhatsApp", #278).
  */
 export function KartuPilih({
@@ -67,11 +68,18 @@ export function KartuPilih({
       </CardHeader>
       {!compact && image?.src && (
         <CardContent>
-          <img
-            src={image.src}
-            alt={image.alt}
-            className="max-h-44 w-full rounded-2xl border-2 border-border bg-muted object-contain"
-          />
+          <figure className="flex flex-col gap-1.5">
+            <img
+              src={image.src}
+              alt={image.alt}
+              className="max-h-44 w-full rounded-2xl border-2 border-border bg-muted object-contain"
+            />
+            {image.caption && (
+              <figcaption className="text-base leading-5 font-semibold text-nemu-secondary">
+                {image.caption}
+              </figcaption>
+            )}
+          </figure>
         </CardContent>
       )}
       <CardContent

@@ -137,7 +137,7 @@ test("F3-1: the official photo reads 3 rows matching the kunci; Citra's Tajwid i
   assert.deepEqual(reading.table.columns, COLUMNS);
   assert.deepEqual(
     reading.questions.map((question) => [question.kind, question.rowName, question.prompt]),
-    [["value", "Citra Lestari", "Tajwid Citra Lestari tidak terbaca jelas. Berapa, Bu?"]],
+    [["value", "Citra Lestari", "Skor Tajwid Citra?"]],
   );
   // The teacher answers 87 (the kunci's note); then every row matches the kunci.
   const rows = reading.table.rows.map((row) =>
