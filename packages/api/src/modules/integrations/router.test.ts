@@ -58,6 +58,34 @@ describe("WS-07 integration secrets", () => {
     });
   });
 
+  it("shows an address's host for the Integrasi summary, but never a key or token", async () => {
+    const context = await createSchoolContext(ADMIN_JAVAN);
+    const save = (name: "moodle_url" | "moodle_token", value: string) =>
+      call(integrationsRouter.saveIntegrationSecret, { name, value }, { context });
+    await save("moodle_url", "https://moodle-uji.sekolah.test/moodle/");
+    await save("moodle_token", "token-rahasia-7c21");
+
+    const list = await call(integrationsRouter.listIntegrationSecrets, undefined, { context });
+    expect(list.map(({ name, host }) => [name, host])).toEqual([
+      ["alursekolah_base_url", null],
+      ["alursekolah_api_key", null],
+      ["moodle_url", "moodle-uji.sekolah.test"],
+      ["moodle_token", null],
+      ["whatsapp_number", null],
+    ]);
+    expect(JSON.stringify(list)).not.toContain("rahasia");
+
+    // Without the encryption key the host is unknown, and the list still loads.
+    context.secretCipher = createSecretCipher("");
+    const withoutKey = await call(integrationsRouter.listIntegrationSecrets, undefined, {
+      context,
+    });
+    expect(withoutKey.find(({ name }) => name === "moodle_url")).toMatchObject({
+      lastFour: "odle",
+      host: null,
+    });
+  });
+
   it("says so when the Nemu Service has no INTEGRATION_SECRETS_KEY", async () => {
     const context = await createSchoolContext(ADMIN_JAVAN);
     context.secretCipher = createSecretCipher("");

@@ -10,11 +10,15 @@ export const integrationSecretNameSchema = z.enum([
 ]);
 export type IntegrationSecretName = z.infer<typeof integrationSecretNameSchema>;
 
-/** What the Admin Workspace may know about a setting: whether it is set, and its last 4 characters. */
+/**
+ * What the Admin Workspace may know about a setting: whether it is set, its last 4 characters, and
+ * for an address (`*_url`) its host, which is public anyway. A key or token never comes back.
+ */
 export const integrationSecretStatusSchema = z
   .object({
     name: integrationSecretNameSchema,
     lastFour: z.string().nullable(),
+    host: z.string().nullable(),
     updatedAt: z.date().nullable(),
   })
   .strict();

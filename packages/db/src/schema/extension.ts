@@ -54,7 +54,7 @@ export const schoolSetting = sqliteTable("school_setting", {
     .references(() => workspace.id, { onDelete: "cascade" }),
   // The combination the teacher holds to talk, as "Ctrl+Space".
   talkShortcut: text("talk_shortcut").default("Ctrl+Space").notNull(),
-  // Cara 1 Nemu isi · cara 2 Nemu tunjukkan · cara 3 guru isi, Nemu cek (PRD §6.1).
+  // Cara 1 Nemu kerjakan, Ibu lihat · cara 2 Nemu tunjuk, Ibu isi · cara 3 guru isi, Nemu cek (PRD §6.1).
   defaultCara: text("default_cara", { enum: ["isi", "tunjuk", "cek"] })
     .default("isi")
     .notNull(),
