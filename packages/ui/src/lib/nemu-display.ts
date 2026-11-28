@@ -95,7 +95,13 @@ export type GelembungKerjaProps = BubbleBase & {
 };
 
 /** Gelembung Tunjuk: the teacher's turn. Points at a field or button; no buttons. */
-export type GelembungTunjukProps = BubbleBase & { note?: NemuSingleNote };
+export type GelembungTunjukProps = BubbleBase & {
+  note?: NemuSingleNote;
+  /** A small amber chip under the text, such as "Belum tersimpan". */
+  chip?: string;
+  /** A way out as a link at the bottom, such as "Batal, jangan hapus". */
+  cancel?: { label: string; onSelect: () => void };
+};
 
 /** Gelembung Jawab: an answer or a problem, with at most one (black) action button. */
 export type GelembungJawabProps = BubbleBase & {
@@ -135,8 +141,11 @@ export type KartuInfoProps = {
   title: string;
   /** A quieter line under the title: "Yang lain sudah benar: 15 soal, kelas 4A." Not read aloud. */
   detail?: string;
+  /** Numbered 1, 2, 3 in small amber circles. */
   items: readonly string[];
-  /** At most one small link above Tutup, such as Catatan langkah's "Coba sendiri". */
+  /** A small label above the list, such as "Catatan langkah · Cara pasang kuis". */
+  itemsLabel?: string;
+  /** At most one small link left of Tutup, such as Catatan langkah's "Coba sendiri". */
   link?: { label: string; onSelect: () => void };
   onClose: () => void;
 };

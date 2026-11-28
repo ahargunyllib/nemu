@@ -125,10 +125,10 @@ the page's Shadow DOM.
 | Type                 | When                   | Shape                                                                                                                           |
 | -------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | **Gelembung Kerja**  | Nemu is working        | Heading with a count and progress bar, one sentence and its detail line, **[Pelan]** (optional) and **[Berhenti]** on the right |
-| **Gelembung Tunjuk** | The teacher's turn     | One sentence beside the field or button the cursor points at. No buttons, at most one link                                      |
+| **Gelembung Tunjuk** | The teacher's turn     | One sentence beside the field or button the cursor points at, an optional chip. No buttons, at most one link and a cancel link  |
 | **Gelembung Jawab**  | An answer or a problem | One sentence, then one row: **Kenapa?**, **Sumber**, **Lihat ringkasan** left, at most one action button right; ×               |
 | **Kartu Pilih**      | A decision             | One question, a detail line, 2–3 equal stacked big buttons, nothing pre-selected or focused                                     |
-| **Kartu Info**       | Something to read      | A title, a short list, then one row: at most one link left (Catatan langkah: "Coba sendiri"), **[Tutup]** right                 |
+| **Kartu Info**       | Something to read      | A title, a short numbered list, then one row: at most one link left (Catatan langkah: "Coba sendiri"), **[Tutup]** right        |
 
 - **Surface**: every display is the stock card, plain white with its thin `ring-foreground/10`
   edge, `rounded-3xl`, 24 px side padding, and the Float shadow; no amber edge or band. A
@@ -177,6 +177,14 @@ the page's Shadow DOM.
   waits beside the Nemu button, such as "Foto dari WhatsApp · Mulai / Nanti". Its picture is a
   64 px square thumbnail left of the title (`rounded-xl`, 2 px `border`, cropped from the top so
   the photo's heading shows), and a `Skeleton` of that square while it loads (#278).
+- **Kartu Info list**: the `items` are an ordered list, each led by a 30 px circle with its number
+  (`nemu-subtle` fill, 1 px `nemu-amber-200` edge, 15 px bold `nemu-strong`) and 20 px regular
+  text. An optional label sits above it (`itemsLabel`, 16 px semibold `nemu-secondary`):
+  "Catatan langkah · Cara isi nilai kelas". The label also names the list for screen readers.
+- **Gelembung Tunjuk extras**: an optional **chip** under the text (`chip`, a `subtle`
+  `NemuBadge` pill 34 px tall with a `nemu-amber-200` edge and 16 px semibold text: "Belum
+  tersimpan") and an optional **cancel link** at the bottom (`cancel`, a `nemu-strong` link:
+  "Batal, jangan hapus"). Still no buttons.
 - **Spoken word** (#200): `highlightedWord` marks the word Nemu's voice is on.
 
 **The Nemu cursor** (F0-16, PRD v2.3 P1-7): the 44 px Nemu mascot (`NemuMascot`, the same idle
