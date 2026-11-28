@@ -12,7 +12,8 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
 - **Identity without login (ADR-0015).** Nemu reads the email of the account signed in on the
   AlurSekolah page and sends it with every request; the Nemu Service matches it against the
   school's Teachers & contacts (WS-06). An unregistered account gets "Akun Ibu belum didaftarkan
-  di Nemu." and **Siapkan pesan WA ke operator**, which opens WhatsApp Web to the school's own
+  di Nemu.", a line naming the operator who can register it ("Yang bisa mendaftarkan: Pak Rizal,
+  operator sekolah.") and **Siapkan pesan WA**, which opens WhatsApp Web to the school's own
   operator with a ready request (the page and the account email); she presses Kirim (ID-02). The page is read again whenever it changes, so
   signing in as someone else switches who Nemu helps. Sites without an AlurSekolah account (Ruang
   GTK, Moodle) ask as the last account seen on AlurSekolah.

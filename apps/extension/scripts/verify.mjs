@@ -196,6 +196,10 @@ await check(
     await bubble(page).getByText("Akun Ibu belum didaftarkan di Nemu.").waitFor({
       timeout: 10_000,
     });
+    await bubble(page).getByText("Belum terdaftar", { exact: true }).waitFor();
+    await bubble(page)
+      .getByText("Yang bisa mendaftarkan: Pak Rizal, operator sekolah.", { exact: true })
+      .waitFor();
     expect(
       (await overlay(page).getByLabel("Pertanyaan untuk Nemu").count()) === 0,
       "an unregistered account still has the type box",
@@ -204,7 +208,7 @@ await check(
 
     const [whatsapp] = await Promise.all([
       context.waitForEvent("page"),
-      bubble(page).getByRole("button", { name: "Siapkan pesan WA ke operator" }).click(),
+      bubble(page).getByRole("button", { name: "Siapkan pesan WA", exact: true }).click(),
     ]);
     await whatsapp.waitForLoadState();
     const url = new URL(whatsapp.url());
@@ -220,6 +224,10 @@ await check(
     // Nemu only opens the chat; the teacher presses Kirim. The mock page stays as it was.
     expect(!page.isClosed(), "the AlurSekolah page was closed");
     await whatsapp.close();
+
+    // Its × closes the panel.
+    await bubble(page).getByRole("button", { name: "Tutup" }).click();
+    await bubble(page).waitFor({ state: "detached" });
   },
 );
 
