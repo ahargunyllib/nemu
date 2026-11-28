@@ -65,6 +65,18 @@ boxes, and the table in a white card whose footer counts what is filled.
   disimpan" with Impor Excel (greyed out, does nothing) and Simpan. The field labels, the
   Nilai and Catatan columns and the button names are what the executor targets, so they keep
   the code's wording where the real app's differs ("Keterangan", "Penilaian").
+- **Al-Quran › Tahfidz**: "Tahfidz · Kelas 4A" with Ujian baru and Setoran baru, filters Kelas
+  and Periode (school weeks counted from Monday 13 July 2026; it opens on the latest week with
+  records), the history Tanggal, Murid, Surah, Ayat, Nilai akhir, Keterangan ("Terlihat orang
+  tua"), and a footer "Pekan 21 · 3 dari 10 murid sudah setor". Ujian baru opens its form above
+  the history.
+- **Setoran baru** is its own page on the same `#/tahfidz` route ("Al-Quran › Tahfidz › Setoran
+  baru"): Tanggal setoran, Jenis and Kelas, the weights chip, one row per student (Murid, Surah,
+  Dari, Sampai, Fashohah 30%, Tartil 30%, Tajwid 30%, Adab 10%, Catatan, Nilai akhir), and a
+  footer "2 dari 10 murid terisi · baris kosong berarti tidak setor · belum disimpan" with Batal
+  and Simpan setoran. Nilai akhir reads "otomatis" until the save, then shows the mock's
+  computed score; the page stays open with "tersimpan 10.27". Catatan stays although the real
+  app's frame has no such column, because the BPMN has the field.
 
 ## Run and deploy
 

@@ -34,10 +34,29 @@ const CLASS_4A = [
   "Hana Safitri",
   "Ilham Nugroho",
 ].map((name, index) => ({ studentId: `4a-${index + 1}`, name, number: index + 1 }));
-// The labels the mock's Setoran baru form shows (05_tiruan-alursekolah, Al-Quran › Tahfidz).
-const PAGE_LABELS = ["Kelas", "Tanggal setoran"];
-const PAGE_COLUMNS = ["Murid", "Surah", "Dari ayat", "Sampai ayat"];
-const PAGE_COLUMNS_SCORES = ["Fashohah", "Tartil", "Tajwid", "Adab", "Catatan"];
+// The labels the mock's Setoran baru page shows (apps/mock-alursekolah, Al-Quran › Tahfidz ›
+// Setoran baru), and the page label each BPMN field of the setoran task must find there.
+const PAGE_LABELS = ["Tanggal setoran", "Jenis", "Kelas"];
+const PAGE_COLUMNS = ["Murid", "Surah", "Dari", "Sampai"];
+const PAGE_COLUMNS_SCORES = [
+  "Fashohah 30%",
+  "Tartil 30%",
+  "Tajwid 30%",
+  "Adab 10%",
+  "Catatan",
+  "Nilai akhir",
+];
+const PAGE_LABEL_FOR = {
+  tanggal_setoran: "Tanggal setoran",
+  surah: "Surah",
+  ayat_dari: "Dari",
+  ayat_sampai: "Sampai",
+  fashohah: "Fashohah 30%",
+  tartil: "Tartil 30%",
+  tajwid: "Tajwid 30%",
+  adab: "Adab 10%",
+  catatan: "Catatan",
+};
 
 function option(name) {
   const index = process.argv.indexOf(`--${name}`);
@@ -245,7 +264,7 @@ const matches = await ai.matchFields({
 });
 console.log(`labels: ${JSON.stringify(matches)}`);
 report(
-  allFields.every((field) => matches[field.id] === field.label),
+  allFields.every((field) => matches[field.id] === (PAGE_LABEL_FOR[field.id] ?? field.label)),
   "every setoran field finds its page label",
 );
 

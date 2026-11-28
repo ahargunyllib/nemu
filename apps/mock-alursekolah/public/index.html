@@ -93,6 +93,24 @@
   .peringatan { margin-top:4px; padding:12px 16px; border:1px solid #f1b4b4; border-radius:12px; background:#fdf1f1; font-size:14px; }
   .peringatan b { color:var(--merah); }
   .hal .toast { margin:12px 0 0; border-radius:12px; font-size:14px; }
+  .hal .btn svg { vertical-align:-3px; margin-right:4px; }
+  .hal .tabel th small { font-size:12px; font-weight:400; }
+  .hal .tabel td.terlihat { color:var(--hijau); font-size:13px; }
+  .hal .tabel td.kosong { padding:28px 16px; text-align:center; color:var(--muted); }
+  .hal #tabel-setoran th, .hal #tabel-setoran td { padding:8px 6px; }
+  .hal #tabel-setoran th:first-child, .hal #tabel-setoran td:first-child { padding-left:16px; }
+  .hal #tabel-setoran td input[type=number] { width:64px; padding:4px 8px; }
+  .hal #tabel-setoran td input.tf-ayat_dari, .hal #tabel-setoran td input.tf-ayat_sampai { width:52px; }
+  .hal #tabel-setoran td select { width:150px; }
+  .hal #tabel-setoran td input.catatan { width:140px; }
+  .otomatis { display:inline-block; min-width:76px; padding:7px 10px; border-radius:8px; background:#f1f2f4; color:var(--muted); font-size:13px; }
+  .otomatis.terhitung { color:var(--ink); font-weight:600; }
+  .form-kartu { padding:16px 20px 20px; margin-bottom:16px; }
+  .form-kartu h2 { margin:0 0 4px; font-size:16px; font-weight:600; }
+  .hal .form-kartu label { font-weight:500; font-size:13px; margin:12px 0 4px; }
+  .hal .form-kartu select, .hal .form-kartu input { font-size:14px; padding:7px 10px; border:1px solid #cfd4da; border-radius:8px; }
+  .form-kartu .row { gap:16px; align-items:flex-end; }
+  .hal .form-kartu .btn { margin-top:16px; }
 </style>
 </head>
 <body>
@@ -258,68 +276,122 @@ async function viewRekap() {
     ${Object.entries(all[key]).map(([n, v]) => `<tr><td>${n}</td><td>${v.nilai}</td><td>${v.catatan}</td></tr>`).join("")}</table>`;
   }).join("") : `<p class="note">Belum ada nilai tersimpan.</p>`);
 }
-async function viewTahfidz() {
+// Pekan sekolah dihitung dari awal semester ganjil (Senin, 13 Juli 2026).
+const AWAL_SEMESTER = Date.UTC(2026, 6, 13);
+const pekanDari = tanggal => Math.floor((Date.parse(tanggal + "T00:00:00Z") - AWAL_SEMESTER) / 6048e5) + 1;
+const tanggalId = tanggal => new Date(tanggal + "T00:00:00").toLocaleDateString("id-ID", {day: "numeric", month: "short", year: "numeric"});
+const PLUS = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg>';
+function kelasTahfidz(u) { return u.tugas === "semua" ? u.kelas : u.kelas.filter(k => ditugaskan(u, k, "Tahfidz")); }
+// Label dan id di halaman Tahfidz, Ujian baru, dan Setoran baru dipakai ekstensi, perekam, dan skrip
+// verify (Kelas, Setoran baru, Ujian baru, Tanggal setoran, Surah, Catatan, Simpan setoran): jangan diganti.
+async function viewTahfidz(kelasAwal) {
   const u = me();
-  const kelasAQ = u.tugas === "semua" ? u.kelas : u.kelas.filter(k => ditugaskan(u, k, "Tahfidz"));
+  const kelasAQ = kelasTahfidz(u);
   let riwayat = [];
   try { riwayat = await server("/tahfidz"); } catch (e) { riwayat = []; }
-  app.innerHTML = `<h1>Al-Quran › Tahfidz</h1><p class="note">Form ini mengikuti proses BPMN "Catat Hafalan Tahfidz" (kasus uji F3-1).</p>
-    <div class="row"><div><label for="tf-kelas">Kelas</label><select id="tf-kelas"><option value="">Pilih kelas</option>${kelasAQ.map(k => `<option>${k}</option>`).join("")}</select></div></div>
-    <div><button id="btn-setoran-baru">Setoran baru</button> <button class="secondary" id="btn-ujian-baru">Ujian baru</button></div>
+  const kelas0 = kelasAwal || kelasAQ[0] || "";
+  app.innerHTML = `<div class="hal">
+    <div class="hal-kepala"><div><p class="jejak">Al-Quran › Tahfidz</p><h1 id="judul-tahfidz">Tahfidz</h1></div>
+      <div class="aksi"><button class="btn garis" id="btn-ujian-baru">Ujian baru</button><button class="btn" id="btn-setoran-baru">${PLUS}Setoran baru</button></div></div>
+    <div class="saringan">
+      <div class="saring"><label for="tf-kelas">Kelas</label><select id="tf-kelas"><option value="">Pilih kelas</option>${kelasAQ.map(k => `<option${k === kelas0 ? " selected" : ""}>${k}</option>`).join("")}</select></div>
+      <div class="saring"><label for="tf-periode">Periode</label><select id="tf-periode"></select></div></div>
     <div id="tf-area"></div>
-    <h2 style="font-size:18px;margin-top:32px">Riwayat</h2>
-    <table id="tabel-riwayat-tahfidz"><tr><th>Tanggal</th><th>Jenis</th><th>Murid</th><th>Surah / ujian</th><th>Ayat</th><th>F</th><th>T</th><th>Tj</th><th>A</th><th>Nilai</th></tr>
-    ${riwayat.map(x => `<tr><td>${x.tanggal}</td><td>${x.jenis}</td><td>${x.murid}</td><td>${x.surah || x.jenis_ujian || ""}</td><td>${x.ayat_dari || ""}${x.ayat_sampai ? "–" + x.ayat_sampai : ""}</td><td>${x.fashohah}</td><td>${x.tartil}</td><td>${x.tajwid}</td><td>${x.adab}</td><td>${x.nilai}</td></tr>`).join("")}</table>`;
-  const pilihKelas = () => { const k = $("#tf-kelas").value; if (!k) { $("#tf-area").innerHTML = `<p class="note">Pilih kelas dulu.</p>`; } return k; };
-  $("#btn-setoran-baru").onclick = () => {
-    const k = pilihKelas(); if (!k) return;
-    const opsi = `<option value="">Pilih surah</option>` + SURAH.map(x => `<option>${x}</option>`).join("");
-    const sk = (f, n) => `<input type="number" min="0" max="100" class="tf-${f}" aria-label="${f[0].toUpperCase() + f.slice(1)} ${n}" style="width:70px">`;
-    $("#tf-area").innerHTML = `<h2 style="font-size:20px">Setoran baru · kelas ${k}</h2>
-      <label for="tanggal_setoran">Tanggal setoran</label><input type="date" id="tanggal_setoran">
-      <p class="note">Baris murid yang tidak setor dibiarkan kosong. Ayat dikosongkan berarti semua ayat. Skor dikosongkan berarti belum dinilai. Bobot: Fashohah 30%, Tartil 30%, Tajwid 30%, Adab 10%.</p>
-      <table id="tabel-setoran"><thead><tr><th>Murid</th><th>Surah</th><th>Dari ayat</th><th>Sampai ayat</th><th>Fashohah</th><th>Tartil</th><th>Tajwid</th><th>Adab</th><th>Catatan</th></tr></thead><tbody>
-      ${SISWA[k].map(n => `<tr data-murid="${n}"><td>${n}</td><td><select class="tf-surah" aria-label="Surah ${n}">${opsi}</select></td>
-        <td><input type="number" min="1" class="tf-ayat_dari" aria-label="Dari ayat ${n}" style="width:70px"></td><td><input type="number" min="1" class="tf-ayat_sampai" aria-label="Sampai ayat ${n}" style="width:70px"></td>
-        <td>${sk("fashohah", n)}</td><td>${sk("tartil", n)}</td><td>${sk("tajwid", n)}</td><td>${sk("adab", n)}</td><td><input type="text" class="tf-catatan catatan" aria-label="Catatan ${n}"></td></tr>`).join("")}
-      </tbody></table><button id="btn-simpan-setoran">Simpan setoran</button><div id="tf-hasil"></div>`;
-    $("#btn-simpan-setoran").onclick = () => {
-      const tgl = $("#tanggal_setoran").value;
-      const baris = [...document.querySelectorAll("#tabel-setoran tbody tr")].map(tr => {
-        const g = f => tr.querySelector(".tf-" + f).value;
-        return {jenis: "Setoran", tanggal: tgl, murid: tr.dataset.murid, surah: g("surah"), ayat_dari: g("ayat_dari"), ayat_sampai: g("ayat_sampai"), fashohah: g("fashohah"), tartil: g("tartil"), tajwid: g("tajwid"), adab: g("adab"), catatan: g("catatan")};
-      }).filter(r => r.surah);
-      if (!tgl) { $("#tf-hasil").innerHTML = `<p class="note">Tanggal setoran wajib diisi.</p>`; return; }
-      if (!baris.length) { $("#tf-hasil").innerHTML = `<p class="note">Belum ada murid yang diisi.</p>`; return; }
-      $("#konfirmasi-teks").textContent = `Simpan setoran ${baris.length} murid kelas ${k}? Hasil langsung terlihat orang tua.`;
-      $("#konfirmasi").showModal();
-      $("#ya-simpan").onclick = async () => {
-        $("#konfirmasi").close();
-        try { await server("/tahfidz", {username: store.get("user", ""), kelas: k, baris}); }
-        catch (e) { return gagal("#tf-hasil", e); }
-        await viewTahfidz();
-        $("#tf-area").innerHTML = `<div class="toast" role="status">Setoran tersimpan untuk ${baris.length} murid kelas ${k}.</div>`;
-      };
-      $("#batal-simpan").onclick = () => $("#konfirmasi").close();
-    };
+    <div class="kartu"><table id="tabel-riwayat-tahfidz" class="tabel"><thead><tr><th>Tanggal</th><th>Murid</th><th>Surah</th><th>Ayat</th><th>Nilai akhir</th><th>Keterangan</th></tr></thead><tbody id="riwayat-isi"></tbody></table>
+      <div class="kaki"><span id="tf-rekap"></span></div></div></div>`;
+  const tampilRiwayat = () => {
+    const k = $("#tf-kelas").value;
+    $("#judul-tahfidz").textContent = k ? `Tahfidz · Kelas ${k}` : "Tahfidz";
+    const milikKelas = riwayat.filter(x => !k || x.kelas === k);
+    const pekanIni = pekanDari(new Date().toISOString().slice(0, 10));
+    const daftar = [...new Set([pekanIni, ...milikKelas.map(x => pekanDari(x.tanggal))])].sort((a, b) => b - a);
+    const pilihan = $("#tf-periode").value;
+    const terbaru = milikKelas.length ? Math.max(...milikKelas.map(x => pekanDari(x.tanggal))) : pekanIni;
+    const pekan = daftar.includes(Number(pilihan)) ? Number(pilihan) : pilihan === "semua" ? "semua" : terbaru;
+    $("#tf-periode").innerHTML = daftar.map(p => `<option value="${p}"${p === pekan ? " selected" : ""}>Pekan ${p}</option>`).join("") + `<option value="semua"${pekan === "semua" ? " selected" : ""}>Semua pekan</option>`;
+    const tampil = milikKelas.filter(x => pekan === "semua" || pekanDari(x.tanggal) === pekan).sort((a, b) => b.tanggal.localeCompare(a.tanggal));
+    $("#riwayat-isi").innerHTML = tampil.length ? tampil.map(x => `<tr><td class="redup">${tanggalId(x.tanggal)}</td><td>${x.murid}</td><td>${x.surah || x.jenis_ujian || ""}</td>
+      <td class="redup">${x.ayat_dari || ""}${x.ayat_sampai ? "–" + x.ayat_sampai : ""}</td><td><b>${x.nilai.replace(".", ",")}</b></td><td class="terlihat">Terlihat orang tua</td></tr>`).join("")
+      : `<tr><td colspan="6" class="kosong">Belum ada setoran atau ujian${pekan === "semua" ? "" : ` di pekan ${pekan}`}.</td></tr>`;
+    const setor = new Set(tampil.filter(x => x.jenis === "Setoran").map(x => x.murid)).size;
+    $("#tf-rekap").textContent = k ? `${pekan === "semua" ? "Semua pekan" : `Pekan ${pekan}`} · ${setor} dari ${(SISWA[k] || []).length} murid sudah setor` : "Pilih kelas untuk melihat riwayat.";
   };
+  tampilRiwayat();
+  $("#tf-kelas").onchange = () => { $("#tf-periode").value = ""; tampilRiwayat(); };
+  $("#tf-periode").onchange = tampilRiwayat;
+  const pilihKelas = () => { const k = $("#tf-kelas").value; if (!k) { $("#tf-area").innerHTML = `<p class="note">Pilih kelas dulu.</p>`; } return k; };
+  $("#btn-setoran-baru").onclick = () => { const k = pilihKelas(); if (k) viewSetoranBaru(k); };
   $("#btn-ujian-baru").onclick = () => {
     const k = pilihKelas(); if (!k) return;
-    $("#tf-area").innerHTML = `<h2 style="font-size:20px">Ujian baru · kelas ${k}</h2>
-      <label for="uj-murid">Murid</label><select id="uj-murid"><option value="">Pilih murid</option>${SISWA[k].map(n => `<option>${n}</option>`).join("")}</select>
-      <label for="uj-jenis">Jenis ujian</label><select id="uj-jenis"><option value="">Pilih jenis ujian</option><option>Ujian Juz 30</option><option>Ujian Juz 29</option></select>
-      <label for="uj-tanggal">Tanggal ujian</label><input type="date" id="uj-tanggal">
+    $("#tf-area").innerHTML = `<div class="kartu form-kartu"><h2>Ujian baru · kelas ${k}</h2>
+      <div class="row"><div><label for="uj-murid">Murid</label><select id="uj-murid"><option value="">Pilih murid</option>${SISWA[k].map(n => `<option>${n}</option>`).join("")}</select></div>
+      <div><label for="uj-jenis">Jenis ujian</label><select id="uj-jenis"><option value="">Pilih jenis ujian</option><option>Ujian Juz 30</option><option>Ujian Juz 29</option></select></div>
+      <div><label for="uj-tanggal">Tanggal ujian</label><input type="date" id="uj-tanggal"></div></div>
       <div class="row">${["Fashohah", "Tartil", "Tajwid", "Adab"].map(f => `<div><label for="uj-${f.toLowerCase()}">${f}</label><input type="number" min="0" max="100" id="uj-${f.toLowerCase()}" style="min-width:0;width:100px"></div>`).join("")}</div>
-      <button id="btn-simpan-ujian">Simpan ujian</button><div id="tf-hasil"></div>`;
+      <button class="btn" id="btn-simpan-ujian">Simpan ujian</button><div id="tf-hasil"></div></div>`;
     $("#btn-simpan-ujian").onclick = async () => {
       const r = {jenis: "Ujian", tanggal: $("#uj-tanggal").value, murid: $("#uj-murid").value, jenis_ujian: $("#uj-jenis").value, fashohah: $("#uj-fashohah").value, tartil: $("#uj-tartil").value, tajwid: $("#uj-tajwid").value, adab: $("#uj-adab").value};
       if (!r.murid || !r.jenis_ujian || !r.tanggal) { $("#tf-hasil").innerHTML = `<p class="note">Murid, jenis ujian, dan tanggal wajib diisi.</p>`; return; }
       let tersimpan;
       try { tersimpan = (await server("/tahfidz", {username: store.get("user", ""), kelas: k, baris: [r]})).baris[0]; }
       catch (e) { return gagal("#tf-hasil", e); }
-      await viewTahfidz();
+      await viewTahfidz(k);
       $("#tf-area").innerHTML = `<div class="toast" role="status">Ujian ${r.murid} tersimpan. Nilai ${tersimpan.nilai}.</div>`;
     };
+  };
+}
+// Setoran baru: halaman sendiri (Al-Quran › Tahfidz › Setoran baru) di rute #/tahfidz yang sama.
+function viewSetoranBaru(k) {
+  const u = me();
+  const opsi = `<option value="">Pilih surah</option>` + SURAH.map(x => `<option>${x}</option>`).join("");
+  const sk = (f, n) => `<input type="number" min="0" max="100" class="tf-${f}" aria-label="${f[0].toUpperCase() + f.slice(1)} ${n}">`;
+  app.innerHTML = `<div class="hal">
+    <div class="hal-kepala"><div><p class="jejak">Al-Quran › Tahfidz › Setoran baru</p><h1>Setoran baru · Kelas ${k}</h1></div>
+      <span class="chip">Bobot: Fashohah, Tartil, Tajwid 30% · Adab 10%</span></div>
+    <div class="saringan">
+      <div class="saring"><label for="tanggal_setoran">Tanggal setoran</label><input type="date" id="tanggal_setoran"></div>
+      <div class="saring"><label for="tf-jenis">Jenis</label><select id="tf-jenis"><option>Setoran</option><option>Ujian</option></select></div>
+      <div class="saring"><label for="tf-kelas">Kelas</label><select id="tf-kelas">${kelasTahfidz(u).map(x => `<option${x === k ? " selected" : ""}>${x}</option>`).join("")}</select></div></div>
+    <div class="kartu"><table id="tabel-setoran" class="tabel"><thead><tr><th>Murid</th><th>Surah</th><th>Dari</th><th>Sampai</th>
+      <th>Fashohah <small>30%</small></th><th>Tartil <small>30%</small></th><th>Tajwid <small>30%</small></th><th>Adab <small>10%</small></th><th>Catatan</th><th>Nilai akhir</th></tr></thead><tbody>
+      ${SISWA[k].map(n => `<tr data-murid="${n}"><td>${n}</td><td><select class="tf-surah" aria-label="Surah ${n}">${opsi}</select></td>
+        <td><input type="number" min="1" class="tf-ayat_dari" aria-label="Dari ayat ${n}"></td><td><input type="number" min="1" class="tf-ayat_sampai" aria-label="Sampai ayat ${n}"></td>
+        <td>${sk("fashohah", n)}</td><td>${sk("tartil", n)}</td><td>${sk("tajwid", n)}</td><td>${sk("adab", n)}</td><td><input type="text" class="tf-catatan catatan" aria-label="Catatan ${n}"></td>
+        <td><span class="otomatis">otomatis</span></td></tr>`).join("")}
+      </tbody></table>
+      <div class="kaki"><span id="tf-hitung"></span><span class="aksi"><button class="btn garis" id="btn-batal-setoran">Batal</button><button class="btn" id="btn-simpan-setoran">Simpan setoran</button></span></div></div>
+    <div id="tf-hasil"></div></div>`;
+  const terisi = () => [...document.querySelectorAll("#tabel-setoran .tf-surah")].filter(x => x.value).length;
+  const hitung = status => { $("#tf-hitung").textContent = `${terisi()} dari ${SISWA[k].length} murid terisi · baris kosong berarti tidak setor · ${status}`; };
+  hitung("belum disimpan");
+  $("#tabel-setoran").addEventListener("input", () => hitung("belum disimpan"));
+  $("#tabel-setoran").addEventListener("change", () => hitung("belum disimpan"));
+  $("#tf-kelas").onchange = () => viewSetoranBaru($("#tf-kelas").value);
+  $("#tf-jenis").onchange = async () => { if ($("#tf-jenis").value === "Ujian") { await viewTahfidz(k); $("#btn-ujian-baru").click(); } };
+  $("#btn-batal-setoran").onclick = () => viewTahfidz(k);
+  $("#btn-simpan-setoran").onclick = () => {
+    const tgl = $("#tanggal_setoran").value;
+    const baris = [...document.querySelectorAll("#tabel-setoran tbody tr")].map(tr => {
+      const g = f => tr.querySelector(".tf-" + f).value;
+      return {jenis: "Setoran", tanggal: tgl, murid: tr.dataset.murid, surah: g("surah"), ayat_dari: g("ayat_dari"), ayat_sampai: g("ayat_sampai"), fashohah: g("fashohah"), tartil: g("tartil"), tajwid: g("tajwid"), adab: g("adab"), catatan: g("catatan")};
+    }).filter(r => r.surah);
+    if (!tgl) { $("#tf-hasil").innerHTML = `<p class="note">Tanggal setoran wajib diisi.</p>`; return; }
+    if (!baris.length) { $("#tf-hasil").innerHTML = `<p class="note">Belum ada murid yang diisi.</p>`; return; }
+    $("#konfirmasi-teks").textContent = `Simpan setoran ${baris.length} murid kelas ${k}? Hasil langsung terlihat orang tua.`;
+    $("#konfirmasi").showModal();
+    $("#ya-simpan").onclick = async () => {
+      $("#konfirmasi").close();
+      let hasil;
+      try { hasil = await server("/tahfidz", {username: store.get("user", ""), kelas: k, baris}); }
+      catch (e) { return gagal("#tf-hasil", e); }
+      hasil.baris.forEach(b => {
+        const sel = document.querySelector(`#tabel-setoran tr[data-murid="${b.murid}"] .otomatis`);
+        if (sel) { sel.textContent = b.nilai.replace(".", ","); sel.classList.add("terhitung"); }
+      });
+      hitung(`tersimpan ${jam()}`);
+      $("#tf-hasil").innerHTML = `<div class="toast" role="status">Setoran tersimpan untuk ${baris.length} murid kelas ${k}.</div>`;
+    };
+    $("#batal-simpan").onclick = () => $("#konfirmasi").close();
   };
 }
 // Kerangka halaman: menu samping, bilah atas, dan jejak halaman ("SDIT Nusantara › Akademik › Nilai").

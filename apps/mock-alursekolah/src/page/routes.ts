@@ -145,6 +145,7 @@ function riwayat(h: BarisHafalan) {
   return {
     jenis: h.jenis,
     tanggal: h.tanggal,
+    kelas: h.kelas,
     murid: h.nama_siswa,
     surah: h.surah_nomor ? (SURAH[h.surah_nomor - 1] ?? "") : "",
     jenis_ujian: h.jenis_ujian ?? "",

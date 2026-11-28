@@ -100,8 +100,8 @@ describe("mock page", () => {
     expect(res.status).toBe(200);
     const riwayat = await (await mock.page("/tahfidz")).json();
     expect(riwayat).toMatchObject([
-      { murid: "Aisyah Putri Wijaya", nilai: "88.4" },
-      { murid: "Citra Lestari", nilai: "belum dinilai" },
+      { kelas: "4A", murid: "Aisyah Putri Wijaya", nilai: "88.4" },
+      { kelas: "4A", murid: "Citra Lestari", nilai: "belum dinilai" },
     ]);
   });
 
