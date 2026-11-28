@@ -48,9 +48,19 @@ describe("singleSourceFile (F3·09)", () => {
     expect(singleSourceFile({ sources: [SOP.label], files: [SOP] })).toEqual(SOP);
   });
 
-  test("several sources, a source without a file, or a process keep the Sumber list", () => {
-    const other = { ...SOP, label: "SOP Penilaian SDIT Nusantara · hlm. 3 · 4.1", page: 3 };
+  test("several points of the same document open at the first one", () => {
+    const other = { ...SOP, label: "SOP Penilaian SDIT Nusantara · hlm. 2 · 3.4" };
+    expect(singleSourceFile({ sources: [SOP.label, other.label], files: [SOP, other] })).toEqual(
+      SOP,
+    );
+  });
+
+  test("other documents, a source without a file, or a process keep the Sumber list", () => {
+    const other = { ...SOP, docId: "sop-tahfidz", label: "SOP Tahfidz · hlm. 1", page: 1 };
     expect(singleSourceFile({ sources: [SOP.label, other.label], files: [SOP, other] })).toBeNull();
+    expect(
+      singleSourceFile({ sources: [SOP.label, "Kamus Kendala · K-07"], files: [SOP] }),
+    ).toBeNull();
     expect(singleSourceFile({ sources: ["Kamus Kendala · K-07"] })).toBeNull();
     expect(
       singleSourceFile({

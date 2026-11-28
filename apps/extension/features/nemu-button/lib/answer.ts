@@ -106,15 +106,20 @@ export function fromGroundedAnswer(answer: GroundedAnswer): AskResult {
 }
 
 /**
- * F3·09: an answer that cites one document Nemu can open gets one link straight to its page.
- * Several sources, or a process's steps and diagram (F2-08), keep the Sumber list.
+ * F3·09: an answer whose sources are all in one document Nemu can open gets one link straight to
+ * the first cited page (points 3.2 and 3.4 of the SOP Penilaian open at page 2). Sources from
+ * several documents, a source with no file, or a process's steps and diagram (F2-08) keep the
+ * Sumber list.
  */
 export function singleSourceFile(
   result: Pick<Extract<AskResult, { kind: "answer" }>, "sources" | "files" | "diagram">,
 ): SourceFile | null {
   const files = result.files ?? [];
-  if (files.length !== 1 || result.sources.length !== 1 || result.diagram) return null;
-  return result.sources[0] === files[0]!.label ? files[0]! : null;
+  const first = files[0];
+  if (!first || result.diagram) return null;
+  if (files.some((file) => file.docId !== first.docId)) return null;
+  const opens = new Set(files.map((file) => file.label));
+  return result.sources.every((source) => opens.has(source)) ? first : null;
 }
 
 function escapeRegExp(text: string): string {
