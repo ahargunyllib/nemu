@@ -103,9 +103,15 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     order ("Menu Nilai", "Pilih kelas, mapel, penilaian", "Ketik nilai per murid", "Tekan
     Simpan"). A plan names its stages with each step's `stage` and the job with the task's
     `recipe`; a step without a stage gets a plain line from its verb (`recipe-steps.ts`). Who did
-    what stays in the action log and the kept notes' `log`, not in the card. It reopens from the
-    Nemu button (**Lihat catatan langkah**), and "Coba sendiri", there too, starts that kind of
-    task in cara 2 next time.
+    what stays in the action log and the kept notes' `log`, not in the card. Each site keeps its
+    last five (one per recipe, in `chrome.storage.session`), and "Coba sendiri", also on a
+    reopened one, starts that kind of task in cara 2 next time.
+  - **Nemu button menu (F1·12a).** A click asks "Mau buka apa, Bu?" (Kartu Pilih with ×):
+    **Catatan langkah · 3 tersimpan** reopens the newest, **Tanya Nemu (Ctrl + Spasi)** (the
+    school's talk combination) opens the type box, and **Rekam cara** shows only for the school's
+    operator (`operator` in `extensionIdentify`: a WS-06 teacher with the operator contact's
+    number). With nothing to reopen and no operator tools, the click opens the type box straight
+    away; holding the button or the combination talks as before.
   - **Action log (WS-10).** Every action goes to `actionLogRecord` as who, when, website, task,
     action, target, cara and result, never a value.
   - **Finishers.** A flow that has more to do once its task ends registers

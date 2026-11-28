@@ -249,10 +249,20 @@ page.on("framenavigated", (frame) => {
   if (frame === page.mainFrame()) visited.push(new URL(frame.url()).pathname);
 });
 
+/** After a click on the Nemu button: Tanya Nemu when it shows its menu, so the type box opens. */
+async function openTypeBox(overlay) {
+  const typeBox = overlay.getByLabel("Pertanyaan untuk Nemu");
+  const ask = overlay.getByRole("button", { name: /^Tanya Nemu \(/u });
+  await typeBox.or(ask).first().waitFor({ timeout: 10_000 });
+  if (await ask.count()) await ask.click();
+}
+
 async function askNemu(words) {
   const closed = overlay.locator("button[aria-label='Tanya Nemu']");
   await closed.waitFor({ timeout: 15_000 });
   await closed.click();
+  // With kept Catatan langkah the Nemu button asks "Mau buka apa?" first (F1·12a).
+  await openTypeBox(overlay);
   await overlay.getByLabel("Pertanyaan untuk Nemu").fill(words);
   await overlay.getByRole("button", { name: "Kirim" }).click();
 }

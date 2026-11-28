@@ -10,7 +10,7 @@ import { Skeleton } from "@nemu/ui/components/skeleton";
 import { type KartuPilihProps, orderChoices } from "@nemu/ui/lib/nemu-display";
 import { NEMU_DETAIL, NemuCard } from "@nemu/ui/nemu/nemu-frame";
 import { cn } from "cn";
-import { TriangleAlert } from "lucide-react";
+import { TriangleAlert, X } from "lucide-react";
 import { useId } from "react";
 
 /**
@@ -30,6 +30,7 @@ export function KartuPilih({
   note,
   compact = false,
   status,
+  onClose,
 }: KartuPilihProps) {
   const questionId = useId();
   return (
@@ -37,9 +38,15 @@ export function KartuPilih({
       display="pilih"
       label="Pilihan Nemu"
       status={status}
-      className={cn(compact && "w-[300px] gap-3 [--card-spacing:--spacing(5)]")}
+      className={cn(
+        compact && "w-[300px] gap-3 [--card-spacing:--spacing(5)]",
+        // Keep the heading and the question clear of the × at the top right.
+        onClose && "relative [&_[data-nemu-status]]:mr-12",
+      )}
     >
-      <CardHeader className={cn(compact && image && "flex items-center gap-3")}>
+      <CardHeader
+        className={cn(compact && image && "flex items-center gap-3", onClose && !status && "pr-16")}
+      >
         {compact &&
           image &&
           (image.src ? (
@@ -107,6 +114,18 @@ export function KartuPilih({
         <CardFooter className="text-lg leading-6 text-muted-foreground">
           <p>{note}</p>
         </CardFooter>
+      )}
+      {onClose && (
+        <Button
+          type="button"
+          variant="secondary"
+          size="icon"
+          aria-label="Tutup"
+          onClick={onClose}
+          className="absolute top-3 right-4 size-11 rounded-full [&_svg:not([class*='size-'])]:size-6"
+        >
+          <X />
+        </Button>
       )}
     </NemuCard>
   );

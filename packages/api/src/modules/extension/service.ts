@@ -54,13 +54,26 @@ export async function identifyTeacher(
   deps: IdentifyDeps,
   school: InstalledSchool,
   email: string,
-): Promise<{ teacher: TeacherProfile } | { unregistered: Omit<Unregistered, "status"> }> {
+): Promise<
+  { teacher: TeacherProfile; operator: boolean } | { unregistered: Omit<Unregistered, "status"> }
+> {
   const teacher = await deps.directory.teacherByEmail(school.workspaceId, email);
-  if (teacher) return { teacher };
+  if (teacher) {
+    const contacts = await deps.school.listContacts(school.workspaceId);
+    const operator = contacts.some(
+      (contact) => contact.role === "operator" && contact.phone === teacher.phone,
+    );
+    return { teacher, operator };
+  }
   return { unregistered: await unregistered(deps.school, school.workspaceId, email) };
 }
 
 export function toIdentity(result: Awaited<ReturnType<typeof identifyTeacher>>): ExtensionIdentity {
   if ("unregistered" in result) return { status: "unregistered", ...result.unregistered };
-  return { status: "registered", name: result.teacher.name, honorific: result.teacher.honorific };
+  return {
+    status: "registered",
+    name: result.teacher.name,
+    honorific: result.teacher.honorific,
+    ...(result.operator ? { operator: true as const } : {}),
+  };
 }

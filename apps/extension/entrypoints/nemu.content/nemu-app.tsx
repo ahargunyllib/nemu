@@ -1,9 +1,7 @@
 import type { PageSnapshot } from "@nemu/contracts/school";
 import { shortcutKeys } from "@nemu/contracts/talk-shortcut";
-import { Button } from "@nemu/ui/components/button";
-import type { NemuSource } from "@nemu/ui/lib/nemu-display";
+import type { NemuChoice, NemuDisplay, NemuSource } from "@nemu/ui/lib/nemu-display";
 import { GelembungJawab, GelembungJawabSkeleton } from "@nemu/ui/nemu/gelembung-jawab";
-import { NEMU_LINK } from "@nemu/ui/nemu/nemu-frame";
 import { NemuStage } from "@nemu/ui/nemu/nemu-stage";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -61,7 +59,12 @@ export function NemuApp({ access }: { access: SiteAccess }) {
   const pageEmail = usePageEmail();
   const identity = useIdentity(pageEmail);
   const [open, setOpen] = useState(false);
-  const close = useCallback(() => setOpen(false), []);
+  // F1·12a: a click on the Nemu button first asks what to open.
+  const [menu, setMenu] = useState(false);
+  const close = useCallback(() => {
+    setOpen(false);
+    setMenu(false);
+  }, []);
   const startGrades = useCallback(
     (utterance: string) => {
       close();
@@ -143,6 +146,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     onStart: () => {
       pressSnapshot.current = readPageSnapshot(document, location.href);
       recorder.talkStarted();
+      setMenu(false);
       setOpen(true);
     },
     // While F1, F3 or F4-06 waits for an answer (a photo question, a number, a choice), the words
@@ -186,6 +190,27 @@ export function NemuApp({ access }: { access: SiteAccess }) {
 
   // The executor works as the teacher on the page, in Nemu's voice.
   const honorific = identity?.status === "registered" ? identity.honorific : "";
+
+  // F1·12a: "Mau buka apa, Bu?" when the Nemu button has more than the type box to offer: the
+  // site's kept Catatan langkah, and for the school's operator "Rekam cara" (F3-01).
+  const operator = identity?.status === "registered" && identity.operator === true;
+  const menuDisplay = useMemo(
+    () =>
+      nemuMenu({
+        honorific,
+        keys: shortcutKeys(shortcut),
+        notes: identity?.status === "registered" && !run.active ? run.notesCount : 0,
+        operator: operator && !run.active,
+        onChoose: (choice) => {
+          setMenu(false);
+          if (choice === "notes") executor.showNotes();
+          else if (choice === "record") startRecording("");
+          else setOpen(true);
+        },
+        onClose: () => setMenu(false),
+      }),
+    [honorific, shortcut, identity, run.active, run.notesCount, operator, startRecording],
+  );
   useEffect(
     () => executor.connect({ pageEmail, honorific, speak: (text) => void speak(text) }),
     [pageEmail, honorific, speak],
@@ -306,6 +331,10 @@ export function NemuApp({ access }: { access: SiteAccess }) {
           <div className="pointer-events-auto">
             <NemuStage display={preview.display} target={preview.target} />
           </div>
+        ) : menu && menuDisplay ? (
+          <div className="pointer-events-auto">
+            <NemuStage display={menuDisplay} />
+          </div>
         ) : (
           open && (
             <div className="pointer-events-auto flex flex-col items-end gap-2">
@@ -322,29 +351,6 @@ export function NemuApp({ access }: { access: SiteAccess }) {
                 onOpenSource={openSource}
                 onDismiss={dismissAll}
               />
-              {run.hasNotes && !run.active && (
-                <Button
-                  type="button"
-                  variant="link"
-                  onClick={() => {
-                    close();
-                    executor.showNotes();
-                  }}
-                  className={`${NEMU_LINK} rounded-2xl bg-background px-3 shadow-nemu-float`}
-                >
-                  Lihat catatan langkah
-                </Button>
-              )}
-              {registered && !run.active && (
-                <Button
-                  type="button"
-                  variant="link"
-                  onClick={() => startRecording("")}
-                  className={`${NEMU_LINK} rounded-2xl bg-background px-3 shadow-nemu-float`}
-                >
-                  Rekam cara
-                </Button>
-              )}
             </div>
           )
         )}
@@ -356,6 +362,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
           !quizDeletion.display &&
           !importing.display &&
           !open &&
+          !menu &&
           grades.card && (
             <div className="pointer-events-auto">
               <NemuStage display={grades.card} />
@@ -363,9 +370,13 @@ export function NemuApp({ access }: { access: SiteAccess }) {
           )}
         <div className="pointer-events-auto">
           <NemuButton
-            open={open}
+            open={open || menu}
             shortcutKeys={shortcutKeys(shortcut)}
-            onToggle={() => setOpen((current) => !current)}
+            onToggle={() => {
+              if (open || menu) return close();
+              if (menuDisplay) setMenu(true);
+              else setOpen(true);
+            }}
             onHoldStart={talk.press}
             onHoldEnd={talk.release}
           />
@@ -384,6 +395,40 @@ export function NemuApp({ access }: { access: SiteAccess }) {
       )}
     </>
   );
+}
+
+type MenuChoice = "notes" | "ask" | "record";
+
+/**
+ * The Nemu button's menu (F1·12a): Catatan langkah with how many the site keeps, Tanya Nemu with
+ * the talk combination, and Rekam cara for the operator. Null when only Tanya Nemu is left, so
+ * the button opens the type box straight away.
+ */
+function nemuMenu(input: {
+  honorific: string;
+  keys: readonly string[];
+  notes: number;
+  operator: boolean;
+  onChoose: (choice: MenuChoice) => void;
+  onClose: () => void;
+}): NemuDisplay | null {
+  const choices: (NemuChoice & { id: MenuChoice })[] = [
+    ...(input.notes > 0
+      ? [{ id: "notes" as const, label: `Catatan langkah · ${input.notes} tersimpan` }]
+      : []),
+    { id: "ask", label: `Tanya Nemu (${input.keys.join(" + ")})` },
+    ...(input.operator ? [{ id: "record" as const, label: "Rekam cara" }] : []),
+  ];
+  const [first, second, third] = choices;
+  if (!first || !second) return null;
+  return {
+    type: "pilih",
+    status: { text: "Nemu" },
+    question: input.honorific ? `Mau buka apa, ${input.honorific}?` : "Mau buka apa?",
+    choices: third ? [first, second, third] : [first, second],
+    onChoose: (id) => input.onChoose(id as MenuChoice),
+    onClose: input.onClose,
+  };
 }
 
 type NemuPanelProps = {

@@ -26,12 +26,12 @@ export type NemuMessage =
   // sends the recording to `speechTranscribe`.
   | { type: "nemu:transcribe"; pageEmail: PageEmail; recording: Recording }
   | { type: "nemu:speak"; pageEmail: PageEmail; text: string }
-  // The executor (#202): its run per tab and the last Catatan langkah live in
+  // The executor (#202): its run per tab and each site's last few Catatan langkah live in
   // `chrome.storage.session`, which only the background reads; actions go to the action log.
   | { type: "nemu:run-save"; state: unknown }
   | { type: "nemu:run-load" }
-  | { type: "nemu:notes-save"; notes: StepNotes }
-  | { type: "nemu:notes-load" }
+  | { type: "nemu:notes-save"; site: string; notes: StepNotes }
+  | { type: "nemu:notes-load"; site: string }
   | { type: "nemu:log-actions"; pageEmail: PageEmail; entries: ActionLogEntry[] }
   // F1 (#207): the WhatsApp photo, its questions, the fill's rules and the read-back.
   | { type: "nemu:grade-photo"; pageEmail: PageEmail; request: GradePhotoRequest }

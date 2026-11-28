@@ -2,7 +2,8 @@
 // (#202) on the mock AlurSekolah through its dev-only dock (`?uji-nemu`): cara 1 visible
 // navigation and fill that stops at Simpan, the teacher's own click stopping Nemu (F0-07), a page
 // load mid-task, Berhenti asking whether she fills the rest herself (F0-11), F0-1 (Muat respons
-// uji), F0-09 (Koneksi putus), and Catatan langkah.
+// uji), F0-09 (Koneksi putus), and Catatan langkah, reopened from the Nemu button's menu
+// ("Mau buka apa, Bu?").
 // Playwright's clicks are real (isTrusted) input. Needs `NEMU_RESPONDER=fixture pnpm dev` running.
 // Screenshots go to .output/verify-executor/.
 import { execFileSync } from "node:child_process";
@@ -127,8 +128,18 @@ await check(
     await notes.getByRole("button", { name: "Coba sendiri" }).waitFor();
     await page.screenshot({ path: join(shots, "catatan-langkah.png") });
     await notes.getByRole("button", { name: "Tutup" }).click();
-    await overlay.getByRole("button", { name: "Tanya Nemu" }).click();
-    await overlay.getByRole("button", { name: "Lihat catatan langkah" }).click();
+    // F1·12a: the Nemu button asks what to open: the kept notes, or the type box.
+    await overlay.locator("button[aria-label='Tanya Nemu']").click();
+    const menu = display("pilih");
+    await menu.getByText("Mau buka apa, Bu?").waitFor();
+    await menu.getByRole("button", { name: "Catatan langkah · 1 tersimpan" }).waitFor();
+    await menu.getByRole("button", { name: /^Tanya Nemu \(Ctrl \+ Spasi\)$/u }).waitFor();
+    expect(
+      !(await menu.getByRole("button", { name: "Rekam cara" }).count()),
+      "Rekam cara is offered to a teacher who isn't the operator",
+    );
+    await page.screenshot({ path: join(shots, "menu.png") });
+    await menu.getByRole("button", { name: "Catatan langkah · 1 tersimpan" }).click();
     await notes.waitFor();
     // Reopened from the Nemu button, it still offers Coba sendiri.
     await notes.getByRole("button", { name: "Coba sendiri" }).waitFor();

@@ -57,9 +57,9 @@ async function handle(
     case "nemu:run-load":
       return loadRun(tabId);
     case "nemu:notes-save":
-      return saveNotes(message.notes);
+      return saveNotes(message.site, message.notes);
     case "nemu:notes-load":
-      return loadNotes();
+      return loadNotes(message.site);
     case "nemu:log-actions":
       return recordActions(message);
     case "nemu:grade-photo":
