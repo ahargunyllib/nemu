@@ -13,7 +13,7 @@ import { microphoneReady, PROMPT_CLOSED } from "../lib/microphone-messages";
 import { matchShortCommand } from "../lib/short-commands";
 import { IDLE, type TalkEvent, talkReducer, type TalkState } from "../lib/talk-machine";
 import { createHoldDetector } from "../lib/talk-shortcut";
-import { isUnclear, unclearMessage } from "../lib/unclear-speech";
+import { isUnclear } from "../lib/unclear-speech";
 import { voiceCommands } from "../stores/voice-commands";
 
 type TalkOptions = {
@@ -95,7 +95,7 @@ export function useTalk(options: TalkOptions) {
     }
     const text = result.text;
     const command = matchShortCommand(text);
-    const { onAnswer, onQuestion, honorific } = latest.current;
+    const { onAnswer, onQuestion } = latest.current;
     if (command) {
       dispatch({ type: "transcribed" });
       setHeard(text);
@@ -110,7 +110,7 @@ export function useTalk(options: TalkOptions) {
       setHeard(text);
     } else if (isUnclear(text)) {
       // Nothing is done with it: Nemu shows what it caught and asks again.
-      dispatch({ type: "notice", message: unclearMessage(text, honorific) });
+      dispatch({ type: "unclear", words: text });
     } else {
       dispatch({ type: "transcribed" });
       setHeard(text);
@@ -125,9 +125,10 @@ export function useTalk(options: TalkOptions) {
     if (previous.mode === "command") voiceCommands.emit({ type: "resume" });
   }, [dispatch]);
 
-  /** Closes the heard text, a notice and the blocked steps; a hold in progress carries on. */
+  /** Closes the heard text, a notice, unclear words and the blocked steps; a hold carries on. */
   const dismiss = useCallback(() => {
-    if (current.current.phase === "notice" || current.current.phase === "blocked") {
+    const { phase } = current.current;
+    if (phase === "notice" || phase === "unclear" || phase === "blocked") {
       current.current = IDLE;
       setState(IDLE);
     }

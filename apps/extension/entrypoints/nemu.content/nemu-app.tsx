@@ -45,6 +45,7 @@ import { useTalk } from "../../features/voice/hooks/use-talk";
 import { useVoice, type VoiceState } from "../../features/voice/hooks/use-voice";
 import type { TalkState } from "../../features/voice/lib/talk-machine";
 import { talkShortcutFrom } from "../../features/voice/lib/talk-shortcut";
+import { unclearSpeech } from "../../features/voice/lib/unclear-speech";
 import { spokenWordIn, withSpokenWord } from "../../features/voice/lib/word-timing";
 import { voiceCommands } from "../../features/voice/stores/voice-commands";
 
@@ -58,6 +59,7 @@ import { voiceCommands } from "../../features/voice/stores/voice-commands";
 export function NemuApp({ access }: { access: SiteAccess }) {
   const talkShortcut = access.settings.talkShortcut;
   const shortcut = useMemo(() => talkShortcutFrom(talkShortcut), [talkShortcut]);
+  const talkKeys = shortcutKeys(shortcut).join(" + ");
   const pageEmail = usePageEmail();
   const identity = useIdentity(pageEmail);
   const [open, setOpen] = useState(false);
@@ -314,6 +316,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
                 state={state}
                 talk={talk.state}
                 heard={talk.heard}
+                talkKeys={talkKeys}
                 voice={voice}
                 action={nextAction}
                 onAsk={askTyped}
@@ -391,6 +394,8 @@ type NemuPanelProps = {
   state: AskState;
   talk: TalkState;
   heard: string | null;
+  /** The school's talk combination as she presses it: "Ctrl + Spasi". */
+  talkKeys: string;
   voice: VoiceState | null;
   action: { label: string; onSelect: () => void } | undefined;
   onAsk: (question: string) => void;
@@ -418,6 +423,7 @@ function NemuPanel({
   state,
   talk,
   heard,
+  talkKeys,
   voice,
   action,
   onAsk,
@@ -448,6 +454,9 @@ function NemuPanel({
       {heard !== null && <HeardBubble text={heard} />}
       {talk.phase === "notice" ? (
         <GelembungJawab sentence={talk.message} onClose={onDismiss} />
+      ) : talk.phase === "unclear" ? (
+        // No ×: the next hold or a typed question replaces it (F0-03).
+        <GelembungJawab {...unclearSpeech(talk.words, identity.honorific, talkKeys)} />
       ) : (
         <>
           {state.status === "asking" && <GelembungJawabSkeleton />}

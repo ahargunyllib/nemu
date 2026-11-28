@@ -6,7 +6,8 @@
  *
  * The first time she talks on a site, Chrome asks for the microphone (`asking`): Nemu points at
  * Izinkan until she answers, whatever her fingers do. A blocked microphone shows the steps to
- * allow it again (`blocked`). A `notice` is a sentence in place of what Nemu heard.
+ * allow it again (`blocked`). A `notice` is a sentence in place of what Nemu heard; `unclear`
+ * holds words too unclear to act on, shown back so she says them again (F0-03).
  */
 export const MIN_HOLD_MS = 300;
 
@@ -18,7 +19,8 @@ export type TalkState =
   | { phase: "asking" }
   | { phase: "transcribing"; mode: TalkMode }
   | { phase: "blocked" }
-  | { phase: "notice"; message: string };
+  | { phase: "notice"; message: string }
+  | { phase: "unclear"; words: string };
 
 export type TalkEvent =
   | { type: "press"; working: boolean; at: number }
@@ -27,7 +29,8 @@ export type TalkEvent =
   | { type: "transcribed" }
   | { type: "asking" }
   | { type: "blocked" }
-  | { type: "notice"; message: string };
+  | { type: "notice"; message: string }
+  | { type: "unclear"; words: string };
 
 export const IDLE: TalkState = { phase: "idle" };
 
@@ -52,5 +55,7 @@ export function talkReducer(state: TalkState, event: TalkEvent): TalkState {
       return { phase: "blocked" };
     case "notice":
       return { phase: "notice", message: event.message };
+    case "unclear":
+      return state.phase === "transcribing" ? { phase: "unclear", words: event.words } : state;
   }
 }

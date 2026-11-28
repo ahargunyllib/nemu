@@ -88,8 +88,15 @@ export function isUnclear(utterance: string): boolean {
   return !meaningful.some((word) => REQUEST_WORDS.has(word));
 }
 
-/** "Nemu menangkap: “nilai”. Bisa diulang, Bu?" */
-export function unclearMessage(utterance: string, honorific: string): string {
-  const ask = honorific ? `Bisa diulang, ${honorific}?` : "Bisa diulang?";
-  return `Nemu menangkap: “${utterance.trim()}”. ${ask}`;
+/**
+ * The Gelembung Jawab for unclear words (F0-03): BELUM JELAS, "Maaf, Bu. Nemu belum dengar
+ * jelas.", and the words it caught with how to try again. Nemu shows what it heard and never
+ * guesses what she meant. `keys` is the school's talk combination: "Ctrl + Spasi".
+ */
+export function unclearSpeech(utterance: string, honorific: string, keys: string) {
+  return {
+    status: { text: "Belum jelas", tone: "danger" as const },
+    sentence: `${honorific ? `Maaf, ${honorific}.` : "Maaf."} Nemu belum dengar jelas.`,
+    detail: `Terdengar: "${utterance.trim()}". Tahan ${keys} lagi, lalu ulangi lebih dekat.`,
+  };
 }
