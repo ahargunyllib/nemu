@@ -7,3 +7,4 @@ export * from "./extension";
 export * from "./integrations";
 export * from "./action-log";
 export * from "./kamus";
+export * from "./teacher-question";

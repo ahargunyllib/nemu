@@ -14,6 +14,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { SparklesIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { useTeacherQuestionStats } from "@/features/teacher-questions/hooks/use-teacher-question-stats";
 import { navGroupsFor } from "@/features/workspace/lib/nav-items";
 import { homePath } from "@/features/workspace/lib/roles";
 
@@ -26,6 +27,8 @@ export default function WorkspaceSidebar({
   footer: ReactNode;
 }) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  // This week's questions Nemu couldn't answer, for Uji jawaban (ADR-0022).
+  const unanswered = useTeacherQuestionStats().data?.unansweredThisWeek ?? 0;
 
   return (
     <AppSidebar aria-label="Admin menu">
@@ -53,10 +56,20 @@ export default function WorkspaceSidebar({
               {group.items.map(({ to, label, icon: Icon }) => (
                 <SidebarMenuItem key={label}>
                   {to ? (
-                    <SidebarMenuButton isActive={pathname.startsWith(to)} render={<Link to={to} />}>
-                      <Icon />
-                      <span>{label}</span>
-                    </SidebarMenuButton>
+                    <>
+                      <SidebarMenuButton
+                        isActive={pathname.startsWith(to)}
+                        render={<Link to={to} />}
+                      >
+                        <Icon />
+                        <span>{label}</span>
+                      </SidebarMenuButton>
+                      {to === "/try-answer" && unanswered > 0 && (
+                        <SidebarMenuBadge aria-label={`${unanswered} pertanyaan belum terjawab`}>
+                          {unanswered}
+                        </SidebarMenuBadge>
+                      )}
+                    </>
                   ) : (
                     <>
                       <SidebarMenuButton disabled>

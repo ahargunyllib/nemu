@@ -6,7 +6,8 @@ import { schoolAdminProcedure, schoolProcedure } from "../../index";
 import { createCatalogRepository } from "../documents/catalog-repository";
 import { createDocumentRepository } from "../documents/repository";
 import { createKamusRepository } from "../kamus/repository";
-import { ask, explain, route, tryAnswer } from "./service";
+import { createTeacherQuestionRepository } from "../teacher-questions/repository";
+import { askTeacher, explain, route, tryAnswer } from "./service";
 
 function helpDeps(context: Pick<Context, "db" | "school">) {
   return {
@@ -30,6 +31,7 @@ export const helpRouter = {
       return explain(
         {
           ...helpDeps(context),
+          questions: createTeacherQuestionRepository(context.db),
           processes: {
             ai: context.school.ai,
             catalog: createCatalogRepository(context.db),
@@ -47,8 +49,13 @@ export const helpRouter = {
   helpAsk: schoolProcedure
     .input(z.object({ question: z.string().trim().min(1).max(500) }))
     .handler(async ({ context, input }) => {
-      await context.caller.requireTeacher();
-      return ask(helpDeps(context), context.caller.workspaceId, input.question);
+      const teacher = await context.caller.requireTeacher();
+      return askTeacher(
+        { ...helpDeps(context), questions: createTeacherQuestionRepository(context.db) },
+        teacher,
+        context.caller.workspaceId,
+        input.question,
+      );
     }),
 
   /** WS-09 Uji jawaban (operator or Admin Javan): the answer with chosen inactive documents. */
