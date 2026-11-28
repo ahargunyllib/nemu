@@ -214,11 +214,14 @@ describe("Dokumen dan alur stats", () => {
       },
       { context },
     );
-    await call(
+    const recording = await call(
       processesRouter.procedureSave,
       { title: "Input nilai per kelas", version: "1", isActive: true, procedure },
       { context },
     );
+    // Dokumen dan alur says who recorded it.
+    const listed = await call(documentsRouter.listDocuments, { packageId: null }, { context });
+    expect(listed.find((row) => row.id === recording.id)?.createdByName).toBe("Rizal Hidayat");
 
     const stats = await call(documentsRouter.knowledgeStats, undefined, { context });
     // The seeded SOP Penilaian, the tahfidz BPMN and the recording are the school's own.

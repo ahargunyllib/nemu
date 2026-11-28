@@ -185,7 +185,10 @@ export const processesRouter = {
       }),
     )
     .handler(({ context, input }) =>
-      saveProcedure(processDeps(context), context.session.user.workspaceId, input),
+      saveProcedure(processDeps(context), context.session.user.workspaceId, {
+        ...input,
+        createdBy: context.session.user.id,
+      }),
     ),
 
   procedureList: schoolProcedure.handler(({ context }) =>

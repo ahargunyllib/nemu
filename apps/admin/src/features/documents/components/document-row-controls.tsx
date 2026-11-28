@@ -110,11 +110,12 @@ async function openFile(id: string) {
 export function DocumentExportBpmnButton({
   id,
   title,
-  withLabel = false,
+  label,
 }: {
   id: string;
   title: string;
-  withLabel?: boolean;
+  /** Shown on the button ("Ekspor BPMN 2.0"); without it, an icon button. */
+  label?: string;
 }) {
   const exportBpmn = useMutation(
     orpc.procedureExportBpmn.mutationOptions({
@@ -131,14 +132,14 @@ export function DocumentExportBpmnButton({
   );
   return (
     <Button
-      variant={withLabel ? "default" : "ghost"}
-      size={withLabel ? "default" : "icon-sm"}
+      variant={label ? "default" : "ghost"}
+      size={label ? "default" : "icon-sm"}
       aria-label={`Unduh BPMN ${title}`}
       disabled={exportBpmn.isPending}
       onClick={() => exportBpmn.mutate({ documentId: id })}
     >
       {exportBpmn.isPending ? <Spinner /> : <DownloadIcon />}
-      {withLabel && "Unduh BPMN"}
+      {label}
     </Button>
   );
 }
