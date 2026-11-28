@@ -115,13 +115,22 @@ describe("F4-1's closing sentence (#256)", () => {
   test("after the last of two problems Nemu says one closing sentence, then Catatan langkah", async () => {
     await checked(3, [1, 3]);
     expect(view()).toMatchObject({
-      sentence: "Soal 1 belum ada kunci jawabannya, Bu. Ibu isi kuncinya lewat Edit soal.",
+      sentence: "Soal 1 belum ada kunci jawabannya, Bu.",
+      detail: "Ibu isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.",
+      status: { text: "Memeriksa kuis", count: "1 dari 2" },
+      notes: {
+        kenapa:
+          "Semua pilihan di Soal 1 bernilai 0, jadi siswa yang menjawab benar pun mendapat 0.",
+      },
     });
-    press("Berikutnya");
+    // Only the sentence is spoken, not the detail line under it.
+    expect(spoken.at(-1)).toBe("Soal 1 belum ada kunci jawabannya, Bu.");
+    press("Lanjut");
     expect(view()).toMatchObject({
-      sentence: "Soal 3 belum ada kunci jawabannya, Bu. Ibu isi kuncinya lewat Edit soal.",
+      sentence: "Soal 3 belum ada kunci jawabannya, Bu.",
+      status: { text: "Memeriksa kuis", count: "2 dari 2" },
     });
-    press("Berikutnya");
+    press("Lanjut");
 
     expect(view()).toMatchObject({
       type: "jawab",
@@ -135,21 +144,21 @@ describe("F4-1's closing sentence (#256)", () => {
     expect(quizCheck.getView().display).toBeNull();
     expect(executor.presentNotes).toHaveBeenCalledWith([
       "Nemu membuka Setelan.",
-      "Masalah: Soal 1 belum ada kunci jawabannya, Bu. Ibu isi kuncinya lewat Edit soal.",
-      "Masalah: Soal 3 belum ada kunci jawabannya, Bu. Ibu isi kuncinya lewat Edit soal.",
+      "Masalah: Soal 1 belum ada kunci jawabannya, Bu. Ibu isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.",
+      "Masalah: Soal 3 belum ada kunci jawabannya, Bu. Ibu isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.",
       "Nemu tidak mengubah apa pun di kuis ini.",
     ]);
   });
 
   test("with one problem the sentence says “hal itu”", async () => {
     await checked(2, [2]);
-    press("Berikutnya");
+    press("Lanjut");
     expect(view()).toMatchObject({ sentence: "Selain hal itu, kuisnya sudah siap, Bu." });
   });
 
   test("a page load on the closing sentence shows it again (F0-13)", async () => {
     await checked(2, [2]);
-    press("Berikutnya");
+    press("Lanjut");
     quizCheck.connect({ pageEmail: { kind: "unreadable" }, honorific: "", speak: () => {} });
     await quizCheck.restore();
     expect(view()).toMatchObject({ sentence: "Selain hal itu, kuisnya sudah siap, Bu." });
@@ -170,12 +179,40 @@ describe("F4-1's closing sentence (#256)", () => {
     expect(spoken).toEqual([]);
   });
 
-  test("closing the problems with × skips the closing sentence", async () => {
+  test("a problem has Lanjut and no ×, also the last one", async () => {
     await checked(3, [1, 3]);
+    press("Lanjut");
+    const last = view();
+    expect(last).toMatchObject({ status: { count: "2 dari 2" } });
+    if (last.type !== "jawab") throw new Error("not a Gelembung Jawab");
+    expect(last.onClose).toBeUndefined();
+  });
+
+  test("while it checks, Nemu says it looks as a student does, with only Berhenti", async () => {
+    const shown: NemuDisplay[] = [];
+    const stop = quizCheck.subscribe(() => {
+      const display = quizCheck.getView().display;
+      if (display) shown.push(display);
+    });
+    await checked(2, [2]);
+    stop();
+    const working = shown.find((display) => display.type === "kerja");
+    expect(working).toMatchObject({
+      sentence: "Saya lihat seperti siswa melihatnya.",
+      detail: "Nemu tidak mengubah apa pun.",
+      status: { text: "Memeriksa kuis" },
+    });
+    if (working?.type !== "kerja") throw new Error("no Gelembung Kerja");
+    expect(working.onSlow).toBeUndefined();
+  });
+
+  test("Kenapa? is read aloud when she opens it", async () => {
+    await checked(2, [2]);
     const display = view();
     if (display.type !== "jawab") throw new Error("not a Gelembung Jawab");
-    display.onClose?.();
-    expect(quizCheck.getView().display).toBeNull();
-    expect(spoken.some((text) => text.startsWith("Selain"))).toBe(false);
+    display.onRead?.(display.notes?.kenapa ?? "");
+    expect(spoken.at(-1)).toBe(
+      "Semua pilihan di Soal 2 bernilai 0, jadi siswa yang menjawab benar pun mendapat 0.",
+    );
   });
 });

@@ -39,6 +39,26 @@ export function closingSentence(count: number, honorific: string): string | null
   return say(`Selain ${things}, kuisnya sudah siap`, honorific);
 }
 
+/** ["Gambar (2)", "Gambar (3)"] → "Gambar (2) dan Gambar (3)" */
+function listed(names: string[]): string {
+  return names.length < 2
+    ? (names[0] ?? "")
+    : `${names.slice(0, -1).join(", ")} dan ${names.at(-1)}`;
+}
+
+/**
+ * Kenapa? for a missing image: what the preview showed, named by the images' alt text when every
+ * one has it ("Di pratinjau, Gambar (3) tidak tampil. …").
+ */
+function missingImageWhy(alts: string[]): string {
+  const what = alts.every(Boolean)
+    ? listed(alts)
+    : alts.length === 1
+      ? "gambar di soal ini"
+      : `${countWord(alts.length)} gambar di soal ini`;
+  return `Di pratinjau, ${what} tidak tampil. Siswa hanya melihat tempatnya kosong.`;
+}
+
 /** A class the way schools write it ("4A", "10 IPA" is not one): a grade and a letter. */
 const CLASS = /(?:^|[^\p{L}\p{N}])(\d{1,2})\s?([A-F])(?![\p{L}\p{N}])/u;
 
@@ -70,23 +90,30 @@ export function checkQuiz(
   const { honorific } = options;
   const problems: QuizProblem[] = [];
 
-  for (const question of [...quiz.questions].sort((a, b) => a.slot - b.slot)) {
-    if (question.images.some((image) => !image.loaded))
-      problems.push({
-        kind: "missing_image",
-        slot: question.slot,
-        sentence: say(`Soal ${question.slot} belum ada gambarnya`, honorific),
-      });
+  // Missing images first, then missing keys, each by question number: what students can't see
+  // comes before what only grading gets wrong (F4-1's soal 15, then soal 7).
+  const bySlot = [...quiz.questions].sort((a, b) => a.slot - b.slot);
+  for (const question of bySlot) {
+    const missing = question.images.filter((image) => !image.loaded);
+    if (missing.length === 0) continue;
+    problems.push({
+      kind: "missing_image",
+      slot: question.slot,
+      sentence: say(`Soal ${question.slot} belum ada gambarnya`, honorific),
+      why: missingImageWhy(missing.map((image) => image.alt.trim())),
+    });
+  }
+  for (const question of bySlot) {
+    if (question.hasKey !== false) continue;
     // PRD v2.3: Nemu says where to fill the key and never proposes one ("Kuncinya setrika, Bu?").
-    if (question.hasKey === false)
-      problems.push({
-        kind: "no_key",
-        slot: question.slot,
-        sentence: `${say(`Soal ${question.slot} belum ada kunci jawabannya`, honorific)} ${ask(
-          "isi kuncinya lewat Edit soal",
-          honorific,
-        )}`,
-      });
+    // Where to fill it goes on the quieter detail line, under the sentence the key expects.
+    problems.push({
+      kind: "no_key",
+      slot: question.slot,
+      sentence: say(`Soal ${question.slot} belum ada kunci jawabannya`, honorific),
+      detail: `${ask("isi kuncinya lewat Edit soal", honorific)} Nemu tidak mengubahnya.`,
+      why: `Semua pilihan di Soal ${question.slot} bernilai 0, jadi siswa yang menjawab benar pun mendapat 0.`,
+    });
   }
 
   // Question count: none at all, students seeing a different number, or not what she said.

@@ -46,31 +46,82 @@ const BEFORE_TEST = {
 };
 
 describe("checkQuiz (F4-01 DOM rules)", () => {
-  test("F4-1: exactly the two planted problems, each as one sentence", () => {
+  test("F4-1: exactly the two planted problems, the missing image first (F4-1_kunci.csv's order)", () => {
     expect(checkQuiz(f41(), BEFORE_TEST)).toEqual([
+      {
+        kind: "missing_image",
+        slot: 15,
+        sentence: "Soal 15 belum ada gambarnya, Bu.",
+        why: "Di pratinjau, Gambar (3) tidak tampil. Siswa hanya melihat tempatnya kosong.",
+      },
       {
         kind: "no_key",
         slot: 7,
-        sentence: "Soal 7 belum ada kunci jawabannya, Bu. Ibu isi kuncinya lewat Edit soal.",
+        sentence: "Soal 7 belum ada kunci jawabannya, Bu.",
+        detail: "Ibu isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.",
+        why: "Semua pilihan di Soal 7 bernilai 0, jadi siswa yang menjawab benar pun mendapat 0.",
       },
-      { kind: "missing_image", slot: 15, sentence: "Soal 15 belum ada gambarnya, Bu." },
     ]);
+  });
+
+  test("every missing image comes before every missing key, each by question number", () => {
+    const quiz = f41({
+      questions: [
+        question(2, { hasKey: false }),
+        question(9, { images: [{ alt: "", loaded: false }] }),
+        question(4, { hasKey: false, images: [{ alt: "Peta", loaded: false }] }),
+      ],
+      listed: 3,
+    });
+    expect(checkQuiz(quiz, BEFORE_TEST).map(({ kind, slot }) => `${kind} ${slot}`)).toEqual([
+      "missing_image 4",
+      "missing_image 9",
+      "no_key 2",
+      "no_key 4",
+    ]);
+  });
+
+  test("Kenapa? names the images by their alt text, or counts them when one has none", () => {
+    const why = (images: QuizQuestion["images"]) =>
+      checkQuiz(f41({ questions: [question(1, { images })], listed: 1 }), BEFORE_TEST)[0]?.why;
+    expect(
+      why([
+        { alt: "Gambar (2)", loaded: false },
+        { alt: "Gambar (3)", loaded: false },
+      ]),
+    ).toBe(
+      "Di pratinjau, Gambar (2) dan Gambar (3) tidak tampil. Siswa hanya melihat tempatnya kosong.",
+    );
+    expect(why([{ alt: "", loaded: false }])).toBe(
+      "Di pratinjau, gambar di soal ini tidak tampil. Siswa hanya melihat tempatnya kosong.",
+    );
+    expect(
+      why([
+        { alt: "", loaded: false },
+        { alt: "Peta", loaded: false },
+      ]),
+    ).toBe(
+      "Di pratinjau, dua gambar di soal ini tidak tampil. Siswa hanya melihat tempatnya kosong.",
+    );
   });
 
   test("without a known honorific the sentence just ends", () => {
     const problems = checkQuiz(f41(), { ...BEFORE_TEST, honorific: "" });
-    expect(problems[0]?.sentence).toBe(
-      "Soal 7 belum ada kunci jawabannya. Isi kuncinya lewat Edit soal.",
-    );
-    expect(problems[1]?.sentence).toBe("Soal 15 belum ada gambarnya.");
+    expect(problems[0]?.sentence).toBe("Soal 15 belum ada gambarnya.");
+    expect(problems[1]).toMatchObject({
+      sentence: "Soal 7 belum ada kunci jawabannya.",
+      detail: "Isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.",
+    });
   });
 
   test("a question with no key points to Edit soal and never proposes a key (PRD v2.3)", () => {
-    const [noKey] = checkQuiz(f41(), { ...BEFORE_TEST, honorific: "Pak" });
-    expect(noKey?.sentence).toBe(
-      "Soal 7 belum ada kunci jawabannya, Pak. Bapak isi kuncinya lewat Edit soal.",
+    const noKey = checkQuiz(f41(), { ...BEFORE_TEST, honorific: "Pak" }).find(
+      (problem) => problem.kind === "no_key",
     );
-    expect(noKey?.sentence).not.toMatch(/\?/u);
+    // The sentence is the official key's; where to fill it is the detail line under it.
+    expect(noKey?.sentence).toBe("Soal 7 belum ada kunci jawabannya, Pak.");
+    expect(noKey?.detail).toBe("Bapak isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.");
+    expect(`${noKey?.sentence} ${noKey?.detail}`).not.toMatch(/\?/u);
   });
 
   test("question count: none, a different number for students, or not what she asked for", () => {

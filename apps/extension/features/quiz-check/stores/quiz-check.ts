@@ -41,6 +41,8 @@ type Pointing = {
 type Context = { pageEmail: PageEmail; honorific: string; speak: (text: string) => void };
 
 const NOTHING_CHANGED = "Nemu tidak mengubah apa pun di kuis ini.";
+/** The header over the working bubble and each problem: "Memeriksa kuis · 1 dari 2". */
+const CHECKING = "Memeriksa kuis";
 
 function say(sentence: string, honorific: string): string {
   return honorific ? `${sentence}, ${honorific}.` : `${sentence}.`;
@@ -102,26 +104,24 @@ function createQuizCheck() {
   }
 
   /**
-   * One problem at a time, pointed at on the page, with the next one behind Berikutnya. After the
-   * last one Nemu says the closing sentence (#256), about no element, and Catatan langkah follows.
+   * One problem at a time, pointed at on the page, with the next one behind Lanjut, also on the
+   * last one. After it Nemu says the closing sentence (#256), about no element, and Catatan
+   * langkah follows. Kenapa? reads what the check saw, when it can say more than the sentence.
    */
   function show() {
     if (!pointing) return publish({ display: null, target: null });
     const { problems, index, closing } = pointing;
     const problem = problems[index];
     if (!problem) return closing && index === problems.length ? showReady(closing) : finish();
-    const last = index === problems.length - 1 && !closing;
     publish({
       display: {
         type: "jawab",
         sentence: problem.sentence,
-        status: {
-          tone: "unsaved",
-          text: "Masalah di kuis",
-          progress: { done: index + 1, total: problems.length },
-        },
-        action: { label: last ? "Selesai" : "Berikutnya", onSelect: last ? finish : next },
-        onClose: close,
+        ...(problem.detail ? { detail: problem.detail } : {}),
+        status: { text: CHECKING, count: `${index + 1} dari ${problems.length}` },
+        ...(problem.why ? { notes: { kenapa: problem.why } } : {}),
+        onRead: (text) => context.speak(text),
+        action: { label: "Lanjut", onSelect: next },
       },
       target: targetFor(problem),
     });
@@ -153,7 +153,9 @@ function createQuizCheck() {
     const found =
       state.problems.length === 0
         ? ["Nemu tidak menemukan masalah."]
-        : state.problems.map((problem) => `Masalah: ${problem.sentence}`);
+        : state.problems.map((problem) =>
+            [`Masalah: ${problem.sentence}`, problem.detail].filter(Boolean).join(" "),
+          );
     return [...state.notes, ...found, ...(state.changed ? [] : [NOTHING_CHANGED])];
   }
 
@@ -166,7 +168,10 @@ function createQuizCheck() {
     if (state) executor.presentNotes(lines(state));
   }
 
-  /** ×: the problems are kept in Catatan langkah, which the Nemu button reopens. */
+  /**
+   * × on the closing or quiz-ready bubble (the problem bubbles have none, only Lanjut): the
+   * problems are kept in Catatan langkah, which the Nemu button reopens.
+   */
   function close() {
     const state = pointing;
     pointing = null;
@@ -186,9 +191,11 @@ function createQuizCheck() {
     publish({
       display: {
         type: "kerja",
-        sentence: "Nemu memeriksa soal-soalnya…",
-        status: { tone: "working", text: "Nemu mengecek kuis" },
-        onSlow: () => undefined,
+        sentence: "Saya lihat seperti siswa melihatnya.",
+        // After F4-03 put the quiz in, Nemu did change it, so it doesn't say otherwise here.
+        ...(changed ? {} : { detail: "Nemu tidak mengubah apa pun." }),
+        status: { text: CHECKING },
+        // Only Berhenti: reading the preview has no pace to slow down.
         onStop: () => publish({ display: null, target: null }),
       },
       target: null,
@@ -200,10 +207,16 @@ function createQuizCheck() {
       honorific,
       utterance: found.utterance,
     });
-    // #218: judgement checks from the Nemu Service; without them the rules still stand.
+    // #218: judgement checks from the Nemu Service; without them the rules still stand. The
+    // judge only needs what was found, not the detail line or Kenapa?, so a service without
+    // `detail` and `why` accepts it too.
     const judged = await requestQuizCheck(context.pageEmail, {
       op: "judge",
-      input: { quiz: found.quiz, utterance: found.utterance, found: problems },
+      input: {
+        quiz: found.quiz,
+        utterance: found.utterance,
+        found: problems.map(({ why: _why, detail: _detail, ...problem }) => problem),
+      },
     });
     const all = [...problems, ...(judged.ok ? judged.value.problems : [])];
     if (all.length === 0) {
