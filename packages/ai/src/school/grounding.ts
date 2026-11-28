@@ -110,7 +110,8 @@ export async function answerGrounded(
     schemaName: "grounded_answer",
     schema: MODEL_ANSWER_JSON_SCHEMA,
     parse: (value) => modelAnswerSchema.parse(value),
-    maxOutputTokens: 600,
+    // The text model reasons first, inside this budget; 600 left some answers with no text (#308).
+    maxOutputTokens: 2_000,
   });
 
   return verifyGroundedAnswer(response, context);

@@ -1,4 +1,4 @@
-import { pageSnapshotSchema } from "@nemu/contracts/school";
+import { pageSnapshotSchema, processDetailsRequestSchema } from "@nemu/contracts/school";
 import { z } from "zod";
 
 import type { Context } from "../../context";
@@ -6,7 +6,7 @@ import { schoolAdminProcedure, schoolProcedure } from "../../index";
 import { createCatalogRepository } from "../documents/catalog-repository";
 import { createDocumentRepository } from "../documents/repository";
 import { createKamusRepository } from "../kamus/repository";
-import { ask, explain, route, tryAnswer } from "./service";
+import { ask, explain, explainDetails, route, tryAnswer } from "./service";
 
 function helpDeps(context: Pick<Context, "db" | "school">) {
   return {
@@ -23,7 +23,11 @@ export const helpRouter = {
    */
   helpExplain: schoolProcedure
     .input(
-      z.object({ snapshot: pageSnapshotSchema, question: z.string().trim().max(500).nullable() }),
+      z.object({
+        snapshot: pageSnapshotSchema,
+        question: z.string().trim().max(500).nullable(),
+        answerFirst: z.boolean().optional(),
+      }),
     )
     .handler(async ({ context, input }) => {
       const teacher = await context.caller.requireTeacher();
@@ -36,6 +40,29 @@ export const helpRouter = {
             files: context.documentFiles,
             alurSekolah: context.school.alurSekolah,
           },
+        },
+        teacher,
+        context.caller.workspaceId,
+        input,
+      );
+    }),
+
+  /**
+   * #308: after `helpExplain` with `answerFirst`, its `detailsRequest` → `why`, `steps` and
+   * `parentReply` in plain words, or null when the walk no longer fits the school's BPMN (the
+   * drafts already shown stay).
+   */
+  helpExplainDetails: schoolProcedure
+    .input(processDetailsRequestSchema)
+    .handler(async ({ context, input }) => {
+      const teacher = await context.caller.requireTeacher();
+      return explainDetails(
+        {
+          ...helpDeps(context),
+          ai: context.school.ai,
+          catalog: createCatalogRepository(context.db),
+          files: context.documentFiles,
+          alurSekolah: context.school.alurSekolah,
         },
         teacher,
         context.caller.workspaceId,

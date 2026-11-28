@@ -3,6 +3,7 @@ import { routeCommand } from "@nemu/ai/school/commands";
 import {
   describesSymptom,
   screenSymptoms,
+  type ExplainProcessInput,
   type ProcessIndex,
   type SymptomCandidate,
 } from "@nemu/ai/school/process-help";
@@ -14,6 +15,8 @@ import type {
   GroundedAnswer,
   HelpExplanation,
   PageSnapshot,
+  ProcessDetails,
+  ProcessDetailsRequest,
 } from "@nemu/contracts/school";
 
 import type { DocumentFileStore } from "../../context";
@@ -39,13 +42,18 @@ export type HelpDeps = {
 
 /** What F2-08 needs on top: the WS-04 symptoms, the BPMN files and AlurSekolah (F3-13). */
 export type ProcessHelpDeps = {
-  ai: Pick<SchoolAi, "matchSymptom" | "explainProcess">;
+  ai: Pick<SchoolAi, "matchSymptom" | "explainProcess" | "explainProcessDetails">;
   catalog: Pick<CatalogRepository, "listProcessElements">;
   files: DocumentFileStore;
   alurSekolah: AlurSekolahConnector;
 };
 
-type ExplainInput = { snapshot: PageSnapshot; question: string | null };
+type ExplainInput = {
+  snapshot: PageSnapshot;
+  question: string | null;
+  /** #308: word only the spoken answer now; `helpExplainDetails` words the rest. */
+  answerFirst?: boolean;
+};
 
 /** The active, ready BPMNs, their WS-04 elements and every symptom as a match candidate. */
 async function processSymptoms(
@@ -80,6 +88,7 @@ async function explainFromProcess(
   teacher: TeacherProfile,
   workspaceId: string,
   question: string,
+  answerFirst = false,
 ): Promise<{ answer: HelpExplanation | null; symptoms: boolean }> {
   const { processes, elements, candidates } = await processSymptoms(deps, workspaceId);
   if (!candidates.length) return { answer: null, symptoms: false };
@@ -88,21 +97,49 @@ async function explainFromProcess(
   const match = found?.match;
   const at = match ? processes.findIndex((item) => item.id === match.documentId) : -1;
   const document = processes[at];
-  const body = document ? await deps.files.get(document.storageKey) : null;
-  if (!found || !match || !document || !body) return { answer: null, symptoms: true };
+  if (!found || !match || !document) return { answer: null, symptoms: true };
+  const input = await processInput(deps, teacher, workspaceId, {
+    question,
+    document,
+    elements: elements[at]!,
+    match,
+    via: found.via,
+  });
+  if (!input) return { answer: null, symptoms: true };
+  const answer = await deps.ai.explainProcess(input, { answerFirst });
+  return { answer, symptoms: true };
+}
 
+/**
+ * The walk's input for one matched symptom: the BPMN file, the WS-04 index as the operator left it
+ * (symptoms, the way back and who can help) and whether AlurSekolah has the pupil's grades.
+ */
+async function processInput(
+  deps: Pick<ProcessHelpDeps, "files" | "alurSekolah">,
+  teacher: TeacherProfile,
+  workspaceId: string,
+  found: {
+    question: string;
+    document: { id: string; title: string; version: string; storageKey: string };
+    elements: Awaited<ReturnType<CatalogRepository["listProcessElements"]>>;
+    match: SymptomCandidate;
+    via: SymptomCandidate | null;
+  },
+): Promise<ExplainProcessInput | null> {
+  const { question, document, elements, match, via } = found;
+  const body = await deps.files.get(document.storageKey);
+  if (!body) return null;
   const [graph, gradeCheck] = await Promise.all([
     importBpmn(new TextDecoder().decode(body)),
     checkSavedGrades(deps.alurSekolah, workspaceId, teacher, `${question} ${match.symptom}`),
   ]);
-  // The WS-04 index as the operator left it: symptoms, the way back and who can help.
   const index: ProcessIndex = Object.fromEntries(
-    elements[at]!.map((element) => [
+    elements.map((element) => [
       element.elementId,
       { symptoms: element.symptoms, wayBack: element.wayBack, role: element.role },
     ]),
   );
-  const answer = await deps.ai.explainProcess({
+  return {
     question,
     process: {
       documentId: document.id,
@@ -112,11 +149,42 @@ async function explainFromProcess(
       index,
     },
     match,
-    via: found.via,
+    via,
     gradeCheck,
     teacher,
+  };
+}
+
+/**
+ * #308: the why, steps and parent reply of an `answerFirst` explanation, for the same walk. The
+ * match comes back from the client, so it must still be a symptom of that element in WS-04.
+ */
+export async function explainDetails(
+  deps: Pick<HelpDeps, "documents"> & ProcessHelpDeps,
+  teacher: TeacherProfile,
+  workspaceId: string,
+  request: ProcessDetailsRequest,
+): Promise<ProcessDetails | null> {
+  const { processes, elements, candidates } = await processSymptoms(deps, workspaceId);
+  const at = processes.findIndex((item) => item.id === request.documentId);
+  const known = (ref: { elementId: string; symptom: string }) =>
+    candidates.find(
+      (candidate) =>
+        candidate.documentId === request.documentId &&
+        candidate.elementId === ref.elementId &&
+        candidate.symptom === ref.symptom,
+    );
+  const match = known(request.match);
+  const via = request.via ? known(request.via) : null;
+  if (at === -1 || !match || via === undefined) return null;
+  const input = await processInput(deps, teacher, workspaceId, {
+    question: request.question,
+    document: processes[at]!,
+    elements: elements[at]!,
+    match,
+    via,
   });
-  return { answer, symptoms: true };
+  return input ? deps.ai.explainProcessDetails(input) : null;
 }
 
 export async function explain(
@@ -132,6 +200,7 @@ export async function explain(
       teacher,
       workspaceId,
       input.question,
+      input.answerFirst,
     );
     if (fromProcess.answer) return fromProcess.answer;
     symptoms = fromProcess.symptoms;
