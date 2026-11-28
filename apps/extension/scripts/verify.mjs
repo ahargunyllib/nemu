@@ -150,7 +150,11 @@ await check(
     await page.locator("body").click({ position: { x: 5, y: 5 } });
     await page.keyboard.down("Control");
     await page.keyboard.down("Space");
-    await overlay(page).getByText("Nemu mendengar…").waitFor({ timeout: 5_000 });
+    const listening = overlay(page).getByRole("status", { name: "Nemu mendengar" });
+    await listening.getByText("Nemu mendengar…", { exact: true }).waitFor({ timeout: 5_000 });
+    await listening
+      .getByText("Lepas Ctrl + Spasi kalau sudah selesai.", { exact: true })
+      .waitFor({ timeout: 5_000 });
     await page.waitForTimeout(1_000);
     await page.screenshot({ path: join(shots, "listening.png") });
     await page.keyboard.up("Space");
