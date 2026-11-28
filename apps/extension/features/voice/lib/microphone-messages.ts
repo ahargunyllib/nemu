@@ -33,15 +33,20 @@ export const PROMPT_CLOSED =
   "Nemu belum bisa mendengar. Tahan lagi tombolnya, lalu tekan Izinkan di kotak Chrome.";
 
 /**
- * Kartu Info for a blocked microphone: three steps to allow it again, then [Tutup] (F0-17).
+ * Kartu Info for a blocked microphone: three steps to allow it again, then [Tutup] (F0-02,
+ * F0-17). The first step says "ikon", not a padlock: current Chrome shows a settings icon there.
  * Chrome lets the page use the microphone as soon as it is allowed, but shows a "Muat ulang" bar
- * after the change, so the last step reloads to match what she sees.
+ * after the change, so the last step reloads to match what she sees (#280).
  */
-export const MICROPHONE_BLOCKED = {
-  title: "Mikrofon masih diblokir",
-  items: [
-    "Pertama, tekan ikon di kiri alamat situs, di bagian atas layar.",
-    "Kedua, pada Mikrofon, pilih Izinkan atau nyalakan tombolnya.",
-    "Terakhir, muat ulang halaman, lalu tahan lagi tombolnya.",
-  ],
-} as const;
+export function microphoneBlocked(honorific: string) {
+  return {
+    status: { text: "Mikrofon terblokir", tone: "muted" as const },
+    title: `Nemu belum bisa mendengar ${teacher(honorific)}.`,
+    detail: "Mikrofon tidak diizinkan. Buka lagi dengan 3 langkah ini:",
+    items: [
+      "Klik ikon di kiri alamat situs",
+      "Pada Mikrofon, pilih Izinkan",
+      "Klik Muat ulang di bagian atas",
+    ],
+  };
+}
