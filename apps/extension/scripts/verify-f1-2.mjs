@@ -327,13 +327,12 @@ async function scenario(how) {
       await page.locator("#btn-simpan").click();
       await page.locator("#ya-simpan").click();
       await page.getByText("Nilai tersimpan.").waitFor();
-      const answer = display("jawab");
-      await answer.getByText("Tersimpan").waitFor({ timeout: 30_000 });
+      // F1·12: one Sudah dicek card with the recipe; her two corrections stay in its log.
+      const notes = display("info");
+      await notes.getByText("Sudah dicek").waitFor({ timeout: 30_000 });
+      await notes.getByText("Tersimpan, sama dengan buku.", { exact: true }).waitFor();
       const left = await service({ name: "inboxJobs" });
       expect(!left.some((job) => job.jobId === jobId), "the photo is still in the inbox");
-      await answer.getByRole("button", { name: "Catatan langkah" }).click();
-      // The recipe (F1·12); her two corrections stay in the kept notes' log.
-      const notes = overlay.getByRole("region", { name: "Cara isi nilai kelas" });
       await notes.getByText("Ketik nilai per murid", { exact: true }).waitFor({ timeout: 5000 });
       await page.screenshot({ path: join(shots, `${how}-catatan-langkah.png`) });
       await notes.getByRole("button", { name: "Tutup" }).click();

@@ -249,7 +249,7 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
     expect(await guide.check(step, "86")).toEqual({ ok: true, sentence: "Sudah pas." });
   });
 
-  test("after the save, the read-back is said in one sentence, the photo deleted, then Catatan langkah", async () => {
+  test("after the save, the read-back is said in one sentence, the photo deleted, all in one Sudah dicek card", async () => {
     const task = {
       kind: "f1-isi-nilai",
       title: "Isi nilai UTS Matematika 4B",
@@ -267,16 +267,10 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
     await until(() => view().display?.type === "jawab");
     expect(calls.some((call) => call.op === "readback")).toBe(false);
     document.body.innerHTML = `<div role="status">Nilai tersimpan. 1 nilai Matematika UTS kelas 4B.</div>`;
-    await until(() => {
-      const display = view().display;
-      return display?.type === "jawab" && display.sentence === "2 nilai tersimpan dan sesuai.";
-    });
+    await until(() => executor.presentRecipe.mock.calls.length > 0);
     expect(spoken.at(-1)).toBe("2 nilai tersimpan dan sesuai.");
     expect(calls).toContainEqual({ op: "ack", jobId: "job-1" });
-    const done = view().display;
-    if (done?.type !== "jawab") throw new Error("no answer");
-    done.action?.onSelect();
-    // She sees the recipe (F1·12); who did what is kept as its log.
+    // F1·12: one card, Sudah dicek with the recipe; who did what is kept as its log.
     expect(executor.presentRecipe).toHaveBeenCalledWith(
       {
         title: "Cara isi nilai kelas",
@@ -294,6 +288,12 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
           "Nemu membaca ulang 2 nilai dari AlurSekolah: semua sesuai",
           "Foto buku nilai dihapus dari Nemu",
         ],
+        card: {
+          status: { tone: "success", text: "Sudah dicek" },
+          title: "2 nilai tersimpan dan sesuai.",
+          detail: "1 nilai sudah Nemu baca ulang. Putra dikosongkan (sakit).",
+          itemsLabel: "Catatan langkah · Cara isi nilai kelas",
+        },
       },
     );
     expect(view().display).toBeNull();

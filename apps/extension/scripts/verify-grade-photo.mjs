@@ -348,12 +348,12 @@ await check(
     await page.locator("#btn-simpan").click();
     await page.locator("#ya-simpan").click();
     await page.getByText("Nilai tersimpan.").waitFor();
-    const answer = display("jawab");
-    await answer.getByText("Tersimpan").waitFor({ timeout: 30_000 });
-    const sentence = await answer.textContent();
-    console.log(
-      `  read-back: ${sentence.replace(/Tersimpan|Catatan langkah|Lihat ringkasan/gu, "").trim()}`,
-    );
+    // F1·12: one card, Sudah dicek with the recipe under it.
+    const card = display("info");
+    await card.getByText("Sudah dicek").waitFor({ timeout: 30_000 });
+    await card.getByText("Tersimpan, sama dengan buku.", { exact: true }).waitFor();
+    const detail = await card.getByText(/^\d+ nilai sudah Nemu baca ulang\./u).textContent();
+    console.log(`  read-back: Tersimpan, sama dengan buku. ${detail}`);
     await page.screenshot({ path: join(shots, "baca-ulang.png") });
     const left = await service({ name: "inboxJobs" });
     expect(!left.some((job) => job.jobId === jobId), "the photo is still in the inbox");
@@ -371,22 +371,33 @@ await check(
   },
 );
 
-await check("Catatan langkah shows at the end, as the recipe Cara isi nilai kelas", async () => {
-  await display("jawab").getByRole("button", { name: "Catatan langkah" }).click();
-  const notes = overlay.getByRole("region", { name: "Cara isi nilai kelas" });
-  await notes
-    .getByText("Disimpan dari pengisian Matematika 4B", { exact: false })
-    .waitFor({ timeout: 5000 });
-  for (const step of [
-    "Menu Nilai",
-    "Pilih kelas, mapel, penilaian",
-    "Ketik nilai per murid",
-    "Tekan Simpan",
-  ])
-    await notes.getByText(step, { exact: true }).waitFor();
-  await notes.getByRole("button", { name: "Coba sendiri" }).waitFor();
-  await page.screenshot({ path: join(shots, "catatan-langkah.png") });
-});
+const RECIPE = [
+  "Menu Nilai",
+  "Pilih kelas, mapel, penilaian",
+  "Ketik nilai per murid",
+  "Tekan Simpan",
+];
+
+await check(
+  "the Sudah dicek card lists Cara isi nilai kelas, then reopens from the Nemu button",
+  async () => {
+    const card = display("info");
+    await card.getByText("Catatan langkah · Cara isi nilai kelas").waitFor({ timeout: 5000 });
+    for (const step of RECIPE) await card.getByText(step, { exact: true }).waitFor();
+    await card.getByRole("button", { name: "Coba sendiri" }).waitFor();
+    await card.getByRole("button", { name: "Tutup" }).click();
+    await overlay.getByRole("button", { name: "Tanya Nemu" }).click();
+    await overlay.getByRole("button", { name: "Lihat catatan langkah" }).click();
+    // F1·12b: reopened, it is the recipe itself, with where it was saved from.
+    const notes = overlay.getByRole("region", { name: "Cara isi nilai kelas" });
+    await notes
+      .getByText("Disimpan dari pengisian Matematika 4B", { exact: false })
+      .waitFor({ timeout: 5000 });
+    for (const step of RECIPE) await notes.getByText(step, { exact: true }).waitFor();
+    await notes.getByRole("button", { name: "Coba sendiri" }).waitFor();
+    await page.screenshot({ path: join(shots, "catatan-langkah.png") });
+  },
+);
 
 await check("F1-1: 0 wrong grades saved in AlurSekolah, in under 5 minutes", async () => {
   const minutes = (Date.now() - started) / 60_000;

@@ -34,7 +34,7 @@ export function diffReadback(
     }
   }
   if (!mismatches.length) {
-    return { match: true, mismatches, sentence: "Sudah saya cek, sama dengan buku." };
+    return { match: true, mismatches, sentence: "Tersimpan, sama dengan buku." };
   }
   const first = mismatches[0]!;
   const others = mismatches.length > 1 ? ` dan ${mismatches.length - 1} lainnya` : "";

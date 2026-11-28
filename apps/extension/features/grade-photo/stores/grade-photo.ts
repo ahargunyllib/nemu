@@ -8,6 +8,7 @@ import type {
 import type { KartuPilihProps, NemuDisplay } from "@nemu/ui/lib/nemu-display";
 
 import type { PageEmail } from "../../../shared/lib/messages";
+import { type NotesCard, recipeCard } from "../../executor/lib/recipe";
 import { type Recipe, recipeOf, stoppedDetail } from "../../executor/lib/recipe-steps";
 import type { RunState } from "../../executor/lib/run";
 import { executor } from "../../executor/stores/executor";
@@ -19,7 +20,14 @@ import {
   replyFromNumber,
   replyFromSpeech,
 } from "../lib/answers";
-import { addressFor, GRADE_TASK_KIND, type GradeTarget, gradeTask } from "../lib/grade-task";
+import {
+  addressFor,
+  GRADE_RECIPE,
+  GRADE_TASK_KIND,
+  type GradeTarget,
+  gradeTask,
+  readBackDetail,
+} from "../lib/grade-task";
 import { gradeGuide } from "../lib/guided-lines";
 import type { GradePhotoRequest, GradePhotoValue } from "../lib/requests";
 import { gradesOnPage, watchForSave } from "../lib/saved-page";
@@ -60,8 +68,7 @@ type Phase =
   | { name: "finalizing" }
   | { name: "filling" }
   | { name: "saving" }
-  | { name: "reading-back" }
-  | { name: "done"; sentence: string; match: boolean; ringkasan: string | null };
+  | { name: "reading-back" };
 
 /** What is kept in the background for this tab while the fill and the save are under way. */
 type Kept = {
@@ -295,17 +302,6 @@ function createGradePhoto() {
           status: { tone: "working", text: "Nemu memeriksa" },
           onSlow: () => undefined,
           onStop: () => finishWithoutReadback(),
-        };
-      case "done":
-        return {
-          type: "jawab",
-          sentence: phase.sentence,
-          status: phase.match
-            ? { tone: "saved", text: "Tersimpan" }
-            : { tone: "unsaved", text: "Belum sesuai" },
-          notes: phase.ringkasan ? { ringkasan: phase.ringkasan } : undefined,
-          action: { label: "Catatan langkah", onSelect: () => showNotes(true) },
-          onClose: () => showNotes(false),
         };
     }
   }
@@ -593,19 +589,22 @@ function createGradePhoto() {
       ],
     };
     void call({ op: "state-save", state: null });
-    job = null;
-    target = null;
-    const ringkasan = result.mismatches.length
-      ? result.mismatches
+    // F1·12: one card. "Sudah dicek" and what was found, then the recipe and Coba sendiri.
+    const detail = result.match
+      ? readBackDetail(current.entries)
+      : result.mismatches
           .map(
-            (item) => `${item.name}: tersimpan ${item.saved ?? "kosong"}, di buku ${item.expected}`,
+            (item) =>
+              `${item.name}: tersimpan ${item.saved ?? "kosong"}, di buku ${item.expected}.`,
           )
-          .join("; ")
-      : null;
-    setPhase(
-      { name: "done", sentence: result.sentence, match: result.match, ringkasan },
-      result.sentence,
-    );
+          .join(" ");
+    const card = recipeCard({
+      checked: { ok: result.match, title: result.sentence },
+      detail,
+      recipe: GRADE_RECIPE,
+    });
+    showNotes(true, card);
+    context.speak(result.sentence);
   }
 
   /** The teacher closed the wait: Catatan langkah without a read-back; the photo stays for now. */
@@ -617,12 +616,12 @@ function createGradePhoto() {
     showNotes(true);
   }
 
-  function showNotes(show: boolean) {
+  function showNotes(show: boolean, card?: NotesCard) {
     const notes = kept?.notes ?? [];
     const offer = kept?.offer ?? null;
     const recipe = kept?.recipe;
     reset();
-    if (recipe) executor.presentRecipe(recipe, { offer, show, log: notes });
+    if (recipe) executor.presentRecipe(recipe, { offer, show, log: notes, card });
     else executor.presentNotes(notes, offer, show);
   }
 
