@@ -106,7 +106,7 @@ async function signIn(email, password) {
   await admin.waitForURL((url) => !url.pathname.startsWith("/login"));
 }
 
-/** WS-04: the page of the setoran task, as Pak Rizal types it in the sheet. */
+/** WS-04: the page of the setoran task, as Pak Rizal corrects it in the BPMN's panel. */
 async function setPage(value) {
   await admin.goto(new URL("documents", ADMIN).href);
   await admin.getByRole("row").nth(1).waitFor();
@@ -117,13 +117,11 @@ async function setPage(value) {
     .filter({ has: admin.getByText("Aktif", { exact: true }) })
     .first()
     .click();
-  await admin.getByRole("button", { name: `Gejala dan halaman ${TITLE}` }).click();
-  const sheet = admin.getByRole("dialog");
-  const form = sheet.locator("form").filter({ hasText: TASK });
+  await admin.getByRole("button", { name: `Ubah ${TASK}` }).click();
+  const form = admin.getByRole("form", { name: `Ubah ${TASK}` });
   await form.getByLabel("Halaman").fill(value);
   await form.getByRole("button", { name: "Simpan" }).click();
   await admin.getByText(`${TASK} disimpan`).first().waitFor({ timeout: 10_000 });
-  await admin.keyboard.press("Escape");
 }
 
 let ready = false;

@@ -115,6 +115,43 @@ describe("WS-04 knowledge", () => {
   });
 });
 
+describe("Dokumen dan alur: a BPMN's tasks in the panel", () => {
+  it("says who does each task, the branch that leads to it, and counts tasks and gateways", async () => {
+    const context = await operatorContext();
+    const document = await call(
+      documentsRouter.uploadDocument,
+      {
+        title: "Catat Hafalan Tahfidz",
+        version: "1",
+        isActive: true,
+        file: await fixtureFile("F3-1_catat-hafalan-tahfidz.bpmn"),
+        siteIds: [],
+      },
+      { context },
+    );
+
+    const detail = await call(documentsRouter.getProcessDetail, { id: document.id }, { context });
+    expect([detail.taskCount, detail.gatewayCount, detail.unmappedTasks]).toEqual([5, 2, 0]);
+    const task = (id: string) => detail.elements.find((element) => element.elementId === id);
+    expect(task("Task_Setoran")).toMatchObject({
+      performer: "person",
+      lane: "Guru",
+      branch: "Setoran",
+    });
+    expect(task("Task_PilihJenis")).toMatchObject({ performer: "person", branch: null });
+    expect(task("Task_Hitung")).toMatchObject({
+      performer: "system",
+      lane: "Sistem AlurSekolah",
+      page: null,
+    });
+    expect(task("End_1")?.performer).toBeNull();
+
+    await expect(
+      call(documentsRouter.getProcessDetail, { id: "sop-penilaian-sdit-nusantara" }, { context }),
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+});
+
 describe("Dokumen dan alur stats", () => {
   it("counts active knowledge by package and school, BPMN tasks, and the newest recording's steps", async () => {
     const context = await operatorContext();
