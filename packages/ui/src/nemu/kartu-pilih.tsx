@@ -8,7 +8,13 @@ import {
 } from "@nemu/ui/components/card";
 import { Skeleton } from "@nemu/ui/components/skeleton";
 import { type KartuPilihProps, orderChoices } from "@nemu/ui/lib/nemu-display";
-import { NEMU_DETAIL, NemuCard } from "@nemu/ui/nemu/nemu-frame";
+import {
+  NEMU_BUTTON,
+  NEMU_DETAIL,
+  NEMU_OUTLINE,
+  NemuActionRow,
+  NemuCard,
+} from "@nemu/ui/nemu/nemu-frame";
 import { cn } from "cn";
 import { TriangleAlert } from "lucide-react";
 import { useId } from "react";
@@ -17,9 +23,10 @@ import { useId } from "react";
  * Kartu Pilih: a decision. One question, an optional detail line ("Pilih salah satu, Nemu
  * menunggu."), and two or three equal, stacked big buttons. Nothing is
  * pre-selected or focused; a risky choice carries ⚠ and sits under the safe one. An `image`
- * shows what the question is about (W5's photo crop); `compact` is the small card that waits
- * beside the Nemu button, with 44 px buttons, and its `image` is a thumbnail beside the question
- * ("Foto dari WhatsApp", #278).
+ * shows what the question is about in a framed box with an optional caption (W5's photo crop,
+ * the WhatsApp photo). `compact` is the card that waits beside the Nemu button: its choices are
+ * compact buttons on the right, in the order given, the `primary` one black ("Foto masuk ·
+ * Nanti / Mulai").
  */
 export function KartuPilih({
   question,
@@ -32,77 +39,90 @@ export function KartuPilih({
   status,
 }: KartuPilihProps) {
   const questionId = useId();
+  const ordered = orderChoices(choices);
   return (
-    <NemuCard
-      display="pilih"
-      label="Pilihan Nemu"
-      status={status}
-      className={cn(compact && "w-[300px] gap-3 [--card-spacing:--spacing(5)]")}
-    >
-      <CardHeader className={cn(compact && image && "flex items-center gap-3")}>
-        {compact &&
-          image &&
-          (image.src ? (
-            <img
-              src={image.src}
-              alt={image.alt}
-              className="size-16 shrink-0 rounded-xl border-2 border-border bg-muted object-cover object-top"
-            />
-          ) : (
-            <Skeleton aria-hidden className="size-16 shrink-0" />
-          ))}
-        <div className="flex flex-col gap-1.5">
-          <CardTitle
-            id={questionId}
-            className={cn("font-semibold", compact ? "text-lg leading-6" : "text-xl leading-7")}
-          >
-            {question}
-          </CardTitle>
-          {detail && (
-            <CardDescription data-nemu-detail className={NEMU_DETAIL}>
-              {detail}
-            </CardDescription>
-          )}
-        </div>
+    <NemuCard display="pilih" label="Pilihan Nemu" status={status}>
+      <CardHeader className="gap-1.5">
+        <CardTitle id={questionId} className="text-xl leading-7 font-semibold">
+          {question}
+        </CardTitle>
+        {detail && (
+          <CardDescription data-nemu-detail className={NEMU_DETAIL}>
+            {detail}
+          </CardDescription>
+        )}
       </CardHeader>
-      {!compact && image?.src && (
+      {image && (image.src || compact) && (
         <CardContent>
-          <img
-            src={image.src}
-            alt={image.alt}
-            className="max-h-44 w-full rounded-2xl border-2 border-border bg-muted object-contain"
-          />
+          <figure className="flex flex-col gap-2 rounded-2xl border border-nemu-amber-100 bg-nemu-subtle p-3">
+            {image.caption && (
+              <figcaption className="text-sm leading-[18px] text-nemu-secondary">
+                {image.caption}
+              </figcaption>
+            )}
+            {image.src ? (
+              <img
+                src={image.src}
+                alt={image.alt}
+                className={cn(
+                  "w-full rounded-xl",
+                  compact ? "h-32 object-cover object-top" : "max-h-44 object-contain",
+                )}
+              />
+            ) : (
+              <Skeleton aria-hidden className="h-32 w-full rounded-xl" />
+            )}
+          </figure>
         </CardContent>
       )}
-      <CardContent
-        role="group"
-        aria-labelledby={questionId}
-        className={cn("flex", compact ? "gap-2" : "flex-col gap-3")}
-      >
-        {orderChoices(choices).map((choice) => (
-          <Button
-            key={choice.id}
-            type="button"
-            variant="outline"
-            data-risky={choice.risky ? "" : undefined}
-            onClick={() => onChoose(choice.id)}
-            className={cn(
-              "h-auto w-full justify-start gap-3 rounded-2xl border-2 text-left font-semibold whitespace-normal [&_svg:not([class*='size-'])]:size-6",
-              compact
-                ? "min-h-11 flex-1 justify-center px-4 py-2 text-lg leading-6"
-                : "min-h-14 px-5 py-3 text-xl leading-7",
-            )}
-          >
-            {choice.risky && (
-              <>
-                <TriangleAlert aria-hidden className="text-destructive" />
-                <span className="sr-only">Berisiko: </span>
-              </>
-            )}
-            {choice.label}
-          </Button>
-        ))}
-      </CardContent>
+      {compact ? (
+        <CardFooter>
+          <NemuActionRow>
+            <div role="group" aria-labelledby={questionId} className="flex items-center gap-2.5">
+              {ordered.map((choice) => (
+                <Button
+                  key={choice.id}
+                  type="button"
+                  variant={choice.primary ? "default" : "outline"}
+                  data-primary={choice.primary ? "" : undefined}
+                  data-risky={choice.risky ? "" : undefined}
+                  onClick={() => onChoose(choice.id)}
+                  className={cn(NEMU_BUTTON, !choice.primary && NEMU_OUTLINE)}
+                >
+                  {choice.risky && (
+                    <>
+                      <TriangleAlert aria-hidden className="text-destructive" />
+                      <span className="sr-only">Berisiko: </span>
+                    </>
+                  )}
+                  {choice.label}
+                </Button>
+              ))}
+            </div>
+          </NemuActionRow>
+        </CardFooter>
+      ) : (
+        <CardContent role="group" aria-labelledby={questionId} className="flex flex-col gap-3">
+          {ordered.map((choice) => (
+            <Button
+              key={choice.id}
+              type="button"
+              variant="outline"
+              data-risky={choice.risky ? "" : undefined}
+              onClick={() => onChoose(choice.id)}
+              className="h-auto min-h-14 w-full justify-start gap-3 rounded-2xl border-2 px-5 py-3 text-left text-xl leading-7 font-semibold whitespace-normal [&_svg:not([class*='size-'])]:size-6"
+            >
+              {choice.risky && (
+                <>
+                  <TriangleAlert aria-hidden className="text-destructive" />
+                  <span className="sr-only">Berisiko: </span>
+                </>
+              )}
+              {choice.label}
+            </Button>
+          ))}
+        </CardContent>
+      )}
       {note && (
         <CardFooter className="text-lg leading-6 text-muted-foreground">
           <p>{note}</p>

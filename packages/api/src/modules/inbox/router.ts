@@ -90,7 +90,7 @@ export const inboxRouter = {
   }),
 
   /**
-   * #278: the small copy the "Foto dari WhatsApp" card shows before Mulai. It starts no read, and
+   * #278: the small copy the "Foto masuk" card shows before Mulai. It starts no read, and
    * goes with the photo on `inboxAck`.
    */
   inboxThumbnail: schoolProcedure.input(jobIdSchema).handler(async ({ context, input }) => {

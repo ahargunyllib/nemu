@@ -112,7 +112,13 @@ export type GelembungJawabProps = BubbleBase & {
   onRepeat?: () => void;
 };
 
-export type NemuChoice = { id: string; label: string; risky?: boolean };
+export type NemuChoice = {
+  id: string;
+  label: string;
+  risky?: boolean;
+  /** On a `compact` card, the main choice: the black button ("Mulai"). The rest are outline. */
+  primary?: boolean;
+};
 
 /** Kartu Pilih: one question, two or three equal choices, nothing pre-selected. */
 export type KartuPilihProps = {
@@ -122,13 +128,18 @@ export type KartuPilihProps = {
   choices: readonly [NemuChoice, NemuChoice] | readonly [NemuChoice, NemuChoice, NemuChoice];
   onChoose: (id: string) => void;
   /**
-   * What the question is about: the enlarged cell of the grade-book photo (W5), or on a `compact`
-   * card the photo's thumbnail beside the question (#278). No `src` yet: a Skeleton of its shape.
+   * What the question is about, in a framed box under the question: the enlarged cell of the
+   * grade-book photo (W5), or on a `compact` card the photo's thumbnail (#278). `caption` names it
+   * at the top of the box ("Foto dari WhatsApp · 1 halaman"). On a `compact` card, no `src` yet
+   * shows a Skeleton of its shape.
    */
-  image?: { src?: string; alt: string };
+  image?: { src?: string; alt: string; caption?: string };
   /** One quiet line under the choices: "Pertanyaan 1 dari 10 · 22 nilai lain sudah cocok." */
   note?: string;
-  /** A small card that waits beside the Nemu button, such as "Foto dari WhatsApp". */
+  /**
+   * The card that waits beside the Nemu button, such as "Foto masuk": its choices are compact
+   * buttons on the right, in the order given, the `primary` one black.
+   */
   compact?: boolean;
   /** The heading: "NEMU BERHENTI · 3 dari 32", "HATI-HATI · My Family". */
   status?: NemuStatus;

@@ -8,7 +8,7 @@
       <bpmn:messageEventDefinition id="MessageDef_FotoMasuk" />
     </bpmn:startEvent>
     <bpmn:scriptTask id="Task_TawarkanFoto" name="Nemu menawarkan foto">
-      <bpmn:documentation>Tab yang terlihat menanyakan inboxJobs tiap 4 detik dan mengklaim foto untuk satu tab saja; Kartu Pilih "Foto dari WhatsApp · Mulai / Nanti".</bpmn:documentation>
+      <bpmn:documentation>Tab yang terlihat menanyakan inboxJobs tiap 4 detik dan mengklaim foto untuk satu tab saja; Kartu Pilih "Foto masuk · Nanti / Mulai".</bpmn:documentation>
       <bpmn:incoming>Flow_1</bpmn:incoming>
       <bpmn:outgoing>Flow_2</bpmn:outgoing>
     </bpmn:scriptTask>

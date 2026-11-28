@@ -146,7 +146,7 @@ beforeAll(() => {
 });
 
 describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
-  test("a new photo shows as the small Foto dari WhatsApp card with its thumbnail; Mulai asks which grades with the photo's title (#270, #278)", async () => {
+  test("a new photo shows as the Foto masuk card with its time and thumbnail; Mulai asks which grades with the photo's title (#270, #278)", async () => {
     await until(() => {
       const card = view().card;
       return card?.type === "pilih" && !!card.image?.src;
@@ -154,8 +154,25 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
     expect(view().card).toMatchObject({
       type: "pilih",
       compact: true,
-      question: "Foto dari WhatsApp",
-      image: { src: "data:image/jpeg;base64,TH", alt: "Foto buku nilai dari WhatsApp" },
+      status: {
+        text: "Foto masuk",
+        count: new Date(JOB.createdAt).toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      },
+      question: "Foto buku nilai dari WhatsApp.",
+      detail: "Dari nomor Ibu. Belum ada yang diisi.",
+      image: {
+        src: "data:image/jpeg;base64,TH",
+        alt: "Foto buku nilai dari WhatsApp",
+        caption: "Foto dari WhatsApp · 1 halaman",
+      },
+      // Nanti first, then the black Mulai on the right.
+      choices: [
+        { id: "nanti", label: "Nanti" },
+        { id: "mulai", label: "Mulai", primary: true },
+      ],
     });
     // The thumbnail is all that is fetched before Mulai: nothing is read yet.
     expect(calls.map((call) => call.op)).not.toContain("title");

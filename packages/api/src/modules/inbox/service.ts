@@ -97,7 +97,7 @@ export type EnqueuePhotoInput = {
   /** WhatsApp message id: the same message enqueued twice (webhook retry) is one job. */
   messageId?: string;
   /**
-   * #278: a small copy for the "Foto dari WhatsApp" card, made by `apps/wa-bot` at hand-off. One
+   * #278: a small copy for the "Foto masuk" card, made by `apps/wa-bot` at hand-off. One
    * that isn't a small image is dropped; the photo is queued either way.
    */
   thumbnail?: Uint8Array;
@@ -289,7 +289,7 @@ export async function jobPhoto(
 }
 
 /**
- * #278: the "Foto dari WhatsApp" card's thumbnail, before the teacher presses Mulai. Serving it
+ * #278: the "Foto masuk" card's thumbnail, before the teacher presses Mulai. Serving it
  * reads nothing and leaves the job as it is; null when the job isn't this teacher's, is gone, or
  * came without one.
  */

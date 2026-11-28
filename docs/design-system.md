@@ -132,7 +132,7 @@ the page's Shadow DOM.
 
 - **Surface**: every display is the stock card, plain white with its thin `ring-foreground/10`
   edge, `rounded-3xl`, 24 px side padding, and the Float shadow; no amber edge or band. A
-  **Gelembung** (bubble) is 420 px wide, a **Kartu** (card) 400 px (the compact Kartu Pilih 300 px).
+  **Gelembung** (bubble) is 420 px wide, a **Kartu** (card) 400 px.
 - **Action row** (`NemuActionRow`): the last row of a display. Small links sit on the left, compact
   buttons on the right, the main one last. A compact button is a 52 px pill with 18 px semibold
   text and no icon: the main action is the stock default Button (black `#18181B`), a second one
@@ -173,10 +173,14 @@ the page's Shadow DOM.
 - **Links**: Kenapa?, Sumber and Lihat ringkasan are small underlined `nemu-strong` links. What is
   behind them shows in a `nemu-subtle` box and is read (`onRead`) only once the teacher clicks.
 - **Kartu Pilih**: a risky choice gets ⚠ and goes under the safe one, whatever order it was given
-  in. All choices share one look. The **compact** Kartu Pilih (300 px, 44 px buttons side by side)
-  waits beside the Nemu button, such as "Foto dari WhatsApp · Mulai / Nanti". Its picture is a
-  64 px square thumbnail left of the title (`rounded-xl`, 2 px `border`, cropped from the top so
-  the photo's heading shows), and a `Skeleton` of that square while it loads (#278).
+  in. All stacked choices share one look. Its picture (`image`) sits in a framed box under the
+  question (`rounded-2xl`, `nemu-subtle` fill, 1 px `nemu-amber-100` edge) with an optional
+  caption at the top in 14 px `nemu-secondary` ("Foto dari WhatsApp · 1 halaman"). The
+  **compact** Kartu Pilih waits beside the Nemu button, such as "Foto masuk · Nanti / Mulai":
+  its choices are compact buttons in an action row on the right, in the order given, and the one
+  marked `primary` is the black main button (the rest outline). Its thumbnail fills the box's
+  width, 128 px tall and cropped from the top so the photo's heading shows, with a `Skeleton` of
+  that shape while it loads (#278).
 - **Kartu Info list**: the `items` are an ordered list, each led by a 30 px circle with its number
   (`nemu-subtle` fill, 1 px `nemu-amber-200` edge, 15 px bold `nemu-strong`) and 20 px regular
   text. An optional label sits above it (`itemsLabel`, 16 px semibold `nemu-secondary`):
