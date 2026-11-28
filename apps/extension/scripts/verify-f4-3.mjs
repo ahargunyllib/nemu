@@ -384,14 +384,9 @@ await check(
       (await tunjuk.locator("[data-nemu-status]").textContent())?.includes("Giliran Ibu"),
       "the heading isn't Giliran Ibu",
     );
-    expect(
-      await tunjuk.getByText("Nemu tidak menghapus apa pun.", { exact: true }).isVisible(),
-      "the detail line isn't showing",
-    );
-    expect(
-      await tunjuk.getByRole("button", { name: "Batal, jangan hapus" }).isVisible(),
-      "the Batal, jangan hapus link isn't showing",
-    );
+    // The bubble fades in after the cursor arrives; wait for its parts rather than glance.
+    await tunjuk.getByText("Nemu tidak menghapus apa pun.", { exact: true }).waitFor();
+    await tunjuk.getByRole("button", { name: "Batal, jangan hapus" }).waitFor();
     expect(await page.locator("body.editing").count(), "Mode Edit is off");
     const hapus = page
       .locator("li.modtype_quiz", { hasText: QUIZ })
