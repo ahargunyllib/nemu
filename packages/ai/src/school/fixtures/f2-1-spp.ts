@@ -73,7 +73,9 @@ export function isF21Spp(graph: ProcessGraph): boolean {
  * The plain-language phrasing for the three F2-1 walks, by the cause's name, written from the
  * official key (`jawaban_inti` and `balasan_untuk_orang_tua`) so the offline answers read like the
  * live model's. Steps follow the walk's order; the code still decides the ids, the fixer and the
- * guardrails.
+ * guardrails. "Lock Student Grades" (Q1) follows the design's Sumber steps and parent reply
+ * (`docs/design-system.md`); `{nilai_murid}` is the pupil's grade the Nemu Service checked
+ * ("UTS Aisyah"), or "ananda".
  */
 export const F2_1_SPP_PHRASING: Record<
   string,
@@ -84,13 +86,12 @@ export const F2_1_SPP_PHRASING: Record<
       "Menurut alur SPP sekolah, nilai murid dikunci otomatis kalau ada tagihan SPP bulanan (tagihan reguler) yang sudah lewat jatuh tempo.",
     why: "Saat tagihan reguler lewat jatuh tempo, sistem mengunci nilai murid. Jalan kembalinya: nilai dibuka lagi setelah tidak ada lagi tagihan reguler yang lewat jatuh tempo.",
     steps: [
-      "Tagihan sampai di tanggal jatuh tempo.",
-      "Sistem memeriksa: ini tagihan reguler (bulanan).",
-      "Nilai murid dikunci, jadi tidak muncul di aplikasi orang tua.",
-      "Nilai dibuka lagi kalau tidak ada lagi tagihan reguler yang lewat jatuh tempo.",
+      "Tagihan SPP lewat jatuh tempo.",
+      "Sistem mengunci nilai di aplikasi orang tua.",
+      "Nilai terbuka lagi setelah tagihan lunas.",
     ],
     parent_reply:
-      "Assalamu'alaikum, Bapak/Ibu. Nilai UTS ananda sudah kami masukkan. Saat ini nilainya belum tampil di aplikasi karena masih ada administrasi sekolah yang perlu diselesaikan. Untuk rinciannya, Bapak/Ibu bisa menghubungi Bu Ratna di bagian keuangan. Setelah selesai, nilai akan terbuka otomatis. Terima kasih.",
+      "Nilai {nilai_murid} sudah diinput, Bunda. Tampilnya di aplikasi menunggu administrasi sekolah selesai. Untuk detailnya silakan hubungi bagian keuangan.",
   },
   "Update Status: Partially Paid": {
     answer:

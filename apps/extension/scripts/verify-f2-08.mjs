@@ -240,9 +240,11 @@ await check(
   "F2-1 Q1: the parent reply opens in WhatsApp Web; the teacher presses Kirim",
   async () => {
     const text = expectSafeReply(await parentReply(page));
-    expect(text.startsWith("Assalamu"), "the greeting is missing");
-    expect(text.includes("sudah kami masukkan"), "the reply doesn't say the grade is in");
-    expect(text.includes("Bu Ratna"), "the reply doesn't name Bu Ratna");
+    expect(
+      text.includes("Nilai UTS Aisyah sudah diinput"),
+      "the reply doesn't say the grade is in",
+    );
+    expect(text.includes("bagian keuangan"), "the reply doesn't point to bagian keuangan");
   },
 );
 

@@ -227,9 +227,22 @@ export function stepDrafts(graph: ProcessGraph, trace: CauseTrace): StepDraft[] 
   const causeNodes =
     outcomeOf?.node.kind === "task" ? [outcomeOf.node, trace.cause] : [trace.cause];
   const nearestBranch = before.findLastIndex((hop) => !!hop.branch);
+  // A trigger and the branch it decides right after it read as one step ("Tagihan SPP lewat jatuh
+  // tempo." for the due date and "is it a regular invoice? yes").
+  const trigger = before[0];
+  const foldTrigger = !!trigger && isTrigger(trigger.node) && !!before[1]?.branch;
   before.forEach((hop, index) => {
     const { node, branch } = hop;
-    if (branch) {
+    if (foldTrigger && index === 0) return;
+    if (foldTrigger && index === 1 && branch) {
+      ranked.push({
+        elementIds: [trigger!.node.id, node.id, branch.id],
+        text: `${nodeText(trigger!.node).replace(/[.!?]+$/u, "")}: ${branchLabel(node, branch)}.`,
+        role: "trigger",
+        rank: index === nearestBranch ? 2 : 3,
+        order: index,
+      });
+    } else if (branch) {
       ranked.push({
         elementIds: [node.id, branch.id],
         text: `${branchLabel(node, branch)}.`,

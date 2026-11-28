@@ -441,7 +441,7 @@ Gunakan hanya langkah dan cabang yang diberikan; jangan menambah langkah, syarat
 - answer: 1-2 kalimat (paling banyak 45 kata) yang langsung menjawab pertanyaan guru menurut jalur. Bila ada jalan_kembali, sebut syarat yang membedakannya. Jangan menyebut siapa yang membantu dan jangan menulis bahwa nilai sudah tersimpan (keduanya ditambahkan sistem). Ikuti "kepastian": bila "kemungkinan", sistem sendiri membuka jawaban dengan "Kemungkinan karena alur …", jadi answer dan why menjelaskan aturan alurnya, bukan fakta tentang murid ini. Keadaan yang tidak dicek (misalnya status pembayaran) ditulis sebagai aturan alur ("menurut alur sekolah, ... kalau ..."), bukan fakta.
 - why: 1-2 kalimat: jalur sebabnya dengan syarat cabangnya (misalnya jenis tagihan dan jatuh temponya), dan jalan kembalinya bila jalan_kembali ada (bila null, jangan menyinggungnya).
 - steps: untuk setiap draf_langkah, satu kalimat pendek (index sama dengan drafnya).
-- parent_reply: pesan WhatsApp guru kepada orang tua murid, 2-4 kalimat, yang menjawab hal yang sama untuk orang tua: apa yang terjadi dan apa langkah berikutnya. Sopan, hangat, tidak menyalahkan, tanpa istilah teknis. DILARANG menyebut nominal, angka biaya, atau jumlah yang kurang, dan DILARANG memakai kata "tunggakan" atau "menunggak": sebut "administrasi sekolah". Sebut yang_membantu (nama dan bagiannya) bila ada. Jangan menjanjikan waktu dalam hitungan hari.`;
+- parent_reply: pesan WhatsApp guru kepada orang tua murid, 2-4 kalimat, yang menjawab hal yang sama untuk orang tua: apa yang terjadi dan apa langkah berikutnya. Sopan, hangat, tidak menyalahkan, tanpa istilah teknis. DILARANG menyebut nominal, angka biaya, atau jumlah yang kurang, dan DILARANG memakai kata "tunggakan" atau "menunggak": sebut "administrasi sekolah". Bila nilai_murid ada, sebut bahwa nilai itu sudah diinput. Sebut bagian yang_membantu (contoh: "bagian keuangan"); namanya boleh disebut. Jangan menjanjikan waktu dalam hitungan hari.`;
 
 const ELEMENT_ID = /\b[A-Za-z]+_[A-Za-z0-9_]+\b/gu;
 
@@ -456,10 +456,10 @@ function likelyLead(gradeCheck: GradeCheck, title: string): string | null {
   return `Kemungkinan karena alur ${name}${/\bsekolah$/iu.test(name) ? "" : " sekolah"}`;
 }
 
-/** "Nilai UTS Aisyah sudah tersimpan.": her first name, and the kind only when it was checked. */
-function savedDetail(gradeCheck: { student: string; assessment?: string }): string {
+/** "UTS Aisyah": her first name, and the kind of grade only when it was checked. */
+function gradeOf(gradeCheck: { student: string; assessment?: string }): string {
   const firstName = gradeCheck.student.trim().split(/\s+/u)[0] ?? gradeCheck.student;
-  return `Nilai ${gradeCheck.assessment ? `${gradeCheck.assessment} ` : ""}${firstName} sudah tersimpan.`;
+  return gradeCheck.assessment ? `${gradeCheck.assessment} ${firstName}` : firstName;
 }
 
 function templates(input: ExplainProcessInput, trace: CauseTrace, fixer: Contact | null) {
@@ -487,7 +487,7 @@ function templates(input: ExplainProcessInput, trace: CauseTrace, fixer: Contact
     : "";
   const parentReply = [
     "Assalamu'alaikum, Bapak/Ibu.",
-    saved ? `Nilai ${gradeCheck.student} sudah kami masukkan.` : "",
+    saved ? `Nilai ${gradeOf(gradeCheck)} sudah kami masukkan.` : "",
     pending,
     fixer
       ? `Untuk rinciannya, Bapak/Ibu dapat menghubungi ${fixer.name} (${fixer.role}) di sekolah.`
@@ -596,7 +596,8 @@ export async function explainProcess(
             gejala_cocok: match.symptom,
             kejadian_awal: input.via?.symptom ?? null,
             kepastian: lead ? "kemungkinan" : "aturan alur",
-            yang_membantu: fixer ? `${fixer.name} (${fixer.role})` : null,
+            yang_membantu: fixer ? `${fixer.name} (${roleName(fixer.role)})` : null,
+            nilai_murid: gradeCheck.status === "saved" ? gradeOf(gradeCheck) : null,
             jalur: trace.path.map((hop) => ({
               ...describe(hop.node),
               syarat_cabang: hop.branch ? branchLabel(hop.node, hop.branch) : undefined,
@@ -651,7 +652,12 @@ export async function explainProcess(
   }));
   const answer = clean(response.answer, draft.answer, 500);
   const reply = clean(response.parent_reply, draft.parentReply, 900);
-  const replyOk = isParentSafe(reply) && (!fixer || reply.includes(fixer.name));
+  // The reply points the parent to who can help, by name or by the office ("bagian keuangan").
+  const replyOk =
+    isParentSafe(reply) &&
+    (!fixer ||
+      reply.includes(fixer.name) ||
+      reply.toLocaleLowerCase("id-ID").includes(roleName(fixer.role)));
 
   const why = clean(response.why, draft.why, 500);
   const helper = fixer ? `Yang bisa membantu: ${fixer.name} (${roleName(fixer.role)}).` : "";
@@ -667,7 +673,9 @@ export async function explainProcess(
       : [answer, fixer ? `Yang bisa membantu: ${fixer.name} (${fixer.role}).` : ""]
           .filter(Boolean)
           .join(" "),
-    ...(gradeCheck.status === "saved" ? { detail: savedDetail(gradeCheck) } : {}),
+    ...(gradeCheck.status === "saved"
+      ? { detail: `Nilai ${gradeOf(gradeCheck)} sudah tersimpan.` }
+      : {}),
     why: lead ? [why, helper].filter(Boolean).join(" ") : why,
     process: { documentId: process.documentId, title: process.title, version: process.version },
     elementId: trace.cause.id,
