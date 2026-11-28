@@ -27,8 +27,8 @@ const PLAN: ImportPlan = {
   courseId: 2,
   section: "IPAS",
   name: "Latihan IPAS Kelas 4A",
-  opens: { date: "2026-11-30", time: "00:00" },
-  closes: { date: "2026-12-03", time: "23:59" },
+  opens: { date: "2026-12-07", time: "00:00" },
+  closes: { date: "2026-12-10", time: "23:59" },
   xml: "<quiz></quiz>",
   fileName: "Latihan IPAS Kelas 4A.xml",
   count: 10,
@@ -108,12 +108,12 @@ describe("F4-03 as one executor task (#210)", () => {
       )
       .map((step) => `${step.target.group} ${step.target.label}=${step.option}`);
     expect(times).toEqual([
-      "Kuis dimulai Hari=30",
-      "Kuis dimulai Bulan=November",
+      "Kuis dimulai Hari=7",
+      "Kuis dimulai Bulan=December",
       "Kuis dimulai Tahun=2026",
       "Kuis dimulai Jam=00",
       "Kuis dimulai Menit=00",
-      "Tutup kuis Hari=3",
+      "Tutup kuis Hari=10",
       "Tutup kuis Bulan=December",
       "Tutup kuis Tahun=2026",
       "Tutup kuis Jam=23",
@@ -127,7 +127,7 @@ describe("F4-03 as one executor task (#210)", () => {
       verb: "point",
       target: { role: "button", text: "Simpan dan tampilkan" },
       sentence:
-        "Tekan Simpan dan tampilkan, Bu. Kuis dibuka 30 November pukul 00.00, ditutup 3 Desember pukul 23.59.",
+        "Tekan Simpan dan tampilkan, Bu. Kuis dibuka 7 Desember pukul 00.00, ditutup 10 Desember pukul 23.59.",
     });
     expect(continuation?.phase).toBe("saved");
     // Waktu Pengerjaan already open: it isn't clicked shut.

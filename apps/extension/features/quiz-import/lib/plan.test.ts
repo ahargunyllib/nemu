@@ -6,19 +6,19 @@ import { readySentence, spokenDate, timesInOrder, timesSentence, withDefaults } 
 describe("F4-03's times (#210)", () => {
   test("dates without a clock time open at 00.00 and close at 23.59, and Nemu says so", () => {
     const times = withDefaults(
-      { date: "2026-11-30", time: null },
-      { date: "2026-12-03", time: null },
+      { date: "2026-12-07", time: null },
+      { date: "2026-12-10", time: null },
     );
     expect(times).toEqual({
-      opens: { date: "2026-11-30", time: "00:00" },
-      closes: { date: "2026-12-03", time: "23:59" },
+      opens: { date: "2026-12-07", time: "00:00" },
+      closes: { date: "2026-12-10", time: "23:59" },
       defaulted: "both",
     });
     expect(timesSentence(times.opens, times.closes, times.defaulted, "Bu")).toBe(
-      "Jamnya tidak disebut, jadi kuis dibuka 30 November pukul 00.00 dan ditutup 3 Desember pukul 23.59, Bu.",
+      "Jamnya tidak disebut, jadi kuis dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember pukul 23.59, Bu.",
     );
-    expect(spokenDate("2026-11-30")).toBe("Senin, 30 November 2026");
-    expect(spokenDate("2026-12-03")).toBe("Kamis, 3 Desember 2026");
+    expect(spokenDate("2026-12-07")).toBe("Senin, 7 Desember 2026");
+    expect(spokenDate("2026-12-10")).toBe("Kamis, 10 Desember 2026");
   });
 
   test("times she said are kept and not called out; a close before the open is refused", () => {
@@ -39,14 +39,14 @@ describe("F4-03's times (#210)", () => {
       courseId: 2,
       section: "IPAS",
       name: "Latihan IPAS Kelas 4A",
-      opens: { date: "2026-11-30", time: "00:00" },
-      closes: { date: "2026-12-03", time: "23:59" },
+      opens: { date: "2026-12-07", time: "00:00" },
+      closes: { date: "2026-12-10", time: "23:59" },
       xml: "",
       fileName: "Latihan IPAS Kelas 4A.xml",
       count: 10,
     };
     expect(readySentence(plan, 10, "Bu")).toBe(
-      "Kuis Latihan IPAS Kelas 4A sudah siap: 10 soal, dibuka 30 November pukul 00.00 dan ditutup 3 Desember pukul 23.59, Bu.",
+      "Kuis Latihan IPAS Kelas 4A sudah siap: 10 soal, dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember pukul 23.59, Bu.",
     );
   });
 });

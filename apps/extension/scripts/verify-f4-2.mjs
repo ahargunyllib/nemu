@@ -1,14 +1,14 @@
 // Loads a production build of the extension into Playwright's Chromium and checks F4-2 (#210) end
 // to end on the Moodle test site (infra/): on course 4A-UJI Bu Siti says "Nemu, masukkan kuis dari
-// naskah ini ke Moodle. Buka Senin 30 November, tutup Kamis 3 Desember." and picks Richard's
+// naskah ini ke Moodle. Buka Senin 7 Desember, tutup Kamis 10 Desember." and picks Richard's
 // script (infra/setup/f4-2/F4-2_naskah-ipas-10-soal.pdf). Nemu says it uses 00.00 and 23.59, then in
 // cara 1 turns on Mode Edit, adds a Kuis in IPAS, fills its name and times and points at Simpan dan
 // tampilkan, which she presses. It opens the quiz's Bank soal › Impor, drops the XML on the picker
 // (the spike) and points at Impor; then Soal › Tambah › dari bank soal, and she presses Tambahkan.
 // The F4-1 check runs on the new quiz (she presses Pratinjau kuis) and Nemu reports in one sentence.
 // Afterwards the Moodle database must hold 10/10 questions as in F4-2_hasil-yang-diharapkan.xml
-// (words, choices, key, and soal 7's three pictures pixel for pixel), opening Monday 30 November
-// 00.00 and closing Thursday 3 December 2026 23.59 (Asia/Jakarta).
+// (words, choices, key, and soal 7's three pictures pixel for pixel), opening Monday 7 December
+// 00.00 and closing Thursday 10 December 2026 23.59 (Asia/Jakarta).
 // Needs `NEMU_RESPONDER=fixture pnpm dev` and the Moodle test site; skips with a message when
 // Moodle isn't running. A local run first removes an earlier run's quiz (infra/setup/reset-f4-2.php).
 // Screenshots: .output/verify-f4-2/.
@@ -26,7 +26,7 @@ const MOODLE = process.env.MOODLE_URL ?? "https://localhost/";
 const INSTALL_CODE = process.env.NEMU_INSTALL_CODE ?? "NEMU-SDITN-2026";
 const QUIZ = "Latihan IPAS Kelas 4A";
 const UTTERANCE =
-  "Nemu, masukkan kuis dari naskah ini ke Moodle. Buka Senin 30 November, tutup Kamis 3 Desember.";
+  "Nemu, masukkan kuis dari naskah ini ke Moodle. Buka Senin 7 Desember, tutup Kamis 10 Desember.";
 const HEADED = process.argv.includes("--headed");
 
 const root = resolve(import.meta.dirname, "..");
@@ -224,7 +224,7 @@ await check("Bu Siti asks on the course page and picks her script", async () => 
 
 await check("Nemu reads 10 questions, asks nothing, and says it uses 00.00 and 23.59", async () => {
   const sentence =
-    "Jamnya tidak disebut, jadi kuis dibuka 30 November pukul 00.00 dan ditutup 3 Desember pukul 23.59, Bu.";
+    "Jamnya tidak disebut, jadi kuis dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember pukul 23.59, Bu.";
   await display("jawab").getByText(sentence).waitFor({ timeout: 30_000 });
   await display("jawab").getByText("10 soal siap", { exact: false }).waitFor();
   expect(!(await display("pilih").count()), "Nemu asked about the script");
@@ -256,8 +256,8 @@ await check(
     });
     console.log(`  Form: ${JSON.stringify(values)}`);
     expect(values.name === QUIZ, `the name is ${values.name}`);
-    expect(values.open === "2026-11-30-0-0", `opens ${values.open}`);
-    expect(values.close === "2026-12-3-23-59", `closes ${values.close}`);
+    expect(values.open === "2026-12-7-0-0", `opens ${values.open}`);
+    expect(values.close === "2026-12-10-23-59", `closes ${values.close}`);
     await shePresses("Tekan Simpan dan tampilkan, Bu.", save, "3-simpan-dan-tampilkan.png");
     await page.waitForURL(/\/mod\/quiz\/view\.php/u, { timeout: 20_000 });
   },
@@ -300,7 +300,7 @@ await check(
 );
 
 const ready =
-  "Kuis Latihan IPAS Kelas 4A sudah siap: 10 soal, dibuka 30 November pukul 00.00 dan ditutup 3 Desember pukul 23.59, Bu.";
+  "Kuis Latihan IPAS Kelas 4A sudah siap: 10 soal, dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember pukul 23.59, Bu.";
 await check("The F4-1 check runs on the new quiz and Nemu reports in one sentence", async () => {
   const preview = page.getByRole("button", {
     name: /^(Pratinjau kuis|Lanjutkan pratinjau terakhir)$/u,
@@ -388,7 +388,7 @@ function expectedQuestions() {
 }
 
 await check(
-  "F4-2: 10/10 questions match the expected XML; opens Mon 30 Nov, closes Thu 3 Dec 2026",
+  "F4-2: 10/10 questions match the expected XML; opens Mon 7 Dec, closes Thu 10 Dec 2026",
   async () => {
     if (!local) return console.log("  (database not reachable: compare the quiz by hand)");
     const [quiz] =
@@ -412,12 +412,12 @@ await check(
     console.log(`  ${QUIZ} in ${section}: opens ${at(timeopen)}, closes ${at(timeclose)}`);
     expect(section === "IPAS", `the quiz is in section ${section}`);
     expect(
-      Number(timeopen) === Date.UTC(2026, 10, 29, 17, 0) / 1000,
-      "it doesn't open Mon 30 Nov 00.00 WIB",
+      Number(timeopen) === Date.UTC(2026, 11, 6, 17, 0) / 1000,
+      "it doesn't open Mon 7 Dec 00.00 WIB",
     );
     expect(
-      Number(timeclose) === Date.UTC(2026, 11, 3, 16, 59) / 1000,
-      "it doesn't close Thu 3 Dec 23.59 WIB",
+      Number(timeclose) === Date.UTC(2026, 11, 10, 16, 59) / 1000,
+      "it doesn't close Thu 10 Dec 23.59 WIB",
     );
 
     const slots = sql(`SELECT s.slot, qn.id, qn.name, qn.questiontext, ctx.id FROM mdl_quiz_slots s

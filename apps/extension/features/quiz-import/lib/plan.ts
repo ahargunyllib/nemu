@@ -41,7 +41,7 @@ function localDate(date: string): Date {
   return new Date(year ?? 0, (month ?? 1) - 1, day ?? 1);
 }
 
-/** "Senin, 30 November 2026" */
+/** "Senin, 7 Desember 2026" */
 export function spokenDate(date: string): string {
   return localDate(date).toLocaleDateString("id-ID", {
     weekday: "long",
@@ -51,7 +51,7 @@ export function spokenDate(date: string): string {
   });
 }
 
-/** "30 November pukul 00.00" */
+/** "7 Desember pukul 00.00" */
 export function spokenTime(time: SetTime): string {
   const day = localDate(time.date).toLocaleDateString("id-ID", { day: "numeric", month: "long" });
   return `${day} pukul ${time.time.replace(":", ".")}`;

@@ -79,7 +79,7 @@ test("the extension's own quiz commands are told apart, and grades for a quiz st
   assert.equal(quizCommand("naskah soal ini jadikan kuis di Moodle ya"), "quiz-import");
   assert.equal(
     quizCommand(
-      "Nemu, masukkan kuis dari naskah ini ke Moodle. Buka Senin 30 November, tutup Kamis 3 Desember.",
+      "Nemu, masukkan kuis dari naskah ini ke Moodle. Buka Senin 7 Desember, tutup Kamis 10 Desember.",
     ),
     "quiz-import",
   );

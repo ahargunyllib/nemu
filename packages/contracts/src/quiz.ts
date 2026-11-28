@@ -83,9 +83,9 @@ export const quizScriptFileSchema = z
 export const quizScriptInputSchema = z
   .object({
     file: quizScriptFileSchema,
-    /** Her words, e.g. "Masukkan kuis ini, buka Senin 30 November, tutup Kamis 3 Desember." */
+    /** Her words, e.g. "Masukkan kuis ini, buka Senin 7 Desember, tutup Kamis 10 Desember." */
     utterance: z.string().max(500),
-    /** Her computer's date ("2026-11-27"), for "Senin" and a year she didn't say. */
+    /** Her computer's date ("2026-12-01"), for "Senin" and a year she didn't say. */
     today: z.string().regex(/^\d{4}-\d{2}-\d{2}$/u),
     /** The Moodle course the quiz goes into, as its page names it ("4A-UJI · Kelas 4A (uji)"). */
     course: z.string().max(255),

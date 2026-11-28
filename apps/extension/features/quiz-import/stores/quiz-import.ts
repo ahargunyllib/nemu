@@ -30,7 +30,7 @@ import {
 } from "../lib/plan";
 
 /**
- * F4-03 (#210): "Nemu, masukkan kuis dari naskah ini, buka Senin 30 November, tutup Kamis 3
+ * F4-03 (#210): "Nemu, masukkan kuis dari naskah ini, buka Senin 7 Desember, tutup Kamis 10
  * Desember." on the course page. She picks the script; the Nemu Service reads it (#219); Nemu asks
  * about every part it couldn't read (Kartu Pilih, as F1 does) and about a date she didn't say,
  * says the times it will set, and then puts the quiz into Moodle in cara 1 (`import-task`). After
@@ -418,7 +418,7 @@ function createQuizImport() {
       }
       if (phase.name === "times") {
         const heard = quizTimesFrom(words, today());
-        // "30 November" alone answers the one date still missing.
+        // "10 Desember" alone answers the one date still missing.
         if (heard.opens && !heard.closes && opens && !closes) {
           closes = heard.opens;
         } else {

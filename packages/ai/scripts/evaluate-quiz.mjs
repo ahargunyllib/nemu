@@ -102,8 +102,8 @@ const input = {
     dataUrl: `data:${mimeType};base64,${bytesToBase64(bytes)}`,
   },
   utterance:
-    "Nemu, masukkan kuis dari naskah ini ke Moodle. Buka Senin 30 November, tutup Kamis 3 Desember.",
-  today: "2026-11-27",
+    "Nemu, masukkan kuis dari naskah ini ke Moodle. Buka Senin 7 Desember, tutup Kamis 10 Desember.",
+  today: "2026-12-01",
   course: "4A-UJI · Kelas 4A (uji)",
   sections: ["Umum", "IPAS", "Bahasa Inggris"],
 };
