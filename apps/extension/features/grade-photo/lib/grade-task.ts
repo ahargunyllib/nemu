@@ -57,16 +57,48 @@ export function gradeTask(input: {
   honorific: string;
 }): ExecutorTask {
   const { command, entries } = input;
+  const address = addressFor(input.honorific);
+  // "…, Bu." when WS-06 knows how to address her, else the sentence alone.
+  const toHer = (sentence: string) =>
+    input.honorific ? `${sentence}, ${input.honorific}.` : `${sentence}.`;
+  const assessment = formAssessment(command.assessment);
+  // Langkah 1 dari 3: the menu; 2: the filters and Tampilkan Siswa; 3: the fill, whose heading
+  // counts students instead ("3 dari 32"), so its steps carry no stage.
+  const stage = (n: number) => ({ n, of: 3 });
   const open: ExecutorStep[] = [
-    { verb: "clickMenu", target: { role: "link", text: "Nilai" } },
-    { verb: "selectOption", target: { label: "Kelas" }, option: command.className },
-    { verb: "selectOption", target: { label: "Mata Pelajaran" }, option: command.subject },
+    {
+      verb: "clickMenu",
+      target: { role: "link", text: "Nilai" },
+      approach: { sentence: toHer("Saya buka menu Nilai"), detail: `${address} lihat saja dulu.` },
+      sentence: "Ini menu Nilai.",
+      detail: toHer("Saya klik"),
+      stage: stage(1),
+    },
+    {
+      verb: "selectOption",
+      target: { label: "Kelas" },
+      option: command.className,
+      stage: stage(2),
+    },
+    {
+      verb: "selectOption",
+      target: { label: "Mata Pelajaran" },
+      option: command.subject,
+      stage: stage(2),
+    },
     {
       verb: "selectOption",
       target: { label: "Jenis Penilaian" },
-      option: formAssessment(command.assessment),
+      option: assessment,
+      stage: stage(2),
     },
-    { verb: "clickMenu", target: { role: "button", text: "Tampilkan Siswa" } },
+    {
+      verb: "clickMenu",
+      target: { role: "button", text: "Tampilkan Siswa" },
+      sentence: `Ini Isi nilai kelas ${command.className}.`,
+      detail: `Kelas ${command.className}, ${command.subject}, ${assessment} sudah saya pilih.`,
+      stage: stage(2),
+    },
   ];
   const fill = entries.flatMap((entry): ExecutorStep[] => {
     const value: ExecutorStep = {

@@ -127,8 +127,9 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     daftar** on names. Holding the talk combination answers too: "delapan puluh enam", "86",
     "kosongkan", a name on the card.
   - `gradesFinalize`'s entries become one cara 1 task (`lib/grade-task.ts`): the Nilai menu,
-    Kelas, Mata Pelajaran and Jenis Penilaian (UH, tugas and PR are **Harian**), Tampilkan Siswa,
-    then each student's **Nilai** found by the row's name and the column header, **Catatan**
+    Kelas, Mata Pelajaran and Jenis Penilaian (UH, tugas and PR are **Harian**), Tampilkan Siswa
+    (each step in its own words under "Nemu bekerja · Langkah 1/2 dari 3": "Saya buka menu Nilai,
+    Bu.", "Ini menu Nilai.", "Ini Isi nilai kelas 4B."), then each student's **Nilai** found by the row's name and the column header, **Catatan**
     "remedial" below KKM and "tidak hadir" for S/I/A (value left blank). It ends pointing at
     Simpan: "Silakan Ibu tekan Simpan.", with every value behind **Lihat ringkasan**.
   - **After Simpan** Nemu waits for the page's saved message (or **Sudah tersimpan**), reads the
@@ -310,7 +311,7 @@ read-back, WS-07 connected to the mock (Admin › Integrasi: URL `http://localho
 `as_uji_sdit_nusantara_2026`). It sends the official F1-1 grade-book photo
 (`packages/ai/src/school/fixtures/f1-1-buku-nilai-4b.jpg`) the way `apps/wa-bot` does and checks:
 the card in one of two tabs only, Mulai and "Ini nilai apa, Bu?" with the photo's title picked (#270), the 10 W5 questions (4
-doubtful cells, 5 names, 1 S) with their crops, the cara 1 fill of all 32 students with notes,
+doubtful cells, 5 names, 1 S) with their crops, the navigation lines (Langkah 1 and 2 of 3), the cara 1 fill of all 32 students with notes,
 Lihat ringkasan beside Simpan, the read-back sentence after the save, the photo gone from the
 inbox, Catatan langkah, and every saved grade right in under 5 minutes. Screenshots go to
 `.output/verify-grade-photo/`. It also hands over the photo's thumbnail
