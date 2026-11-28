@@ -11,10 +11,16 @@ export type KnowledgeChunk = {
 
 export type RankedKnowledgeChunk = KnowledgeChunk & { score: number };
 
+// Question words and "bisa" say nothing about the topic: "Kenapa Nemu tidak bisa mendengar saya?"
+// would otherwise rank a point that quotes "ini kenapa?" and "yang bisa membantu" first (#314).
 const STOP_WORDS = new Set([
   "ada",
   "apa",
   "bagaimana",
+  "bisa",
+  "kenapa",
+  "kok",
+  "mengapa",
   "dan",
   "di",
   "dengan",

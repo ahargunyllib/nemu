@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import test from "node:test";
 
-import type { KnowledgeChunk } from "../knowledge.js";
+import { retrieveKnowledge, type KnowledgeChunk } from "../knowledge.js";
 import { bpmnKnowledgeTexts, importBpmn } from "./bpmn/graph.js";
 import { planBpmnStep } from "./bpmn/plan.js";
 import { F2_2_PAGE, F2_3_PAGE, KAMUS_ROWS, NOT_IN_GUIDE_PAGES } from "./fixtures/kamus.js";
@@ -240,6 +240,37 @@ test("a rule question cites the SOP point, not a recorded procedure's field list
   if (result.status !== "answered") return;
   assert.equal(result.citations[0]?.chunkId, "sop-tahfidz-page-1-pasal-3-ayat-3.2");
   assert.match(result.answer, /3 ayat/u);
+});
+
+const tentangNemuPoint = (article: string, text: string): KnowledgeChunk => ({
+  id: `tentang-nemu-${article}`,
+  docId: "tentang-nemu",
+  title: "Tentang Nemu",
+  version: "2026",
+  article,
+  active: true,
+  text,
+});
+
+test("a kenapa question matches the topic, not a point that quotes ini kenapa?", async () => {
+  const chunks = [
+    tentangNemuPoint(
+      "2.4",
+      '2.4 Menjelaskan error: tanyakan "ini kenapa?" saat muncul pesan error atau nilai tidak muncul. Nemu menjelaskan penyebabnya dan siapa yang bisa membantu.',
+    ),
+    tentangNemuPoint(
+      "4.3",
+      "4.3 Kalau Nemu tetap tidak mendengar, periksa mikrofon komputer, lalu coba lagi.",
+    ),
+  ];
+  const question = "Kenapa Nemu tidak bisa mendengar saya?";
+
+  assert.equal(retrieveKnowledge(chunks, question, 1)[0]?.article, "4.3");
+
+  const result = await ai.answerGrounded({ question, chunks });
+  assert.equal(result.status, "answered");
+  if (result.status !== "answered") return;
+  assert.equal(result.citations[0]?.article, "4.3");
 });
 
 test("offline slot extraction plans F3-1 the same way the real model is expected to", async () => {
