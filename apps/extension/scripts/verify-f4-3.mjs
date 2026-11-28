@@ -369,7 +369,9 @@ await check(
       .getByRole("button", { name: /Tunjukkan tombol Hapus/u })
       .click();
     await page.waitForURL(/\/course\/view\.php/u, { timeout: 30_000 });
-    const sentence = display("tunjuk").getByText("Kalau jadi dihapus, tekan Hapus sendiri, Bu.");
+    const sentence = display("tunjuk").getByText(
+      "Tombol Hapus ada di sini, Bu. Nemu tidak menghapus apa pun.",
+    );
     await sentence.waitFor({ timeout: 40_000 });
     expect(await page.locator("body.editing").count(), "Mode Edit is off");
     const hapus = page

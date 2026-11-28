@@ -165,7 +165,7 @@ export async function nextShowSteps(
       {
         verb: "point",
         target: { role: "menuitem", text: remove, near: name },
-        sentence: `Kalau jadi dihapus, tekan ${remove} sendiri${teacher ? `, ${teacher}` : ""}.`,
+        sentence: `Tombol ${remove} ada di sini${teacher ? `, ${teacher}` : ""}. Nemu tidak menghapus apa pun.`,
       },
     ],
     continuation: null,
