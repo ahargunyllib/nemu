@@ -193,10 +193,17 @@ export function NemuApp({ access }: { access: SiteAccess }) {
 
   // F1 polls for WhatsApp photos as this teacher, and speaks with Nemu's voice (#207).
   const registered = identity?.status === "registered";
+  const talkKeys = shortcutKeys(shortcut).join(" + ");
   useEffect(
     () =>
-      gradePhoto.connect({ pageEmail, honorific, registered, speak: (text) => void speak(text) }),
-    [pageEmail, honorific, registered, speak],
+      gradePhoto.connect({
+        pageEmail,
+        honorific,
+        registered,
+        shortcut: talkKeys,
+        speak: (text) => void speak(text),
+      }),
+    [pageEmail, honorific, registered, talkKeys, speak],
   );
   // F3 runs an uploaded BPMN process as this teacher (#213), and records a new one (#214).
   useEffect(() => {

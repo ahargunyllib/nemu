@@ -253,13 +253,25 @@ await check(
     await pick.waitFor({ timeout: 15_000 });
     const labels = await pick.getByRole("group").getByRole("button").allTextContents();
     expect(
-      JSON.stringify(labels) === JSON.stringify(["UTS · Matematika · 4B", "Nilai lain"]),
+      JSON.stringify(labels) ===
+        JSON.stringify(["UTS Matematika 4B", "Pilih yang lain", "Nanti saja"]),
       `choices: ${labels.join(", ")}`,
     );
-    expect(await typeBox.isVisible(), "no type box under the Kartu Pilih");
+    // Cukup klik: the answer is a click (or said with the talk combination), not typed.
+    expect(!(await typeBox.isVisible()), "a type box under the Kartu Pilih");
+    // The heading names the photo; the detail says where the choices came from and the keys to hold.
+    await pick
+      .locator("[data-nemu-status]")
+      .getByText("Foto buku nilai", { exact: true })
+      .waitFor();
+    const detail = await pick.locator("[data-nemu-detail]").textContent();
+    expect(
+      detail === "Dari judul di foto. Bisa juga diucapkan: tahan Ctrl + Spasi.",
+      `detail: ${detail}`,
+    );
     await page.screenshot({ path: join(shots, "pilih-judul.png") });
     await pick.screenshot({ path: join(shots, "pilih-judul-dekat.png") });
-    await pick.getByRole("button", { name: "UTS · Matematika · 4B" }).click();
+    await pick.getByRole("button", { name: "UTS Matematika 4B" }).click();
     // While the photo is read: one sentence and only Berhenti (no Pelan).
     const reading = display("kerja");
     if (
