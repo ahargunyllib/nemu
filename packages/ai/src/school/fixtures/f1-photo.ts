@@ -1,3 +1,5 @@
+import type { PhotoTitleCandidate } from "@nemu/contracts/school";
+
 import type { ModelCell, ModelReading } from "../grades/vision.js";
 import type { RosterStudent } from "../names.js";
 
@@ -159,6 +161,11 @@ export const F1_DOUBTFUL: Record<number, Partial<ModelCell>> = {
 
 /** Read A: coordinates, and the four doubtful cells as a first reader would see them. */
 export const F1_READ_A = f1Page(true, F1_DOUBTFUL);
+
+/** The official page's heading, "Daftar Nilai UTS Matematika - Kelas 4B", read for #269. */
+export const F1_TITLE: PhotoTitleCandidate[] = [
+  { assessment: "UTS", subject: "Matematika", className: "4B" },
+];
 
 /** Read B: an independent reader that gets the rest of the page as written. */
 export const F1_READ_B = f1Page(false, F1_HARD);

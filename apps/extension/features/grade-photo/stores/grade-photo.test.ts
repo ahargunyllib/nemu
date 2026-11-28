@@ -7,11 +7,14 @@ import type { CaraTwoGuide, GuidedStep } from "../../executor/lib/run";
 import type { GradePhotoRequest } from "../lib/requests";
 
 const calls: GradePhotoRequest[] = [];
+/** Ops whose request fails, as when the Nemu Service can't be reached. */
+const failing = new Set<GradePhotoRequest["op"]>();
 const replies: Partial<Record<GradePhotoRequest["op"], (request: never) => unknown>> = {};
 
 vi.mock("../api/request-grade-photo", () => ({
   requestGradePhoto: async (_pageEmail: unknown, request: GradePhotoRequest) => {
     calls.push(request);
+    if (failing.has(request.op)) return { ok: false, message: "Nemu belum tersambung." };
     const reply = replies[request.op];
     return { ok: true, value: reply ? reply(request as never) : null };
   },
@@ -76,6 +79,14 @@ const until = async (check: () => boolean) => {
     await new Promise((resolve) => setTimeout(resolve, 5));
   expect(check()).toBe(true);
 };
+const question = () => {
+  const display = view().display;
+  return display?.type === "pilih"
+    ? display.question
+    : display?.type === "jawab"
+      ? display.sentence
+      : null;
+};
 function choose(display: NemuDisplay | null, label: string) {
   if (display?.type !== "pilih") throw new Error(`no Kartu Pilih: ${display?.type}`);
   const choice = display.choices.find((item) => item.label === label);
@@ -85,12 +96,17 @@ function choose(display: NemuDisplay | null, label: string) {
 
 beforeAll(() => {
   replies.poll = () => [JOB];
+  // #269: the photo's heading names the assessment and subject but not the class.
+  replies.title = () => ({
+    candidates: [{ assessment: "UTS", subject: "Matematika", className: null }],
+  });
   replies.command = (request: { utterance: string }) =>
     /4B/u.test(request.utterance)
       ? { status: "ok", className: "4B", subject: "Matematika", assessment: "UTS" }
       : { status: "ask", missing: "className", question: "Nilai kelas berapa, Bu?" };
-  replies.process = () => ({
+  replies.process = (request: { jobId: string }) => ({
     ...JOB,
+    jobId: request.jobId,
     status: "ready",
     reading: READING,
     verification: VERIFICATION,
@@ -129,7 +145,7 @@ beforeAll(() => {
 });
 
 describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
-  test("a new photo shows as the small Foto dari WhatsApp card; Mulai asks what the grades are", async () => {
+  test("a new photo shows as the small Foto dari WhatsApp card; Mulai asks which grades with the photo's title (#270)", async () => {
     await until(() => view().card !== null);
     expect(view().card).toMatchObject({
       type: "pilih",
@@ -137,20 +153,28 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
       question: "Foto dari WhatsApp",
     });
     choose(view().card, "Mulai");
-    await until(() => view().typing);
+    await until(() => view().display?.type === "pilih");
     expect(calls).toContainEqual({ op: "hold", jobId: "job-1" });
-    expect(view().display).toMatchObject({ type: "jawab" });
-    expect(spoken.at(-1)).toMatch(/Nilai apa ini, Ibu\?/u);
+    expect(calls).toContainEqual({ op: "title", jobId: "job-1" });
+    expect(view().display).toMatchObject({
+      type: "pilih",
+      question: "Ini nilai apa, Bu?",
+      choices: [{ label: "UTS · Matematika" }, { label: "Nilai lain" }],
+    });
+    // Saying or typing it still works while the card waits.
+    expect(view().typing).toBe(true);
+    expect(spoken.at(-1)).toBe("Ini nilai apa, Bu?");
   });
 
-  test("the command asks for anything missing, then the photo is read", async () => {
-    expect(gradePhoto.hear("nilai UTS Matematika")).toBe(true);
+  test("picking a title without a class asks for the class, then the photo is read", async () => {
+    choose(view().display, "UTS · Matematika");
     await until(() => spoken.at(-1) === "Nilai kelas berapa, Bu?");
+    expect(view().display).toMatchObject({ type: "jawab", sentence: "Nilai kelas berapa, Bu?" });
     gradePhoto.hear("4B");
-    await until(() => view().display?.type === "pilih");
+    await until(() => question() === "Nilai Alya Nur Fitri: 86 atau 88?");
     expect(calls).toContainEqual({
       op: "command",
-      utterance: "nilai UTS Matematika 4B",
+      utterance: "UTS Matematika 4B",
     });
     expect(calls).toContainEqual({
       op: "process",
@@ -246,5 +270,90 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
     expect(view().display).toBeNull();
     // The deleted photo isn't offered again while the next poll is still to come.
     expect(view().card).toBeNull();
+  });
+});
+
+describe("Kartu Pilih from the photo's title (#270)", () => {
+  const NEXT: InboxJob = { ...JOB, jobId: "job-2", createdAt: 2 };
+  const asked = () => calls.filter((call) => call.op === "process").length;
+
+  async function mulai() {
+    replies.poll = () => [NEXT];
+    document.dispatchEvent(new Event("visibilitychange"));
+    await until(() => view().card !== null);
+    choose(view().card, "Mulai");
+  }
+
+  test("a full title goes straight to the read; no class is asked for", async () => {
+    replies.title = () => ({
+      candidates: [{ assessment: "UTS", subject: "Matematika", className: "4B" }],
+    });
+    const before = asked();
+    await mulai();
+    await until(() => question() === "Ini nilai apa, Bu?");
+    choose(view().display, "UTS · Matematika · 4B");
+    await until(() => asked() === before + 1);
+    expect(calls).toContainEqual({
+      op: "process",
+      jobId: "job-2",
+      className: "4B",
+      assessment: "UTS",
+    });
+    gradePhoto.cancel();
+  });
+
+  test("saying or typing it instead of picking still works", async () => {
+    const before = asked();
+    await mulai();
+    await until(() => question() === "Ini nilai apa, Bu?");
+    expect(gradePhoto.hear("nilai UTS Matematika 4B")).toBe(true);
+    await until(() => asked() === before + 1);
+    expect(calls).toContainEqual({ op: "command", utterance: "nilai UTS Matematika 4B" });
+    gradePhoto.cancel();
+  });
+
+  test("Nilai lain asks her to say or type it", async () => {
+    await mulai();
+    await until(() => question() === "Ini nilai apa, Bu?");
+    choose(view().display, "Nilai lain");
+    await until(() => view().display?.type === "jawab");
+    expect(question()).toMatch(/^Foto buku nilai sudah masuk\. Nilai apa ini, Ibu\?/u);
+    expect(view().typing).toBe(true);
+    gradePhoto.cancel();
+  });
+
+  test("at most two titles are offered, most likely first, with Nilai lain", async () => {
+    replies.title = () => ({
+      candidates: [
+        { assessment: "UTS", subject: "Matematika", className: "4B" },
+        { assessment: "UH 2", subject: "Matematika", className: "4B" },
+        { assessment: "UAS", subject: "Matematika", className: "4B" },
+      ],
+    });
+    await mulai();
+    await until(() => question() === "Ini nilai apa, Bu?");
+    const display = view().display;
+    expect(display?.type === "pilih" && display.choices.map((choice) => choice.label)).toEqual([
+      "UTS · Matematika · 4B",
+      "UH 2 · Matematika · 4B",
+      "Nilai lain",
+    ]);
+    gradePhoto.cancel();
+  });
+
+  test("a title Nemu can't read falls back to asking, as before", async () => {
+    replies.title = () => ({ candidates: [] });
+    await mulai();
+    await until(() => view().display?.type === "jawab");
+    expect(question()).toMatch(/^Foto buku nilai sudah masuk\. Nilai apa ini, Ibu\?/u);
+    expect(view().typing).toBe(true);
+    gradePhoto.cancel();
+
+    failing.add("title");
+    await mulai();
+    await until(() => view().display?.type === "jawab");
+    expect(question()).toMatch(/^Foto buku nilai sudah masuk\. Nilai apa ini, Ibu\?/u);
+    failing.delete("title");
+    gradePhoto.cancel();
   });
 });

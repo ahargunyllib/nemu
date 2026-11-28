@@ -3,7 +3,12 @@ import { imageDataUrl } from "@nemu/ai/school/llm";
 import { buildVerificationPlan } from "@nemu/ai/school/grades/verification";
 import type { TeacherProfile } from "@nemu/ai/school/profile";
 import type { SchoolAi } from "@nemu/ai/school/runtime";
-import { inboxJobSchema, type InboxJob } from "@nemu/contracts/school";
+import {
+  inboxJobSchema,
+  photoTitleSchema,
+  type InboxJob,
+  type PhotoTitle,
+} from "@nemu/contracts/school";
 
 import type { InboxFileStore } from "../../context";
 import type { SchoolDirectory } from "../school/directory";
@@ -144,6 +149,24 @@ export async function listJobs({ store }: InboxDeps, teacherId: string): Promise
     .filter((job): job is StoredJob => !!job)
     .sort((left, right) => right.createdAt - left.createdAt)
     .map(publicJob);
+}
+
+/**
+ * #269: the photo's heading as choices for "Ini nilai apa, Bu?" (#270), before the full read. The
+ * job stays as it is; null when the job or its photo isn't this teacher's (or is gone).
+ */
+export async function readTitle(
+  deps: InboxDeps & { ai: Pick<SchoolAi, "readPhotoTitle"> },
+  input: { teacherId: string; jobId: string },
+): Promise<PhotoTitle | null> {
+  const job = await readJob(deps.store, input.teacherId, input.jobId);
+  if (!job) return null;
+  const photo = await deps.store.get(photoKey(input.teacherId, input.jobId));
+  if (!photo) return null;
+  const candidates = await deps.ai.readPhotoTitle({
+    image: { type: "image", dataUrl: imageDataUrl(new Uint8Array(photo), job.contentType) },
+  });
+  return photoTitleSchema.parse({ candidates: candidates.slice(0, 3) });
 }
 
 export type ProcessJobInput = {

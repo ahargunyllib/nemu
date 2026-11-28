@@ -4,6 +4,7 @@ import type {
   GradeRulesResult,
   GradeSheetReading,
   InboxJob,
+  PhotoTitle,
   ReadbackResult,
   ReadbackRow,
   VerificationAnswer,
@@ -19,6 +20,8 @@ export type GradePhotoRequest =
   /** The teacher started on this photo here: no other tab shows it. */
   | { op: "hold"; jobId: string }
   | { op: "release"; jobId: string }
+  /** #269: the photo's heading, read before the full read, for "Ini nilai apa, Bu?" (#270). */
+  | { op: "title"; jobId: string }
   | { op: "command"; utterance: string }
   | { op: "process"; jobId: string; className: string; assessment: string | null }
   /** W5: the cell each question is about, cut from the photo (`null` where there is no box). */
@@ -50,6 +53,7 @@ export type GradePhotoValue = {
   poll: InboxJob[];
   hold: null;
   release: null;
+  title: PhotoTitle;
   command: GradeCommand;
   process: InboxJob;
   crops: (string | null)[];

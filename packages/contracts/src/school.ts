@@ -617,6 +617,25 @@ export const inboxJobSchema = z
   })
   .strict();
 
+/**
+ * #269: what the grade-book photo's heading says ("UTS Matematika 4B"), read before the full read
+ * so Nemu can ask "Ini nilai apa, Bu?" with it as the choices (#270). Most likely first; empty
+ * when the heading can't be read, and Nemu then asks her to say or type it.
+ */
+export const photoTitleCandidateSchema = z
+  .object({
+    /** As the heading writes it: "UTS", "UH 2", "Tugas". */
+    assessment: z.string().min(1),
+    subject: z.string().min(1),
+    /** null when the heading names no class: Nemu asks for it after she picks. */
+    className: z.string().min(1).nullable(),
+  })
+  .strict();
+
+export const photoTitleSchema = z
+  .object({ candidates: z.array(photoTitleCandidateSchema).max(3) })
+  .strict();
+
 export type GradeCell = z.infer<typeof gradeCellSchema>;
 export type GradeRow = z.infer<typeof gradeRowSchema>;
 export type GradeSheetReading = z.infer<typeof gradeSheetReadingSchema>;
@@ -659,3 +678,5 @@ export type VoiceControl = z.infer<typeof voiceControlSchema>;
 export type CommandRoute = z.infer<typeof commandRouteSchema>;
 export type InboxJob = z.infer<typeof inboxJobSchema>;
 export type InboxJobStatus = z.infer<typeof inboxJobStatusSchema>;
+export type PhotoTitleCandidate = z.infer<typeof photoTitleCandidateSchema>;
+export type PhotoTitle = z.infer<typeof photoTitleSchema>;
