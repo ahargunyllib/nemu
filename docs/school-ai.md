@@ -11,6 +11,8 @@ Everything here runs on the synthetic school **SDIT Nusantara**. Replace the syn
 | Offline | `NEMU_RESPONDER=fixture` in `apps/server/.env`, then `pnpm dev` | None. Every photo reads as the official F1-1 page (4 doubtful digits, 5 names spelled differently, Raka's S), help and answers come from rules. Shapes are real, so the UI can be built against it. |
 | Live    | `NEMU_RESPONDER=ai` and a valid `OPENROUTER_API_KEY`            | The `OPENROUTER_SCHOOL_*` models in `apps/server/.env.schema`                                                                                                                                       |
 
+The text model (`anthropic/claude-haiku-5.5`) reasons before it answers, and on OpenRouter those reasoning tokens count against `maxOutputTokens`: a call that uses up its budget reasoning comes back with no text ("OpenRouter Responses API did not contain output text"). Measured live, a symptom match reasons 235–946 tokens for about 10 of answer. So every model call gets at least 2000 (#315); a small cap saves nothing, since it is only a ceiling.
+
 The OpenRouter key in `apps/server/.env` had **expired** on 25 Nov 2026 (HTTP 401), so nothing live was run. Renew it before live testing.
 
 Accounts (seeded by `packages/db/src/migrations/20261125120000_seed_school_workspace` and `20261126080000_seed_school_directory`, workspace `W-SEKOLAH`, demo date Tuesday 1 Dec 2026):
