@@ -96,6 +96,7 @@ function choose(display: NemuDisplay | null, label: string) {
 
 beforeAll(() => {
   replies.poll = () => [JOB];
+  replies.thumbnail = () => "data:image/jpeg;base64,TH";
   // #269: the photo's heading names the assessment and subject but not the class.
   replies.title = () => ({
     candidates: [{ assessment: "UTS", subject: "Matematika", className: null }],
@@ -145,13 +146,23 @@ beforeAll(() => {
 });
 
 describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
-  test("a new photo shows as the small Foto dari WhatsApp card; Mulai asks which grades with the photo's title (#270)", async () => {
-    await until(() => view().card !== null);
+  test("a new photo shows as the small Foto dari WhatsApp card with its thumbnail; Mulai asks which grades with the photo's title (#270, #278)", async () => {
+    await until(() => {
+      const card = view().card;
+      return card?.type === "pilih" && !!card.image?.src;
+    });
     expect(view().card).toMatchObject({
       type: "pilih",
       compact: true,
       question: "Foto dari WhatsApp",
+      image: { src: "data:image/jpeg;base64,TH", alt: "Foto buku nilai dari WhatsApp" },
     });
+    // The thumbnail is all that is fetched before Mulai: nothing is read yet.
+    expect(calls.map((call) => call.op)).not.toContain("title");
+    expect(calls.map((call) => call.op)).not.toContain("process");
+    expect(calls.filter((call) => call.op === "thumbnail")).toEqual([
+      { op: "thumbnail", jobId: "job-1" },
+    ]);
     choose(view().card, "Mulai");
     await until(() => view().display?.type === "pilih");
     expect(calls).toContainEqual({ op: "hold", jobId: "job-1" });

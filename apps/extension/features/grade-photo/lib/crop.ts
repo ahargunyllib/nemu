@@ -39,6 +39,12 @@ function toBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
+/** A small image as a data URL the page can show, such as the photo card's thumbnail (#278). */
+export async function imageDataUrl(image: Blob): Promise<string> {
+  const type = image.type || "image/jpeg";
+  return `data:${type};base64,${toBase64(new Uint8Array(await image.arrayBuffer()))}`;
+}
+
 /**
  * Background: W5's crops, each cell enlarged with a little of its line, as data URLs. Only the
  * crops reach the page, never the whole photo. Null for a question without a box, or when the

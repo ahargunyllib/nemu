@@ -11,8 +11,10 @@ For each image in a one-to-one chat:
    Unknown numbers are ignored: no read receipt, no download, no reply.
 2. Pause, mark the message read, download the photo at full quality (images sent as documents too)
    into a temporary folder.
-3. Post it with the shared secret to `POST /api-reference/wa-bot/photos`, which calls `enqueuePhoto`.
-   The same message id twice is one job. Delete the photo.
+3. Make a thumbnail of it (`internal/thumbnail`: JPEG, 320 px on its long side) for the
+   extension's "Foto dari WhatsApp" card (#278); a photo Go can't decode (WebP) goes without one.
+   Post both with the shared secret to `POST /api-reference/wa-bot/photos`, which calls
+   `enqueuePhoto`. The same message id twice is one job. Delete the photo.
 4. Show the typing indicator, pause, and reply in Indonesian.
 
 Messages are handled one at a time with random pauses, so the number behaves like a person reading

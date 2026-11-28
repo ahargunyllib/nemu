@@ -18,7 +18,10 @@ export const waBotRouter = {
       registered: await isRegisteredSender(context.school.directory, input.phone),
     })),
 
-  /** The downloaded photo, as multipart form data. The same `messageId` twice is one job. */
+  /**
+   * The downloaded photo and the bot's thumbnail of it, as multipart form data. The same
+   * `messageId` twice is one job.
+   */
   waBotPhoto: waBotProcedure
     .route({ method: "POST", path: "/wa-bot/photos" })
     .input(
@@ -26,6 +29,8 @@ export const waBotRouter = {
         phone: phoneSchema,
         messageId: z.string().trim().min(1).max(128),
         photo: z.instanceof(File),
+        /** #278: the bot's small JPEG for the extension's photo card (optional). */
+        thumbnail: z.instanceof(File).optional(),
       }),
     )
     .handler(async ({ context, input }) =>
@@ -35,6 +40,9 @@ export const waBotRouter = {
           phone: input.phone,
           messageId: input.messageId,
           bytes: new Uint8Array(await input.photo.arrayBuffer()),
+          thumbnail: input.thumbnail
+            ? new Uint8Array(await input.thumbnail.arrayBuffer())
+            : undefined,
         },
       ),
     ),

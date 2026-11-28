@@ -59,6 +59,8 @@ export type NemuServiceClient = {
   inboxReadTitle: Call<{ jobId: string }, PhotoTitle>;
   inboxProcess: Call<{ jobId: string; className: string; assessment: string | null }, InboxJob>;
   inboxPhoto: Call<{ jobId: string }, Blob>;
+  /** #278: the "Foto dari WhatsApp" card's thumbnail, before Mulai. */
+  inboxThumbnail: Call<{ jobId: string }, Blob>;
   inboxAck: Call<{ jobId: string }, { deleted: boolean }>;
   gradesParseCommand: Call<{ utterance: string }, GradeCommand>;
   gradesFinalize: Call<

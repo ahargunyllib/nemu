@@ -20,6 +20,8 @@ export type GradePhotoRequest =
   /** The teacher started on this photo here: no other tab shows it. */
   | { op: "hold"; jobId: string }
   | { op: "release"; jobId: string }
+  /** #278: the card's thumbnail as a data URL, before Mulai; null when the photo has none. */
+  | { op: "thumbnail"; jobId: string }
   /** #269: the photo's heading, read before the full read, for "Ini nilai apa, Bu?" (#270). */
   | { op: "title"; jobId: string }
   | { op: "command"; utterance: string }
@@ -53,6 +55,7 @@ export type GradePhotoValue = {
   poll: InboxJob[];
   hold: null;
   release: null;
+  thumbnail: string | null;
   title: PhotoTitle;
   command: GradeCommand;
   process: InboxJob;

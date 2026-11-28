@@ -21,12 +21,20 @@ import type { SchoolDirectory } from "../school/directory";
  */
 
 export const MAX_PHOTO_BYTES = 8 * 1024 * 1024;
+/** The bot's thumbnail is about 320 px on its long side; anything bigger isn't one. */
+export const MAX_THUMBNAIL_BYTES = 256 * 1024;
 /** A job still "processing" after this long is assumed abandoned and may be read again. */
 const PROCESSING_TIMEOUT_MS = 3 * 60_000;
 
 export type InboxDeps = { store: InboxFileStore };
 
-type StoredJob = InboxJob & { teacherId: string; contentType: string; updatedAt: number };
+type StoredJob = InboxJob & {
+  teacherId: string;
+  contentType: string;
+  /** #278: the card's thumbnail beside the photo; absent when the bot sent none. */
+  thumbnailType?: string;
+  updatedAt: number;
+};
 
 function prefixFor(teacherId: string): string {
   return `inbox/${encodeURIComponent(teacherId)}/`;
@@ -38,6 +46,10 @@ function jobKey(teacherId: string, jobId: string): string {
 
 function photoKey(teacherId: string, jobId: string): string {
   return `${prefixFor(teacherId)}${jobId}/photo`;
+}
+
+function thumbnailKey(teacherId: string, jobId: string): string {
+  return `${prefixFor(teacherId)}${jobId}/thumbnail`;
 }
 
 async function readJob(
@@ -84,6 +96,11 @@ export type EnqueuePhotoInput = {
   bytes: Uint8Array;
   /** WhatsApp message id: the same message enqueued twice (webhook retry) is one job. */
   messageId?: string;
+  /**
+   * #278: a small copy for the "Foto dari WhatsApp" card, made by `apps/wa-bot` at hand-off. One
+   * that isn't a small image is dropped; the photo is queued either way.
+   */
+  thumbnail?: Uint8Array;
   now?: number;
 };
 
@@ -109,6 +126,16 @@ export async function enqueuePhoto(
     clean.slice().buffer as ArrayBuffer,
     contentType,
   );
+  const thumbnailType =
+    input.thumbnail && input.thumbnail.byteLength <= MAX_THUMBNAIL_BYTES
+      ? imageMimeType(input.thumbnail)
+      : null;
+  if (input.thumbnail && thumbnailType)
+    await store.put(
+      thumbnailKey(input.teacherId, jobId),
+      stripJpegMetadata(input.thumbnail).slice().buffer as ArrayBuffer,
+      thumbnailType,
+    );
   const now = input.now ?? Date.now();
   const job: StoredJob = {
     jobId,
@@ -121,6 +148,7 @@ export async function enqueuePhoto(
     verification: null,
     message: null,
     contentType,
+    ...(thumbnailType ? { thumbnailType } : {}),
   };
   await writeJob(store, job);
   return { status: "queued", job: publicJob(job) };
@@ -260,7 +288,26 @@ export async function jobPhoto(
   return body ? { body, contentType: job.contentType } : null;
 }
 
-/** The teacher saved (or gave up): delete the photo and the job (UU PDP: delete after processing). */
+/**
+ * #278: the "Foto dari WhatsApp" card's thumbnail, before the teacher presses Mulai. Serving it
+ * reads nothing and leaves the job as it is; null when the job isn't this teacher's, is gone, or
+ * came without one.
+ */
+export async function jobThumbnail(
+  { store }: InboxDeps,
+  teacherId: string,
+  jobId: string,
+): Promise<{ body: ArrayBuffer; contentType: string } | null> {
+  const job = await readJob(store, teacherId, jobId);
+  if (!job?.thumbnailType) return null;
+  const body = await store.get(thumbnailKey(teacherId, jobId));
+  return body ? { body, contentType: job.thumbnailType } : null;
+}
+
+/**
+ * The teacher saved (or gave up): delete the photo, its thumbnail and the job (UU PDP: delete
+ * after processing, F1-12).
+ */
 export async function ackJob(
   { store }: InboxDeps,
   teacherId: string,
@@ -270,6 +317,7 @@ export async function ackJob(
   if (!job) return false;
   await Promise.all([
     store.delete(photoKey(teacherId, jobId)),
+    store.delete(thumbnailKey(teacherId, jobId)),
     store.delete(jobKey(teacherId, jobId)),
   ]);
   return true;

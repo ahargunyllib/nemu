@@ -1,8 +1,11 @@
 package nemu
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"image"
+	"image/jpeg"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -84,6 +87,61 @@ func TestHandOverPostsThePhotoAsMultipart(t *testing.T) {
 	want := map[string]string{"phone": "6281200000099", "messageId": "3EB0A", "photo": string(photo)}
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("posted %v, want %v", got, want)
+	}
+}
+
+// handOverParts hands over a photo with these bytes and returns the form parts the service got.
+func handOverParts(t *testing.T, photo []byte) map[string][]byte {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "photo-1")
+	if err := os.WriteFile(path, photo, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	parts := map[string][]byte{}
+	client := fakeNemu(t, func(w http.ResponseWriter, r *http.Request) {
+		reader, err := r.MultipartReader()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		for part, err := reader.NextPart(); err == nil; part, err = reader.NextPart() {
+			parts[part.FormName()], _ = io.ReadAll(part)
+		}
+		_ = json.NewEncoder(w).Encode(map[string]string{"status": "queued", "jobId": "abc"})
+	})
+	if outcome, err := client.HandOver(context.Background(), "6281200000099", "3EB0A", path); err != nil || outcome != bot.Queued {
+		t.Fatalf("HandOver = %q, %v", outcome, err)
+	}
+	return parts
+}
+
+func TestHandOverAddsAThumbnailForTheCard(t *testing.T) {
+	var photo bytes.Buffer
+	if err := jpeg.Encode(&photo, image.NewGray(image.Rect(0, 0, 1280, 960)), nil); err != nil {
+		t.Fatal(err)
+	}
+	parts := handOverParts(t, photo.Bytes())
+
+	if !bytes.Equal(parts["photo"], photo.Bytes()) {
+		t.Fatal("the photo was not posted as it is")
+	}
+	config, err := jpeg.DecodeConfig(bytes.NewReader(parts["thumbnail"]))
+	if err != nil {
+		t.Fatalf("no JPEG thumbnail: %v", err)
+	}
+	if config.Width != 320 || config.Height != 240 {
+		t.Fatalf("thumbnail %dx%d, want 320x240", config.Width, config.Height)
+	}
+}
+
+func TestHandOverWithoutAThumbnailWhenThePhotoCantBeDecoded(t *testing.T) {
+	parts := handOverParts(t, []byte("RIFF....WEBPVP8 not decodable here"))
+
+	if _, ok := parts["thumbnail"]; ok {
+		t.Fatal("posted a thumbnail for a photo Go can't decode")
+	}
+	if string(parts["messageId"]) != "3EB0A" {
+		t.Fatalf("form parts: %q", parts)
 	}
 }
 

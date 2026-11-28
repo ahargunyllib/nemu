@@ -1,5 +1,6 @@
 import { Button } from "@nemu/ui/components/button";
 import { CardContent, CardFooter, CardHeader, CardTitle } from "@nemu/ui/components/card";
+import { Skeleton } from "@nemu/ui/components/skeleton";
 import { type KartuPilihProps, orderChoices } from "@nemu/ui/lib/nemu-display";
 import { NemuCard } from "@nemu/ui/nemu/nemu-frame";
 import { cn } from "cn";
@@ -10,7 +11,8 @@ import { useId } from "react";
  * Kartu Pilih: a decision. One question and two or three equal, stacked big buttons. Nothing is
  * pre-selected or focused; a risky choice carries ⚠ and sits under the safe one. An `image`
  * shows what the question is about (W5's photo crop); `compact` is the small card that waits
- * beside the Nemu button, with 44 px buttons.
+ * beside the Nemu button, with 44 px buttons, and its `image` is a thumbnail beside the question
+ * ("Foto dari WhatsApp", #278).
  */
 export function KartuPilih({
   question,
@@ -23,7 +25,18 @@ export function KartuPilih({
   const questionId = useId();
   return (
     <NemuCard display="pilih" label="Pilihan Nemu" className={cn(compact && "w-[300px] gap-3")}>
-      <CardHeader>
+      <CardHeader className={cn(compact && image && "flex items-center gap-3")}>
+        {compact &&
+          image &&
+          (image.src ? (
+            <img
+              src={image.src}
+              alt={image.alt}
+              className="size-16 shrink-0 rounded-xl border-2 border-border bg-muted object-cover object-top"
+            />
+          ) : (
+            <Skeleton aria-hidden className="size-16 shrink-0" />
+          ))}
         <CardTitle
           id={questionId}
           className={cn("font-semibold", compact ? "text-lg leading-6" : "text-xl leading-7")}
@@ -31,7 +44,7 @@ export function KartuPilih({
           {question}
         </CardTitle>
       </CardHeader>
-      {image && (
+      {!compact && image?.src && (
         <CardContent>
           <img
             src={image.src}

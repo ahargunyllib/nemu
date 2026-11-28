@@ -1,8 +1,10 @@
 // F1-1 on the mock AlurSekolah (#207): loads a development build of the extension into
 // Playwright's Chromium, sends the official F1-1 grade-book photo the way apps/wa-bot does, and walks
-// the whole flow as Bu Siti: the card in one tab only, Mulai, "Ini nilai apa, Bu?" with the
+// the whole flow as Bu Siti: the card in one tab only with the photo's thumbnail (#278) and no read
+// before Mulai, Bu Dewi refused the thumbnail, Mulai, "Ini nilai apa, Bu?" with the
 // photo's title as the choice (#270), W5's questions (by button, and once by "Angka lain" and typing), the cara 1 fill with
-// visible navigation, Simpan pressed by the "teacher", the read-back, inboxAck, Catatan langkah.
+// visible navigation, Simpan pressed by the "teacher", the read-back, inboxAck (photo and thumbnail
+// gone), Catatan langkah.
 // It checks every saved grade against the page's truth (0 wrong) and the time (≤ 5 minutes).
 //
 // Needs the stack running with the offline AI and the wa-bot secret, e.g.
@@ -25,6 +27,8 @@ const HEADED = process.argv.includes("--headed");
 // Bu Siti in WS-06 (synthetic): her WhatsApp number and her AlurSekolah email.
 const PHONE = "6281200001001";
 const EMAIL = "siti.aminah@sditnusantara.sch.id";
+// Another registered teacher of the same school (WS-06 seed), who must not see Bu Siti's photo.
+const OTHER_EMAIL = "dewi.lestari@sditnusantara.sch.id";
 
 if (!WA_BOT_SECRET) {
   console.error("Set WA_BOT_SECRET to the secret the running Nemu Service was started with.");
@@ -33,6 +37,11 @@ if (!WA_BOT_SECRET) {
 
 const root = resolve(import.meta.dirname, "..");
 const photo = resolve(root, "../../packages/ai/src/school/fixtures/f1-1-buku-nilai-4b.jpg");
+// What apps/wa-bot's internal/thumbnail makes of that photo (320 px on its long side).
+const thumbnail = resolve(
+  root,
+  "../../packages/ai/src/school/fixtures/f1-1-buku-nilai-4b-thumbnail.jpg",
+);
 const extension = join(root, ".output/verify-grade-photo-extension");
 const shots = join(root, ".output/verify-grade-photo");
 mkdirSync(shots, { recursive: true });
@@ -75,13 +84,13 @@ const CLASS_4B = [
 ];
 const TRUTH = new Map(CLASS_4B);
 
-async function service(procedure) {
+async function service(procedure, email = EMAIL) {
   const response = await fetch(`${SERVER}/rpc/${procedure.name}`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
       "x-nemu-install-code": INSTALL_CODE,
-      "x-nemu-email": EMAIL,
+      "x-nemu-email": email,
     },
     body: JSON.stringify({ json: procedure.input ?? null }),
   });
@@ -161,6 +170,7 @@ const form = new FormData();
 form.set("phone", PHONE);
 form.set("messageId", `verify-f1-${Date.now()}`);
 form.set("photo", new Blob([readFileSync(photo)], { type: "image/jpeg" }), "buku-nilai.jpg");
+form.set("thumbnail", new Blob([readFileSync(thumbnail)], { type: "image/jpeg" }), "thumbnail");
 const sent = await (
   await fetch(`${SERVER}/api-reference/wa-bot/photos`, {
     method: "POST",
@@ -186,7 +196,48 @@ await check("the photo shows as the small Foto dari WhatsApp card, in one tab on
   expect((await cardIn(winner).count()) === 1, "the card went away");
   page = winner;
   await other.close();
-  await page.screenshot({ path: join(shots, "kartu-foto.png") });
+});
+
+await check(
+  "the card shows the photo's thumbnail, and nothing is read before Mulai (#278)",
+  async () => {
+    const image = cardIn(page).getByRole("img", { name: "Foto buku nilai dari WhatsApp" });
+    await image.waitFor({ timeout: 10_000 });
+    const shown = await image.evaluate((element) => ({
+      width: element.naturalWidth,
+      height: element.naturalHeight,
+      src: element.src.slice(0, 23),
+    }));
+    expect(
+      shown.src === "data:image/jpeg;base64," && shown.width === 230 && shown.height === 320,
+      `thumbnail ${JSON.stringify(shown)}`,
+    );
+    const [job] = await service({ name: "inboxJobs" });
+    expect(
+      job?.jobId === jobId && job.status === "queued" && job.reading === null,
+      `job ${job?.status}`,
+    );
+    await page.screenshot({ path: join(shots, "kartu-foto.png") });
+    await cardIn(page).screenshot({ path: join(shots, "kartu-foto-dekat.png") });
+  },
+);
+
+await check("another teacher can't fetch the thumbnail (#278)", async () => {
+  const response = await fetch(`${SERVER}/rpc/inboxThumbnail`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-nemu-install-code": INSTALL_CODE,
+      "x-nemu-email": OTHER_EMAIL,
+    },
+    body: JSON.stringify({ json: { jobId } }),
+  });
+  const body = await response.json();
+  expect(
+    response.status === 404 && body.json?.code === "NOT_FOUND",
+    `Bu Dewi got ${response.status}`,
+  );
+  expect((await service({ name: "inboxJobs" }, OTHER_EMAIL)).length === 0, "Bu Dewi sees the job");
 });
 
 const overlay = page.locator("nemu-overlay");
@@ -306,6 +357,17 @@ await check(
     await page.screenshot({ path: join(shots, "baca-ulang.png") });
     const left = await service({ name: "inboxJobs" });
     expect(!left.some((job) => job.jobId === jobId), "the photo is still in the inbox");
+    // F1-12: its thumbnail went with it.
+    const after = await fetch(`${SERVER}/rpc/inboxThumbnail`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-nemu-install-code": INSTALL_CODE,
+        "x-nemu-email": EMAIL,
+      },
+      body: JSON.stringify({ json: { jobId } }),
+    });
+    expect(after.status === 404, `the thumbnail is still served (${after.status})`);
   },
 );
 

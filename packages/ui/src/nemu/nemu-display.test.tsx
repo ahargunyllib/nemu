@@ -215,6 +215,29 @@ describe("Kartu Pilih for W5 and the inbox", () => {
     fireEvent.click(screen.getByRole("button", { name: "Mulai" }));
     expect(onChoose).toHaveBeenCalledWith("mulai");
   });
+
+  test("the compact photo card shows the thumbnail beside its title, a skeleton while it loads (#278)", () => {
+    const card = (src?: string) => (
+      <KartuPilih
+        compact
+        question="Foto dari WhatsApp"
+        choices={[
+          { id: "mulai", label: "Mulai" },
+          { id: "nanti", label: "Nanti" },
+        ]}
+        onChoose={vi.fn()}
+        image={{ src, alt: "Foto buku nilai dari WhatsApp" }}
+      />
+    );
+    const { container, rerender } = render(card());
+    expect(screen.queryByRole("img")).toBeNull();
+    expect(container.querySelector("[data-slot=card-header] [data-slot=skeleton]")).toBeTruthy();
+
+    rerender(card("data:image/jpeg;base64,AA"));
+    const thumbnail = screen.getByRole("img", { name: "Foto buku nilai dari WhatsApp" });
+    expect(thumbnail.closest("[data-slot=card-header]")).toBeTruthy();
+    expect(container.querySelector("[data-slot=skeleton]")).toBeNull();
+  });
 });
 
 describe("Kartu Info", () => {
