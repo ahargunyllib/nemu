@@ -13,6 +13,8 @@ import type { AlurSekolahConnector } from "../alursekolah/connector";
  */
 
 const ABOUT_GRADES = /\b(nilai|nilainya|rapor|rapornya)\b/iu;
+/** The kind of grade a question may name, as AlurSekolah's `jenis` spells it. */
+const ASSESSMENT = /\b(UTS|UAS|PTS|PAS|STS|SAS)\b/iu;
 
 function words(text: string): string[] {
   return text
@@ -67,6 +69,17 @@ export async function checkSavedGrades(
     const students = await client.siswa();
     const student = studentInQuestion(question, students.data, teacher);
     if (!student) return { status: "not_asked" };
+    // "Nilai UTS Aisyah …": the bubble names UTS only when AlurSekolah has a UTS grade for her.
+    const assessment = question.match(ASSESSMENT)?.[1]?.toUpperCase();
+    if (assessment) {
+      const named = await client.nilai({
+        nis: student.nis,
+        jenis: assessment,
+        halaman: 1,
+        ukuran: 1,
+      });
+      if (named.meta.total > 0) return { status: "saved", student: student.nama, assessment };
+    }
     const saved = await client.nilai({ nis: student.nis, halaman: 1, ukuran: 1 });
     return saved.meta.total > 0
       ? { status: "saved", student: student.nama }

@@ -198,17 +198,15 @@ await check(
     expect(documentReady, "the SPP BPMN isn't uploaded");
     await ask(page, "Nilai UTS Aisyah kok tidak muncul di aplikasi orang tua?");
     await bubble(page)
-      .getByText("Nilai Aisyah Putri Wijaya sudah tersimpan.", { exact: false })
+      .getByText("Bukan kesalahan Ibu. Kemungkinan karena alur SPP sekolah.", { exact: true })
       .waitFor({ timeout: 15_000 });
-    await bubble(page)
-      .getByText("Kemungkinan karena alur SPP sekolah:", { exact: false })
-      .waitFor();
+    await bubble(page).getByText("Nilai UTS Aisyah sudah tersimpan.", { exact: true }).waitFor();
     await page.screenshot({ path: join(shots, "q1-sentence.png") });
-    await bubble(page)
-      .getByText("Yang bisa membantu: Bu Ratna (keuangan).", { exact: false })
-      .waitFor();
     await bubble(page).getByRole("button", { name: "Kenapa?" }).click();
     await bubble(page).getByText("Jalan kembalinya:", { exact: false }).waitFor();
+    await bubble(page)
+      .getByText("Yang bisa membantu: Bu Ratna (bagian keuangan).", { exact: false })
+      .waitFor();
     await bubble(page).getByRole("button", { name: "Sumber" }).click();
     const steps = bubble(page).locator("li");
     const count = await steps.count();
