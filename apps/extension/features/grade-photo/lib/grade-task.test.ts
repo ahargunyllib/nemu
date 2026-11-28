@@ -1,6 +1,7 @@
 import type { GradeEntry } from "@nemu/contracts/school";
 import { describe, expect, test } from "vite-plus/test";
 
+import { recipeOf } from "../../executor/lib/recipe-steps";
 import { addressFor, formAssessment, GRADE_TASK_KIND, gradeTask } from "./grade-task";
 
 const ENTRIES: GradeEntry[] = [
@@ -16,15 +17,24 @@ const task = gradeTask({
   honorific: "Bu",
 });
 
+const MENU = "Menu Nilai";
+const PICK = "Pilih kelas, mapel, penilaian";
+const FILL = "Ketik nilai per murid";
+
 describe("the F1 fill task (cara 1)", () => {
   test("opens Isi nilai kelas through the menu and picks the class, subject and assessment", () => {
     expect(task.kind).toBe(GRADE_TASK_KIND);
     expect(task.steps.slice(0, 5)).toEqual([
-      { verb: "clickMenu", target: { role: "link", text: "Nilai" } },
-      { verb: "selectOption", target: { label: "Kelas" }, option: "4B" },
-      { verb: "selectOption", target: { label: "Mata Pelajaran" }, option: "Matematika" },
-      { verb: "selectOption", target: { label: "Jenis Penilaian" }, option: "UTS" },
-      { verb: "clickMenu", target: { role: "button", text: "Tampilkan Siswa" } },
+      { verb: "clickMenu", stage: MENU, target: { role: "link", text: "Nilai" } },
+      { verb: "selectOption", stage: PICK, target: { label: "Kelas" }, option: "4B" },
+      {
+        verb: "selectOption",
+        stage: PICK,
+        target: { label: "Mata Pelajaran" },
+        option: "Matematika",
+      },
+      { verb: "selectOption", stage: PICK, target: { label: "Jenis Penilaian" }, option: "UTS" },
+      { verb: "clickMenu", stage: PICK, target: { role: "button", text: "Tampilkan Siswa" } },
     ]);
   });
 
@@ -32,29 +42,34 @@ describe("the F1 fill task (cara 1)", () => {
     expect(task.steps.slice(5, -1)).toEqual([
       {
         verb: "setValue",
+        stage: FILL,
         target: { row: "Ahmad Fadli", column: "Nilai", role: "textbox" },
         value: "82",
         rowName: "Ahmad Fadli",
       },
       {
         verb: "setValue",
+        stage: FILL,
         target: { row: "Bagas Saputra", column: "Nilai", role: "textbox" },
         value: "58",
         rowName: "Bagas Saputra",
       },
       {
         verb: "setValue",
+        stage: FILL,
         target: { row: "Bagas Saputra", column: "Catatan", role: "textbox" },
         value: "remedial",
       },
       {
         verb: "setValue",
+        stage: FILL,
         target: { row: "Putra Wijaya", column: "Nilai", role: "textbox" },
         value: "",
         rowName: "Putra Wijaya",
       },
       {
         verb: "setValue",
+        stage: FILL,
         target: { row: "Putra Wijaya", column: "Catatan", role: "textbox" },
         value: "tidak hadir",
       },
@@ -71,6 +86,15 @@ describe("the F1 fill task (cara 1)", () => {
     expect(last && "ringkasan" in last && last.ringkasan).toBe(
       "3 nilai, 1 remedial, 1 kosong. Ahmad Fadli 82, Bagas Saputra 58 (remedial), Putra Wijaya kosong (tidak hadir).",
     );
+  });
+
+  test("names its four stages, so Catatan langkah is the recipe Cara isi nilai kelas (F1·12)", () => {
+    expect(task.recipe).toEqual({ name: "Isi nilai kelas", from: "pengisian Matematika 4B" });
+    expect(recipeOf(task, new Date(2026, 11, 1))).toEqual({
+      title: "Cara isi nilai kelas",
+      subtitle: "Disimpan dari pengisian Matematika 4B, 1 Des 2026.",
+      items: [MENU, PICK, FILL, "Tekan Simpan"],
+    });
   });
 
   test("names the assessment as Jenis Penilaian lists it, and addresses the teacher in full", () => {

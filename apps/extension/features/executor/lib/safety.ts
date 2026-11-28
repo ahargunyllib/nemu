@@ -2,6 +2,7 @@ import { isDeniedActionName } from "@nemu/ai/school/safety";
 import type { SitePermission } from "@nemu/contracts/extension";
 import type { TalkShortcut } from "@nemu/contracts/talk-shortcut";
 import {
+  executorRecipeSchema,
   type ExecutorStep,
   executorStepSchema,
   executorTargetSchema,
@@ -80,11 +81,13 @@ export function toSafeTask(untrusted: UntrustedTask): { task: ExecutorTask; refu
     refused.push(steps.length);
     steps.push({ verb: "point", target: target.data, sentence: "" });
   }
+  const recipe = executorRecipeSchema.safeParse(untrusted.recipe);
   return {
     task: {
       kind: untrusted.kind,
       title: untrusted.title,
       ...(untrusted.source ? { source: untrusted.source } : {}),
+      ...(recipe.success && recipe.data ? { recipe: recipe.data } : {}),
       steps,
     },
     refused,

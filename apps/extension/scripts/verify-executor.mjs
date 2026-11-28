@@ -107,20 +107,31 @@ await check(
 );
 
 await check(
-  "the teacher presses Simpan; Catatan langkah follows and reopens from the Nemu button",
+  "the teacher presses Simpan; Catatan langkah is the recipe and reopens from the Nemu button",
   async () => {
     await page.locator("#btn-simpan").click();
     await page.locator("#ya-simpan").click();
     await page.getByText("Nilai tersimpan.").waitFor();
-    const notes = overlay.getByRole("region", { name: "Catatan langkah" });
-    await notes.getByText("Nemu mengisi 6 isian").waitFor({ timeout: 5_000 });
-    await notes.getByText("Bu menekan Simpan").waitFor();
+    // F1·12: the plan's stages as "Cara isi nilai kelas", not who pressed what.
+    const notes = overlay.getByRole("region", { name: "Cara isi nilai kelas" });
+    await notes.waitFor({ timeout: 5_000 });
+    const steps = await notes.getByRole("listitem").allTextContents();
+    const recipe = [
+      "Menu Nilai",
+      "Pilih kelas, mapel, penilaian",
+      "Ketik nilai per murid",
+      "Tekan Simpan",
+    ].map((step, index) => `${index + 1}${step}`);
+    expect(steps.join("|") === recipe.join("|"), `the recipe is ${JSON.stringify(steps)}`);
+    await notes.getByText(/^Disimpan dari pengisian Matematika 4B \(contoh\), /u).waitFor();
     await notes.getByRole("button", { name: "Coba sendiri" }).waitFor();
     await page.screenshot({ path: join(shots, "catatan-langkah.png") });
     await notes.getByRole("button", { name: "Tutup" }).click();
     await overlay.getByRole("button", { name: "Tanya Nemu" }).click();
     await overlay.getByRole("button", { name: "Lihat catatan langkah" }).click();
     await notes.waitFor();
+    // Reopened from the Nemu button, it still offers Coba sendiri.
+    await notes.getByRole("button", { name: "Coba sendiri" }).waitFor();
     await notes.getByRole("button", { name: "Tutup" }).click();
   },
 );
@@ -192,9 +203,9 @@ await check("F0-11: Berhenti asks; Ya, saya isi sendiri goes on in cara 2", asyn
 await check("F0-11: Berhenti then Tidak, berhenti ends with Catatan langkah", async () => {
   const card = await pressBerhenti();
   await card.getByRole("button", { name: "Tidak, berhenti" }).click();
-  const notes = overlay.getByRole("region", { name: "Catatan langkah" });
+  const notes = overlay.getByRole("region", { name: "Cara isi nilai kelas" });
   await notes
-    .getByText(/^Berhenti di langkah \d+ dari \d+; isian tetap ada$/u)
+    .getByText(/^Berhenti di langkah \d+ dari \d+\. Isian tetap ada\.$/u)
     .waitFor({ timeout: 5_000 });
   expect(!(await page.locator("#konfirmasi").isVisible()), "Simpan was pressed");
   await page.screenshot({ path: join(shots, "berhenti-tidak-catatan.png") });

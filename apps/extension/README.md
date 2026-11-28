@@ -98,13 +98,20 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     the whole task).
   - **F0-09.** Steps that come in parts (`registerStepSource`) are retried twice with a plain
     message, then Nemu stops at a safe step with the inputs kept; "lanjut" or **Lanjut** resumes.
-  - **Catatan langkah (F0-14)** ends each task and reopens from the Nemu button (**Lihat catatan
-    langkah**); "Coba sendiri" starts that kind of task in cara 2 next time.
+  - **Catatan langkah (F0-14)** ends each task as a numbered recipe (F1·12): "Cara isi
+    nilai kelas", "Disimpan dari pengisian Matematika 4B, 1 Des 2026.", then the plan's stages in
+    order ("Menu Nilai", "Pilih kelas, mapel, penilaian", "Ketik nilai per murid", "Tekan
+    Simpan"). A plan names its stages with each step's `stage` and the job with the task's
+    `recipe`; a step without a stage gets a plain line from its verb (`recipe-steps.ts`). Who did
+    what stays in the action log and the kept notes' `log`, not in the card. It reopens from the
+    Nemu button (**Lihat catatan langkah**), and "Coba sendiri", there too, starts that kind of
+    task in cara 2 next time.
   - **Action log (WS-10).** Every action goes to `actionLogRecord` as who, when, website, task,
     action, target, cara and result, never a value.
   - **Finishers.** A flow that has more to do once its task ends registers
     `executor.registerFinisher(kind, …)`; it gets the notes so far and shows Catatan langkah itself
-    with `executor.presentNotes`. F1 uses it to read the grades back after Simpan.
+    with `executor.presentRecipe` (the run's recipe) or `executor.presentNotes` (its own lines,
+    such as F4-1's problems). F1 uses it to read the grades back after Simpan.
   - **Dev tools.** In a dev build, an allowed page opened with `?uji-nemu`
     (`http://localhost:3003/?uji-nemu#/beranda`) shows a dock: **Muat respons uji** runs
     `F0-1_respons-ai-palsu.json` (three fake AI responses that try to press; it passes when Nemu

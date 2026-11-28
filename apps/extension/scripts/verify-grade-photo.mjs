@@ -371,13 +371,20 @@ await check(
   },
 );
 
-await check("Catatan langkah shows at the end", async () => {
+await check("Catatan langkah shows at the end, as the recipe Cara isi nilai kelas", async () => {
   await display("jawab").getByRole("button", { name: "Catatan langkah" }).click();
-  const notes = overlay.getByRole("region", { name: "Catatan langkah" });
-  await notes.getByText("Bu menjawab 10 pertanyaan tentang foto").waitFor({ timeout: 5000 });
-  await notes.getByText("Bu menekan Simpan").waitFor();
-  await notes.getByText(/Nemu membaca ulang 32 nilai dari AlurSekolah: semua sesuai/u).waitFor();
-  await notes.getByText("Foto buku nilai dihapus dari Nemu").waitFor();
+  const notes = overlay.getByRole("region", { name: "Cara isi nilai kelas" });
+  await notes
+    .getByText("Disimpan dari pengisian Matematika 4B", { exact: false })
+    .waitFor({ timeout: 5000 });
+  for (const step of [
+    "Menu Nilai",
+    "Pilih kelas, mapel, penilaian",
+    "Ketik nilai per murid",
+    "Tekan Simpan",
+  ])
+    await notes.getByText(step, { exact: true }).waitFor();
+  await notes.getByRole("button", { name: "Coba sendiri" }).waitFor();
   await page.screenshot({ path: join(shots, "catatan-langkah.png") });
 });
 

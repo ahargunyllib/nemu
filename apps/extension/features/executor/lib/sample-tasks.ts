@@ -6,12 +6,16 @@ import type { StepSource } from "./run";
  * Dev-only tasks on the mock AlurSekolah's Isi nilai kelas page, to try each cara without the AI
  * (`?uji-nemu`). F1 (#207) builds the real ones from the grade-book photo.
  */
+/** The recipe's stages, as F1's real task names them (Catatan langkah · Cara isi nilai kelas). */
+const PICK = "Pilih kelas, mapel, penilaian";
+const FILL_STAGE = "Ketik nilai per murid";
+
 const OPEN_GRADES: ExecutorStep[] = [
-  { verb: "clickMenu", target: { role: "link", text: "Nilai" } },
-  { verb: "selectOption", target: { label: "Kelas" }, option: "4B" },
-  { verb: "selectOption", target: { label: "Mata Pelajaran" }, option: "Matematika" },
-  { verb: "selectOption", target: { label: "Jenis Penilaian" }, option: "UTS" },
-  { verb: "clickMenu", target: { role: "button", text: "Tampilkan Siswa" } },
+  { verb: "clickMenu", stage: "Menu Nilai", target: { role: "link", text: "Nilai" } },
+  { verb: "selectOption", stage: PICK, target: { label: "Kelas" }, option: "4B" },
+  { verb: "selectOption", stage: PICK, target: { label: "Mata Pelajaran" }, option: "Matematika" },
+  { verb: "selectOption", stage: PICK, target: { label: "Jenis Penilaian" }, option: "UTS" },
+  { verb: "clickMenu", stage: PICK, target: { role: "button", text: "Tampilkan Siswa" } },
 ];
 
 const GRADES: readonly [string, string][] = [
@@ -25,17 +29,29 @@ const GRADES: readonly [string, string][] = [
 const FILL: ExecutorStep[] = [
   ...GRADES.map(([name, value]): ExecutorStep => ({
     verb: "setValue",
+    stage: FILL_STAGE,
     target: { label: `Nilai ${name}` },
     value,
     rowName: name,
   })),
-  { verb: "setValue", target: { label: "Catatan Bagas Saputra" }, value: "remedial" },
-  { verb: "point", target: { role: "button", text: "Simpan" }, sentence: "Silakan tekan Simpan." },
+  {
+    verb: "setValue",
+    stage: FILL_STAGE,
+    target: { label: "Catatan Bagas Saputra" },
+    value: "remedial",
+  },
+  {
+    verb: "point",
+    stage: "Tekan Simpan",
+    target: { role: "button", text: "Simpan" },
+    sentence: "Silakan tekan Simpan.",
+  },
 ];
 
 export const SAMPLE_GRADE_TASK: ExecutorTask = {
   kind: "uji-isi-nilai",
   title: "Isi nilai UTS Matematika 4B (contoh)",
+  recipe: { name: "Isi nilai kelas", from: "pengisian Matematika 4B (contoh)" },
   steps: [...OPEN_GRADES, ...FILL],
 };
 

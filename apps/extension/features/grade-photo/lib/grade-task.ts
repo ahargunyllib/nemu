@@ -43,6 +43,14 @@ export function gradeSummary(summarySentence: string, entries: readonly GradeEnt
   return `${summarySentence} ${lines.join(", ")}.`;
 }
 
+/** The recipe's lines (Catatan langkah · Cara isi nilai kelas): the plan's four stages. */
+const STAGE = {
+  menu: "Menu Nilai",
+  pick: "Pilih kelas, mapel, penilaian",
+  fill: "Ketik nilai per murid",
+  save: "Tekan Simpan",
+} as const;
+
 /**
  * The cara 1 task for Isi nilai kelas (F1-08/09). Nemu opens it through the menu (visible
  * navigation), picks the class, subject and assessment, shows the students, then fills each
@@ -58,19 +66,35 @@ export function gradeTask(input: {
 }): ExecutorTask {
   const { command, entries } = input;
   const open: ExecutorStep[] = [
-    { verb: "clickMenu", target: { role: "link", text: "Nilai" } },
-    { verb: "selectOption", target: { label: "Kelas" }, option: command.className },
-    { verb: "selectOption", target: { label: "Mata Pelajaran" }, option: command.subject },
+    { verb: "clickMenu", stage: STAGE.menu, target: { role: "link", text: "Nilai" } },
     {
       verb: "selectOption",
+      stage: STAGE.pick,
+      target: { label: "Kelas" },
+      option: command.className,
+    },
+    {
+      verb: "selectOption",
+      stage: STAGE.pick,
+      target: { label: "Mata Pelajaran" },
+      option: command.subject,
+    },
+    {
+      verb: "selectOption",
+      stage: STAGE.pick,
       target: { label: "Jenis Penilaian" },
       option: formAssessment(command.assessment),
     },
-    { verb: "clickMenu", target: { role: "button", text: "Tampilkan Siswa" } },
+    {
+      verb: "clickMenu",
+      stage: STAGE.pick,
+      target: { role: "button", text: "Tampilkan Siswa" },
+    },
   ];
   const fill = entries.flatMap((entry): ExecutorStep[] => {
     const value: ExecutorStep = {
       verb: "setValue",
+      stage: STAGE.fill,
       target: { row: entry.name, column: "Nilai", role: "textbox" },
       value: entry.value === null ? "" : String(entry.value),
       rowName: entry.name,
@@ -81,6 +105,7 @@ export function gradeTask(input: {
       value,
       {
         verb: "setValue",
+        stage: STAGE.fill,
         target: { row: entry.name, column: "Catatan", role: "textbox" },
         value: note,
       },
@@ -88,6 +113,7 @@ export function gradeTask(input: {
   });
   const save: ExecutorStep = {
     verb: "point",
+    stage: STAGE.save,
     target: { role: "button", text: "Simpan" },
     sentence: `Silakan ${addressFor(input.honorific)} tekan Simpan.`,
     ringkasan: gradeSummary(input.summarySentence, entries),
@@ -96,6 +122,7 @@ export function gradeTask(input: {
     kind: GRADE_TASK_KIND,
     title: `Isi nilai ${command.assessment} ${command.subject} ${command.className}`,
     source: "Foto buku nilai dari WhatsApp",
+    recipe: { name: "Isi nilai kelas", from: `pengisian ${command.subject} ${command.className}` },
     steps: [...open, ...fill, save],
   };
 }
