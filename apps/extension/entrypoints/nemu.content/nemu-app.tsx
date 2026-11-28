@@ -34,6 +34,8 @@ import { useQuizDelete } from "../../features/quiz-delete/hooks/use-quiz-delete"
 import { quizDelete } from "../../features/quiz-delete/stores/quiz-delete";
 import { useQuizImport } from "../../features/quiz-import/hooks/use-quiz-import";
 import { quizImport } from "../../features/quiz-import/stores/quiz-import";
+import { RecordingBubble } from "../../features/recorder/components/recording-bubble";
+import { RecordingPill } from "../../features/recorder/components/recording-pill";
 import { useRecorder } from "../../features/recorder/hooks/use-recorder";
 import { recorder } from "../../features/recorder/stores/recorder";
 import { NemuButton } from "../../features/nemu-button/components/nemu-button";
@@ -193,6 +195,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
 
   // F1 polls for WhatsApp photos as this teacher, and speaks with Nemu's voice (#207).
   const registered = identity?.status === "registered";
+  const operatorName = identity?.status === "registered" ? identity.name : undefined;
   useEffect(
     () =>
       gradePhoto.connect({ pageEmail, honorific, registered, speak: (text) => void speak(text) }),
@@ -201,13 +204,19 @@ export function NemuApp({ access }: { access: SiteAccess }) {
   // F3 runs an uploaded BPMN process as this teacher (#213), and records a new one (#214).
   useEffect(() => {
     processRun.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
-    recorder.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
+    recorder.connect({
+      pageEmail,
+      honorific,
+      name: operatorName,
+      talkKeys: shortcutKeys(shortcut).join(" + "),
+      speak: (text) => void speak(text),
+    });
     // F4-01 checks a Moodle quiz as this teacher (#209); F4-03 puts her script into one (#210).
     quizCheck.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
     // F4-06 warns before she deletes a quiz students took (#211).
     quizDelete.connect({ honorific, speak: (text) => void speak(text) });
     quizImport.connect({ pageEmail, honorific, speak: (text) => void speak(text) });
-  }, [pageEmail, honorific, speak]);
+  }, [pageEmail, honorific, operatorName, shortcut, speak]);
 
   // A task under way in this tab carries on after a page load (F0-13).
   useEffect(() => {
@@ -281,6 +290,12 @@ export function NemuApp({ access }: { access: SiteAccess }) {
             <NemuStage display={withSpokenWord(importing.display, voice)} />
             {talk.state.phase === "listening" && <ListeningBubble />}
             {importing.typing && <AskBox pending={false} onAsk={(text) => quizImport.hear(text)} />}
+          </div>
+        ) : recording.recording ? (
+          <div className="pointer-events-auto flex flex-col items-end gap-2">
+            {talk.heard !== null && <HeardBubble text={talk.heard} />}
+            <RecordingBubble recording={recording.recording} />
+            {talk.state.phase === "listening" && <ListeningBubble />}
           </div>
         ) : recording.display ? (
           <div className="pointer-events-auto flex flex-col items-end gap-2">
@@ -371,6 +386,9 @@ export function NemuApp({ access }: { access: SiteAccess }) {
           />
         </div>
       </div>
+      {recording.recording && (
+        <RecordingPill paused={recording.recording.paused} steps={recording.recording.steps} />
+      )}
       <RowTicks elements={run.ticks} />
       {TEST_TOOLS_ENABLED && <ExecutorTestDock />}
       {PREVIEW_ENABLED && (
