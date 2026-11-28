@@ -2,6 +2,7 @@ import type { ActionLogEntry } from "@nemu/contracts/executor";
 import { browser } from "wxt/browser";
 
 import type { NemuMessage, PageEmail } from "../../../shared/lib/messages";
+import type { NotesCard } from "../lib/recipe";
 import type { RunState } from "../lib/run";
 
 /** Content script: the executor's storage and log, through the background. */
@@ -21,7 +22,8 @@ export function requestLoadRun(): Promise<RunState | null> {
   return send<RunState>({ type: "nemu:run-load" });
 }
 
-export type StepNotes = { title: string; items: string[] };
+/** The last Catatan langkah; `card` when a read-back made it a "Sudah dicek" recipe. */
+export type StepNotes = { title: string; items: string[]; card?: NotesCard };
 
 export function requestSaveNotes(notes: StepNotes) {
   void send({ type: "nemu:notes-save", notes });

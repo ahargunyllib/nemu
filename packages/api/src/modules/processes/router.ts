@@ -1,4 +1,5 @@
 import {
+  formTableRowSchema,
   formTableSchema,
   narrationSegmentSchema,
   procedureSchema,
@@ -9,8 +10,12 @@ import { z } from "zod";
 
 import type { Context } from "../../context";
 import { schoolAdminProcedure, schoolProcedure } from "../../index";
+import { AlurSekolahError } from "../alursekolah/client";
+import { AlurSekolahNotConfiguredError } from "../alursekolah/connector";
 import { createCatalogRepository } from "../documents/catalog-repository";
 import { createDocumentRepository } from "../documents/repository";
+import { MissingSecretKeyError } from "../integrations/cipher";
+import { readbackSetoran } from "./readback";
 import {
   compileRecording,
   exportProcedureBpmn,
@@ -109,6 +114,45 @@ export const processesRouter = {
       if (!result)
         throw new ORPCError("NOT_FOUND", { message: "Process, task or photo not found" });
       return result;
+    }),
+  /**
+   * F3·08: after the teacher presses Simpan setoran, the rows Nemu filled read back from
+   * AlurSekolah API v1 (`/hafalan/setoran`, the school's WS-07 key), as F1-10 does for grades.
+   */
+  processReadbackAlurSekolah: schoolProcedure
+    .input(
+      z.object({
+        rows: z.array(formTableRowSchema).max(60),
+        className: z.string().trim().max(20).nullable(),
+        date: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/u)
+          .nullable(),
+      }),
+    )
+    .handler(async ({ context, input }) => {
+      const teacher = await context.caller.requireTeacher();
+      const className = input.className?.toUpperCase() || null;
+      if (className && !teacher.classes.some((item) => item.toUpperCase() === className)) {
+        throw new ORPCError("FORBIDDEN", {
+          message: `Kelas ${className} bukan kelas ${teacher.honorific} ${teacher.name}`,
+        });
+      }
+      try {
+        const alurSekolah = await context.school.alurSekolah(context.caller.workspaceId);
+        return await readbackSetoran(alurSekolah, { ...input, className });
+      } catch (error) {
+        if (
+          error instanceof AlurSekolahNotConfiguredError ||
+          error instanceof MissingSecretKeyError
+        ) {
+          throw new ORPCError("PRECONDITION_FAILED", { message: error.message, cause: error });
+        }
+        if (error instanceof AlurSekolahError) {
+          throw new ORPCError("BAD_GATEWAY", { message: error.message, cause: error });
+        }
+        throw error;
+      }
     }),
   /** F3-17: each BPMN form field → the label this page shows for it, or null. */
   processMatchFields: schoolProcedure

@@ -74,6 +74,18 @@ async function answer(
       return client.processMatchFields({ fields: request.fields, pageLabels: request.pageLabels });
     case "ack":
       return client.inboxAck({ jobId: request.jobId });
+    case "readback":
+      try {
+        return await client.processReadbackAlurSekolah({
+          rows: request.rows,
+          className: request.className,
+          date: request.date,
+        });
+      } catch (error) {
+        // AlurSekolah isn't connected in WS-07: Catatan langkah shows without the check.
+        if (error instanceof ORPCError && error.code === "PRECONDITION_FAILED") return null;
+        throw error;
+      }
   }
 }
 

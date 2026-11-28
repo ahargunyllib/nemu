@@ -21,6 +21,7 @@ import {
   type RunState,
   type StepSource,
 } from "../lib/run";
+import type { NotesCard } from "../lib/recipe";
 import type { Cara } from "../lib/run-notes";
 import { guardSubmits, isTeacherInput, toSafeTask } from "../lib/safety";
 
@@ -139,12 +140,13 @@ function createExecutor() {
     };
   }
 
-  function showNotes(items: string[], offerToTry: string | null) {
+  function showNotes(items: string[], offerToTry: string | null, card?: NotesCard) {
     const close = () => publish({ display: null, target: null });
     publish({
       display: {
         type: "info",
         title: "Catatan langkah",
+        ...card,
         items,
         link: offerToTry
           ? {
@@ -250,11 +252,14 @@ function createExecutor() {
       guides.set(kind, guide);
     },
 
-    /** A finisher's last word: Catatan langkah with its own lines added, kept for the Nemu button. */
-    presentNotes(items: string[], offerToTry: string | null = null, show = true) {
-      notes = { title: "Catatan langkah", items };
+    /**
+     * A finisher's last word: Catatan langkah with its own lines added, kept for the Nemu button.
+     * `card` turns it into a checked recipe (`recipeCard`): "Sudah dicek", the title, the recipe.
+     */
+    presentNotes(items: string[], offerToTry: string | null = null, show = true, card?: NotesCard) {
+      notes = { title: card?.title ?? "Catatan langkah", items, ...(card ? { card } : {}) };
       requestSaveNotes(notes);
-      if (show) showNotes(items, offerToTry);
+      if (show) showNotes(items, offerToTry, card);
       else publish({});
     },
 
@@ -299,7 +304,7 @@ function createExecutor() {
 
     /** Reopens the last Catatan langkah from the Nemu button (F0-14). */
     showNotes() {
-      if (notes) showNotes(notes.items, null);
+      if (notes) showNotes(notes.items, null, notes.card);
     },
   };
 }

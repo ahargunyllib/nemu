@@ -104,6 +104,11 @@ export type NemuServiceClient = {
         parameter: Procedure["parameters"][number];
       }
   >;
+  /** F3·08: the rows Nemu filled, read back from AlurSekolah's `/hafalan/setoran`. */
+  processReadbackAlurSekolah: Call<
+    { rows: FormTable["rows"]; className: string | null; date: string | null },
+    ProcessReadback
+  >;
   processMatchFields: Call<
     { fields: Array<{ id: string; label: string }>; pageLabels: string[] },
     Record<string, string | null>
@@ -112,6 +117,14 @@ export type NemuServiceClient = {
   quizJudge: Call<QuizJudgeInput, QuizJudgement>;
   // F4-03 (#210): the teacher's script read into a quiz (#219).
   quizScriptRead: Call<QuizScriptInput, QuizScriptResult>;
+};
+
+/** F3·08: how many filled rows AlurSekolah holds as filled; who is missing; which cells differ. */
+export type ProcessReadback = {
+  total: number;
+  matched: number;
+  missing: string[];
+  different: string[];
 };
 
 export type ProcessSlots = Record<string, string | number | boolean | null>;
