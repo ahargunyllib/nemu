@@ -168,6 +168,14 @@ await page.getByRole("link", { name: QUIZ }).first().click();
 await page.waitForURL(/\/mod\/quiz\/view\.php/u);
 const quizUrl = page.url();
 
+/** After a click on the Nemu button: Tanya Nemu when it shows its menu, so the type box opens. */
+async function openTypeBox(overlay) {
+  const typeBox = overlay.getByLabel("Pertanyaan untuk Nemu");
+  const ask = overlay.getByRole("button", { name: /^Tanya Nemu \(/u });
+  await typeBox.or(ask).first().waitFor({ timeout: 10_000 });
+  if (await ask.count()) await ask.click();
+}
+
 /** Whether Nemu's ring (Sorot arahkan) sits on the element. */
 async function ringsOn(locator) {
   const ring = await overlay.locator("[data-nemu-ring]").boundingBox();
@@ -186,6 +194,8 @@ await check("Bu Siti asks on the quiz page; Nemu opens Setelan, Soal and Kuis it
   const closed = overlay.locator("button[aria-label='Tanya Nemu']");
   await closed.waitFor({ timeout: 15_000 });
   await closed.click();
+  // With kept Catatan langkah the Nemu button asks "Mau buka apa?" first (F1·12a).
+  await openTypeBox(overlay);
   await overlay.getByLabel("Pertanyaan untuk Nemu").fill("Nemu, tolong cek kuis ini.");
   await overlay.getByRole("button", { name: "Kirim" }).click();
   await page.waitForURL(/\/course\/modedit\.php/u, { timeout: 20_000 });

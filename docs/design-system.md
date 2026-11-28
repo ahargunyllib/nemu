@@ -177,6 +177,9 @@ the page's Shadow DOM.
   waits beside the Nemu button, such as "Foto dari WhatsApp · Mulai / Nanti". Its picture is a
   64 px square thumbnail left of the title (`rounded-xl`, 2 px `border`, cropped from the top so
   the photo's heading shows), and a `Skeleton` of that square while it loads (#278).
+- **The Nemu button's menu** is a Kartu Pilih with heading "Nemu" and the round grey × of
+  Gelembung Jawab (`onClose`): "Mau buka apa, Bu?", then **Catatan langkah · 3 tersimpan** and
+  **Tanya Nemu (Ctrl + Spasi)** (and **Rekam cara** for the school's operator).
 - **Kartu Info list**: the `items` are an ordered list, each led by a 30 px circle with its number
   (`nemu-subtle` fill, 1 px `nemu-amber-200` edge, 15 px bold `nemu-strong`) and 20 px regular
   text. An optional label sits above it (`itemsLabel`, 16 px semibold `nemu-secondary`):

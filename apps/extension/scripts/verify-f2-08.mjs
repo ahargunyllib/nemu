@@ -156,11 +156,22 @@ expect(saved.ok, `saving the mock grades failed: HTTP ${saved.status}`);
 
 const overlay = (page) => page.locator("nemu-overlay");
 const bubble = (page) => overlay(page).getByRole("region", { name: "Jawaban Nemu" });
+
+/** After a click on the Nemu button: Tanya Nemu when it shows its menu, so the type box opens. */
+async function openTypeBox(overlay) {
+  const typeBox = overlay.getByLabel("Pertanyaan untuk Nemu");
+  const ask = overlay.getByRole("button", { name: /^Tanya Nemu \(/u });
+  await typeBox.or(ask).first().waitFor({ timeout: 10_000 });
+  if (await ask.count()) await ask.click();
+}
+
 async function ask(page, question) {
   const closed = overlay(page).locator("button[aria-label='Tanya Nemu']");
   const close = overlay(page).locator("button[aria-label='Tutup Nemu']");
   await closed.or(close).waitFor({ timeout: 10_000 });
   if (await closed.count()) await closed.click();
+  // With kept Catatan langkah the Nemu button asks "Mau buka apa?" first (F1·12a).
+  await openTypeBox(overlay(page));
   await overlay(page).getByLabel("Pertanyaan untuk Nemu").fill(question);
   await overlay(page).getByRole("button", { name: "Kirim" }).click();
 }

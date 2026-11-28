@@ -74,6 +74,11 @@ export const extensionIdentitySchema = z.discriminatedUnion("status", [
       status: z.literal("registered"),
       name: z.string(),
       honorific: z.enum(["Bu", "Pak"]),
+      /**
+       * The teacher is also the school's operator in WS-06 (the same WhatsApp number), so the
+       * Nemu button offers the operator's tools, such as "Rekam cara" (F3-01).
+       */
+      operator: z.literal(true).optional(),
     })
     .strict(),
   z

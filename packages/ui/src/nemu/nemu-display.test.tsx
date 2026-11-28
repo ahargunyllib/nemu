@@ -256,6 +256,26 @@ describe("Kartu Pilih for W5 and the inbox", () => {
     for (const button of buttons) expect(document.activeElement).not.toBe(button);
   });
 
+  test("a menu card closes with its × (the Nemu button's Mau buka apa)", () => {
+    const onClose = vi.fn();
+    const onChoose = vi.fn();
+    render(
+      <KartuPilih
+        status={{ text: "Nemu" }}
+        question="Mau buka apa, Bu?"
+        choices={[
+          { id: "notes", label: "Catatan langkah · 3 tersimpan" },
+          { id: "ask", label: "Tanya Nemu (Ctrl + Spasi)" },
+        ]}
+        onChoose={onChoose}
+        onClose={onClose}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Tutup" }));
+    expect(onClose).toHaveBeenCalled();
+    expect(onChoose).not.toHaveBeenCalled();
+  });
+
   test("the compact card puts its two choices side by side", () => {
     const onChoose = vi.fn();
     render(

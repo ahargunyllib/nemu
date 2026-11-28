@@ -76,6 +76,25 @@ describe("identity from the page email (ID-02, ID-04)", () => {
     });
   });
 
+  it("marks a teacher who is also the school's operator, for the operator's tools", async () => {
+    const siti = await fromExtension({ installCode: INSTALL_CODE, email: BU_SITI });
+    await createSchoolRepository(siti.db).upsertContact({
+      workspaceId: "W-SEKOLAH",
+      role: "operator",
+      name: "Siti Aminah",
+      honorific: "Bu",
+      phone: "6281200001001",
+    });
+    await expect(
+      call(extensionRouter.extensionIdentify, undefined, { context: siti }),
+    ).resolves.toEqual({
+      status: "registered",
+      name: "Siti Aminah, S.Pd.",
+      honorific: "Bu",
+      operator: true,
+    });
+  });
+
   it("still names the sentence, without an operator to message, when WS-06 has none", async () => {
     const rizal = await fromExtension({ installCode: INSTALL_CODE, email: PAK_RIZAL });
     await createSchoolRepository(rizal.db).deleteContact("W-SEKOLAH", "operator");

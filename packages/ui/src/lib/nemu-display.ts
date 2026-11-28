@@ -132,6 +132,8 @@ export type KartuPilihProps = {
   compact?: boolean;
   /** The heading: "NEMU BERHENTI · 3 dari 32", "HATI-HATI · My Family". */
   status?: NemuStatus;
+  /** A round grey × at the top right, for a card she may just close (the Nemu button's menu). */
+  onClose?: () => void;
 };
 
 /** Kartu Info: something to read, a title, a short list and one [Tutup]. */

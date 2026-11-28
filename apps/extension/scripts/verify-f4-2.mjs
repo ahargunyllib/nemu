@@ -193,6 +193,14 @@ async function ringsOn(locator) {
   return x >= box.x && x <= box.x + box.width && y >= box.y && y <= box.y + box.height;
 }
 
+/** After a click on the Nemu button: Tanya Nemu when it shows its menu, so the type box opens. */
+async function openTypeBox(overlay) {
+  const typeBox = overlay.getByLabel("Pertanyaan untuk Nemu");
+  const ask = overlay.getByRole("button", { name: /^Tanya Nemu \(/u });
+  await typeBox.or(ask).first().waitFor({ timeout: 10_000 });
+  if (await ask.count()) await ask.click();
+}
+
 /** Nemu points (Gelembung Tunjuk) with `sentence`; the ring is on `button`, and she presses it. */
 async function shePresses(sentence, button, shot) {
   await display("tunjuk").getByText(sentence, { exact: false }).waitFor({ timeout: 90_000 });
@@ -213,6 +221,8 @@ await check("Bu Siti asks on the course page and picks her script", async () => 
   const closed = overlay.locator("button[aria-label='Tanya Nemu']");
   await closed.waitFor({ timeout: 15_000 });
   await closed.click();
+  // With kept Catatan langkah the Nemu button asks "Mau buka apa?" first (F1·12a).
+  await openTypeBox(overlay);
   await overlay.getByLabel("Pertanyaan untuk Nemu").fill(UTTERANCE);
   await overlay.getByRole("button", { name: "Kirim" }).click();
   const pick = display("jawab").getByRole("button", { name: "Pilih naskah" });
@@ -328,8 +338,10 @@ await check("The F4-1 check runs on the new quiz and ends on one Sudah dicek car
   await page.screenshot({ path: join(shots, "7-siap.png") });
   await card.getByRole("button", { name: "Tutup" }).click();
   // Reopened from the Nemu button it is the recipe itself, still with Coba sendiri.
-  await overlay.getByRole("button", { name: "Tanya Nemu" }).click();
-  await overlay.getByRole("button", { name: "Lihat catatan langkah" }).click();
+  // F1·12a: the Nemu button asks what to open; Catatan langkah counts the kept notes.
+  await overlay.locator("button[aria-label='Tanya Nemu']").click();
+  await overlay.getByText("Mau buka apa, Bu?").waitFor();
+  await overlay.getByRole("button", { name: /^Catatan langkah · \d+ tersimpan$/u }).click();
   const notes = overlay.getByRole("region", { name: "Cara pasang kuis" });
   await notes.getByText(`Disimpan dari pemasangan ${QUIZ}`, { exact: false }).waitFor();
   await notes.getByRole("button", { name: "Coba sendiri" }).waitFor();

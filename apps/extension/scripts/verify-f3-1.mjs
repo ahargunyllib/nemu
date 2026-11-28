@@ -184,11 +184,22 @@ await page.locator("#menu-email").filter({ hasText: "@" }).waitFor();
 
 const overlay = page.locator("nemu-overlay");
 const display = (type) => overlay.locator(`[data-nemu-display='${type}']`);
+
+/** After a click on the Nemu button: Tanya Nemu when it shows its menu, so the type box opens. */
+async function openTypeBox(overlay) {
+  const typeBox = overlay.getByLabel("Pertanyaan untuk Nemu");
+  const ask = overlay.getByRole("button", { name: /^Tanya Nemu \(/u });
+  await typeBox.or(ask).first().waitFor({ timeout: 10_000 });
+  if (await ask.count()) await ask.click();
+}
+
 async function ask(question) {
   const closed = overlay.locator("button[aria-label='Tanya Nemu']");
   const close = overlay.locator("button[aria-label='Tutup Nemu']");
   await closed.or(close).waitFor({ timeout: 10_000 });
   if (await closed.count()) await closed.click();
+  // With kept Catatan langkah the Nemu button asks "Mau buka apa?" first (F1·12a).
+  await openTypeBox(overlay);
   await overlay.getByLabel("Pertanyaan untuk Nemu").fill(question);
   await overlay.getByRole("button", { name: "Kirim" }).click();
 }

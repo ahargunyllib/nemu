@@ -29,7 +29,7 @@ How Nemu works for every teacher of one school: the talk combination (default Ct
 _Avoid_: preferences, config
 
 **Nemu button**:
-The dark orange round button at the bottom right of an allowed website. Clicking it opens the type box; holding Ctrl + Spasi talks to Nemu instead.
+The dark orange round button at the bottom right of an allowed website. Clicking it asks "Mau buka apa, Bu?" (Catatan langkah, Tanya Nemu, and Rekam cara for the operator), or opens the type box straight away when there is nothing else to open; holding Ctrl + Spasi talks to Nemu instead.
 _Avoid_: launcher, FAB, mascot
 
 **Display type**:

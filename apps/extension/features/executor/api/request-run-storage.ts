@@ -38,12 +38,14 @@ export type StepNotes = {
   log?: string[];
 };
 
+/** Keeps the notes a task ended with among this site's last few (F1·12a). */
 export function requestSaveNotes(notes: StepNotes) {
-  void send({ type: "nemu:notes-save", notes });
+  void send({ type: "nemu:notes-save", site: location.host, notes });
 }
 
-export function requestLoadNotes(): Promise<StepNotes | null> {
-  return send<StepNotes>({ type: "nemu:notes-load" });
+/** This site's kept notes, newest first. */
+export async function requestLoadNotes(): Promise<StepNotes[]> {
+  return (await send<StepNotes[]>({ type: "nemu:notes-load", site: location.host })) ?? [];
 }
 
 export function requestLogActions(pageEmail: PageEmail, entries: ActionLogEntry[]) {

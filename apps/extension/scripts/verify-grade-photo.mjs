@@ -386,8 +386,10 @@ await check(
     for (const step of RECIPE) await card.getByText(step, { exact: true }).waitFor();
     await card.getByRole("button", { name: "Coba sendiri" }).waitFor();
     await card.getByRole("button", { name: "Tutup" }).click();
-    await overlay.getByRole("button", { name: "Tanya Nemu" }).click();
-    await overlay.getByRole("button", { name: "Lihat catatan langkah" }).click();
+    // F1·12a: the Nemu button asks what to open; Catatan langkah counts the kept notes.
+    await overlay.locator("button[aria-label='Tanya Nemu']").click();
+    await overlay.getByText("Mau buka apa, Bu?").waitFor();
+    await overlay.getByRole("button", { name: /^Catatan langkah · \d+ tersimpan$/u }).click();
     // F1·12b: reopened, it is the recipe itself, with where it was saved from.
     const notes = overlay.getByRole("region", { name: "Cara isi nilai kelas" });
     await notes

@@ -23,6 +23,7 @@ import {
 } from "../lib/run";
 import type { NotesCard } from "../lib/recipe";
 import { type Recipe, recipeOf, stoppedDetail } from "../lib/recipe-steps";
+import { withNotes } from "../lib/kept-notes";
 import type { Cara } from "../lib/run-notes";
 import { guardSubmits, isTeacherInput, toSafeTask } from "../lib/safety";
 
@@ -35,8 +36,8 @@ export type ExecutorView = {
   active: boolean;
   /** Nemu is pointing and waiting for the teacher; `refused` when it was asked to press it. */
   waiting: { refused: boolean } | null;
-  /** A Catatan langkah to reopen from the Nemu button. */
-  hasNotes: boolean;
+  /** How many Catatan langkah this site keeps for the Nemu button ("3 tersimpan", F1·12a). */
+  notesCount: number;
 };
 
 const IDLE: ExecutorView = {
@@ -45,7 +46,7 @@ const IDLE: ExecutorView = {
   ticks: [],
   active: false,
   waiting: null,
-  hasNotes: false,
+  notesCount: 0,
 };
 
 /** The page's Nemu overlay host; input on it is Nemu's own bubble, not the page. */
@@ -81,7 +82,8 @@ function createExecutor() {
   const guides = new Map<string, CaraTwoGuide>();
   let view: ExecutorView = IDLE;
   let run: ExecutorRun | null = null;
-  let notes: StepNotes | null = null;
+  /** This site's kept notes, newest first (`withNotes`). */
+  let notes: StepNotes[] = [];
   let context: { pageEmail: PageEmail; honorific: string; speak: (text: string) => void } = {
     pageEmail: { kind: "unreadable" },
     honorific: "",
@@ -98,7 +100,7 @@ function createExecutor() {
       ...next,
       active: run?.isActive() ?? false,
       waiting: run?.waiting ?? null,
-      hasNotes: notes !== null,
+      notesCount: notes.length,
     };
     voiceCommands.setWorking(view.active);
     for (const listener of listeners) listener();
@@ -176,7 +178,7 @@ function createExecutor() {
   }
 
   function keepNotes(next: StepNotes) {
-    notes = next;
+    notes = withNotes(notes, next);
     requestSaveNotes(next);
   }
 
@@ -354,7 +356,8 @@ function createExecutor() {
 
     /** Reopens the last Catatan langkah from the Nemu button (F0-14, F1·12b), Coba sendiri too. */
     showNotes() {
-      if (notes) showNotes(notes);
+      const last = notes[0];
+      if (last) showNotes(last);
     },
   };
 }
