@@ -74,7 +74,7 @@
       <bpmn:outgoing>Flow_Cara3</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:scriptTask id="Task_Cara1" name="Nemu mengisi nilai (cara 1)">
-      <bpmn:documentation>Nemu membuka menu Nilai, memilih Kelas, Mata Pelajaran, dan Jenis Penilaian, menekan Tampilkan Siswa, lalu mengisi Nilai dan Catatan tiap siswa sekitar satu isian per detik (Pelan: separuhnya). Lalu Nemu menunjuk Simpan: "Silakan Ibu tekan Simpan." Gerakan guru sendiri menghentikan Nemu (F0-07); "Ajari saya" atau "Saya isi sendiri" melanjutkan sisanya dengan cara 2.</bpmn:documentation>
+      <bpmn:documentation>Nemu membuka menu Nilai, memilih Kelas, Mata Pelajaran, dan Jenis Penilaian, menekan Tampilkan Siswa, lalu mengisi Nilai dan Catatan tiap siswa sekitar satu isian per detik (Pelan: separuhnya). Lalu Nemu menunjuk Simpan: "Silakan Ibu tekan Simpan." Gerakan guru sendiri menghentikan Nemu (F0-07); "Ajari saya" atau "Ya, saya isi sendiri" melanjutkan sisanya dengan cara 2.</bpmn:documentation>
       <bpmn:incoming>Flow_Cara1</bpmn:incoming>
       <bpmn:outgoing>Flow_10a</bpmn:outgoing>
     </bpmn:scriptTask>

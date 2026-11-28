@@ -260,10 +260,9 @@ export class ExecutorRun {
     if (!this.isActive()) return;
     if (this.state.cara !== 1) return this.stop();
     this.halt("asking");
-    const teacher = this.deps.honorific || "Anda";
     this.render({
       type: "pilih",
-      question: `Nemu berhenti. ${teacher} mau isi sendiri?`,
+      question: `${this.address()} mau isi sendiri?`,
       choices: [
         { id: "sendiri", label: "Ya, saya isi sendiri" },
         { id: "berhenti", label: "Tidak, berhenti" },
@@ -279,15 +278,14 @@ export class ExecutorRun {
     this.askHowToGoOn();
   }
 
-  /** Kartu Pilih: Saya isi sendiri (cara 2) / Nemu lanjut / Berhenti. */
+  /** Kartu Pilih: Ya, saya isi sendiri (cara 2) / Nemu saja yang lanjut / Berhenti. */
   private askHowToGoOn() {
-    const teacher = this.deps.honorific || "Anda";
     this.render({
       type: "pilih",
-      question: `Nemu berhenti karena ${teacher} memakai halaman. Lanjut bagaimana?`,
+      question: `${this.address()} mau isi sendiri?`,
       choices: [
-        { id: "sendiri", label: "Saya isi sendiri" },
-        { id: "lanjut", label: "Nemu lanjut" },
+        { id: "sendiri", label: "Ya, saya isi sendiri" },
+        { id: "lanjut", label: "Nemu saja yang lanjut" },
         { id: "berhenti", label: "Berhenti" },
       ],
       onChoose: (id) => {
@@ -296,6 +294,14 @@ export class ExecutorRun {
         else this.stop();
       },
     });
+  }
+
+  /** The teacher as a sentence's subject: "Ibu" / "Bapak" from WS-06's "Bu" / "Pak". */
+  private address(): string {
+    const { honorific } = this.deps;
+    if (honorific === "Bu") return "Ibu";
+    if (honorific === "Pak") return "Bapak";
+    return honorific || "Anda";
   }
 
   /** After a page load: carry on, or ask again if Nemu had stopped to ask. */
