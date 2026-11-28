@@ -140,6 +140,8 @@ the page's Shadow DOM.
   of a Kartu Info.
 - **Links**: Kenapa?, Sumber and Lihat ringkasan are small underlined `nemu-strong` links. What is
   behind them shows in a `nemu-subtle` box and is read (`onRead`) only once the teacher clicks.
+  Sumber may open with a title and one short note over its list, such as "Kenapa nilai bisa belum
+  tampil?" and "Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan." (F2-08).
 - **Kartu Pilih**: a risky choice gets ⚠ and goes under the safe one, whatever order it was given
   in. All choices share one look. The **compact** Kartu Pilih (300 px, 44 px buttons side by side)
   waits beside the Nemu button, such as "Foto dari WhatsApp · Mulai / Nanti". Its picture is a

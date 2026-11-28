@@ -163,8 +163,8 @@ Example: a parent asks on WhatsApp "nilai UTS Aisyah kok belum muncul?" and the 
    - Walk backwards: the trigger (timer: regular bill overdue) → gateway condition → task.
    - Walk the reverse path: `Unlock Student Grades` and its condition (bill paid).
    - Find the role that can fix it: the lane of the reverse path's user task, e.g. finance.
-   - The source is the BPMN element IDs, shown to the teacher as 2–4 plain steps with the current one highlighted (W4).
-3. **Certainty (PRD revision 28 Nov, P0-1):** the bill can't be checked (no finance scope; AlurSekolah's SPP module is still "Segera hadir"), so an answer about a named pupil opens "Kemungkinan karena alur SPP sekolah: …", enforced in code, never as a fact. A question that names no pupil gets the rule ("menurut alur sekolah, … kalau …").
+   - The source is the BPMN element IDs, shown to the teacher as 2–4 plain steps (W4). No step is marked as the current one: Nemu can't see which step the pupil's bill is at (P0-1).
+3. **Certainty (PRD revision 28 Nov, P0-1):** the bill can't be checked (no finance scope; AlurSekolah's SPP module is still "Segera hadir"), so an answer about a named pupil opens "Kemungkinan karena alur SPP sekolah: …", enforced in code, never as a fact. Its Sumber opens with "Kenapa nilai bisa belum tampil?" and "Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan." over the steps. A question that names no pupil gets the rule ("menurut alur sekolah, … kalau …").
 4. **Parent reply** (Siapkan balasan):
    - polite, **no amount, no "tunggakan"**, points to the finance office;
    - a code validator rejects digits that look like money, "Rp" and "tunggak*";

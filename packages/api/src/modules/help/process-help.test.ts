@@ -133,10 +133,19 @@ describe("F2-08: nilai tidak muncul, from the uploaded SPP BPMN", () => {
         fixer: { name: "Bu Ratna", role: "keuangan" },
       });
       if (answer.status !== "process") continue;
-      if (expected.saved)
+      if (expected.saved) {
         expect(answer.sentence).toMatch(
           /^Nilai Aisyah Putri Wijaya sudah tersimpan\. Bukan kesalahan Ibu\. Kemungkinan karena alur SPP sekolah: /u,
         );
+        expect(answer).toMatchObject({
+          sourceTitle: "Kenapa nilai bisa belum tampil?",
+          sourceNote: "Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan.",
+        });
+      } else {
+        // No pupil named: the rule is said as the rule, so Sumber is the steps alone.
+        expect(answer.sourceTitle).toBeUndefined();
+        expect(answer.sourceNote).toBeUndefined();
+      }
       expect(answer.steps.length).toBeGreaterThanOrEqual(2);
       expect(answer.steps.length).toBeLessThanOrEqual(4);
       expect(answer.steps.flatMap((step) => step.elementIds)).toEqual(
@@ -184,7 +193,11 @@ describe("F2-08: nilai tidak muncul, from the uploaded SPP BPMN", () => {
       { snapshot: PAGE, question: "Nilai UTS Aisyah kok tidak muncul di aplikasi orang tua?" },
       { context: siti },
     );
-    expect(answer).toMatchObject({ status: "process" });
+    expect(answer).toMatchObject({
+      status: "process",
+      sourceTitle: "Kenapa nilai bisa belum tampil?",
+      sourceNote: "Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan.",
+    });
     expect(answer.sentence).toMatch(/^Kemungkinan karena alur SPP sekolah: /u);
   });
 

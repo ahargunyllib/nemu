@@ -61,6 +61,8 @@ describe("fromExplanation", () => {
       why: "Di Alur Pembayaran SPP, …",
       process: { documentId: "doc-spp", title: "Alur Pembayaran SPP", version: "1" },
       elementId: "Task_KunciNilai",
+      sourceTitle: "Kenapa nilai bisa belum tampil?",
+      sourceNote: "Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan.",
       steps: [
         { text: "SPP belum lunas.", elementIds: ["Gateway_JatuhTempo", "Flow_BelumLunas"] },
         { text: "Sistem menyembunyikan nilai.", elementIds: ["Task_KunciNilai"] },
@@ -71,6 +73,8 @@ describe("fromExplanation", () => {
     expect(result).toMatchObject({
       kind: "answer",
       sources: ["SPP belum lunas.", "Sistem menyembunyikan nilai."],
+      sourcesTitle: "Kenapa nilai bisa belum tampil?",
+      sourcesNote: "Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan.",
       next: { kind: "whatsapp", label: "Buka balasan untuk orang tua" },
       diagram: { label: "Lihat diagram Alur Pembayaran SPP" },
     });

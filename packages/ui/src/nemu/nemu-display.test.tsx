@@ -115,6 +115,33 @@ describe("Gelembung Jawab", () => {
     expect(onOpen).toHaveBeenCalledOnce();
   });
 
+  test("Sumber opens with its title and note over the steps, and reads them first", () => {
+    const onRead = vi.fn();
+    render(
+      <GelembungJawab
+        sentence="Kemungkinan karena alur SPP sekolah: nilai dikunci."
+        notes={{
+          sumberTitle: "Kenapa nilai bisa belum tampil?",
+          sumberNote: "Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan.",
+          sumber: ["Tagihan SPP lewat jatuh tempo.", "Sistem mengunci nilai."],
+        }}
+        onRead={onRead}
+      />,
+    );
+    expect(screen.queryByText("Kenapa nilai bisa belum tampil?")).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Sumber" }));
+    const title = screen.getByText("Kenapa nilai bisa belum tampil?");
+    const step = screen.getByText("Tagihan SPP lewat jatuh tempo.");
+    expect(title.compareDocumentPosition(step) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(
+      screen.getByText("Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan."),
+    ).toBeTruthy();
+    expect(onRead).toHaveBeenLastCalledWith(
+      "Kenapa nilai bisa belum tampil? Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan. Sumber: Tagihan SPP lewat jatuh tempo.; Sistem mengunci nilai.",
+    );
+  });
+
   test("says its sentence again when the sentence is clicked", () => {
     const onRepeat = vi.fn();
     render(

@@ -360,7 +360,7 @@ test("a step naming an element id the file doesn't have keeps the code's draft",
 test("F2-08: one pupil's case is never a sure cause, since the bill can't be checked (P0-1)", async () => {
   const graph = await sppGraph();
   const index = await createFixtureSchoolAi().suggestSymptoms({ graph });
-  const ask = async (answer: string, title: string, gradeCheck: GradeCheck) => {
+  const explain = async (answer: string, title: string, gradeCheck: GradeCheck) => {
     const llm = fakeJsonCall({
       process_help: (request) => {
         const data = JSON.parse((request.content[0] as { text: string }).text);
@@ -378,14 +378,25 @@ test("F2-08: one pupil's case is never a sure cause, since the bill can't be che
       },
     );
     assert.equal(result?.status, "process");
-    return result?.status === "process" ? result.sentence : "";
+    return result?.status === "process" ? result : null;
   };
+  const ask = async (answer: string, title: string, gradeCheck: GradeCheck) =>
+    (await explain(answer, title, gradeCheck))?.sentence ?? "";
   const saved: GradeCheck = { status: "saved", student: "Aisyah Putri Wijaya" };
 
   assert.match(
-    await ask("Nilai terkunci menunggu administrasi SPP.", "Alur SPP", saved),
-    /Bukan kesalahan Ibu\. Kemungkinan karena alur SPP sekolah: nilai terkunci menunggu administrasi SPP\./u,
+    await ask("Nilai belum tampil di aplikasi orang tua.", "Alur SPP", saved),
+    /Bukan kesalahan Ibu\. Kemungkinan karena alur SPP sekolah: nilai belum tampil di aplikasi orang tua\./u,
   );
+  // Sumber says why it's only "kemungkinan": Nemu can't see the bill (F2 · 06).
+  for (const gradeCheck of [saved, { status: "unknown" } as const]) {
+    const result = await explain("Nilai dikunci.", "Alur SPP", gradeCheck);
+    assert.equal(result?.sourceTitle, "Kenapa nilai bisa belum tampil?");
+    assert.equal(
+      result?.sourceNote,
+      "Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan.",
+    );
+  }
   assert.match(
     await ask("Kemungkinan nilai dikunci.", "Alur SPP", { status: "unknown" }),
     /^Kemungkinan karena alur SPP sekolah: nilai dikunci\./u,
@@ -420,6 +431,11 @@ test("F2-08: one pupil's case is never a sure cause, since the bill can't be che
     }),
     /^Menurut alur sekolah, nilai dikunci/u,
   );
+  const rule = await explain("Menurut alur sekolah, nilai dikunci.", "Alur SPP", {
+    status: "not_asked",
+  });
+  assert.equal(rule?.sourceTitle, undefined);
+  assert.equal(rule?.sourceNote, undefined);
 });
 
 test("F3-12: the walk holds up when the live index or match varies", async () => {
