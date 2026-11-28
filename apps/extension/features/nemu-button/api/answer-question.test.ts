@@ -34,7 +34,8 @@ function fakeClient(route: CommandRoute) {
     helpExplain: vi.fn(async () => ({
       status: "matched" as const,
       entryId: "K-07",
-      sentence: "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).",
+      sentence: "Bukan kesalahan Ibu. Yang bisa membantu: Pak Rizal.",
+      detail: "Pak Rizal operator sekolah.",
       why: "Mata pelajaran itu belum ditugaskan ke akun Ibu.",
       teacherFault: false,
       canSelfFix: false,
@@ -78,7 +79,8 @@ describe("answerQuestion", () => {
       answerQuestion(client, "Ini kenapa?", SNAPSHOT, async () => "JPEG"),
     ).resolves.toEqual({
       kind: "answer",
-      text: "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).",
+      text: "Bukan kesalahan Ibu. Yang bisa membantu: Pak Rizal.",
+      detail: "Pak Rizal operator sekolah.",
       why: "Mata pelajaran itu belum ditugaskan ke akun Ibu.",
       sources: ["Kamus Kendala · hlm. 2 · K-07"],
       next: {

@@ -31,10 +31,8 @@ test("F2-2: matched in code to Kamus Kendala no. 7, Pak Rizal fixes it, WhatsApp
   if (result.status !== "matched") return;
   assert.equal(result.entryId, "K-07");
   assert.ok(result.sentence.startsWith("Bukan kesalahan Ibu."));
-  assert.equal(
-    result.sentence,
-    "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).",
-  );
+  assert.equal(result.sentence, "Bukan kesalahan Ibu. Yang bisa membantu: Pak Rizal.");
+  assert.equal(result.detail, "Pak Rizal operator sekolah.");
   assert.deepEqual(sentenceIssues(result.sentence), []);
   assert.match(result.why, /^Bukan kesalahan Ibu\. Penugasan guru per mapel dan kelas diatur/u);
   assert.deepEqual([result.canSelfFix, result.guidedTarget], [false, null]);

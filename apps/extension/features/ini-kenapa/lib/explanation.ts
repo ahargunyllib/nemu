@@ -82,6 +82,7 @@ export function fromExplanation(explanation: HelpExplanation): AskResult {
   return {
     kind: "answer",
     text: explanation.sentence,
+    detail: explanation.detail,
     why: explanation.why || undefined,
     sources: [sourceLabel(explanation.citation)],
     next,

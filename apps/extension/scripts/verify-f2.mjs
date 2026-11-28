@@ -112,8 +112,9 @@ await check(
     await page.getByText("Anda belum ditugaskan mengampu IPAS di kelas 4A").waitFor();
     await ask(page, "Nemu, ini kenapa?");
     await bubble(page)
-      .getByText("Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).")
+      .getByText("Bukan kesalahan Ibu. Yang bisa membantu: Pak Rizal.")
       .waitFor({ timeout: 15_000 });
+    await bubble(page).getByText("Pak Rizal operator sekolah.").waitFor();
     await bubble(page).getByRole("button", { name: "Kenapa?" }).click();
     await bubble(page)
       .getByText("Penugasan guru per mapel dan kelas diatur admin sekolah", { exact: false })
