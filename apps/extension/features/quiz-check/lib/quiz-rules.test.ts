@@ -57,8 +57,8 @@ describe("checkQuiz (F4-01 DOM rules)", () => {
       {
         kind: "no_key",
         slot: 7,
-        sentence:
-          "Soal 7 belum ada kunci jawabannya, Bu. Ibu isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.",
+        sentence: "Soal 7 belum ada kunci jawabannya, Bu.",
+        detail: "Ibu isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.",
         why: "Semua pilihan di Soal 7 bernilai 0, jadi siswa yang menjawab benar pun mendapat 0.",
       },
     ]);
@@ -108,19 +108,20 @@ describe("checkQuiz (F4-01 DOM rules)", () => {
   test("without a known honorific the sentence just ends", () => {
     const problems = checkQuiz(f41(), { ...BEFORE_TEST, honorific: "" });
     expect(problems[0]?.sentence).toBe("Soal 15 belum ada gambarnya.");
-    expect(problems[1]?.sentence).toBe(
-      "Soal 7 belum ada kunci jawabannya. Isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.",
-    );
+    expect(problems[1]).toMatchObject({
+      sentence: "Soal 7 belum ada kunci jawabannya.",
+      detail: "Isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.",
+    });
   });
 
   test("a question with no key points to Edit soal and never proposes a key (PRD v2.3)", () => {
     const noKey = checkQuiz(f41(), { ...BEFORE_TEST, honorific: "Pak" }).find(
       (problem) => problem.kind === "no_key",
     );
-    expect(noKey?.sentence).toBe(
-      "Soal 7 belum ada kunci jawabannya, Pak. Bapak isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.",
-    );
-    expect(noKey?.sentence).not.toMatch(/\?/u);
+    // The sentence is the official key's; where to fill it is the detail line under it.
+    expect(noKey?.sentence).toBe("Soal 7 belum ada kunci jawabannya, Pak.");
+    expect(noKey?.detail).toBe("Bapak isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.");
+    expect(`${noKey?.sentence} ${noKey?.detail}`).not.toMatch(/\?/u);
   });
 
   test("question count: none, a different number for students, or not what she asked for", () => {

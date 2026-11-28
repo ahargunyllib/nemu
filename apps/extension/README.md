@@ -152,10 +152,14 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   - **Judgement (#218).** The extension sends what it read to `quizJudge`, which asks
     `SchoolAi.judgeQuiz`. No model checks exist yet, so it adds nothing; without the service the
     rules still stand.
-  - **Pointing.** While the rules run, Gelembung Kerja says "Saya lihat seperti siswa melihatnya.
-    Nemu tidak mengubah apa pun." under **Memeriksa kuis**. Then one Gelembung Jawab per problem,
+  - **Pointing.** While the rules run, Gelembung Kerja says "Saya lihat seperti siswa melihatnya."
+    with "Nemu tidak mengubah apa pun." on its detail line, under **Memeriksa kuis**, with only
+    **Berhenti** (no Pelan). Then one Gelembung Jawab per problem,
     missing images first and missing keys after them, each by question number (F4-1: soal 15,
-    then soal 7), under "Memeriksa kuis · 1 dari 2". It is pointed at on the preview: the missing
+    then soal 7), under "Memeriksa kuis · 1 dari 2". A missing key says the key file's sentence
+    ("Soal 7 belum ada kunci jawabannya, Bu.") with "Ibu isi kuncinya lewat Edit soal. Nemu tidak
+    mengubahnya." on its detail line; Nemu never proposes a key, so a missing image has no detail
+    line naming the right answer. It is pointed at on the preview: the missing
     image or the answers when the question is on this page, else its button in Navigasi kuis. Each
     has **Lanjut**, also the last one, and no ×. A missing image or key also has **Kenapa?**, built
     from what the check saw (the images' alt text, or every answer grading 0), since the extension
@@ -316,8 +320,9 @@ wrong grades saved. Screenshots go to `.output/verify-f1-2/`.
 AlurSekolah account), opens the F4-1 quiz as `siti.aminah` (password `TEACHER_PASSWORD` from
 `infra/.env`, or `MOODLE_TEACHER_PASSWORD`), and types "Nemu, tolong cek kuis ini." It checks that
 Nemu opens Setelan, Soal and Kuis itself, points at Pratinjau kuis for her to press, then points at
-soal 7 and soal 15 with the sentences in `infra/setup/f4-1/F4-1_kunci.csv` (and, after she opens
-soal 15, at its missing image), that Catatan langkah says nothing changed, and that the quiz's
+soal 15 and soal 7 with the sentences in `infra/setup/f4-1/F4-1_kunci.csv`, in its order (and,
+after she opens soal 15, at its missing image), with soal 7's Edit soal line under its sentence,
+that Catatan langkah says nothing changed, and that the quiz's
 last-modified time and question count in the Moodle database are what they were. `MOODLE_URL`
 (default `https://localhost/`) points it at another Moodle; without the local database only the
 Soal page's count is compared. It skips with a message when Moodle isn't running. Screenshots go

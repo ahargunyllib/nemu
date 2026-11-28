@@ -106,13 +106,12 @@ export function checkQuiz(
   for (const question of bySlot) {
     if (question.hasKey !== false) continue;
     // PRD v2.3: Nemu says where to fill the key and never proposes one ("Kuncinya setrika, Bu?").
+    // Where to fill it goes on the quieter detail line, under the sentence the key expects.
     problems.push({
       kind: "no_key",
       slot: question.slot,
-      sentence: `${say(`Soal ${question.slot} belum ada kunci jawabannya`, honorific)} ${ask(
-        "isi kuncinya lewat Edit soal",
-        honorific,
-      )} Nemu tidak mengubahnya.`,
+      sentence: say(`Soal ${question.slot} belum ada kunci jawabannya`, honorific),
+      detail: `${ask("isi kuncinya lewat Edit soal", honorific)} Nemu tidak mengubahnya.`,
       why: `Semua pilihan di Soal ${question.slot} bernilai 0, jadi siswa yang menjawab benar pun mendapat 0.`,
     });
   }

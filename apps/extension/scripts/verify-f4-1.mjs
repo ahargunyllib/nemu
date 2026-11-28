@@ -1,9 +1,10 @@
 // Loads a production build of the extension into Playwright's Chromium and checks F4-1 (#209) end
 // to end on the Moodle test site (infra/): Bu Siti asks "Nemu, tolong cek kuis ini." on the quiz
 // page, Nemu opens Setelan, Soal and the quiz page through the menus, points at Pratinjau kuis
-// (she presses it), and then points at soal 15 (missing image) and soal 7 (no key, "… Ibu isi
-// kuncinya lewat Edit soal. Nemu tidak mengubahnya.", #267), in setup/f4-1/F4-1_kunci.csv's order,
-// each under "Memeriksa kuis · 1 dari 2" with Kenapa? and Lanjut, and then says one
+// (she presses it), and then points at soal 15 (missing image) and soal 7 (no key, with "Ibu isi
+// kuncinya lewat Edit soal. Nemu tidak mengubahnya." on the detail line, #267), each saying
+// setup/f4-1/F4-1_kunci.csv's sentence in its order, under "Memeriksa kuis · 1 dari 2" with Kenapa?
+// and Lanjut, and then says one
 // closing sentence ("Selain dua hal itu, kuisnya sudah siap, Bu.", #256). Afterwards the quiz's
 // last-modified time and question count are what they were (read from the Moodle database when it
 // runs locally).
@@ -221,13 +222,10 @@ const [header, ...rows] = readFileSync(join(infra, "setup/f4-1/F4-1_kunci.csv"),
   .map(csvCells);
 const sentenceColumn = header.indexOf("kalimat_nemu_yang_diharapkan");
 // PRD v2.3 (#267): a question with no key also says where to fill it, and Nemu proposes no key.
-// The updated key file isn't in infra/ yet, so its old no-key sentence gets the new ending here.
+// The sentence is the key's; where to fill it is the detail line under it.
+const NO_KEY = "Soal 7 belum ada kunci jawabannya, Bu.";
 const EDIT_SOAL = "Ibu isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.";
-const NO_KEY = `Soal 7 belum ada kunci jawabannya, Bu. ${EDIT_SOAL}`;
-const kunci = rows
-  .map((row) => row[sentenceColumn])
-  .filter((text) => /^Soal \d+ /u.test(text))
-  .map((text) => (text.endsWith("kunci jawabannya, Bu.") ? `${text} ${EDIT_SOAL}` : text));
+const kunci = rows.map((row) => row[sentenceColumn]).filter((text) => /^Soal \d+ /u.test(text));
 
 await check(
   "F4-1: soal 15 (no image), then soal 7 (no key), one sentence each, pointed at",
@@ -235,11 +233,16 @@ await check(
     const jawab = display("jawab");
     await jawab.waitFor({ timeout: 30_000 });
     const sentences = [];
+    const details = new Map();
     for (let index = 0; index < 10; index += 1) {
       await page.waitForTimeout(900);
-      const texts = (await jawab.locator("p").allInnerTexts()).map((text) => text.trim());
+      const texts = (await jawab.locator("p:not([data-nemu-detail])").allInnerTexts()).map((text) =>
+        text.trim(),
+      );
       const sentence = texts.find((text) => /, Bu\.$|\.$/u.test(text)) ?? texts.join(" ");
       sentences.push(sentence);
+      const detail = jawab.locator("[data-nemu-detail]");
+      if (await detail.count()) details.set(sentence, (await detail.innerText()).trim());
       const slot = Number(sentence.match(/^Soal (\d+)/u)?.[1]);
       if (slot) {
         const onPage = page.locator(`.que[id$='-${slot}']`);
@@ -263,12 +266,12 @@ await check(
         await page.screenshot({ path: join(shots, "3-soal-15-gambar.png") });
       }
       if (slot) {
-        const header = (await jawab.locator("[data-nemu-status]").innerText()).replace(
-          /\s+/gu,
-          " ",
-        );
+        // The heading's label and its count on the right: "MEMERIKSA KUIS" "1 dari 2".
+        const header = (await jawab.locator("[data-nemu-status] p").allTextContents())
+          .map((text) => text.trim())
+          .join(" · ");
         expect(
-          header.toLowerCase().includes(`memeriksa kuis · ${index + 1} dari `),
+          header.toLowerCase().startsWith(`memeriksa kuis · ${index + 1} dari `),
           `the header says “${header}”`,
         );
         expect(await jawab.getByRole("button", { name: "Kenapa?" }).count(), "no Kenapa? link");
@@ -287,7 +290,11 @@ await check(
       expect(sentences.includes(expected), `Nemu didn't say “${expected}”`);
     expect(sentences.includes(NO_KEY), `Nemu didn't say “${NO_KEY}”`);
     expect(
-      !sentences.some((sentence) => /\?/u.test(sentence)),
+      details.get(NO_KEY) === EDIT_SOAL,
+      `under “${NO_KEY}” the detail line says “${details.get(NO_KEY)}”`,
+    );
+    expect(
+      ![...sentences, ...details.values()].some((text) => /\?/u.test(text)),
       "Nemu asked about a key instead of pointing to Edit soal",
     );
     const closesAt = new Date(2026, 11, 4, 21, 0);

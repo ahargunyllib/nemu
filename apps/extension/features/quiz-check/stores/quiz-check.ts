@@ -117,11 +117,8 @@ function createQuizCheck() {
       display: {
         type: "jawab",
         sentence: problem.sentence,
-        status: {
-          tone: "unsaved",
-          text: CHECKING,
-          progress: { done: index + 1, total: problems.length },
-        },
+        ...(problem.detail ? { detail: problem.detail } : {}),
+        status: { text: CHECKING, count: `${index + 1} dari ${problems.length}` },
         ...(problem.why ? { notes: { kenapa: problem.why } } : {}),
         onRead: (text) => context.speak(text),
         action: { label: "Lanjut", onSelect: next },
@@ -156,7 +153,9 @@ function createQuizCheck() {
     const found =
       state.problems.length === 0
         ? ["Nemu tidak menemukan masalah."]
-        : state.problems.map((problem) => `Masalah: ${problem.sentence}`);
+        : state.problems.map((problem) =>
+            [`Masalah: ${problem.sentence}`, problem.detail].filter(Boolean).join(" "),
+          );
     return [...state.notes, ...found, ...(state.changed ? [] : [NOTHING_CHANGED])];
   }
 
@@ -192,12 +191,11 @@ function createQuizCheck() {
     publish({
       display: {
         type: "kerja",
+        sentence: "Saya lihat seperti siswa melihatnya.",
         // After F4-03 put the quiz in, Nemu did change it, so it doesn't say otherwise here.
-        sentence: changed
-          ? "Saya lihat seperti siswa melihatnya."
-          : "Saya lihat seperti siswa melihatnya. Nemu tidak mengubah apa pun.",
-        status: { tone: "working", text: CHECKING },
-        onSlow: () => undefined,
+        ...(changed ? {} : { detail: "Nemu tidak mengubah apa pun." }),
+        status: { text: CHECKING },
+        // Only Berhenti: reading the preview has no pace to slow down.
         onStop: () => publish({ display: null, target: null }),
       },
       target: null,
@@ -210,13 +208,14 @@ function createQuizCheck() {
       utterance: found.utterance,
     });
     // #218: judgement checks from the Nemu Service; without them the rules still stand. The
-    // judge only needs what was found, not Kenapa?, so a service without `why` accepts it too.
+    // judge only needs what was found, not the detail line or Kenapa?, so a service without
+    // `detail` and `why` accepts it too.
     const judged = await requestQuizCheck(context.pageEmail, {
       op: "judge",
       input: {
         quiz: found.quiz,
         utterance: found.utterance,
-        found: problems.map(({ why: _why, ...problem }) => problem),
+        found: problems.map(({ why: _why, detail: _detail, ...problem }) => problem),
       },
     });
     const all = [...problems, ...(judged.ok ? judged.value.problems : [])];

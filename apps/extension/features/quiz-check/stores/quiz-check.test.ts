@@ -115,18 +115,20 @@ describe("F4-1's closing sentence (#256)", () => {
   test("after the last of two problems Nemu says one closing sentence, then Catatan langkah", async () => {
     await checked(3, [1, 3]);
     expect(view()).toMatchObject({
-      sentence:
-        "Soal 1 belum ada kunci jawabannya, Bu. Ibu isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.",
-      status: { text: "Memeriksa kuis", progress: { done: 1, total: 2 } },
+      sentence: "Soal 1 belum ada kunci jawabannya, Bu.",
+      detail: "Ibu isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.",
+      status: { text: "Memeriksa kuis", count: "1 dari 2" },
       notes: {
         kenapa:
           "Semua pilihan di Soal 1 bernilai 0, jadi siswa yang menjawab benar pun mendapat 0.",
       },
     });
+    // Only the sentence is spoken, not the detail line under it.
+    expect(spoken.at(-1)).toBe("Soal 1 belum ada kunci jawabannya, Bu.");
     press("Lanjut");
     expect(view()).toMatchObject({
-      sentence:
-        "Soal 3 belum ada kunci jawabannya, Bu. Ibu isi kuncinya lewat Edit soal. Nemu tidak mengubahnya.",
+      sentence: "Soal 3 belum ada kunci jawabannya, Bu.",
+      status: { text: "Memeriksa kuis", count: "2 dari 2" },
     });
     press("Lanjut");
 
@@ -181,9 +183,27 @@ describe("F4-1's closing sentence (#256)", () => {
     await checked(3, [1, 3]);
     press("Lanjut");
     const last = view();
-    expect(last).toMatchObject({ status: { progress: { done: 2, total: 2 } } });
+    expect(last).toMatchObject({ status: { count: "2 dari 2" } });
     if (last.type !== "jawab") throw new Error("not a Gelembung Jawab");
     expect(last.onClose).toBeUndefined();
+  });
+
+  test("while it checks, Nemu says it looks as a student does, with only Berhenti", async () => {
+    const shown: NemuDisplay[] = [];
+    const stop = quizCheck.subscribe(() => {
+      const display = quizCheck.getView().display;
+      if (display) shown.push(display);
+    });
+    await checked(2, [2]);
+    stop();
+    const working = shown.find((display) => display.type === "kerja");
+    expect(working).toMatchObject({
+      sentence: "Saya lihat seperti siswa melihatnya.",
+      detail: "Nemu tidak mengubah apa pun.",
+      status: { text: "Memeriksa kuis" },
+    });
+    if (working?.type !== "kerja") throw new Error("no Gelembung Kerja");
+    expect(working.onSlow).toBeUndefined();
   });
 
   test("Kenapa? is read aloud when she opens it", async () => {
