@@ -85,18 +85,19 @@ type BubbleBase = {
   onRead?: (text: string) => void;
 };
 
-/** Gelembung Kerja: Nemu is working. Always [Pelan] [Berhenti]. */
+/** Gelembung Kerja: Nemu is working. [Pelan] when it can slow down, and always [Berhenti]. */
 export type GelembungKerjaProps = BubbleBase & {
   status: NemuStatus;
   slow?: boolean;
-  onSlow: () => void;
+  /** Without it there is no Pelan, such as while Nemu reads a photo. */
+  onSlow?: () => void;
   onStop: () => void;
 };
 
 /** Gelembung Tunjuk: the teacher's turn. Points at a field or button; no buttons. */
 export type GelembungTunjukProps = BubbleBase & { note?: NemuSingleNote };
 
-/** Gelembung Jawab: an answer or a problem, with at most one action button. */
+/** Gelembung Jawab: an answer or a problem, with at most one (black) action button. */
 export type GelembungJawabProps = BubbleBase & {
   notes?: NemuNotes;
   action?: { label: string; onSelect: () => void };

@@ -122,16 +122,24 @@ stock `Card`, `Button` and `Progress`, and their data is the `NemuDisplay` union
 `@nemu/ui/lib/nemu-display`. `NemuStage` draws the one current display; the extension renders it in
 the page's Shadow DOM.
 
-| Type                 | When                   | Shape                                                                                                 |
-| -------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------- |
-| **Gelembung Kerja**  | Nemu is working        | Heading with a count and progress bar, one sentence and its detail line, **[Pelan] [Berhenti]**       |
-| **Gelembung Tunjuk** | The teacher's turn     | One sentence beside the field or button the cursor points at. No buttons, at most one link            |
-| **Gelembung Jawab**  | An answer or a problem | One sentence, the **Kenapa?**, **Sumber** and **Lihat ringkasan** links, at most one action button, × |
-| **Kartu Pilih**      | A decision             | One question, a detail line, 2–3 equal stacked big buttons, nothing pre-selected or focused           |
-| **Kartu Info**       | Something to read      | A title, a short list, at most one link (Catatan langkah: "Coba sendiri"), one **[Tutup]**            |
+| Type                 | When                   | Shape                                                                                                                           |
+| -------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **Gelembung Kerja**  | Nemu is working        | Heading with a count and progress bar, one sentence and its detail line, **[Pelan]** (optional) and **[Berhenti]** on the right |
+| **Gelembung Tunjuk** | The teacher's turn     | One sentence beside the field or button the cursor points at. No buttons, at most one link                                      |
+| **Gelembung Jawab**  | An answer or a problem | One sentence, then one row: **Kenapa?**, **Sumber**, **Lihat ringkasan** left, at most one action button right; ×               |
+| **Kartu Pilih**      | A decision             | One question, a detail line, 2–3 equal stacked big buttons, nothing pre-selected or focused                                     |
+| **Kartu Info**       | Something to read      | A title, a short list, then one row: at most one link left (Catatan langkah: "Coba sendiri"), **[Tutup]** right                 |
 
-- **Gelembung** (bubble): white, `rounded-3xl`, a 2 px `nemu` edge, 420 px wide. **Kartu** (card):
-  the stock card, 400 px wide, with an 8 px `nemu` band along its top.
+- **Surface**: every display is the stock card, plain white with its thin `ring-foreground/10`
+  edge, `rounded-3xl`, 24 px side padding, and the Float shadow; no amber edge or band. A
+  **Gelembung** (bubble) is 420 px wide, a **Kartu** (card) 400 px (the compact Kartu Pilih 300 px).
+- **Action row** (`NemuActionRow`): the last row of a display. Small links sit on the left, compact
+  buttons on the right, the main one last. A compact button is a 52 px pill with 18 px semibold
+  text and no icon: the main action is the stock default Button (black `#18181B`), a second one
+  the stock outline with a 2 px edge on white. Gelembung Kerja: **Pelan** (outline, only when the
+  caller passes `onSlow`) then **Berhenti** (black). What a link opens shows under the whole row.
+- **Close**: Gelembung Jawab's × is a 44 px round `secondary` icon button at the top right, level
+  with the heading. Kartu Info has no ×, only **Tutup**.
 - **Heading** (Kepala, `status`): every display can open with one row: the 28 px mascot, a short
   label in Label/Caps (14 px bold, +6% tracking, uppercase), and on the right an optional count in
   16 px semibold `nemu-secondary` ("3 dari 32", "1 dari 2", "10.02"). With `progress` an 8 px bar
@@ -149,18 +157,19 @@ the page's Shadow DOM.
   between the question and the choices. It is never read aloud and is not part of the sentence
   that says itself again.
 - **Sizes**: the sentence is 24 px (semibold), card text 20 px, the detail line and links 18 px,
-  the heading label 14 px bold capitals. Every button and link is at least 44 px tall; the big buttons are 48 px with
-  20 px text.
+  the heading label 14 px bold capitals. Every button and link is at least 44 px tall; the
+  compact buttons are 52 px with 18 px text, Kartu Pilih's choices at least 56 px with 20 px text.
 - **Contrast ≥ 7:1**: text is `foreground` on white, or `nemu-strong` (amber 800, Nemu's dark
-  orange) on white or `nemu-subtle`. The one action button in a Gelembung Jawab is a `nemu-strong`
-  fill with white text (9.6:1); the main button in a Kartu is the stock black default. The lighter
-  `nemu` (5.0:1) is only for edges, the progress bar, the cursor's label and the target ring.
+  orange) on white or `nemu-subtle`. The main button of every display is the stock black default
+  with white text. The lighter `nemu` (5.0:1) is only for the progress bar, the cursor's label
+  and the target ring.
 - **Colour is never the only signal**: the heading's words say the state ("Nemu mengisi",
   "Belum jelas", "Sudah dicek") and the warning and success headings change the mascot too; a
   risky choice carries a ⚠ icon (and "Berisiko" for screen readers); the spoken word is tinted
   and underlined.
-- **Never read aloud**: the heading, the links and the buttons. Nemu says only the sentence (`spokenText`), the question of a Kartu Pilih, or the title
-  of a Kartu Info, never the detail line under it.
+- **Never read aloud**: the heading, the links and the buttons. Nemu says only the sentence
+  (`spokenText`), the question of a Kartu Pilih, or the title of a Kartu Info, never the detail
+  line under it.
 - **Links**: Kenapa?, Sumber and Lihat ringkasan are small underlined `nemu-strong` links. What is
   behind them shows in a `nemu-subtle` box and is read (`onRead`) only once the teacher clicks.
 - **Kartu Pilih**: a risky choice gets ⚠ and goes under the safe one, whatever order it was given

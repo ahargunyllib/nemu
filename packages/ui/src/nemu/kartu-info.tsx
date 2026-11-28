@@ -7,12 +7,17 @@ import {
   CardTitle,
 } from "@nemu/ui/components/card";
 import type { KartuInfoProps } from "@nemu/ui/lib/nemu-display";
-import { BIG_BUTTON, NEMU_DETAIL, NEMU_LINK, NemuCard } from "@nemu/ui/nemu/nemu-frame";
-import { cn } from "cn";
+import {
+  NEMU_BUTTON,
+  NEMU_DETAIL,
+  NEMU_LINK,
+  NemuActionRow,
+  NemuCard,
+} from "@nemu/ui/nemu/nemu-frame";
 
 /**
- * Kartu Info: something to read. A title with an optional detail line, a short list, at most one
- * link, and one [Tutup].
+ * Kartu Info: something to read. A title with an optional detail line, a short list, then one
+ * row: at most one link on the left and a compact black [Tutup] on the right. No ×.
  */
 export function KartuInfo({ status, title, detail, items, link, onClose }: KartuInfoProps) {
   return (
@@ -32,20 +37,20 @@ export function KartuInfo({ status, title, detail, items, link, onClose }: Kartu
           ))}
         </ul>
       </CardContent>
-      <CardFooter className="flex-col items-stretch gap-2">
-        {link && (
-          <Button
-            type="button"
-            variant="link"
-            onClick={link.onSelect}
-            className={cn(NEMU_LINK, "self-start")}
-          >
-            {link.label}
+      <CardFooter>
+        <NemuActionRow
+          links={
+            link && (
+              <Button type="button" variant="link" onClick={link.onSelect} className={NEMU_LINK}>
+                {link.label}
+              </Button>
+            )
+          }
+        >
+          <Button type="button" onClick={onClose} className={NEMU_BUTTON}>
+            Tutup
           </Button>
-        )}
-        <Button type="button" onClick={onClose} className={cn(BIG_BUTTON, "w-full")}>
-          Tutup
-        </Button>
+        </NemuActionRow>
       </CardFooter>
     </NemuCard>
   );
