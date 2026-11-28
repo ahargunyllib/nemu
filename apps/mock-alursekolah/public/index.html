@@ -5,18 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AlurSekolah Tiruan</title>
 <style>
-  :root { --ink:#1f2933; --muted:#5f6b76; --line:#d5dade; --bg:#ffffff; --side:#f3f4f6; --head:#2d3e50; --accent:#2d3e50; --ok:#e7f4ea; }
+  :root { --ink:#1f2933; --muted:#5f6b76; --line:#d5dade; --bg:#ffffff; --side:#f3f4f6; --head:#2d3e50; --accent:#2d3e50; --ok:#e7f4ea;
+    /* Kerangka AlurSekolah: latar krem, panel putih, menu samping di atas latar. */
+    --latar:#f4f1ec; --garis:#e7e2da; --menu-ink:#2b2f33; --menu-redup:#8a8f94; --grup:#8b857c; --merek:#2f7a5b; --profil:#fde9d9; --profil-ink:#c2571a; }
   * { box-sizing:border-box; }
-  body { margin:0; font-family: Arial, Helvetica, sans-serif; color:var(--ink); background:var(--bg); font-size:16px; }
-  header { background:var(--head); color:#fff; padding:14px 24px; display:flex; justify-content:space-between; align-items:center; }
-  header b { font-size:20px; }
-  .banner { background:#fff8e1; border-bottom:1px solid #e6c766; padding:6px 24px; font-size:13px; }
-  .wrap { display:flex; min-height:calc(100vh - 90px); }
-  nav { width:220px; background:var(--side); padding:16px 0; }
-  nav a { display:block; padding:10px 24px; color:var(--ink); text-decoration:none; }
-  nav a.active { font-weight:bold; background:#e5e7eb; }
-  .akun { padding:0 24px 12px; margin-bottom:8px; border-bottom:1px solid var(--line); font-size:14px; }
-  .akun span { display:block; color:var(--muted); word-break:break-all; }
+  body { margin:0; font-family: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif; color:var(--ink); background:var(--latar); font-size:16px; }
+  .banner { background:#fff8e1; border-bottom:1px solid #e6c766; padding:4px 16px; font-size:12px; color:#6b5a1e; }
+  .kerangka { display:flex; align-items:flex-start; gap:10px; padding:10px 10px 10px 0; min-height:calc(100vh - 26px); }
+  .samping { width:240px; flex:none; position:sticky; top:0; height:calc(100vh - 36px); display:flex; flex-direction:column; padding:4px 10px 0; }
+  .merek { display:flex; align-items:center; gap:10px; padding:8px 8px 18px; }
+  .logo { width:36px; height:36px; border-radius:10px; background:var(--merek); color:#fff; font-weight:700; font-size:14px; display:grid; place-items:center; flex:none; }
+  .merek b { display:block; font-size:15px; }
+  .merek div span { display:block; font-size:12px; color:var(--muted); }
+  .menu { flex:1; overflow-y:auto; font-size:15px; }
+  .grup { margin:14px 12px 4px; font-size:12px; color:var(--grup); }
+  .menu a, .menu .inert { display:flex; align-items:center; gap:10px; padding:7px 12px; border-radius:10px; color:var(--menu-ink); text-decoration:none; }
+  .menu a:hover { background:#ebe6de; }
+  .menu a.active { background:#fff; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+  .menu .inert { color:var(--menu-redup); cursor:default; }
+  .menu i, .topbar i { display:inline-flex; flex:none; }
+  .akun { display:flex; align-items:center; gap:10px; margin:10px 0; padding:10px 12px; border-radius:12px; background:var(--profil); font-size:13px; }
+  .akun b { display:block; font-size:13px; }
+  .akun > div { min-width:0; }
+  .akun span#menu-email { display:block; color:var(--muted); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .avatar { width:32px; height:32px; border-radius:50%; display:grid; place-items:center; flex:none; font-weight:700; font-size:12px; color:var(--profil-ink); background:var(--profil); }
+  .akun .avatar { background:#fff; }
+  .panel { flex:1; min-width:0; background:#fff; border-radius:16px; border:1px solid var(--garis); min-height:calc(100vh - 46px); }
+  .panel.tanpa-menu { margin-left:10px; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:10px 24px; border-bottom:1px solid var(--garis); font-size:14px; }
+  .remah ol { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:8px; color:var(--muted); }
+  .remah li + li::before { content:"›"; margin-right:8px; color:var(--menu-redup); }
+  .remah li[aria-current] { color:var(--ink); }
+  .topbar-kanan { display:flex; align-items:center; gap:12px; }
+  .cari { display:flex; align-items:center; gap:8px; width:260px; padding:7px 12px; border:1px solid var(--garis); border-radius:999px; background:var(--latar); color:var(--menu-redup); }
+  .cari input { border:0; outline:0; background:transparent; font:inherit; font-size:14px; width:100%; min-width:0; padding:0; color:var(--ink); }
+  .semester { padding:6px 12px; border:1px solid var(--garis); border-radius:999px; white-space:nowrap; }
+  .lonceng { color:var(--menu-ink); }
+  .pengguna { display:flex; align-items:center; gap:8px; }
+  .pengguna b { display:block; font-size:14px; }
+  .pengguna small { display:block; color:var(--muted); font-size:12px; }
   main { flex:1; padding:24px 32px; max-width:1100px; }
   h1 { font-size:24px; margin:0 0 16px; }
   label { display:block; font-weight:bold; margin:12px 0 4px; }
@@ -35,19 +62,48 @@
 </style>
 </head>
 <body>
-<header><b>AlurSekolah (tiruan)</b><span id="who">Belum masuk</span></header>
 <div class="banner">TIRUAN UNTUK UJI NEMU. Bukan AlurSekolah asli. Data sintetis SDIT Nusantara. Nilai dan setoran tersimpan di server tiruan, sama di semua browser.</div>
-<div class="wrap">
-  <nav id="nav" class="hidden" aria-label="Menu utama">
-    <div id="menu-akun" class="akun"><b id="menu-nama"></b><span id="menu-email"></span></div>
-    <a href="#/beranda" id="menu-beranda">Beranda</a>
-    <a href="#/nilai" id="menu-nilai">Nilai</a>
-    <a href="#/rekap" id="menu-rekap">Rekap Nilai</a>
-    <a href="#/tahfidz" id="menu-alquran">Al-Quran</a>
-    <a href="#/profil" id="menu-profil">Profil</a>
-    <a href="#/keluar" id="menu-keluar">Keluar</a>
+<div class="kerangka">
+  <!-- Menu samping seperti AlurSekolah asli. Menu yang belum ada di tiruan tampil redup dan tidak bisa
+       diklik (bukan tautan), supaya Nemu tidak pernah memilihnya. Label tautan dipakai ekstensi dan
+       skrip verify: jangan diganti. -->
+  <nav id="nav" class="samping hidden" aria-label="Menu utama">
+    <div class="merek"><span class="logo" aria-hidden="true">SN</span><div><b id="merek-sekolah">SDIT Nusantara</b><span id="merek-peran">AlurSekolah</span></div></div>
+    <div class="menu">
+      <div class="grup">Utama</div>
+      <a href="#/beranda" id="menu-beranda"><i data-ikon="beranda"></i>Beranda</a>
+      <span class="inert" aria-disabled="true" title="Belum ada di tiruan"><i data-ikon="kelas"></i>Kelas saya</span>
+      <div class="grup">Akademik</div>
+      <a href="#/nilai" id="menu-nilai"><i data-ikon="nilai"></i>Nilai</a>
+      <a href="#/rekap" id="menu-rekap"><i data-ikon="rekap"></i>Rekap Nilai</a>
+      <span class="inert" aria-disabled="true" title="Belum ada di tiruan"><i data-ikon="presensi"></i>Presensi</span>
+      <span class="inert" aria-disabled="true" title="Belum ada di tiruan"><i data-ikon="jadwal"></i>Jadwal</span>
+      <span class="inert" aria-disabled="true" title="Belum ada di tiruan"><i data-ikon="agenda"></i>PR &amp; Agenda</span>
+      <div class="grup">Keislaman</div>
+      <a href="#/tahfidz" id="menu-alquran"><i data-ikon="alquran"></i>Al-Quran</a>
+      <div class="grup">E-learning</div>
+      <span class="inert" aria-disabled="true" title="Belum ada di tiruan"><i data-ikon="moodle"></i>Moodle</span>
+      <div class="grup">Bantuan</div>
+      <span class="inert" aria-disabled="true" title="Belum ada di tiruan"><i data-ikon="panduan"></i>Panduan Pengguna</span>
+      <span class="inert" aria-disabled="true" title="Belum ada di tiruan"><i data-ikon="support"></i>Support</span>
+      <div class="grup">Akun</div>
+      <a href="#/profil" id="menu-profil"><i data-ikon="profil"></i>Profil</a>
+      <a href="#/keluar" id="menu-keluar"><i data-ikon="keluar"></i>Keluar</a>
+    </div>
+    <div id="menu-akun" class="akun"><span class="avatar" id="menu-inisial" aria-hidden="true"></span><div><b id="menu-nama"></b><span id="menu-email"></span></div></div>
   </nav>
-  <main id="app"></main>
+  <div class="panel" id="panel">
+    <header class="topbar">
+      <nav class="remah" aria-label="Lokasi halaman"><ol id="remah"></ol></nav>
+      <div class="topbar-kanan">
+        <div class="cari hidden" id="topbar-cari"><i data-ikon="cari"></i><input type="search" placeholder="Cari murid, kelas, atau menu" aria-label="Cari murid, kelas, atau menu"></div>
+        <span class="semester">Semester ganjil 2026/2027</span>
+        <span class="lonceng hidden" id="topbar-lonceng" role="img" aria-label="Notifikasi"><i data-ikon="lonceng"></i></span>
+        <span class="pengguna"><span class="avatar hidden" id="who-inisial" aria-hidden="true"></span><span><b id="who">Belum masuk</b><small id="who-peran"></small></span></span>
+      </div>
+    </header>
+    <main id="app"></main>
+  </div>
 </div>
 <dialog id="konfirmasi"><p id="konfirmasi-teks"></p><button id="ya-simpan">Ya, simpan</button> <button class="secondary" id="batal-simpan">Batal</button></dialog>
 <script>
@@ -71,7 +127,7 @@ function me() { return USERS[store.get("user", "")]; }
 function gagal(sel, e) { $(sel).innerHTML = `<p class="note" role="alert">${e.message}</p>`; }
 
 function viewLogin() {
-  $("#nav").classList.add("hidden"); $("#who").textContent = "Belum masuk";
+  kerangka(null, "#/masuk");
   app.innerHTML = `<h1>Masuk</h1>
     <label for="username">Nama pengguna</label><input type="text" id="username" autocomplete="username">
     <label for="password">Kata sandi</label><input type="password" id="password" autocomplete="current-password">
@@ -212,13 +268,49 @@ async function viewTahfidz() {
     };
   };
 }
+// Kerangka halaman: menu samping, bilah atas, dan jejak halaman ("SDIT Nusantara › Akademik › Nilai").
+const JEJAK = {"#/beranda": ["Beranda"], "#/nilai": ["Akademik", "Nilai"], "#/rekap": ["Akademik", "Rekap Nilai"],
+  "#/tahfidz": ["Keislaman", "Al-Quran"], "#/profil": ["Akun", "Profil"], "#/masuk": ["Masuk"]};
+const IKON = {
+  beranda: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>',
+  kelas: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/>',
+  nilai: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M9 11h6M9 15h4"/>',
+  rekap: '<path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/>',
+  presensi: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
+  jadwal: '<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+  agenda: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>',
+  alquran: '<path d="M12 6.5C10 5 7 4.5 3 5v14c4-.5 7 0 9 1.5 2-1.5 5-2 9-1.5V5c-4-.5-7 0-9 1.5Z"/><path d="M12 6.5v14"/>',
+  moodle: '<path d="m2 9 10-5 10 5-10 5Z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/>',
+  panduan: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6"/><path d="M12 17h.01"/>',
+  support: '<path d="M4 5h16v11H9l-5 4Z"/>',
+  profil: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  keluar: '<path d="M15 4h4v16h-4"/><path d="m10 8-4 4 4 4"/><path d="M6 12h10"/>',
+  cari: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  lonceng: '<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15Z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>'
+};
+document.querySelectorAll("[data-ikon]").forEach(el => {
+  el.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${IKON[el.dataset.ikon]}</svg>`;
+});
+const inisial = nama => nama.replace(/,.*$/, "").split(/\s+/).slice(0, 2).map(x => x[0]).join("").toUpperCase();
+function kerangka(u, h) {
+  const masuk = Boolean(u);
+  $("#nav").classList.toggle("hidden", !masuk); $("#panel").classList.toggle("tanpa-menu", !masuk);
+  ["#topbar-cari", "#topbar-lonceng", "#who-inisial"].forEach(s => $(s).classList.toggle("hidden", !masuk));
+  $("#who").textContent = masuk ? u.nama : "Belum masuk";
+  $("#who-peran").textContent = !masuk ? "" : u.wali ? `Wali kelas ${u.wali}` : u.peran === "operator" ? "Operator sekolah" : "Guru";
+  if (masuk) {
+    $("#who-inisial").textContent = $("#menu-inisial").textContent = inisial(u.nama);
+    $("#menu-nama").textContent = u.nama; $("#menu-email").textContent = u.email; $("#menu-email").title = u.email;
+  }
+  const jejak = [SEKOLAH.nama || "AlurSekolah", ...(JEJAK[h] || JEJAK["#/beranda"])];
+  $("#remah").innerHTML = jejak.map((x, i) => i === jejak.length - 1 ? `<li aria-current="page">${x}</li>` : `<li>${x}</li>`).join("");
+  document.querySelectorAll("#nav a").forEach(a => a.classList.toggle("active", a.getAttribute("href") === h));
+}
 function route() {
   const h = location.hash || "#/beranda";
   if (h === "#/keluar") { store.set("user", ""); location.hash = "#/masuk"; }
   if (!me()) return viewLogin();
-  $("#nav").classList.remove("hidden"); $("#who").textContent = me().nama;
-  $("#menu-nama").textContent = me().nama; $("#menu-email").textContent = me().email;
-  document.querySelectorAll("nav a").forEach(a => a.classList.toggle("active", a.getAttribute("href") === h));
+  kerangka(me(), h);
   ({"#/nilai": viewNilai, "#/rekap": viewRekap, "#/tahfidz": viewTahfidz, "#/profil": viewProfil}[h] || viewBeranda)();
 }
 server("/sekolah").then(d => {
