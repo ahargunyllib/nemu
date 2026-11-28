@@ -17,7 +17,7 @@ export default function WorkspaceBreadcrumb() {
   return (
     <Breadcrumb>
       <BreadcrumbList className="flex-nowrap">
-        <BreadcrumbItem className="hidden xl:inline-flex">Admin Workspace</BreadcrumbItem>
+        <BreadcrumbItem className="hidden xl:inline-flex">Workspace</BreadcrumbItem>
         {location && (
           <>
             <BreadcrumbSeparator className="hidden xl:inline-flex" />

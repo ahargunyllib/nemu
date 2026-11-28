@@ -1,6 +1,6 @@
 // F3-1 on the mock AlurSekolah (#213, #220): a process the school taught Nemu with no code change.
 // Loads a production build of the extension into Playwright's Chromium, then:
-//   1. Pak Rizal uploads the official tahfidz BPMN in Pengetahuan sekolah and, in WS-04, sets the
+//   1. Pak Rizal uploads the official tahfidz BPMN in Dokumen dan alur and, in WS-04, sets the
 //      page of "Isi setoran satu kelas" to "Al-Quran › Setoran baru" (F3-19);
 //   2. the setoran book photo lands in Bu Siti's inbox (as an upload, like a WhatsApp photo);
 //   3. Bu Siti types "Catat setoran hafalan 4A hari ini" on the mock: the steps show first (2–6),

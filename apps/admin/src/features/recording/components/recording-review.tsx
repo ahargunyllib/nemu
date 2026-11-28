@@ -215,7 +215,7 @@ export default function RecordingReview({ recordingId }: { recordingId: string }
         {savedId ? (
           <>
             <Button variant="outline" nativeButton={false} render={<Link to="/documents" />}>
-              Lihat di Pengetahuan sekolah
+              Lihat di Dokumen dan alur
             </Button>
             <DocumentExportBpmnButton id={savedId} title={draft.title} withLabel />
           </>
