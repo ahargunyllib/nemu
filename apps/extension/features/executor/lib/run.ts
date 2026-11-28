@@ -282,10 +282,10 @@ export class ExecutorRun {
     if (!this.isActive()) return;
     if (this.state.cara !== 1) return this.stop();
     this.halt("asking");
-    const teacher = this.deps.honorific || "Anda";
     this.render({
       type: "pilih",
-      question: `Nemu berhenti. ${teacher} mau isi sendiri?`,
+      ...this.stopped(),
+      question: `${this.address()} mau isi sendiri?`,
       choices: [
         { id: "sendiri", label: "Ya, saya isi sendiri" },
         { id: "berhenti", label: "Tidak, berhenti" },
@@ -301,15 +301,15 @@ export class ExecutorRun {
     this.askHowToGoOn();
   }
 
-  /** Kartu Pilih: Saya isi sendiri (cara 2) / Nemu lanjut / Berhenti. */
+  /** Kartu Pilih: Ya, saya isi sendiri (cara 2) / Nemu saja yang lanjut / Berhenti. */
   private askHowToGoOn() {
-    const teacher = this.deps.honorific || "Anda";
     this.render({
       type: "pilih",
-      question: `Nemu berhenti karena ${teacher} memakai halaman. Lanjut bagaimana?`,
+      ...this.stopped(),
+      question: `${this.address()} mau isi sendiri?`,
       choices: [
-        { id: "sendiri", label: "Saya isi sendiri" },
-        { id: "lanjut", label: "Nemu lanjut" },
+        { id: "sendiri", label: "Ya, saya isi sendiri" },
+        { id: "lanjut", label: "Nemu saja yang lanjut" },
         { id: "berhenti", label: "Berhenti" },
       ],
       onChoose: (id) => {
@@ -318,6 +318,36 @@ export class ExecutorRun {
         else this.stop();
       },
     });
+  }
+
+  /**
+   * The heading and detail line of both stop cards (F1·08): "Nemu berhenti", grey, with the row
+   * Nemu was on ("3 dari 32") when the task fills rows, and "Pilih salah satu, Nemu menunggu."
+   */
+  private stopped(): { status: NemuStatus; detail: string } {
+    const steps = this.state.task.steps;
+    // Before the first row (the menu, the filters) there is no row to count yet.
+    const first = steps.findIndex((step) => rowOf(step) !== undefined);
+    const at =
+      first >= 0 && this.state.index >= first
+        ? this.progress(Math.min(this.state.index, steps.length - 1))
+        : undefined;
+    return {
+      status: {
+        tone: "muted",
+        text: "Nemu berhenti",
+        ...(at ? { count: `${at.done} dari ${at.total}` } : {}),
+      },
+      detail: "Pilih salah satu, Nemu menunggu.",
+    };
+  }
+
+  /** The teacher as a sentence's subject: "Ibu" / "Bapak" from WS-06's "Bu" / "Pak". */
+  private address(): string {
+    const { honorific } = this.deps;
+    if (honorific === "Bu") return "Ibu";
+    if (honorific === "Pak") return "Bapak";
+    return honorific || "Anda";
   }
 
   /** After a page load: carry on, or ask again if Nemu had stopped to ask. */

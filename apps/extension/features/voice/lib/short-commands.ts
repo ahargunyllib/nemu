@@ -17,7 +17,15 @@ const PHRASES: Record<ShortCommand, readonly string[]> = {
   ],
   ulangi: ["ulangi", "ulang", "sekali lagi", "apa tadi", "gimana tadi", "bagaimana tadi"],
   ajari_saya: ["ajari saya", "ajarin saya", "ajarkan saya", "ajari aku", "ajari", "ajarin"],
-  lanjut: ["lanjut", "lanjutkan", "teruskan", "terus", "ayo lanjut", "silakan lanjut"],
+  lanjut: [
+    "lanjut",
+    "lanjutkan",
+    "teruskan",
+    "terus",
+    "ayo lanjut",
+    "silakan lanjut",
+    "saja yang lanjut",
+  ],
   berhenti: ["berhenti", "stop", "setop", "cukup", "batal", "sudah", "udah", "diam"],
 };
 
