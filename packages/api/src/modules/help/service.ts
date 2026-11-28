@@ -1,5 +1,6 @@
 import { importBpmn } from "@nemu/ai/school/bpmn/graph";
 import { routeCommand } from "@nemu/ai/school/commands";
+import { notInGuideAnswer } from "@nemu/ai/school/help";
 import {
   describesSymptom,
   screenSymptoms,
@@ -158,15 +159,23 @@ export async function explain(
   return explanation;
 }
 
-/** F3: a teacher's question from the school's active knowledge, addressed to her. */
+/**
+ * F3: a teacher's question from the school's active knowledge, addressed to her. When the guides
+ * don't answer it, she learns who can, with her question ready for the operator (F3·11).
+ */
 export async function ask(
   deps: HelpDeps,
   workspaceId: string,
   question: string,
-  teacher?: Pick<TeacherProfile, "honorific">,
+  teacher?: TeacherProfile,
 ): Promise<GroundedAnswer> {
   const chunks = await loadSchoolKnowledge(deps.documents, workspaceId);
-  return deps.ai.answerGrounded({ question, chunks, honorific: teacher?.honorific });
+  const answer = await deps.ai.answerGrounded({
+    question,
+    chunks,
+    honorific: teacher?.honorific,
+  });
+  return answer.status === "not_in_guide" && teacher ? notInGuideAnswer(teacher, question) : answer;
 }
 
 /**

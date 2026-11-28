@@ -5,7 +5,7 @@ import type { PageSnapshot } from "@nemu/contracts/school";
 
 import { F2_2_PAGE, F2_3_PAGE, KAMUS_ROWS, NOT_IN_GUIDE_PAGES } from "./fixtures/kamus.js";
 import { BU_SITI } from "./fixtures/sdit-nusantara.js";
-import { explainError } from "./help.js";
+import { explainError, notInGuideAnswer } from "./help.js";
 import { guidedTargetOf, matchKamus, requestFromFix } from "./kamus.js";
 import { mentionsSecret, sentenceIssues } from "./safety.js";
 import { fakeJsonCall, textOf } from "./test-helpers.js";
@@ -166,4 +166,30 @@ test("the button and the request come from the kamus text", () => {
     "memperbarui data PTK di Dapodik",
   );
   assert.equal(requestFromFix("Buka E-Kinerja, lalu tekan Sinkro."), null);
+});
+
+test("F3·11: a question not in the guide names who can answer and drafts it to the operator", () => {
+  const operator = BU_SITI.contacts.operator!;
+  const answer = notInGuideAnswer(BU_SITI, "  Cuti melahirkan   berapa lama ");
+  assert.deepEqual(answer, {
+    status: "not_in_guide",
+    answer: "Ini belum ada di panduan sekolah, Bu.",
+    detail: `Yang bisa menjawab: ${operator.name} atau kepala sekolah.`,
+    offerOperator: operator,
+    waDraft: {
+      phone: operator.phone,
+      text: `Assalamualaikum ${operator.name}. Saya ${BU_SITI.name} (NIP ${BU_SITI.nip}). Saya mau bertanya: "Cuti melahirkan berapa lama". Ini belum ada di panduan sekolah. Mohon bantuannya. Terima kasih.`,
+    },
+  });
+  assertSafe(answer.answer);
+
+  const { operator: _operator, ...others } = BU_SITI.contacts;
+  const alone = notInGuideAnswer({ ...BU_SITI, honorific: "Pak", contacts: others }, "Cuti?");
+  assert.deepEqual(alone, {
+    status: "not_in_guide",
+    answer: "Ini belum ada di panduan sekolah, Pak.",
+    detail: "Yang bisa menjawab: kepala sekolah.",
+    offerOperator: null,
+    waDraft: null,
+  });
 });
