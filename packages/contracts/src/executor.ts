@@ -41,6 +41,34 @@ export const executorTargetSchema = z
     message: "A target needs a label, a text or a row",
   });
 
+/**
+ * What Nemu shows while it does a step itself (cara 1), when the task has its own words for it.
+ * Without them the executor says its own line ("Membuka Nilai…", "Memilih 4B.").
+ * - `sentence`, `detail`: the Gelembung Kerja's sentence and the quieter line under it.
+ * - `stage`: where the step sits in the task, "Langkah 1 dari 3" on the heading's right; `label`
+ *   replaces the heading's words (default "Nemu bekerja", or "Nemu mengisi" for a value).
+ * - `approach`: said before the cursor sets off for the target: "Saya buka menu Nilai, Bu."
+ */
+const actLines = {
+  sentence: z.string().min(1).max(200).optional(),
+  detail: z.string().min(1).max(300).optional(),
+  stage: z
+    .object({
+      label: z.string().min(1).max(40).optional(),
+      n: z.number().int().positive(),
+      of: z.number().int().positive(),
+    })
+    .strict()
+    .optional(),
+  approach: z
+    .object({
+      sentence: z.string().min(1).max(200),
+      detail: z.string().min(1).max(300).optional(),
+    })
+    .strict()
+    .optional(),
+};
+
 export const executorStepSchema = z.discriminatedUnion("verb", [
   /**
    * The teacher's turn: Nemu points and waits for her to press it (Simpan, Kirim, uploads).
@@ -63,21 +91,28 @@ export const executorStepSchema = z.discriminatedUnion("verb", [
       target: executorTargetSchema,
       value: z.string(),
       rowName: z.string().optional(),
+      ...actLines,
     })
     .strict(),
   z
-    .object({ verb: z.literal("selectOption"), target: executorTargetSchema, option: z.string() })
+    .object({
+      verb: z.literal("selectOption"),
+      target: executorTargetSchema,
+      option: z.string(),
+      ...actLines,
+    })
     .strict(),
   z
     .object({
       verb: z.literal("check"),
       target: executorTargetSchema,
       checked: z.boolean().default(true),
+      ...actLines,
     })
     .strict(),
   z.object({ verb: z.literal("scroll"), target: executorTargetSchema }).strict(),
   /** Visible navigation (F0-13): Nemu clicks a menu, link or tab with the cursor, naming it. */
-  z.object({ verb: z.literal("clickMenu"), target: executorTargetSchema }).strict(),
+  z.object({ verb: z.literal("clickMenu"), target: executorTargetSchema, ...actLines }).strict(),
 ]);
 
 /** The six step verbs; anything else a model or recording sends is never run (F0-08). */

@@ -19,13 +19,45 @@ const task = gradeTask({
 describe("the F1 fill task (cara 1)", () => {
   test("opens Isi nilai kelas through the menu and picks the class, subject and assessment", () => {
     expect(task.kind).toBe(GRADE_TASK_KIND);
-    expect(task.steps.slice(0, 5)).toEqual([
+    expect(task.steps.slice(0, 5)).toMatchObject([
       { verb: "clickMenu", target: { role: "link", text: "Nilai" } },
       { verb: "selectOption", target: { label: "Kelas" }, option: "4B" },
       { verb: "selectOption", target: { label: "Mata Pelajaran" }, option: "Matematika" },
       { verb: "selectOption", target: { label: "Jenis Penilaian" }, option: "UTS" },
       { verb: "clickMenu", target: { role: "button", text: "Tampilkan Siswa" } },
     ]);
+  });
+
+  test("says each navigation step in its own words, as Langkah 1 and 2 of 3 (F1·05a–06b)", () => {
+    expect(task.steps[0]).toMatchObject({
+      approach: { sentence: "Saya buka menu Nilai, Bu.", detail: "Ibu lihat saja dulu." },
+      sentence: "Ini menu Nilai.",
+      detail: "Saya klik, Bu.",
+      stage: { n: 1, of: 3 },
+    });
+    expect(task.steps.slice(1, 4).map((step) => "stage" in step && step.stage)).toEqual([
+      { n: 2, of: 3 },
+      { n: 2, of: 3 },
+      { n: 2, of: 3 },
+    ]);
+    // The class, subject and assessment come from the task, not the design's example.
+    const other = gradeTask({
+      command: { className: "5A", subject: "IPAS", assessment: "UH 2" },
+      entries: ENTRIES,
+      summarySentence: "",
+      honorific: "Pak",
+    });
+    expect(other.steps[0]).toMatchObject({
+      approach: { sentence: "Saya buka menu Nilai, Pak.", detail: "Bapak lihat saja dulu." },
+      detail: "Saya klik, Pak.",
+    });
+    expect(other.steps[4]).toMatchObject({
+      sentence: "Ini Isi nilai kelas 5A.",
+      detail: "Kelas 5A, IPAS, Harian sudah saya pilih.",
+      stage: { n: 2, of: 3 },
+    });
+    // The fill counts students on its heading instead of a stage.
+    expect(task.steps.slice(5).some((step) => "stage" in step)).toBe(false);
   });
 
   test("fills each Nilai by the student's row; below KKM gets remedial, S stays blank and tidak hadir", () => {

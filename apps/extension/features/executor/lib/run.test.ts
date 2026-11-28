@@ -177,6 +177,52 @@ describe("cara 1", () => {
     // Glide, then two digits at 2 × 120 ms.
     expect(waits.slice(0, 3)).toEqual([600, 240, 240]);
   });
+
+  test("a step's own sentence, detail and stage replace the executor's line (F1·05a–06b)", async () => {
+    const task: ExecutorTask = {
+      ...GRADES,
+      steps: [
+        {
+          verb: "clickMenu",
+          target: { role: "link", text: "Nilai" },
+          approach: { sentence: "Saya buka menu Nilai, Bu.", detail: "Ibu lihat saja dulu." },
+          sentence: "Ini menu Nilai.",
+          detail: "Saya klik, Bu.",
+          stage: { n: 1, of: 3 },
+        },
+        {
+          verb: "selectOption",
+          target: { label: "Kelas" },
+          option: "4B",
+          stage: { n: 2, of: 3 },
+        },
+      ],
+    };
+    const { run, shown, spoken } = harness(createRunState(task, { cara: 1 }));
+    await run.run();
+
+    const working = shown.flatMap(({ display, target }) =>
+      display?.type === "kerja" ? [{ ...display, pointed: target !== null }] : [],
+    );
+    expect(working.slice(0, 3)).toMatchObject([
+      // Said beside the Nemu button before the cursor sets off, then at the menu.
+      {
+        sentence: "Saya buka menu Nilai, Bu.",
+        detail: "Ibu lihat saja dulu.",
+        status: { text: "Nemu bekerja", count: "Langkah 1 dari 3" },
+        pointed: false,
+      },
+      {
+        sentence: "Ini menu Nilai.",
+        detail: "Saya klik, Bu.",
+        status: { text: "Nemu bekerja", count: "Langkah 1 dari 3" },
+        pointed: true,
+      },
+      // Without a sentence of its own, the step keeps the executor's line under the stage.
+      { sentence: "Memilih 4B.", status: { text: "Nemu bekerja", count: "Langkah 2 dari 3" } },
+    ]);
+    expect(spoken).toEqual(["Saya buka menu Nilai, Bu.", "Ini menu Nilai."]);
+  });
 });
 
 describe("F0-13: a step that loads another page", () => {
