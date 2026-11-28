@@ -90,14 +90,34 @@ function withAnswered(notes: readonly string[], answered: string): string[] {
   return [...notes.slice(0, source), answered, ...notes.slice(source)];
 }
 
-/** The choice for a title the photo shows: "UTS · Matematika · 4B". */
-function titleLabel(candidate: PhotoTitleCandidate) {
-  return [candidate.assessment, candidate.subject, candidate.className].filter(Boolean).join(" · ");
-}
-
-/** The same title as the words she would say, for the command parser: "UTS Matematika 4B". */
+/**
+ * A title the photo shows, as the choice's label and as the words she would say for the command
+ * parser: "UTS Matematika 4B".
+ */
 function titleWords(candidate: PhotoTitleCandidate) {
   return [candidate.assessment, candidate.subject, candidate.className].filter(Boolean).join(" ");
+}
+
+/** "Ini nilai apa, Bu?" besides the photo's titles: she names it herself, or puts the photo off. */
+const OTHER_TITLE = { id: "lain", label: "Pilih yang lain" };
+const LATER = { id: "nanti", label: "Nanti saja" };
+
+/** What she may say instead of pressing those two, lower-case and without punctuation. */
+const SPOKEN_CHOICES: Record<string, string> = {
+  "pilih yang lain": OTHER_TITLE.id,
+  "yang lain": OTHER_TITLE.id,
+  "nanti saja": LATER.id,
+  "nanti aja": LATER.id,
+  nanti: LATER.id,
+};
+
+function spokenChoice(text: string): string | undefined {
+  return SPOKEN_CHOICES[
+    text
+      .toLocaleLowerCase("id-ID")
+      .replace(/[^\p{L}\p{N}]+/gu, " ")
+      .trim()
+  ];
 }
 
 function capitalize(text: string) {
@@ -211,23 +231,20 @@ function createGradePhoto() {
         };
       case "picking": {
         const candidates = phase.candidates;
-        const other = { id: "lain", label: "Nilai lain" };
         const [first, second] = candidates.map((candidate, index) => ({
           id: String(index),
-          label: titleLabel(candidate),
+          label: titleWords(candidate),
         }));
+        // A Kartu Pilih has at most 3 choices: with two titles, the Nanti saja button makes way
+        // (saying "nanti saja" still puts the photo off).
         const choices: KartuPilihProps["choices"] = second
-          ? [first!, second, other]
-          : [first!, other];
+          ? [first!, second, OTHER_TITLE]
+          : [first!, OTHER_TITLE, LATER];
         return {
           type: "pilih",
           question: pickQuestion(),
           choices,
-          onChoose: (id) => {
-            const picked = candidates[Number(id)];
-            if (id === other.id || !picked) askCommand();
-            else void command(titleWords(picked));
-          },
+          onChoose: (id) => pick(candidates, id),
         };
       }
       case "command":
@@ -312,7 +329,9 @@ function createGradePhoto() {
     view = {
       display: displayFor(),
       card: cardFor(),
-      typing: ["picking", "command", "number"].includes(phase.name),
+      // "Ini nilai apa, Bu?" is answered with a click; saying it (the talk combination, Ctrl +
+      // Spasi by default) still reaches hear().
+      typing: ["command", "number"].includes(phase.name),
     };
     for (const listener of listeners) listener();
   }
@@ -373,6 +392,20 @@ function createGradePhoto() {
       : [];
     if (candidates.length === 0) return askCommand();
     setPhase({ name: "picking", candidates }, pickQuestion());
+  }
+
+  /** A choice on "Ini nilai apa, Bu?": a title from the photo, Pilih yang lain, or Nanti saja. */
+  function pick(candidates: readonly PhotoTitleCandidate[], id: string) {
+    if (id === LATER.id) return later();
+    const picked = candidates[Number(id)];
+    if (id === OTHER_TITLE.id || !picked) return askCommand();
+    void command(titleWords(picked));
+  }
+
+  /** Nanti saja: as Nanti on the Foto dari WhatsApp card, the photo waits and isn't offered again. */
+  function later() {
+    if (job) dismissed.add(job.jobId);
+    cancel();
   }
 
   /** "Nilai apa ini, Ibu?": she says or types what the grades are. */
@@ -703,7 +736,12 @@ function createGradePhoto() {
      */
     hear(text: string): boolean {
       switch (phase.name) {
-        case "picking":
+        case "picking": {
+          const said = spokenChoice(text);
+          if (said) pick(phase.candidates, said);
+          else void command(text);
+          return true;
+        }
         case "command":
           void command(text);
           return true;
