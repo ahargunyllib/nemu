@@ -195,8 +195,10 @@ A display about no element (an answer to a typed question, most Kartu) sits abov
 **Pointing at the browser** (#268): Chrome's microphone prompt is browser UI over the top left
 of the page, which Nemu can't see. The first time the teacher talks on a site, the cursor glides to
 the prompt's measured place instead: just right of its edge, level with its top **Izinkan** button.
-The Gelembung Tunjuk beside it names the button, "Tekan Izinkan yang paling atas di kotak Chrome
-supaya Nemu bisa mendengar, Bu.", in case the cursor stands a little off (ADR-0019).
+The Gelembung Tunjuk beside it, headed GILIRAN IBU, says "Klik Izinkan, Bu." and its detail line
+names which one, since Chrome shows two and "Izinkan kali ini" makes it ask on every visit:
+"Pilih Izinkan yang paling atas, supaya Nemu bisa mendengar suara Ibu. Cukup sekali ini saja."
+That still leads her there if the cursor stands a little off (ADR-0019).
 
 **Preview**: in a dev build, open an allowed page with `?pratinjau-nemu` (for example
 `http://localhost:3003/?pratinjau-nemu#/nilai` on the mock AlurSekolah). A dock at the bottom left

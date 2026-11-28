@@ -23,7 +23,7 @@ export function MicrophoneDisplay({ phase, honorific, onClose, speak }: Micropho
   const display = useMemo<NemuDisplay>(
     () =>
       phase === "asking"
-        ? { type: "tunjuk", sentence: pointAtAllow(honorific) }
+        ? { type: "tunjuk", ...pointAtAllow(honorific) }
         : { type: "info", ...MICROPHONE_BLOCKED, items: [...MICROPHONE_BLOCKED.items], onClose },
     [phase, honorific, onClose],
   );

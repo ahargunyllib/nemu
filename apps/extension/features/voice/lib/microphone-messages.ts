@@ -4,9 +4,23 @@ function to(honorific: string, sentence: string, end = "."): string {
   return honorific ? `${sentence}, ${honorific}${end}` : `${sentence}${end}`;
 }
 
-/** Gelembung Tunjuk beside Chrome's prompt, the first time she talks on a site. */
-export function pointAtAllow(honorific: string): string {
-  return to(honorific, "Tekan Izinkan yang paling atas di kotak Chrome supaya Nemu bisa mendengar");
+/** "Bu" → "Ibu", "Pak" → "Bapak": how Nemu names the teacher inside a sentence. */
+function teacher(honorific: string): string {
+  return honorific === "Pak" ? "Bapak" : honorific === "Bu" ? "Ibu" : "Anda";
+}
+
+/**
+ * Gelembung Tunjuk beside Chrome's prompt, the first time she talks on a site (F0-01). Chrome shows
+ * two Izinkan: only the top one, "Izinkan saat mengunjungi situs", lasts, while "Izinkan kali ini"
+ * makes Chrome ask again on every visit, so the detail line names the top one (ADR-0019).
+ */
+export function pointAtAllow(honorific: string) {
+  const who = teacher(honorific);
+  return {
+    status: { text: `Giliran ${who}` },
+    sentence: to(honorific, "Klik Izinkan"),
+    detail: `Pilih Izinkan yang paling atas, supaya Nemu bisa mendengar suara ${who}. Cukup sekali ini saja.`,
+  };
 }
 
 /** After she allowed it: this hold wasn't recorded, so she holds again. */
