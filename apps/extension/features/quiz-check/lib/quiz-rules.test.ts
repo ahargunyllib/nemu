@@ -48,15 +48,29 @@ const BEFORE_TEST = {
 describe("checkQuiz (F4-01 DOM rules)", () => {
   test("F4-1: exactly the two planted problems, each as one sentence", () => {
     expect(checkQuiz(f41(), BEFORE_TEST)).toEqual([
-      { kind: "no_key", slot: 7, sentence: "Soal 7 belum ada kunci jawabannya, Bu." },
+      {
+        kind: "no_key",
+        slot: 7,
+        sentence: "Soal 7 belum ada kunci jawabannya, Bu. Ibu isi kuncinya lewat Edit soal.",
+      },
       { kind: "missing_image", slot: 15, sentence: "Soal 15 belum ada gambarnya, Bu." },
     ]);
   });
 
   test("without a known honorific the sentence just ends", () => {
-    expect(checkQuiz(f41(), { ...BEFORE_TEST, honorific: "" })[1]?.sentence).toBe(
-      "Soal 15 belum ada gambarnya.",
+    const problems = checkQuiz(f41(), { ...BEFORE_TEST, honorific: "" });
+    expect(problems[0]?.sentence).toBe(
+      "Soal 7 belum ada kunci jawabannya. Isi kuncinya lewat Edit soal.",
     );
+    expect(problems[1]?.sentence).toBe("Soal 15 belum ada gambarnya.");
+  });
+
+  test("a question with no key points to Edit soal and never proposes a key (PRD v2.3)", () => {
+    const [noKey] = checkQuiz(f41(), { ...BEFORE_TEST, honorific: "Pak" });
+    expect(noKey?.sentence).toBe(
+      "Soal 7 belum ada kunci jawabannya, Pak. Bapak isi kuncinya lewat Edit soal.",
+    );
+    expect(noKey?.sentence).not.toMatch(/\?/u);
   });
 
   test("question count: none, a different number for students, or not what she asked for", () => {

@@ -114,9 +114,13 @@ beforeEach(() => {
 describe("F4-1's closing sentence (#256)", () => {
   test("after the last of two problems Nemu says one closing sentence, then Catatan langkah", async () => {
     await checked(3, [1, 3]);
-    expect(view()).toMatchObject({ sentence: "Soal 1 belum ada kunci jawabannya, Bu." });
+    expect(view()).toMatchObject({
+      sentence: "Soal 1 belum ada kunci jawabannya, Bu. Ibu isi kuncinya lewat Edit soal.",
+    });
     press("Berikutnya");
-    expect(view()).toMatchObject({ sentence: "Soal 3 belum ada kunci jawabannya, Bu." });
+    expect(view()).toMatchObject({
+      sentence: "Soal 3 belum ada kunci jawabannya, Bu. Ibu isi kuncinya lewat Edit soal.",
+    });
     press("Berikutnya");
 
     expect(view()).toMatchObject({
@@ -131,8 +135,8 @@ describe("F4-1's closing sentence (#256)", () => {
     expect(quizCheck.getView().display).toBeNull();
     expect(executor.presentNotes).toHaveBeenCalledWith([
       "Nemu membuka Setelan.",
-      "Masalah: Soal 1 belum ada kunci jawabannya, Bu.",
-      "Masalah: Soal 3 belum ada kunci jawabannya, Bu.",
+      "Masalah: Soal 1 belum ada kunci jawabannya, Bu. Ibu isi kuncinya lewat Edit soal.",
+      "Masalah: Soal 3 belum ada kunci jawabannya, Bu. Ibu isi kuncinya lewat Edit soal.",
       "Nemu tidak mengubah apa pun di kuis ini.",
     ]);
   });

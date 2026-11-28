@@ -11,6 +11,12 @@ function say(sentence: string, honorific: string): string {
   return honorific ? `${sentence}, ${honorific}.` : `${sentence}.`;
 }
 
+/** "Bu" → "Ibu isi …", "Pak" → "Bapak isi …"; with no honorific, just "Isi …". */
+function ask(rest: string, honorific: string): string {
+  const who = honorific === "Bu" ? "Ibu" : honorific === "Pak" ? "Bapak" : honorific;
+  return who ? `${who} ${rest}.` : `${rest.charAt(0).toUpperCase()}${rest.slice(1)}.`;
+}
+
 const ONES = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan"];
 
 /** 2 → "dua", 14 → "empat belas"; a number past two words stays in digits (EYD). */
@@ -71,11 +77,15 @@ export function checkQuiz(
         slot: question.slot,
         sentence: say(`Soal ${question.slot} belum ada gambarnya`, honorific),
       });
+    // PRD v2.3: Nemu says where to fill the key and never proposes one ("Kuncinya setrika, Bu?").
     if (question.hasKey === false)
       problems.push({
         kind: "no_key",
         slot: question.slot,
-        sentence: say(`Soal ${question.slot} belum ada kunci jawabannya`, honorific),
+        sentence: `${say(`Soal ${question.slot} belum ada kunci jawabannya`, honorific)} ${ask(
+          "isi kuncinya lewat Edit soal",
+          honorific,
+        )}`,
       });
   }
 
