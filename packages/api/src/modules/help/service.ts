@@ -17,6 +17,7 @@ import type {
   PageSnapshot,
   ProcessDetails,
   ProcessDetailsRequest,
+  ProcessMatch,
 } from "@nemu/contracts/school";
 
 import type { DocumentFileStore } from "../../context";
@@ -53,6 +54,8 @@ type ExplainInput = {
   question: string | null;
   /** #308: word only the spoken answer now; `helpExplainDetails` words the rest. */
   answerFirst?: boolean;
+  /** #308: the match `helpRoute` already made, so the symptom isn't matched twice. */
+  processMatch?: ProcessMatch;
 };
 
 /** The active, ready BPMNs, their WS-04 elements and every symptom as a match candidate. */
@@ -79,6 +82,35 @@ async function processSymptoms(
 }
 
 /**
+ * A match the client sends back (from `helpRoute` or `detailsRequest`), as the WS-04 candidates it
+ * names; null when the operator has since changed those symptoms.
+ */
+function knownMatch(
+  candidates: readonly SymptomCandidate[],
+  sent: ProcessMatch,
+): { match: SymptomCandidate; via: SymptomCandidate | null } | null {
+  const known = (ref: { elementId: string; symptom: string }) =>
+    candidates.find(
+      (candidate) =>
+        candidate.documentId === sent.documentId &&
+        candidate.elementId === ref.elementId &&
+        candidate.symptom === ref.symptom,
+    );
+  const match = known(sent.match);
+  const via = sent.via ? known(sent.via) : null;
+  return match && via !== undefined ? { match, via } : null;
+}
+
+function toProcessMatch(found: { match: SymptomCandidate; via: SymptomCandidate | null }) {
+  const ref = ({ elementId, symptom }: SymptomCandidate) => ({ elementId, symptom });
+  return {
+    documentId: found.match.documentId,
+    match: ref(found.match),
+    via: found.via ? ref(found.via) : null,
+  };
+}
+
+/**
  * The teacher's words against every active BPMN's symptoms (operator-corrected in WS-04). On a
  * match, the grades are checked in AlurSekolah first, then the file is walked to the cause.
  * `symptoms` says whether the school has any, for F3-14.
@@ -88,12 +120,13 @@ async function explainFromProcess(
   teacher: TeacherProfile,
   workspaceId: string,
   question: string,
-  answerFirst = false,
+  options: { answerFirst?: boolean; processMatch?: ProcessMatch } = {},
 ): Promise<{ answer: HelpExplanation | null; symptoms: boolean }> {
   const { processes, elements, candidates } = await processSymptoms(deps, workspaceId);
   if (!candidates.length) return { answer: null, symptoms: false };
 
-  const found = await deps.ai.matchSymptom({ question, candidates });
+  const routed = options.processMatch ? knownMatch(candidates, options.processMatch) : null;
+  const found = routed ?? (await deps.ai.matchSymptom({ question, candidates }));
   const match = found?.match;
   const at = match ? processes.findIndex((item) => item.id === match.documentId) : -1;
   const document = processes[at];
@@ -106,7 +139,7 @@ async function explainFromProcess(
     via: found.via,
   });
   if (!input) return { answer: null, symptoms: true };
-  const answer = await deps.ai.explainProcess(input, { answerFirst });
+  const answer = await deps.ai.explainProcess(input, { answerFirst: options.answerFirst });
   return { answer, symptoms: true };
 }
 
@@ -167,22 +200,13 @@ export async function explainDetails(
 ): Promise<ProcessDetails | null> {
   const { processes, elements, candidates } = await processSymptoms(deps, workspaceId);
   const at = processes.findIndex((item) => item.id === request.documentId);
-  const known = (ref: { elementId: string; symptom: string }) =>
-    candidates.find(
-      (candidate) =>
-        candidate.documentId === request.documentId &&
-        candidate.elementId === ref.elementId &&
-        candidate.symptom === ref.symptom,
-    );
-  const match = known(request.match);
-  const via = request.via ? known(request.via) : null;
-  if (at === -1 || !match || via === undefined) return null;
+  const found = knownMatch(candidates, request);
+  if (at === -1 || !found) return null;
   const input = await processInput(deps, teacher, workspaceId, {
     question: request.question,
     document: processes[at]!,
     elements: elements[at]!,
-    match,
-    via,
+    ...found,
   });
   return input ? deps.ai.explainProcessDetails(input) : null;
 }
@@ -200,7 +224,7 @@ export async function explain(
       teacher,
       workspaceId,
       input.question,
-      input.answerFirst,
+      { answerFirst: input.answerFirst, processMatch: input.processMatch },
     );
     if (fromProcess.answer) return fromProcess.answer;
     symptoms = fromProcess.symptoms;
@@ -287,12 +311,17 @@ export async function route(
       workspaceId,
     );
     const screened = screenSymptoms(utterance, candidates);
-    if (
-      screened === "match" ||
-      (screened === "near" &&
-        (await deps.processes.ai.matchSymptom({ question: utterance, candidates })))
-    ) {
-      return { kind: "intent", intent: "kenapa", processName: null };
+    if (screened === "match") return { kind: "intent", intent: "kenapa", processName: null };
+    if (screened === "near") {
+      const found = await deps.processes.ai.matchSymptom({ question: utterance, candidates });
+      if (found) {
+        return {
+          kind: "intent",
+          intent: "kenapa",
+          processName: null,
+          processMatch: toProcessMatch(found),
+        };
+      }
     }
   }
   return routed;

@@ -270,21 +270,21 @@ describe("F2-08: nilai tidak muncul, from the uploaded SPP BPMN", () => {
  * The stack `verify:f2-08` runs: Bu Siti from the seeded WS-06 registry (wali kelas 4A, teaches
  * 4A and 4B) and an AlurSekolah shaped like the mock, which has two pupils called Aisyah.
  */
-describe("F2-08 with the seeded WS-06 teacher and the mock's pupils", () => {
-  async function seededStack() {
-    const { siti } = await withSppProcess();
-    const directory = createRegistrySchoolDirectory(createSchoolRepository(siti.db));
-    const teacher = { ...siti, school: { ...siti.school, directory } };
-    teacher.alurSekolahFake.siswa.splice(
-      0,
-      teacher.alurSekolahFake.siswa.length,
-      { nis: "4101", nama: "Aisyah Putri Wijaya", kelas: "4A", wali_kelas: "Siti Aminah, S.Pd." },
-      { nis: "0159870002", nama: "Aisyah Zahra", kelas: "4B", wali_kelas: "" },
-    );
-    await connectAlurSekolah(teacher);
-    return teacher;
-  }
+async function seededStack() {
+  const { siti } = await withSppProcess();
+  const directory = createRegistrySchoolDirectory(createSchoolRepository(siti.db));
+  const teacher = { ...siti, school: { ...siti.school, directory } };
+  teacher.alurSekolahFake.siswa.splice(
+    0,
+    teacher.alurSekolahFake.siswa.length,
+    { nis: "4101", nama: "Aisyah Putri Wijaya", kelas: "4A", wali_kelas: "Siti Aminah, S.Pd." },
+    { nis: "0159870002", nama: "Aisyah Zahra", kelas: "4B", wali_kelas: "" },
+  );
+  await connectAlurSekolah(teacher);
+  return teacher;
+}
 
+describe("F2-08 with the seeded WS-06 teacher and the mock's pupils", () => {
   it("Q1: 'Aisyah' is the pupil in the asking teacher's own homeroom, so her saved grade counts", async () => {
     const siti = await seededStack();
     const answer = await call(
@@ -392,5 +392,52 @@ describe("#308: answerFirst, then helpExplainDetails", () => {
         { context: siti },
       ),
     ).resolves.toBeNull();
+  });
+});
+
+describe("#308: helpExplain reuses the match helpRoute made", () => {
+  const QUESTION = "Kalau sudah bayar sebagian kapan terbuka?";
+  const MATCHES = "Orang tuanya bilang sudah bayar sebagian, kok masih terkunci?";
+
+  /** The route's one model call, answered as the fixture answers a question it does match. */
+  async function routed() {
+    const siti = await seededStack();
+    const ai = siti.school.ai;
+    const real = ai.matchSymptom.bind(ai);
+    const matchSymptom = vi
+      .spyOn(ai, "matchSymptom")
+      .mockImplementationOnce((input) => real({ ...input, question: MATCHES }));
+    const route = await call(helpRouter.helpRoute, { utterance: QUESTION }, { context: siti });
+    if (route.kind !== "intent" || !route.processMatch) throw new Error("no processMatch");
+    expect(route.intent).toBe("kenapa");
+    return { siti, matchSymptom, processMatch: route.processMatch };
+  }
+
+  it("a near miss is matched once, by the route, and explained from that match", async () => {
+    const { siti, matchSymptom, processMatch } = await routed();
+    const answer = await call(
+      helpRouter.helpExplain,
+      { snapshot: PAGE, question: QUESTION, processMatch },
+      { context: siti },
+    );
+    expect(matchSymptom).toHaveBeenCalledTimes(1);
+    expect(answer).toMatchObject({ status: "process", elementId: "Task_UpdatePartiallyPaid" });
+  });
+
+  it("a match the operator no longer has is matched again", async () => {
+    const { siti, matchSymptom, processMatch } = await routed();
+    await call(
+      helpRouter.helpExplain,
+      {
+        snapshot: PAGE,
+        question: QUESTION,
+        processMatch: {
+          ...processMatch,
+          match: { ...processMatch.match, symptom: "gejala yang sudah dihapus" },
+        },
+      },
+      { context: siti },
+    );
+    expect(matchSymptom).toHaveBeenCalledTimes(2);
   });
 });

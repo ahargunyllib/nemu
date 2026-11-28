@@ -275,6 +275,15 @@ const symptomRefSchema = z
   .object({ elementId: z.string().min(1), symptom: z.string().min(1).max(300) })
   .strict();
 
+/** #308: a BPMN symptom match (and what happened first) that a later call can reuse. */
+export const processMatchSchema = z
+  .object({
+    documentId: z.string().min(1),
+    match: symptomRefSchema,
+    via: symptomRefSchema.nullable(),
+  })
+  .strict();
+
 /** #308: what `helpExplainDetails` needs to walk the same BPMN again without matching again. */
 export const processDetailsRequestSchema = z
   .object({
@@ -622,6 +631,11 @@ export const commandRouteSchema = z.discriminatedUnion("kind", [
       intent: z.enum(["input_nilai", "kenapa", "proses", "tanya", "unknown"]),
       /** For "proses": the matched process name. */
       processName: z.string().nullable(),
+      /**
+       * #308: for "kenapa", the symptom the route already matched with the model; pass it to
+       * `helpExplain` so it doesn't match again.
+       */
+      processMatch: processMatchSchema.optional(),
     })
     .strict(),
 ]);
@@ -682,6 +696,7 @@ export type SourceCitation = z.infer<typeof sourceCitationSchema>;
 export type DocumentFileLink = z.infer<typeof documentFileLinkSchema>;
 export type Contact = z.infer<typeof contactSchema>;
 export type HelpExplanation = z.infer<typeof helpExplanationSchema>;
+export type ProcessMatch = z.infer<typeof processMatchSchema>;
 export type ProcessDetailsRequest = z.infer<typeof processDetailsRequestSchema>;
 export type ProcessDetails = z.infer<typeof processDetailsSchema>;
 export type GroundedAnswer = z.infer<typeof groundedAnswerSchema>;

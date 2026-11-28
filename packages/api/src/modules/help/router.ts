@@ -1,4 +1,8 @@
-import { pageSnapshotSchema, processDetailsRequestSchema } from "@nemu/contracts/school";
+import {
+  pageSnapshotSchema,
+  processDetailsRequestSchema,
+  processMatchSchema,
+} from "@nemu/contracts/school";
 import { z } from "zod";
 
 import type { Context } from "../../context";
@@ -27,6 +31,7 @@ export const helpRouter = {
         snapshot: pageSnapshotSchema,
         question: z.string().trim().max(500).nullable(),
         answerFirst: z.boolean().optional(),
+        processMatch: processMatchSchema.optional(),
       }),
     )
     .handler(async ({ context, input }) => {
