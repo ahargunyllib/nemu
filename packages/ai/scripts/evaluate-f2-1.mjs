@@ -172,7 +172,9 @@ for (const row of rows) {
       if (!pattern.test(answer.why)) problems.push(`Kenapa? lacks ${pattern}`);
     if (/\bsalah\b/iu.test(answer.sentence)) problems.push("sentence says salah");
     if (!answer.parentReply || !isParentSafe(answer.parentReply)) problems.push("unsafe reply");
-    if (!/Bu Ratna/u.test(answer.parentReply ?? "")) problems.push("reply lacks Bu Ratna");
+    // The reply points to Bu Ratna or her office (the design's Q1 reply says "bagian keuangan").
+    if (!/Bu Ratna|bagian keuangan/u.test(answer.parentReply ?? ""))
+      problems.push("reply lacks Bu Ratna or bagian keuangan");
     if (/\b\d+\s*hari\b/iu.test(`${answer.sentence} ${answer.parentReply}`))
       problems.push("promises days");
   }

@@ -146,7 +146,7 @@ describe("F2-08: nilai tidak muncul, from the uploaded SPP BPMN", () => {
       expect(answer.steps.flatMap((step) => step.elementIds)).toEqual(
         expect.arrayContaining([...expected.cites]),
       );
-      expect(answer.parentReply).toMatch(/Bu Ratna/u);
+      expect(answer.parentReply).toMatch(/Bu Ratna|bagian keuangan/u);
       expect(answer.parentReply).not.toMatch(/tunggak|nunggak|rp\s?\d|\d[\d.]*\s?(ribu|juta)/iu);
     }
     expect(

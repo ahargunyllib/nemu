@@ -329,14 +329,21 @@ export function createFixtureSchoolAi(): SchoolAi {
           llm: codeCall((request) => {
             const text = requestText(request);
             const drafted = draftPhrasing(text);
-            const cause = (JSON.parse(text) as { jalur: Array<{ nama: string }> }).jalur.at(-1);
+            const data = JSON.parse(text) as {
+              jalur: Array<{ nama: string }>;
+              nilai_murid: string | null;
+            };
             const canned = isF21Spp(input.process.graph)
-              ? F2_1_SPP_PHRASING[cause?.nama ?? ""]
+              ? F2_1_SPP_PHRASING[data.jalur.at(-1)?.nama ?? ""]
               : undefined;
             if (!canned || canned.steps.length !== drafted.steps.length) return drafted;
             return {
               ...canned,
               steps: canned.steps.map((step, index) => ({ index, text: step })),
+              parent_reply: canned.parent_reply.replace(
+                "{nilai_murid}",
+                data.nilai_murid ?? "ananda",
+              ),
             };
           }),
         },

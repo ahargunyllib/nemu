@@ -115,8 +115,8 @@ test("F3-12: the walks for the three F2-1 questions follow the file", async () =
   assert.deepEqual(
     stepDrafts(graph, locked).map((step) => step.elementIds),
     [
-      ["Timer_DueDateReached"],
-      ["Gw_IsRegularInvoice", "Flow_04"],
+      // The due date and the regular-invoice branch right after it are one step.
+      ["Timer_DueDateReached", "Gw_IsRegularInvoice", "Flow_04"],
       ["Task_LockGrades", "End_GradesLocked"],
       ["Gw_InvoiceType", "Flow_12", "Task_UnlockGrades"],
     ],
@@ -207,8 +207,21 @@ test("F2-1: 3/3 official questions with the fixture responder, Bu Ratna and a sa
     assert.ok(answer.steps.length >= 2 && answer.steps.length <= 4);
     assert.equal(answer.fixer?.name, "Bu Ratna");
     assert.ok(answer.parentReply && isParentSafe(answer.parentReply), answer.parentReply ?? "");
-    assert.match(answer.parentReply, /Bu Ratna/u);
+    assert.match(answer.parentReply, /Bu Ratna|bagian keuangan/u);
     if (expected.gradeCheck.status === "saved") {
+      // The design's Sumber steps and parent reply (docs/design-system.md).
+      assert.deepEqual(
+        answer.steps.map((step) => step.text),
+        [
+          "Tagihan SPP lewat jatuh tempo.",
+          "Sistem mengunci nilai di aplikasi orang tua.",
+          "Nilai terbuka lagi setelah tagihan lunas.",
+        ],
+      );
+      assert.equal(
+        answer.parentReply,
+        "Nilai Aisyah sudah diinput, Bunda. Tampilnya di aplikasi menunggu administrasi sekolah selesai. Untuk detailnya silakan hubungi bagian keuangan.",
+      );
       // Q1 is about one pupil: the bubble says only "kemungkinan", her saved grade sits under it,
       // and the cause (lulus_jika 2) and Bu Ratna (lulus_jika 4) are in Kenapa?.
       assert.equal(answer.sentence, "Bukan kesalahan Ibu. Kemungkinan karena alur SPP sekolah.");
@@ -362,7 +375,7 @@ test("a step naming an element id the file doesn't have keeps the code's draft",
   );
   assert.equal(answer?.status, "process");
   if (answer?.status !== "process") return;
-  assert.equal(answer.steps[0]!.text, "Due Date Reached.");
+  assert.equal(answer.steps[0]!.text, "Due Date Reached: Is Regular Invoice? (Yes).");
   assert.equal(answer.steps[1]!.text, "Langkah biasa.");
 });
 
