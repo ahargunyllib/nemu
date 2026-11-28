@@ -58,33 +58,38 @@ Research behind this document was done on 25 November 2026 against live sources 
 
 ### 3.1 What AI delivers
 
-As of 27 November 2026, the extension work (#223 to #242) has built every flow end to end behind the `SchoolAi` seam, with fixture responders and synthetic test data. What remains for AI is the real model work and the switch to the official test pack. Status:
+As of 28 November 2026, the AI cases run on the official test pack (#243 to #251), behind the `SchoolAi` seam with a fixture responder for offline runs. What remains is the PRD v2.3 revision of 28 November (three PRs in review) and the F0-2 run with a tester's own voice. Status:
 
-- ✅ real and tested;
-- 🧩 the seam, the procedure and a fixture are on `main`, but the real model or the official data is still open (issue in brackets);
-- 🆕 not started.
+- ✅ real and tested on the official files;
+- 🔍 built and tested, the PR is in review (issue, PR);
+- 🧩 the code is done, but the case still waits on something outside the code (issue in brackets).
 
 Pure functions live in `packages/ai`; procedures in `packages/api`.
 
-| Function / procedure                                                                        | Requirement                | Status     |
-| ------------------------------------------------------------------------------------------- | -------------------------- | ---------- |
-| `readGradePhoto`, `matchNames`, `buildVerificationPlan`, `applyAnswers`, `applySchoolRules` | F1-03 to F1-07             | ✅         |
-| Roster, KKM and read-back from API v1 (`/siswa`, `/nilai/rekap`, `/nilai`)                  | F1-04, F1-07, F1-10        | ✅ (#228)  |
-| `explainError`: kamus table (WS-05) + page snapshot from the extension                      | F2-02, F2-03, F2-06, F2-07 | 🧩 (#216)  |
-| `suggestSymptoms`, `matchSymptom`, `explainProcess` + grade check: F2-08 on any BPMN        | F2-08, F3-11 to F3-14      | 🧩 (#217)  |
-| `answerGrounded` with verified citations                                                    | F3-04, F3-07, WS-09        | ✅         |
-| `readFormPhoto`, `matchFields`, `planBpmnStep`: run a new BPMN (tahfidz)                    | F3-15 to F3-19             | 🧩 (#220)  |
-| `compileProcedure`, procedure → BPMN XML                                                    | F3-01, F3-03               | ✅ (#239)  |
-| Nemu's own F1 and F4 flows as `.bpmn` files                                                 | F3-09                      | 🆕 (#215)  |
-| `judgeQuiz`: quiz checks that need a model, if any                                          | F4-01                      | 🧩 (#218)  |
-| `readQuizScript` → Moodle XML: no question generation; unreadable parts asked               | F4-03                      | 🧩 (#219)  |
-| `routeCommand`, `matchVoiceControl` + Javanese-mixed commands                               | F0-04, F0-15               | 🧩 (#222)  |
-| `transcribe`, `synthesize`                                                                  | F0-03, F0-05               | ✅         |
-| Step notes after a task                                                                     | F0-14                      | 🆕         |
-| Desktop screen reader (UIA, Electron)                                                       | –                          | ❌ removed |
-| Excel parsing                                                                               | F1-2 cut                   | dormant    |
+| Function / procedure                                                                        | Requirement                | Status              |
+| ------------------------------------------------------------------------------------------- | -------------------------- | ------------------- |
+| `readGradePhoto`, `matchNames`, `buildVerificationPlan`, `applyAnswers`, `applySchoolRules` | F1-03 to F1-07             | ✅ (#251)           |
+| Roster, KKM and read-back from API v1 (`/siswa`, `/nilai/rekap`, `/nilai`)                  | F1-04, F1-07, F1-10        | ✅ (#228)           |
+| `readPhotoTitle`: the photo's heading as the choices for "Ini nilai apa, Bu?"               | F1-05                      | 🔍 (#269, PR #275)  |
+| `explainError`: kamus table (WS-05) + page snapshot from the extension                      | F2-02, F2-03, F2-06, F2-07 | ✅ (#245, ADR-0021) |
+| `suggestSymptoms`, `matchSymptom`, `explainProcess` + grade check: F2-08 on any BPMN        | F2-08, F3-11 to F3-14      | ✅ (#250, ADR-0020) |
+| F2-08: a cause Nemu can't check opens "Kemungkinan karena alur …"                           | F2-08                      | 🔍 (#266, PR #265)  |
+| `answerGrounded` with verified citations                                                    | F3-04, F3-07, WS-09        | ✅ (#248, #249)     |
+| Rule questions ("minimal", "maksimal") find the SOP point, not a procedure's fields         | WS-1                       | 🔍 (#264, PR #276)  |
+| `readFormPhoto`, `matchFields`, `planBpmnStep`: run a new BPMN (tahfidz)                    | F3-15 to F3-19             | ✅ (#247)           |
+| `compileProcedure`, procedure → BPMN XML                                                    | F3-01, F3-03               | ✅ (#239)           |
+| Nemu's own F1 and F4 flows as `.bpmn` files                                                 | F3-09                      | ✅ (#243)           |
+| `judgeQuiz`: none needed, the F4-1 checks run in the extension without a model              | F4-01                      | ✅ (#244)           |
+| `readQuizScript` → Moodle XML: no question generation; unreadable parts asked               | F4-03                      | ✅ (#244)           |
+| `routeCommand`, `matchVoiceControl` + Javanese-mixed commands                               | F0-04, F0-15               | 🧩 (#222)           |
+| `transcribe`, `synthesize`                                                                  | F0-03, F0-05               | ✅                  |
+| Step notes after a task: built in the extension from the action log, no model               | F0-14                      | ✅ (#233)           |
+| Desktop screen reader (UIA, Electron)                                                       | –                          | ❌ removed          |
+| Excel parsing                                                                               | F1-2 cut                   | dormant             |
 
-**The official test pack** (`00_BACA-DULU.md` and its folders) is now available. The fixtures on `main` are synthetic stand-ins and differ from it. For example, the official `F2-1_alur-spp.bpmn` has a DOKU payment pool, partial payment and a "Paid in Cash" boundary event, and its three questions are different. Every 🧩 row is done only when its case passes on the official files.
+F0-2 (#222) gets 10/10 intents on the ten commands as text (#246) and as synthetic Indonesian speech through `microsoft/mai-transcribe-2`; what's left is the run with a 45+ tester's own recordings.
+
+**The official test pack** (`00_BACA-DULU.md` and its folders) is what the evals and `verify:*` scripts run on since #243 to #251; its files are in `packages/ai/src/school/fixtures` and `packages/api/src/testing/fixtures`.
 
 ### 3.2 What AI needs from the fullstack side
 
@@ -354,9 +359,11 @@ Per ADR-0003, a case is complete only when the extension path passes too.
   - ADR-0015: the extension knows the teacher without a login.
   - ADR-0016: known sites are granted, and WS-03 decides.
   - ADR-0017: a new BPMN process runs from its own form.
-- **To write with the code:**
-  - **BPMN symptom index and tracing.** Symptoms are generated once at upload and point to element IDs; tracing is graph code; the model only phrases.
-  - **Kamus as a table.** Deterministic matching first, a model only as fallback.
+  - ADR-0018: Sumber opens documents through signed links.
+  - ADR-0019: the microphone is asked for on the school site.
+- **Written with the code (AI):**
+  - ADR-0020: BPMN symptoms are indexed on upload and traced in code; the model only phrases.
+  - ADR-0021: the Kamus Kendala is matched in code before any model.
 
 ---
 
