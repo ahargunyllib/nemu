@@ -11,6 +11,7 @@ import { type KartuPilihProps, orderChoices } from "@nemu/ui/lib/nemu-display";
 import {
   NEMU_BUTTON,
   NEMU_DETAIL,
+  NEMU_LINK,
   NEMU_OUTLINE,
   NemuActionRow,
   NemuCard,
@@ -24,7 +25,8 @@ import { useId } from "react";
  * menunggu."), and two or three equal, stacked big buttons. Nothing is
  * pre-selected or focused; a risky choice carries ⚠ and sits under the safe one. An `image`
  * shows what the question is about in a framed box with an optional caption (W5's photo crop,
- * the WhatsApp photo). `compact` is the card that waits beside the Nemu button: its choices are
+ * the WhatsApp photo), and one `link` can sit at the bottom left ("Lihat foto utuh"). `compact`
+ * is the card that waits beside the Nemu button: its choices are
  * compact buttons on the right, in the order given, the `primary` one black ("Foto masuk ·
  * Nanti / Mulai").
  */
@@ -35,6 +37,7 @@ export function KartuPilih({
   onChoose,
   image,
   note,
+  link,
   compact = false,
   status,
 }: KartuPilihProps) {
@@ -66,7 +69,7 @@ export function KartuPilih({
                 alt={image.alt}
                 className={cn(
                   "w-full rounded-xl",
-                  compact ? "h-32 object-cover object-top" : "max-h-44 object-contain",
+                  compact ? "h-32 object-cover object-top" : "max-h-[50vh] object-contain",
                 )}
               />
             ) : (
@@ -126,6 +129,17 @@ export function KartuPilih({
       {note && (
         <CardFooter className="text-lg leading-6 text-muted-foreground">
           <p>{note}</p>
+        </CardFooter>
+      )}
+      {link && (
+        <CardFooter>
+          <NemuActionRow
+            links={
+              <Button type="button" variant="link" onClick={link.onSelect} className={NEMU_LINK}>
+                {link.label}
+              </Button>
+            }
+          />
         </CardFooter>
       )}
     </NemuCard>

@@ -28,6 +28,8 @@ export type GradePhotoRequest =
   | { op: "process"; jobId: string; className: string; assessment: string | null }
   /** W5: the cell each question is about, cut from the photo (`null` where there is no box). */
   | { op: "crops"; jobId: string; boxes: (readonly [number, number, number, number] | null)[] }
+  /** W5's "Lihat foto utuh": the whole photo, smaller, only once the teacher asks for it. */
+  | { op: "photo"; jobId: string }
   | { op: "finalize"; reading: GradeSheetReading; answers: VerificationAnswer[] }
   /**
    * F1-10: from AlurSekolah's API with the school's WS-07 key; when the school hasn't connected
@@ -60,6 +62,7 @@ export type GradePhotoValue = {
   command: GradeCommand;
   process: InboxJob;
   crops: (string | null)[];
+  photo: string | null;
   finalize: GradeRulesResult;
   readback: ReadbackResult & { source: "alursekolah" | "page" };
   ack: { deleted: boolean };

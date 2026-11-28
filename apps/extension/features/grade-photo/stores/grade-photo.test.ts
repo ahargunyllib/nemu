@@ -204,7 +204,7 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
       if (display) shown.push(display);
     });
     gradePhoto.hear("4B");
-    await until(() => question() === "Nilai Alya Nur Fitri: 86 atau 88?");
+    await until(() => question() === "Nilai Alya Nur Fitri?");
     stop();
     // While the photo is read: one sentence, how long it takes, and only Berhenti (no Pelan).
     const reading = shown.find((display) => display.type === "kerja");
@@ -230,11 +230,34 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
     const first = view().display;
     expect(first).toMatchObject({
       type: "pilih",
-      question: "Nilai Alya Nur Fitri: 86 atau 88?",
-      image: { src: "data:image/jpeg;base64,AA" },
-      note: "Pertanyaan 1 dari 2. 30 nilai lain sudah cocok.",
+      status: { text: "Memeriksa foto", progress: { done: 1, total: 2 } },
+      question: "Nilai Alya Nur Fitri?",
+      detail: "Lihat buku Ibu, baris 3.",
+      image: { src: "data:image/jpeg;base64,AA", caption: "Potongan foto" },
+      link: { label: "Lihat foto utuh" },
     });
+    expect(spoken.at(-1)).toBe("Nilai Alya Nur Fitri?");
     expect(view().card).toBeNull();
+
+    // Lihat foto utuh fetches the whole photo once, shows it in the card, and goes back.
+    replies.photo = () => "data:image/jpeg;base64,UTUH";
+    if (first?.type !== "pilih") throw new Error("no Kartu Pilih");
+    first.link?.onSelect();
+    await until(() => {
+      const display = view().display;
+      return display?.type === "pilih" && display.image?.caption === "Foto utuh";
+    });
+    const whole = view().display;
+    expect(whole).toMatchObject({
+      question: "Nilai Alya Nur Fitri?",
+      image: { src: "data:image/jpeg;base64,UTUH" },
+      link: { label: "Lihat potongan foto" },
+    });
+    expect(calls.filter((call) => call.op === "photo")).toEqual([{ op: "photo", jobId: "job-1" }]);
+    if (whole?.type !== "pilih") throw new Error("no Kartu Pilih");
+    whole.link?.onSelect();
+    expect(view().display).toMatchObject({ image: { caption: "Potongan foto" } });
+
     choose(first, "Angka lain");
     expect(view().typing).toBe(true);
     gradePhoto.hear("delapan puluh enam");

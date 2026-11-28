@@ -175,7 +175,8 @@ the page's Shadow DOM.
 - **Kartu Pilih**: a risky choice gets ⚠ and goes under the safe one, whatever order it was given
   in. All stacked choices share one look. Its picture (`image`) sits in a framed box under the
   question (`rounded-2xl`, `nemu-subtle` fill, 1 px `nemu-amber-100` edge) with an optional
-  caption at the top in 14 px `nemu-secondary` ("Foto dari WhatsApp · 1 halaman"). The
+  caption at the top in 14 px `nemu-secondary` ("Foto dari WhatsApp · 1 halaman", "Potongan
+  foto"). At most one small link sits at the bottom left (`link`: "Lihat foto utuh"). The
   **compact** Kartu Pilih waits beside the Nemu button, such as "Foto masuk · Nanti / Mulai":
   its choices are compact buttons in an action row on the right, in the order given, and the one
   marked `primary` is the black main button (the rest outline). Its thumbnail fills the box's

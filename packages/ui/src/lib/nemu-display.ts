@@ -134,8 +134,10 @@ export type KartuPilihProps = {
    * shows a Skeleton of its shape.
    */
   image?: { src?: string; alt: string; caption?: string };
-  /** One quiet line under the choices: "Pertanyaan 1 dari 10 · 22 nilai lain sudah cocok." */
+  /** One quiet line under the choices. */
   note?: string;
+  /** One small link at the bottom left, such as "Lihat foto utuh". */
+  link?: { label: string; onSelect: () => void };
   /**
    * The card that waits beside the Nemu button, such as "Foto masuk": its choices are compact
    * buttons on the right, in the order given, the `primary` one black.
