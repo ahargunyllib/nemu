@@ -256,6 +256,27 @@ describe("Kartu Pilih for W5 and the inbox", () => {
     for (const button of buttons) expect(document.activeElement).not.toBe(button);
   });
 
+  test("a link at the bottom stays out of the choices", () => {
+    const onSelect = vi.fn();
+    render(
+      <KartuPilih
+        question="Nilai Farah Annisa?"
+        choices={[
+          { id: "71", label: "71" },
+          { id: "77", label: "77" },
+          { id: "lain", label: "Angka lain" },
+        ]}
+        onChoose={vi.fn()}
+        image={{ src: "data:image/jpeg;base64,AA", alt: "Baris 10", caption: "Potongan foto" }}
+        link={{ label: "Lihat foto utuh", onSelect }}
+      />,
+    );
+    expect(within(screen.getByRole("group")).getAllByRole("button")).toHaveLength(3);
+    expect(screen.getByText("Potongan foto").tagName).toBe("FIGCAPTION");
+    fireEvent.click(screen.getByRole("button", { name: "Lihat foto utuh" }));
+    expect(onSelect).toHaveBeenCalledOnce();
+  });
+
   test("the compact card puts its choices in a row, in the order given, the primary one black", () => {
     const onChoose = vi.fn();
     render(

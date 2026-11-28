@@ -47,8 +47,9 @@ export async function imageDataUrl(image: Blob): Promise<string> {
 
 /**
  * Background: W5's crops, each cell enlarged with a little of its line, as data URLs. Only the
- * crops reach the page, never the whole photo. Null for a question without a box, or when the
- * photo can't be drawn; the card then shows the question alone.
+ * crops reach the page, and the whole photo only when the teacher asks for it (`wholePhoto`). Null
+ * for a question without a box, or when the photo can't be drawn; the card then shows the question
+ * alone.
  */
 export async function cropPhoto(
   photo: Blob,
@@ -87,4 +88,34 @@ export async function cropPhoto(
   );
   bitmap.close();
   return crops;
+}
+
+/** The longest side of the whole photo "Lihat foto utuh" shows. */
+const WHOLE_LONG_SIDE = 1600;
+
+/**
+ * Background: the whole photo for W5's "Lihat foto utuh", at most 1600 px on its long side, as a
+ * data URL. Asked for only when the teacher clicks the link. Null when it can't be drawn.
+ */
+export async function wholePhoto(photo: Blob): Promise<string | null> {
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(photo);
+  } catch {
+    return null;
+  }
+  const scale = Math.min(1, WHOLE_LONG_SIDE / Math.max(bitmap.width, bitmap.height));
+  const canvas = new OffscreenCanvas(
+    Math.round(bitmap.width * scale),
+    Math.round(bitmap.height * scale),
+  );
+  const context = canvas.getContext("2d");
+  if (!context) {
+    bitmap.close();
+    return null;
+  }
+  context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+  const blob = await canvas.convertToBlob({ type: "image/jpeg", quality: 0.85 });
+  return `data:image/jpeg;base64,${toBase64(new Uint8Array(await blob.arrayBuffer()))}`;
 }

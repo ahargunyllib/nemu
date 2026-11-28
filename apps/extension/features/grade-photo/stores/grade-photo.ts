@@ -54,7 +54,7 @@ type Phase =
   | { name: "picking"; candidates: PhotoTitleCandidate[] }
   | { name: "command"; question: string }
   | { name: "reading" }
-  | { name: "verifying"; index: number; misheard?: boolean }
+  | { name: "verifying"; index: number; misheard?: boolean; whole?: boolean }
   | { name: "number"; index: number; misheard?: boolean }
   | { name: "finalizing" }
   | { name: "filling" }
@@ -105,6 +105,14 @@ function arrivedAt(createdAt: number) {
   return new Date(createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
 }
 
+/**
+ * What a W5 card asks. A doubtful digit is "Nilai Farah Annisa?": the readings are the choices and
+ * the detail line points at the book's line. A name or an S/I/A keeps the Nemu Service's question.
+ */
+function askedFor(question: VerificationQuestion) {
+  return question.kind === "digit" ? `Nilai ${question.studentName}?` : question.prompt;
+}
+
 function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
@@ -135,6 +143,8 @@ function createGradePhoto() {
   let job: InboxJob | null = null;
   let answers: VerificationAnswer[] = [];
   let crops: (string | null)[] = [];
+  /** W5's "Lihat foto utuh": the whole photo, fetched once she asks for it. */
+  let photo: string | null = null;
   let kept: Kept | null = null;
   let stopWatching: (() => void) | null = null;
   let pollTimer: ReturnType<typeof setInterval> | undefined;
@@ -257,15 +267,33 @@ function createGradePhoto() {
         const question = questions()[index];
         if (!question) return null;
         const crop = crops[index];
-        const total = questions().length;
-        const accepted = job?.verification?.acceptedSentence ?? "";
+        const whole = phase.whole && photo;
+        const asked = askedFor(question);
         return {
           type: "pilih",
-          question: phase.misheard ? `Nemu belum menangkap. ${question.prompt}` : question.prompt,
+          status: {
+            text: "Memeriksa foto",
+            progress: { done: index + 1, total: questions().length },
+          },
+          question: phase.misheard ? `Nemu belum menangkap. ${asked}` : asked,
+          detail: `Lihat buku ${address()}, baris ${question.line}.`,
           choices: questionChoices(question),
           onChoose: (id) => answer(index, replyFromChoice(id)),
-          image: crop ? { src: crop, alt: `Foto buku nilai, baris ${question.line}` } : undefined,
-          note: `Pertanyaan ${index + 1} dari ${total}. ${accepted}`.trim(),
+          image: whole
+            ? { src: whole, alt: "Foto buku nilai, utuh", caption: "Foto utuh" }
+            : crop
+              ? {
+                  src: crop,
+                  alt: `Foto buku nilai, baris ${question.line}`,
+                  caption: "Potongan foto",
+                }
+              : undefined,
+          link: whole
+            ? {
+                label: "Lihat potongan foto",
+                onSelect: () => setPhase({ name: "verifying", index }),
+              }
+            : { label: "Lihat foto utuh", onSelect: () => void showWhole(index) },
         };
       }
       case "number": {
@@ -380,6 +408,7 @@ function createGradePhoto() {
     job = offered;
     answers = [];
     crops = [];
+    photo = null;
     void call({ op: "hold", jobId: offered.jobId });
     if (target) return process();
     utterance = "";
@@ -486,10 +515,24 @@ function createGradePhoto() {
   function ask(index: number, misheard = false) {
     const question = questions()[index];
     if (!question) return;
+    const asked = askedFor(question);
     setPhase(
       { name: "verifying", index, misheard },
-      misheard ? `Nemu belum menangkap. ${question.prompt}` : question.prompt,
+      misheard ? `Nemu belum menangkap. ${asked}` : asked,
     );
+  }
+
+  /** "Lihat foto utuh": the whole photo in the card, fetched the first time she asks. */
+  async function showWhole(index: number) {
+    if (!job) return;
+    const run = generation;
+    if (!photo) {
+      const response = await call({ op: "photo", jobId: job.jobId });
+      if (run !== generation) return;
+      photo = response.ok ? (response.value as GradePhotoValue["photo"]) : null;
+    }
+    if (!photo || phase.name !== "verifying" || phase.index !== index) return;
+    setPhase({ ...phase, whole: true, misheard: false });
   }
 
   function answer(index: number, reply: QuestionReply) {
@@ -644,6 +687,7 @@ function createGradePhoto() {
     kept = null;
     answers = [];
     crops = [];
+    photo = null;
     utterance = "";
     setPhase({ name: "idle" });
   }

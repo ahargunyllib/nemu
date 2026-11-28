@@ -289,20 +289,31 @@ await check(
         await page.waitForTimeout(100);
         continue;
       }
-      const note = await card.locator("[data-slot=card-footer]").textContent();
+      const heading = await card.locator("[data-nemu-status]").textContent();
+      const detail = await card.locator("[data-nemu-detail]").textContent();
       const buttons = card.getByRole("group").getByRole("button");
       const labels = await buttons.allTextContents();
       const image = await card.getByRole("img").count();
       questions.push({ prompt, labels, image });
-      expect(/Pertanyaan \d+ dari \d+\. 22 nilai lain sudah cocok\./u.test(note), `note: ${note}`);
+      expect(
+        heading.includes("Memeriksa foto") && heading.includes(`${questions.length} dari 10`),
+        `heading: ${heading}`,
+      );
+      expect(/^Lihat buku Ibu, baris \d+\.$/u.test(detail), `detail: ${detail}`);
       expect(labels.length >= 2 && labels.length <= 3, `${labels.length} buttons`);
       if (index === 0) await page.screenshot({ path: join(shots, "w5-nama.png") });
       if (index === 1) {
         await page.screenshot({ path: join(shots, "w5-angka.png") });
         await card.screenshot({ path: join(shots, "w5-angka-dekat.png") });
+        // Lihat foto utuh shows the whole photo in the card, then back to the crop.
+        await card.getByRole("button", { name: "Lihat foto utuh" }).click();
+        await card.getByRole("img", { name: "Foto buku nilai, utuh" }).waitFor({ timeout: 10_000 });
+        await card.screenshot({ path: join(shots, "w5-foto-utuh.png") });
+        await card.getByRole("button", { name: "Lihat potongan foto" }).click();
+        await card.getByText("Potongan foto").waitFor();
       }
 
-      const digit = prompt.match(/^Nilai (.+?)(?:: | berapa\?$)/u);
+      const digit = prompt.match(/^Nilai (.+)\?$/u);
       if (digit) {
         expect(labels.includes("Angka lain"), "no Angka lain");
         const truth = String(TRUTH.get(digit[1]));

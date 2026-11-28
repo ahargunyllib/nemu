@@ -189,7 +189,7 @@ async function upToTheFill() {
     last = prompt;
     asked += 1;
     const buttons = card.getByRole("group").getByRole("button");
-    const digit = prompt.match(/^Nilai (.+?)(?:: | berapa\?$)/u);
+    const digit = prompt.match(/^Nilai (.+)\?$/u);
     if (digit) {
       const book = SCENARIO.find((row) => row.name === digit[1]).book;
       const offered = buttons.filter({ hasText: new RegExp(`^${book}$`, "u") });
@@ -206,8 +206,10 @@ async function upToTheFill() {
     } else if (/S \(sakit\)/u.test(prompt)) await buttons.filter({ hasText: "Kosongkan" }).click();
     else await buttons.first().click();
   }
+  // The heading's label and its count are separate lines ("Nemu mengisi", "3 dari 46").
   await display("kerja")
-    .getByText(/Nemu mengisi · 3 dari \d+/u)
+    .filter({ hasText: "Nemu mengisi" })
+    .getByText(/^3 dari \d+$/u)
     .waitFor({ timeout: 60_000 });
 }
 

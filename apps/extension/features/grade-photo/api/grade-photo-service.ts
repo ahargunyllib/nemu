@@ -4,7 +4,7 @@ import { browser } from "wxt/browser";
 import { failureMessage } from "../../../shared/api/nemu-service";
 import type { PageEmail } from "../../../shared/lib/messages";
 import { teacherClient } from "../../identity/api/teacher-client";
-import { cropPhoto, imageDataUrl } from "../lib/crop";
+import { cropPhoto, imageDataUrl, wholePhoto } from "../lib/crop";
 import { claimJobs, holdJob, type InboxClaims, releaseJobs } from "../lib/inbox-claims";
 import type { GradePhotoRequest, GradePhotoResponse, GradePhotoValue } from "../lib/requests";
 
@@ -83,6 +83,8 @@ async function answer(
       });
     case "crops":
       return cropPhoto(await client.inboxPhoto({ jobId: request.jobId }), request.boxes);
+    case "photo":
+      return wholePhoto(await client.inboxPhoto({ jobId: request.jobId }));
     case "finalize":
       return client.gradesFinalize({ reading: request.reading, answers: request.answers });
     case "readback": {
