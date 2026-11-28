@@ -21,7 +21,8 @@ describe("operatorRequest (ID-02)", () => {
       PAGE,
     );
 
-    expect(request?.label).toBe("Siapkan pesan WA ke operator");
+    expect(request?.detail).toBe("Yang bisa mendaftarkan: Pak Rizal, operator sekolah.");
+    expect(request?.label).toBe("Siapkan pesan WA");
     expect(request?.url.startsWith("https://web.whatsapp.com/send?phone=6281200001003&")).toBe(
       true,
     );
@@ -44,6 +45,20 @@ describe("operatorRequest (ID-02)", () => {
     expect(
       operatorRequest({ status: "registered", name: "Siti Aminah, S.Pd.", honorific: "Bu" }, PAGE),
     ).toBeUndefined();
+  });
+
+  test("names whichever operator WS-06 lists", () => {
+    const request = operatorRequest(
+      {
+        status: "unregistered",
+        message: "…",
+        email: RIZAL,
+        operator: { name: "Bu Wulan", phone: "6281200009999" },
+      },
+      PAGE,
+    );
+    expect(request?.detail).toBe("Yang bisa mendaftarkan: Bu Wulan, operator sekolah.");
+    expect(textOf(request!.url)).toContain("Assalamualaikum Bu Wulan.");
   });
 
   test("names the page by its address alone when it has no heading", () => {

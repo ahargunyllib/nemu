@@ -324,6 +324,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
                 onRead={(text) => void speak(text)}
                 onOpenSource={openSource}
                 onDismiss={dismissAll}
+                onClose={close}
               />
               {run.hasNotes && !run.active && (
                 <Button
@@ -403,6 +404,8 @@ type NemuPanelProps = {
   onRead: (text: string) => void;
   onOpenSource: (file: SourceFile) => void;
   onDismiss: () => void;
+  /** Closes the panel, for the × on a bubble that has nothing to dismiss but the panel. */
+  onClose: () => void;
 };
 
 /** Sumber's list: a cited PDF opens at its page (#258); other sources stay text. */
@@ -431,14 +434,19 @@ function NemuPanel({
   onRead,
   onOpenSource,
   onDismiss,
+  onClose,
 }: NemuPanelProps) {
   if (!identity) return <GelembungJawabSkeleton />;
-  // ID-02: an unregistered or signed-out account gets the reason instead of the type box.
+  // ID-02: an unregistered or signed-out account gets the reason instead of the type box; its ×
+  // closes the panel. An unregistered one names the operator who can register it (F0-04).
   if (identity.status !== "registered") {
     const request = operatorRequest(identity, currentRequestPage(document, window.location));
     return (
       <GelembungJawab
+        status={identity.status === "unregistered" ? { text: "Belum terdaftar" } : undefined}
         sentence={identity.message}
+        detail={request?.detail}
+        onClose={onClose}
         action={
           request && {
             label: request.label,
