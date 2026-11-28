@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, test } from "vite-plus/test";
 
-import { readPageSnapshot } from "./page-snapshot";
+import { messageToPoint, readAlertElements, readPageSnapshot } from "./page-snapshot";
 
 afterEach(() => {
   document.body.innerHTML = "";
@@ -80,5 +80,35 @@ describe("readPageSnapshot", () => {
   test("a hidden password field (a signed-in page keeps its sign-in form) doesn't block", () => {
     document.body.innerHTML = `<form hidden><input type="password"></form><h1>Rekap Nilai</h1>`;
     expect(readPageSnapshot(document, URL_NILAI)?.headings).toEqual(["Rekap Nilai"]);
+  });
+});
+
+describe("messageToPoint", () => {
+  const VIEWPORT = { width: 1280, height: 800 };
+  /** happy-dom lays nothing out, so each message gets its place by hand. */
+  function placed(element: Element, top: number) {
+    element.getBoundingClientRect = () =>
+      ({ left: 250, top, width: 900, height: 60, right: 1150, bottom: top + 60 }) as DOMRect;
+    return element;
+  }
+
+  test("points at the error she asked about, not a status message beside it (F2 · 02)", () => {
+    document.body.innerHTML = `<div role="status">Data dimuat</div>
+      <div role="alert"><b>Tidak dapat menampilkan siswa</b><br>Anda belum ditugaskan.</div>`;
+    const [status, error] = readAlertElements(document).map((element, at) =>
+      placed(element, 200 + at * 80),
+    );
+    expect(messageToPoint([status!, error!], VIEWPORT)).toBe(error);
+  });
+
+  test("a message that is gone or scrolled out of view leaves the answer above the Nemu button", () => {
+    document.body.innerHTML = `<div role="alert" id="pesan">Anda belum ditugaskan.</div>`;
+    const messages = readAlertElements(document);
+    placed(messages[0]!, -200);
+    expect(messageToPoint(messages, VIEWPORT)).toBeNull();
+    placed(messages[0]!, 300);
+    expect(messageToPoint(messages, VIEWPORT)).toBe(messages[0]);
+    document.body.innerHTML = `<div role="alert">Anda belum ditugaskan.</div>`;
+    expect(messageToPoint(messages, VIEWPORT)).toBeNull();
   });
 });

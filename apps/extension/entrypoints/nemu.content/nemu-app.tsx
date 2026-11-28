@@ -1,7 +1,7 @@
 import type { PageSnapshot } from "@nemu/contracts/school";
 import { shortcutKeys } from "@nemu/contracts/talk-shortcut";
 import { Button } from "@nemu/ui/components/button";
-import type { NemuSource } from "@nemu/ui/lib/nemu-display";
+import type { GelembungJawabProps, NemuSource } from "@nemu/ui/lib/nemu-display";
 import { GelembungJawab, GelembungJawabSkeleton } from "@nemu/ui/nemu/gelembung-jawab";
 import { NEMU_LINK } from "@nemu/ui/nemu/nemu-frame";
 import { NemuStage } from "@nemu/ui/nemu/nemu-stage";
@@ -23,7 +23,11 @@ import { usePageEmail } from "../../features/identity/hooks/use-page-email";
 import type { IdentityResult } from "../../features/identity/lib/identity";
 import { currentRequestPage, operatorRequest } from "../../features/identity/lib/operator-request";
 import { useNextAction } from "../../features/ini-kenapa/hooks/use-next-action";
-import { readPageSnapshot } from "../../features/ini-kenapa/lib/page-snapshot";
+import {
+  messageToPoint,
+  readAlertElements,
+  readPageSnapshot,
+} from "../../features/ini-kenapa/lib/page-snapshot";
 import { requestSourceFile } from "../../features/nemu-button/api/request-source";
 import { AskBox } from "../../features/nemu-button/components/ask-box";
 import { useProcessRun } from "../../features/process-run/hooks/use-process-run";
@@ -128,6 +132,8 @@ export function NemuApp({ access }: { access: SiteAccess }) {
   const run = useExecutor();
   // "ini kenapa?" reads the page as it was when the talk combination went down (F2-01).
   const pressSnapshot = useRef<PageSnapshot | null>(null);
+  // The messages it read then, so its answer can point at the one it explains (F2 · 02).
+  const askedMessages = useRef<Element[]>([]);
   const grades = useGradePhoto();
   const process = useProcessRun();
   const recording = useRecorder();
@@ -142,6 +148,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
     isWorking: () => working || voiceCommands.isWorking(),
     onStart: () => {
       pressSnapshot.current = readPageSnapshot(document, location.href);
+      askedMessages.current = readAlertElements(document);
       recorder.talkStarted();
       setOpen(true);
     },
@@ -162,9 +169,23 @@ export function NemuApp({ access }: { access: SiteAccess }) {
   const askTyped = useCallback(
     (question: string) => {
       dismiss();
+      askedMessages.current = readAlertElements(document);
       void ask(question);
     },
     [dismiss, ask],
+  );
+
+  // An answer that explains a message on the page points at it, if it is still there and in view;
+  // otherwise it sits above the Nemu button.
+  const answerTarget = useMemo(
+    () =>
+      state.status === "answered" && state.result.kind === "answer" && state.result.aboutMessage
+        ? messageToPoint(askedMessages.current, {
+            width: window.innerWidth,
+            height: window.innerHeight,
+          })
+        : null,
+    [state],
   );
 
   const dismissAll = useCallback(() => {
@@ -312,6 +333,7 @@ export function NemuApp({ access }: { access: SiteAccess }) {
               <NemuPanel
                 identity={identity}
                 state={state}
+                answerTarget={answerTarget}
                 talk={talk.state}
                 heard={talk.heard}
                 voice={voice}
@@ -389,6 +411,8 @@ export function NemuApp({ access }: { access: SiteAccess }) {
 type NemuPanelProps = {
   identity: IdentityResult | null;
   state: AskState;
+  /** The message on the page the answer explains, to attach it to; null above the Nemu button. */
+  answerTarget: Element | null;
   talk: TalkState;
   heard: string | null;
   voice: VoiceState | null;
@@ -416,6 +440,7 @@ function sumberEntries(
 function NemuPanel({
   identity,
   state,
+  answerTarget,
   talk,
   heard,
   voice,
@@ -442,6 +467,28 @@ function NemuPanel({
       />
     );
   }
+  const answer: GelembungJawabProps | null =
+    state.status === "answered"
+      ? {
+          sentence: state.result.text,
+          highlightedWord: spokenWordIn(state.result.text, voice),
+          notes:
+            state.result.kind === "answer"
+              ? {
+                  kenapa: state.result.why,
+                  kenapaTitle: state.result.whyTitle,
+                  sumber: sumberEntries(state.result.sources, state.result.files, onOpenSource),
+                  sumberName: state.result.sourcesName,
+                  sumberSteps: state.result.sourceSteps,
+                  sumberLink: state.result.diagram,
+                }
+              : undefined,
+          action,
+          onRead,
+          onRepeat,
+          onClose: onDismiss,
+        }
+      : null;
   return (
     <>
       {talk.phase === "transcribing" && <HeardBubble text={null} />}
@@ -451,28 +498,13 @@ function NemuPanel({
       ) : (
         <>
           {state.status === "asking" && <GelembungJawabSkeleton />}
-          {state.status === "answered" && (
-            <GelembungJawab
-              sentence={state.result.text}
-              highlightedWord={spokenWordIn(state.result.text, voice)}
-              notes={
-                state.result.kind === "answer"
-                  ? {
-                      kenapa: state.result.why,
-                      kenapaTitle: state.result.whyTitle,
-                      sumber: sumberEntries(state.result.sources, state.result.files, onOpenSource),
-                      sumberName: state.result.sourcesName,
-                      sumberSteps: state.result.sourceSteps,
-                      sumberLink: state.result.diagram,
-                    }
-                  : undefined
-              }
-              action={action}
-              onRead={onRead}
-              onRepeat={onRepeat}
-              onClose={onDismiss}
-            />
-          )}
+          {answer &&
+            (answerTarget ? (
+              // Attached to the message it explains: the cursor, the ring, then the bubble.
+              <NemuStage display={{ type: "jawab", ...answer }} target={answerTarget} />
+            ) : (
+              <GelembungJawab {...answer} />
+            ))}
         </>
       )}
       {talk.phase === "listening" && <ListeningBubble />}

@@ -80,14 +80,57 @@ function alertText(element: Element): string {
     .join(" ");
 }
 
-/** The outermost of nested alerts only, so one message isn't sent twice. */
-function readAlerts(doc: Document): string[] {
+/**
+ * The messages on screen (alerts, toasts, errors), in page order: the outermost of nested ones
+ * only, so one message isn't sent twice.
+ */
+export function readAlertElements(doc: Document): Element[] {
   const found = visible(doc, ALERTS);
-  const outermost = found.filter(
+  return found.filter(
     (element) => !found.some((other) => other !== element && other.contains(element)),
   );
-  const texts = outermost.map((element) => alertText(element).slice(0, 2_000)).filter(Boolean);
+}
+
+function readAlerts(doc: Document): string[] {
+  const texts = readAlertElements(doc)
+    .map((element) => alertText(element).slice(0, 2_000))
+    .filter(Boolean);
   return [...new Set(texts)].slice(0, MAX_ALERTS);
+}
+
+/** A message that says something went wrong, rather than a status such as "Nilai tersimpan". */
+const PROBLEMS = [
+  "[role=alert]",
+  "[role=alertdialog]",
+  "[aria-live=assertive]",
+  ".alert",
+  ".error",
+  ".galat",
+  ".invalid-feedback",
+].join(", ");
+
+/**
+ * The message an "ini kenapa?" answer explains, for Nemu to point at (F2 · 02): of the messages
+ * read when she asked, the first problem still on the page and in view, else the first message.
+ * Null when none is left, so the answer sits above the Nemu button as before.
+ */
+export function messageToPoint(
+  messages: readonly Element[],
+  viewport: { width: number; height: number },
+): Element | null {
+  const shown = messages.filter((element) => {
+    if (!element.isConnected || !isVisible(element)) return false;
+    const { left, top, width, height } = element.getBoundingClientRect();
+    return (
+      width > 0 &&
+      height > 0 &&
+      left < viewport.width &&
+      top < viewport.height &&
+      left + width > 0 &&
+      top + height > 0
+    );
+  });
+  return shown.find((element) => element.matches(PROBLEMS)) ?? shown[0] ?? null;
 }
 
 /** The page as Nemu may send it, or null while a password field is on screen. */
