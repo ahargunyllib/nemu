@@ -1,4 +1,5 @@
 import type { GroundedAnswer, SourceCitation } from "@nemu/contracts/school";
+import type { NemuStatus } from "@nemu/ui/lib/nemu-display";
 
 import type { AnswerNext } from "../../ini-kenapa/lib/explanation";
 
@@ -11,6 +12,10 @@ export type AskResult =
   | {
       kind: "answer";
       text: string;
+      /** The heading: "Jawaban" on an answer from the school's guides (F3·09). */
+      status?: NemuStatus;
+      /** The quieter line under the sentence: the cited rule ("KKM 75 berlaku untuk semua mapel."). */
+      detail?: string;
       sources: string[];
       /** The sources Sumber can open: a cited document at its page (#258). */
       files?: SourceFile[];
@@ -34,8 +39,11 @@ export type AskResult =
   | { kind: "quiz-import"; utterance: string }
   | { kind: "stop" };
 
-/** A cited document by the Sumber label it shows; `page` is where the browser opens it. */
-export type SourceFile = { label: string; docId: string; page: number | null };
+/**
+ * A cited document by the Sumber label it shows; `page` is where the browser opens it and
+ * `title` is the document's name.
+ */
+export type SourceFile = { label: string; docId: string; title: string; page: number | null };
 
 /** Grade entry and process runs wait for the executor (#202), whether typed or spoken. */
 export const NOT_AVAILABLE_YET =
@@ -58,7 +66,12 @@ function sourceFiles(citations: readonly SourceCitation[]): SourceFile[] {
   for (const citation of citations) {
     const label = sourceLabel(citation);
     if (citation.page !== null && !files.has(label)) {
-      files.set(label, { label, docId: citation.docId, page: citation.page });
+      files.set(label, {
+        label,
+        docId: citation.docId,
+        title: citation.title,
+        page: citation.page,
+      });
     }
   }
   return [...files.values()];
@@ -70,9 +83,43 @@ export function fromGroundedAnswer(answer: GroundedAnswer): AskResult {
   return {
     kind: "answer",
     text: answer.answer,
+    status: { text: "Jawaban" },
+    ...(answer.detail ? { detail: answer.detail } : {}),
     sources: uniqueSources(answer.citations),
     ...(files.length > 0 ? { files } : {}),
   };
+}
+
+/**
+ * F3·09: an answer that cites one document Nemu can open gets one link straight to its page.
+ * Several sources, or a process's steps and diagram (F2-08), keep the Sumber list.
+ */
+export function singleSourceFile(
+  result: Pick<Extract<AskResult, { kind: "answer" }>, "sources" | "files" | "diagram">,
+): SourceFile | null {
+  const files = result.files ?? [];
+  if (files.length !== 1 || result.sources.length !== 1 || result.diagram) return null;
+  return result.sources[0] === files[0]!.label ? files[0]! : null;
+}
+
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+}
+
+/**
+ * "Sumber: SOP Penilaian, hlm. 2": the document's name without the school's, which the teacher
+ * already knows, and the page it opens at.
+ */
+export function sourceLinkLabel(file: SourceFile, schoolName?: string | null): string {
+  const school = schoolName?.trim();
+  const short = school
+    ? file.title
+        .replace(new RegExp(escapeRegExp(school), "iu"), " ")
+        .replace(/\s+/gu, " ")
+        .trim()
+    : "";
+  const name = short || file.title;
+  return `Sumber: ${file.page === null ? name : `${name}, hlm. ${file.page}`}`;
 }
 
 /** "Rekam cara input ujian tahfidz" → "input ujian tahfidz"; null when it isn't that command. */

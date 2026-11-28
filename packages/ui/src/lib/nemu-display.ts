@@ -60,6 +60,11 @@ export type NemuNotes = {
   sumber?: readonly NemuSource[];
   /** A link under the Sumber list, such as "Lihat diagram" for a BPMN-backed answer. */
   sumberLink?: { label: string; href: string };
+  /**
+   * One cited document, in place of the Sumber list: a single link that opens it at its page,
+   * "Sumber: SOP Penilaian, hlm. 2" (F3·09).
+   */
+  sumberFile?: NemuSourceLink;
   ringkasan?: string;
 };
 export type NemuNoteKind = "kenapa" | "sumber" | "ringkasan";

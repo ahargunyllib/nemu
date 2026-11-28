@@ -246,7 +246,7 @@ export function NemuActionRow({
 
 /**
  * Kenapa?, Sumber and Lihat ringkasan as small links, with the display's `actions` on the right
- * of the same row. Nothing under the links shows or is read until the teacher clicks one; then
+ * of the same row. A single cited document (`sumberFile`) is one link that opens it at once. Nothing under the links shows or is read until the teacher clicks one; then
  * its text opens below the row and `onRead` gets it, so Nemu can say it.
  */
 export function NemuNoteLinks({
@@ -263,7 +263,8 @@ export function NemuNoteLinks({
   const kinds = NOTE_ORDER.filter((kind) =>
     kind === "sumber" ? (notes.sumber?.length ?? 0) > 0 : Boolean(notes[kind]),
   );
-  if (kinds.length === 0 && !actions) return null;
+  const file = notes.sumberFile;
+  if (kinds.length === 0 && !file && !actions) return null;
 
   function toggle(kind: NemuNoteKind) {
     if (open === kind) {
@@ -278,19 +279,32 @@ export function NemuNoteLinks({
     <div className="flex flex-col gap-2">
       <NemuActionRow
         links={
-          kinds.length > 0 &&
-          kinds.map((kind) => (
-            <Button
-              key={kind}
-              type="button"
-              variant="link"
-              aria-expanded={open === kind}
-              onClick={() => toggle(kind)}
-              className={NEMU_LINK}
-            >
-              {NOTE_LABELS[kind]}
-            </Button>
-          ))
+          (kinds.length > 0 || file) && (
+            <>
+              {kinds.map((kind) => (
+                <Button
+                  key={kind}
+                  type="button"
+                  variant="link"
+                  aria-expanded={open === kind}
+                  onClick={() => toggle(kind)}
+                  className={NEMU_LINK}
+                >
+                  {NOTE_LABELS[kind]}
+                </Button>
+              ))}
+              {file && (
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={file.onOpen}
+                  className={cn(NEMU_LINK, "h-auto min-h-11 text-left whitespace-normal")}
+                >
+                  {file.label}
+                </Button>
+              )}
+            </>
+          )
         }
       >
         {actions}

@@ -137,6 +137,17 @@ test("offline mode: screens the kamus doesn't cover offer the operator", async (
 test("offline mode answers from the SOP with a verified quote, and abstains otherwise", async () => {
   const kkm = await ai.answerGrounded({ question: "KKM nilai berapa?", chunks: SOP_CHUNKS });
   assert.equal(kkm.status, "answered");
+  // The official F3-2 questions read as the design's Gelembung Jawab (F3·09).
+  const remedial = await ai.answerGrounded({
+    question: "Nilai di bawah berapa harus remedial?",
+    chunks: SOP_CHUNKS,
+    honorific: "Pak",
+  });
+  assert.equal(remedial.status, "answered");
+  if (remedial.status !== "answered") return;
+  assert.equal(remedial.answer, "Di bawah 75, Pak. Itu wajib remedial.");
+  assert.equal(remedial.detail, "KKM 75 berlaku untuk semua mapel.");
+  assert.equal(remedial.citations[0]?.article, "3.2");
   const cuti = await ai.answerGrounded({
     question: "cuti melahirkan berapa bulan?",
     chunks: SOP_CHUNKS,

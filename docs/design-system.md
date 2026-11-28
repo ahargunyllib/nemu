@@ -172,6 +172,9 @@ the page's Shadow DOM.
   line under it.
 - **Links**: Kenapa?, Sumber and Lihat ringkasan are small underlined `nemu-strong` links. What is
   behind them shows in a `nemu-subtle` box and is read (`onRead`) only once the teacher clicks.
+  An answer that cites one document Nemu can open has no Sumber box: its one link names the
+  document and page, "Sumber: SOP Penilaian, hlm. 2", and opens it there in one click
+  (`notes.sumberFile`). Several sources, or a process's steps and Lihat diagram, keep the box.
 - **Kartu Pilih**: a risky choice gets ⚠ and goes under the safe one, whatever order it was given
   in. All choices share one look. The **compact** Kartu Pilih (300 px, 44 px buttons side by side)
   waits beside the Nemu button, such as "Foto dari WhatsApp · Mulai / Nanti". Its picture is a
