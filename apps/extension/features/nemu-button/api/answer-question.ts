@@ -10,14 +10,35 @@ import {
   recordCommand,
 } from "../lib/answer";
 
+const BARE_KENAPA = new Set([
+  "nemu",
+  "ini",
+  "itu",
+  "kenapa",
+  "mengapa",
+  "kok",
+  "apa",
+  "ya",
+  "bu",
+  "pak",
+]);
+
+/** Whether a "kenapa" question says what it is about, beyond "Nemu, ini kenapa ya?". */
+function saysMore(question: string): boolean {
+  return question
+    .toLocaleLowerCase("id-ID")
+    .split(/[^\p{L}\p{N}]+/u)
+    .some((word) => word.length > 1 && !BARE_KENAPA.has(word));
+}
+
 /**
  * A typed or spoken question goes to `helpRoute` first (docs/school-ai.md). Questions about the
  * school's rules go to `helpAsk`, "kenapa" to `helpExplain` with what the page shows plus a
- * viewport screenshot, and a voice control closes the bubble. `snapshot` is null while a password
- * field is on screen: then "kenapa" reads and sends nothing (F2-07). Grade entry goes to F1
- * (#207); a process the school uploaded as BPMN to F3 (#213); checking a Moodle quiz to F4 (#209),
- * deleting one to F4-06 (#211), and putting the teacher's script into Moodle as a quiz to F4-03
- * (#210).
+ * viewport screenshot (then `helpAsk` when the kamus and the BPMN have nothing, #314), and a voice
+ * control closes the bubble. `snapshot` is null while a password field is on screen: then "kenapa"
+ * reads and sends nothing (F2-07). Grade entry goes to F1 (#207); a process the school uploaded as
+ * BPMN to F3 (#213); checking a Moodle quiz to F4 (#209), deleting one to F4-06 (#211), and putting
+ * the teacher's script into Moodle as a quiz to F4-03 (#210).
  */
 export async function answerQuestion(
   client: Pick<NemuServiceClient, "helpRoute" | "helpAsk" | "helpExplain">,
@@ -39,9 +60,18 @@ export async function answerQuestion(
     case "kenapa": {
       if (!snapshot) return { kind: "notice", text: PASSWORD_ON_SCREEN };
       const screenshotBase64 = await captureScreenshot();
-      return fromExplanation(
-        await client.helpExplain({ snapshot: { ...snapshot, screenshotBase64 }, question }),
-      );
+      const explanation = await client.helpExplain({
+        snapshot: { ...snapshot, screenshotBase64 },
+        question,
+      });
+      // "Kenapa Nemu tidak bisa mendengar saya?" isn't a page error: the school's documents may
+      // answer what the kamus and the BPMN don't (#314). A bare "ini kenapa?" or an error on the
+      // page is the kamus's alone, so the offer to ask stays.
+      if (explanation.status === "not_in_guide" && !snapshot.alerts.length && saysMore(question)) {
+        const answer = await client.helpAsk({ question });
+        if (answer.status === "answered") return fromGroundedAnswer(answer);
+      }
+      return fromExplanation(explanation);
     }
     case "tanya":
     case "unknown":
