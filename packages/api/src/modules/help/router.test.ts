@@ -100,8 +100,15 @@ describe("F2 and school questions through the API (seeded kamus and SOP)", () =>
     await expect(
       call(helpRouter.helpAsk, { question: "Cuti melahirkan berapa bulan?" }, { context }),
     ).resolves.toEqual({
+      // F3·11: who can answer instead, from WS-06, and her question drafted to the operator.
       status: "not_in_guide",
-      answer: "Belum ada di panduan sekolah.",
+      answer: "Ini belum ada di panduan sekolah, Bu.",
+      detail: "Yang bisa menjawab: Pak Rizal atau kepala sekolah.",
+      offerOperator: { name: "Pak Rizal", role: "operator", phone: "6281200000002" },
+      waDraft: {
+        phone: "6281200000002",
+        text: 'Assalamualaikum Pak Rizal. Saya Siti Rahmawati (NIP 197001012000032001). Saya mau bertanya: "Cuti melahirkan berapa bulan?" Ini belum ada di panduan sekolah. Mohon bantuannya. Terima kasih.',
+      },
     });
   });
 

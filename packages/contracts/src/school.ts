@@ -338,7 +338,20 @@ export const groundedAnswerSchema = z.discriminatedUnion("status", [
       citations: z.array(sourceCitationSchema).min(1),
     })
     .strict(),
-  z.object({ status: z.literal("not_in_guide"), answer: z.string() }).strict(),
+  z
+    .object({
+      status: z.literal("not_in_guide"),
+      answer: z.string(),
+      /**
+       * F3·11, for the teacher who asked: who can answer instead ("Yang bisa menjawab: Pak Rizal
+       * atau kepala sekolah."), the WS-06 operator, and a WhatsApp draft to the operator with her
+       * question. WS-09 Uji jawaban has no teacher, so none of them.
+       */
+      detail: z.string().optional(),
+      offerOperator: contactSchema.nullable().optional(),
+      waDraft: z.object({ phone: z.string(), text: z.string() }).strict().nullable().optional(),
+    })
+    .strict(),
 ]);
 
 /** One row of a form table: who it is and the value of each repeating field, by field id. */
