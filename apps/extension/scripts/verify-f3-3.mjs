@@ -307,7 +307,11 @@ for (const row of REPLAYS) {
     const point = display("tunjuk").filter({ hasText: "Silakan Ibu tekan Simpan ujian." });
     await point.waitFor({ timeout: 60_000 });
     await point.getByRole("button", { name: "Sumber" }).click();
-    await point.getByText("Rekaman Bu Siti, langkah 11 dari 11").waitFor();
+    // Sumber opens its own card in the bubble's place; Tutup brings the bubble back.
+    const sumber = overlay.locator("[data-nemu-note='sumber']");
+    await sumber.getByText("Rekaman Bu Siti, langkah 11 dari 11").waitFor();
+    await sumber.getByRole("button", { name: "Tutup" }).click();
+    await point.waitFor();
     const form = {
       kelas: await page.locator("#tf-kelas").inputValue(),
       murid: await page.locator("#uj-murid").inputValue(),

@@ -80,6 +80,7 @@ describe("answerQuestion", () => {
       kind: "answer",
       text: "Bukan kesalahan Ibu. Yang bisa memperbaiki: Pak Rizal (operator).",
       why: "Mata pelajaran itu belum ditugaskan ke akun Ibu.",
+      whyTitle: "Kenapa muncul pesan ini?",
       sources: ["Kamus Kendala · hlm. 2 · K-07"],
       next: {
         kind: "whatsapp",

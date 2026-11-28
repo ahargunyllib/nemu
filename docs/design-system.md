@@ -171,7 +171,21 @@ the page's Shadow DOM.
   (`spokenText`), the question of a Kartu Pilih, or the title of a Kartu Info, never the detail
   line under it.
 - **Links**: Kenapa?, Sumber and Lihat ringkasan are small underlined `nemu-strong` links. What is
-  behind them shows in a `nemu-subtle` box and is read (`onRead`) only once the teacher clicks.
+  behind them is read (`onRead`) only once the teacher clicks.
+- **Kenapa? and Sumber cards** (`NemuNoteCard`): the link's card takes the bubble's place, in the
+  Kartu Info look, and its black **Tutup** brings the bubble back (a new answer also shows as a
+  bubble). The heading says which: **KENAPA?**, or **SUMBER** with the process on the right
+  ("Alur SPP sekolah", `sumberName`). Then a 20 px title: Kenapa?'s `kenapaTitle` ("Kenapa muncul
+  pesan ini?" for a message on the page), Sumber's `sumberTitle` ("Kenapa nilai bisa belum
+  tampil?") with `sumberNote` as its detail line, or the process's name when there is no other
+  title (then it is not repeated on the heading). The body is the reason as one paragraph, a
+  process's steps numbered like Kartu Info's list (`sumberSteps`), or the sources as a plain list
+  (a document Nemu can open is a link). Only real steps are numbered. Left of Tutup sits one link:
+  on the Kenapa? card it opens Sumber ("Sumber: Kamus Kendala · K-07", "Sumber: Alur SPP
+  sekolah"); on the Sumber card it opens the diagram, "Lihat diagram (operator)". Nemu reads the
+  card's title, then its detail line and its paragraph or steps.
+- **Lihat ringkasan** opens under the links in a `nemu-subtle` box instead, so the sentence it
+  belongs to (often "Tekan Simpan") stays in view.
 - **Kartu Pilih**: a risky choice gets ⚠ and goes under the safe one, whatever order it was given
   in. All choices share one look. The **compact** Kartu Pilih (300 px, 44 px buttons side by side)
   waits beside the Nemu button, such as "Foto dari WhatsApp · Mulai / Nanti". Its picture is a

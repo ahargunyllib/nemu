@@ -13,6 +13,7 @@ export type PreviewScene =
   | "baca-foto"
   | "tunjuk"
   | "jawab"
+  | "jawab-proses"
   | "belum-jelas"
   | "pilih"
   | "hati-hati"
@@ -24,6 +25,7 @@ export const PREVIEW_SCENES: readonly { scene: PreviewScene; label: string }[] =
   { scene: "baca-foto", label: "Baca foto" },
   { scene: "tunjuk", label: "Tunjuk" },
   { scene: "jawab", label: "Jawab" },
+  { scene: "jawab-proses", label: "Jawab proses" },
   { scene: "belum-jelas", label: "Belum jelas" },
   { scene: "pilih", label: "Pilih" },
   { scene: "hati-hati", label: "Hati-hati" },
@@ -99,6 +101,30 @@ export function sceneDisplay(
           ringkasan: "Nilai di bawah 75 perlu remedial sebelum rapor dikunci.",
         },
         action: { label: "Buka Rekap Nilai", onSelect: actions.close },
+        onClose: actions.close,
+      };
+    case "jawab-proses":
+      // Kenapa? and Sumber open as their own card with Tutup (F2 · 03, F2 · 06).
+      return {
+        type: "jawab",
+        status: { text: "Jawaban" },
+        sentence: "Bukan kesalahan Ibu. Kemungkinan karena alur SPP sekolah.",
+        detail: "Nilai UTS Aisyah sudah tersimpan.",
+        notes: {
+          kenapa:
+            "Di alur SPP sekolah, nilai dikunci selama tagihan lewat jatuh tempo, dan terbuka lagi setelah lunas.",
+          sumber: [
+            "Tagihan SPP lewat jatuh tempo.",
+            "Sistem mengunci nilai di aplikasi orang tua.",
+            "Nilai terbuka lagi setelah tagihan lunas.",
+          ],
+          sumberSteps: true,
+          sumberName: "Alur SPP sekolah",
+          sumberTitle: "Kenapa nilai bisa belum tampil?",
+          sumberNote: "Nemu tidak bisa melihat status tagihan. Pastikan ke bagian keuangan.",
+          sumberLink: { label: "Lihat diagram (operator)", href: "#/nilai" },
+        },
+        action: { label: "Siapkan balasan", onSelect: actions.close },
         onClose: actions.close,
       };
     case "belum-jelas":

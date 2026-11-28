@@ -134,7 +134,10 @@ async function ask(page, question) {
 /** Opens Sumber, clicks the cited source, and returns the new tab and the file's response. */
 async function openSource(page, source, shot) {
   await bubble(page).getByRole("button", { name: "Sumber" }).click();
-  const link = bubble(page).getByRole("button", { name: source });
+  // Sumber opens its own card in the bubble's place.
+  const link = overlay(page)
+    .locator("[data-nemu-note='sumber']")
+    .getByRole("button", { name: source });
   await link.waitFor({ timeout: 10_000 });
   await page.screenshot({ path: join(shots, `${shot}-sumber.png`) });
   const before = fileResponses.length;

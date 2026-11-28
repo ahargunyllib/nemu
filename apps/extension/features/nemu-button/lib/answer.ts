@@ -14,9 +14,15 @@ export type AskResult =
       sources: string[];
       /** The sources Sumber can open: a cited document at its page (#258). */
       files?: SourceFile[];
+      /** What the Sumber list comes from, such as a process's title (F2-08). */
+      sourcesName?: string;
+      /** The sources are a process's steps in order, so Sumber numbers them. */
+      sourceSteps?: boolean;
       why?: string;
+      /** The Kenapa? card's title: "Kenapa muncul pesan ini?" for a message on the page (F2). */
+      whyTitle?: string;
       next?: AnswerNext;
-      /** "Lihat diagram" under Sumber, for a BPMN-backed answer (F2-08). */
+      /** "Lihat diagram (operator)" on the Sumber card, for a BPMN-backed answer (F2-08). */
       diagram?: { label: string; href: string };
     }
   | { kind: "notice"; text: string }

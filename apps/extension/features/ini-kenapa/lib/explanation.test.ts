@@ -33,6 +33,7 @@ describe("fromExplanation", () => {
       kind: "answer",
       text: "Ibu bisa memperbaikinya sendiri, saya tunjukkan caranya.",
       why: "Akun Ibu belum ditandai sebagai User Ruang GTK.",
+      whyTitle: "Kenapa muncul pesan ini?",
       sources: ["Kamus Kendala · K-02"],
       next: { kind: "fix", target: "Sinkro Ruang GTK", how: CITATION.quote, entryId: "K-02" },
     });
@@ -71,8 +72,10 @@ describe("fromExplanation", () => {
     expect(result).toMatchObject({
       kind: "answer",
       sources: ["SPP belum lunas.", "Sistem menyembunyikan nilai."],
+      sourcesName: "Alur Pembayaran SPP",
+      sourceSteps: true,
       next: { kind: "whatsapp", label: "Buka balasan untuk orang tua" },
-      diagram: { label: "Lihat diagram Alur Pembayaran SPP" },
+      diagram: { label: "Lihat diagram (operator)" },
     });
     if (result.kind !== "answer") return;
     const diagram = new URL(result.diagram!.href);

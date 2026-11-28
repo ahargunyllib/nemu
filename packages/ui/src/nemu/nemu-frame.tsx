@@ -1,21 +1,31 @@
 import { Button } from "@nemu/ui/components/button";
-import { Card } from "@nemu/ui/components/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@nemu/ui/components/card";
 import { Progress } from "@nemu/ui/components/progress";
 import {
   NOTE_LABELS,
+  type NemuCardNoteKind,
   type NemuNoteKind,
   type NemuNotes,
   type NemuStatus,
   type NemuTone,
+  noteCard,
   noteText,
   sourceName,
   statusCount,
   statusText,
   statusTone,
+  sumberLinkLabel,
 } from "@nemu/ui/lib/nemu-display";
 import { NemuMascot, type NemuMascotMood } from "@nemu/ui/nemu/nemu-mascot";
 import { cn } from "cn";
-import { type ComponentProps, Fragment, type ReactNode, useState } from "react";
+import { type ComponentProps, Fragment, type ReactNode, useId, useState } from "react";
 
 /*
  * The building blocks the five display types share (PRD §6.2): a plain white surface, the
@@ -245,33 +255,94 @@ export function NemuActionRow({
 }
 
 /**
+ * A numbered list in small amber circles 1, 2, 3 (Kartu Info's items, a process's steps), under
+ * an optional label that also names it for screen readers.
+ */
+export function NemuSteps({ items, label }: { items: readonly string[]; label?: string }) {
+  const labelId = useId();
+  return (
+    <div className="flex flex-col gap-1.5">
+      {label && (
+        <p id={labelId} className="text-base leading-5 font-semibold text-nemu-secondary">
+          {label}
+        </p>
+      )}
+      <ol aria-labelledby={label ? labelId : undefined} className="flex flex-col">
+        {items.map((item, index) => (
+          <li key={item} className="flex items-start gap-3 py-1 text-xl leading-7">
+            <span
+              aria-hidden
+              data-nemu-step
+              className="flex size-[30px] shrink-0 items-center justify-center rounded-full border border-nemu-amber-200 bg-nemu-subtle text-[15px] leading-5 font-bold text-nemu-strong"
+            >
+              {index + 1}
+            </span>
+            <span className="pt-px">{item}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+/** The links a display shows: Sumber only when it has something in it. */
+export function noteKinds(notes: NemuNotes): NemuNoteKind[] {
+  return NOTE_ORDER.filter((kind) =>
+    kind === "sumber" ? (notes.sumber?.length ?? 0) > 0 : Boolean(notes[kind]),
+  );
+}
+
+/**
+ * Which link's card (Kenapa?, Sumber) is open in a bubble's place, if any. Opening one reads it
+ * (`onRead`); the next sentence (a new answer) shows as a bubble again.
+ */
+export function useNemuNote(
+  notes: NemuNotes | undefined,
+  onRead: ((text: string) => void) | undefined,
+  sentence: string,
+) {
+  const [state, setState] = useState<{ kind: NemuCardNoteKind; sentence: string } | null>(null);
+  return {
+    open: state?.sentence === sentence ? state.kind : null,
+    show(kind: NemuCardNoteKind) {
+      setState({ kind, sentence });
+      if (notes) onRead?.(noteText(kind, notes));
+    },
+    close() {
+      setState(null);
+    },
+  };
+}
+
+/**
  * Kenapa?, Sumber and Lihat ringkasan as small links, with the display's `actions` on the right
- * of the same row. Nothing under the links shows or is read until the teacher clicks one; then
- * its text opens below the row and `onRead` gets it, so Nemu can say it.
+ * of the same row. Nothing behind them shows or is read until the teacher clicks one. Kenapa? and
+ * Sumber then open their card in the bubble's place (`useNemuNote`, `NemuNoteCard`); Lihat
+ * ringkasan opens under the row, so the sentence stays in view, and `onRead` gets it.
  */
 export function NemuNoteLinks({
   notes,
+  onOpen,
   onRead,
   actions,
 }: {
   notes: NemuNotes;
+  onOpen: (kind: NemuCardNoteKind) => void;
   onRead?: (text: string) => void;
   /** The compact buttons on the right of the links' row. */
   actions?: ReactNode;
 }) {
-  const [open, setOpen] = useState<NemuNoteKind | null>(null);
-  const kinds = NOTE_ORDER.filter((kind) =>
-    kind === "sumber" ? (notes.sumber?.length ?? 0) > 0 : Boolean(notes[kind]),
-  );
+  const [summary, setSummary] = useState(false);
+  const kinds = noteKinds(notes);
   if (kinds.length === 0 && !actions) return null;
 
-  function toggle(kind: NemuNoteKind) {
-    if (open === kind) {
-      setOpen(null);
+  function select(kind: NemuNoteKind) {
+    if (kind !== "ringkasan") {
+      onOpen(kind);
       return;
     }
-    setOpen(kind);
-    onRead?.(noteText(kind, notes));
+    setSummary(!summary);
+    if (!summary) onRead?.(noteText(kind, notes));
   }
 
   return (
@@ -284,8 +355,8 @@ export function NemuNoteLinks({
               key={kind}
               type="button"
               variant="link"
-              aria-expanded={open === kind}
-              onClick={() => toggle(kind)}
+              aria-expanded={kind === "ringkasan" ? summary : undefined}
+              onClick={() => select(kind)}
               className={NEMU_LINK}
             >
               {NOTE_LABELS[kind]}
@@ -295,44 +366,115 @@ export function NemuNoteLinks({
       >
         {actions}
       </NemuActionRow>
-      {open && (
-        <div className="rounded-2xl bg-nemu-subtle px-4 py-3 text-xl leading-7 text-nemu-subtle-foreground">
-          {open === "sumber" ? (
-            <>
-              <ul className="flex list-disc flex-col gap-1 pl-5">
-                {notes.sumber?.map((source) => (
-                  <li key={sourceName(source)}>
-                    {typeof source === "string" ? (
-                      source
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="link"
-                        onClick={source.onOpen}
-                        className="h-auto min-h-11 p-0 text-left text-xl font-normal whitespace-normal text-nemu-strong underline underline-offset-4 hover:text-foreground"
-                      >
-                        {source.label}
-                      </Button>
-                    )}
-                  </li>
-                ))}
-              </ul>
-              {notes.sumberLink && (
-                <a
-                  href={notes.sumberLink.href}
-                  target="_blank"
-                  rel="noopener"
-                  className={cn(NEMU_LINK, "mt-1 inline-flex items-center")}
-                >
-                  {notes.sumberLink.label}
-                </a>
-              )}
-            </>
-          ) : (
-            <p>{notes[open]}</p>
-          )}
-        </div>
+      {summary && (
+        <p className="rounded-2xl bg-nemu-subtle px-4 py-3 text-xl leading-7 text-nemu-subtle-foreground">
+          {notes.ringkasan}
+        </p>
       )}
     </div>
+  );
+}
+
+/** A source Nemu can open, inside the Sumber card's list: 20 px like the text around it. */
+const SOURCE_LINK =
+  "h-auto min-h-11 p-0 text-left text-xl font-normal whitespace-normal text-nemu-strong underline underline-offset-4 hover:text-foreground";
+
+/**
+ * What a link opens, in the bubble's place: the Kartu Info look under the link's heading
+ * ("Kenapa?", "Sumber · Alur SPP sekolah"), an optional title and detail line, then a paragraph,
+ * numbered steps or the sources. At the bottom one link (the Kenapa? card opens Sumber, the Sumber
+ * card its diagram) and a black [Tutup] back to the bubble.
+ */
+export function NemuNoteCard({
+  kind,
+  notes,
+  onOpen,
+  onClose,
+}: {
+  kind: NemuCardNoteKind;
+  notes: NemuNotes;
+  /** Opens another link's card: Sumber from the Kenapa? card. */
+  onOpen: (kind: NemuCardNoteKind) => void;
+  onClose: () => void;
+}) {
+  const card = noteCard(kind, notes);
+  const toSumber = kind === "kenapa" && noteKinds(notes).includes("sumber");
+  const diagram = kind === "sumber" ? notes.sumberLink : undefined;
+  return (
+    <NemuCard
+      display="info"
+      data-nemu-note={kind}
+      label={card.title ?? card.status.text}
+      status={card.status}
+      aria-live="polite"
+    >
+      {(card.title || card.detail) && (
+        <CardHeader className="gap-1.5">
+          {card.title && (
+            <CardTitle className="text-xl leading-7 font-semibold">{card.title}</CardTitle>
+          )}
+          {card.detail && (
+            <CardDescription data-nemu-detail className={NEMU_DETAIL}>
+              {card.detail}
+            </CardDescription>
+          )}
+        </CardHeader>
+      )}
+      <CardContent className="text-xl leading-7">
+        {card.text && <p>{card.text}</p>}
+        {card.steps && <NemuSteps items={card.steps} />}
+        {card.sources && (
+          <ul className="flex list-disc flex-col gap-1 pl-5">
+            {card.sources.map((source) => (
+              <li key={sourceName(source)}>
+                {typeof source === "string" ? (
+                  source
+                ) : (
+                  <Button
+                    type="button"
+                    variant="link"
+                    onClick={source.onOpen}
+                    className={SOURCE_LINK}
+                  >
+                    {source.label}
+                  </Button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+      <CardFooter>
+        <NemuActionRow
+          links={
+            toSumber ? (
+              <Button
+                type="button"
+                variant="link"
+                onClick={() => onOpen("sumber")}
+                className={cn(NEMU_LINK, "h-auto min-h-11 text-left whitespace-normal")}
+              >
+                {sumberLinkLabel(notes)}
+              </Button>
+            ) : (
+              diagram && (
+                <a
+                  href={diagram.href}
+                  target="_blank"
+                  rel="noopener"
+                  className={cn(NEMU_LINK, "inline-flex items-center")}
+                >
+                  {diagram.label}
+                </a>
+              )
+            )
+          }
+        >
+          <Button type="button" onClick={onClose} className={NEMU_BUTTON}>
+            Tutup
+          </Button>
+        </NemuActionRow>
+      </CardFooter>
+    </NemuCard>
   );
 }
