@@ -78,6 +78,8 @@ export function sceneDisplay(
         sentence: "Sekarang tekan Tampilkan Siswa.",
         detail: "Nemu menunggu sampai daftar murid muncul.",
         note: { kenapa: "Daftar murid kelas 4A muncul setelah tombol ini ditekan." },
+        chip: "Belum tersimpan",
+        cancel: { label: "Batal, biar Ibu sendiri", onSelect: actions.close },
       };
     case "kursor":
       return {
@@ -135,13 +137,16 @@ export function sceneDisplay(
       return {
         type: "info",
         status: { tone: "success", text: "Sudah dicek" },
-        title: "Catatan langkah",
-        detail: "Yang Nemu dan Ibu kerjakan di halaman ini.",
+        title: "Tersimpan, sama dengan buku.",
+        detail: "32 nilai Harian Matematika 4B sudah Nemu baca ulang.",
+        itemsLabel: "Catatan langkah · Cara isi nilai kelas",
         items: [
-          "32 nilai Harian Matematika 4B diisi Nemu.",
-          "Ibu menekan Simpan pukul 09.12.",
-          "2 nilai di bawah KKM: Bagas Pratama, Fatih Rizky Wijaya.",
+          "Menu Nilai",
+          "Pilih kelas, mapel, penilaian",
+          "Ketik nilai per murid",
+          "Tekan Simpan",
         ],
+        link: { label: "Coba sendiri", onSelect: actions.close },
         onClose: actions.close,
       };
   }

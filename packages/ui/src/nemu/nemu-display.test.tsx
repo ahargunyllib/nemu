@@ -75,6 +75,27 @@ describe("Gelembung Tunjuk", () => {
         .map((button) => button.textContent),
     ).toEqual(["Kenapa?"]);
   });
+
+  test("shows a chip under its text and a cancel link at the bottom, still no buttons", () => {
+    const onSelect = vi.fn();
+    render(
+      <GelembungTunjuk
+        status={{ text: "Giliran Ibu" }}
+        sentence="Tombol Hapus ada di sini, Bu."
+        detail="Nemu tidak menghapus apa pun."
+        chip="Belum tersimpan"
+        cancel={{ label: "Batal, jangan hapus", onSelect }}
+      />,
+    );
+    const bubble = screen.getByRole("region", { name: "Petunjuk Nemu" });
+    const chip = within(bubble).getByText("Belum tersimpan");
+    expect(follows(within(bubble).getByText("Nemu tidak menghapus apa pun."), chip)).toBe(true);
+    const cancel = within(bubble).getByRole("button", { name: "Batal, jangan hapus" });
+    expect(follows(chip, cancel)).toBe(true);
+    expect(within(bubble).getAllByRole("button")).toEqual([cancel]);
+    fireEvent.click(cancel);
+    expect(onSelect).toHaveBeenCalledOnce();
+  });
 });
 
 describe("Gelembung Jawab", () => {
@@ -292,6 +313,31 @@ describe("Kartu Info", () => {
     expect(within(card).getAllByRole("button")).toHaveLength(1);
     fireEvent.click(within(card).getByRole("button", { name: "Tutup" }));
     expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  test("numbers its items 1, 2, 3 under their label", () => {
+    render(
+      <KartuInfo
+        status={{ tone: "muted", text: "Mikrofon terblokir" }}
+        title="Nemu belum bisa mendengar Ibu."
+        itemsLabel="Buka lagi dengan 3 langkah ini"
+        items={[
+          "Klik ikon gembok di kiri alamat situs",
+          "Pada Mikrofon, pilih Izinkan",
+          "Klik Muat ulang di bagian atas",
+        ]}
+        onClose={vi.fn()}
+      />,
+    );
+    const list = screen.getByRole("list", { name: "Buka lagi dengan 3 langkah ini" });
+    expect(list.tagName).toBe("OL");
+    const items = within(list).getAllByRole("listitem");
+    expect(items.map((item) => item.querySelector("[data-nemu-step]")?.textContent)).toEqual([
+      "1",
+      "2",
+      "3",
+    ]);
+    expect(items[1]?.textContent).toBe("2Pada Mikrofon, pilih Izinkan");
   });
 
   test("puts its one link and Tutup in one row, the link first", () => {
