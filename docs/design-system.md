@@ -1,8 +1,8 @@
 # Nemu design system (extension)
 
 What the Nemu Extension should look like: colour, type, the mascot, the Composer, the five
-display types and the Nemu cursor, the three answer levels, and motion. The last section names the
-Admin Workspace's side menu.
+display types and the Nemu cursor, the three answer levels, and motion. The last sections name the
+Admin Workspace's side menu and lay out its top bar.
 
 ## Colour
 
@@ -275,8 +275,8 @@ popup's frame and shadow. Rows:
 
 The Admin Workspace keeps the shared dark side menu from `packages/ui/src/shell`; only its words
 and order follow the design. The brand reads "Nemu Workspace" ("Nemu" strong, "Workspace" muted),
-and the top bar's breadcrumb starts at "Workspace", then the group, then the page
-("Workspace › Pengetahuan › Dokumen dan alur"). Groups and entries, in order:
+and the breadcrumb just above each page's title starts at "Workspace", then the group, then the
+page ("Workspace › Pengetahuan › Dokumen dan alur"). Groups and entries, in order:
 
 - **Utama**: Ringkasan.
 - **Pengetahuan**: Dokumen dan alur, Kamus kendala, Uji jawaban.
@@ -288,3 +288,24 @@ AlurSekolah and Tables under Pengetahuan, Daftar sekolah under Sekolah, and Peng
 Sistem. A page's title matches its menu entry. A school operator sees only the entries open to the
 `operator` role (Dokumen dan alur, Kamus kendala, Uji jawaban, Guru dan kontak); the design's
 count badge on Uji jawaban waits for data to count.
+
+At the bottom of the side menu a school card names the school and its reach: "SDIT Nusantara"
+over "Tombol Nemu aktif di N website · N guru", counted from Website diizinkan (WS-03) and Guru dan
+kontak (WS-06), so it follows every change made there.
+
+## Admin Workspace top bar
+
+The white top bar, left to right:
+
+- **Search**: a field-shaped button "Cari dokumen, alur, atau langkah" (also Ctrl K / ⌘ K) opens a
+  command palette over the school's own knowledge, in three groups: **Dokumen** (PDF, Markdown),
+  **Alur** (BPMN, recorded procedures) and **Langkah** (each BPMN's named tasks and events). A BPMN
+  or a step opens Diagram proses with that step outlined; anything else opens Dokumen dan alur
+  filtered to its title.
+- **Sekolah**: "Sekolah: **SDIT Nusantara**" in an outlined pill. Only Admin Javan with more than one
+  school gets the ▾ dropdown (the schools, then Daftar sekolah); an operator always sees the name.
+- **Account**: the initials avatar, the name, and the role under it ("Operator sekolah", "Admin
+  Javan"); it opens the account menu (email, Sign out).
+
+The design's bell is left out until there is something for it to open: teacher-question counts
+alone don't name the questions.

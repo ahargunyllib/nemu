@@ -125,6 +125,15 @@ describe("workspace roles", () => {
     });
   });
 
+  it("names the operator's own school, and keeps a teacher out of it", async () => {
+    await expect(
+      call(schoolRouter.currentSchool, undefined, { context: await createSchoolContext(OPERATOR) }),
+    ).resolves.toEqual({ id: "W-SEKOLAH", name: "SDIT Nusantara" });
+    await expect(
+      call(schoolRouter.currentSchool, undefined, { context: await createSchoolContext() }),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+
   it("shows Admin Javan the one-row school list and WS-06", async () => {
     const context = await createSchoolContext(ADMIN_JAVAN);
     await expect(call(schoolRouter.listSchools, undefined, { context })).resolves.toEqual([

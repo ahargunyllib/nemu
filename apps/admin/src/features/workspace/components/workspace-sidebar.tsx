@@ -17,7 +17,7 @@ import type { ReactNode } from "react";
 import { navGroupsFor } from "@/features/workspace/lib/nav-items";
 import { homePath } from "@/features/workspace/lib/roles";
 
-/** The Admin Workspace's dark side menu: the sections the admin's role sees, and the admin at the bottom. */
+/** The Admin Workspace's dark side menu: the sections the admin's role sees, and the school at the bottom. */
 export default function WorkspaceSidebar({
   role,
   footer,
