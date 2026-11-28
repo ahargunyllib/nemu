@@ -26,7 +26,7 @@ export const allowedSiteSchema = z
   .object({ pattern: z.string().min(1), label: z.string(), permission: sitePermissionSchema })
   .strict();
 
-/** Cara 1 Nemu isi · cara 2 Nemu tunjukkan · cara 3 guru isi, Nemu cek (PRD §6.1). */
+/** Cara 1 Nemu kerjakan, Ibu lihat · cara 2 Nemu tunjuk, Ibu isi · cara 3 guru isi, Nemu cek (PRD §6.1). */
 export const caraSchema = z.enum(["isi", "tunjuk", "cek"]);
 export type Cara = z.infer<typeof caraSchema>;
 

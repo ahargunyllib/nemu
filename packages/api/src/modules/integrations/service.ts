@@ -58,15 +58,33 @@ function normalizeValue(
   return { ok: true, value: trimmed };
 }
 
+/**
+ * Each setting's status. An address also shows its host (Website diizinkan's Integrasi card); a key,
+ * token or number shows only its last four. A host that can't be decrypted reads as unknown.
+ */
 export async function listSecrets(
-  deps: Pick<IntegrationDeps, "secrets">,
+  deps: IntegrationDeps,
   workspaceId: string,
 ): Promise<IntegrationSecretStatus[]> {
   const records = await deps.secrets.list(workspaceId);
-  return integrationSecretNameSchema.options.map((name) => {
-    const record = records.find((item) => item.name === name);
-    return { name, lastFour: record?.lastFour ?? null, updatedAt: record?.updatedAt ?? null };
-  });
+  return Promise.all(
+    integrationSecretNameSchema.options.map(async (name) => {
+      const record = records.find((item) => item.name === name);
+      const host =
+        record && URL_SETTINGS.has(name)
+          ? await deps.cipher
+              .open(record, additionalData(workspaceId, name))
+              .then((url) => new URL(url).host)
+              .catch(() => null)
+          : null;
+      return {
+        name,
+        lastFour: record?.lastFour ?? null,
+        host,
+        updatedAt: record?.updatedAt ?? null,
+      };
+    }),
+  );
 }
 
 export async function saveSecret(
