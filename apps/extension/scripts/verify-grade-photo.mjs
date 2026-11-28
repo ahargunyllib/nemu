@@ -259,6 +259,16 @@ await check(
     );
     // Cukup klik: the answer is a click (or said with the talk combination), not typed.
     expect(!(await typeBox.isVisible()), "a type box under the Kartu Pilih");
+    // The heading names the photo; the detail says where the choices came from and the keys to hold.
+    await pick
+      .locator("[data-nemu-status]")
+      .getByText("Foto buku nilai", { exact: true })
+      .waitFor();
+    const detail = await pick.locator("[data-nemu-detail]").textContent();
+    expect(
+      detail === "Dari judul di foto. Bisa juga diucapkan: tahan Ctrl + Spasi.",
+      `detail: ${detail}`,
+    );
     await page.screenshot({ path: join(shots, "pilih-judul.png") });
     await pick.screenshot({ path: join(shots, "pilih-judul-dekat.png") });
     await pick.getByRole("button", { name: "UTS Matematika 4B" }).click();

@@ -141,6 +141,7 @@ beforeAll(() => {
     pageEmail: { kind: "read", email: "siti.aminah@sditnusantara.sch.id" },
     honorific: "Bu",
     registered: true,
+    shortcut: "Ctrl + Spasi",
     speak: (text) => spoken.push(text),
   });
 });
@@ -186,7 +187,9 @@ describe("F1 from the WhatsApp photo to the read-back (#207)", () => {
     expect(calls).toContainEqual({ op: "title", jobId: "job-1" });
     expect(view().display).toMatchObject({
       type: "pilih",
+      status: { text: "Foto buku nilai" },
       question: "Ini nilai apa, Bu?",
+      detail: "Dari judul di foto. Bisa juga diucapkan: tahan Ctrl + Spasi.",
       choices: [{ label: "UTS Matematika" }, { label: "Pilih yang lain" }, { label: "Nanti saja" }],
     });
     // Cukup klik: no type box under the card; saying it still works (hear).

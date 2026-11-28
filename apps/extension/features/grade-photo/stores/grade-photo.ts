@@ -77,6 +77,8 @@ type Context = {
   pageEmail: PageEmail;
   honorific: string;
   registered: boolean;
+  /** The talk shortcut as the teacher presses it: "Ctrl + Spasi". */
+  shortcut: string;
   speak: (text: string) => void;
 };
 
@@ -143,6 +145,7 @@ function createGradePhoto() {
     pageEmail: { kind: "unreadable" },
     honorific: "",
     registered: false,
+    shortcut: "Ctrl + Spasi",
     speak: () => undefined,
   };
   let view: GradePhotoView = { display: null, card: null, typing: false };
@@ -264,7 +267,9 @@ function createGradePhoto() {
           : [first!, OTHER_TITLE, LATER];
         return {
           type: "pilih",
+          status: { text: "Foto buku nilai" },
           question: pickQuestion(),
+          detail: `Dari judul di foto. Bisa juga diucapkan: tahan ${context.shortcut}.`,
           choices,
           onChoose: (id) => pick(candidates, id),
         };
