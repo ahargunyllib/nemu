@@ -1,14 +1,15 @@
 import { Button } from "@nemu/ui/components/button";
 import type { GelembungKerjaProps } from "@nemu/ui/lib/nemu-display";
-import { BIG_BUTTON, NemuBubble, NemuSentence } from "@nemu/ui/nemu/nemu-frame";
+import { BIG_BUTTON, NemuBubble, NemuText } from "@nemu/ui/nemu/nemu-frame";
 import { Square, Turtle } from "lucide-react";
 
 /**
- * Gelembung Kerja: Nemu is working. The status header with its progress bar, one sentence, and
- * always [Pelan] [Berhenti].
+ * Gelembung Kerja: Nemu is working. The status header with its progress bar, one sentence with an
+ * optional detail line, and always [Pelan] [Berhenti].
  */
 export function GelembungKerja({
   sentence,
+  detail,
   highlightedWord,
   status,
   slow,
@@ -17,7 +18,7 @@ export function GelembungKerja({
 }: GelembungKerjaProps) {
   return (
     <NemuBubble display="kerja" label="Nemu bekerja" status={status}>
-      <NemuSentence sentence={sentence} highlightedWord={highlightedWord} />
+      <NemuText sentence={sentence} detail={detail} highlightedWord={highlightedWord} />
       <div className="grid grid-cols-2 gap-3">
         <Button
           type="button"

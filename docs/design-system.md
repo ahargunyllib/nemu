@@ -19,6 +19,7 @@ The tokens live in `packages/ui/src/styles/nemu.css` and are Tailwind colours:
 | `nemu-soft`                                 | white / 18%                                 | Icon buttons and chips sitting on a `nemu` fill.                                                    |
 | `nemu-text`                                 | amber 700 `#8F460A`                         | Nemu links ("Rincian", "Tutup", "Lihat detail") and outline button text (6.9:1).                    |
 | `nemu-subtle` / `nemu-subtle-foreground`    | amber 50 / amber 800                        | Citation chips ("PMK 119/2023 · Ps. 8 ayat (5)").                                                   |
+| `nemu-secondary`                            | zinc 600 `#52525B`                          | text/secondary: the detail line under a display's sentence (7.7:1).                                 |
 | `nemu-ring`                                 | amber 500 `#E07A16`                         | Mascot orbit ring, click ripple. Lines only (Sorot arahkan is `nemu-amber-600`).                    |
 | `nemu-glow`                                 | amber 400 `#F59331`                         | Mascot glow, loading shimmer.                                                                       |
 | `nemu-success*`                             | `#10B981`, subtle `#ECFDF5`, text `#047857` | "Kamu yang mengirim" label, success card.                                                           |
@@ -118,16 +119,23 @@ the page's Shadow DOM.
 
 | Type                 | When                   | Shape                                                                                                 |
 | -------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------- |
-| **Gelembung Kerja**  | Nemu is working        | Status header with a progress bar, one sentence, always **[Pelan] [Berhenti]**                        |
+| **Gelembung Kerja**  | Nemu is working        | Status header with a progress bar, one sentence and its detail line, always **[Pelan] [Berhenti]**    |
 | **Gelembung Tunjuk** | The teacher's turn     | One sentence beside the field or button the cursor points at. No buttons, at most one link            |
 | **Gelembung Jawab**  | An answer or a problem | One sentence, the **Kenapa?**, **Sumber** and **Lihat ringkasan** links, at most one action button, × |
-| **Kartu Pilih**      | A decision             | One question, 2–3 equal stacked big buttons, nothing pre-selected or focused                          |
+| **Kartu Pilih**      | A decision             | One question, a detail line, 2–3 equal stacked big buttons, nothing pre-selected or focused           |
 | **Kartu Info**       | Something to read      | A title, a short list, at most one link (Catatan langkah: "Coba sendiri"), one **[Tutup]**            |
 
 - **Gelembung** (bubble): white, `rounded-3xl`, a 2 px `nemu` edge, 420 px wide. **Kartu** (card):
   the stock card, 400 px wide, with an 8 px `nemu` band along its top.
-- **Sizes**: the sentence is 24 px (medium), card text 20 px, links 18 px, the header 18 px. Every
-  button and link is at least 44 px tall; the big buttons are 48 px with 20 px text.
+- **Text**: every display leads with one bold line, the sentence of a Gelembung (24 px semibold),
+  the question of a Kartu Pilih or the title of a Kartu Info (20 px semibold). Under it can sit one
+  quieter **detail** line (`detail`, 18/26 regular, `nemu-secondary` `#52525B`, 7.7:1): "Klik atau
+  ketik kalau Ibu mau isi sendiri.", "Pilih salah satu, Nemu menunggu." In a Kartu Pilih it sits
+  between the question and the choices. It is never read aloud and is not part of the sentence
+  that says itself again.
+- **Sizes**: the sentence is 24 px (semibold), card text 20 px, the detail line and links 18 px,
+  the header 18 px. Every button and link is at least 44 px tall; the big buttons are 48 px with
+  20 px text.
 - **Contrast ≥ 7:1**: text is `foreground` on white, or `nemu-strong` (amber 800, Nemu's dark
   orange) on white or `nemu-subtle`. The one action button in a Gelembung Jawab is a `nemu-strong`
   fill with white text (9.6:1); the main button in a Kartu is the stock black default. The lighter
@@ -137,7 +145,7 @@ the page's Shadow DOM.
   icon (and "Berisiko" for screen readers); the spoken word is tinted and underlined.
 - **Header**: what Nemu is doing or whether the page is saved, on `nemu-subtle`. It is never read
   aloud: Nemu says only the sentence (`spokenText`), the question of a Kartu Pilih, or the title
-  of a Kartu Info.
+  of a Kartu Info, never the detail line under it.
 - **Links**: Kenapa?, Sumber and Lihat ringkasan are small underlined `nemu-strong` links. What is
   behind them shows in a `nemu-subtle` box and is read (`onRead`) only once the teacher clicks.
 - **Kartu Pilih**: a risky choice gets ⚠ and goes under the safe one, whatever order it was given
@@ -241,7 +249,8 @@ popup's frame and shadow. Rows:
 1. The idle mascot at 28 px, 8 px gap, "Nemu" in Body/Small Strong.
 2. "Nemu aktif di AlurKerja" in Heading/H3.
 3. "Di situs ini Nemu tidak membaca apa pun. Buka AlurKerja untuk bertanya soal proses kerja." in
-   Body/Small, `muted-foreground` (the design's text/secondary `#52525B` has no token yet).
+   Body/Small, `muted-foreground` (the design's text/secondary `#52525B` is now `nemu-secondary`,
+   not used here yet).
 4. "Buka AlurKerja": a full-width `NemuButton` with `tone="solid"`, opening the Demo App in a new
    tab.
 

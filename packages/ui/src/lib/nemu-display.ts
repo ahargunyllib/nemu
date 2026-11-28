@@ -38,9 +38,14 @@ export type NemuSingleNote =
   | { sumber: readonly NemuSource[]; kenapa?: never; ringkasan?: never }
   | { ringkasan: string; kenapa?: never; sumber?: never };
 
-/** What every bubble shares: one sentence, the word being spoken (#200), and its links' reader. */
+/**
+ * What every bubble shares: one sentence, an optional quieter detail line, the word being spoken
+ * (#200), and its links' reader.
+ */
 type BubbleBase = {
   sentence: string;
+  /** A quieter line under the sentence: "Klik atau ketik kalau Ibu mau isi sendiri." Not read aloud. */
+  detail?: string;
   /** Index of the word Nemu's voice is on, counting words split on spaces. */
   highlightedWord?: number;
   status?: NemuStatus;
@@ -73,6 +78,8 @@ export type NemuChoice = { id: string; label: string; risky?: boolean };
 /** Kartu Pilih: one question, two or three equal choices, nothing pre-selected. */
 export type KartuPilihProps = {
   question: string;
+  /** A quieter line between the question and the choices: "Pilih salah satu, Nemu menunggu." */
+  detail?: string;
   choices: readonly [NemuChoice, NemuChoice] | readonly [NemuChoice, NemuChoice, NemuChoice];
   onChoose: (id: string) => void;
   /**
@@ -89,6 +96,8 @@ export type KartuPilihProps = {
 /** Kartu Info: something to read, a title, a short list and one [Tutup]. */
 export type KartuInfoProps = {
   title: string;
+  /** A quieter line under the title: "Yang lain sudah benar: 15 soal, kelas 4A." Not read aloud. */
+  detail?: string;
   items: readonly string[];
   /** At most one small link above Tutup, such as Catatan langkah's "Coba sendiri". */
   link?: { label: string; onSelect: () => void };
@@ -102,7 +111,10 @@ export type NemuDisplay =
   | ({ type: "pilih" } & KartuPilihProps)
   | ({ type: "info" } & KartuInfoProps);
 
-/** What Nemu says when a display appears: never the header, the links or the buttons. */
+/**
+ * What Nemu says when a display appears: the sentence, question or title only, never the detail
+ * line, the header, the links or the buttons.
+ */
 export function spokenText(display: NemuDisplay): string {
   switch (display.type) {
     case "pilih":
