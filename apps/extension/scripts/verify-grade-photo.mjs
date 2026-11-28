@@ -242,6 +242,12 @@ await check("another teacher can't fetch the thumbnail (#278)", async () => {
 
 const overlay = page.locator("nemu-overlay");
 const display = (type) => overlay.locator(`[data-nemu-display='${type}']`);
+// The heading (Kepala) with its words and, when given, the count on its right ("3 dari 32").
+// Matched apart: the progress bar under the count adds text of its own.
+const heading = (type, text, count) => {
+  const words = display(type).locator("[data-nemu-status]").filter({ hasText: text });
+  return count ? words.filter({ hasText: new RegExp(`(^|\\D)${count}`, "u") }) : words;
+};
 const typeBox = overlay.getByRole("textbox");
 const started = Date.now();
 
@@ -316,6 +322,20 @@ await check(
     );
   },
 );
+
+await check("cara 1 says each navigation step: Langkah 1 and 2 of 3 (F1·05a–06b)", async () => {
+  const working = display("kerja");
+  await working.getByText("Saya buka menu Nilai, Bu.").waitFor({ timeout: 30_000 });
+  await heading("kerja", "Nemu bekerja", "Langkah 1 dari 3").waitFor();
+  await page.screenshot({ path: join(shots, "navigasi-berangkat.png") });
+  await working.getByText("Ini menu Nilai.").waitFor({ timeout: 10_000 });
+  await working.getByText("Saya klik, Bu.").waitFor();
+  await page.screenshot({ path: join(shots, "navigasi-menu.png") });
+  await working.getByText("Ini Isi nilai kelas 4B.").waitFor({ timeout: 15_000 });
+  await working.getByText("Kelas 4B, Matematika, UTS sudah saya pilih.").waitFor();
+  await heading("kerja", "Nemu bekerja", "Langkah 2 dari 3").waitFor();
+  await page.screenshot({ path: join(shots, "navigasi-tampilkan.png") });
+});
 
 await check("cara 1 opens Isi nilai kelas through the menu and fills every value", async () => {
   await display("kerja")

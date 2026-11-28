@@ -155,6 +155,10 @@ function waitForEvent(
   });
 }
 
+function wordCount(sentence: string): number {
+  return sentence.split(/\s+/u).length;
+}
+
 const VALUE_VERBS: ReadonlySet<ExecutorVerb> = new Set(["setValue", "selectOption", "check"]);
 
 /**
@@ -524,6 +528,19 @@ export class ExecutorRun {
     return { done: done + 1, total: fills.length };
   }
 
+  /** Gelembung Kerja while Nemu works: [Pelan] and [Berhenti]. */
+  private working(sentence: string, detail: string | undefined, status: NemuStatus): NemuDisplay {
+    return {
+      type: "kerja",
+      sentence,
+      ...(detail ? { detail } : {}),
+      status,
+      slow: this.state.slow,
+      onSlow: () => this.setSlow(!this.state.slow),
+      onStop: () => this.askToStop(),
+    };
+  }
+
   /** Cara 1: Nemu does the step itself, at the fill speed. */
   private async act(
     index: number,
@@ -534,31 +551,36 @@ export class ExecutorRun {
   ) {
     const started = Date.now();
     const unit = this.state.slow ? 2 : 1;
-    const sentence = {
-      clickMenu: `Membuka ${name}…`,
-      selectOption: `Memilih ${"option" in step ? step.option : ""}.`,
-      check:
-        "checked" in step && !step.checked ? `Menghapus centang ${name}.` : `Mencentang ${name}.`,
-      setValue: `Mengisi ${name}.`,
-    }[step.verb];
-    const status: NemuStatus =
-      step.verb === "setValue"
+    // The task's own words for the step when it has them (F1·05a–06b), else the executor's.
+    const sentence =
+      step.sentence ??
+      {
+        clickMenu: `Membuka ${name}…`,
+        selectOption: `Memilih ${"option" in step ? step.option : ""}.`,
+        check:
+          "checked" in step && !step.checked ? `Menghapus centang ${name}.` : `Mencentang ${name}.`,
+        setValue: `Mengisi ${name}.`,
+      }[step.verb];
+    const status: NemuStatus = step.stage
+      ? {
+          tone: "working",
+          text: step.stage.label ?? (step.verb === "setValue" ? "Nemu mengisi" : "Nemu bekerja"),
+          count: `Langkah ${step.stage.n} dari ${step.stage.of}`,
+          progress: { done: step.stage.n, total: step.stage.of },
+        }
+      : step.verb === "setValue"
         ? { tone: "working", text: "Nemu mengisi", progress: this.progress(index) }
         : {
             tone: "working",
             text: step.verb === "clickMenu" ? "Nemu membuka menu" : "Nemu mengisi",
           };
-    this.render(
-      {
-        type: "kerja",
-        sentence,
-        status,
-        slow: this.state.slow,
-        onSlow: () => this.setSlow(!this.state.slow),
-        onStop: () => this.askToStop(),
-      },
-      element,
-    );
+    if (step.approach) {
+      // Said before the cursor sets off, beside the Nemu button: "Saya buka menu Nilai, Bu."
+      this.render(this.working(step.approach.sentence, step.approach.detail, status));
+      this.deps.speak(step.approach.sentence);
+      await this.sleep(wordCount(step.approach.sentence) * WORD_MS * unit, signal);
+    }
+    this.render(this.working(sentence, step.detail, status), element);
     await this.sleep(CURSOR_GLIDE_MS, signal);
 
     switch (step.verb) {
@@ -604,7 +626,7 @@ export class ExecutorRun {
         if (readAloud) {
           const spoken = `${step.rowName}, ${step.value}.`;
           this.deps.speak(spoken);
-          await this.sleep(spoken.split(/\s+/u).length * WORD_MS * unit, signal);
+          await this.sleep(wordCount(spoken) * WORD_MS * unit, signal);
         }
         break;
       }
