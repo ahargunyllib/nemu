@@ -299,21 +299,42 @@ await check(
   },
 );
 
-const ready =
-  "Kuis Latihan IPAS Kelas 4A sudah siap: 10 soal, dibuka 7 Desember pukul 00.00 dan ditutup 10 Desember pukul 23.59, Bu.";
-await check("The F4-1 check runs on the new quiz and Nemu reports in one sentence", async () => {
+const RECIPE = [
+  "Naskah diubah jadi soal Moodle",
+  "Buat kuis di bagian IPAS",
+  "Atur waktu buka dan tutup",
+  "Ibu tekan Simpan dan tampilkan",
+  "Bank soal › Impor",
+  "Soal › Tambah › dari bank soal",
+];
+await check("The F4-1 check runs on the new quiz and ends on one Sudah dicek card", async () => {
   const preview = page.getByRole("button", {
     name: /^(Pratinjau kuis|Lanjutkan pratinjau terakhir)$/u,
   });
   await shePresses("Pratinjau kuis", preview, "6-pratinjau.png");
   await page.waitForURL(/\/mod\/quiz\/attempt\.php/u, { timeout: 20_000 });
-  const jawab = display("jawab");
-  await jawab.getByText(ready).waitFor({ timeout: 60_000 });
+  // F4·11: Sudah dicek, the title, what the check confirmed, then Cara pasang kuis.
+  const card = display("info");
+  await card
+    .getByText("Kuis terpasang, 10 soal siap.", { exact: true })
+    .waitFor({ timeout: 60_000 });
+  await card.getByText("Sudah dicek").waitFor();
+  await card.getByText("Gambar dan kunci semua soal lengkap.", { exact: true }).waitFor();
+  await card.getByText("Catatan langkah · Cara pasang kuis").waitFor();
+  const steps = await card.getByRole("listitem").allTextContents();
+  const want = RECIPE.map((step, index) => `${index + 1}${step}`);
+  expect(steps.join("|") === want.join("|"), `the recipe is ${JSON.stringify(steps)}`);
+  await card.getByRole("button", { name: "Coba sendiri" }).waitFor();
   await page.screenshot({ path: join(shots, "7-siap.png") });
-  await jawab.getByRole("button", { name: "Catatan langkah" }).click();
-  const info = display("info");
-  await info.getByText(`Nemu menaruh berkas ${QUIZ}.xml di Impor`, { exact: false }).waitFor();
+  await card.getByRole("button", { name: "Tutup" }).click();
+  // Reopened from the Nemu button it is the recipe itself, still with Coba sendiri.
+  await overlay.getByRole("button", { name: "Tanya Nemu" }).click();
+  await overlay.getByRole("button", { name: "Lihat catatan langkah" }).click();
+  const notes = overlay.getByRole("region", { name: "Cara pasang kuis" });
+  await notes.getByText(`Disimpan dari pemasangan ${QUIZ}`, { exact: false }).waitFor();
+  await notes.getByRole("button", { name: "Coba sendiri" }).waitFor();
   await page.screenshot({ path: join(shots, "8-catatan-langkah.png") });
+  await notes.getByRole("button", { name: "Tutup" }).click();
   console.log(`  Pages opened: ${[...new Set(visited)].join(" → ")}`);
 });
 // --- The Moodle database against Richard's expected XML ----------------------------------------

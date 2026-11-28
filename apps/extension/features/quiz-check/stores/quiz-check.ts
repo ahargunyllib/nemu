@@ -2,11 +2,12 @@ import type { QuizProblem, QuizSnapshot } from "@nemu/contracts/quiz";
 import type { NemuDisplay } from "@nemu/ui/lib/nemu-display";
 
 import type { PageEmail } from "../../../shared/lib/messages";
+import { checkedCard } from "../../executor/lib/recipe-steps";
 import type { RunState } from "../../executor/lib/run";
 import { executor } from "../../executor/stores/executor";
 import { requestQuizCheck } from "../api/request-quiz-check";
 import { imageLoaded, quizHeading, questionTarget } from "../lib/moodle-pages";
-import { checkQuiz, closingSentence } from "../lib/quiz-rules";
+import { checkQuiz, closingSentence, completenessDetail } from "../lib/quiz-rules";
 import {
   nextQuizSteps,
   type QuizAsked,
@@ -206,6 +207,21 @@ function createQuizCheck() {
       input: { quiz: found.quiz, utterance: found.utterance, found: problems },
     });
     const all = [...problems, ...(judged.ok ? judged.value.problems : [])];
+    if (all.length === 0 && found.recipe && found.ready) {
+      // F4·11: after the import, one Sudah dicek card with the recipe Cara pasang kuis.
+      publish({ display: null, target: null });
+      executor.presentRecipe(found.recipe, {
+        offer: found.offer ?? null,
+        card: checkedCard(
+          found.recipe,
+          { ok: true, title: found.ready },
+          completenessDetail(found.quiz),
+        ),
+        log: lines({ problems: [], index: 0, notes, changed }),
+      });
+      context.speak(found.ready);
+      return;
+    }
     if (all.length === 0) {
       pointing = { problems: [], index: 0, notes, changed };
       showReady(found.ready ?? say("Kuis ini sudah siap. Nemu tidak menemukan masalah", honorific));
@@ -246,7 +262,10 @@ function createQuizCheck() {
      * "Nemu, tolong cek kuis ini." on any page of a Moodle quiz. F4-03 (#210) also starts it
      * once the teacher has added the questions, with its own sentence and notes (`QuizAsked`).
      */
-    async start(utterance: string, after: Pick<QuizAsked, "ready" | "before"> = {}) {
+    async start(
+      utterance: string,
+      after: Pick<QuizAsked, "ready" | "before" | "recipe" | "offer"> = {},
+    ) {
       pointing = null;
       save();
       const started = quizCheckTask(document, location.href, {

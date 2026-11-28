@@ -2,6 +2,7 @@
 import type { ExecutorStep } from "@nemu/contracts/executor";
 import { describe, expect, test } from "vite-plus/test";
 
+import { recipeOf } from "../../executor/lib/recipe-steps";
 import {
   type ImportContinuation,
   type ImportIo,
@@ -72,7 +73,12 @@ describe("F4-03 as one executor task (#210)", () => {
     const started = quizImportTask(io.doc, URLS.course, PLAN, "Bu")!;
     expect(started.task.kind).toBe(QUIZ_IMPORT_KIND);
     expect(started.task.steps).toEqual([
-      { verb: "check", target: { role: "checkbox", label: "Mode Edit" }, checked: true },
+      {
+        verb: "check",
+        stage: "Buat kuis di bagian IPAS",
+        target: { role: "checkbox", label: "Mode Edit" },
+        checked: true,
+      },
     ]);
     io.show(coursePageHtml(true), URLS.course);
     const next = await nextImportSteps(io, started.continuation, () => {});
@@ -96,10 +102,15 @@ describe("F4-03 as one executor task (#210)", () => {
     expect(steps.slice(0, 2)).toEqual([
       {
         verb: "setValue",
+        stage: "Buat kuis di bagian IPAS",
         target: { role: "textbox", label: "Nama" },
         value: "Latihan IPAS Kelas 4A",
       },
-      { verb: "clickMenu", target: { role: "button", text: "Waktu Pengerjaan" } },
+      {
+        verb: "clickMenu",
+        stage: "Atur waktu buka dan tutup",
+        target: { role: "button", text: "Waktu Pengerjaan" },
+      },
     ]);
     const times = steps
       .filter(
@@ -190,13 +201,27 @@ describe("F4-03 as one executor task (#210)", () => {
     // Moodle XML, and the questions go into the quiz's own bank, not a category from the file.
     expect(all).toContainEqual({
       verb: "check",
+      stage: "Bank soal › Impor",
       target: { role: "radio", label: "Format XML Moodle" },
       checked: true,
     });
     expect(all).toContainEqual({
       verb: "check",
+      stage: "Bank soal › Impor",
       target: { role: "checkbox", label: "Dapatkan kategori dari berkas" },
       checked: false,
+    });
+    // F4·11: Catatan langkah · Cara pasang kuis, from the stages the walk took.
+    expect(recipeOf({ ...started.task, steps: all }, new Date(2026, 11, 7))).toEqual({
+      title: "Cara pasang kuis",
+      subtitle: "Disimpan dari pemasangan Latihan IPAS Kelas 4A, 7 Des 2026.",
+      items: [
+        "Buat kuis di bagian IPAS",
+        "Atur waktu buka dan tutup",
+        "Ibu tekan Simpan dan tampilkan",
+        "Bank soal › Impor",
+        "Soal › Tambah › dari bank soal",
+      ],
     });
     expect(said).toEqual(["Nemu menaruh berkas Latihan IPAS Kelas 4A.xml di sini."]);
     expect(downloads).toEqual([]);
@@ -217,6 +242,7 @@ describe("F4-03 as one executor task (#210)", () => {
     expect(fallback.steps).toEqual([
       {
         verb: "point",
+        stage: "Bank soal › Impor",
         target: { role: "button", text: "Pilih berkas ..." },
         sentence: "Pilih berkas Latihan IPAS Kelas 4A.xml, Bu. Nemu sudah menyimpannya di Unduhan.",
       },

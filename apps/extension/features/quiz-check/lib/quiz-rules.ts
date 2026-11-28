@@ -152,3 +152,21 @@ export function checkQuiz(
 
   return problems;
 }
+
+/**
+ * The Sudah dicek card's detail line (F4·11): what the check confirmed about every question's
+ * pictures and answer key, or what is still missing. Pictures are named only when the quiz has
+ * some.
+ */
+export function completenessDetail(quiz: QuizSnapshot): string {
+  const images = quiz.questions.flatMap((question) => question.images);
+  const missingImages = images.filter((image) => !image.loaded).length;
+  const missingKeys = quiz.questions.filter((question) => question.hasKey === false).length;
+  if (missingImages === 0 && missingKeys === 0)
+    return images.length > 0 ? "Gambar dan kunci semua soal lengkap." : "Kunci semua soal lengkap.";
+  const missing = [
+    ...(missingImages ? [`${missingImages} gambar belum tampil`] : []),
+    ...(missingKeys ? [`${missingKeys} soal belum ada kuncinya`] : []),
+  ].join(", ");
+  return `${missing.charAt(0).toLocaleUpperCase("id-ID")}${missing.slice(1)}.`;
+}

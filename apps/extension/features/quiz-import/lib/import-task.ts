@@ -26,6 +26,28 @@ import { type ImportPlan, type SetTime, spokenTime } from "./plan";
 
 export const QUIZ_IMPORT_KIND = "f4-masukkan-kuis";
 
+/** What Catatan langkah calls F4-2's job: "Cara pasang kuis". */
+export const IMPORT_RECIPE = "Pasang kuis";
+
+/**
+ * The recipe's stages (F4·11), in the order the run takes them. Reading the script happens before
+ * the run, so the finisher puts `script` first itself.
+ */
+export const IMPORT_STAGE = {
+  script: "Naskah diubah jadi soal Moodle",
+  create: (section: string) => `Buat kuis di bagian ${section}`,
+  times: "Atur waktu buka dan tutup",
+  save: (honorific: string) =>
+    `${honorific === "Pak" ? "Bapak" : honorific === "Bu" ? "Ibu" : "Anda"} tekan Simpan dan tampilkan`,
+  import: "Bank soal › Impor",
+  add: "Soal › Tambah › dari bank soal",
+} as const;
+
+/** The steps of one stage of the recipe. */
+function staged(stage: string, steps: ExecutorStep[]): ExecutorStep[] {
+  return steps.map((step) => ({ ...step, stage }));
+}
+
 type Phase =
   | "edit-mode"
   | "settings"
@@ -103,13 +125,16 @@ export function quizImportTask(
     kind: QUIZ_IMPORT_KIND,
     title: `Masukkan kuis ${plan.name}`,
     source: `Naskah ${plan.fileName.replace(/\.xml$/u, "")}`,
+    recipe: { name: IMPORT_RECIPE, from: `pemasangan ${plan.name}` },
     steps,
   });
   if (!course.editing)
     return {
-      task: task([
-        { verb: "check", target: { role: "checkbox", label: "Mode Edit" }, checked: true },
-      ]),
+      task: task(
+        staged(IMPORT_STAGE.create(plan.section), [
+          { verb: "check", target: { role: "checkbox", label: "Mode Edit" }, checked: true },
+        ]),
+      ),
       continuation: { ...continuation, phase: "edit-mode" },
     };
   return { task: task(addQuizSteps(plan)), continuation };
@@ -121,13 +146,13 @@ export function quizImportTask(
  * selects it) and the chooser's own Tambahkan (a button outside any form).
  */
 function addQuizSteps(plan: ImportPlan): ExecutorStep[] {
-  return [
+  return staged(IMPORT_STAGE.create(plan.section), [
     clickMenu({ role: "button", label: `Masukkan konten di bagian '${plan.section}'` }),
     clickMenu({ role: "button", text: "Aktivitas atau sumber daya" }),
     clickMenu({ role: "tab", text: "Semua" }),
     clickMenu({ role: "link", text: "Kuis" }),
     clickMenu({ role: "button", text: "Tambahkan" }),
-  ];
+  ]);
 }
 
 /** Aktifkan, then the day, month, year, hour and minute, in the group the form names. */
@@ -185,14 +210,14 @@ export async function nextImportSteps(
     return { steps: [], continuation: null };
   };
   const pointImport = (dropped: boolean) => ({
-    steps: [
+    steps: staged(IMPORT_STAGE.import, [
       {
-        verb: "point" as const,
-        target: { role: "button" as const, text: "Impor" },
+        verb: "point",
+        target: { role: "button", text: "Impor" },
         sentence: `Tekan Impor${teacher}. Isinya ${plan.count} soal dari naskah.`,
         sumber: `Naskah ${plan.fileName.replace(/\.xml$/u, "")}`,
       },
-    ],
+    ]),
     continuation: next("imported", { dropped }),
   });
 
@@ -205,12 +230,17 @@ export async function nextImportSteps(
       await arrive(io, () => isNewQuizForm(io.doc, io.url()), "The new quiz's form");
       const timing = collapsedHeaderFor(io.doc, "id_timeopen");
       const steps: ExecutorStep[] = [
-        { verb: "setValue", target: { role: "textbox", label: "Nama" }, value: plan.name },
-        ...(timing ? [clickMenu({ role: "button", text: timing })] : []),
-        ...timeSteps(io.doc, "timeopen", plan.opens),
-        ...timeSteps(io.doc, "timeclose", plan.closes),
+        ...staged(IMPORT_STAGE.create(plan.section), [
+          { verb: "setValue", target: { role: "textbox", label: "Nama" }, value: plan.name },
+        ]),
+        ...staged(IMPORT_STAGE.times, [
+          ...(timing ? [clickMenu({ role: "button", text: timing })] : []),
+          ...timeSteps(io.doc, "timeopen", plan.opens),
+          ...timeSteps(io.doc, "timeclose", plan.closes),
+        ]),
         {
           verb: "point",
+          stage: IMPORT_STAGE.save(honorific),
           target: { role: "button", text: "Simpan dan tampilkan" },
           sentence: `Tekan Simpan dan tampilkan${teacher}. Kuis dibuka ${spokenTime(plan.opens)}, ditutup ${spokenTime(plan.closes)}.`,
           ringkasan: `${plan.name} di bagian ${plan.section}: dibuka ${spokenTime(plan.opens)}, ditutup ${spokenTime(plan.closes)}.`,
@@ -222,7 +252,7 @@ export async function nextImportSteps(
       await arrive(io, () => onQuizPage(io, null, "/mod/quiz/view.php"), "The new quiz's page");
       const cmid = quizModule(io.doc, io.url())!.cmid;
       return {
-        steps: [clickMenu({ role: "link", text: "Bank soal" })],
+        steps: staged(IMPORT_STAGE.import, [clickMenu({ role: "link", text: "Bank soal" })]),
         continuation: next("bank", { cmid }),
       };
     }
@@ -235,10 +265,10 @@ export async function nextImportSteps(
         "The quiz's Bank soal",
       );
       return {
-        steps: [
+        steps: staged(IMPORT_STAGE.import, [
           clickMenu({ role: "combobox", text: "Soal-soal" }),
           clickMenu({ role: "menuitem", text: "Impor" }),
-        ],
+        ]),
         continuation: next("import-form"),
       };
     }
@@ -246,7 +276,7 @@ export async function nextImportSteps(
       await arrive(io, () => isImportForm(io.doc, io.url()), "Bank soal › Impor");
       const general = collapsedHeaderFor(io.doc, "id_catfromfile");
       return {
-        steps: [
+        steps: staged(IMPORT_STAGE.import, [
           { verb: "check", target: { role: "radio", label: "Format XML Moodle" }, checked: true },
           ...(general ? [clickMenu({ role: "button", text: general })] : []),
           // The questions go into the quiz's own bank, where Tambah › dari bank soal opens.
@@ -255,7 +285,7 @@ export async function nextImportSteps(
             target: { role: "checkbox", label: "Dapatkan kategori dari berkas" },
             checked: false,
           },
-        ],
+        ]),
         continuation: next("drop"),
       };
     }
@@ -272,13 +302,13 @@ export async function nextImportSteps(
       // Moodle didn't take it: the file goes to Unduhan and she picks it.
       io.download(plan.fileName, plan.xml);
       return {
-        steps: [
+        steps: staged(IMPORT_STAGE.import, [
           {
             verb: "point",
             target: { role: "button", text: "Pilih berkas ..." },
             sentence: `Pilih berkas ${plan.fileName}${teacher}. Nemu sudah menyimpannya di Unduhan.`,
           },
-        ],
+        ]),
         continuation: next("picking"),
       };
     }
@@ -291,14 +321,14 @@ export async function nextImportSteps(
       const result = importResult(io.doc, io.url())!;
       if (result.status === "error") return done({ status: "error", message: result.message });
       return {
-        steps: [clickMenu({ role: "link", text: "Soal" })],
+        steps: staged(IMPORT_STAGE.add, [clickMenu({ role: "link", text: "Soal" })]),
         continuation: next("questions"),
       };
     }
     case "questions": {
       await arrive(io, () => onQuizPage(io, continuation.cmid, "/mod/quiz/edit.php"), "Soal");
       return {
-        steps: [
+        steps: staged(IMPORT_STAGE.add, [
           clickMenu({ role: "button", label: "Tambah" }),
           clickMenu({ role: "menuitem", text: "dari bank soal" }),
           { verb: "check", target: { role: "checkbox", label: "Pilih semua" }, checked: true },
@@ -307,7 +337,7 @@ export async function nextImportSteps(
             target: { role: "button", text: "Tambahkan soal terpilih pada kuis" },
             sentence: `Tekan Tambahkan soal terpilih pada kuis${teacher}. Nemu sudah memilih ${plan.count} soalnya.`,
           },
-        ],
+        ]),
         continuation: next("added"),
       };
     }

@@ -26,6 +26,7 @@ const executor = {
   ) => finishers.set(kind, finisher),
   start: vi.fn(async () => {}),
   presentNotes: vi.fn(),
+  presentRecipe: vi.fn(),
 };
 vi.mock("../../executor/stores/executor", () => ({ executor }));
 
@@ -60,7 +61,12 @@ function press(label: string) {
  * The preview of a quiz with `questions` questions on one page, read by the step source; the
  * questions in `noKey` have no key on Soal. Then the run ends with `status`.
  */
-async function checked(questions: number, noKey: number[], status: RunState["status"] = "done") {
+async function checked(
+  questions: number,
+  noKey: number[],
+  status: RunState["status"] = "done",
+  after: Pick<QuizContinuation, "ready" | "before" | "recipe" | "offer"> = {},
+) {
   goTo(PAGE_URLS.attempt);
   // One question per preview page, as on Moodle; the other pages are read through `fetch`.
   // Without the flag icons, which happy-dom would load from a Moodle that isn't running here.
@@ -79,6 +85,7 @@ async function checked(questions: number, noKey: number[], status: RunState["sta
     cmid: 3,
     utterance: "Nemu, tolong cek kuis ini.",
     honorific: "Bu",
+    ...after,
     facts: {
       name: "Kuis IPAS 4A: Energi, Gaya, dan Peta",
       course: "4A-UJI · Kelas 4A (uji)",
@@ -104,6 +111,7 @@ beforeEach(() => {
   saved = null;
   spoken.length = 0;
   executor.presentNotes.mockClear();
+  executor.presentRecipe.mockClear();
   quizCheck.connect({
     pageEmail: { kind: "unreadable" },
     honorific: "Bu",
@@ -162,6 +170,32 @@ describe("F4-1's closing sentence (#256)", () => {
     });
     press("Catatan langkah");
     expect(spoken.some((text) => text.startsWith("Selain"))).toBe(false);
+  });
+
+  test("after F4-2 put the quiz in, one Sudah dicek card with the recipe (F4·11)", async () => {
+    const recipe = {
+      title: "Cara pasang kuis",
+      subtitle: "Disimpan dari pemasangan Latihan IPAS Kelas 4A, 7 Des 2026.",
+      items: ["Naskah diubah jadi soal Moodle", "Bank soal › Impor"],
+    };
+    await checked(2, [], "done", {
+      ready: "Kuis terpasang, 2 soal siap.",
+      before: ["Bu menekan Impor"],
+      recipe,
+      offer: "f4-masukkan-kuis",
+    });
+    expect(quizCheck.getView().display).toBeNull();
+    expect(spoken).toEqual(["Kuis terpasang, 2 soal siap."]);
+    expect(executor.presentRecipe).toHaveBeenCalledWith(recipe, {
+      offer: "f4-masukkan-kuis",
+      card: {
+        status: { tone: "success", text: "Sudah dicek" },
+        title: "Kuis terpasang, 2 soal siap.",
+        detail: "Kunci semua soal lengkap.",
+        itemsLabel: "Catatan langkah · Cara pasang kuis",
+      },
+      log: ["Bu menekan Impor", "Nemu membuka Setelan.", "Nemu tidak menemukan masalah."],
+    });
   });
 
   test("a check that stopped early says nothing more", async () => {

@@ -1,7 +1,7 @@
 import type { QuizQuestion, QuizSnapshot } from "@nemu/contracts/quiz";
 import { describe, expect, test } from "vite-plus/test";
 
-import { checkQuiz, classIn, closingSentence } from "./quiz-rules";
+import { checkQuiz, classIn, closingSentence, completenessDetail } from "./quiz-rules";
 
 const question = (slot: number, change: Partial<QuizQuestion> = {}): QuizQuestion => ({
   slot,
@@ -132,5 +132,16 @@ describe("closingSentence: what Nemu says after the last problem (#256)", () => 
 
   test("says nothing when there were no problems", () => {
     expect(closingSentence(0, "Bu")).toBeNull();
+  });
+});
+
+describe("completenessDetail: the Sudah dicek card's detail line (F4·11)", () => {
+  test("says pictures and keys are complete only when the check found them so", () => {
+    const whole = f41({
+      questions: [question(1, { images: [{ alt: "Gambar (1)", loaded: true }] }), question(2)],
+    });
+    expect(completenessDetail(whole)).toBe("Gambar dan kunci semua soal lengkap.");
+    expect(completenessDetail(f41({ questions: [question(1)] }))).toBe("Kunci semua soal lengkap.");
+    expect(completenessDetail(f41())).toBe("1 gambar belum tampil, 1 soal belum ada kuncinya.");
   });
 });

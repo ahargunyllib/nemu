@@ -1,6 +1,7 @@
 import type { ExecutorStep, ExecutorTask } from "@nemu/contracts/executor";
 import type { QuizQuestion, QuizSnapshot } from "@nemu/contracts/quiz";
 
+import type { Recipe } from "../../executor/lib/recipe-steps";
 import {
   type ListedQuestion,
   MENU,
@@ -53,11 +54,20 @@ export type QuizContinuation = {
    */
   ready?: string;
   before?: string[];
+  /**
+   * F4·11: the import's recipe (Catatan langkah · Cara pasang kuis) for the Sudah dicek card, and
+   * the task kind "Coba sendiri" starts in cara 2 next time, or null.
+   */
+  recipe?: Recipe;
+  offer?: string | null;
   facts: QuizFacts;
 };
 
 /** What the teacher asked for, carried to the end of the check. */
-export type QuizAsked = Pick<QuizContinuation, "utterance" | "honorific" | "ready" | "before">;
+export type QuizAsked = Pick<
+  QuizContinuation,
+  "utterance" | "honorific" | "ready" | "before" | "recipe" | "offer"
+>;
 
 /** What the step source needs from the browser; tests pass their own. */
 export type QuizIo = {
@@ -274,8 +284,8 @@ export async function nextQuizSteps(
     }
     case "preview": {
       await arrive(io, cmid, ["attempt"]);
-      const { utterance, honorific, ready, before } = continuation;
-      onRead(await readPreview(io, facts), { utterance, honorific, ready, before });
+      const { utterance, honorific, ready, before, recipe, offer } = continuation;
+      onRead(await readPreview(io, facts), { utterance, honorific, ready, before, recipe, offer });
       return { steps: [], continuation: null };
     }
   }

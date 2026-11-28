@@ -76,12 +76,12 @@ export function timesSentence(
   );
 }
 
-/** The one sentence after the F4-1 check finds nothing (#210). */
-export function readySentence(plan: ImportPlan, listed: number, honorific: string): string {
-  return say(
-    `Kuis ${plan.name} sudah siap: ${listed} soal, dibuka ${spokenTime(plan.opens)} dan ditutup ${spokenTime(plan.closes)}`,
-    honorific,
-  );
+/**
+ * The title of the Sudah dicek card after the F4-1 check finds nothing (#210, F4·11). The times
+ * were said before Nemu started (`timesSentence`).
+ */
+export function readySentence(listed: number): string {
+  return `Kuis terpasang, ${listed} soal siap.`;
 }
 
 /** The close comes after the open; otherwise Nemu asks again. */
