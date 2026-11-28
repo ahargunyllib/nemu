@@ -1,6 +1,8 @@
 import type { ExecutorStep, ExecutorTask } from "@nemu/contracts/executor";
 import type { GradeEntry } from "@nemu/contracts/school";
 
+import { addressFor } from "../../executor/lib/address";
+
 /** The grades the teacher asked for: "masukkan nilai UTS Matematika 4B". */
 export type GradeTarget = { className: string; subject: string; assessment: string };
 
@@ -11,12 +13,7 @@ export const GRADE_TASK_KIND = "f1-isi-nilai";
 export const REMEDIAL_NOTE = "remedial";
 export const ABSENT_NOTE = "tidak hadir";
 
-/** "Ibu" / "Bapak" in a full sentence, from WS-06's "Bu" / "Pak". */
-export function addressFor(honorific: string): string {
-  if (honorific === "Bu") return "Ibu";
-  if (honorific === "Pak") return "Bapak";
-  return honorific || "Anda";
-}
+export { addressFor };
 
 /**
  * The option AlurSekolah's Jenis Penilaian shows for what the teacher said: UTS and UAS as they

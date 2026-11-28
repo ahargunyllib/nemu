@@ -178,6 +178,81 @@ describe("cara 1", () => {
     expect(waits.slice(0, 3)).toEqual([600, 240, 240]);
   });
 
+  test("says each of the first three students with how to take over, then goes faster (F1·07, P1-5)", async () => {
+    const names = [
+      "Ahmad Fadli",
+      "Aisyah Zahra",
+      "Alya Nur Fitri",
+      "Bagas Saputra",
+      "Budi Santoso",
+    ];
+    document.body.innerHTML = `<table><tbody>${names
+      .map(
+        (name) => `<tr><td>${name}</td>
+          <td><input type="number" aria-label="Nilai ${name}"></td>
+          <td><input type="text" aria-label="Catatan ${name}"></td></tr>`,
+      )
+      .join("")}</tbody></table>`;
+    const values = ["62", "82", "90", "68", "77"];
+    const task: ExecutorTask = {
+      kind: "isi-nilai",
+      title: "Isi nilai",
+      steps: names.flatMap((name, at): ExecutorStep[] => [
+        { verb: "setValue", target: { label: `Nilai ${name}` }, value: values[at]!, rowName: name },
+        // Ahmad and Bagas are below KKM: a Catatan goes with their row and isn't counted.
+        ...(at === 0 || at === 3
+          ? [
+              {
+                verb: "setValue",
+                target: { label: `Catatan ${name}`, row: name },
+                value: "remedial",
+              } as const,
+            ]
+          : []),
+      ]),
+    };
+    const { run, shown, spoken } = harness(createRunState(task, { cara: 1 }));
+    await run.run();
+
+    const lines = shown.flatMap(({ display }) =>
+      display?.type === "kerja"
+        ? [
+            `${display.status.text} ${display.status.progress?.done} dari ${display.status.progress?.total}: ${display.sentence} / ${display.detail}`,
+          ]
+        : [],
+    );
+    expect([...new Set(lines)]).toEqual([
+      "Nemu mengisi 1 dari 5: Ahmad Fadli, 62. / Klik atau ketik kalau Ibu mau isi sendiri.",
+      "Nemu mengisi 2 dari 5: Aisyah Zahra, 82. / Klik atau ketik kalau Ibu mau isi sendiri.",
+      "Nemu mengisi 3 dari 5: Alya Nur Fitri, 90. / Klik atau ketik kalau Ibu mau isi sendiri.",
+      "Nemu mengisi 4 dari 5: Sisanya saya isi lebih cepat, Bu. / Tekan Pelan untuk melihat satu per satu.",
+      "Nemu mengisi 5 dari 5: Sisanya saya isi lebih cepat, Bu. / Tekan Pelan untuk melihat satu per satu.",
+    ]);
+    expect(spoken).toEqual([
+      "Ahmad Fadli, 62.",
+      "Aisyah Zahra, 82.",
+      "Alya Nur Fitri, 90.",
+      "Sisanya saya isi lebih cepat, Bu.",
+    ]);
+  });
+
+  test("with Pelan on, every student keeps its own line", async () => {
+    const steps = GRADES.steps.slice(2, 4);
+    const many: ExecutorTask = {
+      ...GRADES,
+      steps: [...steps, ...steps, ...steps.slice(0, 1)].map((step, at) =>
+        step.verb === "setValue" ? { ...step, rowName: `Murid ${at + 1}` } : step,
+      ),
+    };
+    const { run, shown } = harness(createRunState(many, { cara: 1 }));
+    run.setSlow(true);
+    await run.run();
+    const sentences = shown.flatMap(({ display }) =>
+      display?.type === "kerja" ? [display.sentence] : [],
+    );
+    expect(sentences.at(-1)).toBe("Murid 5, 80.");
+  });
+
   test("a step's own sentence, detail and stage replace the executor's line (F1·05a–06b)", async () => {
     const task: ExecutorTask = {
       ...GRADES,
@@ -395,7 +470,7 @@ describe("F0-11: Berhenti in the Gelembung Kerja asks whether she fills the rest
     });
     void run.run();
     await vi.waitFor(() =>
-      expect(display()).toMatchObject({ type: "kerja", sentence: "Mengisi Nilai Aisyah Zahra." }),
+      expect(display()).toMatchObject({ type: "kerja", sentence: "Aisyah Zahra, 92." }),
     );
     const bubble = display();
     if (bubble?.type !== "kerja") throw new Error("expected Gelembung Kerja");
@@ -550,9 +625,7 @@ describe("cara 2 and 3", () => {
       sleep: holdWhen(() => run.state.index === 2),
     });
     void run.run();
-    await vi.waitFor(() =>
-      expect(display()).toMatchObject({ sentence: "Mengisi Nilai Ahmad Fadli." }),
-    );
+    await vi.waitFor(() => expect(display()).toMatchObject({ sentence: "Ahmad Fadli, 80." }));
     run.teach();
     await vi.waitFor(() =>
       expect(display()).toMatchObject({ type: "tunjuk", sentence: "Ketik 80 untuk Ahmad Fadli." }),

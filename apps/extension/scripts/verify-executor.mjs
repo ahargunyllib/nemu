@@ -89,8 +89,11 @@ await check(
     // Visible navigation: the menu is clicked (the hash changes), not opened by URL.
     await display("kerja").getByText("Membuka Nilai…").waitFor({ timeout: 5_000 });
     await page.waitForURL(/#\/nilai$/u, { timeout: 5_000 });
+    // The heading counts the students (5), not the values and notes Nemu types.
     await display("kerja")
-      .getByText(/Nemu mengisi · \d dari 6/u)
+      .locator("[data-nemu-status]")
+      .filter({ hasText: "Nemu mengisi" })
+      .filter({ hasText: /\d dari 5/u })
       .waitFor({ timeout: 15_000 });
     await page.screenshot({ path: join(shots, "cara-1-filling.png") });
     await display("tunjuk").getByText("Silakan tekan Simpan.").waitFor({ timeout: 30_000 });
@@ -164,7 +167,7 @@ await check("a task under way carries on after the page loads again", async () =
 async function pressBerhenti() {
   await dock.getByRole("button", { name: "Contoh cara 1" }).click();
   const bubble = display("kerja");
-  await bubble.getByText("Mengisi Nilai Ahmad Fadli.").waitFor({ timeout: 15_000 });
+  await bubble.getByText("Ahmad Fadli, 80.").waitFor({ timeout: 15_000 });
   await bubble.getByRole("button", { name: "Berhenti" }).click();
   const card = display("pilih");
   await card.getByText("Nemu berhenti. Bu mau isi sendiri?").waitFor({ timeout: 3_000 });
