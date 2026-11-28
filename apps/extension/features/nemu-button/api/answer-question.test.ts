@@ -83,7 +83,7 @@ describe("answerQuestion", () => {
       sources: ["Kamus Kendala · hlm. 2 · K-07"],
       next: {
         kind: "whatsapp",
-        label: "Buka WhatsApp ke Pak Rizal",
+        label: "Siapkan pesan WA",
         url: "https://web.whatsapp.com/send?phone=6281200001003&text=Assalamualaikum%20Pak%20Rizal.%20Mohon%20bantuannya.",
       },
     });

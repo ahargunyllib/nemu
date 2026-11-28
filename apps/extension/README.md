@@ -12,7 +12,7 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
 - **Identity without login (ADR-0015).** Nemu reads the email of the account signed in on the
   AlurSekolah page and sends it with every request; the Nemu Service matches it against the
   school's Teachers & contacts (WS-06). An unregistered account gets "Akun Ibu belum didaftarkan
-  di Nemu." and **Siapkan pesan WA ke operator**, which opens WhatsApp Web to the school's own
+  di Nemu." and **Siapkan pesan WA**, which opens WhatsApp Web to the school's own
   operator with a ready request (the page and the account email); she presses Kirim (ID-02). The page is read again whenever it changes, so
   signing in as someone else switches who Nemu helps. Sites without an AlurSekolah account (Ruang
   GTK, Moodle) ask as the last account seen on AlurSekolah.
@@ -31,8 +31,8 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
 - **Answers.** The background sends the question to `helpRoute`. Questions about school rules go to
   `helpAsk`, "ini kenapa?" to `helpExplain` with the page's visible text (never input values, and
   nothing while a password field shows), and "berhenti" closes the bubble. When the question matches
-  a symptom of an uploaded BPMN (F2-08), Sumber lists the process steps with **Lihat diagram** (the
-  Admin Workspace at `WXT_ADMIN_URL`, default `http://localhost:3002`), and the one button opens a
+  a symptom of an uploaded BPMN (F2-08), Sumber lists the process steps with **Lihat diagram (operator)** (the
+  Admin Workspace at `WXT_ADMIN_URL`, default `http://localhost:3002`), and the one button, **Siapkan balasan**, opens a
   reply to the parent in WhatsApp Web. A source cited from a PDF is a link in the Sumber list: the
   background asks the Nemu Service for a short-lived signed link (`documentFileLink`, ADR-0018)
   and opens the PDF at the cited page (`#page=`) in a new tab next to the teacher's
@@ -274,7 +274,7 @@ WS-07 to the mock, Pak Rizal uploads the official `packages/ai/src/school/fixtur
 as "Alur SPP" in Pengetahuan sekolah (once; later runs reuse it) and sees the suggested symptoms,
 Aisyah's UTS grade (4A) is saved in the mock, and the three questions of
 `F2-1_pertanyaan-dan-kunci.csv` are asked: the answer ("sudah tersimpan", the partly-paid branch,
-paying in cash), Kenapa?, Sumber with 2–4 steps, **Lihat diagram** (bpmn-js in the Admin Workspace
+paying in cash), Kenapa?, Sumber with 2–4 steps, **Lihat diagram (operator)** (bpmn-js in the Admin Workspace
 with Lock Student Grades highlighted) and the parent reply in WhatsApp Web (no number, no amounts,
 no "tunggakan"; answered locally, never sent). It also checks a student without grades and a
 question no process covers. A local database that still has the synthetic "Alur Pembayaran SPP"

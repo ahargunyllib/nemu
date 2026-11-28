@@ -71,8 +71,8 @@ describe("fromExplanation", () => {
     expect(result).toMatchObject({
       kind: "answer",
       sources: ["SPP belum lunas.", "Sistem menyembunyikan nilai."],
-      next: { kind: "whatsapp", label: "Buka balasan untuk orang tua" },
-      diagram: { label: "Lihat diagram Alur Pembayaran SPP" },
+      next: { kind: "whatsapp", label: "Siapkan balasan" },
+      diagram: { label: "Lihat diagram (operator)" },
     });
     if (result.kind !== "answer") return;
     const diagram = new URL(result.diagram!.href);

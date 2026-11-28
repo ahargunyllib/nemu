@@ -36,13 +36,13 @@ export function fromExplanation(explanation: HelpExplanation): AskResult {
       why: explanation.why || undefined,
       sources: explanation.steps.map((step) => step.text),
       diagram: {
-        label: `Lihat diagram ${explanation.process.title}`,
+        label: "Lihat diagram (operator)",
         href: processDiagramUrl(explanation),
       },
       next: explanation.parentReply
         ? {
             kind: "whatsapp",
-            label: "Buka balasan untuk orang tua",
+            label: "Siapkan balasan",
             url: whatsAppUrl({ phone: null, text: explanation.parentReply }),
           }
         : undefined,
@@ -75,7 +75,7 @@ export function fromExplanation(explanation: HelpExplanation): AskResult {
       : explanation.waDraft && explanation.fixer
         ? {
             kind: "whatsapp",
-            label: `Buka WhatsApp ke ${explanation.fixer.name}`,
+            label: "Siapkan pesan WA",
             url: whatsAppUrl(explanation.waDraft),
           }
         : undefined;
