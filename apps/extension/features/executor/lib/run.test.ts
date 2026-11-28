@@ -476,7 +476,7 @@ describe("F0-1: a fake AI response that tries to press", () => {
 });
 
 describe("F0-07: the teacher's own input stops Nemu", () => {
-  test("Kartu Pilih offers Saya isi sendiri, Nemu lanjut and Berhenti; Saya isi sendiri is cara 2", async () => {
+  test("Kartu Pilih asks Ibu mau isi sendiri?; Ya, saya isi sendiri is cara 2", async () => {
     const { run, display } = harness(createRunState(GRADES, { cara: 1 }), {
       sleep: holdWhen(() => true),
     });
@@ -487,9 +487,10 @@ describe("F0-07: the teacher's own input stops Nemu", () => {
     const card = display();
     expect(card).toMatchObject({
       type: "pilih",
+      question: "Ibu mau isi sendiri?",
       choices: [
-        { id: "sendiri", label: "Saya isi sendiri" },
-        { id: "lanjut", label: "Nemu lanjut" },
+        { id: "sendiri", label: "Ya, saya isi sendiri" },
+        { id: "lanjut", label: "Nemu saja yang lanjut" },
         { id: "berhenti", label: "Berhenti" },
       ],
     });
@@ -541,7 +542,7 @@ describe("F0-11: Berhenti in the Gelembung Kerja asks whether she fills the rest
     expect(ended).not.toHaveBeenCalled();
     expect(display()).toEqual({
       type: "pilih",
-      question: "Nemu berhenti. Bu mau isi sendiri?",
+      question: "Ibu mau isi sendiri?",
       choices: [
         { id: "sendiri", label: "Ya, saya isi sendiri" },
         { id: "berhenti", label: "Tidak, berhenti" },

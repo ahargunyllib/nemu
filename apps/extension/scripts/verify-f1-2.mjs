@@ -1,7 +1,7 @@
 // F1-2 on the mock AlurSekolah (#208): F1 in cara 2. Loads a development build of the extension
 // into Playwright's Chromium and runs the F1 flow twice as Bu Siti, from the WhatsApp photo to the
 // read-back. Each time Nemu starts filling in cara 1 and the rest switches to cara 2: once because
-// the teacher takes over (her click on the page, then "Saya isi sendiri"), once by "Ajari saya"
+// the teacher takes over (her click on the page, then "Ya, saya isi sendiri"), once by "Ajari saya"
 // (the dev dock's button does what the spoken command does; the test microphone can't say it).
 // In cara 2 the "teacher" types what Nemu says, except where F1-2_cara-2_skenario.csv has her type
 // something else first. Both deliberate mismatches must be caught ("Di buku 68, Bu.", never
@@ -302,9 +302,9 @@ async function scenario(how) {
     if (how === "ambil-alih") {
       await page.locator("h1").first().click();
       const card = display("pilih");
-      await card.getByText(/Nemu berhenti karena Bu memakai halaman/u).waitFor({ timeout: 3000 });
+      await card.getByText("Ibu mau isi sendiri?").waitFor({ timeout: 3000 });
       await page.screenshot({ path: join(shots, `${how}-kartu-pilih.png`) });
-      await card.getByRole("button", { name: "Saya isi sendiri" }).click();
+      await card.getByRole("button", { name: "Ya, saya isi sendiri" }).click();
     } else await dock.getByRole("button", { name: "Ajari saya" }).click();
     await display("tunjuk")
       .getByText(/^(Ketik \d+ untuk|Di Catatan|Untuk )/u)
