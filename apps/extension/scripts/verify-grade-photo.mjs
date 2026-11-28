@@ -335,11 +335,17 @@ await check("cara 1 says each navigation step: Langkah 1 and 2 of 3 (F1·05a–0
 });
 
 await check("cara 1 opens Isi nilai kelas through the menu and fills every value", async () => {
-  await display("kerja")
-    .getByText(/Nemu mengisi · \d+ dari \d+/u)
-    .waitFor({ timeout: 30_000 });
+  // F1·07 (P1-5): each of the first three students said, with how to take over; the count is
+  // students (32), not the values and notes Nemu types.
+  const working = display("kerja");
+  await working.getByText("Alya Nur Fitri, 90.").waitFor({ timeout: 30_000 });
+  await working.getByText("Klik atau ketik kalau Ibu mau isi sendiri.").waitFor();
+  await heading("kerja", /^Nemu mengisi3 dari 32$/u).waitFor();
   await page.waitForURL(/#\/nilai$/u);
   await page.screenshot({ path: join(shots, "mengisi.png") });
+  await working.getByText("Sisanya saya isi lebih cepat, Bu.").waitFor({ timeout: 15_000 });
+  await working.getByText("Tekan Pelan untuk melihat satu per satu.").waitFor();
+  await page.screenshot({ path: join(shots, "mengisi-lebih-cepat.png") });
   await display("tunjuk").getByText("Silakan Ibu tekan Simpan.").waitFor({ timeout: 180_000 });
   expect(!(await page.locator("#konfirmasi").isVisible()), "Simpan was pressed by Nemu");
   for (const [name, value] of CLASS_4B) {

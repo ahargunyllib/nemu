@@ -77,7 +77,10 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   `check`, `scroll` and `clickMenu`; targets are found by label, role, text or table row and
   column, never by position, and a missing or ambiguous one stops Nemu, which asks (F0-06).
   - **Cara 1** fills at about one field per second, typing digits one by one, ticking each row and
-    reading the first two aloud; **Pelan** halves the speed; it stops before Simpan and points at
+    saying each of the first three students ("Alya Nur Fitri, 90.", with "Klik atau ketik kalau
+    Ibu mau isi sendiri." under it), then "Sisanya saya isi lebih cepat, Bu." The heading counts
+    students ("Nemu mengisi · 3 dari 32"), not their notes. **Pelan** halves the speed and keeps
+    each student's line; it stops before Simpan and points at
     it. **Cara 2** points, says the value and checks what the teacher typed. **Cara 3** waits for
     Simpan and then checks every value. "Ajari saya" switches to cara 2 at any time (F0-11). The
     default cara and the cara 1 fill speed are the school's WS-08 settings (pelan 2 s, normal 1 s,

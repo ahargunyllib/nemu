@@ -7,6 +7,7 @@ import type {
 import type { SitePermission } from "@nemu/contracts/extension";
 import type { NemuDisplay, NemuStatus } from "@nemu/ui/lib/nemu-display";
 
+import { addressFor } from "./address";
 import { describeTarget, findTarget, type TargetLookup } from "./find-target";
 import {
   bringIntoView,
@@ -159,11 +160,20 @@ function wordCount(sentence: string): number {
   return sentence.split(/\s+/u).length;
 }
 
+/** Cara 1 reads this many student rows aloud, one by one, before going faster (F1·07a–07c). */
+const READ_ROWS = 3;
+
+/** The student row a value step fills: its `rowName`, or the row its target is found by. */
+function rowOf(step: ExecutorStep | undefined): string | undefined {
+  if (step?.verb !== "setValue") return undefined;
+  return step.rowName ?? step.target.row;
+}
+
 const VALUE_VERBS: ReadonlySet<ExecutorVerb> = new Set(["setValue", "selectOption", "check"]);
 
 /**
  * One task on one page (PRD §6.1). Cara 1: Nemu fills at about a field per second, typing digits
- * one by one, ticking rows and reading the first two aloud, and stops before Simpan. Cara 2: Nemu
+ * one by one, ticking rows and saying the first three students, and stops before Simpan. Cara 2: Nemu
  * points, says the value and checks what the teacher typed. Cara 3: the teacher works alone and
  * Nemu checks once she presses Simpan. The teacher's own input stops cara 1 (F0-07); forbidden
  * targets are pointed at, never pressed (F0-08).
@@ -176,6 +186,8 @@ export class ExecutorRun {
   private view: RunView = { display: null, target: null, ticks: [] };
   /** Nemu is pointing and waiting for the teacher; `refused` when it was asked to press it. */
   waiting: { refused: boolean } | null = null;
+  /** "Sisanya saya isi lebih cepat" is said once; it stays up for the rows after it. */
+  private saidFaster = false;
 
   constructor(state: RunState, deps: RunDeps) {
     this.state = state;
@@ -520,12 +532,66 @@ export class ExecutorRun {
     if (!this.state.ticked.includes(index)) this.state.ticked.push(index);
   }
 
+  /**
+   * Where a value step is: the row it fills among the task's rows ("3 dari 32" students, however
+   * many Catatan go with them), or, for values that aren't in rows, among the values.
+   */
   private progress(index: number): NemuStatus["progress"] {
-    const fills = this.state.task.steps
+    const steps = this.state.task.steps;
+    const rows = [...new Set(steps.map(rowOf).filter((row) => row !== undefined))];
+    const row = rowOf(steps[index]);
+    if (row !== undefined) return { done: rows.indexOf(row) + 1, total: rows.length };
+    if (rows.length) {
+      // A value beside the rows (a Catatan found by its label): the row before it.
+      const before = new Set(
+        steps
+          .slice(0, index)
+          .map(rowOf)
+          .filter((at) => at !== undefined),
+      );
+      return { done: Math.max(before.size, 1), total: rows.length };
+    }
+    const fills = steps
       .map((step, at) => ({ step, at }))
       .filter(({ step }) => step.verb === "setValue");
     const done = fills.filter(({ at }) => at < index).length;
     return { done: done + 1, total: fills.length };
+  }
+
+  /**
+   * Cara 1's line for a student's value (F1·07, P1-5): "Alya Nur Fitri, 90." for the first rows,
+   * with the way to take over under it; from the fourth row "Sisanya saya isi lebih cepat, Bu."
+   * unless Pelan is on. A row with several values names the column: "Bagas: Fashohah 80." Null
+   * for a value without a student (a Catatan), which keeps the row's line.
+   */
+  private rowLine(
+    index: number,
+    step: Extract<ExecutorStep, { verb: "setValue" }>,
+  ): { sentence: string; detail: string; readAloud: boolean } | null {
+    if (step.rowName === undefined) return null;
+    const row = this.progress(index)?.done ?? 1;
+    const address = addressFor(this.deps.honorific);
+    if (row > READ_ROWS && !this.state.slow) {
+      const honorific = this.deps.honorific ? `, ${this.deps.honorific}` : "";
+      return {
+        sentence: `Sisanya saya isi lebih cepat${honorific}.`,
+        detail: "Tekan Pelan untuk melihat satu per satu.",
+        readAloud: false,
+      };
+    }
+    const value = step.value === "" ? "dikosongkan" : step.value;
+    const fields = this.state.task.steps.filter(
+      (other) => other.verb === "setValue" && other.rowName === step.rowName,
+    ).length;
+    const column = step.target.column ?? step.target.label;
+    return {
+      sentence:
+        fields > 1 && column
+          ? `${step.rowName}: ${column} ${value}.`
+          : `${step.rowName}, ${value}.`,
+      detail: `Klik atau ketik kalau ${address} mau isi sendiri.`,
+      readAloud: row <= READ_ROWS,
+    };
   }
 
   /** Gelembung Kerja while Nemu works: [Pelan] and [Berhenti]. */
@@ -551,9 +617,12 @@ export class ExecutorRun {
   ) {
     const started = Date.now();
     const unit = this.state.slow ? 2 : 1;
+    const row =
+      step.verb === "setValue" && step.sentence === undefined ? this.rowLine(index, step) : null;
     // The task's own words for the step when it has them (F1·05a–06b), else the executor's.
     const sentence =
       step.sentence ??
+      row?.sentence ??
       {
         clickMenu: `Membuka ${name}…`,
         selectOption: `Memilih ${"option" in step ? step.option : ""}.`,
@@ -580,7 +649,21 @@ export class ExecutorRun {
       this.deps.speak(step.approach.sentence);
       await this.sleep(wordCount(step.approach.sentence) * WORD_MS * unit, signal);
     }
-    this.render(this.working(sentence, step.detail, status), element);
+    const shown = this.view.display;
+    if (
+      step.verb === "setValue" &&
+      step.sentence === undefined &&
+      step.rowName === undefined &&
+      step.target.row !== undefined &&
+      shown?.type === "kerja"
+    )
+      // A student's Catatan keeps the line of the student's value.
+      this.render(shown, element);
+    else this.render(this.working(sentence, step.detail ?? row?.detail, status), element);
+    if (row && !row.readAloud && !this.saidFaster) {
+      this.saidFaster = true;
+      this.deps.speak(row.sentence);
+    }
     await this.sleep(CURSOR_GLIDE_MS, signal);
 
     switch (step.verb) {
@@ -615,18 +698,14 @@ export class ExecutorRun {
         break;
       case "setValue": {
         if (!isValueField(element)) return this.askAbout({ status: "missing" }, name);
-        const readAloud =
-          step.rowName !== undefined &&
-          this.state.events.filter((event) => event.kind === "acted" && event.verb === "setValue")
-            .length < 2;
         await typeValue(element, step.value, () => this.sleep(CHAR_MS * unit, signal));
         this.state.events.push({ kind: "acted", verb: "setValue", name });
         this.tick(index, element);
         this.render(this.view.display, element);
-        if (readAloud) {
-          const spoken = `${step.rowName}, ${step.value}.`;
-          this.deps.speak(spoken);
-          await this.sleep(wordCount(spoken) * WORD_MS * unit, signal);
+        // The first rows are read aloud as they are filled; the rest go faster, unspoken.
+        if (row?.readAloud) {
+          this.deps.speak(row.sentence);
+          await this.sleep(wordCount(row.sentence) * WORD_MS * unit, signal);
         }
         break;
       }
