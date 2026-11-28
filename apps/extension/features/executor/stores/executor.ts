@@ -148,7 +148,7 @@ function createExecutor() {
         items,
         link: offerToTry
           ? {
-              label: "Lain kali coba sendiri",
+              label: "Coba sendiri",
               onSelect: () => {
                 void tryNextTime(offerToTry);
                 close();
@@ -260,8 +260,8 @@ function createExecutor() {
 
     /**
      * Runs a task. Every task is checked first (`toSafeTask`): steps with verbs outside the
-     * allowed six only point. Cara comes from WS-08's default unless the teacher chose "Lain kali
-     * coba sendiri" for this kind of task, or the caller asks for one.
+     * allowed six only point. Cara comes from WS-08's default unless the teacher chose "Coba
+     * sendiri" for this kind of task, or the caller asks for one.
      */
     async start(untrusted: UntrustedTask, options: { cara?: Cara; continuation?: unknown } = {}) {
       run?.stop(false);

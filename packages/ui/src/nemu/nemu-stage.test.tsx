@@ -72,6 +72,21 @@ describe("NemuStage", () => {
     expect(screen.getByRole("region").textContent).toContain("Lalu tekan Tampilkan Siswa.");
   });
 
+  test("the cursor is the Nemu mascot, labelled Nemu only until the bubble is beside it", () => {
+    const field = pageField({ left: 200, top: 300, width: 240, height: 40 });
+    render(<NemuStage display={tunjuk} target={field} />);
+
+    const cursor = document.querySelector<HTMLElement>("[data-nemu-cursor]");
+    expect(cursor?.style.width).toBe("44px");
+    expect(cursor?.querySelector("svg[data-nemu-mascot]")).toBeTruthy();
+    expect(cursor?.className).toContain("pointer-events-none");
+    expect(screen.getByText("Nemu")).toBeTruthy();
+
+    act(() => vi.advanceTimersByTime(GLIDE_MS));
+    expect(screen.getByRole("region", { name: "Petunjuk Nemu" })).toBeTruthy();
+    expect(screen.queryByText("Nemu")).toBeNull();
+  });
+
   test("shows one display at a time", () => {
     const { rerender, container } = render(
       <NemuStage display={{ type: "jawab", sentence: "KKM 75." }} />,

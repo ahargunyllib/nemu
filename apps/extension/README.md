@@ -99,7 +99,7 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   - **F0-09.** Steps that come in parts (`registerStepSource`) are retried twice with a plain
     message, then Nemu stops at a safe step with the inputs kept; "lanjut" or **Lanjut** resumes.
   - **Catatan langkah (F0-14)** ends each task and reopens from the Nemu button (**Lihat catatan
-    langkah**); "Lain kali coba sendiri" starts that kind of task in cara 2 next time.
+    langkah**); "Coba sendiri" starts that kind of task in cara 2 next time.
   - **Action log (WS-10).** Every action goes to `actionLogRecord` as who, when, website, task,
     action, target, cara and result, never a value.
   - **Finishers.** A flow that has more to do once its task ends registers

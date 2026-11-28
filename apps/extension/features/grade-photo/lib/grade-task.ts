@@ -4,7 +4,7 @@ import type { GradeEntry } from "@nemu/contracts/school";
 /** The grades the teacher asked for: "masukkan nilai UTS Matematika 4B". */
 export type GradeTarget = { className: string; subject: string; assessment: string };
 
-/** Every F1 run is this kind, so "Lain kali coba sendiri" and the read-back finisher find it. */
+/** Every F1 run is this kind, so "Coba sendiri" and the read-back finisher find it. */
 export const GRADE_TASK_KIND = "f1-isi-nilai";
 
 /** The note beside a grade: below KKM, or absent (S/I/A, left blank by the school's rule). */

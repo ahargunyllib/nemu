@@ -50,7 +50,7 @@ export type RunState = {
   id: string;
   task: ExecutorTask;
   cara: Cara;
-  /** The cara the run started in, for "Lain kali coba sendiri". */
+  /** The cara the run started in, for "Coba sendiri". */
   startCara: Cara;
   slow: boolean;
   /** The next step to do. */
