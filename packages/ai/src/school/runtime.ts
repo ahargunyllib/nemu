@@ -43,6 +43,7 @@ import {
   type ReadGradePhotoInput,
   type ReadGradePhotoResult,
 } from "./grades/reading.js";
+import { readPhotoTitle } from "./grades/title.js";
 import { answerGrounded, verifyGroundedAnswer, type AnswerGroundedInput } from "./grounding.js";
 import { explainError, type ExplainErrorInput } from "./help.js";
 import {
@@ -180,9 +181,7 @@ export function createSchoolAi(config: SchoolAiConfig): SchoolAi {
       });
 
   return {
-    // #269 (AI) reads the heading with a model. Until it lands, no title is read and the
-    // extension asks her to say or type what the grades are, as before.
-    readPhotoTitle: async () => [],
+    readPhotoTitle: ({ image }) => readPhotoTitle(readers.readA, image),
     readGradePhoto: (input) => readGradePhoto(readers, input),
     parseGradeExcel: (input) => parseGradeExcel({ mapHeaders: text }, input),
     explainError: (input) => explainError({ llm: text }, input),

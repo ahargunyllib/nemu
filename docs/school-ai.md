@@ -31,6 +31,7 @@ All are oRPC procedures on the Nemu Service, open to a `W-SEKOLAH` session or to
 | `gradesParseCommand`                            | "masukkan nilai UTS Matematika 4B" → `{className, subject, assessment}` or one question                                                                                              | F1-05            |
 | `inboxUploadPhoto`                              | photo file → `InboxJob` (queued)                                                                                                                                                     | F1-01            |
 | `inboxJobs`                                     | → this teacher's jobs, newest first (poll every few seconds while Nemu is open)                                                                                                      | F1-01            |
+| `inboxReadTitle`                                | `{jobId}` → `{candidates}`: the heading as ≤ 3 `{assessment, subject, className}` for "Ini nilai apa, Bu?"; `[]` when unreadable                                                     | F1-05            |
 | `inboxProcess`                                  | `{jobId, className, assessment}` → `InboxJob` with `reading` and `verification` (≤ 60 s)                                                                                             | F1-03/04/06      |
 | `inboxPhoto`                                    | `{jobId}` → the photo, for crops                                                                                                                                                     | W5               |
 | `inboxAck`                                      | `{jobId}` → deletes the photo and job                                                                                                                                                | §8 privacy       |
@@ -66,7 +67,7 @@ The kamus is matched in code first (AI_TECHNICAL_PRD §5.1, `packages/ai/src/sch
 ### F1: grade book to AlurSekolah
 
 1. `helpRoute` → `input_nilai`, then `gradesParseCommand`. Speak `question` if it returns `ask`.
-2. Photo arrives: from WhatsApp (`apps/wa-bot`, below) or `inboxUploadPhoto`. Poll `inboxJobs`; when a job is `queued`, call `inboxProcess` with the class and assessment.
+2. Photo arrives: from WhatsApp (`apps/wa-bot`, below) or `inboxUploadPhoto`. Poll `inboxJobs`; when a job is `queued`, `inboxReadTitle` gives the choices for "Ini nilai apa, Bu?" (none: ask as in step 1), then call `inboxProcess` with the class and assessment.
    - `reshoot`: speak `message` ("Fotonya belum terbaca jelas…").
    - `failed`: speak `message`; the error is also in Workers Logs.
 3. W5: show `verification.questions` one per screen.
