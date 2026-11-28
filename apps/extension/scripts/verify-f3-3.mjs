@@ -171,6 +171,7 @@ await check("Rekam cara records the Ujian baru form and one spoken explanation",
   const counted = await pill.innerText();
   await bubble.getByRole("button", { name: "Jeda" }).click();
   await bubble.getByText("Rekaman dijeda.").waitFor();
+  await overlay.locator("[data-nemu-recording='paused']").waitFor();
   await page.locator("#uj-tanggal").fill("2026-11-30");
   const paused = await pill.innerText();
   expect(

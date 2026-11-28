@@ -14,7 +14,8 @@ export function RecordingPill({ paused, steps }: { paused: boolean; steps: numbe
         role="status"
         data-nemu-recording={paused ? "paused" : "recording"}
         className={cn(
-          "h-8 gap-2 px-3.5 text-sm font-semibold text-white shadow-nemu-float",
+          // The colour changes at once with the words, not through the Badge's fade.
+          "h-8 gap-2 px-3.5 text-sm font-semibold text-white shadow-nemu-float transition-none",
           paused ? "bg-nemu-secondary" : "bg-nemu-danger-strong",
         )}
       >
