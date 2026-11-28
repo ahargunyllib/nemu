@@ -1,8 +1,8 @@
-import type { CommandRoute } from "@nemu/contracts/school";
+import type { CommandRoute, GroundedAnswer, HelpExplanation } from "@nemu/contracts/school";
 import { describe, expect, test, vi } from "vite-plus/test";
 
-import { PASSWORD_ON_SCREEN } from "../../ini-kenapa/lib/explanation";
-import { NOT_AVAILABLE_YET } from "../lib/answer";
+import { fromExplanation, PASSWORD_ON_SCREEN } from "../../ini-kenapa/lib/explanation";
+import { fromGroundedAnswer, NOT_AVAILABLE_YET } from "../lib/answer";
 import { answerQuestion } from "./answer-question";
 
 const SNAPSHOT = {
@@ -49,6 +49,30 @@ function fakeClient(route: CommandRoute) {
       },
       waDraft: { phone: "6281200001003", text: "Assalamualaikum Pak Rizal. Mohon bantuannya." },
     })),
+  };
+}
+
+const NO_ALERT = { ...SNAPSHOT, alerts: [] };
+
+const NOT_IN_KAMUS: HelpExplanation = {
+  status: "not_in_guide",
+  sentence: "Belum ada di panduan sekolah. Mau saya bantu tanyakan ke Pak Rizal?",
+  offerOperator: { name: "Pak Rizal", role: "operator", phone: "6281200001003" },
+  waDraft: {
+    phone: "6281200001003",
+    text: "Assalamualaikum Pak Rizal. Nemu tidak bisa mendengar saya, mohon bantuannya.",
+  },
+};
+
+function kenapaClient(explanation: HelpExplanation, answer: GroundedAnswer) {
+  return {
+    helpRoute: vi.fn(async (): Promise<CommandRoute> => ({
+      kind: "intent",
+      intent: "kenapa",
+      processName: null,
+    })),
+    helpAsk: vi.fn(async () => answer),
+    helpExplain: vi.fn(async () => explanation),
   };
 }
 
@@ -195,5 +219,54 @@ describe("answerQuestion", () => {
       kind: "quiz-check",
       utterance: "Nemu, tolong cek kuis ini.",
     });
+  });
+
+  test("'kenapa' the kamus doesn't know is answered from the school's documents (#314)", async () => {
+    const answered: GroundedAnswer = {
+      status: "answered",
+      answer:
+        "Nemu mendengar setelah Ibu menekan tombol mikrofon dan mengizinkan mikrofon di Chrome.",
+      citations: [
+        {
+          chunkId: "tentang-nemu-4-1",
+          docId: "tentang-nemu",
+          title: "Tentang Nemu",
+          page: null,
+          article: "4.1",
+          quote: "Tekan tombol mikrofon, lalu izinkan Chrome memakai mikrofon.",
+        },
+      ],
+    };
+    const client = kenapaClient(NOT_IN_KAMUS, answered);
+    await expect(
+      answerQuestion(client, "Kenapa Nemu tidak bisa mendengar saya?", NO_ALERT),
+    ).resolves.toEqual(fromGroundedAnswer(answered));
+  });
+
+  test("a bare 'ini kenapa?' or an error on the page stays with the kamus (#314)", async () => {
+    for (const [question, snapshot] of [
+      ["Nemu, ini kenapa ya?", NO_ALERT],
+      ["Kenapa Nemu tidak bisa mendengar saya?", SNAPSHOT],
+    ] as const) {
+      const client = kenapaClient(NOT_IN_KAMUS, {
+        status: "answered",
+        answer: "Jawaban dari panduan.",
+        citations: [],
+      });
+      await expect(answerQuestion(client, question, snapshot)).resolves.toEqual(
+        fromExplanation(NOT_IN_KAMUS),
+      );
+      expect(client.helpAsk).not.toHaveBeenCalled();
+    }
+  });
+
+  test("'kenapa' neither the kamus nor the documents know keeps the offer to ask the operator", async () => {
+    const client = kenapaClient(NOT_IN_KAMUS, {
+      status: "not_in_guide",
+      answer: "Belum ada di panduan sekolah.",
+    });
+    await expect(
+      answerQuestion(client, "Kenapa Nemu tidak bisa mendengar saya?", NO_ALERT),
+    ).resolves.toEqual(fromExplanation(NOT_IN_KAMUS));
   });
 });
