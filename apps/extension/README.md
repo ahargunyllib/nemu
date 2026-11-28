@@ -171,15 +171,19 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   - **Counting** (`lib/delete-task.ts`): one executor task opens the quiz and **Hasil** through the
     menus and reads the number of different students in the attempts table (or "Yang telah
     mengerjakan: N orang").
-  - **Warning** (`lib/warning.ts`): Kartu Pilih beside that count, "Kuis ini sudah dikerjakan 3
-    siswa. Kalau dihapus, nilainya ikut terhapus.", with **Jangan hapus** first and ⚠ **Tunjukkan
-    tombol Hapus** under it. She can also answer by voice ("jangan", "tunjukkan").
+  - **Warning** (`lib/warning.ts`): Kartu Pilih beside that count under a red **HATI-HATI** heading
+    with the quiz's name on the right, "Kuis ini sudah dikerjakan 3 siswa. Kalau dihapus, nilainya
+    ikut terhapus.", with **Jangan hapus** first and ⚠ **Tunjukkan tombol Hapus** under it. She can
+    also answer by voice ("jangan", "tunjukkan").
   - **Jangan hapus** ends with Catatan langkah: the count, her choice, and "Nemu tidak menekan
     Hapus; Nemu hanya menunjuknya."
   - **Tunjukkan tombol Hapus** runs a second task: back to the course, **Mode Edit** on if it is
     off, the quiz's own **Edit** menu (`near` the quiz's name, since every activity's menu is
-    called Edit), then a point at **Hapus**: "Kalau jadi dihapus, tekan Hapus sendiri, Bu." She
-    presses it or not; Moodle then asks her to confirm. The executor refuses Hapus anyway (F0-08).
+    called Edit), then a point at **Hapus** under a **GILIRAN IBU** heading: "Tombol Hapus ada di
+    sini, Bu." with the detail "Nemu tidak menghapus apa pun." She presses it or not; Moodle then
+    asks her to confirm. The executor refuses Hapus anyway (F0-08). The bubble's **Batal, jangan
+    hapus** link (the point step's `cancel`) ends the task as **Jangan hapus** does: Catatan
+    langkah says the quiz and its grades stay.
 - **F4-03: put a quiz into Moodle from the teacher's script (#210).** `features/quiz-import/`.
   "Nemu, masukkan kuis dari naskah ini, buka Senin 7 Desember, tutup Kamis 10 Desember" on a
   Moodle course page is the extension's own command. She picks the script (PDF, Word or photo) with
@@ -321,14 +325,16 @@ to `.output/verify-f4-1/`.
 `./setup-4a-uji.sh` created the F4-3 quizzes and attempts. On the course page Bu Siti types
 "Tolong hapus latihan bahasa Inggris yang kemarin." It checks that Nemu picks "Latihan: My Family
 (has/have)" (or asks between it and the decoy on a day the decoy fits "kemarin"; it says which),
-opens the quiz and Hasil itself, rings the count and shows the warning word for word with
-**Jangan hapus** first and ⚠ on the second choice. Round 1 she keeps it: Catatan langkah, and the
-quiz still has 3 finished attempts and 3 grades. Round 2 ("Nemu, hapus kuis Latihan My Family.")
-she asks for the button: Nemu switches on Mode Edit, opens the quiz's Edit menu and rings Hapus,
-nothing is deleted while it points, she presses Hapus and cancels Moodle's confirmation. Last, in
+opens the quiz and Hasil itself, rings the count and shows the warning word for word under the
+HATI-HATI heading with **Jangan hapus** first and ⚠ on the second choice. Round 1 she keeps it:
+Catatan langkah, and the quiz still has 3 finished attempts and 3 grades. Round 2 ("Nemu, hapus
+kuis Latihan My Family.") she asks for the button: Nemu switches on Mode Edit, opens the quiz's
+Edit menu and rings Hapus with GILIRAN IBU, the detail line and the Batal, jangan hapus link;
+nothing is deleted while it points, she presses Hapus and cancels Moodle's confirmation. Then, in
 Moodle's database the quiz and its grades are there and its log has no new deletion, and the local
 Nemu Service's action log (WS-10, read from `packages/infra/.alchemy`) has Hapus only as a point
-she pressed. Without the local database it checks the pages only. Screenshots go to
+she pressed. Round 3 she picks Batal, jangan hapus on that bubble: Catatan langkah says the quiz
+stays, and it does. Without the local database it checks the pages only. Screenshots go to
 `.output/verify-f4-3/`.
 
 `pnpm --filter extension verify:f4-2` runs F4-2 (#210) on the same Moodle. Locally it first removes

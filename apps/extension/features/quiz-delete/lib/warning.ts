@@ -4,6 +4,13 @@ import type { KartuPilihProps } from "@nemu/ui/lib/nemu-display";
 export const KEEP = "Jangan hapus";
 export const SHOW = "Tunjukkan tombol Hapus";
 export const NOTHING_DELETED = "Nemu tidak menekan Hapus; Nemu hanya menunjuknya.";
+/** The way out on the Gelembung Tunjuk at Hapus: it ends the flow as "Jangan hapus" does. */
+export const CANCEL = "Batal, jangan hapus";
+
+/** Catatan langkah's last lines when she keeps the quiz, from the card or from the Batal link. */
+export function keptLines(): string[] {
+  return [`Pilihan: ${KEEP}. Kuis dan nilainya tetap ada.`, NOTHING_DELETED];
+}
 
 /** The warning, word for word as F4-3 expects it. */
 export function warning(count: number): string {
@@ -12,12 +19,17 @@ export function warning(count: number): string {
     : "Kuis ini belum dikerjakan siswa.";
 }
 
-/** Kartu Pilih: the count, "Jangan hapus", then "Tunjukkan tombol Hapus" with ⚠ under it. */
+/**
+ * Kartu Pilih under a red HATI-HATI heading with the quiz's name on the right: the count,
+ * "Jangan hapus", then "Tunjukkan tombol Hapus" with ⚠ under it.
+ */
 export function warningCard(
   count: number,
+  quiz: string,
   onChoose: (id: "jangan" | "tunjukkan") => void,
 ): KartuPilihProps {
   return {
+    status: { tone: "warning", text: "Hati-hati", count: quiz },
     question: warning(count),
     choices: [
       { id: "jangan", label: KEEP },

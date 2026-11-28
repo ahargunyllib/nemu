@@ -22,7 +22,7 @@ import {
   readCourseQuizzes,
 } from "../lib/moodle-course";
 import { type CourseQuiz, localDay, pickQuiz } from "../lib/pick-quiz";
-import { KEEP, NOTHING_DELETED, SHOW, warning, warningCard } from "../lib/warning";
+import { keptLines, NOTHING_DELETED, SHOW, warning, warningCard } from "../lib/warning";
 
 /**
  * F4-06 (#211): "Tolong hapus latihan bahasa Inggris yang kemarin." Nemu works out which quiz
@@ -112,7 +112,7 @@ function createQuizDelete() {
   /** Kartu Pilih with ⚠ under the safe choice, pointing at the count on the Hasil page. */
   function warn(quiz: QuizRef, students: number, notes: string[]) {
     waiting = { kind: "warn", quiz, count: students, notes };
-    const card = warningCard(students, chooseAction);
+    const card = warningCard(students, quiz.name, chooseAction);
     publish({ display: { type: "pilih", ...card }, target: attemptCountElement(document) });
     context.speak(card.question);
   }
@@ -122,12 +122,7 @@ function createQuizDelete() {
     const { quiz, count: students, notes } = waiting;
     close();
     if (id === "jangan") {
-      executor.presentNotes([
-        ...notes,
-        countLine(quiz.name, students),
-        `Pilihan: ${KEEP}. Kuis dan nilainya tetap ada.`,
-        NOTHING_DELETED,
-      ]);
+      executor.presentNotes([...notes, countLine(quiz.name, students), ...keptLines()]);
       return;
     }
     // Nemu goes to Hapus with the cursor and points; the press, if any, is hers.
@@ -151,8 +146,10 @@ function createQuizDelete() {
   );
   executor.registerFinisher(SHOW_DELETE_KIND, (ended, notes, showNotes) => {
     const source = ended.task.source ? [ended.task.source] : [];
+    // "Batal, jangan hapus" on the Gelembung Tunjuk ends it as "Jangan hapus" does.
+    const kept = ended.events.at(-1)?.kind === "cancelled";
     executor.presentNotes(
-      [...source, `Pilihan: ${SHOW}.`, ...notes, NOTHING_DELETED],
+      [...source, `Pilihan: ${SHOW}.`, ...notes, ...(kept ? keptLines() : [NOTHING_DELETED])],
       null,
       showNotes,
     );

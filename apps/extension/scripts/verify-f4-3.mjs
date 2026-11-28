@@ -3,11 +3,13 @@
 // bahasa Inggris yang kemarin." Nemu picks "Latihan: My Family (has/have)" (or asks between it and
 // the decoy, on days when the decoy fits "kemarin" as well), opens its Hasil page through the
 // menus, and warns on a Kartu Pilih: "Kuis ini sudah dikerjakan 3 siswa. Kalau dihapus, nilainya
-// ikut terhapus." with "Jangan hapus" first. Round 1 she keeps it. Round 2 she asks for the button:
-// Nemu goes back to the course, switches on Mode Edit, opens the quiz's Edit menu and only points
-// at Hapus; she presses it and then cancels Moodle's confirmation. Afterwards the quiz and its 3
-// grades are still there, Moodle's log has no deletion, and the Nemu action log (WS-10) has Hapus
-// only as a point she pressed herself.
+// ikut terhapus." under a HATI-HATI heading, with "Jangan hapus" first. Round 1 she keeps it.
+// Round 2 she asks for the button: Nemu goes back to the course, switches on Mode Edit, opens the
+// quiz's Edit menu and only points at Hapus (GILIRAN IBU, "Tombol Hapus ada di sini, Bu.", the
+// detail "Nemu tidak menghapus apa pun." and a "Batal, jangan hapus" link); she presses it and then
+// cancels Moodle's confirmation. Round 3 she picks "Batal, jangan hapus" on that bubble instead,
+// which ends like "Jangan hapus". Afterwards the quiz and its 3 grades are still there, Moodle's log
+// has no deletion, and the Nemu action log (WS-10) has Hapus only as a point she pressed herself.
 // Needs `NEMU_RESPONDER=fixture pnpm dev` (the Nemu Service and the mock AlurSekolah, where Bu
 // Siti's email is read), the Moodle test site with `./setup-4a-uji.sh` run, and that Moodle's host
 // as an allowed site; skips with a message when Moodle isn't running. Screenshots:
@@ -307,9 +309,16 @@ await check(
 );
 
 await check(
-  "The warning: count 3 from Hasil, exact sentence, Jangan hapus first, ⚠ on the second",
+  "The warning: HATI-HATI heading, count 3 from Hasil, exact sentence, Jangan hapus first, ⚠ on the second",
   async () => {
-    const { choices } = await warningCard();
+    const { card, choices } = await warningCard();
+    const heading = card.locator("[data-nemu-status='warning']");
+    const headingText = (await heading.textContent()) ?? "";
+    console.log(`  Heading: ${headingText.trim()}`);
+    expect(
+      headingText.includes("Hati-hati") && headingText.includes(QUIZ),
+      `the heading isn't a warning “Hati-hati · ${QUIZ}”`,
+    );
     await page.waitForTimeout(900);
     const shown = page.locator(".quizattemptcounts").first();
     expect(await ringsOn(shown), "the ring isn't on the count");
@@ -369,8 +378,20 @@ await check(
       .getByRole("button", { name: /Tunjukkan tombol Hapus/u })
       .click();
     await page.waitForURL(/\/course\/view\.php/u, { timeout: 30_000 });
-    const sentence = display("tunjuk").getByText("Kalau jadi dihapus, tekan Hapus sendiri, Bu.");
-    await sentence.waitFor({ timeout: 40_000 });
+    const tunjuk = display("tunjuk");
+    await tunjuk.getByText("Tombol Hapus ada di sini, Bu.").waitFor({ timeout: 40_000 });
+    expect(
+      (await tunjuk.locator("[data-nemu-status]").textContent())?.includes("Giliran Ibu"),
+      "the heading isn't Giliran Ibu",
+    );
+    expect(
+      await tunjuk.getByText("Nemu tidak menghapus apa pun.", { exact: true }).isVisible(),
+      "the detail line isn't showing",
+    );
+    expect(
+      await tunjuk.getByRole("button", { name: "Batal, jangan hapus" }).isVisible(),
+      "the Batal, jangan hapus link isn't showing",
+    );
     expect(await page.locator("body.editing").count(), "Mode Edit is off");
     const hapus = page
       .locator("li.modtype_quiz", { hasText: QUIZ })
@@ -439,6 +460,37 @@ await check("WS-10 action log: Hapus appears only as a point the teacher pressed
     "Nemu did more than open menus, switch Mode Edit and point",
   );
 });
+
+await check(
+  "Round 3: Batal, jangan hapus on the Gelembung Tunjuk ends it as Jangan hapus does",
+  async () => {
+    await page.goto(courseUrl);
+    await askNemu("Nemu, hapus kuis Latihan My Family.");
+    await page.waitForURL(/\/mod\/quiz\/report\.php/u, { timeout: 30_000 });
+    await (
+      await warningCard()
+    ).card
+      .getByRole("button", { name: /Tunjukkan tombol Hapus/u })
+      .click();
+    const tunjuk = display("tunjuk");
+    await tunjuk.getByText("Tombol Hapus ada di sini, Bu.").waitFor({ timeout: 40_000 });
+    await tunjuk.getByRole("button", { name: "Batal, jangan hapus" }).click();
+    const info = display("info");
+    await info.getByText("Pilihan: Jangan hapus. Kuis dan nilainya tetap ada.").waitFor({
+      timeout: 10_000,
+    });
+    await info.getByText("Nemu tidak menekan Hapus; Nemu hanya menunjuknya.").waitFor();
+    expect(!(await tunjuk.count()), "the Gelembung Tunjuk is still up");
+    await page.screenshot({ path: join(shots, "7-batal-jangan-hapus.png") });
+    const after = moodleState();
+    if (!after) return;
+    expect(
+      after.quizzes === 1 && after.attempts === 3 && after.grades === 3,
+      "the quiz or its grades changed",
+    );
+    expect(after.deletions === before.deletions, "Moodle's log has a deletion");
+  },
+);
 
 await context.close();
 console.log(`Screenshots: ${shots}`);

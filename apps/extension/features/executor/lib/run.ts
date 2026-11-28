@@ -73,6 +73,8 @@ export type StepSource = (
 /** A value step in cara 2. */
 export type GuidedStep = Extract<ExecutorStep, { verb: "setValue" }>;
 
+type PointStep = Extract<ExecutorStep, { verb: "point" }>;
+
 /**
  * A feature's own words for cara 2 value steps, e.g. F1's grade lines (F1-11): what Nemu says as
  * it points, and the check of what the teacher typed once she leaves the field. `null` (or a
@@ -428,16 +430,7 @@ export class ExecutorRun {
       );
     }
     if (step.verb === "point")
-      return this.pointAndWait(
-        index,
-        element,
-        name,
-        step.sentence,
-        false,
-        signal,
-        step.ringkasan,
-        step.sumber,
-      );
+      return this.pointAndWait(index, element, name, step.sentence, false, signal, step);
     if (step.verb === "scroll") {
       element.scrollIntoView({ block: "center", behavior: "smooth" });
       this.deps.log({ action: "scroll", target: name, result: "done" });
@@ -486,13 +479,28 @@ export class ExecutorRun {
     sentence: string,
     refused: boolean,
     signal: AbortSignal,
-    ringkasan?: string,
-    sumber?: string,
+    { ringkasan, sumber, status, detail, cancel }: Partial<PointStep> = {},
   ) {
     this.waiting = { refused };
     // Gelembung Tunjuk carries one link: the numbers behind it, else where the step came from.
     const note = ringkasan ? { ringkasan } : sumber ? { sumber: [sumber] } : undefined;
-    this.render({ type: "tunjuk", sentence, note }, element);
+    // Her way out ("Batal, jangan hapus") ends the run here; the task's finisher sees `cancelled`.
+    const onCancel = () => {
+      if (!cancel || !this.isActive()) return;
+      this.state.events.push({ kind: "cancelled", label: cancel });
+      this.end("stopped");
+    };
+    this.render(
+      {
+        type: "tunjuk",
+        sentence,
+        note,
+        status,
+        detail,
+        cancel: cancel ? { label: cancel, onSelect: onCancel } : undefined,
+      },
+      element,
+    );
     this.deps.speak(sentence);
     await waitForEvent(
       this.deps.doc,

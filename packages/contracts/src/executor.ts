@@ -54,6 +54,22 @@ export const executorStepSchema = z.discriminatedUnion("verb", [
       ringkasan: z.string().max(4000).optional(),
       /** Where this step came from, behind Sumber: "Rekaman Pak Rizal, langkah 11 dari 11". */
       sumber: z.string().max(200).optional(),
+      /** The Gelembung Tunjuk's heading, e.g. "Giliran Ibu" (`NemuStatus` in `@nemu/ui`). */
+      status: z
+        .object({
+          text: z.string().min(1).max(40),
+          tone: z.enum(["nemu", "muted", "danger", "warning", "success"]).optional(),
+          count: z.string().min(1).max(60).optional(),
+        })
+        .strict()
+        .optional(),
+      /** The quieter line under the sentence, never spoken: "Nemu tidak menghapus apa pun." */
+      detail: z.string().max(200).optional(),
+      /**
+       * A way out as a link at the bottom: "Batal, jangan hapus". Choosing it ends the run
+       * (outcome `stopped`, last event `cancelled`), so the task's finisher can tell it apart.
+       */
+      cancel: z.string().min(1).max(60).optional(),
     })
     .strict(),
   /** Types a value into a field. `rowName` (the student) is what Nemu says with it. */

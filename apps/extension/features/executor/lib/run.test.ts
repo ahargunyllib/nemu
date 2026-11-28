@@ -265,6 +265,50 @@ describe("pointing at Simpan", () => {
     });
     run.stop(false);
   });
+
+  test("a point step's heading, detail and cancel link reach the Gelembung Tunjuk; Batal ends the run", async () => {
+    const presses = gradePage();
+    const { run, display, ended, log } = harness(
+      createRunState(
+        {
+          ...GRADES,
+          steps: [
+            {
+              verb: "point",
+              target: { role: "button", text: "Simpan" },
+              status: { text: "Giliran Ibu" },
+              sentence: "Tombol Simpan ada di sini, Bu.",
+              detail: "Nemu tidak menekan apa pun.",
+              cancel: "Batal, jangan simpan",
+            },
+          ],
+        },
+        { cara: 1 },
+      ),
+    );
+    void run.run();
+    await vi.waitFor(() => expect(run.waiting).toEqual({ refused: false }));
+    const shown = display();
+    expect(shown).toMatchObject({
+      type: "tunjuk",
+      status: { text: "Giliran Ibu" },
+      sentence: "Tombol Simpan ada di sini, Bu.",
+      detail: "Nemu tidak menekan apa pun.",
+      cancel: { label: "Batal, jangan simpan" },
+    });
+    if (shown?.type !== "tunjuk") throw new Error("no Gelembung Tunjuk");
+    shown.cancel?.onSelect();
+
+    expect(presses.simpan).toBe(0);
+    expect(ended).toHaveBeenCalledOnce();
+    const [state, notes, showNotes] = ended.mock.calls[0]!;
+    expect(state.status).toBe("stopped");
+    expect(state.events.at(-1)).toEqual({ kind: "cancelled", label: "Batal, jangan simpan" });
+    // Her choice is the last line; there is no "Berhenti di langkah …, isian tetap ada".
+    expect(notes).toEqual(["Bu memilih Batal, jangan simpan"]);
+    expect(showNotes).toBe(true);
+    expect(log.at(-1)).toMatchObject({ action: "stop", result: "stopped" });
+  });
 });
 
 describe("F0-1: a fake AI response that tries to press", () => {

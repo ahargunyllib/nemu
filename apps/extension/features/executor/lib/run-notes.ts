@@ -15,6 +15,8 @@ export type RunEvent =
   | { kind: "pressed"; name: string; refused: boolean }
   /** The teacher did a step Nemu couldn't find or tell apart. */
   | { kind: "skipped"; name: string }
+  /** The teacher chose a point step's cancel link ("Batal, jangan hapus"); the run ended there. */
+  | { kind: "cancelled"; label: string }
   /** Cara 3: the check after Simpan. */
   | { kind: "checked"; total: number; mismatched: number };
 
@@ -50,6 +52,8 @@ function line(event: RunEvent, count: number, teacher: string, corrected: number
         : `${teacher} menekan ${event.name}`;
     case "skipped":
       return `${teacher} mengerjakan ${event.name} sendiri`;
+    case "cancelled":
+      return `${teacher} memilih ${event.label}`;
     case "checked":
       return event.mismatched === 0
         ? `Nemu memeriksa ${event.total} isian: semua sesuai`
@@ -92,7 +96,8 @@ export function stepNotes(input: {
     const corrected = group.filter((item) => item.kind === "taught" && item.corrected).length;
     lines.push(line(event, count, teacher, corrected));
   });
-  if (input.outcome === "stopped") {
+  // A cancel link already says where she stopped, and nothing was left half-filled.
+  if (input.outcome === "stopped" && input.events.at(-1)?.kind !== "cancelled") {
     const total = input.task.steps.length;
     lines.push(
       `Berhenti di langkah ${Math.min(input.index + 1, total)} dari ${total}; isian tetap ada`,

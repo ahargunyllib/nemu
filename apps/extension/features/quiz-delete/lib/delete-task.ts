@@ -11,6 +11,12 @@ import {
   readAttemptCount,
   RESULTS_MENU,
 } from "./moodle-course";
+import { CANCEL } from "./warning";
+
+/** "Giliran Ibu" / "Giliran Bapak" from WS-06's "Bu" / "Pak"; "Giliran Anda" when unknown. */
+function addressFor(honorific: string): string {
+  return honorific === "Bu" ? "Ibu" : honorific === "Pak" ? "Bapak" : "Anda";
+}
 
 /**
  * F4-06 as two executor tasks (#211). The first opens the quiz and its Hasil page through the
@@ -165,7 +171,10 @@ export async function nextShowSteps(
       {
         verb: "point",
         target: { role: "menuitem", text: remove, near: name },
-        sentence: `Kalau jadi dihapus, tekan ${remove} sendiri${teacher ? `, ${teacher}` : ""}.`,
+        status: { text: `Giliran ${addressFor(teacher)}` },
+        sentence: `Tombol ${remove} ada di sini${teacher ? `, ${teacher}` : ""}.`,
+        detail: "Nemu tidak menghapus apa pun.",
+        cancel: CANCEL,
       },
     ],
     continuation: null,
