@@ -91,7 +91,7 @@ await check(
     await display("kerja").getByText("Membuka Nilai…").waitFor({ timeout: 5_000 });
     await page.waitForURL(/#\/nilai$/u, { timeout: 5_000 });
     await display("kerja")
-      .getByText(/Nemu mengisi · \d dari 6/u)
+      .getByRole("progressbar", { name: /Nemu mengisi · \d dari 6/u })
       .waitFor({ timeout: 15_000 });
     await page.screenshot({ path: join(shots, "cara-1-filling.png") });
     await display("tunjuk").getByText("Silakan tekan Simpan.").waitFor({ timeout: 30_000 });
