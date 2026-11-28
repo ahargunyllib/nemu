@@ -1,16 +1,17 @@
 import { Button } from "@nemu/ui/components/button";
 import { Skeleton } from "@nemu/ui/components/skeleton";
 import type { GelembungJawabProps } from "@nemu/ui/lib/nemu-display";
-import { BIG_BUTTON, NemuBubble, NemuNoteLinks, NemuSentence } from "@nemu/ui/nemu/nemu-frame";
+import { BIG_BUTTON, NemuBubble, NemuNoteLinks, NemuText } from "@nemu/ui/nemu/nemu-frame";
 import { cn } from "cn";
 import { X } from "lucide-react";
 
 /**
- * Gelembung Jawab: an answer or a problem. One sentence, the Kenapa?, Sumber and Lihat ringkasan
- * links, and at most one action button in Nemu's dark orange.
+ * Gelembung Jawab: an answer or a problem. One sentence with an optional detail line, the
+ * Kenapa?, Sumber and Lihat ringkasan links, and at most one action button in Nemu's dark orange.
  */
 export function GelembungJawab({
   sentence,
+  detail,
   highlightedWord,
   status,
   notes,
@@ -29,7 +30,12 @@ export function GelembungJawab({
       className={cn(onClose && "[&_[data-nemu-status]]:mr-16")}
     >
       <div className={cn(onClose && !status && "pr-10")}>
-        <NemuSentence sentence={sentence} highlightedWord={highlightedWord} onRepeat={onRepeat} />
+        <NemuText
+          sentence={sentence}
+          detail={detail}
+          highlightedWord={highlightedWord}
+          onRepeat={onRepeat}
+        />
       </div>
       {notes && <NemuNoteLinks notes={notes} onRead={onRead} />}
       {action && (

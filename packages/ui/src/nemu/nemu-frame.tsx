@@ -111,8 +111,10 @@ export function NemuStatusHeader({ status }: { status: NemuStatus }) {
   );
 }
 
+const SENTENCE = "text-2xl leading-8 font-semibold tracking-[-0.01em]";
+
 /**
- * Nemu's one sentence at 24 px. While Nemu's voice reads it (#200), the word it is on is marked
+ * Nemu's one sentence at 24 px semibold. While Nemu's voice reads it (#200), the word it is on is marked
  * with a tint and a thick underline; with `onRepeat`, clicking it says it again.
  */
 export function NemuSentence({
@@ -145,16 +147,36 @@ export function NemuSentence({
       })}
     </>
   );
-  if (!onRepeat) return <p className="text-2xl leading-8 font-medium">{words}</p>;
+  if (!onRepeat) return <p className={SENTENCE}>{words}</p>;
   return (
     <button
       type="button"
       onClick={onRepeat}
       title="Klik untuk mendengar lagi"
-      className="cursor-pointer text-left text-2xl leading-8 font-medium"
+      className={cn(SENTENCE, "cursor-pointer text-left")}
     >
       {words}
     </button>
+  );
+}
+
+/** The quieter line under a sentence, question or title: 18 px `nemu-secondary`. Never read aloud. */
+export const NEMU_DETAIL = "text-lg leading-[26px] font-normal text-nemu-secondary";
+
+/** A bubble's text: the sentence, and under it the optional detail line. */
+export function NemuText({
+  detail,
+  ...sentence
+}: ComponentProps<typeof NemuSentence> & { detail?: string }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <NemuSentence {...sentence} />
+      {detail && (
+        <p data-nemu-detail className={NEMU_DETAIL}>
+          {detail}
+        </p>
+      )}
+    </div>
   );
 }
 

@@ -45,6 +45,7 @@ export function sceneDisplay(
         type: "kerja",
         status: { tone: "working", text: "Nemu mengisi", progress: { done: 13, total: 32 } },
         sentence: "Nemu mengisi nilai Aisyah Putri Wijaya: 85.",
+        detail: "Klik atau ketik kalau Ibu mau isi sendiri.",
         slow: actions.slow,
         onSlow: actions.toggleSlow,
         onStop: actions.close,
@@ -54,6 +55,7 @@ export function sceneDisplay(
         type: "tunjuk",
         status: { tone: "unsaved", text: "Belum tersimpan" },
         sentence: "Sekarang tekan Tampilkan Siswa.",
+        detail: "Nemu menunggu sampai daftar murid muncul.",
         note: { kenapa: "Daftar murid kelas 4A muncul setelah tombol ini ditekan." },
       };
     case "kursor":
@@ -67,6 +69,7 @@ export function sceneDisplay(
         type: "jawab",
         status: { tone: "saved", text: "Tersimpan" },
         sentence: "KKM semua mata pelajaran di SDIT Nusantara adalah 75.",
+        detail: "Berlaku untuk semester ganjil 2026/2027.",
         notes: {
           kenapa: "Sekolah menetapkan satu KKM untuk semua mata pelajaran tahun ini.",
           sumber: ["SOP Penilaian SDIT Nusantara · hlm. 2 · 3.2"],
@@ -79,6 +82,7 @@ export function sceneDisplay(
       return {
         type: "pilih",
         question: "Nilai Bagas Pratama 58, di bawah KKM 75. Tetap simpan?",
+        detail: "Pilih salah satu, Nemu menunggu.",
         choices: [
           { id: "simpan", label: "Tetap simpan", risky: true },
           { id: "periksa", label: "Periksa dulu" },
@@ -89,6 +93,7 @@ export function sceneDisplay(
       return {
         type: "info",
         title: "Catatan langkah",
+        detail: "Yang Nemu dan Ibu kerjakan di halaman ini.",
         items: [
           "32 nilai Harian Matematika 4B diisi Nemu.",
           "Ibu menekan Simpan pukul 09.12.",

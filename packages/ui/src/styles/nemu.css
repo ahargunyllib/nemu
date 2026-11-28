@@ -39,6 +39,8 @@
    */
   --nemu-strong: var(--nemu-amber-800);
   --nemu-strong-foreground: #ffffff;
+  /* text/secondary: the detail line under a display's sentence (7.7:1 on white). */
+  --nemu-secondary: #52525b;
 
   /* bg/success, text/success: "Kamu yang mengirim" label, success Answer Card. */
   --nemu-success: #10b981;
@@ -80,6 +82,7 @@
   --color-nemu-glow: var(--nemu-glow);
   --color-nemu-strong: var(--nemu-strong);
   --color-nemu-strong-foreground: var(--nemu-strong-foreground);
+  --color-nemu-secondary: var(--nemu-secondary);
   --color-nemu-success: var(--nemu-success);
   --color-nemu-success-foreground: var(--nemu-success-foreground);
   --color-nemu-success-subtle: var(--nemu-success-subtle);

@@ -257,3 +257,83 @@ describe("Kartu Info", () => {
     expect(onClose).toHaveBeenCalledOnce();
   });
 });
+
+/** True when `later` comes after `earlier` in the document. */
+function follows(earlier: Node, later: Node) {
+  return Boolean(earlier.compareDocumentPosition(later) & Node.DOCUMENT_POSITION_FOLLOWING);
+}
+
+describe("The detail line", () => {
+  test("sits under a bubble's sentence and is never said", () => {
+    const tunjuk = {
+      type: "tunjuk" as const,
+      sentence: "Tombol Hapus ada di sini, Bu.",
+      detail: "Nemu tidak menghapus apa pun.",
+    };
+    render(<GelembungTunjuk {...tunjuk} />);
+    expect(
+      follows(
+        screen.getByText("Tombol Hapus ada di sini, Bu."),
+        screen.getByText("Nemu tidak menghapus apa pun."),
+      ),
+    ).toBe(true);
+    expect(spokenText(tunjuk)).toBe("Tombol Hapus ada di sini, Bu.");
+  });
+
+  test("on Gelembung Kerja and Gelembung Jawab too, outside the sentence Nemu repeats", () => {
+    render(
+      <>
+        <GelembungKerja
+          sentence="Alya Nur Fitri, 90."
+          detail="Klik atau ketik kalau Ibu mau isi sendiri."
+          status={{ tone: "working", text: "Nemu mengisi" }}
+          onSlow={vi.fn()}
+          onStop={vi.fn()}
+        />
+        <GelembungJawab
+          sentence="Bukan kesalahan Ibu."
+          detail="Nilai UTS Aisyah sudah tersimpan."
+          onRepeat={vi.fn()}
+        />
+      </>,
+    );
+    const kerja = screen.getByRole("region", { name: "Nemu bekerja" });
+    expect(within(kerja).getByText("Klik atau ketik kalau Ibu mau isi sendiri.")).toBeTruthy();
+    const jawab = screen.getByRole("region", { name: "Jawaban Nemu" });
+    expect(within(jawab).getByText("Nilai UTS Aisyah sudah tersimpan.")).toBeTruthy();
+    expect(within(jawab).getByRole("button", { name: "Bukan kesalahan Ibu." })).toBeTruthy();
+  });
+
+  test("on Kartu Pilih, between the question and the choices; only the question is said", () => {
+    const pilih = {
+      type: "pilih" as const,
+      question: "Ibu mau isi sendiri?",
+      detail: "Pilih salah satu, Nemu menunggu.",
+      choices: [
+        { id: "ya", label: "Ya, saya isi sendiri" },
+        { id: "lanjut", label: "Nemu saja yang lanjut" },
+      ] as const,
+      onChoose: vi.fn(),
+    };
+    render(<KartuPilih {...pilih} />);
+    const detail = screen.getByText("Pilih salah satu, Nemu menunggu.");
+    expect(follows(screen.getByText("Ibu mau isi sendiri?"), detail)).toBe(true);
+    expect(follows(detail, screen.getByRole("group"))).toBe(true);
+    expect(spokenText(pilih)).toBe("Ibu mau isi sendiri?");
+  });
+
+  test("on Kartu Info, under the title; only the title is said", () => {
+    const info = {
+      type: "info" as const,
+      title: "Ada 2 hal yang perlu Ibu perbaiki.",
+      detail: "Yang lain sudah benar: 15 soal, kelas 4A.",
+      items: ["Soal 15: gambar (3) belum ada.", "Soal 7: belum ada kunci jawaban."],
+      onClose: vi.fn(),
+    };
+    render(<KartuInfo {...info} />);
+    const card = screen.getByRole("region", { name: "Ada 2 hal yang perlu Ibu perbaiki." });
+    const detail = within(card).getByText("Yang lain sudah benar: 15 soal, kelas 4A.");
+    expect(follows(detail, within(card).getByRole("list"))).toBe(true);
+    expect(spokenText(info)).toBe("Ada 2 hal yang perlu Ibu perbaiki.");
+  });
+});

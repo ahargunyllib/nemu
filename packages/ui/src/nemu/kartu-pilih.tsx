@@ -1,14 +1,21 @@
 import { Button } from "@nemu/ui/components/button";
-import { CardContent, CardFooter, CardHeader, CardTitle } from "@nemu/ui/components/card";
+import {
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@nemu/ui/components/card";
 import { Skeleton } from "@nemu/ui/components/skeleton";
 import { type KartuPilihProps, orderChoices } from "@nemu/ui/lib/nemu-display";
-import { NemuCard } from "@nemu/ui/nemu/nemu-frame";
+import { NEMU_DETAIL, NemuCard } from "@nemu/ui/nemu/nemu-frame";
 import { cn } from "cn";
 import { TriangleAlert } from "lucide-react";
 import { useId } from "react";
 
 /**
- * Kartu Pilih: a decision. One question and two or three equal, stacked big buttons. Nothing is
+ * Kartu Pilih: a decision. One question, an optional detail line ("Pilih salah satu, Nemu
+ * menunggu."), and two or three equal, stacked big buttons. Nothing is
  * pre-selected or focused; a risky choice carries ⚠ and sits under the safe one. An `image`
  * shows what the question is about (W5's photo crop); `compact` is the small card that waits
  * beside the Nemu button, with 44 px buttons, and its `image` is a thumbnail beside the question
@@ -16,6 +23,7 @@ import { useId } from "react";
  */
 export function KartuPilih({
   question,
+  detail,
   choices,
   onChoose,
   image,
@@ -37,12 +45,19 @@ export function KartuPilih({
           ) : (
             <Skeleton aria-hidden className="size-16 shrink-0" />
           ))}
-        <CardTitle
-          id={questionId}
-          className={cn("font-semibold", compact ? "text-lg leading-6" : "text-xl leading-7")}
-        >
-          {question}
-        </CardTitle>
+        <div className="flex flex-col gap-1.5">
+          <CardTitle
+            id={questionId}
+            className={cn("font-semibold", compact ? "text-lg leading-6" : "text-xl leading-7")}
+          >
+            {question}
+          </CardTitle>
+          {detail && (
+            <CardDescription data-nemu-detail className={NEMU_DETAIL}>
+              {detail}
+            </CardDescription>
+          )}
+        </div>
       </CardHeader>
       {!compact && image?.src && (
         <CardContent>
