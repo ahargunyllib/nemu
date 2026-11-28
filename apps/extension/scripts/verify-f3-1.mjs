@@ -200,7 +200,8 @@ await check(
     await ask("Catat setoran hafalan 4A hari ini");
     const steps = overlay.getByRole("region", { name: `Langkah ${TITLE}` });
     await steps.waitFor({ timeout: 15_000 });
-    const items = await steps.locator("li").allInnerTexts();
+    // The list numbers its steps in a circle beside the text; only the text is the step.
+    const items = await steps.locator("li > span:last-child").allInnerTexts();
     console.log(`  ${items.join(" | ")}`);
     expect(items.length >= 2 && items.length <= 6, `${items.length} steps`);
     expect(items[0] === `Buka ${PAGE}.`, `first step: ${items[0]}`);
@@ -310,7 +311,7 @@ await check("the teacher saves; Catatan langkah names the system's tasks", async
   await page.getByText("Setoran tersimpan untuk 3 murid kelas 4A.").waitFor();
   const notes = overlay.getByRole("region", { name: "Catatan langkah" });
   await notes.waitFor({ timeout: 10_000 });
-  const items = await notes.locator("li").allInnerTexts();
+  const items = await notes.locator("li > span:last-child").allInnerTexts();
   console.log(`  ${items.join(" | ")}`);
   expect(
     items.some((item) => /Ibu menekan Simpan setoran|Bu menekan Simpan setoran/u.test(item)),
