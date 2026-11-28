@@ -29,6 +29,11 @@ const SEED_DOCUMENT_FILES = [
     file: "../ai/src/school/fixtures/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf",
     contentType: "application/pdf",
   },
+  {
+    key: "seed/alursekolah/tentang-nemu.md",
+    file: "../ai/src/school/fixtures/tentang-nemu.md",
+    contentType: "text/markdown; charset=utf-8",
+  },
 ].map((seed) => {
   const path = fileURLToPath(new URL(seed.file, import.meta.url).href);
   // The Action runs again only when a file's contents change.
