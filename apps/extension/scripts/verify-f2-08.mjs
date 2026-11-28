@@ -103,11 +103,11 @@ await check(
   async () => {
     await signIn("rizal@nemu.demo", "rizal-demo-2026");
     await admin.goto(new URL("documents", ADMIN).href);
-    const symptoms = admin.getByRole("button", { name: "Gejala dan halaman Alur SPP" });
+    const rows = admin.getByRole("row").filter({ hasText: "Alur SPP" });
     // The seeded SOP is always listed, so a second row means the list has loaded.
     await admin.getByRole("row").nth(1).waitFor();
     await admin.waitForLoadState("networkidle");
-    if (!(await symptoms.count())) {
+    if (!(await rows.count())) {
       await admin.getByRole("button", { name: "Unggah BPMN" }).click();
       const dialog = admin.getByRole("dialog");
       await dialog.getByLabel("File").setInputFiles(bpmn);
@@ -118,16 +118,15 @@ await check(
       await dialog.getByRole("button", { name: "Unggah" }).click();
       await dialog.waitFor({ state: "hidden", timeout: 20_000 });
     }
-    // A copy left inactive by an earlier run is switched on in its row.
-    const rows = admin.getByRole("row").filter({ has: symptoms });
-    const activeRows = rows.filter({
-      has: admin.getByRole("switch", { name: "Aktif", checked: true }),
-    });
+    // A copy left inactive by an earlier run is switched on in the panel its row opens.
+    const activeRows = rows.filter({ has: admin.getByText("Aktif", { exact: true }) });
     if (!(await activeRows.count())) {
-      await rows.first().getByRole("switch", { name: "Aktif" }).click();
+      await rows.first().click();
+      await admin.getByRole("switch", { name: "Aktif" }).click();
       await activeRows.first().waitFor();
     }
-    await activeRows.first().getByRole("button", { name: "Gejala dan halaman Alur SPP" }).click();
+    await activeRows.first().click();
+    await admin.getByRole("button", { name: "Gejala dan halaman Alur SPP" }).click();
     const sheet = admin.getByRole("dialog");
     await sheet
       .getByText("nilai tidak muncul di aplikasi orang tua", { exact: false })

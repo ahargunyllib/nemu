@@ -3,7 +3,7 @@ import type { SchoolAi } from "@nemu/ai/school/runtime";
 
 import type { DocumentFileStore } from "../../context";
 import type { WorkspaceId } from "../../workspace-ids";
-import type { CatalogRepository } from "./catalog-repository";
+import type { CatalogDocument, CatalogRepository, DocumentListScope } from "./catalog-repository";
 import type { DocumentLinkSigner } from "./file-link";
 import { indexBpmnDocument, indexMarkdownDocument, pdfToMarkdown } from "./indexing";
 import { bpmnProcessElements } from "./process-elements";
@@ -187,6 +187,41 @@ export async function uploadDocument(
       }
     );
   }
+}
+
+/** A listed document, and whether this user may only read it (a package document for an operator). */
+export type KnowledgeDocument = CatalogDocument & { readOnly: boolean };
+
+/**
+ * WS-04 lists the school's own documents and, with `all`, the built-in package's next to them
+ * (Dokumen dan alur): an operator sees what Nemu answers from but can't change a package document.
+ */
+export async function listKnowledge(
+  { catalog }: { catalog: Pick<CatalogRepository, "listDocuments"> },
+  workspaceId: string,
+  scope: DocumentListScope,
+  canManagePackages: boolean,
+): Promise<KnowledgeDocument[]> {
+  const documents = await catalog.listDocuments(workspaceId, scope);
+  return documents.map((document) => ({
+    ...document,
+    readOnly: document.packageId !== null && !canManagePackages,
+  }));
+}
+
+/**
+ * Whether this user may switch, re-site, version or delete the document: a package document only
+ * when they manage packages. A document that isn't there passes, so the caller reports NOT_FOUND.
+ */
+export async function canEditDocument(
+  { documents }: { documents: Pick<DocumentRepository, "findById"> },
+  workspaceId: string,
+  id: string,
+  canManagePackages: boolean,
+): Promise<boolean> {
+  if (canManagePackages) return true;
+  const document = await documents.findById(workspaceId, id);
+  return !document?.packageId;
 }
 
 export function setDocumentActive(

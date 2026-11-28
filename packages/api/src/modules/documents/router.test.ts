@@ -19,6 +19,7 @@ const SOP_PENILAIAN_PDF = join(
   "../../../../ai/src/school/fixtures/F3-2_SOP-Penilaian-SDIT-Nusantara.pdf",
 );
 const OPERATOR = { id: "rizal", role: "operator", workspaceId: "W-SEKOLAH" };
+const JAVAN = { id: "javan", role: "admin", workspaceId: "W-SEKOLAH" };
 
 async function operatorContext() {
   const context = await createSchoolContext();
@@ -26,6 +27,18 @@ async function operatorContext() {
     ...context,
     session: { ...context.session!, user: { ...context.session!.user, ...OPERATOR } },
   };
+}
+
+/** The same database, signed in as Admin Javan, who manages the built-in package (WS-02). */
+function asJavan(context: Awaited<ReturnType<typeof operatorContext>>) {
+  return {
+    ...context,
+    session: { ...context.session, user: { ...context.session.user, ...JAVAN } },
+  };
+}
+
+async function fixtureFile(name: string) {
+  return new File([await readFile(join(FIXTURES, name))], name, { type: "application/xml" });
 }
 
 describe("WS-04 knowledge", () => {
@@ -105,8 +118,7 @@ describe("WS-04 knowledge", () => {
 describe("Dokumen dan alur stats", () => {
   it("counts active knowledge by package and school, BPMN tasks, and the newest recording's steps", async () => {
     const context = await operatorContext();
-    const bpmn = async (name: string) =>
-      new File([await readFile(join(FIXTURES, name))], name, { type: "application/xml" });
+    const bpmn = fixtureFile;
     await call(
       documentsRouter.uploadDocument,
       {
@@ -117,7 +129,7 @@ describe("Dokumen dan alur stats", () => {
         siteIds: [],
         packageId: "alursekolah",
       },
-      { context },
+      { context: asJavan(context) },
     );
     await call(
       documentsRouter.uploadDocument,
@@ -177,6 +189,79 @@ describe("Dokumen dan alur stats", () => {
     // Alur SPP has 7 tasks, tahfidz 5; each person's task has a page taken from its label.
     expect(stats.processes).toEqual({ count: 2, tasks: 12, unmappedTasks: 0 });
     expect(stats.recordings).toEqual({ count: 1, latestSteps: procedure.steps.length });
+  });
+});
+
+describe("Dokumen dan alur: package documents for the operator", () => {
+  it("lists the package's documents next to the school's, read-only for the operator", async () => {
+    const context = await operatorContext();
+    const spp = await call(
+      documentsRouter.uploadDocument,
+      {
+        title: "Alur SPP",
+        version: "1",
+        isActive: true,
+        file: await fixtureFile("F2-1_alur-spp.bpmn"),
+        siteIds: [],
+        packageId: "alursekolah",
+      },
+      { context: asJavan(context) },
+    );
+
+    const forOperator = await call(
+      documentsRouter.listDocuments,
+      { packageId: null, withPackages: true },
+      { context },
+    );
+    expect(forOperator.find((row) => row.id === spp.id)).toMatchObject({
+      packageId: "alursekolah",
+      readOnly: true,
+    });
+    expect(forOperator.find((row) => row.id === "sop-penilaian-sdit-nusantara")).toMatchObject({
+      packageId: null,
+      readOnly: false,
+    });
+    const forJavan = await call(
+      documentsRouter.listDocuments,
+      { packageId: null, withPackages: true },
+      { context: asJavan(context) },
+    );
+    expect(forJavan.find((row) => row.id === spp.id)?.readOnly).toBe(false);
+    // Without `withPackages`, WS-04 still lists only the school's own.
+    const own = await call(documentsRouter.listDocuments, { packageId: null }, { context });
+    expect(own.map((row) => row.id)).not.toContain(spp.id);
+
+    for (const [procedure, input] of [
+      [documentsRouter.setDocumentActive, { id: spp.id, isActive: false }],
+      [documentsRouter.setDocumentSites, { id: spp.id, siteIds: [] }],
+      [documentsRouter.deleteDocument, { id: spp.id }],
+    ] as const) {
+      await expect(call(procedure as never, input as never, { context })).rejects.toMatchObject({
+        code: "FORBIDDEN",
+      });
+    }
+    await expect(
+      call(
+        documentsRouter.uploadDocument,
+        {
+          title: "Alur SPP",
+          version: "2",
+          isActive: false,
+          file: await fixtureFile("F2-1_alur-spp.bpmn"),
+          siteIds: [],
+          packageId: "alursekolah",
+        },
+        { context },
+      ),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    // Admin Javan still switches it.
+    await expect(
+      call(
+        documentsRouter.setDocumentActive,
+        { id: spp.id, isActive: false },
+        { context: asJavan(context) },
+      ),
+    ).resolves.toMatchObject({ isActive: false });
   });
 });
 

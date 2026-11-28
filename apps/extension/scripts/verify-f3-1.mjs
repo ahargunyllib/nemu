@@ -111,14 +111,13 @@ async function setPage(value) {
   await admin.goto(new URL("documents", ADMIN).href);
   await admin.getByRole("row").nth(1).waitFor();
   await admin.waitForLoadState("networkidle");
-  const rows = admin.getByRole("row").filter({
-    has: admin.getByRole("button", { name: `Gejala dan halaman ${TITLE}` }),
-  });
-  await rows
-    .filter({ has: admin.getByRole("switch", { name: "Aktif", checked: true }) })
+  await admin
+    .getByRole("row")
+    .filter({ hasText: TITLE })
+    .filter({ has: admin.getByText("Aktif", { exact: true }) })
     .first()
-    .getByRole("button", { name: `Gejala dan halaman ${TITLE}` })
     .click();
+  await admin.getByRole("button", { name: `Gejala dan halaman ${TITLE}` }).click();
   const sheet = admin.getByRole("dialog");
   const form = sheet.locator("form").filter({ hasText: TASK });
   await form.getByLabel("Halaman").fill(value);
@@ -133,8 +132,8 @@ await check("WS-04: Pak Rizal uploads the tahfidz BPMN and sets its task's page"
   await admin.goto(new URL("documents", ADMIN).href);
   await admin.getByRole("row").nth(1).waitFor();
   await admin.waitForLoadState("networkidle");
-  const button = admin.getByRole("button", { name: `Gejala dan halaman ${TITLE}` });
-  if (!(await button.count())) {
+  const rows = admin.getByRole("row").filter({ hasText: TITLE });
+  if (!(await rows.count())) {
     await admin.getByRole("button", { name: "Unggah BPMN" }).click();
     const dialog = admin.getByRole("dialog");
     await dialog.getByLabel("File").setInputFiles(bpmn);
@@ -145,12 +144,11 @@ await check("WS-04: Pak Rizal uploads the tahfidz BPMN and sets its task's page"
     await dialog.getByRole("button", { name: "Unggah" }).click();
     await dialog.waitFor({ state: "hidden", timeout: 20_000 });
   }
-  const rows = admin.getByRole("row").filter({ has: button });
-  const activeRows = rows.filter({
-    has: admin.getByRole("switch", { name: "Aktif", checked: true }),
-  });
+  // A row's status reads Aktif; its switch is in the panel the row opens.
+  const activeRows = rows.filter({ has: admin.getByText("Aktif", { exact: true }) });
   if (!(await activeRows.count())) {
-    await rows.first().getByRole("switch", { name: "Aktif" }).click();
+    await rows.first().click();
+    await admin.getByRole("switch", { name: "Aktif" }).click();
     await activeRows.first().waitFor();
   }
   await setPage(PAGE);
