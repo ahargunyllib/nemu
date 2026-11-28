@@ -33,6 +33,7 @@ import { F1_READ_A, F1_READ_B, F1_REREAD, F1_TITLE } from "./fixtures/f1-photo.j
 import { F4_2_READING, F4_2_SCRIPT_SHA256 } from "./fixtures/f4-2-script.js";
 import { F2_1_SPP_INDEX, F2_1_SPP_PHRASING, isF21Spp } from "./fixtures/f2-1-spp.js";
 import { fixtureFormPhoto } from "./fixtures/form-photo.js";
+import { f32Answer } from "./fixtures/f3-2-sop.js";
 import {
   parseGradeExcel,
   type ParseGradeExcelInput,
@@ -275,10 +276,13 @@ export function createFixtureSchoolAi(): SchoolAi {
         1,
       )[0];
       const quote = sentences[Number(best?.id ?? 0)]!;
+      // The official F3-2 questions read as the live model words them (fixtures/f3-2-sop.ts).
+      const worded = f32Answer(input.question, input.honorific ?? "Bu");
       return verifyGroundedAnswer(
         {
           status: "answered",
-          answer: quote.length > 90 ? `${quote.slice(0, 87)}...` : `${quote}.`,
+          answer: worded?.answer ?? (quote.length > 90 ? `${quote.slice(0, 87)}...` : `${quote}.`),
+          aturan: worded?.detail ?? "",
           citations: [{ chunk_id: top.id, quote }],
         },
         context,

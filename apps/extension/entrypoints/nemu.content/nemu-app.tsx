@@ -1,7 +1,7 @@
 import type { PageSnapshot } from "@nemu/contracts/school";
 import { shortcutKeys } from "@nemu/contracts/talk-shortcut";
 import { Button } from "@nemu/ui/components/button";
-import type { NemuSource } from "@nemu/ui/lib/nemu-display";
+import type { NemuNotes, NemuSource } from "@nemu/ui/lib/nemu-display";
 import { GelembungJawab, GelembungJawabSkeleton } from "@nemu/ui/nemu/gelembung-jawab";
 import { NEMU_LINK } from "@nemu/ui/nemu/nemu-frame";
 import { NemuStage } from "@nemu/ui/nemu/nemu-stage";
@@ -38,7 +38,12 @@ import { useRecorder } from "../../features/recorder/hooks/use-recorder";
 import { recorder } from "../../features/recorder/stores/recorder";
 import { NemuButton } from "../../features/nemu-button/components/nemu-button";
 import { type AskState, useAsk } from "../../features/nemu-button/hooks/use-ask";
-import type { SourceFile } from "../../features/nemu-button/lib/answer";
+import { useSchoolName } from "../../features/nemu-button/hooks/use-school-name";
+import {
+  singleSourceFile,
+  sourceLinkLabel,
+  type SourceFile,
+} from "../../features/nemu-button/lib/answer";
 import { MicrophoneDisplay } from "../../features/voice/components/microphone-display";
 import { HeardBubble, ListeningBubble } from "../../features/voice/components/talk-bubbles";
 import { useTalk } from "../../features/voice/hooks/use-talk";
@@ -412,6 +417,27 @@ function sumberEntries(
   });
 }
 
+/** An answer's links: one cited document opens in one click (F3·09); else the Sumber list. */
+function answerNotes(
+  result: Extract<AskState, { status: "answered" }>["result"],
+  schoolName: string | null,
+  onOpen: (file: SourceFile) => void,
+): NemuNotes | undefined {
+  if (result.kind !== "answer") return undefined;
+  const file = singleSourceFile(result);
+  if (file) {
+    return {
+      kenapa: result.why,
+      sumberFile: { label: sourceLinkLabel(file, schoolName), onOpen: () => onOpen(file) },
+    };
+  }
+  return {
+    kenapa: result.why,
+    sumber: sumberEntries(result.sources, result.files, onOpen),
+    sumberLink: result.diagram,
+  };
+}
+
 /** One display at a time: a talk notice, else the answer (or its Skeleton). */
 function NemuPanel({
   identity,
@@ -426,6 +452,7 @@ function NemuPanel({
   onOpenSource,
   onDismiss,
 }: NemuPanelProps) {
+  const schoolName = useSchoolName();
   if (!identity) return <GelembungJawabSkeleton />;
   // ID-02: an unregistered or signed-out account gets the reason instead of the type box.
   if (identity.status !== "registered") {
@@ -453,17 +480,11 @@ function NemuPanel({
           {state.status === "asking" && <GelembungJawabSkeleton />}
           {state.status === "answered" && (
             <GelembungJawab
+              status={state.result.kind === "answer" ? state.result.status : undefined}
               sentence={state.result.text}
+              detail={state.result.kind === "answer" ? state.result.detail : undefined}
               highlightedWord={spokenWordIn(state.result.text, voice)}
-              notes={
-                state.result.kind === "answer"
-                  ? {
-                      kenapa: state.result.why,
-                      sumber: sumberEntries(state.result.sources, state.result.files, onOpenSource),
-                      sumberLink: state.result.diagram,
-                    }
-                  : undefined
-              }
+              notes={answerNotes(state.result, schoolName, onOpenSource)}
               action={action}
               onRead={onRead}
               onRepeat={onRepeat}

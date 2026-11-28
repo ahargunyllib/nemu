@@ -333,6 +333,8 @@ export const groundedAnswerSchema = z.discriminatedUnion("status", [
     .object({
       status: z.literal("answered"),
       answer: z.string(),
+      /** F3·09: the cited rule in one short line under the answer ("KKM 75 berlaku untuk semua mapel."). */
+      detail: z.string().optional(),
       citations: z.array(sourceCitationSchema).min(1),
     })
     .strict(),

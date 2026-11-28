@@ -9,9 +9,9 @@ import { createSchoolContext } from "../../testing/school";
 import { helpRouter } from "./router";
 
 // F3-2 (PRD §11): the five questions on the official SOP Penilaian, asked as Bu Siti through
-// helpAsk over the seeded W-SEKOLAH knowledge. Offline it checks the cited page and point with the
-// fixture responder; NEMU_LIVE_EVAL=1 asks the configured text model (apps/server/.env) and also
-// checks each answer against the key:
+// helpAsk over the seeded W-SEKOLAH knowledge, checking the cited page and point and the key's
+// facts in the answer or its rule line. Offline it uses the fixture responder; NEMU_LIVE_EVAL=1
+// asks the configured text model (apps/server/.env):
 //   NEMU_LIVE_EVAL=1 pnpm --filter @nemu/api exec vp test run src/modules/help/f3-2-sop.test.ts
 
 const FIXTURES = join(import.meta.dirname, "../../../../ai/src/school/fixtures");
@@ -114,7 +114,8 @@ describe(`F3-2: the official SOP Penilaian answers with its page and point (${li
           answer.status === "answered"
             ? answer.citations.map((c) => `${c.title} hlm. ${c.page} poin ${c.article}`).join("; ")
             : "-";
-        console.info(`F3-2 #${no} [${answer.status}] ${answer.answer} | ${cited}`);
+        const detail = answer.status === "answered" ? (answer.detail ?? "-") : "-";
+        console.info(`F3-2 #${no} [${answer.status}] ${answer.answer} / ${detail} | ${cited}`);
       }
 
       if (point === null) {
@@ -124,7 +125,9 @@ describe(`F3-2: the official SOP Penilaian answers with its page and point (${li
       expect(answer.status).toBe("answered");
       if (answer.status !== "answered") return;
       expect(answer.citations[0]).toMatchObject({ docId: SOP, page, article: point });
-      if (live) for (const pattern of ANSWER_MUST[no]!) expect(answer.answer).toMatch(pattern);
+      // The key's facts may sit in the answer or in the rule line under it (F3·09).
+      const said = `${answer.answer} ${answer.detail ?? ""}`;
+      for (const pattern of ANSWER_MUST[no]!) expect(said).toMatch(pattern);
     },
     live ? 60_000 : 5_000,
   );

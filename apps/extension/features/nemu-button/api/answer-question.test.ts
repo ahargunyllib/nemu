@@ -29,6 +29,7 @@ function fakeClient(route: CommandRoute) {
     helpAsk: vi.fn(async () => ({
       status: "answered" as const,
       answer: "KKM seluruh mata pelajaran adalah 75.",
+      detail: "KKM 75 berlaku untuk semua mapel.",
       citations: [CITATION, CITATION],
     })),
     helpExplain: vi.fn(async () => ({
@@ -58,12 +59,15 @@ describe("answerQuestion", () => {
     await expect(answerQuestion(client, "KKM berapa?", SNAPSHOT)).resolves.toEqual({
       kind: "answer",
       text: "KKM seluruh mata pelajaran adalah 75.",
+      status: { text: "Jawaban" },
+      detail: "KKM 75 berlaku untuk semua mapel.",
       sources: ["SOP Penilaian SDIT Nusantara · hlm. 2 · 3.2"],
       // Sumber opens the cited PDF at its page (#258).
       files: [
         {
           label: "SOP Penilaian SDIT Nusantara · hlm. 2 · 3.2",
           docId: "sop-penilaian-sdit-nusantara",
+          title: "SOP Penilaian SDIT Nusantara",
           page: 2,
         },
       ],

@@ -28,6 +28,27 @@ test("an answer keeps only citations whose quote is really in the active chunk",
   );
 });
 
+test("the cited rule's short line comes back as the answer's detail (F3·09)", async () => {
+  const llm = fakeJsonCall({
+    grounded_answer: {
+      status: "answered",
+      answer: "Di bawah 75, Bu. Itu wajib remedial.",
+      aturan: "KKM 75 berlaku untuk semua mapel.",
+      citations: [{ chunk_id: "sop-p2-3-2", quote: "nilai di bawah 75 wajib mengikuti remedial" }],
+    },
+  });
+  const result = await answerGrounded(
+    { llm },
+    { question: "Nilai di bawah berapa harus remedial?", chunks: SOP_CHUNKS, honorific: "Bu" },
+  );
+  assert.equal(result.status, "answered");
+  if (result.status !== "answered") return;
+  assert.equal(result.answer, "Di bawah 75, Bu. Itu wajib remedial.");
+  assert.equal(result.detail, "KKM 75 berlaku untuk semua mapel.");
+  const sent = llm.calls[0]!.content[0]!;
+  assert.equal(sent.type === "text" && JSON.parse(sent.text).sapaan, "Bu");
+});
+
 test("a made-up quote turns the answer into 'Belum ada di panduan sekolah.'", async () => {
   const llm = fakeJsonCall({
     grounded_answer: {

@@ -158,13 +158,15 @@ export async function explain(
   return explanation;
 }
 
+/** F3: a teacher's question from the school's active knowledge, addressed to her. */
 export async function ask(
   deps: HelpDeps,
   workspaceId: string,
   question: string,
+  teacher?: Pick<TeacherProfile, "honorific">,
 ): Promise<GroundedAnswer> {
   const chunks = await loadSchoolKnowledge(deps.documents, workspaceId);
-  return deps.ai.answerGrounded({ question, chunks });
+  return deps.ai.answerGrounded({ question, chunks, honorific: teacher?.honorific });
 }
 
 /**

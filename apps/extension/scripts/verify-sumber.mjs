@@ -1,6 +1,8 @@
 // Loads a production build of the extension into Playwright's Chromium and checks #258 end to
-// end: Sumber on an answer opens the cited PDF at its page in a new tab.
-// - F3-2: "Nilai di bawah berapa harus remedial?" opens the seeded SOP Penilaian at page 2, and
+// end: an answer that cites one document has one link, "Sumber: SOP Penilaian, hlm. 2" (F3·09),
+// that opens the cited PDF at its page in a new tab.
+// - F3-2: "Nilai di bawah berapa harus remedial?" answers under the JAWABAN heading with the rule
+//   line "KKM 75 berlaku untuk semua mapel." and opens the seeded SOP Penilaian at page 2, and
 //   "Nilai UTS paling lambat dimasukkan kapan?" at page 3 (F3-2_pertanyaan-dan-kunci.csv:
 //   "sumber membuka halaman 2/3").
 // - WS-1: Pak Rizal uploads the SOP Setoran Tahfidz in Pengetahuan sekolah; "Setoran minimal
@@ -131,9 +133,8 @@ async function ask(page, question) {
   await overlay(page).getByRole("button", { name: "Kirim" }).click();
 }
 
-/** Opens Sumber, clicks the cited source, and returns the new tab and the file's response. */
+/** Clicks the answer's one Sumber link and returns the new tab and the file's response. */
 async function openSource(page, source, shot) {
-  await bubble(page).getByRole("button", { name: "Sumber" }).click();
   const link = bubble(page).getByRole("button", { name: source });
   await link.waitFor({ timeout: 10_000 });
   await page.screenshot({ path: join(shots, `${shot}-sumber.png`) });
@@ -178,34 +179,43 @@ const cases = [
   {
     name: "F3-2 no. 1: Sumber opens the SOP Penilaian at page 2 (point 3.2)",
     question: "Nilai di bawah berapa harus remedial?",
-    source: /SOP Penilaian SDIT Nusantara · hlm\. 2 · 3\.2/u,
+    source: "Sumber: SOP Penilaian, hlm. 2",
     page: 2,
     shot: "f3-2-no1",
+    says: ["Jawaban", "Di bawah 75, Bu. Itu wajib remedial.", "KKM 75 berlaku untuk semua mapel."],
   },
   {
     name: "F3-2 no. 3: Sumber opens the SOP Penilaian at page 3 (point 4.1)",
     question: "Nilai UTS paling lambat dimasukkan kapan?",
-    source: /SOP Penilaian SDIT Nusantara · hlm\. 3 · 4\.1/u,
+    source: "Sumber: SOP Penilaian, hlm. 3",
     page: 3,
     shot: "f3-2-no3",
   },
   {
     name: "WS-1: Sumber opens the SOP Setoran Tahfidz at page 1",
     question: "Setoran minimal berapa ayat?",
-    source: new RegExp(`${TAHFIDZ_TITLE} · hlm\\. 1`, "u"),
+    source: "Sumber: SOP Setoran Tahfidz, hlm. 1",
     page: 1,
     shot: "ws1",
     needs: () => tahfidzReady,
   },
 ];
 
-for (const { name, question, source, page: pdfPage, shot, needs } of cases) {
+for (const { name, question, source, page: pdfPage, shot, needs, says = [] } of cases) {
   await check(name, async () => {
     expect(!needs || needs(), "its document isn't uploaded");
     await ask(page, question);
-    await bubble(page).getByRole("button", { name: "Sumber" }).waitFor({ timeout: 20_000 });
+    await bubble(page).getByRole("button", { name: source }).waitFor({ timeout: 20_000 });
+    const text = await bubble(page).innerText();
     console.log(`  Q: ${question}`);
-    console.log(`  A: ${(await bubble(page).innerText()).split("\n")[0]}`);
+    console.log(`  A: ${text.replace(/\n+/gu, " | ")}`);
+    // The heading is drawn in capitals, so innerText reads "JAWABAN".
+    for (const line of says)
+      expect(text.toLowerCase().includes(line.toLowerCase()), `the bubble doesn't say "${line}"`);
+    expect(
+      (await bubble(page).getByRole("button", { name: "Sumber", exact: true }).count()) === 0,
+      "a single source still sits behind the Sumber list",
+    );
     const { tab, response } = await openSource(page, source, shot);
     await expectPdfAt(tab, response, pdfPage);
     await tab.close();

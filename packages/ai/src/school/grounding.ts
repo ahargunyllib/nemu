@@ -44,16 +44,19 @@ export function toCitation(chunk: KnowledgeChunk, quote: string): SourceCitation
 const modelAnswerSchema = z.object({
   status: z.enum(["answered", "not_in_guide"]),
   answer: z.string(),
+  /** The cited rule in one short line, shown under the answer; "" when there is none. */
+  aturan: z.string().optional(),
   citations: z.array(z.object({ chunk_id: z.string(), quote: z.string() })),
 });
 
 const MODEL_ANSWER_JSON_SCHEMA = {
   type: "object",
   additionalProperties: false,
-  required: ["status", "answer", "citations"],
+  required: ["status", "answer", "aturan", "citations"],
   properties: {
     status: { type: "string", enum: ["answered", "not_in_guide"] },
     answer: { type: "string" },
+    aturan: { type: "string" },
     citations: {
       type: "array",
       items: {
@@ -68,13 +71,16 @@ const MODEL_ANSWER_JSON_SCHEMA = {
 
 const GROUNDED_INSTRUCTIONS = `Kamu Nemu, pendamping administrasi untuk guru. Jawab HANYA dari potongan panduan sekolah yang diberikan.
 - Jika potongan tidak menjawab pertanyaan secara langsung, status "not_in_guide". Jangan memakai pengetahuan umum untuk aturan atau prosedur.
-- Jawaban: satu atau dua kalimat pendek (maks. 30 kata), bahasa awam, sapa dengan "Ibu"/"Bapak" bila perlu. Jangan pernah memakai kata "salah".
-- Sebutkan setiap ketentuan dari poin yang menjawab: angka, batas waktu, dan keterangan yang harus ditulis, dengan kata-kata panduan.
+- answer: jawaban langsung untuk guru, satu atau dua kalimat pendek (maks. 14 kata), bahasa awam, dengan sapaan yang diberikan. Contoh: "Di bawah 75, Bu. Itu wajib remedial." Jangan pernah memakai kata "salah".
+- aturan: satu kalimat pendek (maks. 10 kata) yang menyebut aturan dari poin yang dikutip, misalnya "KKM 75 berlaku untuk semua mapel." Kosongkan ("") bila tidak menjawab.
+- Gabungan answer dan aturan menyebut setiap ketentuan dari poin yang menjawab: angka, batas waktu, dan keterangan yang harus ditulis, dengan kata-kata panduan.
 - Untuk setiap fakta, kutip kalimat persis dari potongan (quote) beserta chunk_id-nya. Kutipan harus disalin kata per kata.
 - Jangan pernah meminta kata sandi atau kode apa pun.`;
 
 export type AnswerGroundedInput = {
   question: string;
+  /** How Nemu addresses the teacher who asked; WS-09 Uji jawaban has no teacher. */
+  honorific?: "Bu" | "Pak";
   chunks: readonly KnowledgeChunk[];
   /** Whole-workspace context when it is small; otherwise the top retrieved chunks. */
   maxChunks?: number;
@@ -97,6 +103,7 @@ export async function answerGrounded(
         type: "text",
         text: JSON.stringify({
           pertanyaan: input.question,
+          sapaan: input.honorific ?? "Ibu/Bapak",
           potongan_panduan: context.map((chunk) => ({
             chunk_id: chunk.id,
             judul: chunk.title,
@@ -134,5 +141,11 @@ export function verifyGroundedAnswer(
   if (!citations.length || !response.answer.trim()) {
     return { status: "not_in_guide", answer: NOT_IN_GUIDE_SENTENCE };
   }
-  return { status: "answered", answer: response.answer.trim(), citations };
+  const detail = response.aturan?.trim();
+  return {
+    status: "answered",
+    answer: response.answer.trim(),
+    ...(detail && !mentionsSecret(detail) ? { detail } : {}),
+    citations,
+  };
 }
