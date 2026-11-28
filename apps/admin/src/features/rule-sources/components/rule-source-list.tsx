@@ -23,7 +23,7 @@ import { orpc } from "@/shared/api/orpc";
 const SKELETON_ROWS = ["a", "b", "c", "d"];
 
 function formatLocation(article: string | null, page: number | null) {
-  return [article, page && `p. ${page}`].filter(Boolean).join(" · ");
+  return [article, page && `hlm. ${page}`].filter(Boolean).join(" · ");
 }
 
 export default function RuleSourceList() {
@@ -33,20 +33,20 @@ export default function RuleSourceList() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Rule sources</CardTitle>
+        <CardTitle>Sumber aturan</CardTitle>
         <CardDescription>
           {missing > 0
-            ? `${missing} rule${missing === 1 ? " has" : "s have"} no active source, so Nemu can't run ${missing === 1 ? "its calculation" : "their calculations"}.`
-            : "The document each calculation cites. Point a rule at the new document when a regulation changes."}
+            ? `${missing} aturan belum punya sumber aktif, jadi Nemu belum bisa menghitungnya.`
+            : "Aturan ini dihitung oleh kode Nemu, bukan dibuat AI. Tiap baris menunjuk pasal yang dikutip Nemu. Mengedit hanya mengganti pasal yang dikutip. Kalau SOP direvisi, arahkan ke dokumen atau pasal yang baru."}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Rule</TableHead>
-              <TableHead>Document</TableHead>
-              <TableHead>Location</TableHead>
+              <TableHead>Aturan</TableHead>
+              <TableHead>Dokumen</TableHead>
+              <TableHead>Lokasi</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="w-0" />
             </TableRow>
@@ -59,17 +59,17 @@ export default function RuleSourceList() {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <span>{source.documentTitle ?? source.documentId}</span>
-                        {source.isDefault && <Badge variant="outline">Default</Badge>}
+                        {source.isDefault && <Badge variant="outline">Bawaan</Badge>}
                       </div>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {formatLocation(source.article, source.page) || "Whole document"}
+                      {formatLocation(source.article, source.page) || "Seluruh dokumen"}
                     </TableCell>
                     <TableCell>
                       {source.citationId ? (
-                        <Badge variant="secondary">Found</Badge>
+                        <Badge variant="secondary">Ditemukan</Badge>
                       ) : (
-                        <Badge variant="destructive">Not found</Badge>
+                        <Badge variant="destructive">Tidak ditemukan</Badge>
                       )}
                     </TableCell>
                     <TableCell>
