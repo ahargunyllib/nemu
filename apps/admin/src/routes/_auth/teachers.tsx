@@ -12,7 +12,7 @@ function RouteComponent() {
   return (
     <>
       <PageHeading
-        title="Guru & kontak"
+        title="Guru dan kontak"
         description="Guru yang dikenali Nemu dan siapa yang dihubungi untuk kendala di luar tugas guru."
       />
       <TeacherList />

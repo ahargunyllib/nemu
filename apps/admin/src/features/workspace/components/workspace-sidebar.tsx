@@ -36,10 +36,10 @@ export default function WorkspaceSidebar({
               <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground">
                 <SparklesIcon className="size-4" />
               </div>
-              <div className="grid flex-1 text-left leading-tight">
-                <span className="truncate font-semibold">Nemu</span>
-                <span className="truncate text-xs text-sidebar-foreground/70">Admin Workspace</span>
-              </div>
+              <span className="flex-1 truncate text-left">
+                <span className="font-semibold">Nemu</span>{" "}
+                <span className="text-sidebar-foreground/70">Workspace</span>
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

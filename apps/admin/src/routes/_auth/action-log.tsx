@@ -11,7 +11,7 @@ function RouteComponent() {
   return (
     <>
       <PageHeading
-        title="Log tindakan"
+        title="Log aktivitas"
         description="Apa yang dilakukan Nemu di halaman guru. Tombol Simpan dan Kirim selalu ditekan guru sendiri."
       />
       <ActionLogTable />

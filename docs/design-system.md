@@ -1,7 +1,8 @@
 # Nemu design system (extension)
 
 What the Nemu Extension should look like: colour, type, the mascot, the Composer, the five
-display types and the Nemu cursor, the three answer levels, and motion.
+display types and the Nemu cursor, the three answer levels, and motion. The last section names the
+Admin Workspace's side menu.
 
 ## Colour
 
@@ -269,3 +270,21 @@ popup's frame and shadow. Rows:
   radius 4 px, a `nemu-select-fill` fill, and round amber (`nemu-ring`) corner handles. The rest of
   the page is never darkened, and the box is never filled black. The mascot sits as the cursor at
   the box's bottom-right corner. While Nemu reads, the box stays as a grey dashed outline.
+
+## Admin Workspace menu (Workspace · side menu)
+
+The Admin Workspace keeps the shared dark side menu from `packages/ui/src/shell`; only its words
+and order follow the design. The brand reads "Nemu Workspace" ("Nemu" strong, "Workspace" muted),
+and the top bar's breadcrumb starts at "Workspace", then the group, then the page
+("Workspace › Pengetahuan › Dokumen dan alur"). Groups and entries, in order:
+
+- **Utama**: Ringkasan.
+- **Pengetahuan**: Dokumen dan alur, Kamus kendala, Uji jawaban.
+- **Sekolah**: Guru dan kontak, Website diizinkan.
+- **Sistem**: Integrasi, Log aktivitas.
+
+Admin-only pages the design doesn't draw come after the design's entries in their group: Paket
+AlurSekolah and Tables under Pengetahuan, Daftar sekolah under Sekolah, and Pengaturan Nemu under
+Sistem. A page's title matches its menu entry. A school operator sees only the entries open to the
+`operator` role (Dokumen dan alur, Kamus kendala, Uji jawaban, Guru dan kontak); the design's
+count badge on Uji jawaban waits for data to count.

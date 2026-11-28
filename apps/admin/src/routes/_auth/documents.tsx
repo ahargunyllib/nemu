@@ -13,7 +13,7 @@ function RouteComponent() {
   return (
     <>
       <PageHeading
-        title="Pengetahuan sekolah"
+        title="Dokumen dan alur"
         description="SOP, proses BPMN, dan rekaman yang menjadi sumber jawaban Nemu. Hanya dokumen aktif dan siap yang dipakai."
         actions={<DocumentUploadDialog />}
       />
