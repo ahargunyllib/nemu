@@ -3,7 +3,8 @@
 // typed question answered through helpRoute, and holding Ctrl + Space (or the Nemu button) to talk
 // with a fake microphone. #268: unclear words are shown back, not acted on; and in a second, headed
 // window without the auto-answer flag, the first hold points at Chrome's real prompt, refusing or
-// blocking the microphone shows the three steps, and talking works once it is allowed again.
+// blocking the microphone shows the three steps, and talking works once it is allowed and the page
+// reloaded (#280).
 // Needs `NEMU_RESPONDER=fixture pnpm dev` running.
 // Screenshots go to .output/verify/. Every URL can be overridden, e.g. to use the deployed mocks:
 //   MOCK_ALURSEKOLAH_URL=https://nemu-alursekolah.ahargunyllib.dev/ pnpm --filter extension verify
@@ -359,6 +360,9 @@ await micCheck(
     expect((await steps.getByRole("listitem").count()) === 3, "the card doesn't show three steps");
     await steps.getByText("tekan ikon di kiri alamat situs", { exact: false }).waitFor();
     await steps.getByText("pada Mikrofon, pilih Izinkan", { exact: false }).waitFor();
+    await steps
+      .getByText("Terakhir, muat ulang halaman, lalu tahan lagi tombolnya.", { exact: true })
+      .waitFor();
     const buttons = await steps.getByRole("button").allInnerTexts();
     expect(
       buttons.length === 1 && buttons[0].trim() === "Tutup",
@@ -368,8 +372,10 @@ await micCheck(
     await steps.getByRole("button", { name: "Tutup" }).click();
     await steps.waitFor({ state: "detached" });
 
-    // She followed the steps.
+    // She followed the steps: allowed it, then reloaded the page.
     await setMicrophone("granted");
+    await mic.reload();
+    await untilRegistered();
     await holdToTalk(mic);
     await heardBubble(mic).getByText(HEARD).waitFor({ timeout: 15_000 });
   },

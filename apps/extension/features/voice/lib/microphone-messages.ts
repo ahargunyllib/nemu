@@ -18,12 +18,16 @@ export function microphoneReady(honorific: string): string {
 export const PROMPT_CLOSED =
   "Nemu belum bisa mendengar. Tahan lagi tombolnya, lalu tekan Izinkan di kotak Chrome.";
 
-/** Kartu Info for a blocked microphone: three steps to allow it again, then [Tutup]. */
+/**
+ * Kartu Info for a blocked microphone: three steps to allow it again, then [Tutup] (F0-17).
+ * Chrome lets the page use the microphone as soon as it is allowed, but shows a "Muat ulang" bar
+ * after the change, so the last step reloads to match what she sees.
+ */
 export const MICROPHONE_BLOCKED = {
   title: "Mikrofon masih diblokir",
   items: [
     "Pertama, tekan ikon di kiri alamat situs, di bagian atas layar.",
     "Kedua, pada Mikrofon, pilih Izinkan atau nyalakan tombolnya.",
-    "Terakhir, tahan lagi tombolnya, lalu bicara.",
+    "Terakhir, muat ulang halaman, lalu tahan lagi tombolnya.",
   ],
 } as const;
