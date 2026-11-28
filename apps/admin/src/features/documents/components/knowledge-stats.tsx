@@ -15,7 +15,7 @@ import { orpc } from "@/shared/api/orpc";
 /** Dokumen dan alur's four stat cards: active knowledge, BPMN, teacher questions, recordings. */
 export default function KnowledgeStats() {
   const { data: stats } = useQuery(orpc.knowledgeStats.queryOptions());
-  const questions = useTeacherQuestionStats();
+  const { data: questions } = useTeacherQuestionStats();
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -43,10 +43,10 @@ export default function KnowledgeStats() {
       <StatCard
         label="Pertanyaan guru"
         icon={MessageCircleQuestionIcon}
-        value={questions?.asked ?? "—"}
+        value={questions?.askedThisWeek ?? "—"}
         hint={
           questions
-            ? `pekan ini · ${questions.unanswered} belum terjawab`
+            ? `pekan ini · ${questions.unansweredThisWeek} belum terjawab`
             : "pekan ini · belum dicatat"
         }
       />
