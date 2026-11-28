@@ -1,6 +1,6 @@
 // Loads a production build of the extension into Playwright's Chromium and checks F2-08 (#206)
 // end to end: Admin Javan connects WS-07 to the mock AlurSekolah, Pak Rizal uploads the official
-// SPP BPMN (F2-1) in Pengetahuan sekolah and sees the suggested symptoms, Bu Siti's UTS grade for
+// SPP BPMN (F2-1) in Dokumen dan alur and sees the suggested symptoms, Bu Siti's UTS grade for
 // Aisyah (4A) is saved in the mock, and then the three questions of F2-1_pertanyaan-dan-kunci.csv
 // are asked on the mock: the answer, Kenapa?, Sumber with 2–4 steps and Lihat diagram (bpmn-js,
 // cause highlighted), and the parent reply in WhatsApp Web (answered locally, never sent; no
@@ -108,7 +108,7 @@ await check(
     await admin.getByRole("row").nth(1).waitFor();
     await admin.waitForLoadState("networkidle");
     if (!(await symptoms.count())) {
-      await admin.getByRole("button", { name: "Unggah dokumen" }).click();
+      await admin.getByRole("button", { name: "Unggah BPMN" }).click();
       const dialog = admin.getByRole("dialog");
       await dialog.getByLabel("File").setInputFiles(bpmn);
       await dialog.getByLabel("Judul").fill("Alur SPP");

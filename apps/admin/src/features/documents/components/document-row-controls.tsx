@@ -17,6 +17,7 @@ import { DownloadIcon, ExternalLinkIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { invalidateKnowledge } from "@/features/documents/api/invalidate-knowledge";
 import { client, orpc } from "@/shared/api/orpc";
 
 export function DocumentActiveSwitch({ id, isActive }: { id: string; isActive: boolean }) {
@@ -24,7 +25,7 @@ export function DocumentActiveSwitch({ id, isActive }: { id: string; isActive: b
   const setActive = useMutation(
     orpc.setDocumentActive.mutationOptions({
       onError: (error) => toast.error(error.message),
-      onSettled: () => queryClient.invalidateQueries({ queryKey: orpc.listDocuments.key() }),
+      onSettled: () => invalidateKnowledge(queryClient),
     }),
   );
 
@@ -61,7 +62,7 @@ export function DocumentDeleteButton({ id, title }: { id: string; title: string 
         toast.success(`${title} dihapus`);
       },
       onError: (error) => toast.error(error.message),
-      onSettled: () => queryClient.invalidateQueries({ queryKey: orpc.listDocuments.key() }),
+      onSettled: () => invalidateKnowledge(queryClient),
     }),
   );
 

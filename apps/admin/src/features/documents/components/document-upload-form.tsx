@@ -11,38 +11,45 @@ import z from "zod";
 
 import type { DocumentScope } from "@/features/documents/api/list-documents";
 import SiteChecklist from "@/features/documents/components/site-checklist";
+import {
+  UPLOAD_KINDS,
+  type UploadKind,
+  type UploadKindConfig,
+} from "@/features/documents/lib/upload-kinds";
+import { invalidateKnowledge } from "@/features/documents/api/invalidate-knowledge";
 import { orpc } from "@/shared/api/orpc";
 
-const ACCEPTED_FILES = ".pdf,.md,.markdown,.bpmn,application/pdf,text/markdown,application/xml";
-const FILE_PATTERN = /\.(pdf|md|markdown|bpmn)$/i;
-
-const uploadSchema = z.object({
-  title: z.string().trim().min(1, "Judul wajib diisi"),
-  version: z.string().trim().min(1, "Versi wajib diisi"),
-  isActive: z.boolean(),
-  siteIds: z.array(z.string()),
-  file: z
-    .instanceof(File, { message: "Pilih file PDF, Markdown, atau BPMN" })
-    .nullable()
-    .refine((file) => file !== null, "Pilih file PDF, Markdown, atau BPMN")
-    .refine(
-      (file) => file === null || FILE_PATTERN.test(file.name),
-      "Hanya file PDF, Markdown (.md), atau BPMN (.bpmn)",
-    ),
-});
-
-function titleFromFileName(fileName: string) {
-  return fileName.replace(FILE_PATTERN, "").replace(/[_-]+/g, " ");
+function uploadSchema({ pattern, missing, wrong }: UploadKindConfig) {
+  return z.object({
+    title: z.string().trim().min(1, "Judul wajib diisi"),
+    version: z.string().trim().min(1, "Versi wajib diisi"),
+    isActive: z.boolean(),
+    siteIds: z.array(z.string()),
+    file: z
+      .instanceof(File, { message: missing })
+      .nullable()
+      .refine((file) => file !== null, missing)
+      .refine((file) => file === null || pattern.test(file.name), wrong),
+  });
 }
 
-/** Uploads a PDF, Markdown or BPMN, new or as the next version of an existing title (WS-04). */
+function titleFromFileName(fileName: string) {
+  return fileName.replace(/\.(pdf|md|markdown|bpmn)$/i, "").replace(/[_-]+/g, " ");
+}
+
+/**
+ * Uploads a PDF, Markdown or BPMN (or only the files `kind` takes), new or as the next version of
+ * an existing title (WS-04).
+ */
 export default function DocumentUploadForm({
   packageId,
+  kind = "any",
   initialTitle = "",
   onUploaded,
   children,
 }: {
   packageId: DocumentScope;
+  kind?: UploadKind;
   initialTitle?: string;
   onUploaded?: () => void;
   children?: ReactNode;
@@ -50,6 +57,7 @@ export default function DocumentUploadForm({
   const queryClient = useQueryClient();
   const fileInput = useRef<HTMLInputElement>(null);
   const upload = useMutation(orpc.uploadDocument.mutationOptions());
+  const files = UPLOAD_KINDS[kind];
 
   const form = useForm({
     defaultValues: {
@@ -60,7 +68,7 @@ export default function DocumentUploadForm({
       siteIds: [] as string[],
       file: null as File | null,
     },
-    validators: { onSubmit: uploadSchema },
+    validators: { onSubmit: uploadSchema(files) },
     onSubmit: async ({ value, formApi }) => {
       if (!value.file) return;
       try {
@@ -73,7 +81,7 @@ export default function DocumentUploadForm({
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Gagal mengunggah");
       } finally {
-        await queryClient.invalidateQueries({ queryKey: orpc.listDocuments.key() });
+        await invalidateKnowledge(queryClient);
       }
     },
   });
@@ -96,7 +104,7 @@ export default function DocumentUploadForm({
               id={field.name}
               name={field.name}
               type="file"
-              accept={ACCEPTED_FILES}
+              accept={files.accept}
               onBlur={field.handleBlur}
               onChange={(event) => {
                 const file = event.target.files?.[0] ?? null;

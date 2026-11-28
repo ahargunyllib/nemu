@@ -16,6 +16,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import SiteChecklist from "@/features/documents/components/site-checklist";
+import { invalidateKnowledge } from "@/features/documents/api/invalidate-knowledge";
 import { orpc } from "@/shared/api/orpc";
 
 /** The websites a document applies to, as badges that open the editor. */
@@ -39,7 +40,7 @@ export default function DocumentSitesDialog({
         toast.success("Situs dokumen disimpan");
       },
       onError: (error) => toast.error(error.message),
-      onSettled: () => queryClient.invalidateQueries({ queryKey: orpc.listDocuments.key() }),
+      onSettled: () => invalidateKnowledge(queryClient),
     }),
   );
   const labels = siteIds.flatMap((siteId) => {
