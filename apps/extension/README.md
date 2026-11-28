@@ -11,8 +11,9 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   The Nemu Service refuses extension requests without a known code.
 - **Identity without login (ADR-0015).** Nemu reads the email of the account signed in on the
   AlurSekolah page and sends it with every request; the Nemu Service matches it against the
-  school's Teachers & contacts (WS-06). An unregistered account gets "Akun ini belum didaftarkan.
-  Hubungi Pak Rizal." (the school's own operator). The page is read again whenever it changes, so
+  school's Teachers & contacts (WS-06). An unregistered account gets "Akun Ibu belum didaftarkan
+  di Nemu." and **Siapkan pesan WA ke operator**, which opens WhatsApp Web to the school's own
+  operator with a ready request (the page and the account email); she presses Kirim (ID-02). The page is read again whenever it changes, so
   signing in as someone else switches who Nemu helps. Sites without an AlurSekolah account (Ruang
   GTK, Moodle) ask as the last account seen on AlurSekolah.
 - **Email readers.** `features/identity/lib/page-email-readers.ts` has one reader per site: the
@@ -242,8 +243,9 @@ extension against `http://localhost:3000`, loads it into Playwright's Chromium, 
 - the welcome page says how to talk and that Chrome asks for the microphone the first time;
 - holding Ctrl + Spasi shows "Nemu mendengar…", then the heard text, then the answer with its
   spoken word highlighted; pressing and holding the Nemu button does the same;
-- signing in as `rizal.operator` shows "Akun ini belum didaftarkan. Hubungi Pak Rizal.", and
-  signing in as `dewi.lestari` brings the type box back;
+- signing in as `rizal.operator` shows "Akun Ibu belum didaftarkan di Nemu." and its button opens
+  WhatsApp Web to Pak Rizal's number with the request (answered locally, never sent), and signing
+  in as `dewi.lestari` brings the type box back;
 - Ruang GTK shows the Nemu button and asks as the last AlurSekolah account;
 - e-Rapor gets no Nemu button (WS-1 (a)).
 

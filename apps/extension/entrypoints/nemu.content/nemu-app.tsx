@@ -21,6 +21,7 @@ import { gradePhoto } from "../../features/grade-photo/stores/grade-photo";
 import { useIdentity } from "../../features/identity/hooks/use-identity";
 import { usePageEmail } from "../../features/identity/hooks/use-page-email";
 import type { IdentityResult } from "../../features/identity/lib/identity";
+import { currentRequestPage, operatorRequest } from "../../features/identity/lib/operator-request";
 import { useNextAction } from "../../features/ini-kenapa/hooks/use-next-action";
 import { readPageSnapshot } from "../../features/ini-kenapa/lib/page-snapshot";
 import { requestSourceFile } from "../../features/nemu-button/api/request-source";
@@ -427,7 +428,20 @@ function NemuPanel({
 }: NemuPanelProps) {
   if (!identity) return <GelembungJawabSkeleton />;
   // ID-02: an unregistered or signed-out account gets the reason instead of the type box.
-  if (identity.status !== "registered") return <GelembungJawab sentence={identity.message} />;
+  if (identity.status !== "registered") {
+    const request = operatorRequest(identity, currentRequestPage(document, window.location));
+    return (
+      <GelembungJawab
+        sentence={identity.message}
+        action={
+          request && {
+            label: request.label,
+            onSelect: () => void window.open(request.url, "_blank", "noopener"),
+          }
+        }
+      />
+    );
+  }
   return (
     <>
       {talk.phase === "transcribing" && <HeardBubble text={null} />}

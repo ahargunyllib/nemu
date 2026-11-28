@@ -76,7 +76,16 @@ export const extensionIdentitySchema = z.discriminatedUnion("status", [
       honorific: z.enum(["Bu", "Pak"]),
     })
     .strict(),
-  z.object({ status: z.literal("unregistered"), message: z.string() }).strict(),
+  z
+    .object({
+      status: z.literal("unregistered"),
+      message: z.string(),
+      /** The account on the page, quoted in the message to the operator. */
+      email: z.string(),
+      /** WS-06's operator, who registers the account; null when the school has none. */
+      operator: z.object({ name: z.string(), phone: z.string() }).strict().nullable(),
+    })
+    .strict(),
 ]);
 
 export type AllowedSite = z.infer<typeof allowedSiteSchema>;

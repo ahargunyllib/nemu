@@ -70,7 +70,22 @@ describe("identity from the page email (ID-02, ID-04)", () => {
       call(extensionRouter.extensionIdentify, undefined, { context: rizal }),
     ).resolves.toEqual({
       status: "unregistered",
-      message: "Akun ini belum didaftarkan. Hubungi Pak Rizal.",
+      message: "Akun Ibu belum didaftarkan di Nemu.",
+      email: PAK_RIZAL,
+      operator: { name: "Pak Rizal", phone: "6281200001003" },
+    });
+  });
+
+  it("still names the sentence, without an operator to message, when WS-06 has none", async () => {
+    const rizal = await fromExtension({ installCode: INSTALL_CODE, email: PAK_RIZAL });
+    await createSchoolRepository(rizal.db).deleteContact("W-SEKOLAH", "operator");
+    await expect(
+      call(extensionRouter.extensionIdentify, undefined, { context: rizal }),
+    ).resolves.toEqual({
+      status: "unregistered",
+      message: "Akun Ibu belum didaftarkan di Nemu. Minta operator sekolah mendaftarkannya.",
+      email: PAK_RIZAL,
+      operator: null,
     });
   });
 
@@ -88,7 +103,7 @@ describe("identity from the page email (ID-02, ID-04)", () => {
       refusal(call(helpRouter.helpRoute, { utterance: "KKM berapa?" }, { context: rizal })),
     ).resolves.toEqual({
       code: "FORBIDDEN",
-      message: "Akun ini belum didaftarkan. Hubungi Pak Rizal.",
+      message: "Akun Ibu belum didaftarkan di Nemu.",
       data: { reason: "unregistered" },
     });
   });
