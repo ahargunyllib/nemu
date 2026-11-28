@@ -162,7 +162,7 @@ async function signedInTab() {
 const tabs = [await signedInTab(), await signedInTab()];
 const cardIn = (tab) =>
   tab.locator("nemu-overlay").getByRole("region", { name: "Pilihan Nemu" }).filter({
-    hasText: "Foto dari WhatsApp",
+    hasText: "Foto buku nilai dari WhatsApp.",
   });
 
 // apps/wa-bot's call: the photo from Bu Siti's number.
@@ -180,7 +180,7 @@ const sent = await (
 ).json();
 const jobId = sent.jobId;
 
-await check("the photo shows as the small Foto dari WhatsApp card, in one tab only", async () => {
+await check("the photo shows as the Foto masuk card, in one tab only", async () => {
   expect(sent.status === "queued", `wa-bot photo was ${sent.status}`);
   const winner = await Promise.race(
     tabs.map((tab) =>
@@ -258,6 +258,7 @@ await check(
     );
     expect(await typeBox.isVisible(), "no type box under the Kartu Pilih");
     await page.screenshot({ path: join(shots, "pilih-judul.png") });
+    await pick.screenshot({ path: join(shots, "pilih-judul-dekat.png") });
     await pick.getByRole("button", { name: "UTS · Matematika · 4B" }).click();
     await display("pilih").filter({ hasNotText: "Ini nilai apa" }).waitFor({ timeout: 60_000 });
   },
@@ -283,7 +284,10 @@ await check(
       expect(/Pertanyaan \d+ dari \d+\. 22 nilai lain sudah cocok\./u.test(note), `note: ${note}`);
       expect(labels.length >= 2 && labels.length <= 3, `${labels.length} buttons`);
       if (index === 0) await page.screenshot({ path: join(shots, "w5-nama.png") });
-      if (index === 1) await page.screenshot({ path: join(shots, "w5-angka.png") });
+      if (index === 1) {
+        await page.screenshot({ path: join(shots, "w5-angka.png") });
+        await card.screenshot({ path: join(shots, "w5-angka-dekat.png") });
+      }
 
       const digit = prompt.match(/^Nilai (.+?)(?:: | berapa\?$)/u);
       if (digit) {
@@ -318,9 +322,8 @@ await check(
 );
 
 await check("cara 1 opens Isi nilai kelas through the menu and fills every value", async () => {
-  await display("kerja")
-    .getByText(/Nemu mengisi · \d+ dari \d+/u)
-    .waitFor({ timeout: 30_000 });
+  // The heading's label and its count are separate lines ("Nemu mengisi", "13 dari 32").
+  await display("kerja").getByText("Nemu mengisi", { exact: true }).waitFor({ timeout: 30_000 });
   await page.waitForURL(/#\/nilai$/u);
   await page.screenshot({ path: join(shots, "mengisi.png") });
   await display("tunjuk").getByText("Silakan Ibu tekan Simpan.").waitFor({ timeout: 180_000 });

@@ -41,7 +41,7 @@ const PROCESS_TRIES = 40;
 export type GradePhotoView = {
   /** The one display of the flow, above the Nemu button. */
   display: NemuDisplay | null;
-  /** The small "Foto dari WhatsApp" card, shown when nothing else is. */
+  /** The "Foto masuk" card beside the Nemu button, shown when nothing else is. */
   card: NemuDisplay | null;
   /** The type box goes under the display: Nemu waits for a typed or spoken answer. */
   typing: boolean;
@@ -98,6 +98,11 @@ function titleLabel(candidate: PhotoTitleCandidate) {
 /** The same title as the words she would say, for the command parser: "UTS Matematika 4B". */
 function titleWords(candidate: PhotoTitleCandidate) {
   return [candidate.assessment, candidate.subject, candidate.className].filter(Boolean).join(" ");
+}
+
+/** When the photo came, as the card's heading shows it: "10.02". */
+function arrivedAt(createdAt: number) {
+  return new Date(createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
 }
 
 function capitalize(text: string) {
@@ -171,12 +176,20 @@ function createGradePhoto() {
     return {
       type: "pilih",
       compact: true,
-      question: "Foto dari WhatsApp",
+      status: { text: "Foto masuk", count: arrivedAt(offered.createdAt) },
+      question: "Foto buku nilai dari WhatsApp.",
+      detail: `Dari nomor ${address()}. Belum ada yang diisi.`,
       image:
-        thumbnail === null ? undefined : { src: thumbnail, alt: "Foto buku nilai dari WhatsApp" },
+        thumbnail === null
+          ? undefined
+          : {
+              src: thumbnail,
+              alt: "Foto buku nilai dari WhatsApp",
+              caption: "Foto dari WhatsApp · 1 halaman",
+            },
       choices: [
-        { id: "mulai", label: "Mulai" },
         { id: "nanti", label: "Nanti" },
+        { id: "mulai", label: "Mulai", primary: true },
       ],
       onChoose: (id) => {
         if (id === "mulai") void start(offered);

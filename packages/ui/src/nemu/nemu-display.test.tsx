@@ -256,44 +256,55 @@ describe("Kartu Pilih for W5 and the inbox", () => {
     for (const button of buttons) expect(document.activeElement).not.toBe(button);
   });
 
-  test("the compact card puts its two choices side by side", () => {
+  test("the compact card puts its choices in a row, in the order given, the primary one black", () => {
     const onChoose = vi.fn();
     render(
       <KartuPilih
         compact
-        question="Foto dari WhatsApp"
+        question="Foto buku nilai dari WhatsApp."
         choices={[
-          { id: "mulai", label: "Mulai" },
           { id: "nanti", label: "Nanti" },
+          { id: "mulai", label: "Mulai", primary: true },
         ]}
         onChoose={onChoose}
       />,
     );
-    expect(screen.getByRole("group").className).not.toMatch(/flex-col/u);
+    const group = screen.getByRole("group", { name: "Foto buku nilai dari WhatsApp." });
+    expect(group.className).not.toMatch(/flex-col/u);
+    const buttons = within(group).getAllByRole("button");
+    expect(buttons.map((button) => button.textContent)).toEqual(["Nanti", "Mulai"]);
+    expect(buttons.map((button) => button.hasAttribute("data-primary"))).toEqual([false, true]);
+    expect(buttons[1]!.className).toMatch(/bg-primary/u);
+    expect(buttons[0]!.className).not.toMatch(/bg-primary/u);
     fireEvent.click(screen.getByRole("button", { name: "Mulai" }));
     expect(onChoose).toHaveBeenCalledWith("mulai");
   });
 
-  test("the compact photo card shows the thumbnail beside its title, a skeleton while it loads (#278)", () => {
+  test("the compact photo card frames the thumbnail under a caption, a skeleton while it loads (#278)", () => {
     const card = (src?: string) => (
       <KartuPilih
         compact
-        question="Foto dari WhatsApp"
+        question="Foto buku nilai dari WhatsApp."
         choices={[
-          { id: "mulai", label: "Mulai" },
           { id: "nanti", label: "Nanti" },
+          { id: "mulai", label: "Mulai", primary: true },
         ]}
         onChoose={vi.fn()}
-        image={{ src, alt: "Foto buku nilai dari WhatsApp" }}
+        image={{
+          src,
+          alt: "Foto buku nilai dari WhatsApp",
+          caption: "Foto dari WhatsApp · 1 halaman",
+        }}
       />
     );
     const { container, rerender } = render(card());
     expect(screen.queryByRole("img")).toBeNull();
-    expect(container.querySelector("[data-slot=card-header] [data-slot=skeleton]")).toBeTruthy();
+    expect(container.querySelector("figure [data-slot=skeleton]")).toBeTruthy();
+    expect(screen.getByText("Foto dari WhatsApp · 1 halaman").tagName).toBe("FIGCAPTION");
 
     rerender(card("data:image/jpeg;base64,AA"));
     const thumbnail = screen.getByRole("img", { name: "Foto buku nilai dari WhatsApp" });
-    expect(thumbnail.closest("[data-slot=card-header]")).toBeTruthy();
+    expect(thumbnail.closest("figure")?.textContent).toContain("Foto dari WhatsApp · 1 halaman");
     expect(container.querySelector("[data-slot=skeleton]")).toBeNull();
   });
 });

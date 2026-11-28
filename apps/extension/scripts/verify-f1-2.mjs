@@ -146,7 +146,7 @@ const display = (type) => overlay.locator(`[data-nemu-display='${type}']`);
 const typeBox = overlay.getByRole("textbox");
 const photoCard = overlay
   .getByRole("region", { name: "Pilihan Nemu" })
-  .filter({ hasText: "Foto dari WhatsApp" });
+  .filter({ hasText: "Foto buku nilai dari WhatsApp." });
 await dock.waitFor({ timeout: 10_000 });
 
 async function sendPhoto() {
