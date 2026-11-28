@@ -1,6 +1,7 @@
 import { PageHeading } from "@nemu/ui/shell/page-heading";
 import { createFileRoute } from "@tanstack/react-router";
 
+import SiteDialog from "@/features/sites/components/site-dialog";
 import SiteList from "@/features/sites/components/site-list";
 
 export const Route = createFileRoute("/_auth/sites")({
@@ -10,10 +11,7 @@ export const Route = createFileRoute("/_auth/sites")({
 function RouteComponent() {
   return (
     <>
-      <PageHeading
-        title="Situs yang diizinkan"
-        description="Di mana tombol Nemu muncul, dan apa yang boleh dilakukan Nemu di tiap situs. Ekstensi mengikutinya tanpa pembaruan."
-      />
+      <PageHeading title="Website diizinkan" actions={<SiteDialog />} />
       <SiteList />
     </>
   );

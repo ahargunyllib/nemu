@@ -9,16 +9,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@nemu/ui/components/alert-dialog";
-import { Badge } from "@nemu/ui/components/badge";
 import { Button } from "@nemu/ui/components/button";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@nemu/ui/components/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@nemu/ui/components/card";
 import {
   Empty,
   EmptyDescription,
@@ -42,7 +34,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import SiteDialog from "@/features/sites/components/site-dialog";
-import { permissionLabel } from "@/features/sites/lib/permissions";
+import { permissionSummary } from "@/features/sites/lib/permissions";
 import { orpc } from "@/shared/api/orpc";
 
 const SKELETON_ROWS = ["a", "b", "c"];
@@ -54,15 +46,7 @@ export default function SiteList() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Situs yang diizinkan</CardTitle>
-        <CardDescription>
-          {sites.data
-            ? `${sites.data.length} situs. Ekstensi membaca daftar ini lagi paling lama tiap satu menit.`
-            : "Situs tempat tombol Nemu muncul."}
-        </CardDescription>
-        <CardAction>
-          <SiteDialog />
-        </CardAction>
+        <CardTitle>Website yang diizinkan</CardTitle>
       </CardHeader>
       <CardContent>
         {sites.data?.length === 0 ? (
@@ -71,9 +55,9 @@ export default function SiteList() {
               <EmptyMedia variant="icon">
                 <GlobeIcon />
               </EmptyMedia>
-              <EmptyTitle>Belum ada situs</EmptyTitle>
+              <EmptyTitle>Belum ada website</EmptyTitle>
               <EmptyDescription>
-                Tanpa situs di daftar, tombol Nemu tidak muncul di mana pun.
+                Tanpa website di daftar, tombol Nemu tidak muncul di mana pun.
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
@@ -81,8 +65,7 @@ export default function SiteList() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nama</TableHead>
-                <TableHead>Alamat</TableHead>
+                <TableHead>Website</TableHead>
                 <TableHead>Yang boleh dilakukan Nemu</TableHead>
                 <TableHead className="w-0" />
               </TableRow>
@@ -91,14 +74,12 @@ export default function SiteList() {
               {sites.data
                 ? sites.data.map((site) => (
                     <TableRow key={site.id}>
-                      <TableCell className="font-medium">{site.label}</TableCell>
-                      <TableCell className="font-mono text-muted-foreground">
-                        {site.pattern}
-                      </TableCell>
                       <TableCell>
-                        <Badge variant={site.permission === "read_fill" ? "default" : "secondary"}>
-                          {permissionLabel(site.permission)}
-                        </Badge>
+                        <div className="font-medium">{site.pattern}</div>
+                        {site.label && <div className="text-muted-foreground">{site.label}</div>}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {permissionSummary(site.permission)}
                       </TableCell>
                       <TableCell>
                         <div className="flex justify-end gap-1">
@@ -110,15 +91,25 @@ export default function SiteList() {
                   ))
                 : SKELETON_ROWS.map((key) => (
                     <TableRow key={key}>
-                      <TableCell colSpan={4}>
-                        <Skeleton className="h-6 w-full" />
+                      <TableCell>
+                        <div className="grid gap-1.5">
+                          <Skeleton className="h-4 w-48" />
+                          <Skeleton className="h-4 w-28" />
+                        </div>
                       </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-56" />
+                      </TableCell>
+                      <TableCell />
                     </TableRow>
                   ))}
             </TableBody>
           </Table>
         )}
       </CardContent>
+      <CardFooter className="text-muted-foreground">
+        Di website lain, tombol Nemu tidak muncul dan halaman tidak dibaca.
+      </CardFooter>
     </Card>
   );
 }
@@ -148,8 +139,8 @@ function SiteDeleteButton({ id, label }: { id: string; label: string }) {
         <AlertDialogHeader>
           <AlertDialogTitle>Hapus {label}?</AlertDialogTitle>
           <AlertDialogDescription>
-            Dalam satu menit tombol Nemu hilang dari situs ini untuk semua guru, dan Nemu tidak lagi
-            membaca halamannya.
+            Dalam satu menit tombol Nemu hilang dari website ini untuk semua guru, dan Nemu tidak
+            lagi membaca halamannya.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
