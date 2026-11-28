@@ -319,7 +319,7 @@ await check(
 
 await check("cara 1 opens Isi nilai kelas through the menu and fills every value", async () => {
   await display("kerja")
-    .getByText(/Nemu mengisi · \d+ dari \d+/u)
+    .getByRole("progressbar", { name: /Nemu mengisi · \d+ dari \d+/u })
     .waitFor({ timeout: 30_000 });
   await page.waitForURL(/#\/nilai$/u);
   await page.screenshot({ path: join(shots, "mengisi.png") });

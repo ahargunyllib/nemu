@@ -207,7 +207,7 @@ async function upToTheFill() {
     else await buttons.first().click();
   }
   await display("kerja")
-    .getByText(/Nemu mengisi · 3 dari \d+/u)
+    .getByRole("progressbar", { name: /Nemu mengisi · 3 dari \d+/u })
     .waitFor({ timeout: 60_000 });
 }
 
