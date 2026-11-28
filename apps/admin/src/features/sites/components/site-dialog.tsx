@@ -35,7 +35,7 @@ export default function SiteDialog({ site }: { site?: Site }) {
     orpc.saveAllowedSite.mutationOptions({
       onSuccess: () => {
         setOpen(false);
-        toast.success("Situs disimpan. Ekstensi mengikutinya dalam satu menit.");
+        toast.success("Website disimpan. Ekstensi mengikutinya dalam satu menit.");
       },
       onError: (error) => toast.error(error.message),
       onSettled: () => queryClient.invalidateQueries({ queryKey: orpc.listAllowedSites.key() }),
@@ -63,15 +63,15 @@ export default function SiteDialog({ site }: { site?: Site }) {
       ) : (
         <DialogTrigger render={<Button />}>
           <PlusIcon />
-          Tambah situs
+          Tambah website
         </DialogTrigger>
       )}
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{site ? "Ubah situs" : "Tambah situs"}</DialogTitle>
+          <DialogTitle>{site ? "Ubah website" : "Tambah website"}</DialogTitle>
           <DialogDescription>
-            Tombol Nemu hanya muncul di situs pada daftar ini. Di situs lain Nemu tidak membaca apa
-            pun.
+            Tombol Nemu hanya muncul di website pada daftar ini. Di website lain Nemu tidak membaca
+            apa pun.
           </DialogDescription>
         </DialogHeader>
         <form
@@ -82,7 +82,7 @@ export default function SiteDialog({ site }: { site?: Site }) {
           }}
         >
           <div className="grid gap-2">
-            <Label htmlFor="site-pattern">Alamat situs</Label>
+            <Label htmlFor="site-pattern">Alamat website</Label>
             <Input
               id="site-pattern"
               placeholder="portal.sekolah.sch.id atau *.alursekolah.id"
