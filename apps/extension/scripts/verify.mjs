@@ -1,7 +1,10 @@
 // Loads a production build of the extension into Playwright's Chromium and checks #199 and #200 end
 // to end: the install code, the Nemu button on allowed sites only, identity from the page email, a
 // typed question answered through helpRoute, and holding Ctrl + Space (or the Nemu button) to talk
-// with a fake microphone. Needs `NEMU_RESPONDER=fixture pnpm dev` running.
+// with a fake microphone. #268: unclear words are shown back, not acted on; and in a second, headed
+// window without the auto-answer flag, the first hold points at Chrome's real prompt, refusing or
+// blocking the microphone shows the three steps, and talking works once it is allowed again.
+// Needs `NEMU_RESPONDER=fixture pnpm dev` running.
 // Screenshots go to .output/verify/. Every URL can be overridden, e.g. to use the deployed mocks:
 //   MOCK_ALURSEKOLAH_URL=https://nemu-alursekolah.ahargunyllib.dev/ pnpm --filter extension verify
 import { execFileSync } from "node:child_process";
@@ -117,15 +120,15 @@ await check(
   },
 );
 
-await check("the welcome page asks for the microphone once", async () => {
+await check("the welcome page says how to talk and that Chrome asks the first time", async () => {
   const welcome = await context.newPage();
   await welcome.goto(`chrome-extension://${extensionId}/welcome.html`);
-  // The fake-UI flag may have granted it already; otherwise the button asks.
-  const allow = welcome.getByRole("button", { name: "Izinkan mikrofon" });
-  const ready = welcome.getByText("Mikrofon siap.", { exact: false });
-  await allow.or(ready).first().waitFor();
-  if (await allow.isVisible()) await allow.click();
-  await ready.waitFor();
+  await welcome.getByText("sambil bicara, lalu lepaskan", { exact: false }).waitFor();
+  await welcome.getByText("Chrome meminta izin mikrofon", { exact: false }).waitFor();
+  expect(
+    (await welcome.getByRole("button", { name: "Izinkan mikrofon" }).count()) === 0,
+    "the welcome page still asks for the microphone",
+  );
   await welcome.screenshot({ path: join(shots, "welcome.png"), fullPage: true });
   await welcome.close();
 });
@@ -169,6 +172,16 @@ await check("pressing and holding the Nemu button talks too", async () => {
   await heardBubble(page).getByText(HEARD).waitFor({ timeout: 15_000 });
 });
 
+/** Holds Ctrl + Space for `ms`, then lets go. */
+async function holdToTalk(target, ms = 1_000) {
+  await target.bringToFront();
+  await target.keyboard.down("Control");
+  await target.keyboard.down("Space");
+  await target.waitForTimeout(ms);
+  await target.keyboard.up("Space");
+  await target.keyboard.up("Control");
+}
+
 await check("switching to an unregistered account shows the operator to contact", async () => {
   await signIn("rizal.operator");
   await openNemu(page);
@@ -202,5 +215,166 @@ await check("WS-1 (a): e-Rapor, off the WS-03 list, gets no Nemu button", async 
 });
 
 await context.close();
+
+// #268 in a window of its own: Chrome's real prompt only shows in a headed browser without
+// --use-fake-ui-for-media-stream. Playwright can't press Chrome's buttons, so the checks answer
+// through the permission itself, as Izinkan, Jangan izinkan or the site settings would.
+const micContext = await chromium.launchPersistentContext(mkdtempSync(join(tmpdir(), "nemu-")), {
+  headless: false,
+  channel: "chromium",
+  viewport: { width: 1280, height: 720 },
+  args: [
+    `--disable-extensions-except=${extension}`,
+    `--load-extension=${extension}`,
+    "--use-fake-device-for-media-stream",
+  ],
+});
+const micWorker =
+  micContext.serviceWorkers()[0] ?? (await micContext.waitForEvent("serviceworker"));
+const micExtensionId = new URL(micWorker.url()).host;
+const origin = new URL(MOCK).origin;
+const mic = await micContext.newPage();
+const cdp = await micContext.newCDPSession(mic);
+const setMicrophone = (setting, at = origin) =>
+  cdp.send("Browser.setPermission", { permission: { name: "microphone" }, setting, origin: at });
+const pointerOn = (target) => overlay(target).getByRole("region", { name: "Petunjuk Nemu" });
+const stepsOn = (target) =>
+  overlay(target).getByRole("region", { name: "Mikrofon masih diblokir" });
+const pointer = pointerOn(mic);
+const steps = stepsOn(mic);
+
+/** A hold before the teacher is known only opens the panel, so wait for her type box first. */
+async function untilRegistered(target = mic) {
+  await openNemu(target);
+  await overlay(target).getByLabel("Pertanyaan untuk Nemu").waitFor({ timeout: 10_000 });
+}
+
+async function micCheck(name, run) {
+  await check(name, async () => {
+    try {
+      await run();
+    } catch (error) {
+      await mic.screenshot({ path: join(shots, `failed-mic-${name.slice(0, 24)}.png`) });
+      throw error;
+    }
+  });
+}
+
+await micCheck("the first hold on a site points at Izinkan in Chrome's prompt", async () => {
+  const settingsPage = await micContext.newPage();
+  await settingsPage.goto(`chrome-extension://${micExtensionId}/options.html`);
+  await settingsPage.getByLabel("Kode pemasangan sekolah").fill(INSTALL_CODE);
+  await settingsPage.getByRole("button", { name: "Simpan" }).click();
+  await settingsPage.getByText(/^Terpasang untuk /u).waitFor();
+  await settingsPage.close();
+  for (const open of micContext.pages()) if (open.url().includes("welcome")) await open.close();
+
+  await mic.goto(new URL("#/keluar", MOCK).href);
+  await mic.locator("#username").fill("siti.aminah");
+  await mic.locator("#password").fill("nemu-uji-2026");
+  await mic.locator("#btn-masuk").click();
+  await mic.locator("#menu-email").filter({ hasText: "@" }).waitFor();
+  await untilRegistered();
+
+  await holdToTalk(mic, 600);
+  await pointer
+    .getByText("Tekan Izinkan yang paling atas di kotak Chrome", { exact: false })
+    .waitFor({ timeout: 5_000 });
+  // She let go to press Izinkan: Nemu keeps pointing until Chrome has an answer.
+  const cursor = overlay(mic).locator("[data-nemu-cursor='arrived']");
+  await cursor.waitFor();
+  const x = Number(await cursor.getAttribute("data-x"));
+  const y = Number(await cursor.getAttribute("data-y"));
+  // Right of the prompt (it ends 447 px in), level with its top button (≈ 214–250 px down, less
+  // the bars above the page in this window).
+  expect(x > 447 && x < 480, `the cursor stands at x=${x}, not just right of Chrome's prompt`);
+  expect(y > 100 && y < 260, `the cursor stands at y=${y}, not level with Izinkan`);
+  await mic.waitForTimeout(500);
+  await mic.screenshot({ path: join(shots, "mic-pointing.png") });
+
+  await setMicrophone("granted");
+  await bubble(mic)
+    .getByText("Mikrofon sudah siap. Tahan lagi tombolnya sambil bicara, Bu.")
+    .waitFor({ timeout: 5_000 });
+  expect((await pointer.count()) === 0, "Nemu still points after the microphone was allowed");
+  await mic.screenshot({ path: join(shots, "mic-ready.png") });
+});
+
+// Before any grade request: a grade-book question waiting for its answer would take the words.
+await micCheck(
+  "unclear words are shown back with a request to repeat, and nothing is done",
+  async () => {
+    // The fixture always hears a grade request; here the school AI catches only "nilai".
+    // Answered here in oRPC's response shape; the request never reaches the Nemu Service.
+    await micContext.route("**/rpc/speechTranscribe**", (route) =>
+      route.fulfill({ status: 200, json: { json: { text: "nilai" } } }),
+    );
+    try {
+      // Chrome still holds the first request, answered through the permission rather than its
+      // button; a reload clears it, as pressing Izinkan would.
+      await mic.reload();
+      await untilRegistered();
+      await holdToTalk(mic);
+      await bubble(mic)
+        .getByText("Nemu menangkap: “nilai”. Bisa diulang, Bu?")
+        .waitFor({ timeout: 15_000 });
+      await mic.waitForTimeout(1_500);
+      expect(
+        (await overlay(mic)
+          .getByText(/foto buku nilai|Nilai .+: \d+\?/u)
+          .count()) === 0,
+        "Nemu acted on the unclear words",
+      );
+      expect((await heardBubble(mic).count()) === 0, "the words also showed as heard");
+      await mic.screenshot({ path: join(shots, "mic-unclear.png") });
+    } finally {
+      await micContext.unroute("**/rpc/speechTranscribe**");
+    }
+  },
+);
+
+// On Ruang GTK, a site of its own that Chrome hasn't asked about yet: after the answers given
+// through the permission above, Chrome quietly closes further prompts on AlurSekolah.
+await micCheck("refusing in Chrome's prompt shows the three steps", async () => {
+  const gtk = await micContext.newPage();
+  await gtk.goto(RUANG_GTK);
+  await untilRegistered(gtk);
+  await holdToTalk(gtk, 600);
+  await pointerOn(gtk).waitFor({ timeout: 5_000 });
+  await setMicrophone("denied", new URL(RUANG_GTK).origin);
+  await stepsOn(gtk).waitFor({ timeout: 5_000 });
+  expect((await pointerOn(gtk).count()) === 0, "Nemu still points after the refusal");
+  await gtk.screenshot({ path: join(shots, "mic-refused.png") });
+  await gtk.close();
+});
+
+await micCheck(
+  "a blocked microphone shows three steps with only Tutup, and talking works once allowed",
+  async () => {
+    await setMicrophone("denied");
+    await mic.reload();
+    await untilRegistered();
+    await holdToTalk(mic, 600);
+    await steps.waitFor({ timeout: 5_000 });
+    expect((await steps.getByRole("listitem").count()) === 3, "the card doesn't show three steps");
+    await steps.getByText("tekan ikon di kiri alamat situs", { exact: false }).waitFor();
+    await steps.getByText("pada Mikrofon, pilih Izinkan", { exact: false }).waitFor();
+    const buttons = await steps.getByRole("button").allInnerTexts();
+    expect(
+      buttons.length === 1 && buttons[0].trim() === "Tutup",
+      `the card has buttons ${JSON.stringify(buttons)}, not only Tutup`,
+    );
+    await mic.screenshot({ path: join(shots, "mic-blocked.png") });
+    await steps.getByRole("button", { name: "Tutup" }).click();
+    await steps.waitFor({ state: "detached" });
+
+    // She followed the steps.
+    await setMicrophone("granted");
+    await holdToTalk(mic);
+    await heardBubble(mic).getByText(HEARD).waitFor({ timeout: 15_000 });
+  },
+);
+
+await micContext.close();
 console.log(`Screenshots: ${shots}`);
 process.exit(failed ? 1 : 0);

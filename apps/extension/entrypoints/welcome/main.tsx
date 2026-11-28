@@ -11,17 +11,16 @@ import ReactDOM from "react-dom/client";
 import { browser } from "wxt/browser";
 
 import { useSchoolShortcut } from "../../features/voice/hooks/use-school-shortcut";
-import { MicrophoneStep } from "../../features/welcome/components/microphone-step";
-import { useMicrophonePermission } from "../../features/welcome/hooks/use-microphone-permission";
+import { TalkStep } from "../../features/welcome/components/talk-step";
 
 import "./style.css";
 
 /**
- * Opens after install (#200): the microphone permission is asked here, once, for the whole
- * extension. The settings page, where the operator enters the install code, is one click on.
+ * Opens after install (#200): how to talk to Nemu. The microphone is asked for on each site the
+ * first time the teacher talks there (ADR-0019). The settings page, where the operator enters the
+ * install code, is one click on.
  */
 function WelcomePage() {
-  const { permission, ask } = useMicrophonePermission();
   const shortcut = useSchoolShortcut();
 
   return (
@@ -29,16 +28,10 @@ function WelcomePage() {
       <Card className="w-full max-w-xl">
         <CardHeader>
           <CardTitle>Selamat datang di Nemu</CardTitle>
-          <CardDescription>
-            Nemu mendengar dan menjawab dengan suara. Izinkan mikrofon sekali saja di sini.
-          </CardDescription>
+          <CardDescription>Nemu mendengar dan menjawab dengan suara.</CardDescription>
         </CardHeader>
         <CardContent>
-          <MicrophoneStep
-            permission={permission}
-            shortcutKeys={shortcutKeys(shortcut)}
-            onAsk={() => void ask()}
-          />
+          <TalkStep shortcutKeys={shortcutKeys(shortcut)} />
         </CardContent>
       </Card>
 

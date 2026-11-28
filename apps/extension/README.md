@@ -41,10 +41,12 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
 - **Talking (#200).** Hold **Ctrl + Spasi** on an allowed page, or press and hold the Nemu button,
   and speak: Nemu shows a red dot and "Nemu mendengar…". On release the recording goes to
   `speechTranscribe` as 16 kHz mono WAV, the heard text shows in a small bubble, and then it goes
-  to `helpRoute` like a typed question. The microphone runs in an offscreen document
-  (`entrypoints/offscreen`), so its permission belongs to the extension: the welcome page that
-  opens after install asks for it once, and a hold without it opens that page again. Holds under
-  300 ms send nothing; recordings stop at 15 s. The combination is the school's WS-08 setting,
+  to `helpRoute` like a typed question. The content script records on the site itself, so each
+  school site asks for the microphone once (ADR-0019): on the first hold, Nemu's cursor and a
+  Gelembung Tunjuk point at Izinkan in Chrome's prompt; a blocked microphone gets a Kartu Info
+  with three steps to allow it again; words too unclear to act on show as "Nemu menangkap: “…”.
+  Bisa diulang, Bu?" and nothing is done with them (#268). Holds under 300 ms send nothing;
+  recordings stop at 15 s. The combination is the school's WS-08 setting,
   read with the WS-03 list (`extensionConfig.settings.talkShortcut`); a page picks it up on its
   next load, and Ctrl + Spasi stands in when the school has none.
 - **Site permission and settings (#212).** The background answers `nemu:site-access` with the
@@ -213,11 +215,12 @@ new zip and click the reload icon on the extension card.
    `OPENROUTER_API_KEY` (`docs/school-ai.md`).
 2. Load the extension unpacked: open `chrome://extensions` (or `edge://extensions`), turn on
    **Developer mode**, click **Load unpacked**, and pick `apps/extension/.output/chrome-mv3-dev`.
-3. The welcome page opens on install. Press **Izinkan mikrofon**, then **Buka pengaturan Nemu**,
-   enter `NEMU-SDITN-2026` and press **Simpan**.
+3. The welcome page opens on install. Press **Buka pengaturan Nemu**, enter `NEMU-SDITN-2026`
+   and press **Simpan**.
 4. Open <http://localhost:3003>, sign in as `siti.aminah` (password `nemu-uji-2026`), click the
    Nemu button, and ask "KKM nilai berapa?". Hold Ctrl + Spasi and speak to talk instead; the
-   fixture responder always hears "masukkan nilai UTS Matematika 4B". Sign in as `rizal.operator`
+   fixture responder always hears "masukkan nilai UTS Matematika 4B". The first hold makes Chrome
+   ask for the microphone; press its top Izinkan, then hold again. Sign in as `rizal.operator`
    to see the unregistered message.
 
 In dev the extension calls `http://localhost:3000`. Set `WXT_SERVER_URL` to point it at another
@@ -236,13 +239,26 @@ extension against `http://localhost:3000`, loads it into Playwright's Chromium, 
 - the settings page refuses an unknown install code and keeps `NEMU-SDITN-2026`;
 - the Nemu button and its hint show on the mock AlurSekolah;
 - Bu Siti's "KKM nilai berapa?" comes back as a Gelembung Jawab whose Sumber link shows the SOP;
-- the welcome page has the microphone (a fake one, with the prompt answered for it);
+- the welcome page says how to talk and that Chrome asks for the microphone the first time;
 - holding Ctrl + Spasi shows "Nemu mendengar…", then the heard text, then the answer with its
   spoken word highlighted; pressing and holding the Nemu button does the same;
 - signing in as `rizal.operator` shows "Akun ini belum didaftarkan. Hubungi Pak Rizal.", and
   signing in as `dewi.lestari` brings the type box back;
 - Ruang GTK shows the Nemu button and asks as the last AlurSekolah account;
 - e-Rapor gets no Nemu button (WS-1 (a)).
+
+Then, for #268, it opens a second, headed window without `--use-fake-ui-for-media-stream`, since
+Chrome only shows its real microphone prompt there. Playwright can't press Chrome's buttons, so
+the checks answer through the permission (CDP `Browser.setPermission`), as Izinkan, Jangan izinkan
+or the site settings would:
+
+- the first hold points the Nemu cursor just right of Chrome's prompt, level with Izinkan, with a
+  Gelembung Tunjuk; allowing it says "Mikrofon sudah siap…";
+- words the school AI caught as only "nilai" show "Nemu menangkap: “nilai”. Bisa diulang, Bu?"
+  and nothing is done with them;
+- refusing in the prompt (on Ruang GTK, a site Chrome hasn't asked about) shows the three steps;
+- a blocked microphone shows the three steps with only Tutup, and talking works once it is
+  allowed again.
 
 `pnpm --filter extension verify:executor` does the same for the executor with a development
 build: cara 1 from the Nilai menu to Simpan, Catatan langkah, the teacher's own click (F0-07),

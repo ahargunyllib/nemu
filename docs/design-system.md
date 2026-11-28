@@ -153,6 +153,12 @@ it, below-right, below, above-right, above, or left of the element, the first th
 window and covers none of the page's own controls (the field being filled and the ones after it).
 A display about no element (an answer to a typed question, most Kartu) sits above the Nemu button.
 
+**Pointing at the browser** (#268): Chrome's microphone prompt is browser UI over the top left
+of the page, which Nemu can't see. The first time the teacher talks on a site, the cursor glides to
+the prompt's measured place instead: just right of its edge, level with its top **Izinkan** button.
+The Gelembung Tunjuk beside it names the button, "Tekan Izinkan yang paling atas di kotak Chrome
+supaya Nemu bisa mendengar, Bu.", in case the cursor stands a little off (ADR-0019).
+
 **Preview**: in a dev build, open an allowed page with `?pratinjau-nemu` (for example
 `http://localhost:3003/?pratinjau-nemu#/nilai` on the mock AlurSekolah). A dock at the bottom left
 shows each type with sample content; **Gerak kursor** moves the cursor between Kelas and

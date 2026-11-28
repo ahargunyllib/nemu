@@ -30,9 +30,9 @@ export default defineConfig({
     // have in chrome://extensions. Local builds keep package.json's 0.0.0.
     version: process.env.WXT_EXTENSION_VERSION,
     description: "Nemu membantu guru di AlurSekolah, Moodle, dan portal pemerintah.",
-    // `storage` keeps the install code; `scripting` runs Nemu on sites granted later (ADR-0016);
-    // `offscreen` holds the microphone while the teacher holds the talk combination (#200).
-    permissions: ["storage", "scripting", "offscreen"],
+    // `storage` keeps the install code; `scripting` runs Nemu on sites granted later (ADR-0016).
+    // The microphone belongs to each site, asked for on the first hold there (ADR-0019).
+    permissions: ["storage", "scripting"],
     // Known sites are granted at install; inside them the school's WS-03 list decides where the
     // Nemu button appears. Other sites are asked for from the settings page.
     host_permissions: [
