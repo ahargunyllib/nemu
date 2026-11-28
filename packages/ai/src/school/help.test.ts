@@ -49,9 +49,27 @@ test("F2-2: matched in code to Kamus Kendala no. 7, Pak Rizal fixes it, WhatsApp
   const text = result.waDraft?.text ?? "";
   assert.equal(
     text,
-    `Assalamualaikum Pak Rizal. Saya ${BU_SITI.name} (NIP ${BU_SITI.nip}). Di AlurSekolah, halaman "Isi nilai kelas 4A", muncul pesan: "Tidak dapat menampilkan siswa. Anda belum ditugaskan mengampu IPAS di kelas 4A. Hubungi admin sekolah". Mohon bantuannya menambahkan penugasan guru untuk mapel dan kelas itu di pengaturan AlurSekolah. Terima kasih.`,
+    'Assalamualaikum Pak Rizal, saya Siti (4B). Saat membuka Isi nilai kelas 4A muncul "Anda belum ditugaskan mengampu IPAS di kelas 4A". Mohon dibantu menambahkan penugasan guru untuk mapel dan kelas itu di pengaturan AlurSekolah. Terima kasih.',
   );
   assertSafe(result.sentence, result.why, text);
+});
+
+test("Info GTK 'Pengguna tidak ditemukan' (no. 3): a short message to Pak Rizal, said as signing in", async () => {
+  const result = await ask({
+    title: "Info GTK (tiruan)",
+    url: "https://info-gtk.tiruan.local/masuk",
+    alerts: ["Pengguna tidak ditemukan."],
+    headings: ["Masuk Info GTK"],
+    fields: [],
+    screenshotBase64: null,
+  });
+  assert.equal(result.status, "matched");
+  if (result.status !== "matched") return;
+  assert.equal(result.sentence, "Bukan kesalahan Ibu. Yang bisa membantu: Pak Rizal.");
+  assert.equal(
+    result.waDraft?.text,
+    'Assalamualaikum Pak Rizal, saya Siti (4B). Saat masuk Info GTK muncul "Pengguna tidak ditemukan". Mohon dibantu memeriksa email dan data PTK guru di Dapodik, memperbaikinya, lalu melakukan sinkronisasi. Terima kasih.',
+  );
 });
 
 test("F2-3: matched in code to no. 2, she fixes it herself at Sinkro Ruang GTK, no WhatsApp", async () => {

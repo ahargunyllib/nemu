@@ -98,7 +98,7 @@ test("F2-2 offline: IPAS 4A not assigned is Pak Rizal's to fix (K-07), with a Wh
   assert.equal(result.detail, "Pak Rizal operator sekolah.");
   assert.equal(result.canSelfFix, false);
   assert.equal(result.waDraft?.phone, "6281200000002");
-  assert.match(result.waDraft?.text ?? "", /^Assalamualaikum Pak Rizal\./u);
+  assert.match(result.waDraft?.text ?? "", /^Assalamualaikum Pak Rizal, saya Siti \(4B\)\./u);
 });
 
 test("F2-3 offline: the teacher syncs Ruang GTK herself (K-02), no WhatsApp", async () => {

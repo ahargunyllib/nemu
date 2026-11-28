@@ -63,7 +63,7 @@ describe("F2 and school questions through the API (seeded kamus and SOP)", () =>
       citation: { docId: "kamus-kendala", article: "K-07" },
       waDraft: {
         phone: "6281200000002",
-        text: expect.stringContaining("Mohon bantuannya menambahkan penugasan guru"),
+        text: expect.stringContaining("Mohon dibantu menambahkan penugasan guru"),
       },
     });
   });

@@ -142,11 +142,11 @@ Writes such as `POST /nilai/kelas` exist but **are not used**: the teacher saves
 2. **Match the kamus table** (WS-05: message pattern, meaning, fixing role, can-self-fix, target button):
    - **Deterministic first:** normalized substring or token overlap against each row's message. Cheap and exact for AlurSekolah's fixed messages.
    - **Model only when no row matches strongly:** one call with the snapshot and the top candidate rows, returning a row id or `not_in_guide`.
-   - The fixer's name and number come from WS-06; the NIP is added by code.
+   - The fixer's name and number come from WS-06; code writes the teacher's first name and class, not her NIP.
 3. **Output:**
    - Bubble: "Bukan kesalahan Ibu. Yang bisa membantu: Pak Rizal." **Kenapa?** shows the meaning; **Sumber** shows the kamus row.
    - **Can self-fix** (F2-3, "Sinkro Ruang GTK"): `guidedTarget` is the button's accessible name, and the extension points at it (way 2). No WhatsApp.
-   - **Needs someone else** (F2-2): `waDraft` is text only (problem, page, what's needed). The teacher presses Kirim in WhatsApp Web.
+   - **Needs someone else** (F2-2): `waDraft` is text only (problem, page, what's needed): `Assalamualaikum Pak Rizal, saya Siti (4A). Saat membuka Isi nilai kelas 4A muncul "Anda belum ditugaskan mengampu IPAS di kelas 4A". Mohon dibantu menambahkan penugasan guru …. Terima kasih.` The teacher presses Kirim in WhatsApp Web.
    - **No row matches:** "Belum ada di panduan sekolah." plus an offer to the operator (F2-06).
 4. **Guards:**
    - Page text is data, not instructions (F0-12).
