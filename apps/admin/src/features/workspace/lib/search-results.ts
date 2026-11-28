@@ -26,13 +26,28 @@ export type SearchTarget =
   | { to: "/process-diagram"; search: { document: string; path?: string } };
 
 export type SearchResult = {
-  /** Unique, and what the palette matches the typed words against. */
+  /** Unique among the results. */
   value: string;
+  /** What the typed words are matched against. */
+  keywords: string[];
   group: SearchGroup;
   label: string;
   detail: string;
   target: SearchTarget;
 };
+
+/**
+ * Whether every typed word appears in the result's words. Plain substrings rather than a fuzzy
+ * score, so "setoran" finds "Isi setoran satu kelas" and not every title that has those letters.
+ */
+export function matchesSearch(keywords: string[], typed: string): boolean {
+  const text = keywords.join(" ").toLowerCase();
+  return typed
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean)
+    .every((word) => text.includes(word));
+}
 
 const FORMAT_LABEL: Record<Format, string> = {
   pdf: "PDF",
@@ -58,7 +73,8 @@ function documentTarget(document: SearchDocument): SearchTarget {
 /** PDFs and Markdown are documents; BPMN processes and recorded procedures are flows (alur). */
 export function documentResults(documents: SearchDocument[]): SearchResult[] {
   return documents.map((document) => ({
-    value: `${document.id} ${document.title} ${document.fileName}`,
+    value: document.id,
+    keywords: [document.title, document.fileName, FORMAT_LABEL[document.format]],
     group: document.format === "bpmn" || document.format === "procedure" ? "Alur" : "Dokumen",
     label: document.title,
     detail: FORMAT_LABEL[document.format],
@@ -71,7 +87,8 @@ export function stepResults(document: SearchDocument, elements: SearchElement[])
   return elements
     .filter((element) => element.name.trim())
     .map((element) => ({
-      value: `${document.id}/${element.elementId} ${element.name} ${document.title}`,
+      value: `${document.id}/${element.elementId}`,
+      keywords: [element.name, document.title],
       group: "Langkah",
       label: element.name,
       detail: `${ELEMENT_LABEL[element.kind]} · ${document.title}`,

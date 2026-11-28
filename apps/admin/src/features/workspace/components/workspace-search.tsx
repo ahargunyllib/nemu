@@ -15,7 +15,11 @@ import { FileTextIcon, ListTreeIcon, SearchIcon, WorkflowIcon } from "lucide-rea
 import { useEffect, useState } from "react";
 
 import { useWorkspaceSearch } from "@/features/workspace/hooks/use-workspace-search";
-import type { SearchGroup, SearchResult } from "@/features/workspace/lib/search-results";
+import {
+  type SearchGroup,
+  type SearchResult,
+  matchesSearch,
+} from "@/features/workspace/lib/search-results";
 
 const PLACEHOLDER = "Cari dokumen, alur, atau langkah";
 const SHORTCUT = /Mac|iPhone|iPad/.test(navigator.userAgent) ? "⌘ K" : "Ctrl K";
@@ -68,7 +72,9 @@ export default function WorkspaceSearch() {
         title="Cari di Workspace"
         description={PLACEHOLDER}
       >
-        <Command>
+        <Command
+          filter={(_value, typed, keywords = []) => (matchesSearch(keywords, typed) ? 1 : 0)}
+        >
           <CommandInput placeholder={PLACEHOLDER} />
           <CommandList>
             {isPending ? (
@@ -89,12 +95,12 @@ export default function WorkspaceSearch() {
                     <CommandItem
                       key={result.value}
                       value={result.value}
-                      keywords={[result.label, result.detail]}
+                      keywords={result.keywords}
                       onSelect={() => select(result)}
                     >
                       <Icon />
                       <span className="truncate">{result.label}</span>
-                      <span className="ml-auto shrink-0 truncate text-xs text-muted-foreground">
+                      <span className="ml-auto max-w-1/2 truncate text-xs text-muted-foreground">
                         {result.detail}
                       </span>
                     </CommandItem>
