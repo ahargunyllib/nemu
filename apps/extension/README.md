@@ -41,7 +41,8 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
   processes say they aren't available yet, until F1 (#207) and F3 (#213) hand their step lists to
   the executor.
 - **Talking (#200).** Hold **Ctrl + Spasi** on an allowed page, or press and hold the Nemu button,
-  and speak: Nemu shows a red dot and "Nemu mendengar…". On release the recording goes to
+  and speak: Nemu shows one bubble headed NEMU MENDENGAR… that says "Lepas Ctrl + Spasi kalau
+  sudah selesai." (the school's own combination). On release the recording goes to
   `speechTranscribe` as 16 kHz mono WAV, the heard text shows in a small bubble, and then it goes
   to `helpRoute` like a typed question. The content script records on the site itself, so each
   school site asks for the microphone once (ADR-0019): on the first hold, Nemu's cursor and a

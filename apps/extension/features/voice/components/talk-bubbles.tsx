@@ -1,15 +1,22 @@
 import { Skeleton } from "@nemu/ui/components/skeleton";
+import { NemuBubble, NemuText } from "@nemu/ui/nemu/nemu-frame";
 
-/** While the combination is held: a red dot and "Nemu mendengar…" (F0-03). */
-export function ListeningBubble() {
+/**
+ * While the combination is held (F0-03): one Gelembung headed NEMU MENDENGAR… that tells her how
+ * to finish, "Lepas Ctrl + Spasi kalau sudah selesai." The words come only after release, so it
+ * shows no transcript. It isn't one of the five display types, so scripts looking for one skip it.
+ */
+export function ListeningBubble({ keys }: { keys: string }) {
   return (
-    <div
+    <NemuBubble
+      display="tunjuk"
+      data-nemu-display="mendengar"
+      label="Nemu mendengar"
       role="status"
-      className="flex items-center gap-2.5 rounded-full bg-background px-4 py-2.5 text-lg font-medium text-foreground shadow-nemu-float"
+      status={{ text: "Nemu mendengar…" }}
     >
-      <span aria-hidden className="size-3 animate-pulse rounded-full bg-destructive" />
-      Nemu mendengar…
-    </div>
+      <NemuText sentence={`Lepas ${keys} kalau sudah selesai.`} />
+    </NemuBubble>
   );
 }
 

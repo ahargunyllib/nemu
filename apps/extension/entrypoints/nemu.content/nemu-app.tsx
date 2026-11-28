@@ -275,33 +275,33 @@ export function NemuApp({ access }: { access: SiteAccess }) {
               display={withSpokenWord(quizDeletion.display, voice)}
               target={quizDeletion.target}
             />
-            {talk.state.phase === "listening" && <ListeningBubble />}
+            {talk.state.phase === "listening" && <ListeningBubble keys={talkKeys} />}
           </div>
         ) : importing.display ? (
           <div className="pointer-events-auto flex flex-col items-end gap-2">
             {talk.heard !== null && <HeardBubble text={talk.heard} />}
             <NemuStage display={withSpokenWord(importing.display, voice)} />
-            {talk.state.phase === "listening" && <ListeningBubble />}
+            {talk.state.phase === "listening" && <ListeningBubble keys={talkKeys} />}
             {importing.typing && <AskBox pending={false} onAsk={(text) => quizImport.hear(text)} />}
           </div>
         ) : recording.display ? (
           <div className="pointer-events-auto flex flex-col items-end gap-2">
             {talk.heard !== null && <HeardBubble text={talk.heard} />}
             <NemuStage display={withSpokenWord(recording.display, voice)} />
-            {talk.state.phase === "listening" && <ListeningBubble />}
+            {talk.state.phase === "listening" && <ListeningBubble keys={talkKeys} />}
           </div>
         ) : grades.display ? (
           <div className="pointer-events-auto flex flex-col items-end gap-2">
             {talk.heard !== null && <HeardBubble text={talk.heard} />}
             <NemuStage display={withSpokenWord(grades.display, voice)} />
-            {talk.state.phase === "listening" && <ListeningBubble />}
+            {talk.state.phase === "listening" && <ListeningBubble keys={talkKeys} />}
             {grades.typing && <AskBox pending={false} onAsk={(text) => gradePhoto.hear(text)} />}
           </div>
         ) : process.display ? (
           <div className="pointer-events-auto flex flex-col items-end gap-2">
             {talk.heard !== null && <HeardBubble text={talk.heard} />}
             <NemuStage display={withSpokenWord(process.display, voice)} />
-            {talk.state.phase === "listening" && <ListeningBubble />}
+            {talk.state.phase === "listening" && <ListeningBubble keys={talkKeys} />}
             {process.typing && <AskBox pending={false} onAsk={(text) => processRun.hear(text)} />}
           </div>
         ) : preview.display ? (
@@ -489,7 +489,7 @@ function NemuPanel({
           )}
         </>
       )}
-      {talk.phase === "listening" && <ListeningBubble />}
+      {talk.phase === "listening" && <ListeningBubble keys={talkKeys} />}
       <AskBox pending={state.status === "asking"} onAsk={onAsk} />
     </>
   );
