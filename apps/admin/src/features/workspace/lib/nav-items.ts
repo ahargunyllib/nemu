@@ -46,7 +46,7 @@ export type NavGroup = {
 export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Overview",
-    items: [{ to: "/dashboard", label: "Dashboard", icon: LayoutDashboardIcon, adminOnly: true }],
+    items: [{ to: "/dashboard", label: "Dashboard", icon: LayoutDashboardIcon }],
   },
   {
     label: "Sekolah",
@@ -68,10 +68,10 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Pengaturan",
     items: [
-      { to: "/sites", label: "Situs yang diizinkan", icon: GlobeIcon, adminOnly: true },
+      { to: "/sites", label: "Situs yang diizinkan", icon: GlobeIcon },
       { to: "/settings", label: "Pengaturan Nemu", icon: SlidersHorizontalIcon, adminOnly: true },
-      { to: "/integrations", label: "Integrasi", icon: KeyRoundIcon, adminOnly: true },
-      { to: "/action-log", label: "Log tindakan", icon: ListChecksIcon, adminOnly: true },
+      { to: "/integrations", label: "Integrasi", icon: KeyRoundIcon },
+      { to: "/action-log", label: "Log tindakan", icon: ListChecksIcon },
     ],
   },
 ];

@@ -7,7 +7,7 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 
 import type { AuthenticatedContext } from "../../context";
-import { fullAdminProcedure } from "../../index";
+import { fullAdminProcedure, workspaceAdminProcedure } from "../../index";
 import { checkConnection } from "../alursekolah/service";
 import { MissingSecretKeyError } from "./cipher";
 import { createIntegrationSecretRepository } from "./repository";
@@ -17,9 +17,12 @@ function integrationDeps(context: Pick<AuthenticatedContext, "db" | "secretCiphe
   return { secrets: createIntegrationSecretRepository(context.db), cipher: context.secretCipher };
 }
 
-/** WS-07 (Admin Javan only). Values go in; only "set or not" and the last 4 characters come out. */
+/**
+ * WS-07. Values go in; only "set or not" and the last 4 characters come out. Admin Javan fills it;
+ * the school operator sees that masked list and nothing else (ADR-0022).
+ */
 export const integrationsRouter = {
-  listIntegrationSecrets: fullAdminProcedure
+  listIntegrationSecrets: workspaceAdminProcedure
     .output(z.array(integrationSecretStatusSchema))
     .handler(({ context }) =>
       listSecrets(integrationDeps(context), context.session.user.workspaceId),

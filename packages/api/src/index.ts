@@ -65,7 +65,7 @@ const requireFullAdminRole = o.middleware(async ({ context, next }) => {
   return next({ context: authenticated });
 });
 
-/** Pages only Admin Javan sees (WS-01 school list); a school operator gets FORBIDDEN. */
+/** Admin Javan only (WS-01 school list, WS-07 keys); a school operator gets FORBIDDEN. */
 export const fullAdminProcedure = publicProcedure.use(requireFullAdminRole);
 
 function requireWorkspaceAccess(workspaceId: WorkspaceId) {
@@ -145,7 +145,7 @@ export const schoolAdminProcedure = workspaceAdminProcedure.use(
   requireWorkspaceAccess(WORKSPACES.school),
 );
 
-/** School pages only Admin Javan sees: WS-02 package, WS-03 websites, WS-08 settings, WS-10 log. */
+/** School changes only Admin Javan makes: the WS-02 package and WS-08 settings (ADR-0022). */
 export const schoolFullAdminProcedure = fullAdminProcedure.use(
   requireWorkspaceAccess(WORKSPACES.school),
 );

@@ -32,7 +32,7 @@ export default function WorkspaceSidebar({
       <SidebarHeader className="p-3">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" render={<Link to={homePath(role)} />}>
+            <SidebarMenuButton size="lg" render={<Link to={homePath()} />}>
               <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground">
                 <SparklesIcon className="size-4" />
               </div>

@@ -16,8 +16,11 @@ import SecretDialog from "@/features/integrations/components/secret-dialog";
 import { SETTING_GROUPS } from "@/features/integrations/lib/settings";
 import { orpc } from "@/shared/api/orpc";
 
-/** WS-07: one card per school system; each value shows only whether it is set and its last 4. */
-export default function IntegrationSettings() {
+/**
+ * WS-07: one card per school system; each value shows only whether it is set and its last 4.
+ * Admin Javan enters and checks the values; the school operator only sees this list (ADR-0022).
+ */
+export default function IntegrationSettings({ canEdit }: { canEdit: boolean }) {
   const secrets = useQuery(orpc.listIntegrationSecrets.queryOptions());
   const lastFour = (name: string) =>
     secrets.data?.find((secret) => secret.name === name)?.lastFour ?? null;
@@ -50,16 +53,18 @@ export default function IntegrationSettings() {
                       <Skeleton className="h-5 w-32" />
                     )}
                   </TableCell>
-                  <TableCell className="w-0 text-right">
-                    <SecretDialog field={field} isSet={last !== null} />
-                  </TableCell>
+                  {canEdit && (
+                    <TableCell className="w-0 text-right">
+                      <SecretDialog field={field} isSet={last !== null} />
+                    </TableCell>
+                  )}
                 </TableRow>
               );
             })}
           </TableBody>
         </Table>
       </CardContent>
-      {group.id === "alursekolah" && (
+      {canEdit && group.id === "alursekolah" && (
         <CardFooter>
           <AlurSekolahConnectionCheck
             ready={group.fields.every((field) => lastFour(field.name) !== null)}

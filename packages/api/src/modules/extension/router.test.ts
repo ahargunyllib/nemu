@@ -228,7 +228,7 @@ describe("WS-03 permissions and WS-08 settings reach the extension without an up
     ).rejects.toMatchObject({ code: "BAD_REQUEST" });
   });
 
-  it("refuses a duplicate site, and keeps WS-03 and WS-08 from a school operator", async () => {
+  it("refuses a duplicate site", async () => {
     const admin = await asAdmin();
     await expect(
       call(
@@ -237,13 +237,43 @@ describe("WS-03 permissions and WS-08 settings reach the extension without an up
         { context: admin },
       ),
     ).rejects.toMatchObject({ code: "CONFLICT" });
+  });
 
+  it("lets a school operator manage WS-03 and read WS-08, but not change WS-08 (ADR-0022)", async () => {
     const operator = await asAdmin(OPERATOR);
-    await expect(
-      call(extensionRouter.deleteAllowedSite, { id: "sekolah-alursekolah" }, { context: operator }),
-    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await call(
+      extensionRouter.saveAllowedSite,
+      { id: null, pattern: "portal.dinas.go.id", label: "Portal Dinas", permission: "read_only" },
+      { context: operator },
+    );
+    await call(
+      extensionRouter.deleteAllowedSite,
+      { id: "sekolah-alursekolah" },
+      { context: operator },
+    );
+    const sites = await call(extensionRouter.listAllowedSites, undefined, { context: operator });
+    expect(sites.map((site) => site.pattern)).toContain("portal.dinas.go.id");
+    expect(sites.map((site) => site.id)).not.toContain("sekolah-alursekolah");
+
     await expect(
       call(extensionRouter.getSchoolSettings, undefined, { context: operator }),
+    ).resolves.toMatchObject({ talkShortcut: "Ctrl+Space" });
+    await expect(
+      call(
+        extensionRouter.saveSchoolSettings,
+        { talkShortcut: "Alt+Shift+N", defaultCara: "tunjuk", fillSpeed: "pelan" },
+        { context: operator },
+      ),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+
+  it("keeps WS-03 and WS-08 from a teacher", async () => {
+    const teacher = await createSchoolContext();
+    await expect(
+      call(extensionRouter.deleteAllowedSite, { id: "sekolah-alursekolah" }, { context: teacher }),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(
+      call(extensionRouter.getSchoolSettings, undefined, { context: teacher }),
     ).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
 });
