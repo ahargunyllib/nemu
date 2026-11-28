@@ -57,6 +57,21 @@ export function spokenTime(time: SetTime): string {
   return `${day} pukul ${time.time.replace(":", ".")}`;
 }
 
+/**
+ * What Nemu says while it sets the times (F4·09): "Buka 7 Des, tutup 10 Des." with "Senin pukul
+ * 00.00 sampai Kamis pukul 23.59." under it.
+ */
+export function timesLines(opens: SetTime, closes: SetTime): { sentence: string; detail: string } {
+  const day = (time: SetTime) =>
+    localDate(time.date).toLocaleDateString("id-ID", { day: "numeric", month: "short" });
+  const at = (time: SetTime) =>
+    `${localDate(time.date).toLocaleDateString("id-ID", { weekday: "long" })} pukul ${time.time.replace(":", ".")}`;
+  return {
+    sentence: `Buka ${day(opens)}, tutup ${day(closes)}.`,
+    detail: `${at(opens)} sampai ${at(closes)}.`,
+  };
+}
+
 function say(sentence: string, honorific: string): string {
   return honorific ? `${sentence}, ${honorific}.` : `${sentence}.`;
 }

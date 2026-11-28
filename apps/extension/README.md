@@ -220,6 +220,13 @@ the Nemu Service and the answer comes back as a Gelembung Jawab.
     goes to Unduhan and Nemu points at **Pilih berkas …**. She presses **Impor**.
   - **Soal** › Tambah › dari bank soal › Pilih semua; she presses **Tambahkan soal terpilih pada
     kuis**. Every form submit is hers (F0-08); Nemu only opens menus, fills and ticks.
+  - Every step Nemu does itself carries its stage of the start card's five (the executor's act
+    step `stage`), so the Gelembung Kerja heading reads "Nemu bekerja · Langkah 4 dari 5". The
+    times say "Buka 7 Des, tutup 10 Des." with "Senin pukul 00.00 sampai Kamis pukul 23.59." under
+    **Nemu mengisi · Langkah 2 dari 5** (F4·09, `timesLines`); the Bank soal menus "Ini menu Bank
+    soal, lalu Impor." with "Tempat menyimpan soal sebelum dipakai kuis." (F4·08); the format
+    "Saya pilih format Moodle XML." with "Naskah Ibu sudah saya ubah jadi berkas Moodle XML."
+    (F4·07a). Steps without words of their own keep the executor's ("Membuka Tambah…").
   - The F4-1 check then runs on the new quiz with the number of questions it should have; when it
     finds nothing Nemu says one sentence ("Kuis … sudah siap: 10 soal, dibuka … dan ditutup …"),
     and Catatan langkah holds the import's steps (with the drop) and the check's.
@@ -364,6 +371,8 @@ picks `infra/setup/f4-2/F4-2_naskah-ipas-10-soal.pdf`. It checks that Nemu asks 
 start card asks "Pasang kuis dari naskah ini?" with 00.00 and 23.59 on its detail line, the
 script's chip and the five stages (she presses Mulai), that it fills the quiz form itself, drops the XML on Impor's picker, and points at
 Simpan dan tampilkan, Impor, Tambahkan soal terpilih pada kuis and Pratinjau kuis for her to press;
+that the times, Bank soal and Moodle XML bubbles name their stage ("Langkah 2 dari 5", "Langkah 4
+dari 5") with their detail lines;
 that the F4-1 check ends with the one sentence; and, in the Moodle database, that the quiz is in
 IPAS with those times (Asia/Jakarta) and its 10 questions match
 `infra/setup/f4-2/F4-2_hasil-yang-diharapkan.xml` (words without punctuation, choices, key, and

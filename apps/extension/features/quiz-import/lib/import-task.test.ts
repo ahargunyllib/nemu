@@ -6,6 +6,7 @@ import {
   type ImportContinuation,
   type ImportIo,
   type ImportOutcome,
+  importStages,
   nextImportSteps,
   QUIZ_IMPORT_KIND,
   quizImportTask,
@@ -72,7 +73,12 @@ describe("F4-03 as one executor task (#210)", () => {
     const started = quizImportTask(io.doc, URLS.course, PLAN, "Bu")!;
     expect(started.task.kind).toBe(QUIZ_IMPORT_KIND);
     expect(started.task.steps).toEqual([
-      { verb: "check", target: { role: "checkbox", label: "Mode Edit" }, checked: true },
+      {
+        verb: "check",
+        target: { role: "checkbox", label: "Mode Edit" },
+        checked: true,
+        stage: { n: 1, of: 5 },
+      },
     ]);
     io.show(coursePageHtml(true), URLS.course);
     const next = await nextImportSteps(io, started.continuation, () => {});
@@ -93,14 +99,25 @@ describe("F4-03 as one executor task (#210)", () => {
     const started = quizImportTask(io.doc, URLS.course, PLAN, "Bu")!;
     io.show(newQuizForm(false), URLS.form);
     const { steps, continuation } = await nextImportSteps(io, started.continuation, () => {});
+    // F4·09: the times are stage 2 of 5, with one line for all their fields.
+    const times9 = {
+      sentence: "Buka 7 Des, tutup 10 Des.",
+      detail: "Senin pukul 00.00 sampai Kamis pukul 23.59.",
+      stage: { n: 2, of: 5, label: "Nemu mengisi" },
+    };
     expect(steps.slice(0, 2)).toEqual([
       {
         verb: "setValue",
         target: { role: "textbox", label: "Nama" },
         value: "Latihan IPAS Kelas 4A",
+        stage: { n: 1, of: 5 },
       },
-      { verb: "clickMenu", target: { role: "button", text: "Waktu Pengerjaan" } },
+      { verb: "clickMenu", target: { role: "button", text: "Waktu Pengerjaan" }, ...times9 },
     ]);
+    expect(
+      steps.filter((step) => step.verb === "selectOption").every((step) => step.stage?.n === 2),
+    ).toBe(true);
+    expect(steps.find((step) => step.verb === "selectOption")).toMatchObject(times9);
     const times = steps
       .filter(
         (step): step is Extract<ExecutorStep, { verb: "selectOption" }> =>
@@ -192,12 +209,32 @@ describe("F4-03 as one executor task (#210)", () => {
       verb: "check",
       target: { role: "radio", label: "Format XML Moodle" },
       checked: true,
+      // F4·07a
+      sentence: "Saya pilih format Moodle XML.",
+      detail: "Naskah Ibu sudah saya ubah jadi berkas Moodle XML.",
+      stage: { n: 4, of: 5 },
     });
     expect(all).toContainEqual({
       verb: "check",
       target: { role: "checkbox", label: "Dapatkan kategori dari berkas" },
       checked: false,
+      stage: { n: 4, of: 5 },
     });
+    // F4·08: the Bank soal menus say what Bank soal is.
+    expect(all.find((step) => step.target.text === "Bank soal")).toMatchObject({
+      sentence: "Ini menu Bank soal, lalu Impor.",
+      detail: "Tempat menyimpan soal sebelum dipakai kuis.",
+      stage: { n: 4, of: 5 },
+    });
+    // Every step Nemu does itself names its stage, in the start card's order; her presses don't.
+    const stages = all
+      .filter((step) => step.verb !== "point")
+      .map((step) => ("stage" in step ? step.stage?.n : undefined));
+    expect(stages.every((n) => n !== undefined)).toBe(true);
+    expect(stages).toEqual([...stages].sort((a, b) => (a ?? 0) - (b ?? 0)));
+    expect(new Set(stages)).toEqual(new Set([1, 2, 4, 5]));
+    expect(all.filter((step) => step.verb === "point").some((step) => "stage" in step)).toBe(false);
+    expect(importStages("IPAS", "Bu")).toHaveLength(5);
     expect(said).toEqual(["Nemu menaruh berkas Latihan IPAS Kelas 4A.xml di sini."]);
     expect(downloads).toEqual([]);
   });
