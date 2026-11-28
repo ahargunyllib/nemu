@@ -2,7 +2,7 @@ import { type NemuDisplay, spokenText } from "@nemu/ui/lib/nemu-display";
 import { NemuStage } from "@nemu/ui/nemu/nemu-stage";
 import { useCallback, useMemo, useState } from "react";
 
-import { MICROPHONE_BLOCKED, pointAtAllow } from "../lib/microphone-messages";
+import { microphoneBlocked, pointAtAllow } from "../lib/microphone-messages";
 import { chromePromptAnchor } from "../lib/permission-prompt";
 
 type MicrophoneDisplayProps = {
@@ -24,7 +24,7 @@ export function MicrophoneDisplay({ phase, honorific, onClose, speak }: Micropho
     () =>
       phase === "asking"
         ? { type: "tunjuk", ...pointAtAllow(honorific) }
-        : { type: "info", ...MICROPHONE_BLOCKED, items: [...MICROPHONE_BLOCKED.items], onClose },
+        : { type: "info", ...microphoneBlocked(honorific), onClose },
     [phase, honorific, onClose],
   );
   const onShown = useCallback((shown: NemuDisplay) => speak(spokenText(shown)), [speak]);

@@ -1,6 +1,21 @@
 import { describe, expect, test } from "vite-plus/test";
 
-import { pointAtAllow } from "./microphone-messages";
+import { microphoneBlocked, pointAtAllow } from "./microphone-messages";
+
+describe("microphoneBlocked", () => {
+  test("says Nemu can't hear her, then three steps that end with reloading the page", () => {
+    expect(microphoneBlocked("Bu")).toEqual({
+      status: { text: "Mikrofon terblokir", tone: "muted" },
+      title: "Nemu belum bisa mendengar Ibu.",
+      detail: "Mikrofon tidak diizinkan. Buka lagi dengan 3 langkah ini:",
+      items: [
+        "Klik ikon di kiri alamat situs",
+        "Pada Mikrofon, pilih Izinkan",
+        "Klik Muat ulang di bagian atas",
+      ],
+    });
+  });
+});
 
 describe("pointAtAllow", () => {
   test("asks her to click Izinkan and names the top one in the detail line", () => {

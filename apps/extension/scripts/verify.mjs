@@ -271,7 +271,7 @@ const setMicrophone = (setting, at = origin) =>
   cdp.send("Browser.setPermission", { permission: { name: "microphone" }, setting, origin: at });
 const pointerOn = (target) => overlay(target).getByRole("region", { name: "Petunjuk Nemu" });
 const stepsOn = (target) =>
-  overlay(target).getByRole("region", { name: "Mikrofon masih diblokir" });
+  overlay(target).getByRole("region", { name: "Nemu belum bisa mendengar Ibu." });
 const pointer = pointerOn(mic);
 const steps = stepsOn(mic);
 
@@ -390,11 +390,14 @@ await micCheck(
     await holdToTalk(mic, 600);
     await steps.waitFor({ timeout: 5_000 });
     expect((await steps.getByRole("listitem").count()) === 3, "the card doesn't show three steps");
-    await steps.getByText("tekan ikon di kiri alamat situs", { exact: false }).waitFor();
-    await steps.getByText("pada Mikrofon, pilih Izinkan", { exact: false }).waitFor();
+    await steps.getByText("Mikrofon terblokir", { exact: true }).waitFor();
     await steps
-      .getByText("Terakhir, muat ulang halaman, lalu tahan lagi tombolnya.", { exact: true })
+      .getByText("Mikrofon tidak diizinkan. Buka lagi dengan 3 langkah ini:", { exact: true })
       .waitFor();
+    await steps.getByText("Klik ikon di kiri alamat situs", { exact: true }).waitFor();
+    await steps.getByText("Pada Mikrofon, pilih Izinkan", { exact: true }).waitFor();
+    // The steps end with reloading, as Chrome's own bar asks after the change (#280).
+    await steps.getByText("Klik Muat ulang di bagian atas", { exact: true }).waitFor();
     const buttons = await steps.getByRole("button").allInnerTexts();
     expect(
       buttons.length === 1 && buttons[0].trim() === "Tutup",
