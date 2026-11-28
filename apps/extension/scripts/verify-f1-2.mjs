@@ -169,12 +169,14 @@ async function sendPhoto() {
 async function upToTheFill() {
   await photoCard.waitFor({ timeout: 15_000 });
   await photoCard.getByRole("button", { name: "Mulai" }).click();
-  await display("jawab")
-    .getByText(/Nilai apa ini, Ibu\?/u)
-    .waitFor({ timeout: 5000 });
+  // #270: "Ini nilai apa, Bu?" offers the photo's title; typing the command instead still works.
+  await display("pilih")
+    .filter({ hasText: "Ini nilai apa, Bu?" })
+    .getByRole("button", { name: "UTS · Matematika · 4B" })
+    .waitFor({ timeout: 15_000 });
   await typeBox.fill("Nemu, masukkan nilai UTS Matematika 4B");
   await typeBox.press("Enter");
-  await display("pilih").waitFor({ timeout: 60_000 });
+  await display("pilih").filter({ hasNotText: "Ini nilai apa" }).waitFor({ timeout: 60_000 });
   let last = "";
   for (let asked = 0; asked < 20;) {
     const card = display("pilih");

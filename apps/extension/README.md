@@ -282,7 +282,7 @@ characters> pnpm dev`, and the same `WA_BOT_SECRET` for the script) and, for the
 read-back, WS-07 connected to the mock (Admin › Integrasi: URL `http://localhost:3003`, key
 `as_uji_sdit_nusantara_2026`). It sends the official F1-1 grade-book photo
 (`packages/ai/src/school/fixtures/f1-1-buku-nilai-4b.jpg`) the way `apps/wa-bot` does and checks:
-the card in one of two tabs only, Mulai and the missing class asked for, the 10 W5 questions (4
+the card in one of two tabs only, Mulai and "Ini nilai apa, Bu?" with the photo's title picked (#270), the 10 W5 questions (4
 doubtful cells, 5 names, 1 S) with their crops, the cara 1 fill of all 32 students with notes,
 Lihat ringkasan beside Simpan, the read-back sentence after the save, the photo gone from the
 inbox, Catatan langkah, and every saved grade right in under 5 minutes. Screenshots go to

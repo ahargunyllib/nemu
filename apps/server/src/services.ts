@@ -78,6 +78,7 @@ function createKeylessSchoolAi(): SchoolAi {
     throw new Error("OPENROUTER_API_KEY is not set; set it or use NEMU_RESPONDER=fixture");
   };
   return {
+    readPhotoTitle: missing,
     readGradePhoto: missing,
     parseGradeExcel: (input) => createFixtureSchoolAi().parseGradeExcel(input),
     explainError: missing,

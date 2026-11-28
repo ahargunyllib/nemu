@@ -1,10 +1,11 @@
 import type {
   GradeEntry,
   InboxJob,
+  PhotoTitleCandidate,
   VerificationAnswer,
   VerificationQuestion,
 } from "@nemu/contracts/school";
-import type { NemuDisplay } from "@nemu/ui/lib/nemu-display";
+import type { KartuPilihProps, NemuDisplay } from "@nemu/ui/lib/nemu-display";
 
 import type { PageEmail } from "../../../shared/lib/messages";
 import type { RunState } from "../../executor/lib/run";
@@ -23,8 +24,9 @@ import type { GradePhotoRequest, GradePhotoValue } from "../lib/requests";
 import { gradesOnPage, watchForSave } from "../lib/saved-page";
 
 /**
- * F1 (#207), from the WhatsApp photo to the read-back: the card in one visible tab, the command
- * ("masukkan nilai UTS Matematika 4B"), the read (≤ 60 s), W5's questions one per card, the
+ * F1 (#207), from the WhatsApp photo to the read-back: the card in one visible tab, "Ini nilai
+ * apa, Bu?" with the photo's title as the choices (#270) or the command ("masukkan nilai UTS
+ * Matematika 4B"), the read (≤ 60 s), W5's questions one per card, the
  * rules, the cara 1 fill by the executor, and after the teacher presses Simpan the read-back,
  * `inboxAck` and Catatan langkah. What must survive a page load (the fill and the wait for the
  * save) is kept per tab in the background.
@@ -48,6 +50,8 @@ export type GradePhotoView = {
 type Phase =
   | { name: "idle" }
   | { name: "notice"; sentence: string; retry?: () => void }
+  | { name: "title" }
+  | { name: "picking"; candidates: PhotoTitleCandidate[] }
   | { name: "command"; question: string }
   | { name: "reading" }
   | { name: "verifying"; index: number; misheard?: boolean }
@@ -84,6 +88,16 @@ function sleep(ms: number) {
 function withAnswered(notes: readonly string[], answered: string): string[] {
   const source = notes[0]?.startsWith("Sumber:") ? 1 : 0;
   return [...notes.slice(0, source), answered, ...notes.slice(source)];
+}
+
+/** The choice for a title the photo shows: "UTS · Matematika · 4B". */
+function titleLabel(candidate: PhotoTitleCandidate) {
+  return [candidate.assessment, candidate.subject, candidate.className].filter(Boolean).join(" · ");
+}
+
+/** The same title as the words she would say, for the command parser: "UTS Matematika 4B". */
+function titleWords(candidate: PhotoTitleCandidate) {
+  return [candidate.assessment, candidate.subject, candidate.className].filter(Boolean).join(" ");
 }
 
 function capitalize(text: string) {
@@ -165,6 +179,35 @@ function createGradePhoto() {
           action: phase.retry ? { label: "Coba lagi", onSelect: phase.retry } : undefined,
           onClose: close,
         };
+      case "title":
+        return {
+          type: "kerja",
+          sentence: "Nemu membaca judul foto…",
+          status: { tone: "working", text: "Nemu membaca foto" },
+          onSlow: () => undefined,
+          onStop: close,
+        };
+      case "picking": {
+        const candidates = phase.candidates;
+        const other = { id: "lain", label: "Nilai lain" };
+        const [first, second] = candidates.map((candidate, index) => ({
+          id: String(index),
+          label: titleLabel(candidate),
+        }));
+        const choices: KartuPilihProps["choices"] = second
+          ? [first!, second, other]
+          : [first!, other];
+        return {
+          type: "pilih",
+          question: pickQuestion(),
+          choices,
+          onChoose: (id) => {
+            const picked = candidates[Number(id)];
+            if (id === other.id || !picked) askCommand();
+            else void command(titleWords(picked));
+          },
+        };
+      }
       case "command":
         return { type: "jawab", sentence: phase.question, onClose: close };
       case "reading":
@@ -245,7 +288,7 @@ function createGradePhoto() {
     view = {
       display: displayFor(),
       card: cardFor(),
-      typing: phase.name === "command" || phase.name === "number",
+      typing: ["picking", "command", "number"].includes(phase.name),
     };
     for (const listener of listeners) listener();
   }
@@ -283,6 +326,10 @@ function createGradePhoto() {
 
   // --- The flow ---------------------------------------------------------------------------------
 
+  function pickQuestion() {
+    return `Ini nilai apa, ${context.honorific || address()}?`;
+  }
+
   async function start(offered: InboxJob) {
     job = offered;
     answers = [];
@@ -290,13 +337,31 @@ function createGradePhoto() {
     void call({ op: "hold", jobId: offered.jobId });
     if (target) return process();
     utterance = "";
+    // #270: the photo's title gives the choices; a title Nemu can't read falls back to asking.
+    const run = generation;
+    setPhase({ name: "title" });
+    const response = await call({ op: "title", jobId: offered.jobId });
+    if (run !== generation) return;
+    const candidates = response.ok
+      ? (response.value as GradePhotoValue["title"]).candidates.slice(0, 2)
+      : [];
+    if (candidates.length === 0) return askCommand();
+    setPhase({ name: "picking", candidates }, pickQuestion());
+  }
+
+  /** "Nilai apa ini, Ibu?": she says or types what the grades are. */
+  function askCommand() {
+    utterance = "";
     const question = `Foto buku nilai sudah masuk. Nilai apa ini, ${address()}? Misalnya “UTS Matematika 4B”.`;
     setPhase({ name: "command", question }, question);
   }
 
-  /** "masukkan nilai UTS Matematika 4B", typed, spoken, or the answer to Nemu's question. */
+  /**
+   * "masukkan nilai UTS Matematika 4B", typed, spoken, picked from the photo's title, or the answer
+   * to Nemu's question.
+   */
   async function command(words: string) {
-    if (!["idle", "notice", "command"].includes(phase.name)) return;
+    if (!["idle", "notice", "picking", "command"].includes(phase.name)) return;
     const asked = phase.name === "command";
     utterance = asked ? `${utterance} ${words}`.trim() : words;
     const run = generation;
@@ -612,6 +677,7 @@ function createGradePhoto() {
      */
     hear(text: string): boolean {
       switch (phase.name) {
+        case "picking":
         case "command":
           void command(text);
           return true;

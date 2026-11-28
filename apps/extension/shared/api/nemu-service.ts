@@ -20,6 +20,7 @@ import type {
   GroundedAnswer,
   HelpExplanation,
   InboxJob,
+  PhotoTitle,
   PageSnapshot,
   ReadbackResult,
   ReadbackRow,
@@ -54,6 +55,8 @@ export type NemuServiceClient = {
   actionLogRecord: Call<{ entries: ActionLogEntry[] }, { recorded: number }>;
   // F1 (#207): the WhatsApp photo, its verification, the rules, and the read-back.
   inboxJobs: Call<undefined, InboxJob[]>;
+  /** #269: the photo's heading as choices for "Ini nilai apa, Bu?" (#270). */
+  inboxReadTitle: Call<{ jobId: string }, PhotoTitle>;
   inboxProcess: Call<{ jobId: string; className: string; assessment: string | null }, InboxJob>;
   inboxPhoto: Call<{ jobId: string }, Blob>;
   inboxAck: Call<{ jobId: string }, { deleted: boolean }>;

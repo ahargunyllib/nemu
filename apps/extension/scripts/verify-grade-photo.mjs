@@ -1,7 +1,7 @@
 // F1-1 on the mock AlurSekolah (#207): loads a development build of the extension into
 // Playwright's Chromium, sends the official F1-1 grade-book photo the way apps/wa-bot does, and walks
-// the whole flow as Bu Siti: the card in one tab only, Mulai, the command with the missing class
-// asked for, W5's questions (by button, and once by "Angka lain" and typing), the cara 1 fill with
+// the whole flow as Bu Siti: the card in one tab only, Mulai, "Ini nilai apa, Bu?" with the
+// photo's title as the choice (#270), W5's questions (by button, and once by "Angka lain" and typing), the cara 1 fill with
 // visible navigation, Simpan pressed by the "teacher", the read-back, inboxAck, Catatan langkah.
 // It checks every saved grade against the page's truth (0 wrong) and the time (≤ 5 minutes).
 //
@@ -195,18 +195,20 @@ const typeBox = overlay.getByRole("textbox");
 const started = Date.now();
 
 await check(
-  "Mulai asks what the grades are; a missing class is asked for, then the photo is read",
+  "Mulai asks Ini nilai apa, Bu? with the photo's title; picking it reads the photo (#270)",
   async () => {
     await cardIn(page).getByRole("button", { name: "Mulai" }).click();
-    await display("jawab")
-      .getByText(/Nilai apa ini, Ibu\?/u)
-      .waitFor({ timeout: 5000 });
-    await typeBox.fill("Nemu, masukkan nilai UTS Matematika");
-    await typeBox.press("Enter");
-    await display("jawab").getByText("Nilai kelas berapa, Bu?").waitFor({ timeout: 5000 });
-    await typeBox.fill("4B");
-    await typeBox.press("Enter");
-    await display("pilih").waitFor({ timeout: 60_000 });
+    const pick = display("pilih").filter({ hasText: "Ini nilai apa, Bu?" });
+    await pick.waitFor({ timeout: 15_000 });
+    const labels = await pick.getByRole("group").getByRole("button").allTextContents();
+    expect(
+      JSON.stringify(labels) === JSON.stringify(["UTS · Matematika · 4B", "Nilai lain"]),
+      `choices: ${labels.join(", ")}`,
+    );
+    expect(await typeBox.isVisible(), "no type box under the Kartu Pilih");
+    await page.screenshot({ path: join(shots, "pilih-judul.png") });
+    await pick.getByRole("button", { name: "UTS · Matematika · 4B" }).click();
+    await display("pilih").filter({ hasNotText: "Ini nilai apa" }).waitFor({ timeout: 60_000 });
   },
 );
 

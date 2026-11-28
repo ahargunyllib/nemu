@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vite-plus/test";
 
 import { createMemoryFileStore } from "../../testing/school";
 import { createDemoSchoolDirectory } from "../school/directory";
-import { ackJob, enqueuePhoto, listJobs, processJob, teacherForSender } from "./service";
+import { ackJob, enqueuePhoto, listJobs, processJob, readTitle, teacherForSender } from "./service";
 
 const JPEG = new Uint8Array([0xff, 0xd8, 0xff, 0xda, 0x00, 0x02, 0x01, 0xff, 0xd9]);
 
@@ -136,6 +136,39 @@ describe("photo inbox", () => {
     expect(job).toMatchObject({
       status: "failed",
       message: "Daftar siswa kelas 6A belum ada di Nemu.",
+    });
+  });
+
+  it("reads the photo's title for Ini nilai apa, Bu? before the full read (#269, #270)", async () => {
+    const store = createMemoryFileStore();
+    const queued = await enqueuePhoto(
+      { store },
+      { teacherId: "siti", source: "whatsapp", bytes: JPEG },
+    );
+    const jobId = queued.status === "queued" ? queued.job.jobId : "";
+    const deps = { store, ai: createFixtureSchoolAi() };
+    // Offline, every photo reads as the official F1-1 page: "Daftar Nilai UTS Matematika - Kelas 4B".
+    expect(await readTitle(deps, { teacherId: "siti", jobId })).toEqual({
+      candidates: [{ assessment: "UTS", subject: "Matematika", className: "4B" }],
+    });
+    // The title read leaves the job as it was, for the full read.
+    expect(await listJobs({ store }, "siti")).toMatchObject([{ jobId, status: "queued" }]);
+    expect(await readTitle(deps, { teacherId: "other", jobId })).toBeNull();
+  });
+
+  it("a title the model can't read gives no choices, so Nemu asks instead", async () => {
+    const store = createMemoryFileStore();
+    const queued = await enqueuePhoto(
+      { store },
+      { teacherId: "siti", source: "upload", bytes: JPEG },
+    );
+    const jobId = queued.status === "queued" ? queued.job.jobId : "";
+    const ai = { ...createFixtureSchoolAi(), readPhotoTitle: vi.fn(async () => []) };
+    expect(await readTitle({ store, ai }, { teacherId: "siti", jobId })).toEqual({
+      candidates: [],
+    });
+    expect(ai.readPhotoTitle).toHaveBeenCalledWith({
+      image: expect.objectContaining({ type: "image" }),
     });
   });
 });

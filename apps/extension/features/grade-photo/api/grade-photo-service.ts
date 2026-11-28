@@ -63,6 +63,8 @@ async function answer(
       await saveClaims(claimed.claims);
       return claimed.mine;
     }
+    case "title":
+      return client.inboxReadTitle({ jobId: request.jobId });
     case "command":
       return client.gradesParseCommand({ utterance: request.utterance });
     case "process":

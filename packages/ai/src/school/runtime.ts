@@ -7,6 +7,7 @@ import type {
 import type {
   GroundedAnswer,
   HelpExplanation,
+  PhotoTitleCandidate,
   Procedure,
   SpeechSynthesis,
   Transcript,
@@ -28,7 +29,7 @@ import {
 } from "./bpmn/form-photo.js";
 import type { ProcessGraph } from "./bpmn/graph.js";
 import { extractSlots, resolveWeekday, slotSpecs, type ExtractSlotsInput } from "./bpmn/plan.js";
-import { F1_READ_A, F1_READ_B, F1_REREAD } from "./fixtures/f1-photo.js";
+import { F1_READ_A, F1_READ_B, F1_REREAD, F1_TITLE } from "./fixtures/f1-photo.js";
 import { F4_2_READING, F4_2_SCRIPT_SHA256 } from "./fixtures/f4-2-script.js";
 import { F2_1_SPP_INDEX, F2_1_SPP_PHRASING, isF21Spp } from "./fixtures/f2-1-spp.js";
 import { fixtureFormPhoto } from "./fixtures/form-photo.js";
@@ -44,7 +45,12 @@ import {
 } from "./grades/reading.js";
 import { answerGrounded, verifyGroundedAnswer, type AnswerGroundedInput } from "./grounding.js";
 import { explainError, type ExplainErrorInput } from "./help.js";
-import { createOpenRouterJsonCaller, type JsonCall, type JsonCallRequest } from "./llm.js";
+import {
+  createOpenRouterJsonCaller,
+  type JsonCall,
+  type JsonCallRequest,
+  type LlmContent,
+} from "./llm.js";
 import {
   documentationSymptoms,
   draftPhrasing,
@@ -77,6 +83,12 @@ import {
  * tests and `NEMU_RESPONDER=fixture` use `createFixtureSchoolAi`, which never touches the network.
  */
 export type SchoolAi = {
+  /**
+   * #269: the grade-book photo's heading ("UTS Matematika 4B") as up to 3 candidates, most likely
+   * first, read before the full read so the extension can ask "Ini nilai apa, Bu?" (#270). Empty
+   * when the heading can't be read; the teacher then says or types it.
+   */
+  readPhotoTitle(input: { image: LlmContent }): Promise<PhotoTitleCandidate[]>;
   readGradePhoto(input: ReadGradePhotoInput): Promise<ReadGradePhotoResult>;
   parseGradeExcel(input: ParseGradeExcelInput): Promise<ParseGradeExcelResult>;
   explainError(input: ExplainErrorInput): Promise<HelpExplanation>;
@@ -168,6 +180,9 @@ export function createSchoolAi(config: SchoolAiConfig): SchoolAi {
       });
 
   return {
+    // #269 (AI) reads the heading with a model. Until it lands, no title is read and the
+    // extension asks her to say or type what the grades are, as before.
+    readPhotoTitle: async () => [],
     readGradePhoto: (input) => readGradePhoto(readers, input),
     parseGradeExcel: (input) => parseGradeExcel({ mapHeaders: text }, input),
     explainError: (input) => explainError({ llm: text }, input),
@@ -221,6 +236,7 @@ export function createFixtureSchoolAi(): SchoolAi {
   };
 
   return {
+    readPhotoTitle: async () => F1_TITLE.map((candidate) => ({ ...candidate })),
     readGradePhoto: (input) => readGradePhoto(photoReaders, input),
     parseGradeExcel: (input) => parseGradeExcel({}, input),
 

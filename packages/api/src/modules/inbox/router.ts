@@ -2,7 +2,15 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 
 import { schoolProcedure } from "../../index";
-import { MAX_PHOTO_BYTES, ackJob, enqueuePhoto, jobPhoto, listJobs, processJob } from "./service";
+import {
+  MAX_PHOTO_BYTES,
+  ackJob,
+  enqueuePhoto,
+  jobPhoto,
+  listJobs,
+  processJob,
+  readTitle,
+} from "./service";
 
 const jobIdSchema = z.object({ jobId: z.string().min(1).max(80) });
 
@@ -39,6 +47,20 @@ export const inboxRouter = {
   inboxJobs: schoolProcedure.handler(async ({ context }) => {
     const teacher = await context.caller.requireTeacher();
     return listJobs({ store: context.school.inbox }, teacher.teacherId);
+  }),
+
+  /**
+   * #269: the photo's heading as up to 3 {assessment, subject, className} candidates, for the
+   * extension's "Ini nilai apa, Bu?" (#270). Empty when the heading can't be read.
+   */
+  inboxReadTitle: schoolProcedure.input(jobIdSchema).handler(async ({ context, input }) => {
+    const teacher = await context.caller.requireTeacher();
+    const title = await readTitle(
+      { store: context.school.inbox, ai: context.school.ai },
+      { teacherId: teacher.teacherId, jobId: input.jobId },
+    );
+    if (!title) throw new ORPCError("NOT_FOUND", { message: "Photo job not found" });
+    return title;
   }),
 
   /** Reads the photo into a GradeSheetReading plus the verification questions (≤ 60 s). */
