@@ -45,6 +45,8 @@ export const quizProblemSchema = z
     /** The question it is about, or null for the whole quiz. */
     slot: z.number().int().positive().nullable(),
     sentence: z.string().min(1).max(300),
+    /** What Kenapa? reads: what Nemu saw that makes it a problem, when it can say more. */
+    why: z.string().min(1).max(300).optional(),
   })
   .strict();
 
